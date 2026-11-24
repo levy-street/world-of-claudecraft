@@ -899,7 +899,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // All five referral rewards now own paintings; only the retired Phoenix remains pending.
     // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
     // + the sprite buddy's whistle (whistle_sprites): 2,214.
-    expect(Object.keys(ITEMS)).toHaveLength(2221);
+    // + the Quartered Isle's two Moot Rolls quest objects (quartered-isle-moot-rolls-icons-2026-11-19): 2,223.
+    expect(Object.keys(ITEMS)).toHaveLength(2223);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1134,12 +1135,14 @@ describe('item-art consistency accepted-art provenance', () => {
     // Icon backlog adds 135 Season 2 armour icons, five referral icons, the Horse Whistle, and Nightwing Chimaera.
     // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,183.
     // + the sprite buddy's whistle: 2,184 owners / 2,214 items.
-    expect(new Set(currentOwnerIds).size).toBe(2191);
-    expect(shippingIds).toHaveLength(2191);
+    // + the Quartered Isle's two Moot Rolls quest objects (quartered-isle-moot-rolls-icons-2026-11-19): 2,193 owners.
+    expect(new Set(currentOwnerIds).size).toBe(2193);
+    expect(shippingIds).toHaveLength(2193);
     // The restored legacy whistle and charm definitions add 36 item ids.
     // All five referral rewards now own paintings; only the retired Phoenix remains pending.
     // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
-    expect(Object.keys(ITEMS)).toHaveLength(2221);
+    // + the Quartered Isle's two Moot Rolls quest objects (quartered-isle-moot-rolls-icons-2026-11-19): 2,223.
+    expect(Object.keys(ITEMS)).toHaveLength(2223);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1423,6 +1426,8 @@ describe('item-art consistency accepted-art provenance', () => {
               'gourdlight-eve-sheaf-icon-2026-10-18',
               'gourdlight-eve-daily-icons-2026-10-18',
               'gourdlight-eve-toy-icons-2026-10-18',
+              // the Quartered Isle's Moot Rolls quest objects (gpt-image-2 paintings)
+              'quartered-isle-moot-rolls-icons-2026-11-19',
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1610,7 +1615,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // The membership weapon batch (membership-weapon-2026-10-14, PR 4281): 60.
     // Backlog replacements consolidate old owners into a net 21 additional batches; Lantern
     // Hall's seal and its horse's reins add two: 83.
-    expect(mapping.generatedBatches).toHaveLength(90);
+    // 91 with the Quartered Isle's two Moot Rolls quest objects (quartered-isle-moot-rolls-icons-2026-11-19).
+    expect(mapping.generatedBatches).toHaveLength(91);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1689,7 +1695,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // Staff of Changing batch (PR 4281) adds one: 1510.
     // Backlog adds 141 files; replacements preserve the remaining owner count.
     // + the sprite buddy's whistle render (buddy-whistle-icons batch): 1,652.
-    expect(priorGeneratedIds).toHaveLength(1657);
+    // + the Quartered Isle's two Moot Rolls quest objects: 1,659.
+    expect(priorGeneratedIds).toHaveLength(1659);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
@@ -1698,8 +1705,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005 + Nightwing Chimaera mount: 2182.
     // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount) adds one ordinary entry: 2,183.
     // + the sprite buddy's whistle render: 2,184.
-    expect(allCurrentOwnerIds).toHaveLength(2191);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2191);
+    expect(allCurrentOwnerIds).toHaveLength(2193);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2193);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1722,7 +1729,7 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
       // Plus 34 restored buddy provenance owners, and the membership staff: 1510.
       // Restored feral staff and eight Season 2 jewelry paintings.
-      priorGenerated: 1657,
+      priorGenerated: 1659,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1872,6 +1879,9 @@ describe('item-art consistency accepted-art provenance', () => {
         'barrowstone_heart',
         'muster_grapnel',
         'craterglass_stave',
+        // The Quartered Isle's Moot Rolls quest objects (quartered-isle-moot-rolls-icons-2026-11-19).
+        'council_inscription',
+        'colossus_makers_mark',
       ]),
       'the dated catalog plus the release batches, the Field Kit, the OSSBrain reins icons, and the Mirefen world-boss spoils is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
@@ -2009,9 +2019,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
     // Wobbles the Slime's reins: 2,183.
-    if (ownerIds.length !== 2191)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2191`);
-    if (fileIds.length !== 2191) violations.push(`shipping WebP count: ${fileIds.length} != 2191`);
+    if (ownerIds.length !== 2193)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2193`);
+    if (fileIds.length !== 2193) violations.push(`shipping WebP count: ${fileIds.length} != 2193`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

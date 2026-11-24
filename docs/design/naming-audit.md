@@ -1083,6 +1083,24 @@ the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild Wars 2).
 | the Gourdsworn | the title of Gourdlight Eve's whole-event meta deed (`feat_gourdlight_eve_complete`, round 12) | KEEP. Quoted exact-phrase searches for "Gourdsworn" and "the Gourdsworn", plus a coined-token search scoped to Wowhead, warcraft.wiki.gg, the RuneScape and OSRS wikis, the FFXIV wiki, the GW2 wiki, UESP, the PoE wiki and the Diablo wiki, returned no hit in any game. The nearest results were different tokens: WoW's "Death Foursworn" achievement, GW2's "Bladesworn" specialization, ESL's "Guildsworn" card and the unrelated games "Godsworn", "Crowsworn" and "Ironsworn". WoW's Hallow's End title is "the Hallowed", a different word; "-sworn" is a shared English suffix. |
 | Gourdlight, Start to Finish / Every Doorstep / At Hester's Beck and Call / Three Towns Startled | the round 12 whole-event meta and its three section Feats | KEEP. Plain English phrases built on this event's own names (Gourdlight, Hester); no coined token beyond those already audited above. |
 
+### The Quartered Isle's mobs, townsfolk and quests (web-checked 2026-11-23)
+
+The isle's mobs (`src/sim/content/quartered_isle_mobs.ts`), Rivalmoot's townsfolk and the
+Moot Rolls line (`src/sim/content/quartered_isle_story.ts`). Exact-phrase web searches and the
+coined tokens alone, plus site checks on the Warcraft Wiki, Wowhead, UESP, the RuneScape
+Wiki, the Guild Wars 2 Wiki and poedb.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Quench Shardling, Heaved Shardling | two elemental mobs | RENAMED before shipping to Quench Splinter and Heaved Splinter (ids `quench_shardling`, `heaved_shardling` unchanged). "Shardling" is a recurring World of Warcraft mob family for small crystal and stone creatures (Crystalline Shardling, Raging Shardling, Theradrim Shardling, Void Shardling), and the Raging Shardlings split off a Raging Colossus, close to this isle's Colossus line. Neither "Quench Splinter" nor "Heaved Splinter" has any hit; "splinter" alone is plain English (WoW's Ancient Splinter and Warp Splinter use it as an ordinary word). The Japanese fills move off the katakana of "shardling" and the Russian fills off the coined diminutive. |
+| Heatsworn Ember, Veinback Burrower, The Glassfield Brute, Cinderscar Caller, Warden of the Quench, Rimeglass Bear, Remnant of the First Colossus | the other named mobs | KEEP. No game hit for any full name or for the coined tokens Heatsworn, Veinback and Glassfield. |
+| Ember Hound | a mob | KEEP. Plain English; the nearest uses are longer names (Path of Exile's Farric Ember Hound) or other words (WoW's Ember Worg, Blazing Hound). |
+| Burnway Flare | the Cinderscar Caller's spell | KEEP. No hit. "Cinder Bolt" was considered and dropped: it is an EverQuest spell. |
+| Bettany Quell, Harl Bracken, Keeper Ansel Morrow, Captain Thessaly | Rivalmoot's townsfolk | KEEP. No full-name hit; Thessaly is a real place name used by no game character. |
+| Keeper of the Moot Rolls, The Moot Rolls | the history line and its keeper | KEEP. Only real medieval hallmoot court rolls turn up. |
+| Servants at Their Posts, Wardens of the Arts, Words in the Stone, The First Colossus, Council Inscription | quests and a quest object | KEEP. No hit as a game proper noun; plain English. |
+| The Fallen Giant | a landmark and its quest | KEEP. Used loosely elsewhere (a Final Fantasy XVI hunt mark, a Dungeons and Dragons Online boss, a Tower Defense Simulator enemy), shared English and not distinctive to any one game. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

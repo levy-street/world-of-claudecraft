@@ -42,7 +42,8 @@ describe('hoard valley visual plan', () => {
 
   it('preserves original valley identities and supports every dig-site biome', () => {
     expect([...HOARD_VALLEY_ZONE_IDS].sort()).toEqual([...VAULT_ZONE_IDS].sort());
-    expect(HOARD_VALLEY_ZONE_IDS).toHaveLength(14);
+    // the Quartered Isle's dig sites made it the fifteenth vault zone
+    expect(HOARD_VALLEY_ZONE_IDS).toHaveLength(15);
     const originalZones = HOARD_VALLEY_ZONE_IDS.slice(0, 8);
     expect(new Set(originalZones.map((id) => hoardValleyProfile(id).biome)).size).toBe(8);
     expect(new Set(originalZones.map((id) => hoardValleyProfile(id).ground)).size).toBe(8);
@@ -55,8 +56,9 @@ describe('hoard valley visual plan', () => {
         'veiled_hollow',
         'evergarden',
         'farshore_isle',
+        'quartered_isle',
       ].map((id) => hoardValleyProfile(id as (typeof HOARD_VALLEY_ZONE_IDS)[number]).biome),
-    ).toEqual(['vale', 'marsh', 'peaks', 'dusk', 'garden', 'vale']);
+    ).toEqual(['vale', 'marsh', 'peaks', 'dusk', 'garden', 'vale', 'quartered']);
     for (const id of HOARD_VALLEY_ZONE_IDS) {
       const profile = hoardValleyProfile(id);
       expect(profile.fogNear).toBeGreaterThan(60);

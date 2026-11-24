@@ -83,6 +83,15 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
     chop: 1.45,
     foam: 1.7,
   },
+  // The Quartered Isle: a cold, storm-chopped channel between the Frostveil
+  // and the Drakelands, clear grey-teal with whitecaps off the Gyre.
+  quartered: {
+    deep: 0x0e3448,
+    shallow: 0x3a8e98,
+    absorb: [0.48, 0.12, 0.08],
+    chop: 1.1,
+    foam: 1.2,
+  },
   jungle: TROPICAL,
   garden: {
     deep: 0x0e465a,

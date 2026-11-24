@@ -905,8 +905,12 @@ export async function prepareDungeonCharacterBodies(interior: string): Promise<v
  *  fits are resident from entry (woc_entry_preload.ts). A fetch that fails does
  *  not end the wait: the file is asked for again after its cooldown, by itself
  *  (armCharacterRetry), and its landing fires the ready signal like any other,
- *  so a host may ask once or every frame. */
-export function visualAssetsResident(key: string, fetch = true): boolean {
+ *  so a host may ask once or every frame. `paced`: a SPECULATIVE asker (the zone
+ *  prewarm) leaves alone every body a paced lane still holds (RiftBodyLanes.holds),
+ *  so it never fetches around the lane's one-at-a-time pump; it waits for the
+ *  lane's fetch to land (onCharacterAssetReady) instead. The file still counts as
+ *  awaited, so a lane fetch that fails is asked for again (armCharacterRetry). */
+export function visualAssetsResident(key: string, fetch = true, paced = false): boolean {
   const def = VISUALS[key];
   if (!def) return false;
   // a WOC body's head core streams beside its base (never gating the build)
@@ -916,7 +920,9 @@ export function visualAssetsResident(key: string, fetch = true): boolean {
     if (characterAssetResident(url)) continue;
     resident = false;
     if (!fetch || !(streamedUrlSet.has(url) || lazyOnDemandUrls.has(url))) continue;
+    // awaited either way: a lane fetch that fails is asked for again after its cooldown
     hostAwaitedUrls.add(url);
+    if (paced && riftLanes.holds(url)) continue;
     if (!characterRetryArmed.has(url)) ensureCharacterUrl(url);
   }
   return resident;
@@ -1027,8 +1033,8 @@ export function startStreamedCharacterPreloads(): number {
   return postEntryStreamUrls.length;
 }
 
-// The Rift-only bodies ride their own paced lanes (rift_body_stream_core.ts has
-// the class, the pacing and the trigger); every other profile's lanes are empty.
+// The Rift-only bodies, and on iOS the Quartered Isle's, ride their own paced lanes
+// (rift_body_stream_core.ts has the class, the pacing and the trigger).
 const riftLanes = new RiftBodyLanes({
   fetch: prepareCharacterUrl,
   postEntryStarted: () => streamedStarted,
@@ -1036,7 +1042,7 @@ const riftLanes = new RiftBodyLanes({
     console.info(`[entry-guard] streaming ${count} ${lane} character assets`);
   },
 });
-riftLanes.setUrls(initialStreamPlan.rift, initialStreamPlan.hoard);
+riftLanes.setUrls(initialStreamPlan.rift, initialStreamPlan.hoard, initialStreamPlan.isle);
 const riftTrigger = new RiftBodyStreamTrigger(riftLanes);
 
 /**
@@ -1124,7 +1130,7 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
   streamedUrls = nextStreamedUrls;
   streamedUrlSet = nextStreamedSet;
   postEntryStreamUrls = nextPlan.postEntry;
-  riftLanes.setUrls(nextPlan.rift, nextPlan.hoard);
+  riftLanes.setUrls(nextPlan.rift, nextPlan.hoard, nextPlan.isle);
   // A preset change can move the tier the crowd draws: once the world is up the prefetch
   // plans again for the new profile (never on the launcher, where it has not started).
   if (wocCrowdPrefetchStarted()) startWocCrowdPrefetch(target, prefetchUnderArmorAtlas);

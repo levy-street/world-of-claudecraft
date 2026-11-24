@@ -1,8 +1,9 @@
 import type { Collider } from './colliders';
 import { TRANSPORT_SHIP_HULLS } from './content/transport_ships';
+import { decorSeat } from './decor_seat';
 import { shipHullColliders } from './transport_ship';
 import type { WorldContent } from './types';
-import { groundHeight, WATER_LEVEL } from './world';
+import { groundHeight, terrainHeight, WATER_LEVEL } from './world';
 
 type DecorProp = NonNullable<WorldContent['props']['decorProps']>[number];
 
@@ -33,11 +34,15 @@ function topY(seed: number, x: number, z: number, height: number): number {
  */
 export function buildDecorPropColliders(seed: number, decorProps: DecorProp[]): Collider[] {
   const out: Collider[] = [];
+  const heightAt = (x: number, z: number): number => terrainHeight(x, z, seed);
   for (const d of decorProps) {
-    const cameraTopY = topY(seed, d.x, d.z, d.h ?? 4);
+    // a `seat: 'footprint'` row is drawn sunk onto its footprint (decor_seat.ts); its
+    // collider top and standable top sink with it, so neither stands above the art
+    const sink = d.seat === 'footprint' ? decorSeat(d, heightAt).sink : 0;
+    const cameraTopY = topY(seed, d.x, d.z, d.h ?? 4) - sink;
     const supportBaseY =
       d.float === undefined
-        ? groundHeight(d.x, d.z, seed)
+        ? groundHeight(d.x, d.z, seed) - sink
         : Math.max(groundHeight(d.x, d.z, seed), WATER_LEVEL - d.float);
     // own keys only: a key like 'constructor' must never reach the hull path
     const hull = Object.hasOwn(TRANSPORT_SHIP_HULLS, d.key)
@@ -49,10 +54,14 @@ export function buildDecorPropColliders(seed: number, decorProps: DecorProp[]): 
       );
       continue;
     }
+    // standable: a top to land on; clearAbove: a finite height with nothing to stand on (the
+    // campfire's semantic, a body above it passes over)
     const stand =
-      d.standableTop === undefined
-        ? {}
-        : { moveTopY: supportBaseY + d.standableTop, standable: true as const };
+      d.standableTop !== undefined
+        ? { moveTopY: supportBaseY + d.standableTop, standable: true as const }
+        : d.clearAbove !== undefined
+          ? { moveTopY: supportBaseY + d.clearAbove }
+          : {};
     if (d.hw !== undefined && d.hd !== undefined) {
       out.push({
         type: 'obb',

@@ -881,6 +881,9 @@ describe('Eastbrook authored gameplay data integration', () => {
       // at (-300, 50) offset (-6, 6)), the one authored row carrying a
       // facing (rotated to face the camp ground).
       { x: -306, z: 56, facing: Math.PI },
+      // Rivalmoot's, on the Quartered Isle: appended last under a stable
+      // entity id, so no shipped mailbox's id moves
+      { x: 5, z: 2242, entityId: 2_000_000_017 },
     ]);
     // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md): the spawn moved to the

@@ -8,6 +8,7 @@
 // and on any slope one edge lifts clear of the dirt and the whole plant
 // reads as floating. Pure leaf: deterministic, memoized, no SimContext.
 
+import { isClaimedFrom, ZONES } from './data';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -42,7 +43,15 @@ const WYRMWATCH_CHURCHYARD = { x: 384, z: 1877, r: 20 } as const;
 
 /** Shared scatter clearance: roads, the hub, dens, and the whole modeled
  *  lava network (pools, basins, river banks along the real meander). */
+/** True where another zone claims this ground out of the Drakelands' rect
+ *  (the Quartered Isle's east shore): no ember scatter grows on it. */
+function claimedFromDrakelands(x: number, z: number): boolean {
+  const drakelands = ZONES.find((zone) => zone.id === 'drakelands');
+  return drakelands !== undefined && isClaimedFrom(drakelands, x, z);
+}
+
 export function emberScatterClear(x: number, z: number): boolean {
+  if (claimedFromDrakelands(x, z)) return false;
   if (roadDistance(x, z) < 6) return false;
   if (Math.hypot(x - WYRMWATCH.x, z - WYRMWATCH.z) < WYRMWATCH.r) return false;
   if (Math.hypot(x - WYRMWATCH_CHURCHYARD.x, z - WYRMWATCH_CHURCHYARD.z) < WYRMWATCH_CHURCHYARD.r)

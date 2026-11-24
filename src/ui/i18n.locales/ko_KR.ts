@@ -6673,6 +6673,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmfang_greatblade.name': '고룡송곳니 대검',
   'entities.items.staff_of_the_gravewyrm.name': '무덤고룡의 지팡이',
   'entities.items.fang_of_korzul.name': '코르줄의 송곳니',
+  'entities.items.council_inscription.name': '평의회 비문',
+  'entities.items.colossus_makers_mark.name': '거상 제작자의 표식',
   'entities.items.trail_hardtack.name': '하이워치 여정 건빵',
   'entities.items.meltwater_flask.name': '눈녹은 물 플라스크',
   'entities.items.roast_mountain_goat.name': '구운 산양',
@@ -7703,6 +7705,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': '난파선 벌판',
   'entities.zones.galecrest.pois.6.label': '거울 호수',
   'entities.zones.galecrest.pois.7.label': '게일크레스트 마구간',
+  'entities.zones.quartered_isle.name': '사분섬',
+  'entities.zones.quartered_isle.welcome':
+    '오랜 경쟁이 이 섬을 넷으로 산산이 부쉈다. 라이벌무트는 회오리 봉우리 기슭, 전쟁이 벌어졌던 분화구 위에 자리 잡고 있다.',
+  'entities.zones.quartered_isle.pois.0.label': '라이벌무트',
+  'entities.zones.quartered_isle.pois.1.label': '도전자의 투기장',
+  'entities.zones.quartered_isle.pois.2.label': '서리다리',
+  'entities.zones.quartered_isle.pois.3.label': '서리 빙붕',
+  'entities.zones.quartered_isle.pois.4.label': '잿빛 상흔',
+  'entities.zones.quartered_isle.pois.5.label': '융기석 황야',
+  'entities.zones.quartered_isle.pois.6.label': '회오리 봉우리',
+  'entities.zones.quartered_isle.pois.7.label': '화빙 균열',
+  'entities.zones.quartered_isle.pois.8.label': '크레바스 지대',
+  'entities.zones.quartered_isle.pois.9.label': '서리유리 호수',
+  'entities.zones.quartered_isle.pois.10.label': '불길 수로',
+  'entities.zones.quartered_isle.pois.11.label': '유리 들판',
+  'entities.zones.quartered_isle.pois.12.label': '망치의 협곡',
+  'entities.zones.quartered_isle.pois.13.label': '솟구친 바위판',
+  'entities.zones.quartered_isle.pois.14.label': '쓰러진 거인',
   'entities.npcs.warden_coalfast.name': '숯불 워든',
   'entities.npcs.warden_coalfast.title': '보루 지휘관',
   'entities.npcs.warden_coalfast.greeting':
@@ -7749,6 +7769,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': '돌풍 정령',
   'entities.mobs.shoal_scuttler.name': '여울 게',
   'entities.mobs.the_wreck_warden.name': '난파선 감시자',
+  'entities.mobs.remnant_first_colossus.name': '최초의 거상 잔해',
+  'entities.mobs.quench_shardling.name': '담금질 파편체',
+  'entities.mobs.rimeglass_bear.name': '서리유리 곰',
+  'entities.mobs.warden_of_the_quench.name': '담금질의 감시자',
+  'entities.mobs.heatsworn_ember.name': '열서약 불씨',
+  'entities.mobs.cinderscar_caller.name': '잿빛 상흔 소환사',
+  'entities.mobs.ember_hound.name': '불씨 사냥개',
+  'entities.mobs.the_glassfield_brute.name': '유리 들판의 난폭자',
+  'entities.mobs.heaved_shardling.name': '솟구친 파편체',
+  'entities.mobs.veinback_burrower.name': '광맥등 굴착자',
   'entities.mobs.downs_bandit.name': '구릉 도적',
   'entities.mobs.wreck_thief.name': '난파선 도둑',
   'entities.mobs.glimmerwisp.name': '미광 위습',
@@ -8364,6 +8394,45 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '그것이 쓰러지는 순간 백사장이 침묵했다네, {playerName}. 이 물가에서 십 년을 일하며 처음 듣는 침묵이었지. 선원들은 이제 그저 뼈일 뿐이야. 쉬고 있는 뼈지. 보물 더미 맨 위의 어깨덮개를 가져가게. 어차피 산 사람의 등에 더 잘 맞을 물건이었으니.',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': '난파선 감시자 처치',
+  'entities.quests.q_qi_the_moot_rolls.title': '무트 명부',
+  'entities.quests.q_qi_the_moot_rolls.text':
+    '라이벌무트에는 평의회에 도전하러 온 모든 도전자의 명부가 있다네, {playerName}. 그런데 왜 평의회가 도전할 가치가 있는지는 한 줄도 없지. 나는 그 역사를 쓸 생각이야. 먼저 회관 옆의 대장 테살리를 찾아가게. 그녀의 도전자들은 이 섬의 모든 구역을 누볐고, 병사는 학자가 놓치는 것을 기억하는 법이지.',
+  'entities.quests.q_qi_the_moot_rolls.completion':
+    '앤설이 보냈다고요? 그럼 마침내 제대로 된 사람들에게 묻는군요. 내 도전자들은 모든 구역에서 이 마을보다 오래된, 글이 새겨진 돌을 찾아냈지만 여기서는 아무도 읽지 못합니다. 그 말을 그에게 전해 주십시오.',
+  'entities.quests.q_qi_the_moot_rolls.objectives.0.label': '대장 테살리와 대화',
+  'entities.quests.q_qi_words_in_stone.title': '돌에 새긴 말',
+  'entities.quests.q_qi_words_in_stone.text':
+    '테살리가 말한 돌들은 평의회가 직접 남긴 비문이야, {playerName}. 내 명부를 걸어도 좋아. 전쟁이 땅을 가장 깊이 할퀸 곳에 세 개가 서 있지. 하나는 서리 빙붕에, 하나는 화빙 균열 옆에, 하나는 망치의 협곡 아래에. 하나씩 읽고 한 글자도 빠짐없이 가져다주게.',
+  'entities.quests.q_qi_words_in_stone.completion':
+    '얼음, 불, 바위. 저마다 이 섬을 자기 기술의 것이라 주장하는데, 셋 다 같은 손으로 서명되어 있군. 평의회는 결코 낯선 넷이 아니었어, {playerName}. 스스로와 전쟁을 벌인 하나의 평의회였던 거야.',
+  'entities.quests.q_qi_words_in_stone.objectives.0.label': '평의회 비문 판독',
+  'entities.quests.q_qi_servants_at_their_posts.title': '자리를 지키는 하수인들',
+  'entities.quests.q_qi_servants_at_their_posts.text':
+    '비문에는 평의회의 하수인들이 적혀 있네. 주인이 돌아올 때까지 각 구역을 지키기로 맹세한 자들이지. 주인들은 끝내 돌아오지 않았고, 하수인들은 지키기를 멈추지 않았어. 수를 줄여 주게, {playerName}. 서리 빙붕의 담금질 파편체 여섯, 불길 수로의 열서약 불씨 여섯, 솟구친 바위판의 솟구친 파편체 여섯이야.',
+  'entities.quests.q_qi_servants_at_their_posts.completion':
+    '각각 여섯, 덕분에 구역들이 조금 조용해졌군. 그것들의 핵에는 비문과 같은 표식이 새겨져 있었어. 하수인을 만든 자가 돌도 만든 거지.',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.0.label': '담금질 파편체 처치',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.1.label': '열서약 불씨 처치',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': '솟구친 파편체 처치',
+  'entities.quests.q_qi_wardens_of_the_arts.title': '기술의 감시자들',
+  'entities.quests.q_qi_wardens_of_the_arts.text':
+    '평의회의 감시자 둘이 아직 버티고 있네. 하나는 서리 빙붕의 크레바스 지대에, 하나는 잿빛 상흔의 유리 들판에 가라앉아 있지. 비문은 그들을 각 기술의 비밀을 지키는 자라 부르는데, 순순히 내놓지는 않을 걸세, {playerName}. 담금질의 감시자와 유리 들판의 난폭자를 쓰러뜨리게.',
+  'entities.quests.q_qi_wardens_of_the_arts.completion':
+    '두 감시자 모두 부서졌고, 각자 거인의 윤곽이 새겨진 봉인석을 지니고 있었네. 평의회는 결국 무언가를 함께 만들었던 거야. 그들 누구보다도 거대한 것을. 모든 표식이 융기석 황야를 가리키고 있어.',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.0.label': '담금질의 감시자 처치',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.1.label': '유리 들판의 난폭자 처치',
+  'entities.quests.q_qi_the_fallen_giant.title': '쓰러진 거인',
+  'entities.quests.q_qi_the_fallen_giant.text':
+    '융기석 황야, 쓰러진 거인이 쓰러진 자리에 집채만 한 돌머리가 누워 있네. 도전자들은 그걸 조각상이라 부르지. 나는 봉인석이 가리키는 게 그것이라 생각하네. 그 위의 제작자의 표식을 찾아 주게, {playerName}. 그리고 누구의 손이 새겼는지 알려 주게.',
+  'entities.quests.q_qi_the_fallen_giant.completion':
+    '네 기술의 룬이 나란히 새겨져 하나의 표식을 이루고 있군. 평의회는 함께 거인을 만들었어. 그들이 처음으로 하나가 되어 일한 때였지. 그것은 코르줄을 붙잡아 두기 위한 것이었는데, 완성되기도 전에 쓰러졌다네. 그것의 일부가 아직도 제 머리 곁에서 경계를 서고 있어.',
+  'entities.quests.q_qi_the_fallen_giant.objectives.0.label': '거상 제작자의 표식 발견',
+  'entities.quests.q_qi_the_first_colossus.title': '최초의 거상',
+  'entities.quests.q_qi_the_first_colossus.text':
+    '최초의 거상은 끝내 그 짐승을 붙잡지 못했네. 그것은 쓰러졌고, 평의회는 그 일을 해낸 다른 거상을 만들었지. 하지만 최초의 거상에 남은 것은 아직도 쓰러진 거인 곁에서 자리를 지키고 있어. 반쯤만 깎인 채 오래 잊혀, 다가오는 자는 누구든 쳐 쓰러뜨리면서. 그것을 잠재워 주게, {playerName}. 이 섬의 역사가 전쟁이 끝난 줄도 모르는 파수꾼으로 끝나서는 안 되네.',
+  'entities.quests.q_qi_the_first_colossus.completion':
+    '그럼 잔해는 잠들었고, 명부에는 첫 번째 진짜 장이 생겼군. 무엇 하나 합의하지 못하던 네 경쟁자가, 함께 거인을 만들어야 했던 그날까지의 이야기 말일세. 라이벌무트는 그 역사에 자네의 한 줄을 빚졌네, {playerName}. 내가 직접 쓰겠네.',
+  'entities.quests.q_qi_the_first_colossus.objectives.0.label': '최초의 거상 잔해 처치',
   'entities.quests.q_hub_know_your_numbers.title': '네 숫자를 알아라',
   'entities.quests.q_hub_know_your_numbers.text':
     '잴 수 없는 힘은 키울 수 없는 힘이다, {playerName}. 훈련용 허수아비를 대상으로 삼고 피해량 미터를 열어라. 그다음 열 번 맞혀라, 베기든 주문이든 상관없다. 치는 동안 창을 지켜봐라, 네가 입힌 피해를 세어 준다. 열 번을 채우면 돌아와서 그 숫자를 말해라.',
@@ -10523,6 +10592,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '거대한 나무우듬지 아래 유령 들린 숲. 길 위에서는 기빗미어의 등불만이 유일하게 정직한 빛입니다.',
   'guide.worldPage.galeBlurb':
     '바람이 한시도 쉬지 않는 바다 절벽과 울부짖는 구릉. 올드 비컨은 결코 꺼지지 않고, 윅하버는 문을 굳게 걸어 잠급니다.',
+  'guide.worldPage.quarteredBlurb':
+    '오랜 경쟁으로 얼음, 불, 바위, 폭풍의 네 구역으로 산산이 부서진 섬. 라이벌무트의 도전자들은 회오리 봉우리 기슭에 마을을 세우고, 전쟁이 벌어졌던 분화구에 투기장을 두었다.',
   'guide.worldPage.jungleBlurb':
     '야자수와 백사장, 요란한 새들이 뒤엉킨 열대의 밀림. 해변 마을 드리프트헤이븐이 물가에 불을 피워 둡니다.',
   'guide.worldPage.gardenBlurb':
@@ -10548,6 +10619,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     '이곳의 바람은 단 한 번도 멎은 적이 없고, 올드 비컨은 단 한 번도 꺼진 적이 없다오. 여관 문은 들어온 뒤에 꼭 닫으시오.',
   'guide.worldPage.galeGreeter': '봉화지기, 윅하버',
+  'guide.worldPage.quarteredGreeting':
+    '분화구로 내려가는 일행은 모두 자기들이 투기장을 지켜 낼 거라고 맹세한다. 언덕이 솟으면 내려가서 증명해 봐라.',
+  'guide.worldPage.quarteredGreeter': '도전자, 라이벌무트',
   'guide.worldPage.jungleGreeting':
     '따뜻한 모래, 요란한 새들, 그리고 지평선을 삼키는 정글이라오. 해변에 불을 피워 두었으니, 부디 그 불가로 돌아오시오.',
   'guide.worldPage.jungleGreeter': '항구의 여주인, 드리프트헤이븐',
@@ -10568,6 +10642,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '기빗미어는 제 등불 안에 웅크리고 있습니다. 까마귀 문은 이 숲의 음산한 정문이고, 과부의 덤불은 거미줄로 빽빽이 얽혀 있습니다. 교수대 공터와 애도석 예배당은 숲의 가장 오래된 슬픔을 간직하며, 사냥꾼의 공터는 아직도 그곳에서 사냥하는 무언가의 차지입니다.',
   'guide.worldPage.galePlaceNotes':
     '윅하버는 바람에 몸을 기울인 채 서 있습니다. 바람길은 절벽을 따라 들어오는 길이고, 울부짖는 구릉은 강풍 아래 나무 한 그루 없이 굽이칩니다. 올드 비컨은 누구도 기억하지 못할 만큼 오래 타올랐고, 절단 절벽은 물까지 곧장 떨어지며, 난파선 벌판은 이 해안을 정직하게 만듭니다. 그리고 거울 호수는 이 지역 전체에서 유일하게 고요한 것입니다.',
+  'guide.worldPage.quarteredPlaceNotes':
+    '라이벌무트는 회오리 봉우리 기슭, 평의회의 자리로 오르는 길이 시작되는 곳에 서 있다. 서리다리는 프로스트베일에서 해협을 건너 길을 잇고, 서리 빙붕은 그 아래 하얗고 차갑게 부서진 채 펼쳐진다. 도전자의 투기장은 옛 전쟁의 중심인 큰 분화구 바닥에서 다음 언덕의 왕을 기다리고, 잿빛 상흔은 드레이크랜드 쪽으로 연기를 피우며, 융기석 황야는 앰버폴 쪽으로 솟구치고, 회오리 봉우리는 그 모든 것 위에서 폭풍을 휘감는다.',
   'guide.worldPage.junglePlaceNotes':
     '드리프트헤이븐은 해변에 불을 피워 둡니다. 덩굴 어귀는 강이 초록 장벽과 만나는 곳이고, 야자 백사장은 파도를 따라 희고 따뜻하게 이어집니다. 에메랄드 밀림과 덩굴폭포 숲은 내륙을 삼키고, 사파이어 석호는 맑고 깊게 빛나며, 가라앉은 신상은 물밑에서 지켜봅니다.',
   'guide.worldPage.gardenPlaceNotes':
@@ -13739,6 +13815,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '도금 금고',
   'entities.npcs.bursar_aldous_crane.greeting':
     '어떤 상자든, 금궤든, 장신구든 도금 금고에 맡기시면 안전합니다.',
+  'entities.npcs.bursar_maud_ashby.name': '출납관 모드 애시비',
+  'entities.npcs.bursar_maud_ashby.title': '도금 금고',
+  'entities.npcs.bursar_maud_ashby.greeting':
+    '도금 금고는 이 섬에서도 당신의 물건을 안전하게 보관합니다.',
+  'entities.npcs.keeper_ansel_morrow.name': '기록관 앤설 모로',
+  'entities.npcs.keeper_ansel_morrow.title': '무트 명부 기록관',
+  'entities.npcs.keeper_ansel_morrow.greeting':
+    '이 언덕을 오르는 도전자는 누구나 평의회를 이기고 싶어 하지, {playerName}. 나는 왜 평의회가 이길 가치가 있는지 알고 싶다네.',
+  'entities.npcs.innkeeper_bettany_quell.name': '베서니 퀠',
+  'entities.npcs.innkeeper_bettany_quell.title': '여관 주인',
+  'entities.npcs.innkeeper_bettany_quell.greeting':
+    '문간의 장화 조심해요. 서리 빙붕의 진눈깨비는 어디든 스며드니까. 불은 지펴 놨고 스튜도 따뜻해요. 오늘 진 도전자도 밥은 먹고 가야죠.',
+  'entities.npcs.outfitter_harl_bracken.name': '할 브래컨',
+  'entities.npcs.outfitter_harl_bracken.title': '장비상',
+  'entities.npcs.outfitter_harl_bracken.greeting':
+    '연고, 강장제, 그리고 길에서 쓸 야영 도구 한 벌. 나머지는 이 구역들이 다 망가뜨리니, 연장은 직접 챙겨 오게.',
+  'entities.npcs.captain_thessaly_rivalmoot.name': '대장 테살리',
+  'entities.npcs.captain_thessaly_rivalmoot.title': '도전자의 지도자',
+  'entities.npcs.captain_thessaly_rivalmoot.greeting':
+    '평의회는 아무도 기억하지 못할 만큼 오랫동안 도전받지 않은 채 저 봉우리에 앉아 있었습니다. 내 도전자들이 그것을 바꾸려 합니다. 먼저 상흔의 땅에서 실력을 증명하십시오, {playerName}.',
   'entities.items.furyforged_warhelm.name': '분노벼림 전투투구',
   'entities.items.furyforged_warspaulders.name': '분노벼림 전투어깨갑옷',
   'entities.items.furyforged_warplate.name': '분노벼림 전투흉갑',
@@ -16511,6 +16607,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '어느 채집이든 첫 채집은 Fruits of the Field를, 약초학 100 상한은 Master of the Meadow를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 달빛 개화를 꺾으면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
   'guide.profPages.gatherDeeds.fishing':
     '숙련 100은 Old Salt를, 200은 Master Angler와 그 칭호를 새긴다. 낚시꾼 기예의 정점이다. 낚시도 Master Gatherer(세 기술 100)에 포함된다. 각 지역의 물에서 낚는 첫 물고기가 저마다의 페이지를 채우고, 윤슬 코이를 낚으면 Glimmer of Hope가 기록된다.',
+  'guide.profPages.gatherDeeds.miningWithIsle':
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 채광 100 상한은 Ore in the Blood를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 깨끗한 광맥을 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+  'guide.profPages.gatherDeeds.loggingWithIsle':
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 벌목 100 상한은 Heartwood Hewer를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 고대 심재를 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+  'guide.profPages.gatherDeeds.herbalismWithIsle':
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 약초학 100 상한은 Master of the Meadow를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 달빛 개화를 꺾으면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+  'guide.profPages.gatherDeeds.fishingWithIsle':
+    '숙련 100은 Old Salt를, 200은 Master Angler와 그 칭호를 새긴다. 낚시꾼 기예의 정점이다. 낚시도 Master Gatherer(세 기술 100)에 포함된다. 각 지역의 물에서 낚는 첫 물고기가 저마다의 페이지를 채우고, 윤슬 코이를 낚으면 Glimmer of Hope가 기록된다.',
   'guide.profPages.gatherDeeds.farming':
     '농사에는 아직 고유 업적이 없다. 밭과 작물이 자리 잡은 지금, 다른 전문직을 장식하는 이정표와 상한 업적은 이후 업데이트로 들어온다. 숙련은 이미 Master Gatherer(아무 세 채집 기술 100)에 포함되므로 농부도 남들과 같은 방식으로 그 페이지를 채운다. 업적은 칭호와 명성만 줄 뿐, 결코 힘을 주지 않는다.',
   'guide.profPages.gatherDeeds.farmingSown':
@@ -18096,6 +18200,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.farshoreName': '먼바다 해안',
   'guide.home.world.galeBlurb':
     '바람이 한시도 쉬지 않고, 윅하버가 문을 굳게 닫아거는 해안 절벽과 울부짖는 구릉.',
+  'guide.home.world.quarteredName': '사분섬',
+  'guide.home.world.quarteredBlurb':
+    '오랜 경쟁으로 넷으로 산산이 부서진 섬. 라이벌무트가 폭풍 봉우리 기슭에서 모든 도전자가 차지하려는 분화구를 내려다본다.',
   'guide.home.world.galeName': '게일크레스트',
   'guide.home.world.gardenBlurb':
     '헤지윅과 분수 안뜰을 지나 들어서는, 아무도 본 적 없는 정원사가 여태 다듬고 있는 미로 정원의 나라.',
@@ -22210,6 +22317,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다음 신부의 애가로 받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 최대 {max}중첩. 다음 애가는 등불 빛 안에서 받으세요.',
   'hudChrome.auraEffect.crypt.slippery':
     '미끄러운 얼음 위: 속도가 매초 최대 {grip}미터/초씩만 바뀌므로 출발이 느리고, 멈추면 계속 미끄러지며, 방향을 틀면 크게 돌아갑니다. 얼음에서 벗어나면 다시 중심을 잡을 수 있습니다.',
+  'hudChrome.auraEffect.quartered.galeLane':
+    '돌풍이 회오리 봉우리 정상으로 가는 길을 따라 당신을 밀어 올립니다. 가만히 서 있어도 마찬가지이며, 속도는 최대 {speed}야드/초이고 정상에 가까워질수록 {summit}야드/초까지 줄어듭니다. 굽은 길에서도, 점프 중에도 길 위에 머무르게 해 줍니다. 평행 이동으로 길을 가로지르거나, 길 아래쪽으로 움직여 바람을 거슬러 걸을 수 있습니다. 바람에 실려 가는 동안에는 시전이 중단됩니다. 바람길을 벗어난 뒤에도 최대 {linger}초 동안 지속되어 바람길 사이의 틈을 건너게 해 줍니다.',
   'hudChrome.auraEffect.crypt.harmony':
     '받는 피해가 {pct}% 감소합니다: 살아 있는 성가대원 한 명마다 {per}%. 성가대원을 먼저 처치하세요.',
   'hudChrome.auraEffect.crypt.crescendo':

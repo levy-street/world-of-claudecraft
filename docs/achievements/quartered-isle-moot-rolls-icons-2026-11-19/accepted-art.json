@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "batchId": "quartered-isle-moot-rolls-icons-2026-11-19",
+  "generatedAt": "2026-11-19",
+  "source": "OpenAI gpt-image-2 image edit, one painting per item, two shipped quest-object icons attached as style references",
+  "owner": "World of ClaudeCraft",
+  "license": "Project asset, with the project only",
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "prompt": [
+    {
+      "id": "council_inscription",
+      "prompt": "Generate an image: one game inventory icon in exactly the painted style of images 1 and 2: a single object, painterly and slightly gritty, strong readable silhouette, warm rim light, centred and filling most of the square frame with a little padding, on the same plain near-black background with no vignette pattern, no frame, no text, no letters, no numbers, no border. The object: a weathered upright stone tablet, its face carved with four ancient rune symbols in a row (a flame, a sun, a lightning bolt and a snowflake), the grooves worn and chipped, faint warm gold light in the deepest carved lines, grey-mauve dressed stone with an ochre crust of age."
+    },
+    {
+      "id": "colossus_makers_mark",
+      "prompt": "Generate an image: one game inventory icon in exactly the painted style of images 1 and 2: a single object, painterly and slightly gritty, strong readable silhouette, warm rim light, centred and filling most of the square frame with a little padding, on the same plain near-black background with no vignette pattern, no frame, no text, no letters, no numbers, no border. The object: a broken fragment of carved stone, half grey-mauve dressed block and half raw gold-ochre sandstone, its face chiselled with one maker's mark: four small rune symbols (a flame, a sun, a lightning bolt and a snowflake) joined into a single round sigil, the sun rune still glowing a faint gold, cracks running through it."
+    }
+  ],
+  "references": [
+    {
+      "path": "public/ui/items/sprung_trap.webp",
+      "sha256": "ff8fe365d2649f6c60ce1c95937a32834a7439503a7741591af97a88b9fb5895",
+      "role": "Attached style reference (images 1 and 2): paint treatment, lighting and framing only; subjects not copied"
+    },
+    {
+      "path": "public/ui/items/hearth_ember_cache.webp",
+      "sha256": "b1274baee4d12ba853cd3cb5801e0f659d7cc80e78fdb5f7a4c555ecea1670e0",
+      "role": "Attached style reference (images 1 and 2): paint treatment, lighting and framing only; subjects not copied"
+    }
+  ],
+  "processing": [
+    {
+      "id": "council_inscription",
+      "steps": [
+        "1024 PNG generation",
+        "LANCZOS to a 512 master",
+        "LANCZOS to 128, WebP quality 82, method 6"
+      ]
+    },
+    {
+      "id": "colossus_makers_mark",
+      "steps": [
+        "1024 PNG generation",
+        "LANCZOS to a 512 master",
+        "LANCZOS to 128, WebP quality 82, method 6"
+      ]
+    }
+  ],
+  "review": {
+    "reviewer": "Claude",
+    "sizesInspected": [512, 128, 40, 28, 22],
+    "additionalModes": ["28-grayscale", "64-circle"],
+    "sheetPath": "docs/screenshots/item-art-consistency-2026-08-09/quartered-isle-moot-rolls-icons-2026-11-19/size-review.png",
+    "verdict": "Accepted: a carved tablet with four runes in a row and a cracked two-stone fragment with one round sigil read as distinct silhouettes down to 22 px; opaque, centred, no text."
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "council_inscription",
+      "batchId": "quartered-isle-moot-rolls-icons-2026-11-19",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/council_inscription.webp",
+      "sourcePath": "tmp/imagegen/quartered-isle-moot-rolls/council_inscription/original.png",
+      "sourceSha256": "2bb3ec4964963bdc25e029d075857dd4cdacb8bf76167b969837396a923638d6",
+      "masterPath": "tmp/imagegen/quartered-isle-moot-rolls/council_inscription/master.png",
+      "masterSha256": "556a2db6789e9416cb0dbc5060f0f5806f595c35ea9842d5bbaf92ffcd0ed10f",
+      "acceptedSha256": "070bfd8f17b7a3f8efcd7999b9106ea290c40eb4520e2948731ce17ba64e40c6",
+      "acceptedBytes": 2406,
+      "retryCount": 0
+    },
+    {
+      "kind": "item",
+      "id": "colossus_makers_mark",
+      "batchId": "quartered-isle-moot-rolls-icons-2026-11-19",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/colossus_makers_mark.webp",
+      "sourcePath": "tmp/imagegen/quartered-isle-moot-rolls/colossus_makers_mark/original.png",
+      "sourceSha256": "0fb76f75f10745aab101b6d131e95f5d0741c8c961d228df081b26141260616d",
+      "masterPath": "tmp/imagegen/quartered-isle-moot-rolls/colossus_makers_mark/master.png",
+      "masterSha256": "4425d6cbbb62d71f6ae494e8bf5c9f0faa7ac86ef5438c5a94b25b4d1a890193",
+      "acceptedSha256": "34d60376bfc016f9aaf776b980512bedf72bd5a195ee19e463a4925ef8ac5d31",
+      "acceptedBytes": 2882,
+      "retryCount": 0
+    }
+  ]
+}

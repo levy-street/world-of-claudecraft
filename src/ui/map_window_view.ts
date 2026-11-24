@@ -23,6 +23,7 @@ import {
   gatherNodesInActiveWorld,
   getActiveWorldContent,
   isBgPos,
+  isClaimedFrom,
   isDelvePos,
   STRIP_MAX_X,
   STRIP_MIN_X,
@@ -1009,8 +1010,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // on the canvas edge.
   const inVisibleRegion = (x: number, z: number): boolean =>
     x >= region.minX && x <= region.maxX && z >= region.minZ && z <= region.maxZ;
+  // Ground a claimsOverlap zone took from this one lies inside the rect on
+  // paper but belongs to the claimer's map, as zoneAt resolves it.
   const inZone = (x: number, z: number): boolean =>
-    x >= zoneMinX && x < zoneMaxX && z >= zone.zMin && z < zone.zMax;
+    x >= zoneMinX && x < zoneMaxX && z >= zone.zMin && z < zone.zMax && !isClaimedFrom(zone, x, z);
 
   // Declutter: labels only draw when the current zone's visible span is narrow
   // enough; portals and the player remain visible at every zone scale.

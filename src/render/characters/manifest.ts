@@ -4512,6 +4512,100 @@ export const VISUALS: Record<string, VisualDef> = {
       attackByAbility: { emberkin_felbolt: 'Cast' },
     },
   },
+  // The Quartered Isle's own bodies (scripts/asset_pipeline, Tripo auto-rig with eight
+  // preset clips; the baked ones from scripts/assets/quartered_isle_creatures/).
+  // Warden of the Quench: rime-glass armour over raw Quench ice, a lit cyan core.
+  mob_warden_of_the_quench: {
+    url: `${CREATURES}/warden_of_the_quench.glb`,
+    height: 2.6,
+    // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    authoredAtlas: true,
+  },
+  // The Glassfield Brute: the Heat's warden, basalt crusted in amber glass.
+  mob_the_glassfield_brute: {
+    url: `${CREATURES}/the_glassfield_brute.glb`,
+    height: 4.1,
+    // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    authoredAtlas: true,
+  },
+  // Heaved Splinter: a small sandstone elemental with slate spikes.
+  mob_heaved_shardling: {
+    url: `${CREATURES}/heaved_shardling.glb`,
+    height: 1.4,
+    // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    authoredAtlas: true,
+  },
+  // Veinback Burrower: a large upright mole with an ore-veined stone back.
+  mob_veinback_burrower: {
+    url: `${CREATURES}/veinback_burrower.glb`,
+    height: 2.6,
+    // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    authoredAtlas: true,
+  },
+  // The Quartered Isle's Heatsworn Ember: the Emberkin body with its fel green shifted to
+  // fire red and its lit pockets given a red glow map (scripts/assets/heatsworn_ember/).
+  mob_heatsworn_ember: {
+    url: `${CREATURES}/heatsworn_ember.glb`,
+    height: 2.1,
+    authoredAtlas: true,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+  },
   // WIP forge mech (mech.glb, Tripo auto-rig on a mixamorig core). It ships only
   // a CRAWL -> STAND UP -> DIE clip set (no idle/walk/attack yet), so idle/walk/
   // run all read as the crawl, StandUp doubles as the attack lunge and the spawn
@@ -4568,6 +4662,38 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Cast',
       jump: 'Jump',
     },
+  },
+  // The Remnant of the First Colossus, the Heavestone Wilds' named elite at the Fallen
+  // Giant (content/quartered_isle_mobs.ts): a Tripo P2 multiview build of a weathered,
+  // half-finished Ring Forge Warder (concept sheets and review on the asset job), its
+  // base colour projected from the concept in Blender, the Tripo biped rig with its
+  // hand-to-thigh weights cleaned, and the pipeline's eight retargeted biped clips.
+  // Faces +Z as built; drawn about two and a half players tall.
+  mob_remnant_first_colossus: {
+    url: `${CREATURES}/remnant_first_colossus.glb`,
+    height: 6.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    authoredAtlas: true,
+  },
+  // The Hoarshelf's Rimeglass Bear: a Tripo body on the wolf rig, re-fitted to
+  // the bear (scripts/assets/rimeglass_bear/), so it plays the wolf clip names.
+  // Its Idle (a breathing sniff) and Attack (a bite) are its own; the gaits and
+  // the death are the wolf's, strides scaled to its shorter legs. Baked frost
+  // texture, so no entity tint.
+  mob_rimeglass_bear: {
+    url: `${CREATURES}/rimeglass_bear.glb`,
+    height: 2.3,
+    clips: WOLF_BAKED,
+    authoredAtlas: true,
   },
   // Shared fallback rig for the remaining warlock demons. The entity colour
   // and the mob template's scale distinguish their silhouettes.
@@ -7309,6 +7435,18 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.25,
   },
+  // The Quartered Isle's Cinderscar Caller: the Ember Fiend's body, but a ranged
+  // caster, so its attack (played on the petSpell windup) is the KayKit spell throw.
+  mob_cinderscar_caller: {
+    url: `${CREATURES}/hoard_ember_fiend.glb`,
+    height: 2.9,
+    clips: {
+      ...kaykit(['Spellcast_Shoot']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
   // The forge brute: a slab of volcanic rock that hits with its fists.
   mob_hoard_magma_brute: {
     url: `${CREATURES}/hoard_magma_brute.glb`,
@@ -8347,6 +8485,18 @@ const MOB_KEYS: Record<string, string> = {
   emberkin: 'mob_emberkin',
   gloomshade: 'mob_gloomshade',
   pyre_colossus: 'mob_pyre_colossus',
+  remnant_first_colossus: 'mob_remnant_first_colossus',
+  // The Quartered Isle's mobs: its own bodies, or shipped ones recoloured by their
+  // template colour where the body takes an entity tint (content/quartered_isle_mobs.ts).
+  quench_shardling: 'mob_hoard_rime_elemental',
+  rimeglass_bear: 'mob_rimeglass_bear',
+  warden_of_the_quench: 'mob_warden_of_the_quench',
+  heatsworn_ember: 'mob_heatsworn_ember',
+  cinderscar_caller: 'mob_cinderscar_caller',
+  ember_hound: 'mob_wolf',
+  the_glassfield_brute: 'mob_the_glassfield_brute',
+  heaved_shardling: 'mob_heaved_shardling',
+  veinback_burrower: 'mob_veinback_burrower',
   water_elemental: 'mob_water_elemental',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',

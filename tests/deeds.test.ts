@@ -164,6 +164,12 @@ describe('trigger kinds grant once, with negatives', () => {
     sim.ctx.markVisited(meta, 'npc:bursar_aldous_crane');
     sim.tick();
     expect(meta.deedsEarned.has('hid_gilded_tour')).toBe(true);
+    // the three-branch tour is complete without Rivalmoot; the grand tour is a
+    // separate deed that waits on the fourth branch
+    expect(meta.deedsEarned.has('hid_gilded_grand_tour')).toBe(false);
+    sim.ctx.markVisited(meta, 'npc:bursar_maud_ashby');
+    sim.tick();
+    expect(meta.deedsEarned.has('hid_gilded_grand_tour')).toBe(true);
   });
 
   it('collectItems: quality marks and the item set land through the discovery ledger', () => {

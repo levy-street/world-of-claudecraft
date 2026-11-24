@@ -1323,4 +1323,16 @@ export const table: DeedLocaleTable = {
     desc: 'ゴードライトの宵の間に、世界各地に隠された幽霊カボチャをすべて見つける。',
     title: 'うつろなる者',
   },
+  chr_quartered_isle_gatherer: {
+    name: '四つの地の恵み',
+    desc: '四分の島で鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
+  chr_quartered_isle_first_cast: {
+    name: '四つの地のはざまに垂らす糸',
+    desc: '四分の島の水辺で魚を釣る。',
+  },
+  hid_gilded_grand_tour: {
+    name: '金張り大巡りの旅',
+    desc: '金張りの金庫の4つの支店すべてで取引をした。',
+  },
 };

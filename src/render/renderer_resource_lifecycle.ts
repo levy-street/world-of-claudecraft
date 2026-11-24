@@ -16,6 +16,10 @@ export interface RendererPrewarmAndGroundFxOwner<T extends RendererDisposable> {
   vfx?: RendererDisposable;
   abilityVfxFx?: RendererDisposable;
   jungleFeatures?: RendererDisposable | null;
+  // The Quartered Isle's landmark dressing (quartered_landmark_dressing.ts)
+  // owns two procedural DataTextures, its own materials and every geometry it
+  // clones or builds; scene.clear() detaches the view without freeing them.
+  quarteredMarks?: RendererDisposable | null;
   selectionReticle?: RendererDisposable;
   // The farm patch visuals (src/render/farm_patches.ts) own per-plot material
   // clones; their dispose() walks plots AND feasts. Added at the Phase 17
@@ -53,6 +57,7 @@ export function disposeRendererPrewarmAndGroundFx(
   bestEffort(() => resources.warlockMeteorFx?.dispose());
   bestEffort(() => resources.abilityVfxFx?.dispose());
   bestEffort(() => resources.jungleFeatures?.dispose());
+  bestEffort(() => resources.quarteredMarks?.dispose());
   bestEffort(() => resources.vfx?.dispose());
   bestEffort(() => resources.selectionReticle?.dispose());
   bestEffort(() => resources.farmPatchVisuals?.dispose());

@@ -309,4 +309,42 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     'void_stalker',
     3,
   ),
+  // The Quartered Isle (content/quartered_isle_mobs.ts): one hunt per scarred quarter's
+  // servants, plus the Cinderscar's hound packs. Each ring is centred on its camps and
+  // reaches every camp plus its wander.
+  kill(
+    'wq_quartered_quench_shardlings',
+    'quartered_isle',
+    20,
+    { x: -105, z: 2033, radius: 55 },
+    'quench_shardling',
+    6,
+    // the ring's default champion spot lands on blocked ground by the Rimeglass; the
+    // eastern camp's centre is open
+    { x: -78, z: 2034 },
+  ),
+  kill(
+    'wq_quartered_heatsworn_embers',
+    'quartered_isle',
+    20,
+    { x: 192, z: 2248, radius: 41 },
+    'heatsworn_ember',
+    6,
+  ),
+  kill(
+    'wq_quartered_heaved_shardlings',
+    'quartered_isle',
+    20,
+    { x: -190, z: 2221, radius: 43 },
+    'heaved_shardling',
+    6,
+  ),
+  kill(
+    'wq_quartered_ember_hounds',
+    'quartered_isle',
+    20,
+    { x: 137, z: 2150, radius: 35 },
+    'ember_hound',
+    5,
+  ),
 ]);

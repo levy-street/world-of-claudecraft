@@ -21,6 +21,7 @@
 
 import * as THREE from 'three';
 import { isBuiltinWorldContent } from '../sim/data';
+import { decorSeat } from '../sim/decor_seat';
 import {
   MUSTER_CLUTTER_KEYS,
   type MusterKitKey,
@@ -28,6 +29,7 @@ import {
 } from '../sim/muster_camp_layout';
 import { musterCampPlan } from '../sim/muster_camp_plan';
 import type { WorldContent } from '../sim/types';
+import { terrainHeight } from '../sim/world';
 
 /** The kit's props registry rows (url per piece; one material-dedup kit). */
 export const MUSTER_KIT_PROP_DEFS: Readonly<Record<MusterKitKey, { url: string; kit: string }>> =
@@ -87,13 +89,18 @@ export function musterCampDecor(
   }));
 }
 
-/** The decor list the props pass walks: authored decor, then the muster camps. */
+/** The decor list the props pass walks: authored decor (a `seat: 'footprint'` row
+ *  carries its footprint seat, the one decor_prop_colliders.ts builds from), then the
+ *  muster camps. */
 export function renderDecorProps(
   content: WorldContent,
   seed: number,
   lowTier: boolean,
 ): RenderDecorProp[] {
-  const authored: RenderDecorProp[] = content.props.decorProps ?? [];
+  const heightAt = (x: number, z: number): number => terrainHeight(x, z, seed);
+  const authored: RenderDecorProp[] = (content.props.decorProps ?? []).map((d) =>
+    d.seat === 'footprint' ? { ...d, ...decorSeat(d, heightAt) } : d,
+  );
   const muster = musterCampDecor(content, seed, lowTier);
   return muster.length === 0 ? authored : [...authored, ...muster];
 }

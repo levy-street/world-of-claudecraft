@@ -8078,6 +8078,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmfang_greatblade.name': '龙牙巨刃',
   'entities.items.staff_of_the_gravewyrm.name': '墓龙法杖',
   'entities.items.fang_of_korzul.name': '科祖尔之牙',
+  'entities.items.council_inscription.name': '议会铭文',
+  'entities.items.colossus_makers_mark.name': '巨像工匠印记',
   'entities.items.trail_hardtack.name': '高望行军硬饼',
   'entities.items.meltwater_flask.name': '融雪水瓶',
   'entities.items.roast_mountain_goat.name': '烤山羊',
@@ -9074,6 +9076,24 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': '沉船滩',
   'entities.zones.galecrest.pois.6.label': '镜湖',
   'entities.zones.galecrest.pois.7.label': '疾风崖马厩',
+  'entities.zones.quartered_isle.name': '四分岛',
+  'entities.zones.quartered_isle.welcome':
+    '一场古老的争斗将这座岛屿击碎成四块。争锋镇守在旋风峰脚下，俯瞰着当年战争中心的陨坑。',
+  'entities.zones.quartered_isle.pois.0.label': '争锋镇',
+  'entities.zones.quartered_isle.pois.1.label': '挑战者竞技场',
+  'entities.zones.quartered_isle.pois.2.label': '霜桥',
+  'entities.zones.quartered_isle.pois.3.label': '白霜冰架',
+  'entities.zones.quartered_isle.pois.4.label': '烬痕',
+  'entities.zones.quartered_isle.pois.5.label': '隆岩荒野',
+  'entities.zones.quartered_isle.pois.6.label': '旋风峰',
+  'entities.zones.quartered_isle.pois.7.label': '火冰裂谷',
+  'entities.zones.quartered_isle.pois.8.label': '冰隙群',
+  'entities.zones.quartered_isle.pois.9.label': '霜镜湖',
+  'entities.zones.quartered_isle.pois.10.label': '焚流渠',
+  'entities.zones.quartered_isle.pois.11.label': '琉璃原',
+  'entities.zones.quartered_isle.pois.12.label': '铁锤峡',
+  'entities.zones.quartered_isle.pois.13.label': '隆起石板',
+  'entities.zones.quartered_isle.pois.14.label': '倒下的巨人',
   'entities.npcs.warden_coalfast.name': '守望者·煤耐',
   'entities.npcs.warden_coalfast.title': '堡垒指挥官',
   'entities.npcs.warden_coalfast.greeting':
@@ -9120,6 +9140,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': '疾风精',
   'entities.mobs.shoal_scuttler.name': '浅滩蟹',
   'entities.mobs.the_wreck_warden.name': '沉船守卫',
+  'entities.mobs.remnant_first_colossus.name': '初代巨像残骸',
+  'entities.mobs.quench_shardling.name': '淬冰碎晶',
+  'entities.mobs.rimeglass_bear.name': '霜镜熊',
+  'entities.mobs.warden_of_the_quench.name': '淬冰守卫',
+  'entities.mobs.heatsworn_ember.name': '誓炎余烬',
+  'entities.mobs.cinderscar_caller.name': '烬痕召唤者',
+  'entities.mobs.ember_hound.name': '余烬猎犬',
+  'entities.mobs.the_glassfield_brute.name': '琉璃原蛮兽',
+  'entities.mobs.heaved_shardling.name': '隆起碎晶',
+  'entities.mobs.veinback_burrower.name': '脉背掘地者',
   'entities.mobs.downs_bandit.name': '丘陵强盗',
   'entities.mobs.wreck_thief.name': '沉船窃贼',
   'entities.mobs.glimmerwisp.name': '微光灵',
@@ -9723,6 +9753,45 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '它倒下的那一刻，海滩静了，{playerName}。我在这片岸上讨了十年生活，头一次听见这样的寂静。船员们如今只是白骨了，安息的白骨。把财货堆顶上那件披风拿走吧，它反正更合活人的背。',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': '已击倒沉船守卫',
+  'entities.quests.q_qi_the_moot_rolls.title': '争锋名册',
+  'entities.quests.q_qi_the_moot_rolls.text':
+    '争锋镇有一份名册，记下了每一位前来挑战议会的人，{playerName}，却没有一行写到议会为何值得挑战。我打算把这段历史写出来。先去大厅旁找瑟萨莉队长：她的挑战者们走遍了这座岛的每一块地域，士兵记得学者遗漏的东西。',
+  'entities.quests.q_qi_the_moot_rolls.completion':
+    '安塞尔派你来的？那他总算问对人了。我的挑战者们在每一块地域都找到了刻字的石头，比这座镇子还古老，这里没人读得懂。把这话带回去给他。',
+  'entities.quests.q_qi_the_moot_rolls.objectives.0.label': '与瑟萨莉队长交谈',
+  'entities.quests.q_qi_words_in_stone.title': '石中之言',
+  'entities.quests.q_qi_words_in_stone.text':
+    '瑟萨莉说的那些石头，正是议会亲手留下的铭文，{playerName}，我敢拿我的名册打赌。有三块立在战争伤地最深的地方：一块在白霜冰架，一块在火冰裂谷旁，一块在铁锤峡下方。逐一读过，把每个字都带回来给我。',
+  'entities.quests.q_qi_words_in_stone.completion':
+    '冰、火、岩，各自宣称这座岛属于自己的技艺，而三块都由同一只手署名。议会从来不是四个陌生人，{playerName}。它是一个与自己交战的议会。',
+  'entities.quests.q_qi_words_in_stone.objectives.0.label': '已阅读议会铭文',
+  'entities.quests.q_qi_servants_at_their_posts.title': '坚守岗位的仆从',
+  'entities.quests.q_qi_servants_at_their_posts.text':
+    '铭文里记着议会的仆从，它们立誓守住每一块地域，直到主人归来。主人再也没有回来，仆从也从未停止坚守。去削减它们的数量吧，{playerName}：白霜冰架上的六只淬冰碎晶、焚流渠里的六只誓炎余烬，以及隆起石板上的六只隆起碎晶。',
+  'entities.quests.q_qi_servants_at_their_posts.completion':
+    '每种六只，这几块地域也因此安静了些。它们的核心上刻着和铭文相同的印记。造出这些仆从的人，也造了那些石头。',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.0.label': '已击倒淬冰碎晶',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.1.label': '已击倒誓炎余烬',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': '已击倒隆起碎晶',
+  'entities.quests.q_qi_wardens_of_the_arts.title': '技艺守卫',
+  'entities.quests.q_qi_wardens_of_the_arts.text':
+    '议会的守卫还有两个屹立未倒，一个在白霜冰架的冰隙群里，一个陷在烬痕的琉璃原中。铭文称它们为各自技艺秘密的守护者，它们不会心甘情愿地交出秘密，{playerName}。去打倒淬冰守卫和琉璃原蛮兽。',
+  'entities.quests.q_qi_wardens_of_the_arts.completion':
+    '两个守卫都已被击碎，而且各自带着一块刻有巨人轮廓的封印石。议会终究还是一起造过东西，比他们任何一个都要庞大。每一个印记都指向隆岩荒野。',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.0.label': '已击倒淬冰守卫',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.1.label': '已击倒琉璃原蛮兽',
+  'entities.quests.q_qi_the_fallen_giant.title': '倒下的巨人',
+  'entities.quests.q_qi_the_fallen_giant.text':
+    '隆岩荒野里躺着一颗房子大小的石头头颅，就在倒下的巨人倒下的地方。挑战者们说那是座雕像。我认为封印石指的就是它。去找到上面的工匠印记，{playerName}，告诉我是谁的手刻下的。',
+  'entities.quests.q_qi_the_fallen_giant.completion':
+    '四门技艺的符文，并排刻成了一个印记。议会一同造出了这个巨人，那是他们第一次同心协力。它本该用来镇住科祖尔，却在完工之前就倒下了。它的某一部分至今仍守在自己的头颅旁。',
+  'entities.quests.q_qi_the_fallen_giant.objectives.0.label': '已找到巨像工匠印记',
+  'entities.quests.q_qi_the_first_colossus.title': '初代巨像',
+  'entities.quests.q_qi_the_first_colossus.text':
+    '初代巨像从未镇住那头巨兽。它倒下了，议会又造了另一座，那一座做到了。但初代留下的残躯至今仍守在倒下的巨人旁的岗位上，只雕了一半，早已被遗忘，击倒任何靠近的人。让它安息吧，{playerName}。这座岛的历史不该以一个从不知道战争已经结束的守卫作结。',
+  'entities.quests.q_qi_the_first_colossus.completion':
+    '那么残骸安息了，名册也有了第一个真正的篇章：四个什么都谈不拢的对手，直到那一天，他们不得不一起建造一个巨人。争锋镇欠你一行历史，{playerName}，我会亲手写下。',
+  'entities.quests.q_qi_the_first_colossus.objectives.0.label': '已击倒初代巨像残骸',
   'entities.quests.q_hub_know_your_numbers.title': '认清你的数字',
   'entities.quests.q_hub_know_your_numbers.text':
     '量不出的力量，就是提不高的力量，{playerName}。把训练假人设为目标，打开你的伤害统计，往它身上打满十击，挥砍或施法都算，边打边看着窗口记录你造成的伤害。打满十击后回来，把那个数字告诉我。',
@@ -11764,6 +11833,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一片被巨大树冠笼罩的闹鬼森林，路上唯一可信的光亮，便是绞湖镇的灯笼。',
   'guide.worldPage.galeBlurb':
     '海崖与呼啸的丘陵，这里的风从不停歇，老灯塔的火从未熄灭，烛港的家家户户都把门关得严严实实。',
+  'guide.worldPage.quarteredBlurb':
+    '一座被古老争斗击碎成冰、火、岩、风四块地域的岛屿。争锋镇的挑战者们把城镇建在旋风峰脚下，把竞技场设在当年战争所在的陨坑里。',
   'guide.worldPage.jungleBlurb':
     '棕榈、白沙与喧闹鸟鸣交织的热带丛林，海滨小镇漂流港在沙滩上燃着一堆长明的篝火。',
   'guide.worldPage.gardenBlurb':
@@ -11788,6 +11859,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     '这里的风从未停过一刻，老灯塔的火也从未熄过一次。进来后记得随手关上旅店的门。',
   'guide.worldPage.galeGreeter': '守塔人，烛港',
+  'guide.worldPage.quarteredGreeting':
+    '每支走进陨坑的队伍都发誓自己会守住竞技场。山丘升起时就下去，证明给我看。',
+  'guide.worldPage.quarteredGreeter': '一名挑战者，争锋镇',
   'guide.worldPage.jungleGreeting':
     '温暖的沙滩，喧闹的鸟鸣，还有吞没地平线的丛林。我们在海滩上留着一堆篝火；可要记得回到火边来。',
   'guide.worldPage.jungleGreeter': '港务长，漂流港',
@@ -11808,6 +11882,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '绞湖镇蜷缩在自己的灯笼之间。鸦门是这片森林阴森的正门；寡妇棘丛被蛛网织得密不透风；吊影林地与哀石礼拜堂承载着森林最古老的悲恸；而猎手林隙属于至今仍在那里狩猎的东西。',
   'guide.worldPage.galePlaceNotes':
     '烛港迎风而立。风道是进来的悬崖之路；啸风丘陵在狂风下光秃起伏；老灯塔燃烧的岁月已无人能说清；断崖直落入海；沉船滩让人不敢小看这段海岸；而镜湖是整个国度里唯一静止的东西。',
+  'guide.worldPage.quarteredPlaceNotes':
+    '争锋镇坐落在旋风峰脚下，通往议会之座的攀登之路从这里开始。霜桥把道路从霜幕之境跨过海峡引来；白霜冰架在下方又白又冷、支离破碎地铺开；挑战者竞技场在古老战争的中心、大陨坑的底部静候下一位山丘之王；烬痕向着龙裔荒原阴燃；隆岩荒野朝琥珀秋境隆起；旋风峰则在这一切之上卷动风暴。',
   'guide.worldPage.junglePlaceNotes':
     '漂流港在海滩上燃着篝火。缠木隘口是大河汇入绿墙之处；棕榈长滩沿着浪缘铺展，洁白而温暖；翠绿丛林与垂藤林吞没了内陆；蓝宝石潟湖清澈而幽深地发着光；而沉没神像则在水下静静注视。',
   'guide.worldPage.gardenPlaceNotes':
@@ -14753,6 +14829,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '镀金保险箱',
   'entities.npcs.bursar_aldous_crane.greeting':
     '每一只木箱、每一个钱柜、每一件饰物，交给镀金保险箱都万无一失。',
+  'entities.npcs.bursar_maud_ashby.name': '司库莫德·阿什比',
+  'entities.npcs.bursar_maud_ashby.title': '镀金保险箱',
+  'entities.npcs.bursar_maud_ashby.greeting': '镀金保险箱会妥善保管你的财物，在这座岛上也一样。',
+  'entities.npcs.keeper_ansel_morrow.name': '守卷人安塞尔·莫罗',
+  'entities.npcs.keeper_ansel_morrow.title': '争锋名册守卷人',
+  'entities.npcs.keeper_ansel_morrow.greeting':
+    '每个登上这座山丘的挑战者都想击败议会，{playerName}。我想知道的是，他们为什么值得去击败。',
+  'entities.npcs.innkeeper_bettany_quell.name': '贝塔妮·奎尔',
+  'entities.npcs.innkeeper_bettany_quell.title': '旅店老板',
+  'entities.npcs.innkeeper_bettany_quell.greeting':
+    '靴子放门边，白霜冰架的冻雨什么都能钻进去。炉火正旺，炖菜正热，今天输了的挑战者也照样有饭吃。',
+  'entities.npcs.outfitter_harl_bracken.name': '哈尔·布拉肯',
+  'entities.npcs.outfitter_harl_bracken.title': '装备商',
+  'entities.npcs.outfitter_harl_bracken.greeting':
+    '药膏、补剂，再加一套路上用的野外工具包。别的东西这几块地域都会给你弄坏，所以工具得自己带。',
+  'entities.npcs.captain_thessaly_rivalmoot.name': '瑟萨莉队长',
+  'entities.npcs.captain_thessaly_rivalmoot.title': '挑战者首领',
+  'entities.npcs.captain_thessaly_rivalmoot.greeting':
+    '议会高坐那座山峰，从无人挑战，久到没人记得有多久了。我的挑战者们要改变这一点。先在那几片伤痕之地证明你自己吧，{playerName}。',
   'entities.items.furyforged_warhelm.name': '怒铸战盔',
   'entities.items.furyforged_warspaulders.name': '怒铸战肩',
   'entities.items.furyforged_warplate.name': '怒铸战甲',
@@ -17407,6 +17502,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '任意行业的第一次采集获得Fruits of the Field，草药学100上限铭刻Master of the Meadow。任意三项采集行业达到100可得Master Gatherer（25声望），采下月光绽放另有收藏印记。功业只有头衔与声望，永不赋予力量。',
   'guide.profPages.gatherDeeds.fishing':
     '钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。',
+  'guide.profPages.gatherDeeds.miningWithIsle':
+    '任意行业的第一次采集获得Fruits of the Field，采矿100上限铭刻Ore in the Blood。任意三项采集行业达到100可得Master Gatherer（25声望），凿开纯净矿脉另有收藏印记。功业只有头衔与声望，永不赋予力量。',
+  'guide.profPages.gatherDeeds.loggingWithIsle':
+    '任意行业的第一次采集获得Fruits of the Field，伐木100上限铭刻Heartwood Hewer。任意三项采集行业达到100可得Master Gatherer（25声望），劈出远古心材另有收藏印记。功业只有头衔与声望，永不赋予力量。',
+  'guide.profPages.gatherDeeds.herbalismWithIsle':
+    '任意行业的第一次采集获得Fruits of the Field，草药学100上限铭刻Master of the Meadow。任意三项采集行业达到100可得Master Gatherer（25声望），采下月光绽放另有收藏印记。功业只有头衔与声望，永不赋予力量。',
+  'guide.profPages.gatherDeeds.fishingWithIsle':
+    '钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。',
   'guide.profPages.gatherDeeds.farming':
     '耕作暂无专属功业：如今田畦与作物已经扎根，标记其他行业的里程碑与上限功业将随后续更新一并到来。它的熟练已经计入Master Gatherer（任意三项采集达到100），耕作者能像旁人一样填满那一页。功业只给头衔与名望，绝不给予力量。',
   'guide.profPages.gatherDeeds.farmingSown':
@@ -18922,6 +19025,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '沙洲另一头的一座岛屿，天空在裂野之上撕裂开来，而鸥港为每一次破口鸣响它的钟。',
   'guide.home.world.farshoreName': '远岸',
   'guide.home.world.galeBlurb': '海崖与呼啸的丘陵，这里的风从不停歇，而烛港把门关得紧紧的。',
+  'guide.home.world.quarteredName': '四分岛',
+  'guide.home.world.quarteredBlurb':
+    '一座被古老争斗击碎成四块的岛屿，争锋镇守在风暴之峰脚下，俯瞰着每个挑战者都想夺下的陨坑。',
   'guide.home.world.galeName': '疾风崖',
   'guide.home.world.gardenBlurb':
     '一片树篱迷宫般的国度，至今仍被谁也没见过的园丁修剪着，入口就在篱苑镇与它的喷泉庭院之后。',
@@ -22774,6 +22880,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你承受的下一次新娘的哀歌伤害提高{pct}%：每层{per}%，最多{max}层。下一次请在墓灯光芒中承受。',
   'hudChrome.auraEffect.crypt.slippery':
     '在光滑的冰面上：你的速度每秒最多改变{grip}码/秒，所以起步缓慢，停下时会继续滑行，转向时会甩出大弧线。离开冰面就能重新站稳。',
+  'hudChrome.auraEffect.quartered.galeLane':
+    '狂风推着你沿山路向旋风峰顶前进，即使你站着不动也一样：速度最高可达{speed}码/秒，接近峰顶时逐渐减缓到{summit}码/秒。无论转弯还是跳跃，它都会让你留在路上。平移可以横穿道路，朝山下移动则可以逆风而行。被狂风推动时，施法会被打断。离开风道后最多持续{linger}秒，带你越过风道之间的空隙。',
   'hudChrome.auraEffect.crypt.harmony':
     '受到的伤害降低{pct}%：她每有一名存活的唱诗者就降低{per}%。先杀死唱诗者。',
   'hudChrome.auraEffect.crypt.crescendo':

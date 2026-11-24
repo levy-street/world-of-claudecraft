@@ -4732,6 +4732,9 @@ export const cs_CZ: EnTranslations = {
         "graspRoot": "Držen rukama hrobu: nemůže se pohybovat {seconds} s.",
         "knellAirborne": "Létá nad Obřadním kruhem mimo dosah. Na {mark} s označí polovinu kruhu a pak ji zalije přízračným ohněm: všichni v ní utrpí {min} až {max} ohnivého poškození. Při každém letu spálí {breaths} polovin a potom přistane."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Utrpí o {pct}% méně poškození: {per}% za každý dosud držící řetěz. Rozbijte Pečetní okov a shodíte jeho řetěz.",
         "enrage": "Způsobuje o {pct}% více poškození.",
@@ -9342,6 +9345,8 @@ export const cs_CZ: EnTranslations = {
         "gardenBlurb": "Říše živého bludiště, které dosud stříhal jen zahradník, jehož nikdo nikdy nespatřil, do níž se vchází kolem Hedgewicku a jeho fontánových nádvoří.",
         "galeName": "Vichrný hřeben",
         "galeBlurb": "Přímořské útesy a vyjící stráně, kde vítr nikdy neustává a Wickharbor pevně zavírá své brány.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Úroveň {level}"
       },
       "group": {
@@ -10286,6 +10291,7 @@ export const cs_CZ: EnTranslations = {
       "nightBlurb": "Říše hvězdné půlnoci, kde květy osvětlují stezky a Měsíční klid udržuje tichou hlídku pod snící oblohou.",
       "hauntBlurb": "Strašidelný les pod obřími korunami, kde jsou lucerny Šibenicového močálu jediným poctivým světlem na cestě.",
       "galeBlurb": "Mořské útesy a kvílivé stráně, kde vítr nikdy neustává, Starý maják nikdy nezhasíná a Osadní přístav pevně zavírá své dveře.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Tropický spletenec palem, bílého písku a hlučného ptactva, přičemž pobřežní město Naplavený přístav udržuje na pláži zapálený oheň.",
       "gardenBlurb": "Zahradní říše živoplotového bludiště, stále stříhaná nikým, koho kdo viděl, do níž se vchází kolem Živoplotova a jeho fontánových nádvoří.",
       "valeGreeting": "Měj čepel po ruce. Údolí už není, co bývalo.",
@@ -10310,6 +10316,8 @@ export const cs_CZ: EnTranslations = {
       "hauntGreeter": "Lampář, Šibenicový močál",
       "galeGreeting": "Vítr tu nikdy ani na chvíli neustal a Starý maják nikdy ani na okamžik nezhasl. Zavři za sebou dveře hospody.",
       "galeGreeter": "Strážce majáku, Osadní přístav",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Teplý písek, hlučné ptactvo a džungle, která pohlcuje obzor. Udržujeme na pláži zapálený oheň; snaž se k němu vrátit.",
       "jungleGreeter": "Přístavní velitelka, Naplavený přístav",
       "gardenGreeting": "Někdo pořád stříhá živé ploty, ačkoliv zahradníka nikdo neviděl už sto let. Dej pozor na bludiště: ono dává pozor i na tebe.",
@@ -10325,6 +10333,7 @@ export const cs_CZ: EnTranslations = {
       "nightPlaceNotes": "Měsíční klid drží hlídku. Noční brána je cestou do půlnoční krajiny; Měsíční studna uchovává hvězdné světlo, u kterého můžeš stát; Soumrakové pole kvete ve tmě; Stálá hlídka bdí, aniž by se kdy pohnula; a Bezesná mohyla je jediným místem zde, které nikdy nesní.",
       "hauntPlaceNotes": "Šibenicový močál se choulí uvnitř svých luceren. Crowgate je ponurou přední branou lesa; Widow's Thicket je protkán pavučinami; Hanging Glade a Mournstone Chapel střeží nejstarší žal lesa a Huntsman's Clearing patří tomu, co tam stále loví.",
       "galePlaceNotes": "Osadní přístav se opírá o vítr. Větrná cesta je cesta útesem dovnitř; Kvílivé stráně se táhnou bez stromů pod vichrem; Starý maják hoří tak dlouho, jak si kdo pamatuje; Sráz padá strmě k vodě; Vraková pole udržují pobřeží poctivé; a Zrcadlové jezírko je tou jedinou tichou věcí v celé říši.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Naplavený přístav udržuje svůj oheň na pláži. Spletené ústí je místem, kde řeka narazí na zelenou hráz; Palmová pláž se táhne bílá a teplá podél příboje; Smaragdová spleť a Liánový pád pohlcují vnitrozemí; Safírová laguna svítí čirá a hluboká; a Potopená modla vyhlíží zpod hladiny.",
       "gardenPlaceNotes": "Živoplotov čeká u Zahradní brány. Parterová promenáda kvete v zastřižených barvách; Hrad Úsvitu cvičí své rytíře za novými hradbami; Okvětní rybník se rok co rok vznáší v růžové; Starý mlýn obrací své vlastní záhony; Velké bludiště přeskupuje své cesty pro každého hosta, jeho oblouky střeženy listnatými liškami; Severní hlídka střeží výjezdovou cestu; Liliová kotlina odpočívá za tím vším; a Fontánové nádvoří stále čistě protéká v srdci zahrady.",
       "gladeTitle": "Tichý kout: Mýtina Brightwoodu",
@@ -11116,6 +11125,10 @@ export const cs_CZ: EnTranslations = {
         "logging": "Tvé první naleziště v jakékoli živnosti získá Plody pole a limit 100 v Dřevorubectví zapíše Tesače srdcoviny. Dosažení 100 ve třech z Těžby, Dřevorubectví, Bylinkářství a Rybaření přidá Mistra sběrače za 25 Věhlasu a záseky do dávného jádra zaznamenají svůj vlastní sběratelský odkaz. Skutky jsou jen tituly a Věhlas, nikdy moc.",
         "herbalism": "Tvé první naleziště v jakékoli živnosti získá Plody pole a limit 100 v Bylinkářství zapíše Pána luk. Dosažení 100 ve třech z Těžby, Dřevorubectví, Bylinkářství a Rybaření přidá Mistra sběrače za 25 Věhlasu a měsíčně kvetoucí květ zaznamená svůj vlastní sběratelský odkaz. Skutky jsou jen tituly a Věhlas, nikdy moc.",
         "fishing": "Milník 100 zapíše Starého solanáře a 200 zapíše Mistrného rybáře i s jeho titulem, úplný vrchol rybářského umění; Rybaření se také počítá k Mistru sběrači, získanému na 100 ve třech libovolných sběratelských živnostech. První ryba z vod každé ze šesti zón zaplní vlastní stránku, tří vnitrozemských zón a Vrbové bažiny, Vichrného hřebene a Vzdáleného pobřeží za nimi, a Slunolesklý koi zapíše Záblesk naděje, takže cestovatelé s prutem v batohu si knihu plní rychleji, než čekají.",
+        "miningWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "loggingWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalismWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishingWithIsle": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
         "farmingSown": "Zemědělství má nyní v Knize skutků vlastní polici. Začíná se sázet označí první zasazenou plodinu a čtyři kronikářské stránky označí první úspěšnou sklizeň na každém místě záhonů, od Údolí Eastbrooku po Evergarden. Zlatá sklizeň zapíše vlastní sběratelskou značku s nulovou Hrdostí a zdatnost v Zemědělství se počítá do Mistra sběračů, kterého získáš na 100 ve kterýchkoli třech sběračských řemeslech. Každý brázdový záhon shromáždí celý seznam na jedné stránce: vypěstuj každou plodinu, kterou čtyři zahrady nesou, a sbírka se uzavře. Vrchol nad ním je Mistr sklizně, titul tohoto řemesla za zdatnost 100, a protože semena hor a parteru nyní leží na pultech jejich farmářů, je to cesta, kterou můžeš dokončit už dnes. Skutky jsou pouze tituly a Hrdost, nikdy síla."
       },
@@ -24515,6 +24528,12 @@ export const cs_CZ: EnTranslations = {
       "gourdlight_crow_feather": {
         "name": "Pero dýňové vrány"
       },
+      "council_inscription": {
+        "name": "Council Inscription"
+      },
+      "colossus_makers_mark": {
+        "name": "Colossus Maker's Mark"
+      },
       "membership_staff": {
         "name": "Hůl proměny"
       },
@@ -26407,6 +26426,9 @@ export const cs_CZ: EnTranslations = {
       "drowned_deckhand": {
         "name": "Utopený lodník"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Trhlinozplozenec"
       },
@@ -26631,6 +26653,33 @@ export const cs_CZ: EnTranslations = {
       },
       "buddy_phantom": {
         "name": "Přízrak"
+      },
+      "quench_shardling": {
+        "name": "Quench Splinter"
+      },
+      "rimeglass_bear": {
+        "name": "Rimeglass Bear"
+      },
+      "warden_of_the_quench": {
+        "name": "Warden of the Quench"
+      },
+      "heatsworn_ember": {
+        "name": "Heatsworn Ember"
+      },
+      "cinderscar_caller": {
+        "name": "Cinderscar Caller"
+      },
+      "ember_hound": {
+        "name": "Ember Hound"
+      },
+      "the_glassfield_brute": {
+        "name": "The Glassfield Brute"
+      },
+      "heaved_shardling": {
+        "name": "Heaved Splinter"
+      },
+      "veinback_burrower": {
+        "name": "Veinback Burrower"
       },
       "ironvein_foreman": {
         "name": "Předák Železné žíly"
@@ -27009,6 +27058,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Pokladník Aldous Crane",
         "title": "Pozlacená truhlice",
         "greeting": "Každá bedna, truhlička i cetka je u Pozlacené truhlice v bezpečí."
+      },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
       },
       "brother_aldric_raid": {
         "name": "Bratr Aldric",
@@ -27484,6 +27538,26 @@ export const cs_CZ: EnTranslations = {
         "name": "Laverock",
         "title": "Poslední kantor Bledého sboru",
         "greeting": "Byl jsem nejmladším hlasem Bledého sboru. V noci obřadu jsem nepil a utekl jsem. Od té doby je za každého úplňku slyším zpívat pod vodou. Musím ji vidět, než zemřu. Nech mě jít za tebou. Nebudu bojovat a nebudu tě zdržovat."
+      },
+      "keeper_ansel_morrow": {
+        "name": "Keeper Ansel Morrow",
+        "title": "Keeper of the Moot Rolls",
+        "greeting": "Every challenger who climbs this hill wants to beat the council, {playerName}. I want to know why they are worth beating."
+      },
+      "innkeeper_bettany_quell": {
+        "name": "Bettany Quell",
+        "title": "Innkeeper",
+        "greeting": "Mind the boots by the door, the Hoarshelf sleet gets into everything. The fire is lit and the stew is hot, and a challenger who lost today still gets fed."
+      },
+      "outfitter_harl_bracken": {
+        "name": "Harl Bracken",
+        "title": "Outfitter",
+        "greeting": "Salves, tonics and a field kit for the road. The quarters break everything else, so carry your own tools."
+      },
+      "captain_thessaly_rivalmoot": {
+        "name": "Captain Thessaly",
+        "title": "Challengers' Leader",
+        "greeting": "The council has sat on that peak unchallenged for longer than anyone remembers. My challengers mean to change that. Prove yourself on the scars first, {playerName}."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -29881,6 +29955,75 @@ export const cs_CZ: EnTranslations = {
           }
         }
       },
+      "q_qi_the_moot_rolls": {
+        "title": "The Moot Rolls",
+        "text": "Rivalmoot keeps a roll of every challenger who came to test the council, {playerName}, and not one line on why the council is worth testing. I mean to write that history. Start with Captain Thessaly by the hall: her challengers have walked every quarter of this isle, and soldiers remember what scholars miss.",
+        "completion": "Ansel sent you? Then he is finally asking the right people. My challengers have found carved stones in every quarter, older than this town, and nobody here can read them. Take that back to him.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Captain Thessaly"
+          }
+        }
+      },
+      "q_qi_words_in_stone": {
+        "title": "Words in the Stone",
+        "text": "Thessaly's stones are the council's own inscriptions, {playerName}, I would stake my rolls on it. Three stand where the war scarred the land worst: one on the Hoarshelf, one by the Fireice Rift and one below the Hammer's Cut. Read each one and bring me every word.",
+        "completion": "Ice, fire and stone, each claiming the isle for its own art, and all three signed by the same hand. The council was never four strangers, {playerName}. It was one council at war with itself.",
+        "objectives": {
+          "0": {
+            "label": "Council Inscription read"
+          }
+        }
+      },
+      "q_qi_servants_at_their_posts": {
+        "title": "Servants at Their Posts",
+        "text": "The inscriptions name the council's servants, sworn to hold each quarter until their masters returned. The masters never came back, and the servants never stopped holding. Thin them, {playerName}: six Quench Splinters on the Hoarshelf, six Heatsworn Embers in the Burnways and six Heaved Splinters on the Heaved Slabs.",
+        "completion": "Six of each, and the quarters a little quieter for it. Their cores were cut with the same mark as the inscriptions. Whoever made the servants made the stones too.",
+        "objectives": {
+          "0": {
+            "label": "Quench Splinter slain"
+          },
+          "1": {
+            "label": "Heatsworn Ember slain"
+          },
+          "2": {
+            "label": "Heaved Splinter slain"
+          }
+        }
+      },
+      "q_qi_wardens_of_the_arts": {
+        "title": "Wardens of the Arts",
+        "text": "Two of the council's wardens still stand, one in the Crevasses of the Hoarshelf and one sunk in the Glassfield of the Cinderscar. The inscriptions call them the keepers of their arts' secrets, and they will not share them willingly, {playerName}. Bring down the Warden of the Quench and the Glassfield Brute.",
+        "completion": "Both wardens broken, and each carried a seal-stone cut with a giant's outline. The council built something together after all, something larger than any of them. Every mark points to the Heavestone.",
+        "objectives": {
+          "0": {
+            "label": "Warden of the Quench slain"
+          },
+          "1": {
+            "label": "The Glassfield Brute slain"
+          }
+        }
+      },
+      "q_qi_the_fallen_giant": {
+        "title": "The Fallen Giant",
+        "text": "A stone head the size of a house lies in the Heavestone Wilds, where the Fallen Giant fell. The challengers call it a statue. I think it is what the seal-stones point to. Find the maker's mark on it, {playerName}, and tell me whose hand cut it.",
+        "completion": "The four arts' runes, cut side by side into one mark. The council made the giant together, the first time they ever worked as one. It was meant to hold Korzul, and it fell before it was finished. Something of it still stands guard beside its own head.",
+        "objectives": {
+          "0": {
+            "label": "Colossus Maker's Mark found"
+          }
+        }
+      },
+      "q_qi_the_first_colossus": {
+        "title": "The First Colossus",
+        "text": "The first colossus never held the beast. It fell, and the council built another that did. But what is left of the first still keeps its post at the Fallen Giant, half-carved and long forgotten, striking down anyone who comes near. Lay it to rest, {playerName}. This isle's history should not end with a guard who never learned the war was over.",
+        "completion": "Then the Remnant rests, and the rolls have their first true chapter: four rivals who could agree on nothing, until the day they had to build a giant together. Rivalmoot owes you a line in its history, {playerName}, and I will write it myself.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the First Colossus slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Utopený sbor",
         "text": "Brodci nejednají sami. Mezi nimi kráčejí utopení zasvěcenci, kult, který se potopil s chrámem, stále ve shnilých rouchách a stále zpívá modlitbu ze skal na břehu. Umlč osm z nich a přines mi šest obětin, které nesou. Chci vědět, co hodlají dát své bohyni.",
@@ -30381,6 +30524,57 @@ export const cs_CZ: EnTranslations = {
           },
           "4": {
             "label": "Překážková dráha"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

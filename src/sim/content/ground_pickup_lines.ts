@@ -215,4 +215,13 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     deny: "The watchbell answers only the bellkeeper's errand.",
     enough: 'Every coastal watchbell has been rung.',
   },
+  // the Quartered Isle's Moot Rolls (content/quartered_isle_story.ts)
+  council_inscription: {
+    deny: "The inscription is cut deep into the stone. Without the Keeper's errand, there is nothing here to copy.",
+    enough: 'You have copied every council inscription the Keeper asked for.',
+  },
+  colossus_makers_mark: {
+    deny: "The maker's mark is worn into the giant's plating. Without a reason to study it, it tells you nothing.",
+    enough: "You have already taken a rubbing of the maker's mark.",
+  },
 };

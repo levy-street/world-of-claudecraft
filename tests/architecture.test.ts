@@ -1500,9 +1500,23 @@ const RENDER_PURE_CORES = [
   'src/render/garden_parterre_core.ts',
   'src/render/far_surface_core.ts',
   'src/render/far_terrain_core.ts',
+  'src/render/quartered_ground_core.ts',
   'src/render/foliage_impostor_core.ts',
   'src/render/foliage_frame_windows_core.ts',
   'src/render/lava_chain_core.ts',
+  'src/render/quartered_landmark_dressing_core.ts',
+  'src/render/quartered_landmark_lane_core.ts',
+  // the Gyre's surface and wind: the cliff skin cut over the peak (gyre_surface.ts), and the
+  // wind's ribbons, leaves and pocket spirals (gyre_wind.ts)
+  'src/render/gyre_rock_skin_core.ts',
+  'src/render/gyre_wind_core.ts',
+  'src/render/quartered_floating_debris_core.ts',
+  // the storm round the raid isle: its cloud cards, bolts and strike clock (quartered_raid_storm.ts)
+  'src/render/quartered_raid_storm_core.ts',
+  'src/render/quartered_fissure_lava_core.ts',
+  // the scatter boulders' biome and Cinderscar tint (foliage.ts)
+  'src/render/scatter_rock_tint_core.ts',
+  'src/render/quartered_lake_ice_core.ts',
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
@@ -1522,6 +1536,7 @@ const RENDER_PURE_CORES = [
   'src/render/zone_eviction_core.ts',
   'src/render/drakelands_kit_lane_core.ts',
   'src/render/zone_prewarm_templates_core.ts',
+  'src/render/zone_prewarm_body_wait_core.ts',
   'src/render/cast_vfx_readiness_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/material_program_shape_core.ts',

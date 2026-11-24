@@ -12,7 +12,8 @@
 // world active and then puts the previous one back: the result never depends
 // on which map happened to be open before.
 
-import { getActiveWorldContent, setActiveWorldContent } from '../sim/data';
+import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../sim/data';
+import { insideAnyZone, missingLateZones } from './builtin_zone_match_core';
 import { applyDefaultCollision } from './collision_defaults';
 import { type CustomMap, customMapToWorldContent } from './custom_map';
 import { promoteFeatureDressing } from './feature_prop_placements';
@@ -36,15 +37,22 @@ export function upgradeLoadedMap(map: CustomMap): void {
     return;
   }
   const previous = getActiveWorldContent();
+  // A full-world map saved before a built-in zone existed does not carry that
+  // zone: nothing an upgrade adds may land on its ground (builtin_zone_match_core.ts).
+  const absent = missingLateZones(map.content.zones, BUILTIN_WORLD.zones);
+  const before = absent.length ? new Set(map.placements) : null;
   setActiveWorldContent(customMapToWorldContent(map));
   try {
-    applyUpgrades(map);
+    applyUpgrades(map, (m) => {
+      if (!before) return;
+      m.placements = m.placements.filter((p) => before.has(p) || !insideAnyZone(absent, p.x, p.z));
+    });
   } finally {
     setActiveWorldContent(previous);
   }
 }
 
-function applyUpgrades(map: CustomMap): void {
+function applyUpgrades(map: CustomMap, beforeIds: (map: CustomMap) => void): void {
   promoteMajorWorldProps(map);
   promoteEditablePalms(map);
   promoteStreetlamps(map);
@@ -68,5 +76,6 @@ function applyUpgrades(map: CustomMap): void {
       map.content.npcs.proving_shore_guide.dynamic = true;
     }
   }
+  beforeIds(map);
   ensureMapItemIdsFromContent(map);
 }

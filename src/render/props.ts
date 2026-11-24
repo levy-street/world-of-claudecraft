@@ -49,6 +49,14 @@ import {
 } from './fenbridge_town';
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
+import { isStormRockMaterial } from './gyre_storm_rock';
+import {
+  createGyreSurfaceView,
+  gyreCliffPlaceholder,
+  gyreCliffTexture,
+  onGyreCliffTexture,
+} from './gyre_surface';
+import { createGyreWindView } from './gyre_wind';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
 import { highwatchGuildFlames, highwatchGuildLights } from './highwatch_guild_lights';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
@@ -86,6 +94,7 @@ import {
   propRevealRoots,
   updatePropCullables,
 } from './prop_cull_core';
+import { tickRaidStorm } from './quartered_raid_storm';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
   isLowSceneryCullActive,
@@ -230,6 +239,34 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   rockTallH: { url: '/models/props/rock_tall_h.glb', kit: 'minerock' },
   rockLargeD: { url: '/models/props/rock_large_d.glb', kit: 'minerock' },
   rockLargeF: { url: '/models/props/rock_large_f.glb', kit: 'minerock' },
+  // the Quartered Isle's generated stone (scripts/asset_pipeline, textures
+  // baked over Poly Haven CC0 detail): the Cinderscar's columns, rubble and
+  // lava vents, the Hoarshelf's snow floes and outcrop, the Wilds' sandstone
+  cinderColumnsTall: { url: '/models/props/cinder_columns_tall.glb', kit: 'qprops' },
+  cinderColumnRubble: { url: '/models/props/cinder_column_rubble.glb', kit: 'qprops' },
+  cinderLavaVent: { url: '/models/props/cinder_lava_vent.glb', kit: 'qprops' },
+  frostFloeSlab: { url: '/models/props/frost_floe_slab.glb', kit: 'qprops' },
+  frostFloeBroad: { url: '/models/props/frost_floe_broad.glb', kit: 'qprops' },
+  frostSnowOutcrop: { url: '/models/props/frost_snow_outcrop.glb', kit: 'qprops' },
+  heaveStrataLarge: { url: '/models/props/heave_strata_large.glb', kit: 'qprops' },
+  heaveStrataSmall: { url: '/models/props/heave_strata_small.glb', kit: 'qprops' },
+  heaveStrataRubble: { url: '/models/props/heave_strata_rubble.glb', kit: 'qprops' },
+  // the Gyre's crown and climb (src/sim/content/quartered_council_seat.ts): the sealed gate,
+  // the way beacon and the paved plaza. Their own kit: each model ships a glow map that only
+  // this kit lights (convertMaterial)
+  councilSeatGate: { url: '/models/props/council_seat_gate.glb', kit: 'council' },
+  councilBeacon: { url: '/models/props/council_beacon.glb', kit: 'council' },
+  councilPlaza: { url: '/models/props/council_plaza.glb', kit: 'council' },
+  // the Gyre's storm granite (src/sim/content/quartered_gyre_crags.ts): a spire stack, a bluff, a
+  // wind arch and a standing stone, cut from the Smith's Heart raid's painted Breath kit
+  gyreStormSpire: { url: '/models/props/gyre_storm_spire.glb', kit: 'council' },
+  gyreStormBluff: { url: '/models/props/gyre_storm_bluff.glb', kit: 'council' },
+  gyreStormArch: { url: '/models/props/gyre_storm_arch.glb', kit: 'council' },
+  gyreStormStone: { url: '/models/props/gyre_storm_stone.glb', kit: 'council' },
+  // the railing along the Gyre's outer lip (content/quartered_gyre_rails.ts): the raid's low storm
+  // walls, two variants laid in turn
+  gyreStormWallA: { url: '/models/props/gyre_storm_wall_a.glb', kit: 'council' },
+  gyreStormWallB: { url: '/models/props/gyre_storm_wall_b.glb', kit: 'council' },
   mushroomRed: { url: '/models/props/mushroom_red.glb', kit: 'shroom' },
   mushroomTan: { url: '/models/props/mushroom_tan.glb', kit: 'shroom' },
   // The Mirefen mudfin huts (src/sim/mudfin_huts.ts): the art lead's painted
@@ -533,6 +570,29 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'crateWooden',
   'barrel',
   'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
+  // the Quartered Isle's stone: authored decor with colliders, drawn on every
+  // tier, so the low tier prewarms what blocks as well
+  'cinderColumnsTall',
+  'cinderColumnRubble',
+  'cinderLavaVent',
+  'frostFloeSlab',
+  'frostFloeBroad',
+  'frostSnowOutcrop',
+  'heaveStrataLarge',
+  'heaveStrataSmall',
+  'heaveStrataRubble',
+  // the Gyre's crown and climb: authored decor with colliders (the gate, the beacons) and the
+  // plaza under them, drawn on every tier
+  'councilSeatGate',
+  'councilBeacon',
+  'councilPlaza',
+  // the Gyre's storm granite: crags and stones with colliders, drawn on every tier
+  'gyreStormSpire',
+  'gyreStormBluff',
+  'gyreStormArch',
+  'gyreStormStone',
+  'gyreStormWallA',
+  'gyreStormWallB',
   // The race fixtures are GAMEPLAY landmarks (players ride a timed course
   // against them), so every tier renders them: hiding one on low gfx would
   // break the gameplay-neutral graphics invariant.
@@ -704,6 +764,10 @@ interface PropAsset {
 }
 
 const extractCache = new Map<string, PropAsset>();
+/** How strongly a Council's Seat model's glow map lights (a calm glow: the map is black but for
+ *  the crystals, coals, seal and cracks, and bloom does the rest). */
+const COUNCIL_GLOW_INTENSITY = 0.9;
+
 const matConvCache = new Map<string, THREE.Material>();
 
 /** Drop profile-derived prop geometry/materials while retaining unresolved source recipes. */
@@ -762,14 +826,24 @@ function convertMaterial(
     familyOverride === undefined
       ? ''
       : `${familyOverride?.family ?? 'none'}${familyOverride?.strength ?? ''}`;
-  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}|d${s.side}|f${famKey}`;
+  // The Council's Seat kit (src/sim/content/quartered_council_seat.ts): each model ships a glow
+  // map, its painted crystals, coals, seal and cracks on black, so its own emissive map lights
+  // only those texels. Every other kit ignores a source emissive map, as before.
+  const councilGlow = kit === 'council' && !!s.emissiveMap;
+  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}|d${s.side}|f${famKey}|g${councilGlow ? 1 : 0}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
   const color =
     ov?.color !== undefined
       ? new THREE.Color(ov.color)
       : (s.color?.clone() ?? new THREE.Color(0xffffff));
-  const map = s.map ?? null;
+  // the Gyre's storm rock wears the shared painted cliff tile (render/gyre_surface.ts) rather than
+  // an atlas of its own: its triangles are projected into the tile, so its GLBs ship no texture
+  const stormRock = kit === 'council' && isStormRockMaterial(s.name);
+  const stormTile = stormRock ? gyreCliffTexture() : null;
+  // a tile not in hand yet starts on the shared stand-in, so the map slot (and the shader program)
+  // is there from the first compile and the swap below changes a texture, never the program
+  const map = (stormRock ? (stormTile ?? gyreCliffPlaceholder()) : null) ?? s.map ?? null;
   // Tripo-generated 'hollow' kit: one baked painterly albedo per model, glow
   // painted in, smooth normals. Two nudges make them sit beside the
   // hand-authored kits: flat shading (faceted low-poly light response) and a
@@ -799,9 +873,15 @@ function convertMaterial(
       metalness:
         ov?.metalness ??
         (s.isMeshStandardMaterial && METAL_MAT_NAME.test(s.name) ? Math.min(s.metalness, 0.85) : 0),
-      emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
-      emissiveMap: hollowEmissive ? map : null,
-      emissiveIntensity: hollowEmissive ? 0.3 : (ov?.emissiveIntensity ?? 1),
+      emissive: new THREE.Color(
+        hollowEmissive || councilGlow ? 0xffffff : (ov?.emissive ?? 0x000000),
+      ),
+      emissiveMap: hollowEmissive ? map : councilGlow ? s.emissiveMap : null,
+      emissiveIntensity: hollowEmissive
+        ? 0.3
+        : councilGlow
+          ? COUNCIL_GLOW_INTENSITY
+          : (ov?.emissiveIntensity ?? 1),
       // Metal-named kit materials (MI_Trim_Metal, WornIron, ...) get a mild
       // per-material env boost so anvils/fittings catch the sky IBL; the name
       // is already part of the cache key above. Everything else keeps the
@@ -817,9 +897,15 @@ function convertMaterial(
       side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
-      emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
-      emissiveMap: hollowEmissive ? map : null,
-      emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
+      emissive: new THREE.Color(
+        hollowEmissive || councilGlow ? 0xffffff : (ov?.emissive ?? 0x000000),
+      ),
+      emissiveMap: hollowEmissive ? map : councilGlow ? s.emissiveMap : null,
+      emissiveIntensity: hollowEmissive
+        ? 0.2
+        : councilGlow
+          ? COUNCIL_GLOW_INTENSITY * 0.6
+          : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
   // Distant-zone air (biome_haze_field.ts): every converted kit material
@@ -841,7 +927,7 @@ function convertMaterial(
     familyOverride !== undefined
       ? familyOverride
       : wornFamilyFor(kit, s.name, {
-          emissive: !!hollowEmissive || (ov?.emissive ?? 0) !== 0,
+          emissive: !!hollowEmissive || councilGlow || (ov?.emissive ?? 0) !== 0,
           transparent: s.transparent === true,
           hasOwnMaps: !!(s.normalMap || s.roughnessMap),
         });
@@ -851,6 +937,13 @@ function convertMaterial(
     });
   }
   mat.name = `${kit}:${s.name}`;
+  // the tile not in hand yet (a host that never opened the world-entry preload): bind it when it lands
+  if (stormRock && !stormTile) {
+    onGyreCliffTexture((t) => {
+      (mat as THREE.MeshStandardMaterial).map = t;
+      mat.needsUpdate = true;
+    });
+  }
   matConvCache.set(key, mat);
   return mat;
 }
@@ -1757,7 +1850,15 @@ export function buildProps(
     if (d.pitch || d.roll) g.rotation.set(d.pitch ?? 0, d.rot ?? 0, d.roll ?? 0, 'YXZ');
     group.add(shadowed(g));
     if (d.r) {
-      registerHideable(g, circleFootprint(d.x, d.z, d.r, baseY + (d.h ?? 4)));
+      const top = baseY + (d.h ?? 4);
+      // a row with a box collider (hw and hd) fades as its own box, not the circle round it, so
+      // the camera behind a player standing at a gate's steps does not fade the whole gate
+      registerHideable(
+        g,
+        d.hw && d.hd
+          ? obbFootprint(d.x, d.z, d.hw, d.hd, d.rot ?? 0, top)
+          : circleFootprint(d.x, d.z, d.r, top),
+      );
     }
   }
   // The scheduled ferry (render/transport_ferry_ships.ts): the same ship model,
@@ -1919,14 +2020,19 @@ export function buildProps(
   const STONE_MODULE_LEN = 1.155 * STONE_WALL_SCALE;
   const PALISADE_MODULE_LEN = 2.0; // authored length before scaling
   const PALISADE_SEG = 6.4; // target module length in the world
+  const STORM_MODULE_LEN = 6.0; // authored length of the storm wall (render/props.ts gyreStormWall*)
   for (const f of activeContent.props.fences) {
     if (eastbrookTown && isEastbrookRebuildFence(f)) continue;
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
     const stone = f.kind === 'stone';
     const palisade = f.kind === 'palisade';
+    const storm = f.kind === 'storm';
     const n = Math.max(
       1,
-      Math.round(len / (stone ? STONE_MODULE_LEN : palisade ? PALISADE_SEG : 2.35)),
+      Math.round(
+        len /
+          (stone ? STONE_MODULE_LEN : palisade ? PALISADE_SEG : storm ? STORM_MODULE_LEN : 2.35),
+      ),
     );
     const dirx = (f.x2 - f.x1) / len,
       dirz = (f.z2 - f.z1) / len;
@@ -1953,6 +2059,20 @@ export function buildProps(
           mz,
           new THREE.Euler(-pitch, yaw, 0, 'YXZ'),
           [STONE_WALL_SCALE, STONE_WALL_SCALE, segScale],
+        );
+        continue;
+      }
+      if (storm) {
+        // two wall models in turn along the run (a stable pick per module), length along local +x,
+        // stretched to close the run exactly and pitched with the ground; sunk a touch like the
+        // stone wall so the base course follows a sloped path without floating
+        addInstance(
+          propRand(mx, mz, 7) < 0.5 ? 'gyreStormWallA' : 'gyreStormWallB',
+          mx,
+          (g0 + g1) / 2 - 0.2,
+          mz,
+          new THREE.Euler(0, yaw, pitch, 'YZX'),
+          [len / n / STORM_MODULE_LEN, 1, 1],
         );
         continue;
       }
@@ -2754,6 +2874,13 @@ export function buildProps(
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
   const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
   prepareSceneryDetailRoot(group);
+  // the Gyre's wind (render/gyre_wind.ts): built with the props so every material is in the scene
+  // before the first prewarm; the isle's own content, so only a world with that peak draws it
+  const gyreWind = builtInWorld ? createGyreWindView(ground) : null;
+  if (gyreWind) group.add(gyreWind.group);
+  // ... and its painted stone: the flagstone road and the faceted cliff skin (render/gyre_surface.ts)
+  const gyreSurface = builtInWorld ? createGyreSurfaceView(ground) : null;
+  if (gyreSurface) group.add(gyreSurface.group);
   const cullPass = newPropCullPass();
   let revealGate: RevealGateCore | null = null;
   let bandRevealGate: RevealGateCore | null = null;
@@ -2783,6 +2910,10 @@ export function buildProps(
       dt: number,
       reducedMotion = false,
     ): void {
+      gyreWind?.update(dt, reducedMotion, camX, camZ, fogFar);
+      // the storm round the raid isle: built by the isle's landmark dressing,
+      // which has no per-frame hook of its own (render/quartered_raid_storm.ts)
+      tickRaidStorm(dt, reducedMotion, camX, camZ, fogFar);
       const lowCull = isLowSceneryCullActive(fogFar);
       const clutterFar = sceneryClutterFar(fogFar);
       const clutterFarSq = clutterFar * clutterFar;

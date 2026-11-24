@@ -1371,4 +1371,16 @@ export const table: DeedLocaleTable = {
     desc: '고드라이트 축제의 밤 동안 세계 곳곳에 숨겨진 유령 호박을 모두 찾으세요.',
     title: '공허한 자',
   },
+  chr_quartered_isle_gatherer: {
+    name: '네 구역의 선물',
+    desc: '사분섬에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
+  },
+  chr_quartered_isle_first_cast: {
+    name: '네 구역 사이에 드리운 낚싯줄',
+    desc: '사분섬의 물가에서 물고기를 낚습니다.',
+  },
+  hid_gilded_grand_tour: {
+    name: '도금빛 대유람',
+    desc: '도금 금고의 네 지점 모두와 거래를 했습니다.',
+  },
 };

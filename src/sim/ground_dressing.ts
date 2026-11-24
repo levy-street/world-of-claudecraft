@@ -2,11 +2,13 @@ import {
   activeZoneAt,
   CAMPS,
   getActiveWorldContent,
+  isBuiltinWorldActive,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
   ZONES,
 } from './data';
+import { quarteredLandmarkClears } from './quartered_landmarks';
 import type { BiomeId } from './types';
 import { roadDistance, terrainCutAtHeight, terrainHeight, WATER_LEVEL, zoneBiomeAt } from './world';
 
@@ -46,6 +48,7 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   jungle: 0.5,
   garden: 0.4,
   gale: 0.32,
+  quartered: 0, // a shattered waste of bare sand, red rock and snow: no tufts
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
@@ -198,6 +201,9 @@ export function generateGroundDressing(
       if (
         blocked ||
         roadDistance(x, z) < 4 ||
+        // never on the Quartered Isle's landmarks: the Gyre's path and crown, the rift's bed ...
+        // (the sim's decoration scatter keeps off them too, decoration_exclusions.ts)
+        (isBuiltinWorldActive() && quarteredLandmarkClears(x, z)) ||
         dressH < WATER_LEVEL + 1.2 ||
         // a boolean cut removes the ground: nothing to gather over the void
         terrainCutAtHeight(x, z, dressH) ||

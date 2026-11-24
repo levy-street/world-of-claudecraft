@@ -337,7 +337,7 @@ import {
 } from './door_portal';
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
-import { drakelandsKitLoadFor, drakelandsKitRecheck } from './drakelands_kit_lane';
+import { drakelandsKitLoadFor } from './drakelands_kit_lane';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { DynamicEntityAmbienceSources } from './dynamic_entity_ambience';
@@ -712,6 +712,11 @@ import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_mark
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import {
+  buildQuarteredLandmarks,
+  type QuarteredLandmarkDressingView,
+} from './quartered_landmark_dressing';
+import { quarteredLandmarkLoadFor, zoneKitRecheck } from './quartered_landmark_lane';
+import {
   attachEntityViewBody,
   buildQuestCaravanBody,
   isQuestCaravanEntity,
@@ -966,6 +971,7 @@ import {
   reportZonePrepare,
   type ZonePrewarmStats,
   type ZoneStreamingStats,
+  zonePrewarmStats,
 } from './zone_prepare_stats';
 import { runZoneBackgroundPrewarm, runZonePrewarmTask } from './zone_prewarm';
 import {
@@ -973,6 +979,7 @@ import {
   buildNpcPrewarmGroup,
   buildObjectPrewarmGroup,
   buildPlayerPrewarmGroup,
+  createZoneBodyWait,
   PREWARM_MOB_POOL_COPIES,
   PREWARM_OBJECT_ITEM_IDS,
   PREWARM_OBJECT_POOL_COPIES,
@@ -1760,6 +1767,7 @@ export class Renderer {
   private jungleFeatures: JungleFeaturesView | null = null;
   private gardenFeatures: GardenFeaturesView | null = null;
   private galeFeatures: GaleFeaturesView | null = null;
+  private quarteredMarks: QuarteredLandmarkDressingView | null = null;
   private fogScratch = new THREE.Color();
   // Blue wash + bubbles (and the fog override) while the CAMERA is under a waterline.
   private underwaterView!: UnderwaterView;
@@ -1977,6 +1985,7 @@ export class Renderer {
   private prewarmedMobTemplates = new Set<string>();
   private prewarmedNpcModels = new Set<string>();
   private prewarmedZonePrograms = new Set<string>();
+  private readonly zoneBodyWait = createZoneBodyWait(this.prewarmedZonePrograms, this);
   private time = 0;
   private frameIdx = 0;
   // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
@@ -3459,6 +3468,7 @@ export class Renderer {
         this.prewarmedZonePrograms,
         this.prewarmedMobTemplates,
         this.prewarmedNpcModels,
+        this.zoneBodyWait,
       ],
       prewarmZone: (x, z) => this.prewarmZoneAt(x, z, { background: true }),
       presentationPrewarm: () => this.renderPresentationPrewarmPass(),
@@ -3618,7 +3628,7 @@ export class Renderer {
     // through prepareZoneAt's sky recovery branch (curtain, or idle pace).
     return zoneArrivalReady({
       prepared: this.preparedZones.has(id),
-      programsPrewarmed: this.prewarmedZonePrograms.has(id),
+      programsPrewarmed: this.zoneBodyWait.settledOrWaiting(id),
       standardMaterials: GFX.standardMaterials,
       skyResident: () =>
         skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome)),
@@ -3770,7 +3780,7 @@ export class Renderer {
     }
     const zone = zoneAt(x, z);
     const idlePace = opts?.pace === 'idle';
-    const kitLoad = drakelandsKitLoadFor(zone.biome);
+    const kitLoad = drakelandsKitLoadFor(zone.biome) ?? quarteredLandmarkLoadFor(zone.biome);
     const task = (async () => {
       const started = performance.now();
       onProgress?.(0, 100);
@@ -3888,7 +3898,7 @@ export class Renderer {
     if (this.shutdownStarted) return;
     const dungeon = dungeonAt(x);
     const zoneId = dungeon ? `dungeon:${dungeon.interior}` : this.zoneIdAt(x, z);
-    if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
+    if (zoneId === null || this.zoneBodyWait.skips(zoneId)) return;
     return runZonePrewarmTask(
       this.pendingZonePrewarms,
       zoneId,
@@ -3953,7 +3963,7 @@ export class Renderer {
               await this.compilePrewarmColorPrograms(this.scene, false);
             }
           }
-          this.prewarmedZonePrograms.add(zoneId);
+          this.zoneBodyWait.settle(zoneId, x, z, mobPrewarm.coldKeys);
         } finally {
           mobGroup.removeFromParent();
           npcGroup.removeFromParent();
@@ -3962,12 +3972,7 @@ export class Renderer {
           // prewarm awaits idle compile slots, leaving its shadow variant cold.
           for (const item of mobPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
           for (const item of npcPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
-          this.lastZonePrewarmStats = {
-            zoneId,
-            buildMs: Math.round(tBuild - t0),
-            compileMs: Math.round(tCompile - tBuild),
-            passMs: Math.round(performance.now() - tCompile),
-          };
+          this.lastZonePrewarmStats = zonePrewarmStats(zoneId, t0, tBuild, tCompile);
         }
       },
     );
@@ -4017,7 +4022,7 @@ export class Renderer {
     this.skyResidency.updateSkyResidency(cameraX, cameraZ);
     // The ACTIVE world's zones, never the module list.
     const zones = this.sim.cfg.world?.zones ?? ZONES;
-    const kitHolds = drakelandsKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);
+    const kitHolds = zoneKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
     // The ACTIVE zone list, not the shipped one: an authored map's background
@@ -4264,6 +4269,12 @@ export class Renderer {
         if (!this.galeFeatures) {
           this.galeFeatures = this.timedBuild('buildGaleFeatures', buildGaleFeatures);
           this.attachZoneFeature(this.galeFeatures, false);
+        }
+        break;
+      case 'quartered':
+        if (!this.quarteredMarks) {
+          this.quarteredMarks = this.timedBuild('buildQuarteredLandmarks', buildQuarteredLandmarks);
+          this.attachZoneFeature(this.quarteredMarks);
         }
         break;
       default:
@@ -5509,6 +5520,7 @@ export class Renderer {
     let entityPrewarmGroup: THREE.Group | null = null;
     let npcPrewarmGroup: THREE.Group | null = null;
     let entityPrewarmPool: { key: string; visual: CharacterVisual }[] = [];
+    let entityPrewarmCold: string[] = [];
     let npcPrewarmPool: { key: string; visual: CharacterVisual }[] = [];
     let deferPoolPublication = false;
     const poolsAwaitPublication = (): boolean =>
@@ -6115,6 +6127,7 @@ export class Renderer {
           const built = buildEntityPrewarmGroup(this.zonePrewarmHost(), activeZone);
           entityPrewarmGroup = built.group;
           entityPrewarmPool = built.pooled;
+          entityPrewarmCold = built.coldKeys;
           this.scene.add(entityPrewarmGroup);
         },
         detail: () =>
@@ -7082,7 +7095,7 @@ export class Renderer {
       prewarmPacing: pacing.receipt(compileBatchRoots, hardMaxMs),
     };
     this.lastPrewarmStats = stats;
-    this.prewarmedZonePrograms.add(activeZone.id);
+    this.zoneBodyWait.settle(activeZone.id, p.pos.x, p.pos.z, entityPrewarmCold);
     // Dev-channel diagnostic (pairs with main.ts's "[entry-guard] scene built"): one
     // line naming where the entry-time main-thread budget went, for isolating
     // world-entry process kills on real devices.
@@ -8450,9 +8463,8 @@ export class Renderer {
 
   private readonly onCharacterAssetReady = (url: string): void => {
     if (this.shutdownStarted) return;
-    // This fires for EVERY character GLB arrival, including the streamed
-    // creature bodies that can never be a weapon skin, and the scan below
-    // mints a skin-url string per skinned view: drop non-skin urls first.
+    this.zoneBodyWait.bodyArrived(); // a body a zone prewarm skipped cold may be this
+    // Every character GLB lands here: drop non-skin urls before the per-view skin scan.
     if (!isWeaponSkinModelUrl(url)) return;
     for (const [id] of this.views) {
       const skinId = this.sim.entities.get(id)?.weaponSkinId ?? null;

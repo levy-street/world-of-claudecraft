@@ -125,6 +125,34 @@ describe('renderer zone-streaming horizon', () => {
       }
     }
   });
+
+  it('steps an entry point out of ground a claimsOverlap zone took from the zone', () => {
+    // From the isle's centre the nearest Drakelands / Amberfall point lies in
+    // the isle's claim, so it must land one yard past the claimer's edge.
+    const byId = (id: string) => {
+      const zone = ZONES.find((z) => z.id === id);
+      if (!zone) throw new Error(`no zone ${id}`);
+      return zone;
+    };
+    const isle = byId('quartered_isle');
+    const isleEast = isle.xMax ?? 0;
+    const isleWest = isle.xMin ?? 0;
+    expect(zoneEntryPoint(byId('drakelands'), 0, 2200)).toEqual({ x: isleEast + 1, z: 2200 });
+    expect(zoneEntryPoint(byId('amberfall'), 0, 2200)).toEqual({ x: isleWest - 1, z: 2200 });
+    for (const cam of [
+      { x: 0, z: 2200 },
+      { x: 0, z: 2000 },
+      { x: 215, z: 2400 },
+      { x: -215, z: 2370 },
+    ]) {
+      for (const id of ['drakelands', 'amberfall', 'quartered_isle']) {
+        const entry = zoneEntryPoint(byId(id), cam.x, cam.z);
+        expect(zoneAt(entry.x, entry.z).id, `${id} from (${cam.x}, ${cam.z})`).toBe(id);
+      }
+    }
+    // An unclaimed classic entry point keeps the plain inset clamp.
+    expect(zoneEntryPoint(byId('drakelands'), 300, 1500)).toEqual({ x: 300, z: 1821 });
+  });
 });
 
 describe('teleport-arrival neighbourhood', () => {
@@ -141,9 +169,11 @@ describe('teleport-arrival neighbourhood', () => {
       landing.z,
       ARRIVAL_NEIGHBOR_STREAM_RADIUS,
     );
+    // (the Quartered Isle's south edge is 89 yd north of the landing)
     expect([...arrival.map((zone) => zone.id)].sort()).toEqual([
       'drakelands',
       'frostveil',
+      'quartered_isle',
       'wraithwood',
     ]);
   });

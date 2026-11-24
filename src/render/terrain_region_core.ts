@@ -13,6 +13,9 @@ export interface WorldRect {
   minZ: number;
   maxX: number;
   maxZ: number;
+  /** A zone rect that wins the ground it overlaps in a neighbour's rect
+   *  (ZoneDef.claimsOverlap): ownership tests it before every other rect. */
+  claimsOverlap?: boolean;
 }
 
 /** Axis-aligned XZ distance from a point to a rect. 0 when the point is inside. */
@@ -34,7 +37,17 @@ export function rectDistance(x: number, z: number, rect: WorldRect): number {
 // nearest rect is always one the gap actually abuts. Exactly one rect wins
 // either way, so a caller enumerating cells per rect covers the whole grid and
 // never builds a cell twice. Returns -1 only for an empty rect list.
+//
+// A claimsOverlap rect is tested first so a cell in claimed ground goes to the
+// claimer, matching zoneAt (the claimer sits AFTER the rects it overlaps in
+// zone order, so the plain first-containing walk would pick the neighbour).
+// Points outside every claim fall through to the unchanged walk below.
 export function owningRectIndex(x: number, z: number, rects: readonly WorldRect[]): number {
+  for (let i = 0; i < rects.length; i++) {
+    const rect = rects[i];
+    if (rect.claimsOverlap !== true) continue;
+    if (x >= rect.minX && x < rect.maxX && z >= rect.minZ && z < rect.maxZ) return i;
+  }
   let nearest = -1;
   let nearestDistance = Number.POSITIVE_INFINITY;
   for (let i = 0; i < rects.length; i++) {

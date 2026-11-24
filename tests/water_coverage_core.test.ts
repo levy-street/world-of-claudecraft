@@ -24,6 +24,7 @@ import {
   gapSheetWorthBuilding,
   gapsAdjacentTo,
   rectCovers,
+  sheetRectsForZone,
   WATER_GAP_MIN_SHORE_FRACTION,
   type WaterSheetRect,
   waterCoverageGaps,
@@ -198,6 +199,63 @@ describe('water sheet coverage', () => {
       { id: 'line', xMin: 10, xMax: 10, zMin: 0, zMax: 10 },
     ];
     expect(waterCoverageGaps(zones, { minX: 0, maxX: 10, minZ: 0, maxZ: 10 }, 0, 10)).toEqual([]);
+  });
+
+  it('keeps every shipped sheet disjoint, with claimed ground on the claimer sheet', () => {
+    const rects = zoneRects();
+    const owners = (x: number, z: number) =>
+      rects.filter((r) => x > r.xMin && x < r.xMax && z > r.zMin && z < r.zMax);
+    const ownerZone = (x: number, z: number) => owners(x, z).map((r) => r.zoneId ?? r.id);
+    expect(ownerZone(215, 2200)).toEqual(['quartered_isle']);
+    expect(ownerZone(-215, 2200)).toEqual(['quartered_isle']);
+    expect(ownerZone(300, 2200)).toEqual(['drakelands']);
+    expect(ownerZone(0, 0)).toEqual(['eastbrook_vale']);
+    // No interior point lies under two sheets anywhere in the world rect.
+    const doubled: string[] = [];
+    for (let x = WORLD_MIN_X + 5; x < WORLD_MAX_X; x += 13) {
+      for (let z = WORLD_MIN_Z + 5; z < WORLD_MAX_Z; z += 17) {
+        if (owners(x, z).length > 1) doubled.push(`(${x}, ${z})`);
+      }
+    }
+    expect(doubled, doubled.slice(0, 8).join(' ')).toEqual([]);
+    // An unclaimed zone keeps its single, unsuffixed plane.
+    expect(sheetRectsForZone(rects, 'eastbrook_vale')).toEqual([
+      { id: 'eastbrook_vale', xMin: STRIP_MIN_X, xMax: STRIP_MAX_X, zMin: -180, zMax: 180 },
+    ]);
+  });
+
+  it('cuts the claimed zones around a claimsOverlap zone, not the claimer', () => {
+    const zones: CoverageZone[] = [
+      { id: 'drake', xMin: 180, xMax: 540, zMin: 1820, zMax: 2420 },
+      { id: 'amber', xMin: -540, xMax: -180, zMin: 1820, zMax: 2380 },
+      { id: 'isle', xMin: -250, xMax: 250, zMin: 1960, zMax: 2420, claimsOverlap: true },
+    ];
+    const rects = zoneSheetRects(zones, -180, 180);
+    const box = (r: WaterSheetRect) => [r.id, r.xMin, r.xMax, r.zMin, r.zMax, r.zoneId];
+    expect(rects.map(box)).toEqual([
+      ['drake#0', 250, 540, 1820, 2420, 'drake'],
+      ['drake#1', 180, 250, 1820, 1960, 'drake'],
+      ['amber#0', -540, -250, 1820, 2380, 'amber'],
+      ['amber#1', -250, -180, 1820, 1960, 'amber'],
+      ['isle', -250, 250, 1960, 2420, undefined],
+    ]);
+    expect(sheetRectsForZone(rects, 'drake').map((r) => r.id)).toEqual(['drake#0', 'drake#1']);
+    expect(sheetRectsForZone(rects, 'isle').map((r) => r.id)).toEqual(['isle']);
+    // The pieces abut each other and the claimer, so no seam reads as apron.
+    expect(coveredByOtherSheet(rects, 'drake#1', 215, 1960.5)).toBe(true);
+    expect(coveredByOtherSheet(rects, 'drake#0', 249.5, 1900)).toBe(true);
+    // A claim leaves the gap partition unchanged: the union is the same.
+    const bounds = { minX: -540, maxX: 540, minZ: 1820, maxZ: 2420 };
+    const unclaimed = zones.map((z) => ({ ...z, claimsOverlap: false }));
+    expect(waterCoverageGaps(zones, bounds, -180, 180)).toEqual(
+      waterCoverageGaps(unclaimed, bounds, -180, 180),
+    );
+    // Without a claim every zone keeps its whole rect (the classic overlap).
+    expect(zoneSheetRects(unclaimed, -180, 180).map((r) => r.id)).toEqual([
+      'drake',
+      'amber',
+      'isle',
+    ]);
   });
 
   it('finds adjacency across a shared edge but not across a distant one', () => {

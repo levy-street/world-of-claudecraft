@@ -843,7 +843,8 @@ describe('Masterwrought art completion evidence', () => {
     // + the sprite buddy's whistle render: 2,184.
     // Restored feral staff and eight Season 2 jewelry paintings add nine owners.
     // Halloween adds 27 item-art owners outside the sealed historical set.
-    expect(currentOwnerIds).toHaveLength(2191);
+    // + the Quartered Isle's two Moot Rolls quest objects (quartered-isle-moot-rolls-icons-2026-11-19): 2,193.
+    expect(currentOwnerIds).toHaveLength(2193);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1254,6 +1255,15 @@ describe('Masterwrought art completion evidence', () => {
       'writ_of_the_trickster',
     ]);
     expect(datedIds.filter((id) => halloweenIds.has(id))).toEqual([]);
+    // The Quartered Isle's two Moot Rolls quest objects, additive beyond the dated union
+    // the same way.
+    const mootRollsBatches = mapping.generatedBatches.filter(
+      ({ batchId }) => batchId === 'quartered-isle-moot-rolls-icons-2026-11-19',
+    );
+    expect(mootRollsBatches).toHaveLength(1);
+    const mootRollsIds = new Set(mootRollsBatches[0].itemIds);
+    expect(sorted(mootRollsIds)).toEqual(['colossus_makers_mark', 'council_inscription']);
+    expect(datedIds.filter((id) => mootRollsIds.has(id))).toEqual([]);
 
     const completionOwnerIds = currentOwnerIds.filter(
       (id) =>
@@ -1290,7 +1300,8 @@ describe('Masterwrought art completion evidence', () => {
         !buddyIds.has(id) &&
         !backlogAdditiveIds.has(id) &&
         !lanternHallIds.has(id) &&
-        !halloweenIds.has(id),
+        !halloweenIds.has(id) &&
+        !mootRollsIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
+import { inflateRawSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
+import { QUARTERED_ISLE_CAMPS } from '../src/sim/content/quartered_isle_mobs';
 import {
   MAP_DOC_VERSION,
   MAX_BLOCKER_LENGTH,
@@ -692,5 +695,72 @@ describe('lighting sanitizer', () => {
     expect(doc?.zoneAtmosphere).toEqual({
       z: { lighting, timeScale: 2, skybox: 'builtin:night' },
     });
+  });
+});
+
+// CampDef.offStream picks the camp's PRIVATE rng sub-stream in the Sim's camp
+// spawn loop. Studio playtest spawns from the sanitized camps, so dropping the
+// flag here silently moved every offStream camp (the Quartered Isle, the
+// Proving Shore) back onto the shared world stream.
+describe('camp offStream', () => {
+  type RawCamp = { mobId: unknown; center: unknown; count?: unknown; offStream?: unknown };
+  /** The shipped default map's map.json, parsed (single deflate-raw member). */
+  function shippedDefaultMap(): { content: { camps: RawCamp[] } } {
+    const zip = readFileSync('public/maps/default-world.wocmap.zip');
+    const start = 30 + zip.readUInt16LE(26) + zip.readUInt16LE(28);
+    const member = zip.subarray(start, start + zip.readUInt32LE(18));
+    return JSON.parse(inflateRawSync(member).toString());
+  }
+  const campKey = (c: RawCamp) => `${String(c.mobId)}@${JSON.stringify(c.center)}`;
+
+  it('keeps every shipped camp offStream flag through sanitizeMapDoc', () => {
+    const raw = shippedDefaultMap();
+    const doc = sanitizeMapDoc(raw);
+    expect(doc).not.toBeNull();
+    const before = raw.content.camps;
+    const after = doc?.content.camps ?? [];
+    expect(after.length).toBe(before.length);
+
+    const isleKeys = new Set(QUARTERED_ISLE_CAMPS.map(campKey));
+    const isleOff = (camps: RawCamp[]) =>
+      camps.filter((c) => isleKeys.has(campKey(c)) && c.offStream === true);
+    expect(isleOff(before).length).toBe(QUARTERED_ISLE_CAMPS.length);
+    expect(isleOff(after).length).toBe(isleOff(before).length);
+
+    const offBefore = before.filter((c) => c.offStream === true).length;
+    expect(offBefore).toBeGreaterThan(0);
+    expect(after.filter((c) => c.offStream === true).length).toBe(offBefore);
+    // Camp by camp: present-true stays true, absent stays absent.
+    for (let i = 0; i < before.length; i++) {
+      expect(after[i].offStream).toBe(before[i].offStream);
+    }
+    expect(after.some((c) => !('offStream' in c))).toBe(true);
+  });
+
+  it('preserves booleans only and never turns absent or false into true', () => {
+    const camp = { mobId: 'wolf', center: { x: 0, z: 0 }, radius: 5, count: 1 };
+    const doc = sanitizeMapDoc(
+      rawDoc({
+        camps: [
+          { ...camp, offStream: true },
+          { ...camp, offStream: false },
+          { ...camp },
+          { ...camp, offStream: 'true' },
+          { ...camp, offStream: 1 },
+          { ...camp, offStream: { evil: true } },
+        ],
+      }),
+    );
+    const camps = doc?.content.camps ?? [];
+    expect(camps.map((c) => c.offStream)).toEqual([
+      true,
+      false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]);
+    expect('offStream' in camps[2]).toBe(false);
+    expect('offStream' in camps[3]).toBe(false);
   });
 });

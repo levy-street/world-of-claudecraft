@@ -347,6 +347,19 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_sunbone_totem',
   // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',
+  // the Quartered Isle: the Remnant of the First Colossus (its colour projected from
+  // the concept) and the Rimeglass Bear (scripts/assets/rimeglass_bear, a baked frost coat)
+  'mob_remnant_first_colossus',
+  'mob_rimeglass_bear',
+  // and the Cinderscar Caller: the Ember Fiend's body with its spell-throw attack
+  'mob_cinderscar_caller',
+  // and the Heatsworn Ember: the Emberkin body recoloured red with a red glow map
+  'mob_heatsworn_ember',
+  // and the Quartered Isle's own Tripo bodies
+  'mob_warden_of_the_quench',
+  'mob_the_glassfield_brute',
+  'mob_heaved_shardling',
+  'mob_veinback_burrower',
 ];
 
 describe('authored surfaces', () => {

@@ -29,6 +29,7 @@ const ZONE_ALIASES: Record<string, string> = {
   palmreach: 'palm',
   evergarden: 'garden',
   galecrest: 'gale',
+  quartered_isle: 'quartered',
   farshore_isle: 'isle',
   proving_shore: 'proving',
 };

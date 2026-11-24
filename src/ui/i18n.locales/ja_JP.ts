@@ -6720,6 +6720,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmfang_greatblade.name': 'ワーム牙の大剣',
   'entities.items.staff_of_the_gravewyrm.name': '墓ワームの杖',
   'entities.items.fang_of_korzul.name': 'コルズルの牙',
+  'entities.items.council_inscription.name': '評議会の碑文',
+  'entities.items.colossus_makers_mark.name': '巨像の作り手の刻印',
   'entities.items.trail_hardtack.name': 'ハイウォッチの旅堅パン',
   'entities.items.meltwater_flask.name': '雪解け水のフラスコ',
   'entities.items.roast_mountain_goat.name': '焼き山羊肉',
@@ -7748,6 +7750,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': 'レックフィールズ',
   'entities.zones.galecrest.pois.6.label': 'ミラーターン',
   'entities.zones.galecrest.pois.7.label': 'ゲイルクレストの厩舎',
+  'entities.zones.quartered_isle.name': '四分の島',
+  'entities.zones.quartered_isle.welcome':
+    '古き争いがこの島を四つに砕いた。ライバルムートは旋風の峰のふもと、戦いの中心だったクレーターを見下ろす地に立つ。',
+  'entities.zones.quartered_isle.pois.0.label': 'ライバルムート',
+  'entities.zones.quartered_isle.pois.1.label': '挑戦者の闘技場',
+  'entities.zones.quartered_isle.pois.2.label': '霜の橋',
+  'entities.zones.quartered_isle.pois.3.label': '霜の岩棚',
+  'entities.zones.quartered_isle.pois.4.label': '燼の傷跡',
+  'entities.zones.quartered_isle.pois.5.label': '隆起岩の荒野',
+  'entities.zones.quartered_isle.pois.6.label': '旋風の峰',
+  'entities.zones.quartered_isle.pois.7.label': '炎氷の裂け目',
+  'entities.zones.quartered_isle.pois.8.label': 'クレバス群',
+  'entities.zones.quartered_isle.pois.9.label': '霧氷の鏡湖',
+  'entities.zones.quartered_isle.pois.10.label': '焦熱の水路',
+  'entities.zones.quartered_isle.pois.11.label': '玻璃の原',
+  'entities.zones.quartered_isle.pois.12.label': '鎚の切り通し',
+  'entities.zones.quartered_isle.pois.13.label': '隆起した岩盤',
+  'entities.zones.quartered_isle.pois.14.label': '倒れた巨人',
   'entities.npcs.warden_coalfast.name': '守将コールファスト',
   'entities.npcs.warden_coalfast.title': '要塞司令官',
   'entities.npcs.warden_coalfast.greeting':
@@ -7794,6 +7814,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': 'ゲイルウィスプ',
   'entities.mobs.shoal_scuttler.name': 'ショールスカトラー',
   'entities.mobs.the_wreck_warden.name': 'レックウォーデン',
+  'entities.mobs.remnant_first_colossus.name': '最初の巨像の残骸',
+  'entities.mobs.quench_shardling.name': 'クエンチ・スプリンター',
+  'entities.mobs.rimeglass_bear.name': '霧氷鏡の熊',
+  'entities.mobs.warden_of_the_quench.name': 'クエンチの番人',
+  'entities.mobs.heatsworn_ember.name': '熱誓の残り火',
+  'entities.mobs.cinderscar_caller.name': '燼の傷跡の呼び手',
+  'entities.mobs.ember_hound.name': '残り火の猟犬',
+  'entities.mobs.the_glassfield_brute.name': '玻璃の原の暴れ者',
+  'entities.mobs.heaved_shardling.name': '隆起のスプリンター',
+  'entities.mobs.veinback_burrower.name': '鉱脈背の穴掘り',
   'entities.mobs.downs_bandit.name': '丘陵の盗賊',
   'entities.mobs.wreck_thief.name': '難破船の盗人',
   'entities.mobs.glimmerwisp.name': 'グリマーウィスプ',
@@ -8409,6 +8439,46 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '奴が倒れた瞬間、浜が静まり返った、{playerName}。この岸で働いて十年、初めて聞く静けさだった。船員たちはもうただの骨だ。休んでいる骨だよ。ほら、山のてっぺんのマントをお取り。もともと、生きた背中にこそ似合うものだったのさ。',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'レックウォーデンを打ち倒した',
+  'entities.quests.q_qi_the_moot_rolls.title': 'ムートの名簿',
+  'entities.quests.q_qi_the_moot_rolls.text':
+    'ライバルムートには、評議会に挑みに来たすべての挑戦者の名簿がある、{playerName}。なのに、なぜ評議会が挑むに値するのかは一行も書かれていない。私はその歴史を書くつもりだ。まずは広間のそばにいる隊長テサリーを訪ねてくれ。彼女の挑戦者たちはこの島のすべての地を歩いてきたし、兵士は学者の見落とすものを覚えているものだ。',
+  'entities.quests.q_qi_the_moot_rolls.completion':
+    'アンセルがあなたを？ようやく正しい相手に尋ねる気になったのですね。私の挑戦者たちは、どの地でもこの町より古い、文字の刻まれた石を見つけています。ここでは誰も読めません。そう彼に伝えてください。',
+  'entities.quests.q_qi_the_moot_rolls.objectives.0.label': '隊長テサリーと話した',
+  'entities.quests.q_qi_words_in_stone.title': '石に刻まれた言葉',
+  'entities.quests.q_qi_words_in_stone.text':
+    'テサリーの言う石は、評議会自身の碑文だ、{playerName}。名簿を賭けてもいい。三つが、戦争がもっとも深く大地を傷つけた場所に立っている。霜の岩棚に一つ、炎氷の裂け目のそばに一つ、鎚の切り通しの下に一つ。一つずつ読んで、一語残らず持ち帰ってくれ。',
+  'entities.quests.q_qi_words_in_stone.completion':
+    '氷、炎、岩。それぞれがこの島を自らの術のものだと主張し、三つとも同じ手で署名されている。評議会は四人の他人などではなかったのだ、{playerName}。自らと争う一つの評議会だったのだよ。',
+  'entities.quests.q_qi_words_in_stone.objectives.0.label': '評議会の碑文を読んだ',
+  'entities.quests.q_qi_servants_at_their_posts.title': '持ち場を守る僕たち',
+  'entities.quests.q_qi_servants_at_their_posts.text':
+    '碑文には評議会の僕たちのことが記されている。主が戻るまで各地を守ると誓った者たちだ。主は二度と戻らず、僕たちは守ることをやめなかった。数を減らしてくれ、{playerName}。霜の岩棚のクエンチ・スプリンターを六体、焦熱の水路の熱誓の残り火を六体、隆起した岩盤の隆起のスプリンターを六体だ。',
+  'entities.quests.q_qi_servants_at_their_posts.completion':
+    'それぞれ六体、おかげで各地が少し静かになった。奴らの核には碑文と同じ印が刻まれていた。僕たちを造った者が、石も造ったのだ。',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.0.label':
+    'クエンチ・スプリンターを倒した',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.1.label': '熱誓の残り火を倒した',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': '隆起のスプリンターを倒した',
+  'entities.quests.q_qi_wardens_of_the_arts.title': '術の番人',
+  'entities.quests.q_qi_wardens_of_the_arts.text':
+    '評議会の番人のうち二体がまだ立っている。一体は霜の岩棚のクレバス群に、もう一体は燼の傷跡の玻璃の原に沈んでいる。碑文はそれらを各々の術の秘密の守り手と呼んでいて、素直に明かしはしないだろう、{playerName}。クエンチの番人と玻璃の原の暴れ者を倒してくれ。',
+  'entities.quests.q_qi_wardens_of_the_arts.completion':
+    '番人は二体とも砕けた。どちらも巨人の輪郭が刻まれた封印石を持っていた。評議会は結局、何かを共に造っていたのだ。彼らの誰よりも大きなものを。すべての印が隆起岩の荒野を指している。',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.0.label': 'クエンチの番人を倒した',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.1.label': '玻璃の原の暴れ者を倒した',
+  'entities.quests.q_qi_the_fallen_giant.title': '倒れた巨人',
+  'entities.quests.q_qi_the_fallen_giant.text':
+    '隆起岩の荒野、倒れた巨人が倒れた場所に、家ほどもある石の頭が横たわっている。挑戦者たちは像だと言う。私は、封印石が指しているのはあれだと思う。その上の作り手の刻印を見つけてくれ、{playerName}。そして誰の手が刻んだのか教えてほしい。',
+  'entities.quests.q_qi_the_fallen_giant.completion':
+    '四つの術のルーンが並んで、一つの刻印になっている。評議会は共に巨人を造ったのだ。彼らが初めて一つになって働いたときに。それはコルズルを押さえるためのもので、完成する前に倒れた。その一部が、今も自分の頭のそばで見張りに立っている。',
+  'entities.quests.q_qi_the_fallen_giant.objectives.0.label': '巨像の作り手の刻印を見つけた',
+  'entities.quests.q_qi_the_first_colossus.title': '最初の巨像',
+  'entities.quests.q_qi_the_first_colossus.text':
+    '最初の巨像は、あの獣を押さえることはなかった。それは倒れ、評議会は押さえきるもう一体を造った。だが最初の一体の残りは、今も倒れた巨人のそばで持ち場を守っている。半ばしか彫られず、長く忘れられ、近づく者を誰であれ打ち倒しながら。眠らせてやってくれ、{playerName}。この島の歴史を、戦争が終わったことを知らないままの番兵で終わらせるべきではない。',
+  'entities.quests.q_qi_the_first_colossus.completion':
+    'では残骸は眠りについた。そして名簿に初めて本当の章ができた。何一つ意見の合わなかった四人の好敵手が、ある日、共に巨人を造らねばならなくなるまでの話だ。ライバルムートはその歴史の一行をあなたに負っている、{playerName}。私が自ら書こう。',
+  'entities.quests.q_qi_the_first_colossus.objectives.0.label': '最初の巨像の残骸を倒した',
   'entities.quests.q_hub_know_your_numbers.title': '己の数字を知れ',
   'entities.quests.q_hub_know_your_numbers.text':
     '測れない力は伸ばせない力だ、{playerName}。訓練用人形を標的にして、ダメージメーターを開け。それから十回当てろ、剣でも呪文でも構わん。打ちながら窓を見ていろ、与えたダメージを数えてくれる。十回入ったら戻ってきて、その数字を教えろ。',
@@ -10557,6 +10627,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '巨大な樹冠に覆われた呪われた森。街道でまともな光といえば、ギベットミアのランタンだけです。',
   'guide.worldPage.galeBlurb':
     '風のやむことのない海崖と咆哮の丘陵。古き烽火台の火は決して消えず、ウィックハーバーは扉を固く閉ざしています。',
+  'guide.worldPage.quarteredBlurb':
+    '古き争いによって氷、炎、岩、嵐の四つの地に砕かれた島。ライバルムートの挑戦者たちは旋風の峰のふもとに町を構え、戦いの中心だったクレーターに闘技場を置いている。',
   'guide.worldPage.jungleBlurb':
     'ヤシと白砂、騒がしい鳥たちの南国の密林。浜の町ドリフトヘイヴンが、渚に火を灯し続けています。',
   'guide.worldPage.gardenBlurb':
@@ -10582,6 +10654,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     'ここでは風は一度たりともやんだことがなく、古き烽火台の火は一度たりとも消えたことがない。宿の扉はしっかり閉めてくれ。',
   'guide.worldPage.galeGreeter': '烽火の番人、ウィックハーバー',
+  'guide.worldPage.quarteredGreeting':
+    'クレーターに降りる一行は皆、闘技場を守り抜くのは自分たちだと誓う。丘が立ち上がったら降りて、それを証明してみせろ。',
+  'guide.worldPage.quarteredGreeter': '挑戦者、ライバルムート',
   'guide.worldPage.jungleGreeting':
     '温かい砂、騒がしい鳥、そして地平線を飲み込むジャングル。浜辺には火を灯してある。必ずそこへ帰ってくるんだよ。',
   'guide.worldPage.jungleGreeter': '港の女主人、ドリフトヘイヴン',
@@ -10602,6 +10677,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ギベットミアはランタンの内側に身を寄せ合っています。鴉の門は森の陰気な玄関口。寡婦蜘蛛の茂みは蜘蛛の糸が厚く張られています。首吊りの林間と嘆き石の礼拝堂は森の最も古い悲しみを抱え、狩人の空き地は、今もそこで狩りを続ける何者かのものです。',
   'guide.worldPage.galePlaceNotes':
     'ウィックハーバーは風に身を傾けています。風の道は崖沿いの入り口の道。咆哮の丘陵は強風の下、木一本なくうねっています。古き烽火台は誰も知らぬ昔から燃え続け、断ち崖は水面まで垂直に落ち込み、難破船の野はこの海岸の油断ならなさを物語ります。そして鏡の山湖は、このレルムでただ一つ静止しているものです。',
+  'guide.worldPage.quarteredPlaceNotes':
+    'ライバルムートは旋風の峰のふもと、評議会の座への登り道が始まる場所に立つ。霜の橋がフロストヴェイルから海峡を越えて道を渡し、霜の岩棚が白く冷たく砕けて広がる。挑戦者の闘技場は古き戦いの中心である大クレーターの底で次の丘の王を待ち、燼の傷跡はドレイクランドへとくすぶり、隆起岩の荒野はアンバーフォールへと盛り上がり、旋風の峰はそのすべての上で嵐を巡らせている。',
   'guide.worldPage.junglePlaceNotes':
     'ドリフトヘイヴンは浜辺の火を守っています。タングルマウスは川が緑の壁とぶつかる場所。パームストランドは白く温かな砂浜となって波打ち際に続きます。エメラルドの密林とヴァインフォールは内陸を飲み込み、サファイアの礁湖は澄んで深く輝き、沈んだ偶像は水の底からこちらを見つめています。',
   'guide.worldPage.gardenPlaceNotes':
@@ -13787,6 +13864,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '金張りの金庫',
   'entities.npcs.bursar_aldous_crane.greeting':
     'どんな木箱も、金櫃も、装身具も、金張りの金庫にお預けいただければ安全です。',
+  'entities.npcs.bursar_maud_ashby.name': '出納官モード・アシュビー',
+  'entities.npcs.bursar_maud_ashby.title': '金張りの金庫',
+  'entities.npcs.bursar_maud_ashby.greeting':
+    '金張りの金庫は、この島でもあなたの品を安全にお預かりします。',
+  'entities.npcs.keeper_ansel_morrow.name': '名簿番アンセル・モロウ',
+  'entities.npcs.keeper_ansel_morrow.title': 'ムート名簿の番人',
+  'entities.npcs.keeper_ansel_morrow.greeting':
+    'この丘を登ってくる挑戦者は、誰もが評議会に勝ちたがる、{playerName}。私が知りたいのは、なぜ評議会が打ち負かすに値するのかだ。',
+  'entities.npcs.innkeeper_bettany_quell.name': 'ベタニー・クエル',
+  'entities.npcs.innkeeper_bettany_quell.title': '宿屋の女将',
+  'entities.npcs.innkeeper_bettany_quell.greeting':
+    '扉のそばのブーツに気をつけてね。霜の岩棚のみぞれはどこにでも入り込むから。火は熾してあるし、シチューも温かいよ。今日負けた挑戦者だって、ちゃんと食べさせてあげる。',
+  'entities.npcs.outfitter_harl_bracken.name': 'ハール・ブラッケン',
+  'entities.npcs.outfitter_harl_bracken.title': '道具屋',
+  'entities.npcs.outfitter_harl_bracken.greeting':
+    '軟膏に強壮薬、それに旅の野営道具一式だ。ほかの物はこの四つの地がみんな壊しちまう、道具は自分で持ってきな。',
+  'entities.npcs.captain_thessaly_rivalmoot.name': '隊長テサリー',
+  'entities.npcs.captain_thessaly_rivalmoot.title': '挑戦者の長',
+  'entities.npcs.captain_thessaly_rivalmoot.greeting':
+    '評議会はあの峰に、誰も覚えていないほど長く、挑まれることなく座ってきました。私の挑戦者たちはそれを変えるつもりです。まずは傷跡の地で力を示してください、{playerName}。',
   'entities.items.furyforged_warhelm.name': '憤怒鋳りの戦兜',
   'entities.items.furyforged_warspaulders.name': '憤怒鋳りの戦肩当て',
   'entities.items.furyforged_warplate.name': '憤怒鋳りの戦鎧',
@@ -16560,6 +16657,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。',
   'guide.profPages.gatherDeeds.fishing':
     '熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。',
+  'guide.profPages.gatherDeeds.miningWithIsle':
+    'どの採集職でも最初の採取でFruits of the Fieldを、採掘100でOre in the Bloodを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。pristine veinを掘り当てれば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+  'guide.profPages.gatherDeeds.loggingWithIsle':
+    'どの採集職でも最初の採取でFruits of the Fieldを、伐採100でHeartwood Hewerを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。ancient heartwoodを切り出せば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+  'guide.profPages.gatherDeeds.herbalismWithIsle':
+    'どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+  'guide.profPages.gatherDeeds.fishingWithIsle':
+    '熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。',
   'guide.profPages.gatherDeeds.farming':
     '農耕には専用の功績がまだありません。畑と作物が根付いた今、他の職を彩る到達と上限の功績は今後の更新で加わります。熟練はすでにMaster Gatherer（いずれか三職で100）に数えられるため、農夫もそのページを皆と同じように埋められます。功績は称号と名声だけを与え、力を与えることはありません。',
   'guide.profPages.gatherDeeds.farmingSown':
@@ -18143,6 +18248,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.farshoreName': '遠つ岸',
   'guide.home.world.galeBlurb':
     '風がひとときも休まぬ海食崖と、吠えたける丘陵。ウィックハーバーは戸をきつく閉ざしている。',
+  'guide.home.world.quarteredName': '四分の島',
+  'guide.home.world.quarteredBlurb':
+    '古き争いに四つに砕かれた島。ライバルムートが嵐の峰のふもとから、挑戦者たちの目指すクレーターを見下ろす。',
   'guide.home.world.galeName': 'ゲイルクレスト',
   'guide.home.world.gardenBlurb':
     '誰ひとり姿を見たことのない庭師が、今も刈り込みを続ける生け垣の迷路の領域。ヘッジウィックと噴水の中庭を抜けた先にある。',
@@ -22239,6 +22347,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '次の花嫁の哀歌で受けるダメージが{pct}%増加：1スタックごとに{per}%、最大{max}スタック。次はランタンの光の中で受けること。',
   'hudChrome.auraEffect.crypt.slippery':
     'すべりやすい氷の上：速度は毎秒最大{grip}ヤード/秒しか変わらないため、走り出しが遅く、止まっても滑り続け、曲がると大きく膨らむ。氷から降りれば足場が戻る。',
+  'hudChrome.auraEffect.quartered.galeLane':
+    '突風が旋風の峰の頂上へ続く道に沿って体を押し上げる。立ち止まっていても運ばれ、速度は最大{speed}ヤード/秒、頂上に近づくにつれて{summit}ヤード/秒まで緩やかに落ちる。カーブでもジャンプ中でも道から外れない。平行移動で道を横切り、道を下る方向へ進めば風に逆らって歩ける。風に運ばれている間は詠唱が中断される。風の道を離れてから最大{linger}秒続き、風の道の切れ目を越えて運んでくれる。',
   'hudChrome.auraEffect.crypt.harmony':
     '受けるダメージが{pct}%減少：生きている聖歌隊員1人ごとに{per}%。聖歌隊員を先に倒すこと。',
   'hudChrome.auraEffect.crypt.crescendo':

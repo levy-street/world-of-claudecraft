@@ -1673,6 +1673,66 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     level: 5,
     tier: 1,
   },
+  // The Quartered Isle (phase 1: land, town, arena, landmarks): the expansion
+  // zones' two-per-type hub-outskirt starter kit, the two of each type in
+  // different quarters so no profession is held to one corner of the isle.
+  // Every spot stands on open ground off the roads, clear of Rivalmoot's
+  // hill, the Challengers' Ring, the Gyre and every quartered_landmarks.ts
+  // landmark.
+  {
+    id: 'ore_quartered_isle_1',
+    zoneId: 'quartered_isle',
+    type: 'ore',
+    // The Cinderscar, north of the burnways on the cooled ground.
+    pos: { x: 150, z: 2160 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'ore_quartered_isle_2',
+    zoneId: 'quartered_isle',
+    type: 'ore',
+    // The Heavestone Wilds, the stone flats south of the Hammer's Cut.
+    pos: { x: -150, z: 2130 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_quartered_isle_1',
+    zoneId: 'quartered_isle',
+    type: 'wood',
+    // The Heavestone Wilds, the heath east of the Hammer's Cut.
+    pos: { x: -130, z: 2205 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_quartered_isle_2',
+    zoneId: 'quartered_isle',
+    type: 'wood',
+    // The Cinderscar's north edge, east of the Glassfield.
+    pos: { x: 170, z: 2280 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_quartered_isle_1',
+    zoneId: 'quartered_isle',
+    type: 'herb',
+    // The Hoarshelf, west of the hill road.
+    pos: { x: -30, z: 2012 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_quartered_isle_2',
+    zoneId: 'quartered_isle',
+    type: 'herb',
+    // The Heavestone Wilds' north meadow, off the Wilds road.
+    pos: { x: -180, z: 2290 },
+    level: 20,
+    tier: 1,
+  },
 ];
 
 // Deep-frozen at module load, not just shared: a Studio map resolves its moved

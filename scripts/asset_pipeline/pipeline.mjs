@@ -87,7 +87,8 @@ function flag(name) {
 // stages, renders a review preview of the raw model, and returns before rigging
 // / normalizing, so the web wizard (library --serve) can show the model and let
 // the operator approve it or regenerate (--redo generate) before spending more
-// credits. `--until preview` is implicit: a run without --apply already stops
+// credits. `--until concept` (prop lane) stops on the concept image alone, before
+// any Tripo spend. `--until preview` is implicit: a run without --apply already stops
 // after the previews, so the operator reviews the animated/finished asset there.
 const UNTIL = opt('until');
 async function reviewStop(job, step, glbForReview) {
@@ -560,6 +561,8 @@ async function cmdProp() {
     description: opt('prompt'),
     image: opt('image'),
   });
+  // `--until concept`: stop on the concept image alone, before any Tripo credit
+  if (await reviewStop(job, 'concept', null)) return;
   const input = concept.conceptPath ?? concept.input;
   const gen = await generateStage(job, {
     input,

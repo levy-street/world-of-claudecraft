@@ -155,7 +155,7 @@ describe('MATERIAL_GRADES table', () => {
         const highest = highestTierIn(zoneId, type);
         // Non-vacuity per arm: Math.max over an empty node list is
         // -Infinity, which would pass the below-rung check AND count toward
-        // the 33, hiding a zone that shipped its material row before any
+        // the 36, hiding a zone that shipped its material row before any
         // node of the type.
         expect(Number.isFinite(highest), `${type}/${zoneId} has no nodes`).toBe(true);
         const rung = gatherMaterialTier(row.itemId);
@@ -168,7 +168,8 @@ describe('MATERIAL_GRADES table', () => {
         checkedStarter += 1;
       }
     }
-    expect(checkedStarter).toBe(33);
+    // (36 with the Quartered Isle's ore, wood and herb rows)
+    expect(checkedStarter).toBe(36);
   });
 
   it('resolves both directions, and refuses ids that have no grade', () => {

@@ -4732,6 +4732,9 @@ export const nl_NL: EnTranslations = {
         "graspRoot": "Vastgehouden door de handen van het graf: kan {seconds} sec niet bewegen.",
         "knellAirborne": "Vliegt boven de Ritueelring, buiten bereik. Markeert de helft van de ring {mark} sec en stort dan spookvuur over die helft: {min} tot {max} vuurschade aan iedereen erin. Verbrandt {breaths} helften per vlucht en landt daarna."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Krijgt {pct}% minder schade: {per}% per ketting die nog houdt. Breek een zegelboei om de ketting te laten vallen.",
         "enrage": "Doet {pct}% meer schade.",
@@ -9342,6 +9345,8 @@ export const nl_NL: EnTranslations = {
         "gardenBlurb": "Een heggendoolhofrijk dat nog altijd wordt gesnoeid door geen tuinman die ooit is gezien, bereikt voorbij Haagwijk en zijn fonteinhoven.",
         "galeName": "De Windkam",
         "galeBlurb": "Zeekliffen en Huilende Heuvels waar de wind nooit rust en Wijkhaven zijn deuren potdicht houdt.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Niveau {level}"
       },
       "group": {
@@ -10286,6 +10291,7 @@ export const nl_NL: EnTranslations = {
       "nightBlurb": "Een rijk van sterrige middernacht waar bloemen de paden verlichten en Maanrust een stille wake houdt onder een dromende hemel.",
       "hauntBlurb": "Een spookbos onder reusachtige bladerdaken, waar de lantaarns van Galgenmeer het enige eerlijke licht op de weg zijn.",
       "galeBlurb": "Zeekliffen en huilende heuvels waar de wind nooit rust, het Oude Baken nooit dooft, en Wijkhaven zijn deuren stevig sluit.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Een tropische wirwar van palmen, wit zand en luidruchtige vogels, met het strandstadje Drijfhaven dat een vuur brandend houdt op het strand.",
       "gardenBlurb": "Een doolhoftuinrijk dat nog altijd wordt gesnoeid door geen tuinman die iemand ooit heeft gezien, betreden voorbij Haagwijk en zijn fonteinhoven.",
       "valeGreeting": "Houd je kling dichtbij. Het Dal is niet meer wat het was.",
@@ -10310,6 +10316,8 @@ export const nl_NL: EnTranslations = {
       "hauntGreeter": "De lantaarnopsteker, Galgenmeer",
       "galeGreeting": "De wind is hier nog nooit gestopt, en het Oude Baken is nog nooit gedoofd. Doe de herbergdeur achter je dicht.",
       "galeGreeter": "De bakenwachter, Wijkhaven",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Warm zand, luidruchtige vogels, en een jungle die de horizon verslindt. We houden een vuur brandend op het strand; probeer erbij terug te komen.",
       "jungleGreeter": "De havenmeesteres, Drijfhaven",
       "gardenGreeting": "Iemand snoeit nog altijd de heggen, hoewel er al honderd jaar geen tuinman is gezien. Let op met het doolhof: het let op jou terug.",
@@ -10325,6 +10333,7 @@ export const nl_NL: EnTranslations = {
       "nightPlaceNotes": "Maanrust houdt de wacht. De Nachtpoort is de weg naar het middernachtland; de Maanbron bevat sterrenlicht waar je naast kunt staan; Schemerakker bloeit in het donker; de Staande Wachting waakt zonder ooit te bewegen; en de Slapeloze grafheuvel is de ene plek hier die nooit droomt.",
       "hauntPlaceNotes": "Galgenmeer hurkt binnen zijn lantaarns. Ravenpoort is de grimmige voordeur van het woud; Tansydoorn is dichtgesponnen met web; de Hangende Open plek en de Mournstone-kapel bewaren het oudste verdriet van het bos; en de Jagersklaring behoort toe aan wat daar nog jaagt.",
       "galePlaceNotes": "Wijkhaven leunt tegen de wind. De Windweg is de klifweg naar binnen; de Huilende Heuvels rollen boomloos onder de storm; het Oude Baken brandt al zolang niemand zich kan herinneren; de Scheur valt loodrecht naar het water; de Wrakvelden houden de kust eerlijk; en de Spiegelplas is het enige stille ding in het hele rijk.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drijfhaven houdt zijn vuur brandend op het strand. De Warmond is waar de rivier de groene muur ontmoet; het Palmstrand loopt wit en warm langs de branding; de Smaragdwarboel en de Rankval verslinden het binnenland; de Saffieren Lagune gloeit helder en diep; en het Verzonken Afgodsbeeld waakt van onder het water.",
       "gardenPlaceNotes": "Haagwijk wacht bij de Tuinpoort. De Parterrewandeling bloeit in geknipte kleur; Kasteel Dageraad drilt zijn ridders achter nieuwe muren; de Bloesemvijver drijft het hele jaar door roze; de Oude Molen keert zijn eigen ringbedden om; het Grote Doolhof herschikt zijn gangen voor elke gast, zijn bogen bewaakt door loofvossen; de Noordwacht bewaakt de uitgaande weg; het Lelie-Bekken rust voorbij dat alles; en het Fonteinhof stroomt nog altijd helder in het hart van de tuin.",
       "gladeTitle": "Een rustig hoekje: Brightwood Glade",
@@ -11116,6 +11125,10 @@ export const nl_NL: EnTranslations = {
         "logging": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Houtkap schrijft Kernhouthakker in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een slag in oud kernhout legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
         "herbalism": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Kruidenkunde schrijft Meester van de Weide in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een maanverlichte bloem legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
         "fishing": "De mijlpaal van 100 schrijft Oude Zout in en 200 schrijft Meesterhengelaar in met zijn titel, de absolute top van de hengelaarskunst; Vissen telt ook mee voor Meesterverzamelaar, verdiend bij 100 in drie willekeurige verzamelvakken. Een eerste vis uit de wateren van elk van zes zones vult een eigen pagina, de drie kernlandzones en daarbuiten Het Wilgenveen, De Windkam en De Verrekust, en de Zonglinstering-Koi legt Glinstering van Hoop vast, dus reizigers met een hengel in hun bagage vullen hun boek sneller dan ze verwachten.",
+        "miningWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "loggingWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalismWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishingWithIsle": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
         "farmingSown": "Landbouw heeft nu een eigen plank in het Boek der Daden. Zaaiwerk begint markeert je eerste geplante gewas en vier kroniekpagina's markeren een eerste bloeiende oogst op elke bedlocatie, van de Oostbeekvallei tot Evergaarde. Een gouden oogst legt zijn eigen verzamelaarsmerk zonder Roem vast en landbouwvaardigheid telt mee voor Meesterverzamelaar, verdiend op 100 in drie verzamelambachten. Elke vore gevuld brengt de hele voorraad op één pagina: kweek elk gewas dat de vier tuinen dragen en de verzameling sluit. Het sluitstuk erboven is Oogstmeester, de titel van het ambacht op landbouwvaardigheid 100. Nu berg- en parterrezaad op de toonbanken van hun boeren ligt, kun je die klim vandaag voltooien. Daden zijn alleen titels en Roem, nooit macht."
       },
@@ -24515,6 +24528,12 @@ export const nl_NL: EnTranslations = {
       "gourdlight_crow_feather": {
         "name": "Pompoenlichtkraaienveer"
       },
+      "council_inscription": {
+        "name": "Council Inscription"
+      },
+      "colossus_makers_mark": {
+        "name": "Colossus Maker's Mark"
+      },
       "membership_staff": {
         "name": "Staf van Verandering"
       },
@@ -26407,6 +26426,9 @@ export const nl_NL: EnTranslations = {
       "drowned_deckhand": {
         "name": "Verdronken Matroos"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Riftgebroed"
       },
@@ -26631,6 +26653,33 @@ export const nl_NL: EnTranslations = {
       },
       "buddy_phantom": {
         "name": "Spook"
+      },
+      "quench_shardling": {
+        "name": "Quench Splinter"
+      },
+      "rimeglass_bear": {
+        "name": "Rimeglass Bear"
+      },
+      "warden_of_the_quench": {
+        "name": "Warden of the Quench"
+      },
+      "heatsworn_ember": {
+        "name": "Heatsworn Ember"
+      },
+      "cinderscar_caller": {
+        "name": "Cinderscar Caller"
+      },
+      "ember_hound": {
+        "name": "Ember Hound"
+      },
+      "the_glassfield_brute": {
+        "name": "The Glassfield Brute"
+      },
+      "heaved_shardling": {
+        "name": "Heaved Splinter"
+      },
+      "veinback_burrower": {
+        "name": "Veinback Burrower"
       },
       "ironvein_foreman": {
         "name": "IJzerader-Voorman"
@@ -27009,6 +27058,11 @@ export const nl_NL: EnTranslations = {
         "name": "Thesaurier Aldous Crane",
         "title": "De Vergulde Geldkist",
         "greeting": "Elke kist, koffer en snuisterij is veilig bij de Vergulde Geldkist."
+      },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
       },
       "brother_aldric_raid": {
         "name": "Broeder Aldric",
@@ -27484,6 +27538,26 @@ export const nl_NL: EnTranslations = {
         "name": "Laverock",
         "title": "Laatste voorzanger van het Bleke Koor",
         "greeting": "Ik was de jongste stem van het Bleke Koor. Op de nacht van het ritueel dronk ik niet en vluchtte ik. Sindsdien hoor ik hen bij elke volle maan onder water zingen. Ik moet haar zien voordat ik sterf. Laat me achter je lopen. Ik zal niet vechten en ik zal je niet ophouden."
+      },
+      "keeper_ansel_morrow": {
+        "name": "Keeper Ansel Morrow",
+        "title": "Keeper of the Moot Rolls",
+        "greeting": "Every challenger who climbs this hill wants to beat the council, {playerName}. I want to know why they are worth beating."
+      },
+      "innkeeper_bettany_quell": {
+        "name": "Bettany Quell",
+        "title": "Innkeeper",
+        "greeting": "Mind the boots by the door, the Hoarshelf sleet gets into everything. The fire is lit and the stew is hot, and a challenger who lost today still gets fed."
+      },
+      "outfitter_harl_bracken": {
+        "name": "Harl Bracken",
+        "title": "Outfitter",
+        "greeting": "Salves, tonics and a field kit for the road. The quarters break everything else, so carry your own tools."
+      },
+      "captain_thessaly_rivalmoot": {
+        "name": "Captain Thessaly",
+        "title": "Challengers' Leader",
+        "greeting": "The council has sat on that peak unchallenged for longer than anyone remembers. My challengers mean to change that. Prove yourself on the scars first, {playerName}."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -29881,6 +29955,75 @@ export const nl_NL: EnTranslations = {
           }
         }
       },
+      "q_qi_the_moot_rolls": {
+        "title": "The Moot Rolls",
+        "text": "Rivalmoot keeps a roll of every challenger who came to test the council, {playerName}, and not one line on why the council is worth testing. I mean to write that history. Start with Captain Thessaly by the hall: her challengers have walked every quarter of this isle, and soldiers remember what scholars miss.",
+        "completion": "Ansel sent you? Then he is finally asking the right people. My challengers have found carved stones in every quarter, older than this town, and nobody here can read them. Take that back to him.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Captain Thessaly"
+          }
+        }
+      },
+      "q_qi_words_in_stone": {
+        "title": "Words in the Stone",
+        "text": "Thessaly's stones are the council's own inscriptions, {playerName}, I would stake my rolls on it. Three stand where the war scarred the land worst: one on the Hoarshelf, one by the Fireice Rift and one below the Hammer's Cut. Read each one and bring me every word.",
+        "completion": "Ice, fire and stone, each claiming the isle for its own art, and all three signed by the same hand. The council was never four strangers, {playerName}. It was one council at war with itself.",
+        "objectives": {
+          "0": {
+            "label": "Council Inscription read"
+          }
+        }
+      },
+      "q_qi_servants_at_their_posts": {
+        "title": "Servants at Their Posts",
+        "text": "The inscriptions name the council's servants, sworn to hold each quarter until their masters returned. The masters never came back, and the servants never stopped holding. Thin them, {playerName}: six Quench Splinters on the Hoarshelf, six Heatsworn Embers in the Burnways and six Heaved Splinters on the Heaved Slabs.",
+        "completion": "Six of each, and the quarters a little quieter for it. Their cores were cut with the same mark as the inscriptions. Whoever made the servants made the stones too.",
+        "objectives": {
+          "0": {
+            "label": "Quench Splinter slain"
+          },
+          "1": {
+            "label": "Heatsworn Ember slain"
+          },
+          "2": {
+            "label": "Heaved Splinter slain"
+          }
+        }
+      },
+      "q_qi_wardens_of_the_arts": {
+        "title": "Wardens of the Arts",
+        "text": "Two of the council's wardens still stand, one in the Crevasses of the Hoarshelf and one sunk in the Glassfield of the Cinderscar. The inscriptions call them the keepers of their arts' secrets, and they will not share them willingly, {playerName}. Bring down the Warden of the Quench and the Glassfield Brute.",
+        "completion": "Both wardens broken, and each carried a seal-stone cut with a giant's outline. The council built something together after all, something larger than any of them. Every mark points to the Heavestone.",
+        "objectives": {
+          "0": {
+            "label": "Warden of the Quench slain"
+          },
+          "1": {
+            "label": "The Glassfield Brute slain"
+          }
+        }
+      },
+      "q_qi_the_fallen_giant": {
+        "title": "The Fallen Giant",
+        "text": "A stone head the size of a house lies in the Heavestone Wilds, where the Fallen Giant fell. The challengers call it a statue. I think it is what the seal-stones point to. Find the maker's mark on it, {playerName}, and tell me whose hand cut it.",
+        "completion": "The four arts' runes, cut side by side into one mark. The council made the giant together, the first time they ever worked as one. It was meant to hold Korzul, and it fell before it was finished. Something of it still stands guard beside its own head.",
+        "objectives": {
+          "0": {
+            "label": "Colossus Maker's Mark found"
+          }
+        }
+      },
+      "q_qi_the_first_colossus": {
+        "title": "The First Colossus",
+        "text": "The first colossus never held the beast. It fell, and the council built another that did. But what is left of the first still keeps its post at the Fallen Giant, half-carved and long forgotten, striking down anyone who comes near. Lay it to rest, {playerName}. This isle's history should not end with a guard who never learned the war was over.",
+        "completion": "Then the Remnant rests, and the rolls have their first true chapter: four rivals who could agree on nothing, until the day they had to build a giant together. Rivalmoot owes you a line in its history, {playerName}, and I will write it myself.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the First Colossus slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Het Verdronken Koor",
         "text": "De waders handelen niet alleen. Tussen hen lopen de Verdronken Aanbidders, de sekte die met de tempel zonk, nog in hun verrotte gewaden, nog steeds het gebed zingend vanaf de oeverrotsen. Breng er acht tot zwijgen, en breng me zes van de offergaven die ze dragen. Ik wil weten wat ze hun godin willen geven.",
@@ -30381,6 +30524,57 @@ export const nl_NL: EnTranslations = {
           },
           "4": {
             "label": "De Hindernisbaan"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

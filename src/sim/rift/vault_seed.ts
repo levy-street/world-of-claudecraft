@@ -31,6 +31,7 @@ export const VAULT_ZONE_IDS = Object.freeze([
   'veiled_hollow',
   'evergarden',
   'farshore_isle',
+  'quartered_isle',
 ] as const);
 
 export type VaultZoneId = (typeof VAULT_ZONE_IDS)[number];

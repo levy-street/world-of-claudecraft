@@ -1602,8 +1602,8 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     // (was 14 x 3 = 42 after the v0.32.0 expansion, and 3 x 3 = 9 before it).
     // The Proving Shore tutorial island (release/v0.41.0) then adds the 15th
     // zone (the release read 15 x 3 = 45 on its own), so the merged tree is
-    // 15 zones x 6 bands.
-    expect(combos).toBe(90);
+    // 15 zones x 6 bands. The Quartered Isle then adds the 16th: 16 x 6.
+    expect(combos).toBe(96);
     for (const name of FISHING_COUNTER_NAMES) {
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
@@ -1761,8 +1761,8 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
       // of their own (every other zone's water fishes too, on the
       // eastbrook_vale fallback): the exporter pre-seeds the full cross
       // product so a zone-and-band pair that never fires reads as a real zero
-      // rather than a gap.
-      expect(fishingSeries(text, name), name).toHaveLength(90);
+      // rather than a gap. 16 x 6 since the Quartered Isle joined ZONES.
+      expect(fishingSeries(text, name), name).toHaveLength(96);
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
           expect(fishingValue(text, name, zone, band), `${name} ${zone} ${band}`).toBe('0');

@@ -8546,6 +8546,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmfang_greatblade.name': 'Великий клинок Клык Вирма',
   'entities.items.staff_of_the_gravewyrm.name': 'Посох Могильного Вирма',
   'entities.items.fang_of_korzul.name': 'Клык Корзула',
+  'entities.items.council_inscription.name': 'Надпись Совета',
+  'entities.items.colossus_makers_mark.name': 'Клеймо мастера Колосса',
   'entities.items.trail_hardtack.name': 'Походный сухарь Хайвотча',
   'entities.items.meltwater_flask.name': 'Фляга талой воды',
   'entities.items.roast_mountain_goat.name': 'Жареный горный козел',
@@ -9577,6 +9579,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': 'Поля Кораблекрушений',
   'entities.zones.galecrest.pois.6.label': 'Зеркальное Озеро',
   'entities.zones.galecrest.pois.7.label': 'Конюшни Гейлкреста',
+  'entities.zones.quartered_isle.name': 'Четырёхчастный остров',
+  'entities.zones.quartered_isle.welcome':
+    'Давнее соперничество раскололо этот остров на четыре части. Ривалмут стоит у подножия Вихревого пика, над кратером, где шла война.',
+  'entities.zones.quartered_isle.pois.0.label': 'Ривалмут',
+  'entities.zones.quartered_isle.pois.1.label': 'Арена претендентов',
+  'entities.zones.quartered_isle.pois.2.label': 'Иневый мост',
+  'entities.zones.quartered_isle.pois.3.label': 'Иневый шельф',
+  'entities.zones.quartered_isle.pois.4.label': 'Пепельный шрам',
+  'entities.zones.quartered_isle.pois.5.label': 'Дебри Вздыбленного камня',
+  'entities.zones.quartered_isle.pois.6.label': 'Вихревой пик',
+  'entities.zones.quartered_isle.pois.7.label': 'Огнеледяной разлом',
+  'entities.zones.quartered_isle.pois.8.label': 'Трещины',
+  'entities.zones.quartered_isle.pois.9.label': 'Иневое Зерцало',
+  'entities.zones.quartered_isle.pois.10.label': 'Огненные русла',
+  'entities.zones.quartered_isle.pois.11.label': 'Стеклянное поле',
+  'entities.zones.quartered_isle.pois.12.label': 'Разрез Молота',
+  'entities.zones.quartered_isle.pois.13.label': 'Вздыбленные плиты',
+  'entities.zones.quartered_isle.pois.14.label': 'Павший великан',
   'entities.npcs.warden_coalfast.name': 'Смотритель Хладоуголь',
   'entities.npcs.warden_coalfast.title': 'Комендант редута',
   'entities.npcs.warden_coalfast.greeting':
@@ -9623,6 +9643,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': 'Штормовой дух',
   'entities.mobs.shoal_scuttler.name': 'Отмельный краб',
   'entities.mobs.the_wreck_warden.name': 'Страж Кораблекрушений',
+  'entities.mobs.remnant_first_colossus.name': 'Остаток Первого Колосса',
+  'entities.mobs.quench_shardling.name': 'Осколок Закалки',
+  'entities.mobs.rimeglass_bear.name': 'Медведь Иневого Зерцала',
+  'entities.mobs.warden_of_the_quench.name': 'Страж Закалки',
+  'entities.mobs.heatsworn_ember.name': 'Огнеприсяжный уголёк',
+  'entities.mobs.cinderscar_caller.name': 'Призыватель Пепельного шрама',
+  'entities.mobs.ember_hound.name': 'Угольная гончая',
+  'entities.mobs.the_glassfield_brute.name': 'Громила Стеклянного поля',
+  'entities.mobs.heaved_shardling.name': 'Вздыбленный осколок',
+  'entities.mobs.veinback_burrower.name': 'Жилоспинный землерой',
   'entities.mobs.downs_bandit.name': 'Бандит с холмов',
   'entities.mobs.wreck_thief.name': 'Расхититель кораблекрушений',
   'entities.mobs.glimmerwisp.name': 'Мерцающий огонёк',
@@ -10258,6 +10288,46 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     'Берег умолк в тот самый миг, когда он пал, {playerName}. Первая тишина на этом берегу за десять лет моей работы. Команды теперь просто кости — упокоенные кости. Возьми мантию с верхушки клада: живой спине она всегда была впору больше.',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'Страж Кораблекрушений повержен',
+  'entities.quests.q_qi_the_moot_rolls.title': 'Списки Ривалмута',
+  'entities.quests.q_qi_the_moot_rolls.text':
+    'Ривалмут хранит список каждого претендента, что приходил испытать совет, {playerName}, и ни строчки о том, почему совет стоит испытывать. Я хочу написать эту историю. Начни с капитана Тессали у зала: её претенденты обошли каждый край этого острова, а солдаты помнят то, что упускают учёные.',
+  'entities.quests.q_qi_the_moot_rolls.completion':
+    'Тебя прислал Ансель? Значит, он наконец спрашивает тех, кого нужно. Мои претенденты нашли в каждом краю резные камни, что старше этого города, и никто здесь не может их прочесть. Передай ему это.',
+  'entities.quests.q_qi_the_moot_rolls.objectives.0.label': 'Поговорите с капитаном Тессали',
+  'entities.quests.q_qi_words_in_stone.title': 'Слова в камне',
+  'entities.quests.q_qi_words_in_stone.text':
+    'Камни Тессали и есть надписи самого совета, {playerName}, ставлю на это свои списки. Три стоят там, где война изранила землю сильнее всего: одна на Иневом шельфе, одна у Огнеледяного разлома и одна под Разрезом Молота. Прочти каждую и принеси мне всё до последнего слова.',
+  'entities.quests.q_qi_words_in_stone.completion':
+    'Лёд, огонь и камень, каждый объявляет остров владением своего искусства, и все три подписаны одной рукой. Совет никогда не был четырьмя чужаками, {playerName}. Это был один совет, воевавший сам с собой.',
+  'entities.quests.q_qi_words_in_stone.objectives.0.label': 'Надпись Совета прочитана',
+  'entities.quests.q_qi_servants_at_their_posts.title': 'Слуги на своих постах',
+  'entities.quests.q_qi_servants_at_their_posts.text':
+    'Надписи называют слуг совета, поклявшихся удерживать каждый край, пока не вернутся их хозяева. Хозяева так и не вернулись, а слуги так и не перестали держать оборону. Прореди их, {playerName}: шесть Осколков Закалки на Иневом шельфе, шесть Огнеприсяжных угольков в Огненных руслах и шесть Вздыбленных осколков на Вздыбленных плитах.',
+  'entities.quests.q_qi_servants_at_their_posts.completion':
+    'По шесть каждого, и в краях стало чуть тише. Их ядра вырезаны с тем же знаком, что и надписи. Кто сделал слуг, тот сделал и камни.',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.0.label': 'Осколок Закалки убит',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.1.label': 'Огнеприсяжный уголёк убит',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': 'Вздыбленный осколок убит',
+  'entities.quests.q_qi_wardens_of_the_arts.title': 'Стражи искусств',
+  'entities.quests.q_qi_wardens_of_the_arts.text':
+    'Двое стражей совета всё ещё стоят: один в Трещинах Иневого шельфа, другой погружён в Стеклянное поле Пепельного шрама. Надписи зовут их хранителями тайн своих искусств, и добром они эти тайны не отдадут, {playerName}. Повергни Стража Закалки и Громилу Стеклянного поля.',
+  'entities.quests.q_qi_wardens_of_the_arts.completion':
+    'Оба стража сломлены, и каждый нёс печатный камень с вырезанным силуэтом великана. Значит, совет всё-таки строил что-то вместе, нечто большее, чем любой из них. Все знаки указывают на Дебри Вздыбленного камня.',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.0.label': 'Страж Закалки повержен',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.1.label':
+    'Громила Стеклянного поля повержен',
+  'entities.quests.q_qi_the_fallen_giant.title': 'Павший великан',
+  'entities.quests.q_qi_the_fallen_giant.text':
+    'В Дебрях Вздыбленного камня, там, где пал Павший великан, лежит каменная голова размером с дом. Претенденты зовут её статуей. Я думаю, на неё и указывают печатные камни. Найди на ней клеймо мастера, {playerName}, и скажи мне, чья рука его вырезала.',
+  'entities.quests.q_qi_the_fallen_giant.completion':
+    'Руны четырёх искусств, вырезанные бок о бок в одно клеймо. Совет создал великана вместе, впервые действуя как одно целое. Он должен был сдержать Корзула и пал, так и не будучи завершён. Что-то от него до сих пор стоит на страже рядом с собственной головой.',
+  'entities.quests.q_qi_the_fallen_giant.objectives.0.label': 'Клеймо мастера Колосса найдено',
+  'entities.quests.q_qi_the_first_colossus.title': 'Первый Колосс',
+  'entities.quests.q_qi_the_first_colossus.text':
+    'Первый колосс так и не сдержал зверя. Он пал, и совет построил другого, которому это удалось. Но то, что осталось от первого, до сих пор несёт свой пост у Павшего великана, наполовину вытесанное и давно забытое, сражая всякого, кто подойдёт. Упокой его, {playerName}. История этого острова не должна кончаться стражем, который так и не узнал, что война окончена.',
+  'entities.quests.q_qi_the_first_colossus.completion':
+    'Значит, Остаток упокоен, и у списков появилась первая настоящая глава: четыре соперника, что ни в чём не могли договориться, пока не настал день, когда им пришлось вместе строить великана. Ривалмут обязан тебе строкой в своей истории, {playerName}, и я напишу её сам.',
+  'entities.quests.q_qi_the_first_colossus.objectives.0.label': 'Остаток Первого Колосса повержен',
   'entities.quests.q_hub_know_your_numbers.title': 'Знай свои числа',
   'entities.quests.q_hub_know_your_numbers.text':
     'Сила, которую нельзя измерить, это сила, которую нельзя улучшить, {playerName}. Возьми в цель тренировочный манекен, открой счетчики урона и нанеси по нему десять ударов, оружием или заклинаниями, следя за тем, как окно считает нанесенный урон. Когда все десять будут нанесены, возвращайся и назови мне число.',
@@ -12517,6 +12587,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Населённый призраками лес под исполинскими кронами, где фонари Гиббетмира, единственный честный свет на дороге.',
   'guide.worldPage.galeBlurb':
     'Морские утёсы и воющие холмы, где ветер не знает покоя, Старый Маяк никогда не гаснет, а Викхарбор крепко запирает свои двери.',
+  'guide.worldPage.quarteredBlurb':
+    'Остров, расколотый давним соперничеством на четыре края: льда, огня, камня и бури. Претенденты Ривалмута держат свой город у подножия Вихревого пика, а арену в кратере, где шла война.',
   'guide.worldPage.jungleBlurb':
     'Тропическое сплетение пальм, белого песка и громких птиц, где пляжный городок Дрифтхейвен держит костёр на берегу.',
   'guide.worldPage.gardenBlurb':
@@ -12542,6 +12614,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     'Ветер здесь не стихал ни разу, и Старый Маяк ни разу не гас. Закрой за собой дверь таверны.',
   'guide.worldPage.galeGreeter': 'Смотритель маяка, Викхарбор',
+  'guide.worldPage.quarteredGreeting':
+    'Каждый отряд, что спускается в кратер, клянётся удержать арену. Когда холм восстанет, спустись и докажи это.',
+  'guide.worldPage.quarteredGreeter': 'Претендент, Ривалмут',
   'guide.worldPage.jungleGreeting':
     'Тёплый песок, громкие птицы и джунгли, пожирающие горизонт. Мы держим костёр на берегу; постарайся к нему вернуться.',
   'guide.worldPage.jungleGreeter': 'Хозяйка гавани, Дрифтхейвен',
@@ -12562,6 +12637,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Гиббетмир жмётся к своим фонарям. Вороньи Врата, это мрачная парадная дверь леса; Вдовья Чаща густо оплетена паутиной; Висельная Поляна и Часовня Скорбного Камня хранят самые старые скорби этого леса; а Поляна Ловчего принадлежит тому, что до сих пор там охотится.',
   'guide.worldPage.galePlaceNotes':
     'Викхарбор стоит, накренившись против ветра. Ветровой Проход, это дорога по утёсам на входе; Воющие Холмы катятся под бурей без единого дерева; Старый Маяк горит столько, сколько кто-либо может припомнить; Отвесный Срез обрывается прямо к воде; Поля Кораблекрушений держат побережье в строгости; а Зеркальное Озеро, единственная неподвижная вещь во всём этом краю.',
+  'guide.worldPage.quarteredPlaceNotes':
+    'Ривалмут стоит у подножия Вихревого пика, там, где начинается подъём к престолу совета. Иневый мост ведёт дорогу через пролив из Морозного Предела; Иневый шельф лежит внизу, белый, холодный и расколотый; Арена претендентов ждёт следующего Короля горы на дне большого кратера, сердца старой войны; Пепельный шрам тлеет в сторону Земель Драконов; Дебри Вздыбленного камня вздымаются к Янтарной Пади; а Вихревой пик кружит свою бурю над всем этим.',
   'guide.worldPage.junglePlaceNotes':
     'Дрифтхейвен держит костёр на берегу. Заросшее Устье, это место, где река встречает зелёную стену; Пальмовая Коса тянется белой тёплой полосой вдоль прибоя; Изумрудная Чаща и Лианопад поглощают всё, что дальше от берега; Сапфировая Лагуна светится, прозрачная и глубокая; а Затонувший Идол наблюдает из-под воды.',
   'guide.worldPage.gardenPlaceNotes':
@@ -15744,6 +15821,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': 'Золочёный сундук',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Любой ящик, ларец и безделушка в Золочёном сундуке в полной сохранности.',
+  'entities.npcs.bursar_maud_ashby.name': 'Казначей Мод Эшби',
+  'entities.npcs.bursar_maud_ashby.title': 'Золочёный сундук',
+  'entities.npcs.bursar_maud_ashby.greeting':
+    'Золочёный сундук сохранит ваше добро даже на этом острове.',
+  'entities.npcs.keeper_ansel_morrow.name': 'Хранитель Ансель Морроу',
+  'entities.npcs.keeper_ansel_morrow.title': 'Хранитель списков Ривалмута',
+  'entities.npcs.keeper_ansel_morrow.greeting':
+    'Каждый претендент, что поднимается на этот холм, хочет одолеть совет, {playerName}. А я хочу знать, почему его стоит одолевать.',
+  'entities.npcs.innkeeper_bettany_quell.name': 'Беттани Квелл',
+  'entities.npcs.innkeeper_bettany_quell.title': 'Хозяйка таверны',
+  'entities.npcs.innkeeper_bettany_quell.greeting':
+    'Осторожнее с сапогами у двери, мокрый снег с Иневого шельфа пробирается всюду. Огонь горит, похлёбка горячая, и даже претендента, что сегодня проиграл, здесь накормят.',
+  'entities.npcs.outfitter_harl_bracken.name': 'Харл Бракен',
+  'entities.npcs.outfitter_harl_bracken.title': 'Торговец снаряжением',
+  'entities.npcs.outfitter_harl_bracken.greeting':
+    'Мази, тоники и походный набор в дорогу. Всё остальное здешние края всё равно сломают, так что инструменты носи свои.',
+  'entities.npcs.captain_thessaly_rivalmoot.name': 'Капитан Тессали',
+  'entities.npcs.captain_thessaly_rivalmoot.title': 'Предводительница претендентов',
+  'entities.npcs.captain_thessaly_rivalmoot.greeting':
+    'Совет сидит на той вершине без единого вызова дольше, чем кто-либо помнит. Мои претенденты намерены это изменить. Но сначала докажи себя на шрамах, {playerName}.',
   'entities.items.furyforged_warhelm.name': 'Боевой шлем яростной ковки',
   'entities.items.furyforged_warspaulders.name': 'Боевые наплечники яростной ковки',
   'entities.items.furyforged_warplate.name': 'Боевой панцирь яростной ковки',
@@ -18721,6 +18818,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
   'guide.profPages.gatherDeeds.fishing':
     'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
+  'guide.profPages.gatherDeeds.miningWithIsle':
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Mining вписывает Ore in the Blood. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а вскрытие pristine vein записывает собственную коллекционную отметку. Ничто из этого не дает силы: деяния, это титулы и Известность, летопись дорог, что вы прошли.',
+  'guide.profPages.gatherDeeds.loggingWithIsle':
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Logging вписывает Heartwood Hewer. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а срез ancient heartwood записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
+  'guide.profPages.gatherDeeds.herbalismWithIsle':
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
+  'guide.profPages.gatherDeeds.fishingWithIsle':
+    'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
   'guide.profPages.gatherDeeds.farming':
     'У земледелия пока нет собственных деяний: теперь, когда грядки и культуры укоренились, вехи и деяния предела, что отмечают другие ремесла, придут с одним из будущих обновлений. Его мастерство уже засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах, так что земледелец заполнит эту страницу наравне со всеми. Деяния дают только титулы и известность, но никогда не силу.',
   'guide.profPages.gatherDeeds.farmingSown':
@@ -20212,6 +20317,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.farshoreName': 'Дальний Берег',
   'guide.home.world.galeBlurb':
     'Морские утёсы и воющие холмы, где ветер не стихает ни на миг, а Викхарбор наглухо запирает двери.',
+  'guide.home.world.quarteredName': 'Четырёхчастный остров',
+  'guide.home.world.quarteredBlurb':
+    'Остров, расколотый давним соперничеством на четыре части: Ривалмут стоит у подножия грозового пика над кратером, за который бьётся каждый претендент.',
   'guide.home.world.galeName': 'Гейлкрест',
   'guide.home.world.gardenBlurb':
     'Царство живых изгородей, которые до сих пор подстригает садовник, которого никто и никогда не видел; вход туда лежит за Хеджвиком и его фонтанными дворами.',
@@ -24399,6 +24507,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Следующий Плач невесты нанесёт вам на {pct}% больше урона: {per}% за каждый заряд, не больше {max} зарядов. Встретьте следующий в свете фонаря.',
   'hudChrome.auraEffect.crypt.slippery':
     'Вы на скользком льду: ваша скорость меняется не больше чем на {grip} ярд/сек. за секунду, поэтому вы медленно разгоняетесь, скользите дальше, когда останавливаетесь, и вас заносит на поворотах. Сойдите со льда, чтобы снова твёрдо стоять на ногах.',
+  'hudChrome.auraEffect.quartered.galeLane':
+    'Штормовой ветер несёт вас по дороге к вершине Вихревого пика, даже если вы стоите на месте: до {speed} ярд/сек., а ближе к вершине скорость плавно снижается до {summit} ярд/сек. Ветер удерживает вас на дороге на любом повороте и в прыжке. Шагайте в сторону, чтобы пересечь дорогу, или двигайтесь вниз по ней, чтобы идти против ветра. Пока ветер несёт вас, произнесение заклинаний прерывается. Действует ещё до {linger} сек. после того, как вы покинете полосу ветра, и переносит вас через промежутки между полосами.',
   'hudChrome.auraEffect.crypt.harmony':
     'Получает на {pct}% меньше урона: {per}% за каждого живого Хориста. Сначала убейте Хористов.',
   'hudChrome.auraEffect.crypt.crescendo':

@@ -5905,6 +5905,10 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'feat_guild_writ_runner',
   'feat_guild_hallsworn',
   'feat_guild_of_lantern_hall',
+  // the Quartered Isle's chronicle pair and the four-branch bank tour
+  'chr_quartered_isle_gatherer',
+  'chr_quartered_isle_first_cast',
+  'hid_gilded_grand_tour',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

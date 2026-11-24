@@ -1151,4 +1151,16 @@ export const table: DeedLocaleTable = {
     desc: '在南瓜灯之夜期间，找到藏在世界各处的所有闹鬼南瓜。',
     title: '空心者',
   },
+  chr_quartered_isle_gatherer: {
+    name: '四境之馈',
+    desc: '在四分岛采集一处矿脉、一片林木与一丛草药。',
+  },
+  chr_quartered_isle_first_cast: {
+    name: '四境之间的一线',
+    desc: '在四分岛水域钓上一条鱼。',
+  },
+  hid_gilded_grand_tour: {
+    name: '镀金大巡礼',
+    desc: '与镀金保险箱的全部四家分号都做过生意。',
+  },
 };

@@ -4732,6 +4732,9 @@ export const fr_FR: EnTranslations = {
         "graspRoot": "Retenu par les mains de la tombe : vous ne pouvez pas vous déplacer pendant {seconds} s.",
         "knellAirborne": "Vole au-dessus du Cercle rituel, hors de portée. Il marque la moitié du cercle pendant {mark} s, puis déverse un feu fantomatique sur cette moitié : {min} à {max} points de dégâts de Feu à toutes les personnes qui s'y trouvent. Il embrase {breaths} moitiés à chaque envol, puis atterrit."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Subit {pct}% de dégâts en moins : {per}% pour chacune de ses chaînes encore intactes. Brisez une Entrave scellée pour faire tomber sa chaîne.",
         "enrage": "Inflige {pct}% de dégâts supplémentaires.",
@@ -9342,6 +9345,8 @@ export const fr_FR: EnTranslations = {
         "gardenBlurb": "Un royaume-jardin en labyrinthe de haies, encore taillé par nul jardinier vu de quiconque, dont l'entrée passe par Hedgewick et ses cours de fontaines.",
         "galeName": "La Crête du Vent",
         "galeBlurb": "Falaises marines et landes hurlantes où le vent ne se repose jamais et où Wickharbor ferme bien ses portes.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Niveau {level}"
       },
       "group": {
@@ -10286,6 +10291,7 @@ export const fr_FR: EnTranslations = {
       "nightBlurb": "Un royaume de minuit étoilé où des fleurs éclairent les chemins et où Moonrest maintient une veille silencieuse sous un ciel qui rêve.",
       "hauntBlurb": "Une forêt hantée sous des canopées géantes, où les lanternes de Gibbetmere sont la seule lumière honnête sur la route.",
       "galeBlurb": "Falaises marines et landes hurlantes où le vent ne se repose jamais, où le Vieux Phare ne s'éteint jamais, et où Wickharbor ferme bien ses portes.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Un enchevêtrement tropical de palmiers, de sable blanc, et d'oiseaux bruyants, où la ville de plage de Drifthaven garde un feu allumé sur la grève.",
       "gardenBlurb": "Un royaume-jardin en labyrinthe de haies, encore taillé par nul jardinier vu de quiconque, dont l'entrée passe par Hedgewick et ses cours de fontaines.",
       "valeGreeting": "Gardez votre lame à portée. Le Val n'est plus ce qu'il était.",
@@ -10310,6 +10316,8 @@ export const fr_FR: EnTranslations = {
       "hauntGreeter": "Le lampiste, Gibbetmere",
       "galeGreeting": "Le vent ne s'est jamais arrêté ici, pas une seule fois, et le Vieux Phare ne s'est jamais éteint. Refermez la porte de l'auberge derrière vous.",
       "galeGreeter": "Le gardien du phare, Wickharbor",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Sable chaud, oiseaux bruyants, et une jungle qui dévore l'horizon. Nous gardons un feu allumé sur la plage ; essayez d'y revenir.",
       "jungleGreeter": "La capitaine du port, Drifthaven",
       "gardenGreeting": "Quelqu'un taille encore les haies, bien qu'aucun jardinier n'ait été vu depuis cent ans. Prenez garde au labyrinthe : il vous surveille aussi.",
@@ -10325,6 +10333,7 @@ export const fr_FR: EnTranslations = {
       "nightPlaceNotes": "Moonrest veille. La Porte nocturne mène au pays de minuit ; la Source lunaire garde une lumière stellaire où l’on peut se tenir ; Gloamfield fleurit dans le noir ; la Vigile immobile ne bouge jamais et le Tumulus sans sommeil est le seul endroit qui ne rêve jamais.",
       "hauntPlaceNotes": "Gibbetmere se blottit dans ses lanternes. La Porte aux Corbeaux est la porte funeste du bois ; le Fourré des Veuves est tissé épais de toiles ; la Clairière Pendue et la Chapelle de Mournstone gardent les plus vieux chagrins de la forêt ; et la Clairière du Chasseur appartient à ce qui y chasse encore.",
       "galePlaceNotes": "Wickharbor se penche dans le vent. La Voie du Vent est la route de falaise qui mène ici ; les Landes Hurlantes roulent, sans arbres, sous la tempête ; le Vieux Phare brûle depuis aussi longtemps que quiconque s'en souvienne ; le Surplomb tombe à pic vers l'eau ; les Champs d'Épaves gardent la côte honnête ; et le Lac Miroir est la seule chose immobile dans tout le royaume.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drifthaven garde son feu sur la plage. L'Embouchure emmêlée est là où la rivière rencontre le mur vert ; la Grève des Palmes court blanche et chaude le long du ressac ; l'Enchevêtrement d'Émeraude et la Chute de Lianes engloutissent l'intérieur des terres ; le Lagon de Saphir luit clair et profond ; et l'Idole engloutie observe depuis sous l'eau.",
       "gardenPlaceNotes": "Hedgewick attend à la Porte du Jardin. L'Allée du Parterre fleurit en couleurs taillées ; le Château de Dawnhold entraîne ses chevaliers derrière des murs neufs ; le Bassin aux Pétales dérive en rose toute l'année ; le Vieux Moulin retourne son propre lit de fleurs ; le Grand Labyrinthe réarrange ses manières pour chaque visiteur, ses arcades surveillées par des renards feuillus ; le Guet du Nord garde la route de sortie ; le Bassin des Lys repose au-delà de tout cela ; et la Cour des Fontaines coule encore claire au cœur du jardin.",
       "gladeTitle": "Un coin paisible : la clairière de Brightwood",
@@ -11116,6 +11125,10 @@ export const fr_FR: EnTranslations = {
         "logging": "Votre premier noeud d'un métier quelconque vous vaut Fruits de la terre, et le plafond de 100 en Bûcheronnage inscrit le titre Bûcheron de cœur. Atteindre 100 dans trois quelconques des métiers Minage, Bûcheronnage, Herboristerie et Pêche ajoute Grand Récolteur à 25 de Renommée, et un coup de hache dans un vieux cœur de bois consigne sa propre marque de collectionneur. Les hauts faits n'accordent que des titres et de la Renommée, jamais de puissance.",
         "herbalism": "Votre premier noeud d'un métier quelconque vous vaut Fruits de la terre, et le plafond de 100 en Herboristerie inscrit Maître des prairies. Atteindre 100 dans trois quelconques des métiers Minage, Bûcheronnage, Herboristerie et Pêche ajoute Grand Récolteur à 25 de Renommée, et une floraison au clair de lune consigne sa propre marque de collectionneur. Les hauts faits n'accordent que des titres et de la Renommée, jamais de puissance.",
         "fishing": "Le jalon des 100 inscrit Vieux Sel et celui des 200 inscrit Grand Pêcheur avec son titre, le sommet même de l'art du pêcheur ; la Pêche compte aussi pour Grand Récolteur, obtenu à 100 dans trois métiers de récolte quelconques. Un premier poisson tiré des eaux de chacune de six zones remplit sa propre page, les trois zones du cœur du royaume plus le Marais des Saules, la Crête du Vent et le Rivage Lointain au-delà, et le Koi solaire consigne Lueur d'espoir : les voyageurs qui gardent une canne dans leur paquetage remplissent donc leur livre plus vite qu'ils ne le croient.",
+        "miningWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "loggingWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalismWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishingWithIsle": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
         "farmingSown": "L’Agriculture possède désormais sa propre étagère dans le Livre des hauts faits. Ça commence par les semis marque votre première culture plantée, et quatre pages de chronique marquent la première récolte florissante sur chacun des sites, de la vallée d’Eastbrook à l’Evergarden. Une récolte dorée inscrit sa propre marque de collection à Renom nul, et la compétence en Agriculture compte pour Maître récolteur, obtenu à 100 dans trois métiers de récolte. Chaque sillon rempli rassemble tout le catalogue sur une seule page : faites pousser chaque culture des quatre jardins et la collection se ferme. Au-dessus se trouve Maître des récoltes, le titre de métier à 100 de compétence ; maintenant que les graines de montagne et de parterre sont aux comptoirs des fermières, c’est une progression que vous pouvez terminer aujourd’hui. Les hauts faits ne donnent que des titres et du Renom, jamais de puissance."
       },
@@ -24515,6 +24528,12 @@ export const fr_FR: EnTranslations = {
       "gourdlight_crow_feather": {
         "name": "Plume de corbeau de la Veillée des courges"
       },
+      "council_inscription": {
+        "name": "Council Inscription"
+      },
+      "colossus_makers_mark": {
+        "name": "Colossus Maker's Mark"
+      },
       "membership_staff": {
         "name": "Bâton du changement"
       },
@@ -26407,6 +26426,9 @@ export const fr_FR: EnTranslations = {
       "drowned_deckhand": {
         "name": "Matelot noyé"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Engeance de faille"
       },
@@ -26631,6 +26653,33 @@ export const fr_FR: EnTranslations = {
       },
       "buddy_phantom": {
         "name": "Fantôme"
+      },
+      "quench_shardling": {
+        "name": "Quench Splinter"
+      },
+      "rimeglass_bear": {
+        "name": "Rimeglass Bear"
+      },
+      "warden_of_the_quench": {
+        "name": "Warden of the Quench"
+      },
+      "heatsworn_ember": {
+        "name": "Heatsworn Ember"
+      },
+      "cinderscar_caller": {
+        "name": "Cinderscar Caller"
+      },
+      "ember_hound": {
+        "name": "Ember Hound"
+      },
+      "the_glassfield_brute": {
+        "name": "The Glassfield Brute"
+      },
+      "heaved_shardling": {
+        "name": "Heaved Splinter"
+      },
+      "veinback_burrower": {
+        "name": "Veinback Burrower"
       },
       "ironvein_foreman": {
         "name": "Contremaître Veinefer"
@@ -27009,6 +27058,11 @@ export const fr_FR: EnTranslations = {
         "name": "Trésorier Aldous Crane",
         "title": "Le Coffre doré",
         "greeting": "Chaque caisse, chaque coffret et chaque babiole est en sécurité au Coffre doré."
+      },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
       },
       "brother_aldric_raid": {
         "name": "Frère Aldric",
@@ -27484,6 +27538,26 @@ export const fr_FR: EnTranslations = {
         "name": "Laverock",
         "title": "Dernier chantre du Chœur pâle",
         "greeting": "J'étais la plus jeune voix du Chœur pâle. La nuit du rite, je n'ai pas bu et j'ai fui. Depuis, à chaque pleine lune, je les entends chanter sous l'eau. Je dois la voir avant de mourir. Laissez-moi marcher derrière vous. Je ne combattrai pas et je ne vous ralentirai pas."
+      },
+      "keeper_ansel_morrow": {
+        "name": "Keeper Ansel Morrow",
+        "title": "Keeper of the Moot Rolls",
+        "greeting": "Every challenger who climbs this hill wants to beat the council, {playerName}. I want to know why they are worth beating."
+      },
+      "innkeeper_bettany_quell": {
+        "name": "Bettany Quell",
+        "title": "Innkeeper",
+        "greeting": "Mind the boots by the door, the Hoarshelf sleet gets into everything. The fire is lit and the stew is hot, and a challenger who lost today still gets fed."
+      },
+      "outfitter_harl_bracken": {
+        "name": "Harl Bracken",
+        "title": "Outfitter",
+        "greeting": "Salves, tonics and a field kit for the road. The quarters break everything else, so carry your own tools."
+      },
+      "captain_thessaly_rivalmoot": {
+        "name": "Captain Thessaly",
+        "title": "Challengers' Leader",
+        "greeting": "The council has sat on that peak unchallenged for longer than anyone remembers. My challengers mean to change that. Prove yourself on the scars first, {playerName}."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -29881,6 +29955,75 @@ export const fr_FR: EnTranslations = {
           }
         }
       },
+      "q_qi_the_moot_rolls": {
+        "title": "The Moot Rolls",
+        "text": "Rivalmoot keeps a roll of every challenger who came to test the council, {playerName}, and not one line on why the council is worth testing. I mean to write that history. Start with Captain Thessaly by the hall: her challengers have walked every quarter of this isle, and soldiers remember what scholars miss.",
+        "completion": "Ansel sent you? Then he is finally asking the right people. My challengers have found carved stones in every quarter, older than this town, and nobody here can read them. Take that back to him.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Captain Thessaly"
+          }
+        }
+      },
+      "q_qi_words_in_stone": {
+        "title": "Words in the Stone",
+        "text": "Thessaly's stones are the council's own inscriptions, {playerName}, I would stake my rolls on it. Three stand where the war scarred the land worst: one on the Hoarshelf, one by the Fireice Rift and one below the Hammer's Cut. Read each one and bring me every word.",
+        "completion": "Ice, fire and stone, each claiming the isle for its own art, and all three signed by the same hand. The council was never four strangers, {playerName}. It was one council at war with itself.",
+        "objectives": {
+          "0": {
+            "label": "Council Inscription read"
+          }
+        }
+      },
+      "q_qi_servants_at_their_posts": {
+        "title": "Servants at Their Posts",
+        "text": "The inscriptions name the council's servants, sworn to hold each quarter until their masters returned. The masters never came back, and the servants never stopped holding. Thin them, {playerName}: six Quench Splinters on the Hoarshelf, six Heatsworn Embers in the Burnways and six Heaved Splinters on the Heaved Slabs.",
+        "completion": "Six of each, and the quarters a little quieter for it. Their cores were cut with the same mark as the inscriptions. Whoever made the servants made the stones too.",
+        "objectives": {
+          "0": {
+            "label": "Quench Splinter slain"
+          },
+          "1": {
+            "label": "Heatsworn Ember slain"
+          },
+          "2": {
+            "label": "Heaved Splinter slain"
+          }
+        }
+      },
+      "q_qi_wardens_of_the_arts": {
+        "title": "Wardens of the Arts",
+        "text": "Two of the council's wardens still stand, one in the Crevasses of the Hoarshelf and one sunk in the Glassfield of the Cinderscar. The inscriptions call them the keepers of their arts' secrets, and they will not share them willingly, {playerName}. Bring down the Warden of the Quench and the Glassfield Brute.",
+        "completion": "Both wardens broken, and each carried a seal-stone cut with a giant's outline. The council built something together after all, something larger than any of them. Every mark points to the Heavestone.",
+        "objectives": {
+          "0": {
+            "label": "Warden of the Quench slain"
+          },
+          "1": {
+            "label": "The Glassfield Brute slain"
+          }
+        }
+      },
+      "q_qi_the_fallen_giant": {
+        "title": "The Fallen Giant",
+        "text": "A stone head the size of a house lies in the Heavestone Wilds, where the Fallen Giant fell. The challengers call it a statue. I think it is what the seal-stones point to. Find the maker's mark on it, {playerName}, and tell me whose hand cut it.",
+        "completion": "The four arts' runes, cut side by side into one mark. The council made the giant together, the first time they ever worked as one. It was meant to hold Korzul, and it fell before it was finished. Something of it still stands guard beside its own head.",
+        "objectives": {
+          "0": {
+            "label": "Colossus Maker's Mark found"
+          }
+        }
+      },
+      "q_qi_the_first_colossus": {
+        "title": "The First Colossus",
+        "text": "The first colossus never held the beast. It fell, and the council built another that did. But what is left of the first still keeps its post at the Fallen Giant, half-carved and long forgotten, striking down anyone who comes near. Lay it to rest, {playerName}. This isle's history should not end with a guard who never learned the war was over.",
+        "completion": "Then the Remnant rests, and the rolls have their first true chapter: four rivals who could agree on nothing, until the day they had to build a giant together. Rivalmoot owes you a line in its history, {playerName}, and I will write it myself.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the First Colossus slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Le Chœur noyé",
         "text": "Les pataugeurs n'agissent pas seuls. Parmi eux marchent les Dévots noyés — la secte qui a sombré avec le temple, encore vêtue de ses ornements putréfiés, chantant toujours la prière depuis les rochers du rivage. Réduis-en huit au silence et rapporte-moi six des offrandes qu'ils portent. Je veux savoir ce qu'ils comptent donner à leur déesse.",
@@ -30381,6 +30524,57 @@ export const fr_FR: EnTranslations = {
           },
           "4": {
             "label": "Le Gantelet"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

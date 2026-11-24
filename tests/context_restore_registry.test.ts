@@ -260,9 +260,14 @@ describe('every GPU "done" record answers what a context restore does to it', ()
     for (const record of ['prewarmedZonePrograms', 'prewarmedMobTemplates', 'prewarmedNpcModels']) {
       expect(surface).toContain(`this.${record}`);
     }
-    // ...and isZoneReadyAt reads the very set it clears, so a teleport into a
-    // zone prepared before the loss takes its blocking arrival again.
-    expect(renderer).toContain('programsPrewarmed: this.prewarmedZonePrograms.has(id),');
+    // ...and isZoneReadyAt reads the very records it clears, so a teleport into a
+    // zone prepared before the loss takes its blocking arrival again. It reads them
+    // through the cold-body wait (zone_prewarm_body_wait_core.ts settledOrWaiting:
+    // prewarmedZonePrograms, or a wait on lane-held bodies no arrival can hurry),
+    // which the restore clears beside them.
+    expect(surface).toContain('this.zoneBodyWait');
+    expect(renderer).toContain('programsPrewarmed: this.zoneBodyWait.settledOrWaiting(id),');
+    expect(renderer).toContain('createZoneBodyWait(this.prewarmedZonePrograms, this);');
   });
 });
 

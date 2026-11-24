@@ -89,8 +89,8 @@ export interface ContextRestoreSurface {
   /** Chunked texture uploads already in flight (texture_residency_ledger.ts). */
   textureInFlight: WeakMap<THREE.Texture, Promise<void>>;
   compileBatchRoots: number;
-  /** The renderer's per-zone "programs prewarmed" records. */
-  zoneProgramRecords(): readonly Set<string>[];
+  /** The renderer's per-zone "programs prewarmed" records (and its cold-body wait). */
+  zoneProgramRecords(): readonly { clear(): void }[];
   /** The zone archetype prewarm, as the background streaming lane runs it. */
   prewarmZone(x: number, z: number): Promise<void>;
   /** One composer pass with the scene hidden plus the shed twin

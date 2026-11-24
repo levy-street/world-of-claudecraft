@@ -2142,6 +2142,70 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     },
     props: 'none',
   },
+  // === The Quartered Isle: Rivalmoot's townsfolk (content/quartered_isle_story.ts) =====
+  // Keeper Ansel Morrow, Keeper of the Moot Rolls: an ink-stained archivist who reads
+  // the council's stones, a tome under his arm.
+  keeper_ansel_morrow: {
+    cls: 'mage',
+    app: {
+      gender: 'male',
+      ...head('swept', 'boxed', 'default', 'default', 'aquiline', 'default'),
+      ...skin(22, 0.35, 0.55),
+      ...hair(30, 0.25, 0.45),
+      ...eyes(200, 0.35, 0.3),
+      headShape: shape({
+        eyeSpacing: 0.16,
+        eyeSize: 0.05,
+        eyeTilt: -0.1,
+        browHeight: 0.15,
+        chinWidth: 0.36,
+      }),
+      bodyScale: 0.98,
+    },
+    props: 'tome',
+  },
+  // Bettany Quell, innkeeper of Rivalmoot's inn: broad and cheerful, sleeves rolled
+  // for the stew pot, nothing in her hands but a welcome.
+  innkeeper_bettany_quell: {
+    cls: 'mage',
+    app: {
+      gender: 'female',
+      ...head('crown', 'none', 'soft_arch', 'default', 'button', 'relaxed'),
+      ...skin(20, 0.4, 0.55),
+      ...hair(12, 0.55, 0.3),
+      ...eyes(110, 0.4, 0.35),
+      headShape: shape({
+        eyeSpacing: 0.18,
+        eyeSize: 0.3,
+        eyeTilt: -0.1,
+        browHeight: 0.25,
+        chinWidth: 0.42,
+      }),
+      bodyScale: 1.03,
+    },
+    props: 'none',
+  },
+  // Harl Bracken, Rivalmoot's outfitter: a weathered trader who sells the tools the
+  // quarters break, a woodaxe on his shoulder.
+  outfitter_harl_bracken: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('quiff', 'long', 'default', 'default', 'broad', 'default'),
+      ...skin(28, 0.42, 0.45),
+      ...hair(8, 0.45, 0.25),
+      ...eyes(30, 0.4, 0.3),
+      headShape: shape({
+        eyeSpacing: 0.15,
+        eyeSize: -0.05,
+        eyeTilt: 0.1,
+        browHeight: -0.1,
+        chinWidth: 0.5,
+      }),
+      bodyScale: 1.04,
+    },
+    props: 'woodaxe',
+  },
   // Maudie Tapwright, innkeeper of the Mirefen tavern: round and rosy from the fire, a
   // grey-streaked bun and laugh lines; nothing in her hands but a welcome.
   innkeeper_maudie: {
@@ -2616,6 +2680,20 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
       bodyScale: 0.99,
     },
     props: 'tome',
+  },
+  // Bursar Maud Ashby, The Gilded Strongbox (Rivalmoot).
+  bursar_maud_ashby: {
+    cls: 'rogue',
+    app: {
+      gender: 'female',
+      ...head('waves', 'none', 'soft_arch', 'almond', 'default', 'full', 'default', 'lobes'),
+      ...skin(26, 0.4, 0.6),
+      ...hair(18, 0.55, 0.22),
+      ...eyes(150, 0.4, 0.35),
+      headShape: shape({ eyeSpacing: 0.24, eyeSize: 0.12, eyeTilt: 0.2, chinWidth: 0.55 }),
+      bodyScale: 1,
+    },
+    props: 'none',
   },
   // Ferryman Odo, Keeper of the Crossing.
   ferryman_odo: {
@@ -3304,6 +3382,8 @@ function baseId(templateId: string): string {
   if (templateId === 'scout_maren_highwatch') return 'scout_maren';
   if (templateId === 'scout_maren_wastes') return 'scout_maren';
   if (templateId === 'brother_halven_marsh') return 'brother_halven';
+  // Captain Thessaly leads Rivalmoot's challengers too (content/quartered_isle_story.ts).
+  if (templateId === 'captain_thessaly_rivalmoot') return 'captain_thessaly';
   // The Muster Standard's soldiers (combat/balgath_trinkets.ts) are the camp's own.
   if (templateId === 'guardian_muster_standard_spear') return 'muster_footman';
   if (templateId === 'guardian_muster_standard_sword') return 'muster_sergeant';

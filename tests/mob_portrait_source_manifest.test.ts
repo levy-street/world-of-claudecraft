@@ -112,7 +112,10 @@ describe('mob portrait source manifest', () => {
     // The 2026-10-09 reviewed renderer receipt captures all 355 current rows.
     // 356: plus the Hunting Spear of the Zulgar hunt rework (the usable body a
     // teammate pulls out, wildheart_hunting_spear).
-    expect(liveIds).toHaveLength(360);
+    // 361: plus the Quartered Isle's first mob, the Heavestone named elite
+    // (remnant_first_colossus).
+    // 370: plus the isle's other nine mobs (content/quartered_isle_mobs.ts).
+    expect(liveIds).toHaveLength(370);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

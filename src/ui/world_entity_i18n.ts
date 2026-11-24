@@ -360,6 +360,7 @@ const MOB_IDS = [
   'wreck_thief',
   'the_wreck_warden',
   'drowned_deckhand',
+  'remnant_first_colossus',
   'riftspawn',
   'breach_wretch',
   'void_stalker',
@@ -449,6 +450,16 @@ const MOB_IDS = [
   'buddy_sprites',
   'buddy_crystal_tide',
   'buddy_phantom',
+  // the Quartered Isle's mobs (content/quartered_isle_mobs.ts; the Remnant is above)
+  'quench_shardling',
+  'rimeglass_bear',
+  'warden_of_the_quench',
+  'heatsworn_ember',
+  'cinderscar_caller',
+  'ember_hound',
+  'the_glassfield_brute',
+  'heaved_shardling',
+  'veinback_burrower',
 ] as const;
 
 const NPC_IDS = [
@@ -507,6 +518,7 @@ const NPC_IDS = [
   'card_master', // Card Duel minigame queue desk (Eastbrook, zone 1)
   'bursar_petra_vell', // Gilded Strongbox banker (Fenbridge, zone 2)
   'bursar_aldous_crane', // Gilded Strongbox banker (Highwatch, zone 3)
+  'bursar_maud_ashby', // Gilded Strongbox banker (Rivalmoot, the Quartered Isle)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'archivist_maelin_emberward', // dev-only Ignivar raid historian
   'archivist_maelin_ember_projection', // Maelin's instanced raid checkpoint projection
@@ -621,6 +633,11 @@ const NPC_IDS = [
   'drillmaster_hale',
   // the Drowned Temple's lore guide (content/drowned_temple_cantor.ts)
   'cantor_laverock',
+  // Rivalmoot's townsfolk on the Quartered Isle (content/quartered_isle_story.ts)
+  'keeper_ansel_morrow',
+  'innkeeper_bettany_quell',
+  'outfitter_harl_bracken',
+  'captain_thessaly_rivalmoot',
 ] as const;
 
 const QUEST_IDS = [
@@ -869,6 +886,13 @@ const QUEST_IDS = [
   'q_gourdlight_daily_towns',
   'q_gourdlight_daily_feathers',
   'q_gourdlight_daily_baskets',
+  // the Quartered Isle's history line, The Moot Rolls (content/quartered_isle_story.ts)
+  'q_qi_the_moot_rolls',
+  'q_qi_words_in_stone',
+  'q_qi_servants_at_their_posts',
+  'q_qi_wardens_of_the_arts',
+  'q_qi_the_fallen_giant',
+  'q_qi_the_first_colossus',
 ] as const;
 
 const ZONE_IDS = [
@@ -889,6 +913,7 @@ const ZONE_IDS = [
   // Appended last, matching the ZONES order in sim/data.ts.
   'goldcrest_harbor',
   'proving_shore',
+  'quartered_isle',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

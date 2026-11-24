@@ -26,6 +26,7 @@ export const HOARD_VALLEY_ZONE_IDS = [
   'veiled_hollow',
   'evergarden',
   'farshore_isle',
+  'quartered_isle',
 ] as const;
 
 export type HoardValleyZoneId = (typeof HOARD_VALLEY_ZONE_IDS)[number];
@@ -256,6 +257,21 @@ export const HOARD_VALLEY_ZONE_PROFILES: Record<HoardValleyZoneId, HoardValleyZo
     cliffLight: 0x9aa09b,
     trunk: 0x554735,
     accent: 0xb9d8c4,
+    dressing: 'windswept_grass',
+  },
+  // the Quartered Isle: storm-grey fog over scarred ochre ground and basalt
+  // walls, the accent the white-gold of the Cinderscar's crystal fire
+  quartered_isle: {
+    biome: 'quartered',
+    fogColor: 0x9aa6b4,
+    fogNear: 96,
+    fogFar: 236,
+    ground: 0x7a6a52,
+    groundLight: 0xb0a07a,
+    cliff: 0x5a5654,
+    cliffLight: 0x8e8a86,
+    trunk: 0x4a3a2c,
+    accent: 0xd8c88a,
     dressing: 'windswept_grass',
   },
 };

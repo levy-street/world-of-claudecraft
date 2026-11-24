@@ -2,6 +2,7 @@
 // into ordinary map placements. They then use the editor's existing selection,
 // transform, undo, collision, and export pipeline instead of renderer-only props.
 
+import * as THREE from 'three';
 import { targetHeightFor } from '../render/asset_scale';
 import {
   isEastbrookRebuildBuilding,
@@ -23,6 +24,7 @@ import { boxesForAssetId, collisionOverrideFor } from '../sim/asset_collision';
 import { ASSET_COLLISION } from '../sim/asset_collision.generated';
 import { builtinStreetlampPlan } from '../sim/colliders';
 import { BUILTIN_WORLD } from '../sim/data';
+import { decorSeat } from '../sim/decor_seat';
 import { type FenWillow, fenWillowSpots, hollowWillowSpots } from '../sim/fen_willows';
 import { MAX_PLACEMENTS, type MapPlacement } from '../sim/map_doc';
 import { hash2 } from '../sim/rng';
@@ -36,6 +38,7 @@ import {
   terrainHeight,
 } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
+import { carriesBuiltinZones } from './builtin_zone_match_core';
 import { isConvertedGreatTree, worldMajorPropPlacements } from './world_prop_conversion';
 
 const MIN_AXIS_SCALE = 0.05;
@@ -861,6 +864,8 @@ export function decorPropPlacements(props: ZonePropsDef): MapPlacement[] {
       scale: Math.max(MIN_AXIS_SCALE, scale),
       collide: false,
     };
+    // a footprint-seated row keeps the seat the game draws it with (sim/decor_seat.ts)
+    if (d.seat === 'footprint') Object.assign(placement, seatedPlacementPose(d, def.yaw ?? 0));
     // Collision follows the record for SMALL dressing (r/hw/hd footprints are
     // truer for a flower bed and cheaper). BUILDING-sized decor is the
     // exception: a walk-in home blocking as a 4.5yd circle stops a body two
@@ -885,6 +890,29 @@ export function decorPropPlacements(props: ZonePropsDef): MapPlacement[] {
     out.push(placement);
   }
   return out;
+}
+
+/**
+ * The placement pose of a footprint-seated decor row: props.ts draws it sunk by the
+ * seat and leaned with Euler(pitch, rot, roll, 'YXZ') over geometry pre-turned by the
+ * asset's yaw; a placement takes its height as an offset from the ground and its turn
+ * as one XYZ Euler, so the same rotation is re-expressed in that order.
+ */
+function seatedPlacementPose(
+  d: NonNullable<ZonePropsDef['decorProps']>[number],
+  yaw: number,
+): Pick<MapPlacement, 'y' | 'rotX' | 'rotY' | 'rotZ'> {
+  const seat = decorSeat(d, (x, z) => terrainHeight(x, z, WORLD_SEED));
+  const q = new THREE.Quaternion()
+    .setFromEuler(new THREE.Euler(seat.pitch, d.rot ?? 0, seat.roll, 'YXZ'))
+    .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw));
+  const e = new THREE.Euler().setFromQuaternion(q, 'XYZ');
+  return {
+    y: cleanZero(-seat.sink),
+    rotX: cleanZero(e.x),
+    rotY: cleanZero(e.y),
+    rotZ: cleanZero(e.z),
+  };
 }
 
 /** A readable name for a promoted prop: "flowerBedRound" -> "Flower Bed Round". */
@@ -1032,11 +1060,7 @@ export function repairLegacyWorldPropFit(map: {
   meta: { seed: number };
 }): number {
   if (map.propsMode !== 'editable-all' || map.presentationMode !== undefined) return 0;
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return 0;
   }
   const byName = (list: MapPlacement[]) => new Map(list.map((p) => [p.name ?? '', p] as const));
@@ -1085,11 +1109,7 @@ export function promoteMajorWorldProps(map: {
 }): boolean {
   if (map.propsMode === 'empty' || map.propsMode === 'editable-all') return false;
   if (map.presentationMode !== undefined) return false;
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const sourceProps =
@@ -1116,11 +1136,7 @@ export function promoteEditablePalms(map: {
   if (map.placements.some((placement) => /^biome\/beach_palm_[123]$/.test(placement.assetId))) {
     return false;
   }
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const palms = reachPalmSpots(map.meta.seed).map((palm, index): MapPlacement => {
@@ -1324,11 +1340,7 @@ export function promoteFarshorePalms(map: {
   ) {
     return false;
   }
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const palms = farshorePalmPlacements(map.meta.seed);
@@ -1351,11 +1363,7 @@ export function promoteWillows(map: {
 }): boolean {
   if (map.propsMode !== 'editable-all' || map.presentationMode !== undefined) return false;
   if (map.placements.some((placement) => placement.assetId === 'props/willow_tree')) return false;
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const willows = willowPropPlacements(map.meta.seed);
@@ -1383,11 +1391,7 @@ export function promoteStreetlamps(map: {
   if (map.placements.some((placement) => placement.assetId.startsWith('props/streetlamp_'))) {
     return false;
   }
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const lamps = streetlampPropPlacements(map.meta.seed);

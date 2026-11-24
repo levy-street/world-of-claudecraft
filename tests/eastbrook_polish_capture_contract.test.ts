@@ -740,7 +740,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Quartered Isle landmark hook in renderer.ts.
+  // No capture was retaken.
+  // Re-minted for the Quartered Isle's iOS prewarm wait (renderer wiring). No capture was retaken.
+  '2f668867dbc8aa5fee120fa3e56e014fcca4e54822ef58da56f6217e769c5f22';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

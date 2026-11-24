@@ -888,7 +888,8 @@ describe('real catalog integration', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 314.
     // 317 with Lantern Hall's three contract milestones (visible; its three bought
     // titles are feats).
-    expect(view.summary.visibleTotal).toBe(324);
+    // (+2 for the Quartered Isle's chronicle pair; its hidden bank tour is not shown)
+    expect(view.summary.visibleTotal).toBe(326);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
     // from visibleTotal): 268 + 22 = 290, then 298, 305, 307 and 308 by the same
@@ -896,7 +897,7 @@ describe('real catalog integration', () => {
     // the world-boss branch's three.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 336.
     // 342 with Lantern Hall's six (three milestones plus the three title feats).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(359);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(361);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

@@ -9,7 +9,7 @@ const root = path.join(__dirname, '..', 'public', 'map_art');
 // (loadMapArt) falls back to the procedural painter for them, and the game HUD
 // keeps plates parked (GAME_MAP_ART_ENABLED in src/ui/map_art.ts). Delete a row
 // when its plate lands; the stale-entry check below fails if one is forgotten.
-const PLATE_PENDING = new Set<string>(['proving_shore']);
+const PLATE_PENDING = new Set<string>(['proving_shore', 'quartered_isle']);
 
 function platePath(id: string): string {
   return path.join(root, `${id}.png`);

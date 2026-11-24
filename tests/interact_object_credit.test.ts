@@ -222,7 +222,10 @@ describe('every multi-count interact objective has enough distinct objects to fi
     // Plus the hub healing drill (q_hub_healing_numbers, count 3), a sixth:
     // tutorial/hub_healing_drill.ts credits it off every EFFECTIVE heal that
     // lands on the friendly hub healing dummy, never through this ledger.
-    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(26);
+    //
+    // Plus the Quartered Isle's council inscriptions (q_qi_words_in_stone,
+    // count 3 over the 3 placed inscriptions, one per ground quarter).
+    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(27);
   });
 
   it.each(

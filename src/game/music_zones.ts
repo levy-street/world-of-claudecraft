@@ -77,6 +77,9 @@ const BIOME_MUSIC: Record<BiomeId, MusicZone> = {
   jungle: 'jungle',
   garden: 'garden',
   gale: 'gale',
+  // the Quartered Isle: the max-level storm-ringed isle borrows the
+  // Galecrest's windswept theme until it has its own cue
+  quartered: 'gale',
   beach: 'jungle',
   desert: 'ember',
   volcano: 'ember',

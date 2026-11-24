@@ -339,8 +339,10 @@ describe('isHarvestableCorpse', () => {
     // Wildheart Basin templates (basin_raptor, fanglord_jaguar, great_saurian,
     // howdah_hexcaller, spore_toad and sunbone_totem_binder), every one on a
     // mapped family; its two plant templates (vine_lasher, thorn_sprout) ship
-    // untagged like the shipped treants.
-    expect(included).toHaveLength(60);
+    // untagged like the shipped treants. Then 63 with the Quartered Isle's three
+    // tagged templates (rimeglass_bear, ember_hound, veinback_burrower), every
+    // family mapped; its seven other templates ship untagged.
+    expect(included).toHaveLength(63);
     // ...and the untagged templates are counted rather than assumed: 189 of
     // them ship, every one excluded, and none of them ever passed through
     // `excluded` (fen_troll was already tagged with claw and tusk when #2905
@@ -403,7 +405,10 @@ describe('isHarvestableCorpse', () => {
       'gourdlight_swelling_gourd',
     ])
       expect(untagged).toContain(MOBS[id]);
-    expect(untagged).toHaveLength(304);
+    // And the Quartered Isle adds seven untagged templates (quench_shardling,
+    // warden_of_the_quench, heatsworn_ember, cinderscar_caller, the_glassfield_brute,
+    // heaved_shardling, remnant_first_colossus: elementals and constructs): 311.
+    expect(untagged).toHaveLength(311);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

@@ -19,7 +19,7 @@ describe('wisp maze content registration', () => {
       );
       expect(evergarden, `cycle wq1_${day}`).toHaveLength(1);
       if (ids.includes('wq_evergarden_watch')) watchDays.push(day);
-      expect(ids).toHaveLength(16);
+      expect(ids).toHaveLength(17);
     }
     expect(watchDays).toEqual([0, 4, 8, 12, 16, 20, 24, 28]);
   });

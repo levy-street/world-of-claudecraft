@@ -17,6 +17,7 @@ import { FROSTVEIL_ZONE } from './frostveil';
 import { GALECREST_ZONE } from './galecrest';
 import { NIGHTBLOOM_ZONE } from './nightbloom';
 import { PALMREACH_ZONE } from './palmreach';
+import { QUARTERED_ISLE_ZONE } from './quartered_isle';
 import { REALM_ZONE } from './realm';
 import { WILLOWFEN_ZONE } from './willowfen';
 import { WRAITHWOOD_ZONE } from './wraithwood';
@@ -161,6 +162,7 @@ export const NOTICEBOARDS: readonly NoticeboardDef[] = Object.freeze([
   hubBoard('wickharbor_noticeboard', 2_000_000_014, GALECREST_ZONE, -5),
   hubBoard('gullhaven_noticeboard', 2_000_000_015, FARSHORE_ZONE, 5),
   townBoard(GLIDER_RANKINGS_BOARD_ID, 2_000_000_016, 201, 560, Math.PI, { x: 201, z: 558.5 }),
+  hubBoard('rivalmoot_noticeboard', 2_000_000_018, QUARTERED_ISLE_ZONE, -6),
 ]);
 
 const fenbridgeMusterBoard = FENBRIDGE_LAYOUT.civic.musterBoard;

@@ -43,9 +43,10 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
 
   it('resolves the open world, and underwater below the water line', () => {
     expect(resolveFogScene(false, 0, 10000, cam, SEED).desired).toBe('outdoor');
-    // The open sea north of the landmass (waterLevelAt reads -4.3 there); a
-    // camera above the surface stays outdoor, one below it goes underwater.
-    const sea = { x: 0, z: 2000 };
+    // The open strait between the Frostveil and the Quartered Isle
+    // (waterLevelAt reads -4.3 there); a camera above the surface stays
+    // outdoor, one below it goes underwater.
+    const sea = { x: -120, z: 1966 };
     expect(resolveFogScene(false, 0, 5, sea, SEED).desired).toBe('outdoor');
     expect(resolveFogScene(false, 0, -20, sea, SEED).desired).toBe('underwater');
     // No water body at all: even a deep camera reads outdoor (-Infinity level).

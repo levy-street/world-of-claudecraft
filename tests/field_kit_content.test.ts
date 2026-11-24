@@ -14,6 +14,8 @@ const FIELD_KIT_SELLERS = [
   'farmer_verbena',
   'fisherman_brandt',
   'forgemistress_darva',
+  // Rivalmoot's outfitter on the Quartered Isle (an ordinary supplier, no tools: R37)
+  'outfitter_harl_bracken',
   'provisioner_fenna',
   'provisioner_hale',
   'quartermaster_bree',

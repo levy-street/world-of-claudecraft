@@ -230,6 +230,9 @@ export const guideStrings = {
       galeName: 'The Galecrest',
       galeBlurb:
         'Sea-cliffs and howling downs where the wind never rests and Wickharbor shuts its doors tight.',
+      quarteredName: 'The Quartered Isle',
+      quarteredBlurb:
+        'An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.',
       // A cap-level zone has min === max, so the two-number band would read
       // "Levels 20 to 20" on the landing grid. Five of the fourteen zones are
       // single-level, so they take this phrasing instead.
@@ -1774,6 +1777,8 @@ export const guideStrings = {
       'A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.',
     galeBlurb:
       'Sea-cliffs and howling downs where the wind never rests, the Old Beacon never goes out, and Wickharbor shuts its doors tight.',
+    quarteredBlurb:
+      'An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.',
     jungleBlurb:
       'A tropical tangle of palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.',
     gardenBlurb:
@@ -1811,6 +1816,9 @@ export const guideStrings = {
     galeGreeting:
       'The wind has never once stopped here, and the Old Beacon has never once gone out. Close the inn door behind you.',
     galeGreeter: 'The beacon-keeper, Wickharbor',
+    quarteredGreeting:
+      'Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.',
+    quarteredGreeter: 'A challenger, Rivalmoot',
     jungleGreeting:
       'Warm sand, loud birds, and a jungle that eats the horizon. We keep a fire lit on the beach; try to come back to it.',
     jungleGreeter: 'The harbormistress, Drifthaven',
@@ -1842,6 +1850,8 @@ export const guideStrings = {
       "Gibbetmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
     galePlaceNotes:
       'Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.',
+    quarteredPlaceNotes:
+      "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
     junglePlaceNotes:
       'Drifthaven keeps its fire on the beach. The Tanglemouth is where the river meets the green wall; the Palmstrand runs white and warm along the surf; the Emerald Tangle and the Vinefall swallow the interior; the Sapphire Lagoon glows clear and deep; and the Sunken Idol watches from beneath the water.',
     gardenPlaceNotes:
@@ -3427,6 +3437,11 @@ export const guideStrings = {
       'An ordinary material signature stays with its units and can share a compatible stack with other gatherers and signers, so material that lands never loses its mark for lack of a matching stack. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, meat) keeps its ordinary yield plain and mints the signed specimen beside it; that distinct item still needs bag room, and if it cannot fit the ordinary yield remains but the specimen is lost. Every other family signs the yield itself.',
     gatherDeedsHeading: 'Deeds along the way',
     gatherDeeds: {
+      // RETIRED with the Quartered Isle: these four counted twelve zones, and
+      // the isle makes thirteen. Superseded by the *WithIsle leaves below and
+      // listed in scripts/i18n_retired_keys.mjs; kept, with their old wording,
+      // so filled locale overlays never strand (the reword-is-a-new-key
+      // convention, as farming / farmingSown).
       mining:
         "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
       logging:
@@ -3435,6 +3450,15 @@ export const guideStrings = {
         "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
       fishing:
         "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
+      // The live arms, NEW keys: thirteen zones, the Quartered Isle among them.
+      miningWithIsle:
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+      loggingWithIsle:
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+      herbalismWithIsle:
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+      fishingWithIsle:
+        "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
       // RETIRED at the celebrations phase (D13): superseded by farmingSown
       // below and no longer rendered, kept so filled locale overlays never
       // strand (the harvestBodyChoice precedent).

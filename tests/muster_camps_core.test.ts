@@ -23,6 +23,7 @@ import {
   type MusterCampDef,
 } from '../src/sim/content/mirefen_muster';
 import { BUILTIN_WORLD } from '../src/sim/data';
+import { decorSeat } from '../src/sim/decor_seat';
 import {
   angleGap,
   bearingTo,
@@ -378,7 +379,13 @@ describe('muster camps: graphics tiers', () => {
     expect(musterCampDecor(editorDoc, WORLD_SEED, false)).toEqual([]);
     const walked = renderDecorProps(BUILTIN_WORLD, WORLD_SEED, false);
     const authored = BUILTIN_WORLD.props.decorProps ?? [];
-    expect(walked.slice(0, authored.length)).toEqual(authored);
+    // authored rows pass through as they are, a footprint-seated row with its seat added
+    // (src/sim/decor_seat.ts)
+    const heightAt = (x: number, z: number): number => terrainHeight(x, z, WORLD_SEED);
+    expect(walked.slice(0, authored.length)).toEqual(
+      authored.map((d) => (d.seat === 'footprint' ? { ...d, ...decorSeat(d, heightAt) } : d)),
+    );
+    expect(authored.some((d) => d.seat === 'footprint')).toBe(true);
     expect(walked.length).toBe(authored.length + plan.length);
     // the tall pieces get a camera-ghost circle, the small ones none
     const tower = walked.find((d) => d.key === 'musterWatchtower');

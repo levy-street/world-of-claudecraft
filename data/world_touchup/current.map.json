@@ -1,14 +1,14 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-42722-5ac5a288-c5a98e78-157d-421e9565-e4972e75",
+    "id": "live-49a98-8cfdd552-3f66cda2-157d-421e9565-e4972e75",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
     "updatedAt": 0,
     "seed": 20061,
     "parentId": "",
-    "overworldBase": "42722-5ac5a288-c5a98e78",
+    "overworldBase": "49a98-8cfdd552-3f66cda2",
     "overworldRevision": "157d-421e9565-e4972e75"
   },
   "content": {
@@ -1445,6 +1445,135 @@
         ],
         "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line and, when you are ready, Ferryman Odo will see you across to the vale. You can also ring the bell to go to the vale directly.",
         "welcomeQuestId": "q_ps_the_gauntlet"
+      },
+      {
+        "id": "quartered_isle",
+        "name": "The Quartered Isle",
+        "zMin": 1960,
+        "zMax": 2420,
+        "xMin": -250,
+        "xMax": 250,
+        "claimsOverlap": true,
+        "levelRange": [20, 20],
+        "biome": "quartered",
+        "southPassX": 22,
+        "waterSouthBorder": true,
+        "eastPassZ": 2064,
+        "westPassZ": 2244,
+        "hub": {
+          "x": 0,
+          "z": 2248,
+          "radius": 24,
+          "name": "Rivalmoot"
+        },
+        "graveyard": {
+          "x": -30,
+          "z": 2240
+        },
+        "lakes": [
+          {
+            "x": -62,
+            "z": 2226,
+            "radius": 11
+          }
+        ],
+        "hillArena": {
+          "x": 0,
+          "z": 2122
+        },
+        "pois": [
+          {
+            "x": 0,
+            "z": 2248,
+            "label": "Rivalmoot",
+            "id": "rivalmoot"
+          },
+          {
+            "x": 0,
+            "z": 2122,
+            "label": "The Challengers' Ring",
+            "id": "the_challengers_ring"
+          },
+          {
+            "x": 22,
+            "z": 1975,
+            "label": "The Hoarbridge",
+            "id": "the_hoarbridge"
+          },
+          {
+            "x": 20,
+            "z": 2040,
+            "label": "The Hoarshelf",
+            "id": "the_hoarshelf"
+          },
+          {
+            "x": 120,
+            "z": 2190,
+            "label": "The Cinderscar",
+            "id": "the_cinderscar"
+          },
+          {
+            "x": -120,
+            "z": 2200,
+            "label": "The Heavestone Wilds",
+            "id": "the_heavestone_wilds"
+          },
+          {
+            "x": 0,
+            "z": 2356,
+            "label": "The Gyre",
+            "id": "the_gyre"
+          },
+          {
+            "x": 196,
+            "z": 2122,
+            "label": "The Fireice Rift",
+            "id": "the_fireice_rift"
+          },
+          {
+            "x": 72,
+            "z": 2036,
+            "label": "The Crevasses",
+            "id": "the_crevasses"
+          },
+          {
+            "x": -104,
+            "z": 2026,
+            "label": "The Rimeglass",
+            "id": "the_rimeglass"
+          },
+          {
+            "x": 200,
+            "z": 2236,
+            "label": "The Burnways",
+            "id": "the_burnways"
+          },
+          {
+            "x": 124,
+            "z": 2290,
+            "label": "The Glassfield",
+            "id": "the_glassfield"
+          },
+          {
+            "x": -166,
+            "z": 2172,
+            "label": "The Hammer's Cut",
+            "id": "the_hammers_cut"
+          },
+          {
+            "x": -204,
+            "z": 2222,
+            "label": "The Heaved Slabs",
+            "id": "the_heaved_slabs"
+          },
+          {
+            "x": -122,
+            "z": 2306,
+            "label": "The Fallen Giant",
+            "id": "the_fallen_giant"
+          }
+        ],
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought."
       }
     ],
     "camps": [
@@ -3030,7 +3159,8 @@
           "z": 400
         },
         "radius": 9,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "shoal_scuttler",
@@ -3039,7 +3169,8 @@
           "z": 460
         },
         "radius": 8,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "gale_wisp",
@@ -3048,7 +3179,8 @@
           "z": 565
         },
         "radius": 9,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "gale_wisp",
@@ -3057,7 +3189,8 @@
           "z": 585
         },
         "radius": 8,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "hedge_knight",
@@ -3111,7 +3244,8 @@
           "z": 2302
         },
         "radius": 8,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3120,7 +3254,8 @@
           "z": 2266
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3129,7 +3264,8 @@
           "z": 2278
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3138,7 +3274,8 @@
           "z": 2352
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3147,7 +3284,8 @@
           "z": 2302
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3156,7 +3294,8 @@
           "z": 2348
         },
         "radius": 10,
-        "count": 8
+        "count": 8,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3165,7 +3304,8 @@
           "z": 2318
         },
         "radius": 10,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3174,7 +3314,8 @@
           "z": 2300
         },
         "radius": 12,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3183,7 +3324,8 @@
           "z": 2380
         },
         "radius": 12,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3192,7 +3334,8 @@
           "z": 2242
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3201,7 +3344,8 @@
           "z": 2296
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3210,7 +3354,8 @@
           "z": 2282
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3219,7 +3364,8 @@
           "z": 2338
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3228,7 +3374,8 @@
           "z": 2302
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3237,7 +3384,8 @@
           "z": 2252
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3246,7 +3394,8 @@
           "z": 2384
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3255,7 +3404,8 @@
           "z": 2242
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3264,7 +3414,8 @@
           "z": 2303
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3273,7 +3424,8 @@
           "z": 2286
         },
         "radius": 6,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3282,7 +3434,8 @@
           "z": 2334
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3291,7 +3444,8 @@
           "z": 2308
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3300,7 +3454,8 @@
           "z": 2258
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3309,7 +3464,8 @@
           "z": 2380
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "friendly_player_dummy",
@@ -3345,7 +3501,8 @@
           "z": -14
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3354,7 +3511,8 @@
           "z": -17
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3363,7 +3521,8 @@
           "z": -11
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3372,7 +3531,8 @@
           "z": -20
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3381,7 +3541,8 @@
           "z": -9
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3390,7 +3551,8 @@
           "z": -42
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3399,7 +3561,8 @@
           "z": -48
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3408,7 +3571,208 @@
           "z": -40
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
+      },
+      {
+        "mobId": "remnant_first_colossus",
+        "center": {
+          "x": -124,
+          "z": 2292
+        },
+        "radius": 5,
+        "count": 1,
+        "offStream": true
+      },
+      {
+        "mobId": "quench_shardling",
+        "center": {
+          "x": -78,
+          "z": 2034
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "quench_shardling",
+        "center": {
+          "x": -112,
+          "z": 2000
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "quench_shardling",
+        "center": {
+          "x": -126,
+          "z": 2064
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "rimeglass_bear",
+        "center": {
+          "x": 32,
+          "z": 2016
+        },
+        "radius": 8,
+        "count": 2,
+        "offStream": true
+      },
+      {
+        "mobId": "rimeglass_bear",
+        "center": {
+          "x": 4,
+          "z": 1996
+        },
+        "radius": 8,
+        "count": 2,
+        "offStream": true
+      },
+      {
+        "mobId": "warden_of_the_quench",
+        "center": {
+          "x": 62,
+          "z": 2036
+        },
+        "radius": 5,
+        "count": 1,
+        "offStream": true
+      },
+      {
+        "mobId": "heatsworn_ember",
+        "center": {
+          "x": 184,
+          "z": 2248
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "heatsworn_ember",
+        "center": {
+          "x": 190,
+          "z": 2224
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "heatsworn_ember",
+        "center": {
+          "x": 202,
+          "z": 2270
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "cinderscar_caller",
+        "center": {
+          "x": 172,
+          "z": 2202
+        },
+        "radius": 6,
+        "count": 2,
+        "offStream": true
+      },
+      {
+        "mobId": "cinderscar_caller",
+        "center": {
+          "x": 194,
+          "z": 2188
+        },
+        "radius": 6,
+        "count": 2,
+        "offStream": true
+      },
+      {
+        "mobId": "ember_hound",
+        "center": {
+          "x": 128,
+          "z": 2164
+        },
+        "radius": 8,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "ember_hound",
+        "center": {
+          "x": 146,
+          "z": 2136
+        },
+        "radius": 8,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "the_glassfield_brute",
+        "center": {
+          "x": 128,
+          "z": 2284
+        },
+        "radius": 5,
+        "count": 1,
+        "offStream": true
+      },
+      {
+        "mobId": "heaved_shardling",
+        "center": {
+          "x": -212,
+          "z": 2210
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "heaved_shardling",
+        "center": {
+          "x": -174,
+          "z": 2208
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "heaved_shardling",
+        "center": {
+          "x": -184,
+          "z": 2246
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "veinback_burrower",
+        "center": {
+          "x": -144,
+          "z": 2182
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
+      },
+      {
+        "mobId": "veinback_burrower",
+        "center": {
+          "x": -148,
+          "z": 2136
+        },
+        "radius": 7,
+        "count": 3,
+        "offStream": true
       }
     ],
     "npcs": {
@@ -5950,6 +6314,86 @@
           "reins_emberbristle_broom"
         ],
         "dynamic": true
+      },
+      "bursar_maud_ashby": {
+        "id": "bursar_maud_ashby",
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "pos": {
+          "x": 15.1,
+          "z": 2241.64615
+        },
+        "facing": 0,
+        "color": 13214247,
+        "questIds": [],
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle.",
+        "banker": true,
+        "dynamic": true
+      },
+      "keeper_ansel_morrow": {
+        "id": "keeper_ansel_morrow",
+        "name": "Keeper Ansel Morrow",
+        "title": "Keeper of the Moot Rolls",
+        "pos": {
+          "x": 19.2,
+          "z": 2251.7999999999997
+        },
+        "facing": 3.141592653589793,
+        "color": 5925514,
+        "questIds": [
+          "q_qi_the_moot_rolls",
+          "q_qi_words_in_stone",
+          "q_qi_servants_at_their_posts",
+          "q_qi_wardens_of_the_arts",
+          "q_qi_the_fallen_giant",
+          "q_qi_the_first_colossus"
+        ],
+        "greeting": "Every challenger who climbs this hill wants to beat the council, $N. I want to know why they are worth beating.",
+        "dynamic": true
+      },
+      "innkeeper_bettany_quell": {
+        "id": "innkeeper_bettany_quell",
+        "name": "Bettany Quell",
+        "title": "Innkeeper",
+        "pos": {
+          "x": -8.299999999999999,
+          "z": 2269.2
+        },
+        "facing": 1.5707963267948966,
+        "color": 10111546,
+        "questIds": [],
+        "greeting": "Mind the boots by the door, the Hoarshelf sleet gets into everything. The fire is lit and the stew is hot, and a challenger who lost today still gets fed.",
+        "vendorItems": ["trail_hardtack", "roast_mountain_goat", "meltwater_flask", "glacier_melt"],
+        "dynamic": true
+      },
+      "outfitter_harl_bracken": {
+        "id": "outfitter_harl_bracken",
+        "name": "Harl Bracken",
+        "title": "Outfitter",
+        "pos": {
+          "x": -17.6,
+          "z": 2239.4
+        },
+        "facing": 0,
+        "color": 6969914,
+        "questIds": [],
+        "greeting": "Salves, tonics and a field kit for the road. The quarters break everything else, so carry your own tools.",
+        "vendorItems": ["healing_potion", "mana_potion", "field_kit"],
+        "dynamic": true
+      },
+      "captain_thessaly_rivalmoot": {
+        "id": "captain_thessaly_rivalmoot",
+        "name": "Captain Thessaly",
+        "title": "Challengers' Leader",
+        "pos": {
+          "x": 12.6,
+          "z": 2251
+        },
+        "facing": 3.141592653589793,
+        "color": 3824282,
+        "questIds": ["q_qi_the_moot_rolls"],
+        "greeting": "The council has sat on that peak unchallenged for longer than anyone remembers. My challengers mean to change that. Prove yourself on the scars first, $N.",
+        "dynamic": true
       }
     },
     "objects": [
@@ -6927,6 +7371,34 @@
             "y": -4.5,
             "facing": 4.71238898038469,
             "scale": 2
+          }
+        ]
+      },
+      {
+        "itemId": "council_inscription",
+        "name": "Council Inscription",
+        "positions": [
+          {
+            "x": -64,
+            "z": 2056
+          },
+          {
+            "x": 170,
+            "z": 2126
+          },
+          {
+            "x": -140,
+            "z": 2206
+          }
+        ]
+      },
+      {
+        "itemId": "colossus_makers_mark",
+        "name": "Colossus Maker's Mark",
+        "positions": [
+          {
+            "x": -112,
+            "z": 2310
           }
         ]
       }
@@ -9016,6 +9488,162 @@
         {
           "x": -314,
           "z": 44
+        }
+      ],
+      [
+        {
+          "x": -2,
+          "z": 1866
+        },
+        {
+          "x": -4,
+          "z": 1880
+        },
+        {
+          "x": -4,
+          "z": 1905
+        },
+        {
+          "x": 4,
+          "z": 1930
+        },
+        {
+          "x": 12,
+          "z": 1946
+        },
+        {
+          "x": 22,
+          "z": 1962
+        }
+      ],
+      [
+        {
+          "x": 22,
+          "z": 1962
+        },
+        {
+          "x": 20,
+          "z": 2000
+        },
+        {
+          "x": 8,
+          "z": 2028
+        },
+        {
+          "x": 0,
+          "z": 2046
+        },
+        {
+          "x": 0,
+          "z": 2122
+        },
+        {
+          "x": 0,
+          "z": 2198
+        },
+        {
+          "x": 0,
+          "z": 2222
+        },
+        {
+          "x": 0,
+          "z": 2248
+        }
+      ],
+      [
+        {
+          "x": -72,
+          "z": 2122
+        },
+        {
+          "x": -96,
+          "z": 2122
+        },
+        {
+          "x": -100,
+          "z": 2148
+        },
+        {
+          "x": -96,
+          "z": 2176
+        }
+      ],
+      [
+        {
+          "x": 0,
+          "z": 2248
+        },
+        {
+          "x": 36,
+          "z": 2240
+        },
+        {
+          "x": 84,
+          "z": 2200
+        },
+        {
+          "x": 124,
+          "z": 2140
+        },
+        {
+          "x": 152,
+          "z": 2098
+        },
+        {
+          "x": 180,
+          "z": 2080
+        },
+        {
+          "x": 214,
+          "z": 2078
+        },
+        {
+          "x": 250,
+          "z": 2062
+        },
+        {
+          "x": 276,
+          "z": 2044
+        }
+      ],
+      [
+        {
+          "x": 0,
+          "z": 2248
+        },
+        {
+          "x": -36,
+          "z": 2254
+        },
+        {
+          "x": -86,
+          "z": 2262
+        },
+        {
+          "x": -136,
+          "z": 2272
+        },
+        {
+          "x": -180,
+          "z": 2274
+        },
+        {
+          "x": -225,
+          "z": 2262
+        },
+        {
+          "x": -272,
+          "z": 2226
+        }
+      ],
+      [
+        {
+          "x": 0,
+          "z": 2248
+        },
+        {
+          "x": 0,
+          "z": 2312
         }
       ]
     ]
@@ -17880,6 +18508,506 @@
       "mode": "level",
       "hardness": 0.6440044550969344,
       "id": "live-terrain-915"
+    },
+    {
+      "x": -13.75,
+      "z": 2258.7226666666666,
+      "radius": 12.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-916"
+    },
+    {
+      "x": -22.15,
+      "z": 2258.7226666666666,
+      "radius": 12.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-917"
+    },
+    {
+      "x": -13.75,
+      "z": 2266.272,
+      "radius": 12.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-918"
+    },
+    {
+      "x": -22.15,
+      "z": 2266.272,
+      "radius": 12.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-919"
+    },
+    {
+      "x": -13.75,
+      "z": 2273.8213333333333,
+      "radius": 12.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-920"
+    },
+    {
+      "x": -22.15,
+      "z": 2273.8213333333333,
+      "radius": 12.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-921"
+    },
+    {
+      "x": 13.21275,
+      "z": 2257.6753333333336,
+      "radius": 13.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-922"
+    },
+    {
+      "x": 13.21275,
+      "z": 2265.746,
+      "radius": 13.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-923"
+    },
+    {
+      "x": 13.21275,
+      "z": 2273.8166666666666,
+      "radius": 13.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-924"
+    },
+    {
+      "x": 22.63825,
+      "z": 2257.6753333333336,
+      "radius": 13.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-925"
+    },
+    {
+      "x": 22.63825,
+      "z": 2265.746,
+      "radius": 13.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-926"
+    },
+    {
+      "x": 22.63825,
+      "z": 2273.8166666666666,
+      "radius": 13.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-927"
+    },
+    {
+      "x": -12.749,
+      "z": 2235.8500000000004,
+      "radius": 10.457746179405014,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4262626098330716,
+      "id": "live-terrain-928"
+    },
+    {
+      "x": -12.749,
+      "z": 2229.75,
+      "radius": 10.457746179405014,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4262626098330716,
+      "id": "live-terrain-929"
+    },
+    {
+      "x": -19.251,
+      "z": 2235.8500000000004,
+      "radius": 10.457746179405014,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4262626098330716,
+      "id": "live-terrain-930"
+    },
+    {
+      "x": -19.251,
+      "z": 2229.75,
+      "radius": 10.457746179405014,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4262626098330716,
+      "id": "live-terrain-931"
+    },
+    {
+      "x": 26.736866666666664,
+      "z": 2237.831,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-932"
+    },
+    {
+      "x": 26.736866666666664,
+      "z": 2231.2181,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-933"
+    },
+    {
+      "x": 26.736866666666664,
+      "z": 2224.6052,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-934"
+    },
+    {
+      "x": 19.2013,
+      "z": 2237.831,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-935"
+    },
+    {
+      "x": 19.2013,
+      "z": 2231.2181,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-936"
+    },
+    {
+      "x": 19.2013,
+      "z": 2224.6052,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-937"
+    },
+    {
+      "x": 11.665733333333334,
+      "z": 2237.831,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-938"
+    },
+    {
+      "x": 11.665733333333334,
+      "z": 2231.2181,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-939"
+    },
+    {
+      "x": 11.665733333333334,
+      "z": 2224.6052,
+      "radius": 10.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5006423605527818,
+      "id": "live-terrain-940"
+    },
+    {
+      "x": -13.75,
+      "z": 2258.7226666666666,
+      "radius": 9.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-941"
+    },
+    {
+      "x": -22.15,
+      "z": 2258.7226666666666,
+      "radius": 9.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-942"
+    },
+    {
+      "x": -13.75,
+      "z": 2266.272,
+      "radius": 9.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-943"
+    },
+    {
+      "x": -22.15,
+      "z": 2266.272,
+      "radius": 9.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-944"
+    },
+    {
+      "x": -13.75,
+      "z": 2273.8213333333333,
+      "radius": 9.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-945"
+    },
+    {
+      "x": -22.15,
+      "z": 2273.8213333333333,
+      "radius": 9.646955679341254,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-946"
+    },
+    {
+      "x": 13.21275,
+      "z": 2257.6753333333336,
+      "radius": 10.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-947"
+    },
+    {
+      "x": 13.21275,
+      "z": 2265.746,
+      "radius": 10.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-948"
+    },
+    {
+      "x": 13.21275,
+      "z": 2273.8166666666666,
+      "radius": 10.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-949"
+    },
+    {
+      "x": 22.63825,
+      "z": 2257.6753333333336,
+      "radius": 10.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-950"
+    },
+    {
+      "x": 22.63825,
+      "z": 2265.746,
+      "radius": 10.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-951"
+    },
+    {
+      "x": 22.63825,
+      "z": 2273.8166666666666,
+      "radius": 10.204347481694679,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-952"
+    },
+    {
+      "x": -12.749,
+      "z": 2235.8500000000004,
+      "radius": 8.457746179405014,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716,
+      "id": "live-terrain-953"
+    },
+    {
+      "x": -12.749,
+      "z": 2229.75,
+      "radius": 8.457746179405014,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716,
+      "id": "live-terrain-954"
+    },
+    {
+      "x": -19.251,
+      "z": 2235.8500000000004,
+      "radius": 8.457746179405014,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716,
+      "id": "live-terrain-955"
+    },
+    {
+      "x": -19.251,
+      "z": 2229.75,
+      "radius": 8.457746179405014,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716,
+      "id": "live-terrain-956"
+    },
+    {
+      "x": 26.736866666666664,
+      "z": 2237.831,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-957"
+    },
+    {
+      "x": 26.736866666666664,
+      "z": 2231.2181,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-958"
+    },
+    {
+      "x": 26.736866666666664,
+      "z": 2224.6052,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-959"
+    },
+    {
+      "x": 19.2013,
+      "z": 2237.831,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-960"
+    },
+    {
+      "x": 19.2013,
+      "z": 2231.2181,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-961"
+    },
+    {
+      "x": 19.2013,
+      "z": 2224.6052,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-962"
+    },
+    {
+      "x": 11.665733333333334,
+      "z": 2237.831,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-963"
+    },
+    {
+      "x": 11.665733333333334,
+      "z": 2231.2181,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-964"
+    },
+    {
+      "x": 11.665733333333334,
+      "z": 2224.6052,
+      "radius": 9.01286373737053,
+      "delta": 10,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5561898951811975,
+      "id": "live-terrain-965"
     }
   ],
   "placements": [

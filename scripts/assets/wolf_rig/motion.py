@@ -29,6 +29,10 @@ import numpy as np
 from mathutils import Matrix, Quaternion, Vector
 
 FPS = 30
+# Paw travel, lift and swing are the old wolf's distances; a shorter-legged body
+# (the Rimeglass Bear) scales them by its leg length over the wolf's. build.py sets
+# it from the model's stride_scale; both wolves keep 1.0.
+STRIDE = 1.0
 # Blender's glTF importer puts a key at frame = t * (the scene's fps at import time).
 # build.py imports at FPS; an interactive session that imported at 24 sets this to 24.
 IMPORT_FPS = FPS
@@ -679,12 +683,13 @@ def _leg_target(P, F, i, leg, L, contact_lo, contact_hi):
         lift, plant = _contact(pad, L, contact_lo, contact_hi)
         settle = float(L['settle'][i]) if L.get('settle') is not None else plant
     on_ground = L['rest_pad'].copy()
-    on_ground.x += d.x
-    on_ground.y += d.y
-    on_ground.z += lift
+    on_ground.x += d.x * STRIDE
+    on_ground.y += d.y * STRIDE
+    on_ground.z += lift * STRIDE
     turn, moved = _swing_offset(F, leg, L)
     if L.get('swing') is not None:
         moved = L['swing'][i]  # eased over the clip (plant_legs)
+    moved = moved * STRIDE
     from_root = P[L['hinge']].to_translation() + turn @ (L['hinge_to_pad'] + moved)
     target = from_root.lerp(on_ground, settle)
     stand = L['gait'] is not None

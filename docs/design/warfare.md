@@ -705,7 +705,8 @@ players who do.
 ## King of the Hill
 
 Once per `HILL_WINDOW_SECONDS` (two hours), a hill is scheduled in one of
-the three northern zones (`hillZones`). Ordinary ground there is contested;
+the four northern zones (`hillZones`: the Drakelands, the Frostveil Reach, the
+Amberfall and the Quartered Isle). Ordinary ground there is contested;
 entering a risen hill enables PvP for eligible players. Each window draws its
 own deterministic warning offset from a private RNG. The first window opens
 `HILL_FIRST_WINDOW_AT_SECONDS` after boot. A late warning slides the full warning
@@ -717,7 +718,12 @@ A hill has three moments, each announced to the whole realm:
    The spot is chosen now, a `HILL_RADIUS` (50 yd) circle on dry, open ground,
    clear of the hub settlement and every collider, wholly inside its zone, and
    it is drawn on the ground as a still, faint outline, so parties can form and
-   travel. Nothing counts yet. A failed spot search retries a minute on with the
+   travel. A zone with a dedicated arena (`ZoneDef.hillArena`) skips the search:
+   the Quartered Isle always raises its hill centred in the Challengers' Ring, a
+   level, cleared floor ringed by a low stone wall at the foot of Rivalmoot's
+   hill (`CHALLENGERS_RING` in `src/sim/quartered_isle_terrain.ts`), and the
+   arena still answers to the same spot probe, so a blocked arena retries like
+   any failed search. Nothing counts yet. A failed spot search retries a minute on with the
    attempt number salted into the spot rng (so a retry searches new ground); a
    window whose planned stand passes before any spot is found is skipped.
 2. **The rise** (`hillRiseLine`), `HILL_WARNING_SECONDS` (15 minutes) after the

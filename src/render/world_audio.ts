@@ -4,6 +4,7 @@
 import { TAVERN_FLOOR_Y, TAVERN_ORIGIN } from '../sim/content/mirefen_tavern';
 import { DUNGEON_X_THRESHOLD, getActiveWorldContent, isBuiltinWorldActive } from '../sim/data';
 import { dockSectionAt } from '../sim/dock_layout';
+import { dominantQuarterAt } from '../sim/quartered_quarters';
 import type { MapPointSound } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { AmbientPointSource, PointSoundSource, Surface } from './audio_sink';
@@ -29,6 +30,12 @@ export function footstepSurfaceAt(
   if (biome === 'vale') return 'grass';
   if (biome === 'marsh' || biome === 'ember') return 'dirt'; // ember: sandy waste
   if (biome === 'amber' || biome === 'fen') return 'grass';
+  if (biome === 'quartered') {
+    // each quarter walks like its ground: glacier shelf, scorched soil,
+    // dry grassland, storm-bare rock
+    const q = dominantQuarterAt(x, z);
+    return q === 'ice' ? 'snow' : q === 'fire' ? 'dirt' : q === 'earth' ? 'grass' : 'stone';
+  }
   return weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
 }
 

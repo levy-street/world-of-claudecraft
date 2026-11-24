@@ -153,8 +153,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
     // + Lantern Hall (the Highwatch guild): three contract milestones (5, 10, 25) and the
     // quartermaster's three zero-Renown title feats: 352, 3850.
-    expect(DEED_ORDER.length).toBe(369);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4010);
+    // + the Quartered Isle: its gatherer and first-cast chronicle pair and the
+    // hidden four-branch Gilded Strongbox tour (5 each): 372, 4025.
+    expect(DEED_ORDER.length).toBe(372);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4025);
   });
 
   it('ships the audited per-category counts', () => {
@@ -191,7 +193,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       dungeon: 63,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
-      chronicle: 53,
+      // +2 the Quartered Isle's gatherer and first-cast pair.
+      chronicle: 55,
       // +4 Reliquary Curator rank bridges and +5 Phase 18 completion ladder
       // deeds on top of the release collection set, +1 col_golden_harvest,
       // +1 the Roots Bramblehide set collection (col_set_bramblehide) the
@@ -208,7 +211,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       exploration: 23,
       // +3 Lantern Hall's quartermaster titles (bought for Lantern Seals).
       feat: 16,
-      hidden: 10,
+      // +1 the four-branch Gilded Strongbox tour (hid_gilded_grand_tour).
+      hidden: 11,
     });
   });
 
@@ -493,6 +497,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'feat_gourdlight_errands',
       'feat_gourdlight_frights',
       'feat_gourdlight_eve_complete',
+      // The Quartered Isle: its chronicle pair, then the four-branch bank tour.
+      'chr_quartered_isle_gatherer',
+      'chr_quartered_isle_first_cast',
+      'hid_gilded_grand_tour',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1138,7 +1146,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Release merge: retain the release catalogue first and append integration's
   // 33 deeds. Stripping them reproduces the release's frozen digest below.
   // Main's frozen catalog is preserved as the prefix; Halloween appends ten feats.
-  const FROZEN_CATALOG_SHA256 = '6209fd36c03fe4f3d6c8a4ba2966d04b4ba0ba2c21128b82db589c50e24697b2';
+  // Re-baselined for the Quartered Isle: three appended deeds (the gatherer and
+  // first-cast chronicle pair, and the hidden four-branch Gilded Strongbox tour,
+  // a NEW deed beside the untouched three-branch one per rule 9).
+  const FROZEN_CATALOG_SHA256 = 'd0238681e559ceca53c7d0002a13b3056d6467e863502063316f8fab99f2a5a1';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1219,19 +1230,15 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   //
   // The hard Wisp Maze deed now appends after the World PvP title ladder.
   // Stripping it reproduces the previous 325-deed mint.
+  // The Quartered Isle appends three deeds after feat_gourdlight_eve_complete; the
+  // previous mint is the Gourdlight Eve catalogue's 6209fd36... literal (rotated
+  // down here), and stripping the three must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    'f0b1e522f87715f2ffbf812095ea6fb172aa9116d57c706a9fe65f945b1b482d';
+    '6209fd36c03fe4f3d6c8a4ba2966d04b4ba0ba2c21128b82db589c50e24697b2';
   const APPENDED_SINCE: readonly string[] = [
-    'feat_gourdlight_guise',
-    'feat_old_thatchgrin',
-    'feat_title_gourdlit',
-    'feat_title_trickster',
-    'feat_title_hollow_grinned',
-    'feat_pumpkin_hunter',
-    'feat_gourdlight_doorsteps',
-    'feat_gourdlight_errands',
-    'feat_gourdlight_frights',
-    'feat_gourdlight_eve_complete',
+    'chr_quartered_isle_gatherer',
+    'chr_quartered_isle_first_cast',
+    'hid_gilded_grand_tour',
   ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
@@ -1243,8 +1250,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'feat_guild_hallsworn',
-      'feat_guild_of_lantern_hall',
+      'feat_gourdlight_frights',
+      'feat_gourdlight_eve_complete',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1475,12 +1482,14 @@ describe('table shape', () => {
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
     // five-dungeon rework's 24, Morthen's Every Candle Lit, then Lantern Hall's six, the
     // quartermaster's third title last.
-    expect(DEED_ORDER[DEED_ORDER.length - 51]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 42]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 41]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 17]).toBe('dgn_morthen_candlelight');
-    expect(DEED_ORDER[DEED_ORDER.length - 11]).toBe('feat_guild_of_lantern_hall');
-    expect(DEED_ORDER.at(-1)).toBe('feat_gourdlight_eve_complete');
+    expect(DEED_ORDER[DEED_ORDER.length - 54]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 45]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 44]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 20]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 14]).toBe('feat_guild_of_lantern_hall');
+    // then Gourdlight Eve's ten, and the Quartered Isle's three close the tail.
+    expect(DEED_ORDER.at(-4)).toBe('feat_gourdlight_eve_complete');
+    expect(DEED_ORDER.at(-1)).toBe('hid_gilded_grand_tour');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -2063,6 +2072,7 @@ describe('trigger references resolve against the real content tables', () => {
       ['wraithwood', 'chr_wraithwood_first_cast'],
       ['palmreach', 'chr_palmreach_first_cast'],
       ['evergarden', 'chr_evergarden_first_cast'],
+      ['quartered_isle', 'chr_quartered_isle_first_cast'],
     ] as const;
     for (const [zoneId, deedId] of CASES) {
       const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: false });
@@ -2098,6 +2108,7 @@ describe('trigger references resolve against the real content tables', () => {
       ['wraithwood', 'chr_wraithwood_gatherer'],
       ['palmreach', 'chr_palmreach_gatherer'],
       ['evergarden', 'chr_evergarden_gatherer'],
+      ['quartered_isle', 'chr_quartered_isle_gatherer'],
     ] as const;
     for (const [zoneId, deedId] of CASES) {
       const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: false });

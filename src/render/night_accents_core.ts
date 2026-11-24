@@ -157,6 +157,7 @@ export const FLORA_DENSITY: Record<BiomeId, number> = {
   peaks: 0.2,
   frost: 0.22,
   gale: 0.18,
+  quartered: 0.22,
   amber: 0.3,
   ember: 0.24, // cinder-blooms rather than mushrooms
   beach: 0.14,
@@ -173,6 +174,7 @@ export const FLORA_TINT: Record<BiomeId, number> = {
   peaks: 0x9fd8ff,
   frost: 0x8fe0ff,
   gale: 0xa8e4ff,
+  quartered: 0xd8e6ff, // pale crystal light, where the four arts meet
   garden: 0xffa8d8,
   amber: 0xffc46a,
   ember: 0xff8a4a,

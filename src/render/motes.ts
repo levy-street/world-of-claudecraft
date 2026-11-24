@@ -46,6 +46,7 @@ const MOTE_TINT: Record<BiomeId, number> = {
   jungle: 0xfff2b0, // sun-caught pollen and midges
   garden: 0xffccd8, // drifting rose petals
   gale: 0xeef6ff, // wind-torn sea spray
+  quartered: 0xf2e6d0, // ash, frost dust and pollen mingled on the wind
 };
 
 // Realms that drift NO motes: the northern columns and headlands read cleaner

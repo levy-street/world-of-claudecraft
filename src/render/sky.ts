@@ -101,6 +101,8 @@ const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number
   garden: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
   // the Galecrest's own storm-light sky (skies_in/galecrest.png)
   gale: { gain: 0.6, clamp: 2.6, contrast: 1.1 },
+  // the Quartered Isle aliases the Galecrest's storm-light sky
+  quartered: { gain: 0.6, clamp: 2.6, contrast: 1.1 },
   // the Farshore's own day sky, graded bright
   farshore: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
 };
@@ -136,6 +138,7 @@ const BIOME_SKY_2K: Record<SkyKey, string> = {
   jungle: '/env/palmreach_day_2k.ktx2',
   garden: '/env/evergarden_day_2k.ktx2',
   gale: '/env/galecrest_day_2k.ktx2',
+  quartered: '/env/frost_twilight_2k.ktx2', // aliases the Frostveil's cold storm-blue sky
   farshore: '/env/farshore_day_2k.ktx2',
 };
 
@@ -157,6 +160,7 @@ const BIOME_SKY_1K: Record<SkyKey, string> = {
   jungle: '/env/palmreach_day_1k.ktx2',
   garden: '/env/evergarden_day_1k.ktx2',
   gale: '/env/galecrest_day_1k.ktx2',
+  quartered: '/env/frost_twilight_1k.ktx2',
   farshore: '/env/farshore_day_1k.ktx2',
 };
 
@@ -183,6 +187,7 @@ const BIOME_SKY_ENV: Record<SkyKey, string> = {
   jungle: '/env/palmreach_day_512.ktx2',
   garden: '/env/evergarden_day_512.ktx2',
   gale: '/env/galecrest_day_512.ktx2',
+  quartered: '/env/frost_twilight_512.ktx2',
   farshore: '/env/farshore_day_512.ktx2',
 };
 
@@ -224,6 +229,7 @@ const BIOME_BACKDROP_8K: Record<SkyKey, string> = {
   jungle: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
   garden: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
   gale: '/env/vale_backdrop.webp', // never shown: backdrop strength 0,
+  quartered: '/env/vale_backdrop.webp',
   farshore: '/env/vale_backdrop.webp',
 };
 
@@ -245,6 +251,7 @@ const BIOME_BACKDROP_4K: Record<SkyKey, string> = {
   jungle: '/env/vale_backdrop_4k.webp',
   garden: '/env/vale_backdrop_4k.webp',
   gale: '/env/vale_backdrop_4k.webp',
+  quartered: '/env/vale_backdrop_4k.webp',
   farshore: '/env/vale_backdrop_4k.webp',
 };
 
@@ -266,6 +273,7 @@ const BACKDROP_Y_BIAS: Record<SkyKey, number> = {
   jungle: 0,
   garden: 0,
   gale: 0,
+  quartered: 0,
   farshore: 0,
 };
 
@@ -295,6 +303,7 @@ const BIOME_BACKDROP_STRENGTH: Record<SkyKey, number> = {
   jungle: 0,
   garden: 0,
   gale: 0,
+  quartered: 0,
   farshore: 0,
 };
 
@@ -320,6 +329,7 @@ const BIOME_HORIZON_LIFT: Record<SkyKey, number> = {
   jungle: 0,
   garden: 0,
   gale: 0,
+  quartered: 0,
   farshore: 0,
 };
 
@@ -389,6 +399,7 @@ const HDRI_SUN_U: Record<SkyKey, number> = {
   jungle: 0.497, // own sky (sunless source): rotation kept at the fen's value
   garden: 0.497, // own sky (sunless source): rotation kept at the fen's value
   gale: 0.497, // own sky (sunless source): rotation kept at the fen's value,
+  quartered: 0.497, // aliases the Galecrest sky, so its rotation too
   farshore: 0.497, // own sky (sunless source): rotation kept at the fen's value
 };
 
@@ -415,6 +426,7 @@ const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
   jungle: [0.95, 1.04, 1.1],
   garden: [0.95, 1.04, 1.12],
   gale: [0.95, 1.03, 1.12],
+  quartered: [0.95, 1.03, 1.12],
   farshore: [0.94, 1.05, 1.14],
 };
 

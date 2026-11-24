@@ -152,6 +152,17 @@ export const BIOME_PALETTE: Record<
     dirt: 0xa88e66,
     sand: 0xe6dcb8,
   },
+  // quartered: the neutral meeting ground at Rivalmoot's hill, a worn mix of
+  // the four quarters. The built-in world blends the four sub-palettes in
+  // quartered_ground_core.ts by position instead; this row serves the map
+  // editor, the palette lab and authored maps.
+  quartered: {
+    grass: 0x9aa070,
+    grassDark: 0x6a7258,
+    grassYellow: 0xbcae6c,
+    dirt: 0x8a7a66,
+    sand: 0xd2cab0,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -173,6 +184,7 @@ export const ROCK_SLOPE_START: Record<BiomeId, number> = {
   jungle: 0.6,
   garden: 0.6,
   gale: 0.5, // the cliffs crag early
+  quartered: 0.5, // heaved stone and glacier shelf both crag early
 };
 
 // Fixed ground tones shared by the near splat tint pass and the far-vista

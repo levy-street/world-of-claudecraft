@@ -45,7 +45,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 const internals = wyrmwatchHarborInternalsForTest;
 const GLB = path.join(__dirname, '..', 'public', internals.assetUrl.replace(/^\//, ''));
 /** Triangles per part (tests/wyrmwatch_harbor_asset.test.ts pins the same). */
-const HOUSE = 1956 + 3288 + 2316 + 1948 + 2212 + 2398 + 3052;
+const HOUSE = 1956 + 3424 + 2316 + 1948 + 2212 + 2398 + 3052;
 const LOW = 2052 + 1272 + 804 + 1728 + 968 + 1832 + 756 + HOUSE;
 const MEDIUM = LOW + 2236;
 const HIGH = MEDIUM + 1364 + 840;

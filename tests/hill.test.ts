@@ -47,7 +47,7 @@ const ARENA_FREE_WORLD: WorldContent = {
   groundObjects: [],
 };
 const SEED = 7;
-const FFA_IDS = ['drakelands', 'frostveil', 'amberfall'];
+const FFA_IDS = ['drakelands', 'frostveil', 'amberfall', 'quartered_isle'];
 
 describe('opt-in hill participation', () => {
   it('flags on the entry tick even when the player leaves before the next presence pass', () => {

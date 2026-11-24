@@ -19,6 +19,30 @@ export const LAST_KEEP_GRAVEYARD_ID = 'gy_last_keep';
 // shift later player, dungeon, raid or boss ids in parity traces.
 export const LAST_KEEP_SPIRIT_HEALER_ENTITY_ID = 1_000_000_004;
 
+// Rivalmoot's yard on the Quartered Isle, reserved the same way.
+export const RIVALMOOT_GRAVEYARD_ID = 'gy_rivalmoot';
+export const RIVALMOOT_SPIRIT_HEALER_ENTITY_ID = 1_000_000_030;
+
+// Gyrefoot Rest at the Gyre's back foot, reserved the same way (1_000_000_031 is Rivalmoot's
+// bursar, content/quartered_isle.ts).
+export const GYREFOOT_GRAVEYARD_ID = 'gy_gyrefoot';
+/** Where Gyrefoot Rest's Pale Keeper hovers and a released spirit rises, and the corner its
+ *  headstones stand from (the isle's props): the flat west shore at the Gyre's foot, clear of the
+ *  storm bluff beside it; the wind pad back up to the crown stands ten yards on
+ *  (quartered_gyre_pads.ts). */
+export const GYREFOOT_REST = { x: -60, z: 2360.5 } as const;
+export const GYREFOOT_SPIRIT_HEALER_ENTITY_ID = 1_000_000_032;
+
+/** Every graveyard whose Pale Keeper spawns under a reserved id instead of the
+ *  ordinary nextId stream (spirit.ts spawnOverworldSpiritHealers): a yard
+ *  appended after the shipped ones takes a slot here so no later player,
+ *  dungeon, raid or boss id moves. */
+export const RESERVED_SPIRIT_HEALER_ENTITY_IDS: Readonly<Record<string, number>> = Object.freeze({
+  [LAST_KEEP_GRAVEYARD_ID]: LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
+  [RIVALMOOT_GRAVEYARD_ID]: RIVALMOOT_SPIRIT_HEALER_ENTITY_ID,
+  [GYREFOOT_GRAVEYARD_ID]: GYREFOOT_SPIRIT_HEALER_ENTITY_ID,
+});
+
 // One graveyard per existing headstone cluster (the ZonePropsDef.graveyards anchors
 // across all three zones), so every visible graveyard on the map gets an angel and
 // no overworld death is ever far from one.
@@ -82,6 +106,13 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // record, so every death at the keep released at the Wyrmwatch cairns,
   // nearly 300 yd north across the zone. Appended last (see above).
   { id: LAST_KEEP_GRAVEYARD_ID, name: 'Last Keep Churchyard', x: 451, z: 2134 },
+  // Rivalmoot's yard on the hilltop, beside the town's headstones
+  // (QUARTERED_ISLE_PROPS.graveyards). Appended last, its keeper reserved.
+  { id: RIVALMOOT_GRAVEYARD_ID, name: 'Rivalmoot Rest', x: -30, z: 2240 },
+  // Gyrefoot Rest at the Gyre's back (west) foot: the isle's nearest yard to the storm peak and
+  // the council's gate on its crown, beside the wind pad that throws a spirit back up to the top
+  // (quartered_gyre_pads.ts). Appended last, its keeper reserved.
+  { id: GYREFOOT_GRAVEYARD_ID, name: 'Gyrefoot Rest', x: GYREFOOT_REST.x, z: GYREFOOT_REST.z },
 ];
 
 // The Spirit Healer NPC id (one shared template; every spawned angel carries this

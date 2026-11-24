@@ -6,9 +6,10 @@
 // streams it after first paint (the why lives in assets.ts, beside the stream).
 // The bodies only Rift content draws are a large share of that stream
 // (measured: 110 to 125 MB of ArrayBuffers at world entry) and no overworld
-// entity ever draws them, so on that profile they wait instead. Desktop and
-// Android keep every body in the boot gate, so nothing here changes what they
-// load or when.
+// entity ever draws them, so they wait instead. That wait (the Rift and hoard
+// lanes), like the dungeon-only and buddy bodies' on-demand loads, holds on EVERY
+// host (characterStreamPlan): Desktop and Android keep only the shared overworld
+// bodies and the Quartered Isle's in the boot gate.
 //
 // The class is derived from CONTENT, never from a file name. A visual key is
 // Rift-only when the mob dispatch reaches it from a Rift or Buried Hoard
@@ -24,6 +25,15 @@
 //   the encounter actors), which only a Buried Hoard spawns.
 // So a natural Rift asks for the Rift lane only, and a Buried Hoard for both.
 //
+// On the iOS profile a third lane holds the Quartered Isle's bodies: every
+// streamed body only the isle's templates draw (QUARTERED_ISLE_MOBS), or only
+// they and Rift content do (the isle wears four Buried Hoard bodies). They wait
+// until the local player comes within reach of the isle, the way Rift bodies
+// wait for a Rift, so the post-entry stream does not carry them from the first
+// minutes of every page life; a body the isle shares with a Rift stays in its
+// Rift lane too, so a Rift still asks for it. Desktop and Android keep these
+// bodies in the boot gate.
+//
 // Pure (RENDER_PURE_CORES): no three.js, no DOM, no clock; tests import it
 // directly.
 
@@ -33,6 +43,8 @@ import { DUNGEON_MOBS } from '../../sim/content/dungeons';
 import { GRAVEWYRM_SANCTUM_MOBS } from '../../sim/content/gravewyrm_sanctum';
 import { HOLLOW_CRYPT_MOBS } from '../../sim/content/hollow_crypt';
 import { HOLLOW_CRYPT_TRASH_MOBS } from '../../sim/content/hollow_crypt_trash';
+import { QUARTERED_ISLE_ZONE } from '../../sim/content/quartered_isle';
+import { QUARTERED_ISLE_MOBS } from '../../sim/content/quartered_isle_mobs';
 import { HOARD_MOBS, RIFT_MOBS } from '../../sim/content/rift/mobs';
 import { SUNKEN_BASTION_MOBS } from '../../sim/content/sunken_bastion';
 import { TEMPLE_DUNGEON_MOBS } from '../../sim/content/temple';
@@ -167,8 +179,8 @@ export function riftOnlyVisualKeys(): ReadonlySet<string> {
   return riftKeys;
 }
 
-/** Which Rift-only lane a body rides. */
-export type RiftBodyLane = 'rift' | 'hoard';
+/** Which paced lane a body rides: the two Rift lanes, or the Quartered Isle's. */
+export type RiftBodyLane = 'rift' | 'hoard' | 'isle';
 
 let laneMemo: ReadonlyMap<string, RiftBodyLane> | null = null;
 
@@ -198,6 +210,43 @@ export function riftOnlyBodyLanes(): ReadonlyMap<string, RiftBodyLane> {
   return lanes;
 }
 
+let isleMemo: ReadonlyMap<string, 'rift' | 'hoard' | null> | null = null;
+
+/** Every streamed body url only Quartered Isle and Rift-only visual defs reference
+ *  and some isle template draws, with the Rift lane it also rides (null when no
+ *  Rift template draws it). Witnessed the same way as riftOnlyBodyLanes: any
+ *  other template, fallback or NPC route drawing the url keeps it in the stream. */
+export function isleOnlyBodyLanes(): ReadonlyMap<string, 'rift' | 'hoard' | null> {
+  if (isleMemo) return isleMemo;
+  const isle = new Set(Object.keys(QUARTERED_ISLE_MOBS));
+  const members = new Set([...isle, ...riftTemplateIds()]);
+  const keys = new Set([...members].map(mobVisualKeyFor));
+  for (const id of new Set([...Object.keys(MOBS), ...mobKeyTemplateIds()]))
+    if (!members.has(id)) keys.delete(mobVisualKeyFor(id));
+  for (const key of fallbackVisualKeys()) keys.delete(key);
+  const urls = new Set<string>();
+  const shared = new Set<string>();
+  for (const [key, def] of Object.entries(VISUALS)) {
+    if (key.startsWith('form_') && def.lazyPreload) continue;
+    for (const url of defUrls(def)) (keys.has(key) ? urls : shared).add(url);
+  }
+  const drawnBy = (ids: Iterable<string>): Set<string> => {
+    const out = new Set<string>();
+    for (const id of ids) for (const url of defUrls(VISUALS[mobVisualKeyFor(id)])) out.add(url);
+    return out;
+  };
+  const isleDrawn = drawnBy(isle);
+  const riftDrawn = drawnBy(Object.keys(RIFT_MOBS));
+  const hoardDrawn = drawnBy(Object.keys(HOARD_MOBS));
+  const lanes = new Map<string, 'rift' | 'hoard' | null>();
+  for (const url of urls) {
+    if (shared.has(url) || !isStreamedBodyUrl(url) || !isleDrawn.has(url)) continue;
+    lanes.set(url, riftDrawn.has(url) ? 'rift' : hoardDrawn.has(url) ? 'hoard' : null);
+  }
+  isleMemo = lanes;
+  return lanes;
+}
+
 /** How the character preload set splits on one graphics profile. */
 export interface CharacterStreamPlan {
   /** Held out of the boot gate: fetched later, and re-armed on a build miss. */
@@ -210,6 +259,9 @@ export interface CharacterStreamPlan {
   rift: string[];
   /** Streamed bodies only Buried Hoard templates draw. */
   hoard: string[];
+  /** iOS only: streamed bodies only the Quartered Isle (and Rift content) draws.
+   *  One the isle shares with a Rift is listed in its Rift lane as well. */
+  isle: string[];
 }
 
 /**
@@ -217,7 +269,8 @@ export interface CharacterStreamPlan {
  * Rift-only and Buried Hoard-only bodies, dungeon-only actors, and cosmetic
  * buddies leave the world-entry gate on every host and load on demand or on
  * destination arrival. The iOS memory profile additionally moves overworld
- * streamed bodies into the post-entry stream.
+ * streamed bodies into the post-entry stream, except the Quartered Isle's,
+ * which wait in the isle lane.
  */
 export function characterStreamPlan(
   preloadUrls: readonly string[],
@@ -226,14 +279,23 @@ export function characterStreamPlan(
 ): CharacterStreamPlan {
   const lanes = riftOnlyBodyLanes();
   const demandBodies = dungeonAndBuddyBodyUrls();
+  const isle = iosMemoryProfile ? isleOnlyBodyLanes() : null;
   const plan: CharacterStreamPlan = {
     streamed: [],
     postEntry: [],
     onDemand: [],
     rift: [],
     hoard: [],
+    isle: [],
   };
   for (const url of preloadUrls) {
+    if (isle?.has(url)) {
+      plan.streamed.push(url);
+      plan.isle.push(url);
+      const alsoRift = isle.get(url);
+      if (alsoRift) plan[alsoRift].push(url);
+      continue;
+    }
     const lane = isStreamedBodyUrl(url)
       ? (lanes.get(url) ??
         (demandBodies.has(url) ? 'onDemand' : iosMemoryProfile ? 'postEntry' : null))
@@ -249,6 +311,8 @@ export function characterStreamPlan(
 export interface RiftBodyDemand {
   rift: boolean;
   hoard: boolean;
+  /** The local player is within reach of the Quartered Isle. */
+  isle: boolean;
   /** The player stands in a Rift or a Buried Hoard: no reason left to wait. */
   inside: boolean;
 }
@@ -274,9 +338,17 @@ export interface RiftBodyLaneHost {
  * fetch that fails is left to that build-miss path too; the lane moves on.
  */
 export class RiftBodyLanes {
-  private readonly urls: Record<RiftBodyLane, readonly string[]> = { rift: [], hoard: [] };
-  private readonly cursor: Record<RiftBodyLane, number> = { rift: 0, hoard: 0 };
-  private readonly demanded: Record<RiftBodyLane, boolean> = { rift: false, hoard: false };
+  private readonly urls: Record<RiftBodyLane, readonly string[]> = {
+    rift: [],
+    hoard: [],
+    isle: [],
+  };
+  private readonly cursor: Record<RiftBodyLane, number> = { rift: 0, hoard: 0, isle: 0 };
+  private readonly demanded: Record<RiftBodyLane, boolean> = {
+    rift: false,
+    hoard: false,
+    isle: false,
+  };
   private urgent = false;
   private inFlight = false;
 
@@ -284,25 +356,36 @@ export class RiftBodyLanes {
 
   /** Install a profile's lane lists. A changed list restarts its walk (resident
    *  bodies resolve at once); what was demanded stays demanded. */
-  setUrls(rift: readonly string[], hoard: readonly string[]): void {
-    if (rift.join('|') !== this.urls.rift.join('|')) {
-      this.urls.rift = rift;
-      this.cursor.rift = 0;
-    }
-    if (hoard.join('|') !== this.urls.hoard.join('|')) {
-      this.urls.hoard = hoard;
-      this.cursor.hoard = 0;
+  setUrls(rift: readonly string[], hoard: readonly string[], isle: readonly string[] = []): void {
+    for (const [lane, list] of [
+      ['rift', rift],
+      ['hoard', hoard],
+      ['isle', isle],
+    ] as const) {
+      if (list.join('|') !== this.urls[lane].join('|')) {
+        this.urls[lane] = list;
+        this.cursor[lane] = 0;
+      }
     }
   }
 
   /** True while a lane holds a body it has not fetched. */
   pending(): boolean {
-    return this.cursor.rift < this.urls.rift.length || this.cursor.hoard < this.urls.hoard.length;
+    return LANE_ORDER.some((lane) => this.cursor[lane] < this.urls[lane].length);
+  }
+
+  /** True while some lane still holds `url` unfetched: the lane owns its timing,
+   *  so a speculative asker (the zone prewarm) must not fetch it around the pacing.
+   *  A body the lane has walked past is in flight, resident, or failed: asking for
+   *  it then joins that fetch or retries it, never adds one beside the lane. */
+  holds(url: string): boolean {
+    return LANE_ORDER.some((lane) => this.urls[lane].indexOf(url, this.cursor[lane]) >= 0);
   }
 
   demand(d: Readonly<RiftBodyDemand>): void {
     if (d.rift) this.demanded.rift = true;
     if (d.hoard) this.demanded.hoard = true;
+    if (d.isle) this.demanded.isle = true;
     if (d.inside) this.urgent = true;
     this.pump();
   }
@@ -332,8 +415,24 @@ export class RiftBodyLanes {
   }
 }
 
-/** A Buried Hoard's trash comes from the Rift lane, so that lane goes first. */
-const LANE_ORDER: readonly RiftBodyLane[] = ['rift', 'hoard'];
+/** The isle lane is asked for only within reach of the isle, where its camps are
+ *  the nearest need (no Rift portal stands near it; a treasure map read anywhere
+ *  asks for both Rift lanes), so it goes first. A Buried Hoard's trash comes from
+ *  the Rift lane, so that lane goes before the hoard lane. */
+const LANE_ORDER: readonly RiftBodyLane[] = ['isle', 'rift', 'hoard'];
+
+/** How far outside the Quartered Isle's bounds the isle lane is asked for: the
+ *  interest radius (where its camps first reach a client) plus an approach, so
+ *  the paced lane can fetch its bodies before the first one is in view. */
+export const ISLE_STREAM_REACH = PLAYER_INTEREST_RADIUS + 150;
+
+/** True when (x, z) lies within ISLE_STREAM_REACH of the isle's bounds. */
+export function nearQuarteredIsle(x: number, z: number): boolean {
+  const zone = QUARTERED_ISLE_ZONE;
+  const dx = Math.max((zone.xMin ?? -Infinity) - x, 0, x - (zone.xMax ?? Infinity));
+  const dz = Math.max(zone.zMin - z, 0, z - zone.zMax);
+  return dx * dx + dz * dz <= ISLE_STREAM_REACH * ISLE_STREAM_REACH;
+}
 
 /** The minimum level a Rift entrance admits, or null for any other template.
  *  Mirrors the gate in sim/rift/runs.ts enterRift: a Buried Hoard entrance
@@ -385,7 +484,9 @@ export interface RiftBodyLaneControl {
  *   stranger's hoard entrance in range also asks: the error is toward loading;
  * - the local player already inside: the Rift lane at once (the position alone
  *   answers before the floor state lands, at a login on the spot), plus the
- *   hoard lane once the floor names a Buried Hoard.
+ *   hoard lane once the floor names a Buried Hoard;
+ * - the local player within ISLE_STREAM_REACH of the Quartered Isle: the isle
+ *   lane (empty off the iOS profile).
  *
  * Once every lane has walked its list (or on any profile where they are empty)
  * the poll is one call. Entrances are re-listed only when the roster changes.
@@ -393,7 +494,12 @@ export interface RiftBodyLaneControl {
 export class RiftBodyStreamTrigger {
   private rosterVersion = -1;
   private readonly entranceIds: number[] = [];
-  private readonly demandScratch: RiftBodyDemand = { rift: false, hoard: false, inside: false };
+  private readonly demandScratch: RiftBodyDemand = {
+    rift: false,
+    hoard: false,
+    isle: false,
+    inside: false,
+  };
 
   constructor(private readonly lanes: RiftBodyLaneControl) {}
 
@@ -401,7 +507,7 @@ export class RiftBodyStreamTrigger {
   update(world: RiftBodyStreamWorld): void {
     if (!this.lanes.pending()) return;
     const demand = this.demandOf(world);
-    if (demand.rift || demand.hoard) this.lanes.demand(demand);
+    if (demand.rift || demand.hoard || demand.isle) this.lanes.demand(demand);
   }
 
   /** What the world asks of the lanes now (a reused object: read it at once). */
@@ -409,8 +515,10 @@ export class RiftBodyStreamTrigger {
     const d = this.demandScratch;
     d.rift = false;
     d.hoard = false;
+    d.isle = false;
     d.inside = false;
     const { player } = world;
+    if (nearQuarteredIsle(player.pos.x, player.pos.z)) d.isle = true;
     const floor = world.riftFloor;
     if (floor !== null || isRiftPos(player.pos.x)) {
       d.inside = true;

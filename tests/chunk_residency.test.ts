@@ -153,8 +153,9 @@ describe('nearest unbuilt ground', () => {
   });
 
   it('never clamps against a cell no zone owns, or anything past the world rim', () => {
-    // 60 of the 792 cells are covered by no zone rectangle (96 before the
-    // Proving Shore tutorial island claimed its 36), so nothing will
+    // 18 of the 792 cells are covered by no zone rectangle (96 before the
+    // Proving Shore tutorial island claimed its 36, 60 before the Quartered
+    // Isle claimed the old north bay's 42), so nothing will
     // ever build them. Treating "no geometry" as "pending" would pin the view
     // against a hole that never fills, which is worse than the zone clamp this
     // replaces. The whole world is resident here, so only unowned cells remain.
@@ -164,7 +165,7 @@ describe('nearest unbuilt ground', () => {
         if (cellOwner(cx, cz) === null) unowned.push([cx, cz]);
       }
     }
-    expect(unowned.length).toBe(60);
+    expect(unowned.length).toBe(18);
     const isPending = pendingOutside(new Set(ZONES.map((zone) => zone.id)));
     // Stand in the middle of an unowned cell: even at zero distance it must not
     // clamp, and the full biome request is granted.
@@ -427,7 +428,11 @@ describe('partially built neighbours (the reported walls)', () => {
 
     // With the arrival neighbourhood built the clamp stops binding entirely,
     // and even an unbounded request clears to the Amberfall 397 yd west.
-    const neighbourhood = pendingOutside(new Set(['drakelands', 'frostveil', 'wraithwood']));
+    // (the Quartered Isle's south edge is 89 yd north of the landing, so it is
+    // part of that neighbourhood: tests/zone_streaming.test.ts)
+    const neighbourhood = pendingOutside(
+      new Set(['drakelands', 'frostveil', 'quartered_isle', 'wraithwood']),
+    );
     for (const requested of [200, 385]) {
       expect(fogFarForBuiltGround(GRID, neighbourhood, landing.x, landing.z, requested)).toBe(
         requested,

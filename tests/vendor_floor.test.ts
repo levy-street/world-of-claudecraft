@@ -864,6 +864,11 @@ describe('stock rows: the phase 11n pulls', () => {
       // pumpkin head left the shelf (Old Thatchgrin's first-kill drop is its one source);
       // (round 9) Hester's five Gourdlight Eve toys joined it, 13 to 18.
       gourdlight_keeper: 18,
+      // Rivalmoot's innkeeper and outfitter on the Quartered Isle
+      // (content/quartered_isle_story.ts): four existing food and drink rows, and two
+      // potions plus the field kit (no gathering tools: rule R37).
+      innkeeper_bettany_quell: 4,
+      outfitter_harl_bracken: 3,
     });
   });
 });

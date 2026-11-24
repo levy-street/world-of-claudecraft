@@ -68,6 +68,9 @@ const FISHING_ZONE_ROD_TIER_ROWS: Record<string, number> = {
   evergarden: 1,
   galecrest: 1,
   farshore_isle: 1,
+  // The Quartered Isle ships the same starter kit as the level-20 expansion
+  // zones above, so its water takes their tier too.
+  quartered_isle: 1,
 };
 
 export const FISHING_ZONE_ROD_TIERS: Readonly<Record<string, number>> = Object.freeze({

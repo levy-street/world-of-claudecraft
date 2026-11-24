@@ -2530,8 +2530,9 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // 60, not 54: the dungeon rework's six tagged Wildheart Basin templates
     // (basin_raptor, fanglord_jaguar, great_saurian, howdah_hexcaller,
     // spore_toad, sunbone_totem_binder), every family mapped. Full chain:
-    // tests/gathering.test.ts.
-    expect(tagged).toHaveLength(60);
+    // tests/gathering.test.ts. Then 63: the Quartered Isle's rimeglass_bear,
+    // ember_hound and veinback_burrower, every family mapped.
+    expect(tagged).toHaveLength(63);
     // 189, not 188: the Nythraxis Bone Spike (src/sim/content/dungeons.ts) the mechanics
     // redo added ships untagged (a stationary pillar, not a butcherable corpse), so it
     // grows MOBS without touching `tagged`. Full documented chain: tests/gathering.test.ts,
@@ -2562,8 +2563,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // tests/gathering.test.ts. Plus buddy_sprites, the flame-sprite pair: 300.
     // Retiring buddy_sapling leaves 299. Zulgar's Hunting Spear is an encounter
     // object without harvest components, bringing the merged roster to 300.
-    // The four Halloween encounter templates are untagged too.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(304);
+    // The four Halloween encounter templates are untagged too. Then the Quartered Isle adds seven untagged templates (quench_shardling,
+    // warden_of_the_quench, heatsworn_ember, cinderscar_caller, the_glassfield_brute,
+    // heaved_shardling, remnant_first_colossus: elementals and constructs): 311.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(311);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(
@@ -2875,8 +2878,10 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // dungeon rework's six tagged Wildheart Basin templates add 2^n subsets
     // each (basin_raptor, fanglord_jaguar, howdah_hexcaller and
     // sunbone_totem_binder carry two families, 4 each; great_saurian and
-    // spore_toad one, 2 each).
-    expect(sweep(Object.keys(MOBS))).toEqual({ spent: 286, refused: 0 });
+    // spore_toad one, 2 each). 306, not 286: the Quartered Isle's rimeglass_bear
+    // and ember_hound carry three families (8 subsets each) and veinback_burrower
+    // two (4).
+    expect(sweep(Object.keys(MOBS))).toEqual({ spent: 306, refused: 0 });
     // Both arms still have to be visited, so neither half of the property is
     // vacuous: the refused arm is driven through the three retagged fixtures.
     const fixtures = withFixtureTemplates(() =>
@@ -2944,7 +2949,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // 475, not 447: the six tagged Wildheart Basin rework templates (see the
     // spend sweep above) extract 6 per two-family template over its four
     // subsets (2 + 1 + 1 + 2) and 2 per one-family template: 4 * 6 + 2 * 2.
-    expect(sweep(Object.keys(MOBS))).toEqual({ extracted: 475, unmappedOffered: 0 });
+    // 511, not 475: the Quartered Isle's three tagged templates (rimeglass_bear,
+    // ember_hound, veinback_burrower) over their subsets.
+    expect(sweep(Object.keys(MOBS))).toEqual({ extracted: 511, unmappedOffered: 0 });
     const fixtures = withFixtureTemplates(() =>
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );

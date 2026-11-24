@@ -16,7 +16,8 @@ export type PaintedTownId =
   | 'lanternmere'
   | 'moonrest'
   | 'gibbetmere'
-  | 'eldershine';
+  | 'eldershine'
+  | 'rivalmoot';
 
 /** A kit building record a layout replaced, exactly as its zone file had it. */
 export interface ReplacedKitBuilding {

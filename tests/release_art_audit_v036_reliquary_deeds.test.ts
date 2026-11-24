@@ -211,8 +211,13 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'feat_guild_writ_runner',
       'feat_guild_hallsworn',
       'feat_guild_of_lantern_hall',
+      // The Quartered Isle's chronicle pair and the four-branch bank tour.
+      'chr_quartered_isle_gatherer',
+      'chr_quartered_isle_first_cast',
+      'hid_gilded_grand_tour',
     ]);
-    expect(DEED_ORDER).toHaveLength(369);
+    // 372 with the Quartered Isle's three (chronicle pair and the four-branch bank tour), all pending.
+    expect(DEED_ORDER).toHaveLength(372);
     expect(DEED_IMAGE_IDS.size).toBe(356);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

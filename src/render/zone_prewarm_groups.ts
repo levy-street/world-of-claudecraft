@@ -15,6 +15,7 @@ import { characterVisualPoolKey } from './characters/visual_pool';
 import type { PooledObjectView } from './ground_object_pool';
 import { buildGroundQuestObject, prewarmFarshoreSalvageObjects } from './quest_objects';
 import { setRenderCategory } from './renderer_diagnostics';
+import { ZonePrewarmBodyWait } from './zone_prewarm_body_wait_core';
 
 const PREWARM_MOB_TEMPLATE_IDS = [
   'forest_wolf',
@@ -56,6 +57,25 @@ export const PREWARM_OBJECT_POOL_COPIES = 2;
 // OTHER mob model is still built once so its shader program compiles at load.
 const PREWARM_MOB_COMMON_IDS = new Set<string>(PREWARM_MOB_TEMPLATE_IDS);
 
+/** The renderer's wait for the cold bodies its zone prewarm skipped, bound to the
+ *  ask-only residency check. A hand-back runs the zone's prewarm as a BACKGROUND
+ *  pass (it lands in live play, never behind a curtain), in a task of its own past
+ *  the pass that settled the zone, so it is never joined to the pass in flight. */
+export function createZoneBodyWait(
+  prewarmed: Set<string>,
+  renderer: { prewarmZoneAt(x: number, z: number, opts: { background: true }): Promise<void> },
+): ZonePrewarmBodyWait {
+  const prewarm = (x: number, z: number) => renderer.prewarmZoneAt(x, z, { background: true });
+  const host = {
+    resident: (key: string) => visualAssetsResident(key, false),
+    defer: (fn: () => void) => {
+      setTimeout(fn, 0);
+    },
+    rewarm: (x: number, z: number) => void prewarm(x, z).catch(() => {}),
+  };
+  return new ZonePrewarmBodyWait(host, prewarmed);
+}
+
 export function prewarmPlayerSkinVariantCount(): number {
   return ALL_CLASSES.reduce((sum, cls) => sum + skinCount(`player_${cls}`), 0);
 }
@@ -88,10 +108,15 @@ export function buildEntityPrewarmGroup(
 ): {
   group: THREE.Group;
   pooled: { key: string; visual: CharacterVisual }[];
+  /** Visual keys of templates skipped because their body files were not resident
+   *  (the pass's wait, zone_prewarm_body_wait_core.ts); a build that failed with
+   *  its files resident is left to the next zone preparation, never waited on. */
+  coldKeys: string[];
 } {
   const h = host as ZonePrewarmGroupHost;
   const group = new THREE.Group();
   const pooled: { key: string; visual: CharacterVisual }[] = [];
+  const coldKeys: string[] = [];
   const p = h.sim.player;
   group.position.set(p.pos.x, p.pos.y, p.pos.z - 14);
   setRenderCategory(group, 'prewarm');
@@ -101,14 +126,22 @@ export function buildEntityPrewarmGroup(
     group.add(obj);
     idx++;
   };
-  const build = (templateId: string, copies: number): void => {
+  /** Build a template's copies; true when every one built (or it has no template). */
+  const build = (templateId: string, copies: number): boolean => {
     const template = MOBS[templateId];
-    if (!template) return;
+    if (!template) return true;
+    let built = 0;
     for (let i = 0; i < copies; i++) {
       const entity = h.prewarmEntity('mob', template.id, template.color, template.scale);
+      const key = visualKeyFor(entity);
       // A lazily loaded body (the training dummy) is fetched here and warmed by a
-      // later pass instead of throwing out of createCharacterVisual.
-      if (!visualAssetsResident(visualKeyFor(entity))) continue;
+      // later pass instead of throwing out of createCharacterVisual. A body a paced
+      // lane still holds (the iOS isle lane, the Rift lanes) is only asked about:
+      // this pass is speculative, so it waits for the lane's fetch to land.
+      if (!visualAssetsResident(key, true, true)) {
+        coldKeys.push(key);
+        break;
+      }
       const visual = createCharacterVisual(entity);
       // Assets unavailable: skip the seed so a later zone preparation can retry it.
       if (!visual) continue;
@@ -116,17 +149,20 @@ export function buildEntityPrewarmGroup(
       if (poolKey) pooled.push({ key: poolKey, visual });
       visual.root.visible = true;
       place(visual.root);
+      built++;
     }
+    return built === copies;
   };
   // Warm only templates that can appear in this zone. The per-template set
-  // persists across transitions, so shared families are paid once per session.
+  // persists across transitions, so shared families are paid once per session;
+  // a template whose body was not resident stays out of it, so the next zone
+  // preparation retries it.
   for (const templateId of h.templateIdsInZone(zone, 'mob')) {
     if (h.prewarmedMobTemplates.has(templateId)) continue;
     const copies = PREWARM_MOB_COMMON_IDS.has(templateId) ? PREWARM_MOB_POOL_COPIES : 1;
-    build(templateId, copies);
-    h.prewarmedMobTemplates.add(templateId);
+    if (build(templateId, copies)) h.prewarmedMobTemplates.add(templateId);
   }
-  return { group, pooled };
+  return { group, pooled, coldKeys };
 }
 
 // Every NPC visual MODEL once (NPCs were not prewarmed at all, entering a zone hub

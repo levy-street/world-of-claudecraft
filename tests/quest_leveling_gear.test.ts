@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { WORLD_BOSS_ENCOUNTER_QUESTS } from '../scripts/quest_leveling_gear_rules';
 import { PROVING_SHORE_QUESTS } from '../src/sim/content/proving_shore';
 import { QUEST_CHOICE_REWARDS } from '../src/sim/content/quest_choice_rewards';
 import { QUEST_LEVELING_GEAR_ITEMS } from '../src/sim/content/quest_leveling_gear';
@@ -29,14 +30,9 @@ const raidMobs = new Set(
 // The generator's eligibility (scripts/quest_leveling_gear_gen.ts): tutorial
 // island, retired and repeatable quests, raid quests and quests above the level
 // cap are left out.
-// The Balgath world-boss encounter steps (the Mirefen muster, PR 4259): the
-// summons, the pike drill and the Foreman's put-out eye pay out in the
-// encounter's own spoils, not leveling gear (owner call, 2026-10-20).
-const WORLD_BOSS_ENCOUNTER_QUESTS = new Set([
-  'q_muster_summons',
-  'q_muster_pike_drill',
-  'q_socketwrights_due',
-]);
+// The Balgath world-boss encounter steps pay out in the encounter's own spoils,
+// not leveling gear (owner call, 2026-10-20): the generator's own list, so the
+// two never drift apart again.
 
 function levelingQuest(q: QuestDef): boolean {
   if (q.retired || q.repeatable) return false;

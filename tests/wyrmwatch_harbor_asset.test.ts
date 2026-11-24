@@ -42,8 +42,8 @@ import {
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, WYRMWATCH_HARBOR_ASSET.target);
-const SHIPPED_SHA256 = 'cf8f016ea98ecc42dd8cb97e38e410d4fc09881092ece79611215211f7423fe6';
-const SHIPPED_BYTES = 463408;
+const SHIPPED_SHA256 = '56befdd22a3cabb9b494a9a4921632e49c7d6c82537225832a81e01fe720bb88';
+const SHIPPED_BYTES = 464584;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   QuayDecks: 2052,
@@ -56,7 +56,7 @@ const TRIANGLES: Record<string, number> = {
   HarborTrim: 2236,
   HarborClutter: 1364,
   HouseFrame: 1956,
-  HouseWallNorth: 3288,
+  HouseWallNorth: 3424, // its wall map gained the Quartered Isle
   HouseWallSouth: 2316,
   HouseWallEast: 1948,
   HouseWallWest: 2212,

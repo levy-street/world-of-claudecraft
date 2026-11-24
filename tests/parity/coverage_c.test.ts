@@ -1855,8 +1855,11 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(rec.notes.rotationChanged).toBe(true);
     // Day 3's Thornpeak slot since the round-2 zone hunts widened the pool.
     expect(rec.notes.rotatedQuestIds).toEqual(['wq_thornpeak_zealots']);
-    expect(trace.draws).toBe(0);
-    expect(trace.drawDigest).toBe('811c9dc5');
+    // One draw since the Quartered Isle joined the rotation: the item slots now land
+    // this day's board on a zone whose piece rolls its quality from the shared stream
+    // (loot/fresh_quality_grant.ts), where the old draw gave a fixed-quality piece.
+    expect(trace.draws).toBe(1);
+    expect(trace.drawDigest).toBe('7c78b5ad');
   });
 
   it('heroic_five_man_clear: one shared claim, one equipment drop, marks and the lockout to every participant', () => {

@@ -3,7 +3,7 @@
 // gold objective badges painted on the map. DOM and localization stay in the
 // controller; this core only returns content identities, counts, and routes.
 
-import { getActiveWorldContent, QUESTS, type ZoneDef } from '../sim/data';
+import { getActiveWorldContent, isClaimedFrom, QUESTS, type ZoneDef } from '../sim/data';
 import { type QuestProgress, questObjectiveRequired } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { ownEntry } from './known_item';
@@ -167,7 +167,10 @@ function nearbyQuests(input: MapSidebarViewInput): MapAtlasNearbyQuest[] {
       npc.pos.x < zoneMinX ||
       npc.pos.x >= zoneMaxX ||
       npc.pos.z < zone.zMin ||
-      npc.pos.z >= zone.zMax
+      npc.pos.z >= zone.zMax ||
+      // A giver in ground a claimsOverlap zone took from this one is listed
+      // under the claimer, as zoneAt places it.
+      isClaimedFrom(zone, npc.pos.x, npc.pos.z)
     )
       continue;
     for (const questId of npc.questIds) {

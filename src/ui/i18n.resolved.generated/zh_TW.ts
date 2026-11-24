@@ -4732,6 +4732,9 @@ export const zh_TW: EnTranslations = {
         "graspRoot": "被墳墓之手抓住：{seconds}秒內無法移動。",
         "knellAirborne": "在儀式之環上空飛行，無法觸及。它會標記半個法環{mark}秒，然後向那一半傾瀉幽魂之火：對其中所有人造成{min}到{max}點火焰傷害。每次飛行焚燒{breaths}個半區，然後降落。"
       },
+      "quartered": {
+        "galeLane": "狂風推著你沿山路向旋風峰頂前進，即使你站著不動也一樣：速度最高可達{speed}碼/秒，接近峰頂時逐漸減緩到{summit}碼/秒。無論轉彎還是跳躍，它都會讓你留在路上。平移可以橫越道路，朝山下移動則可以逆風而行。被狂風推動時，施法會被打斷。離開風道後最多持續{linger}秒，帶你越過風道之間的空隙。"
+      },
       "sanctum": {
         "lockbound": "受到的傷害降低{pct}%：每條仍然完好的鎖鏈提供{per}%。打破一個封印鐐銬即可讓其鎖鏈脫落。",
         "enrage": "造成的傷害提高{pct}%。",
@@ -9342,6 +9345,8 @@ export const zh_TW: EnTranslations = {
         "gardenBlurb": "一座樹籬迷宮的國度，至今仍被修剪得整整齊齊，卻沒有人見過那位園丁；入口就在籬苑鎮與它的噴泉庭院之後。",
         "galeName": "疾風崖",
         "galeBlurb": "海崖與呼嘯的丘原，這裡的風從不歇息，燭港則緊閉門扉。",
+        "quarteredName": "四分島",
+        "quarteredBlurb": "一座被古老爭鬥擊碎成四塊的島嶼，爭鋒鎮守在風暴之峰腳下，俯瞰著每個挑戰者都想奪下的隕坑。",
         "levelsCap": "等級 {level}"
       },
       "group": {
@@ -10286,6 +10291,7 @@ export const zh_TW: EnTranslations = {
       "nightBlurb": "一片星光午夜的國度，花朵照亮路徑，月棲鎮在夢境般的天空下靜靜守夜。",
       "hauntBlurb": "巨大樹冠之下的一片鬧鬼森林，絞湖鎮的燈籠是路上唯一可信的光。",
       "galeBlurb": "海崖與呼嘯的丘陵，這裡的風從不停歇，老燈塔從不熄滅，燭港則緊閉門戶。",
+      "quarteredBlurb": "一座被古老爭鬥擊碎成冰、火、岩、風四塊地域的島嶼。爭鋒鎮的挑戰者們把城鎮建在旋風峰腳下，把競技場設在當年戰爭所在的隕坑裡。",
       "jungleBlurb": "棕櫚、白沙與喧鬧群鳥交織的熱帶叢林，海濱小鎮漂流港在沙灘上燃著一堆火。",
       "gardenBlurb": "一座樹籬迷宮般的園林國度，至今仍被無人見過的園丁修剪著，經由籬苑鎮及其噴泉庭院進入。",
       "valeGreeting": "把你的劍帶在身邊。谷地已不復昔日。",
@@ -10310,6 +10316,8 @@ export const zh_TW: EnTranslations = {
       "hauntGreeter": "點燈人，絞湖鎮",
       "galeGreeting": "這裡的風從未停過一次，老燈塔也從未熄過一次。進了旅店，記得隨手關上門。",
       "galeGreeter": "燈塔看守人，燭港",
+      "quarteredGreeting": "每支走進隕坑的隊伍都發誓自己會守住競技場。山丘升起時就下去，證明給我看。",
+      "quarteredGreeter": "一名挑戰者，爭鋒鎮",
       "jungleGreeting": "溫暖的沙、喧鬧的鳥，還有一片吞沒地平線的叢林。我們在海灘上燃著一堆火；盡量活著回到火邊來。",
       "jungleGreeter": "港務長，漂流港",
       "gardenGreeting": "樹籬仍有人在修剪，儘管一百年來沒人見過任何園丁。當心迷宮：它也在當心你。",
@@ -10325,6 +10333,7 @@ export const zh_TW: EnTranslations = {
       "nightPlaceNotes": "月棲鎮守著長夜。夜門是通往午夜之國的入口；月泉盛著你能佇立其旁的星光；暮光花田在黑暗中綻放；守望石陣一動不動地注視著；不眠古塚則是這裡唯一從不做夢的地方。",
       "hauntPlaceNotes": "絞湖鎮蜷縮在自己的燈籠之中。鴉門是這片森林陰森的正門；寡婦棘叢被蛛網織得密不透風；吊影林地與哀石禮拜堂守著森林最古老的悲慟；獵手林隙則屬於那仍在其中狩獵的東西。",
       "galePlaceNotes": "燭港迎著風而立。風道是進來的懸崖之路；嘯風丘陵在狂風下光禿起伏，寸樹不生；老燈塔燃燒了多久，沒有人說得清；斷崖筆直墜入水中；沉船灘讓這片海岸不敢說謊；鏡湖則是整個國度裡唯一靜止的事物。",
+      "quarteredPlaceNotes": "爭鋒鎮坐落在旋風峰腳下，通往議會之座的攀登之路從這裡開始。霜橋把道路從霜幕之境跨過海峽引來；白霜冰架在下方又白又冷、支離破碎地鋪開；挑戰者競技場在古老戰爭的中心、大隕坑的底部靜候下一位山丘之王；燼痕向著龍裔荒原陰燃；隆岩荒野朝琥珀秋境隆起；旋風峰則在這一切之上捲動風暴。",
       "junglePlaceNotes": "漂流港在海灘上燃著火堆。纏木隘口是河流與綠牆相會之處；棕櫚長灘沿著浪花鋪展，潔白而溫暖；翠綠叢林與垂藤林吞沒了內陸；藍寶石潟湖清澈幽深地發著光；沉沒神像則自水下注視著一切。",
       "gardenPlaceNotes": "籬苑鎮候在花園之門前。花壇步道綻放著修剪齊整的色彩；晨曦堡在新築的城牆後操練騎士；花瓣池終年飄著粉色花瓣；老磨坊在自己的環形花壇上轉動；大迷宮會為每位訪客重新安排它的規矩，拱門有綠葉狐狸守望；北望哨守著出口之路；睡蓮池在這一切之外靜臥；噴泉庭院則仍在花園中心流淌著清澈的泉水。",
       "gladeTitle": "寧靜一隅：碧木林地",
@@ -11116,6 +11125,10 @@ export const zh_TW: EnTranslations = {
         "logging": "任意行業的第一次採集獲得Fruits of the Field，伐木100上限銘刻Heartwood Hewer。任意三項採集行業達到100可得Master Gatherer（25聲望），劈出遠古心材另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
         "herbalism": "任意行業的第一次採集獲得Fruits of the Field，藥草學100上限銘刻Master of the Meadow。任意三項採集行業達到100可得Master Gatherer（25聲望），採下月光綻放另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
         "fishing": "釣魚100熟練銘刻Old Salt，200銘刻Master Angler及其頭銜，垂釣技藝的頂點；釣魚同樣計入Master Gatherer（任意三項採集達到100）。在每個區域的水域釣起第一條魚各有其頁，釣起日輝錦鯉則記下Glimmer of Hope。",
+        "miningWithIsle": "任意行業的第一次採集獲得Fruits of the Field，採礦100上限銘刻Ore in the Blood。任意三項採集行業達到100可得Master Gatherer（25聲望），鑿開純淨礦脈另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
+        "loggingWithIsle": "任意行業的第一次採集獲得Fruits of the Field，伐木100上限銘刻Heartwood Hewer。任意三項採集行業達到100可得Master Gatherer（25聲望），劈出遠古心材另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
+        "herbalismWithIsle": "任意行業的第一次採集獲得Fruits of the Field，藥草學100上限銘刻Master of the Meadow。任意三項採集行業達到100可得Master Gatherer（25聲望），採下月光綻放另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
+        "fishingWithIsle": "釣魚100熟練銘刻Old Salt，200銘刻Master Angler及其頭銜，垂釣技藝的頂點；釣魚同樣計入Master Gatherer（任意三項採集達到100）。在每個區域的水域釣起第一條魚各有其頁，釣起日輝錦鯉則記下Glimmer of Hope。",
         "farming": "耕作暫無專屬功業：如今田畦與作物已經紮根，標記其他行業的里程碑與上限功業將隨後續更新一併到來。它的熟練已經計入Master Gatherer（任意三項採集達到100），耕作者能像旁人一樣填滿那一頁。功業只給頭銜與名望，絕不給予力量。",
         "farmingSown": "耕作如今在功業之書裡有了自己的一欄。Sow It Begins標記你種下的第一株作物，四頁編年記則標記你在每處田畦所在地的第一次成活收成，從Eastbrook Vale直到Evergarden。一次金色的豐收會記下自己的零聲望收藏印記，而耕作的熟練同樣計入Master Gatherer（任意三項採集行業達到100）。Every Furrow Filled把整份名錄收進一頁：把四座園圃所種的每一種作物都種上一輪，這項收藏便告完成。它之上的壓卷之作是Harvestmaster，這門行業的100熟練頭銜，而山地與花圃的種子如今已擺上各自農夫的櫃檯，這段攀登今天就能走完。功業只有頭銜與聲望，永不賦予力量。"
       },
@@ -24515,6 +24528,12 @@ export const zh_TW: EnTranslations = {
       "gourdlight_crow_feather": {
         "name": "南瓜燈烏鴉羽毛"
       },
+      "council_inscription": {
+        "name": "議會銘文"
+      },
+      "colossus_makers_mark": {
+        "name": "巨像工匠印記"
+      },
       "membership_staff": {
         "name": "萬變法杖"
       },
@@ -26407,6 +26426,9 @@ export const zh_TW: EnTranslations = {
       "drowned_deckhand": {
         "name": "溺亡水手"
       },
+      "remnant_first_colossus": {
+        "name": "初代巨像殘骸"
+      },
       "riftspawn": {
         "name": "裂隙孽生"
       },
@@ -26631,6 +26653,33 @@ export const zh_TW: EnTranslations = {
       },
       "buddy_phantom": {
         "name": "幻魂"
+      },
+      "quench_shardling": {
+        "name": "淬冰碎晶"
+      },
+      "rimeglass_bear": {
+        "name": "霜鏡熊"
+      },
+      "warden_of_the_quench": {
+        "name": "淬冰守衛"
+      },
+      "heatsworn_ember": {
+        "name": "誓炎餘燼"
+      },
+      "cinderscar_caller": {
+        "name": "燼痕召喚者"
+      },
+      "ember_hound": {
+        "name": "餘燼獵犬"
+      },
+      "the_glassfield_brute": {
+        "name": "琉璃原蠻獸"
+      },
+      "heaved_shardling": {
+        "name": "隆起碎晶"
+      },
+      "veinback_burrower": {
+        "name": "脈背掘地者"
       },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
@@ -27009,6 +27058,11 @@ export const zh_TW: EnTranslations = {
         "name": "司庫奧爾多斯·克萊恩",
         "title": "鍍金保險箱",
         "greeting": "每一只木箱、每一個錢櫃、每一件飾物，交給鍍金保險箱都萬無一失。"
+      },
+      "bursar_maud_ashby": {
+        "name": "司庫莫德·艾許比",
+        "title": "鍍金保險箱",
+        "greeting": "鍍金保險箱會妥善保管你的財物，在這座島上也一樣。"
       },
       "brother_aldric_raid": {
         "name": "奧德里克修士",
@@ -27484,6 +27538,26 @@ export const zh_TW: EnTranslations = {
         "name": "拉弗洛克",
         "title": "蒼白唱詩班最後的領唱",
         "greeting": "我曾是蒼白唱詩班裡最年輕的聲音。儀式那夜，我沒有喝，我逃了。從那以後，每逢滿月，我都聽見他們在水下歌唱。我必須在死前親眼見到她。讓我跟在你們身後吧。我不會戰鬥，也不會拖累你們。"
+      },
+      "keeper_ansel_morrow": {
+        "name": "守卷人安塞爾·莫羅",
+        "title": "爭鋒名冊守卷人",
+        "greeting": "每個登上這座山丘的挑戰者都想擊敗議會，{playerName}。我想知道的是，他們為什麼值得去擊敗。"
+      },
+      "innkeeper_bettany_quell": {
+        "name": "貝塔妮·奎爾",
+        "title": "旅店老闆",
+        "greeting": "靴子放門邊，白霜冰架的凍雨什麼都能鑽進去。爐火正旺，燉菜正熱，今天輸了的挑戰者也照樣有飯吃。"
+      },
+      "outfitter_harl_bracken": {
+        "name": "哈爾·布拉肯",
+        "title": "裝備商",
+        "greeting": "藥膏、補劑，再加一套路上用的野外工具包。別的東西這幾塊地域都會給你弄壞，所以工具得自己帶。"
+      },
+      "captain_thessaly_rivalmoot": {
+        "name": "瑟薩莉隊長",
+        "title": "挑戰者首領",
+        "greeting": "議會高坐那座山峰，從無人挑戰，久到沒人記得有多久了。我的挑戰者們要改變這一點。先在那幾片傷痕之地證明你自己吧，{playerName}。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
@@ -29881,6 +29955,75 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_qi_the_moot_rolls": {
+        "title": "爭鋒名冊",
+        "text": "爭鋒鎮有一份名冊，記下了每一位前來挑戰議會的人，{playerName}，卻沒有一行寫到議會為何值得挑戰。我打算把這段歷史寫出來。先去大廳旁找瑟薩莉隊長：她的挑戰者們走遍了這座島的每一塊地域，士兵記得學者遺漏的東西。",
+        "completion": "安塞爾派你來的？那他總算問對人了。我的挑戰者們在每一塊地域都找到了刻字的石頭，比這座鎮子還古老，這裡沒人讀得懂。把這話帶回去給他。",
+        "objectives": {
+          "0": {
+            "label": "與瑟薩莉隊長交談"
+          }
+        }
+      },
+      "q_qi_words_in_stone": {
+        "title": "石中之言",
+        "text": "瑟薩莉說的那些石頭，正是議會親手留下的銘文，{playerName}，我敢拿我的名冊打賭。有三塊立在戰爭傷地最深的地方：一塊在白霜冰架，一塊在火冰裂谷旁，一塊在鐵鎚峽下方。逐一讀過，把每個字都帶回來給我。",
+        "completion": "冰、火、岩，各自宣稱這座島屬於自己的技藝，而三塊都由同一隻手署名。議會從來不是四個陌生人，{playerName}。它是一個與自己交戰的議會。",
+        "objectives": {
+          "0": {
+            "label": "已閱讀議會銘文"
+          }
+        }
+      },
+      "q_qi_servants_at_their_posts": {
+        "title": "堅守崗位的僕從",
+        "text": "銘文裡記著議會的僕從，它們立誓守住每一塊地域，直到主人歸來。主人再也沒有回來，僕從也從未停止堅守。去削減它們的數量吧，{playerName}：白霜冰架上的六隻淬冰碎晶、焚流渠裡的六隻誓炎餘燼，以及隆起石板上的六隻隆起碎晶。",
+        "completion": "每種六隻，這幾塊地域也因此安靜了些。它們的核心上刻著和銘文相同的印記。造出這些僕從的人，也造了那些石頭。",
+        "objectives": {
+          "0": {
+            "label": "已擊倒淬冰碎晶"
+          },
+          "1": {
+            "label": "已擊倒誓炎餘燼"
+          },
+          "2": {
+            "label": "已擊倒隆起碎晶"
+          }
+        }
+      },
+      "q_qi_wardens_of_the_arts": {
+        "title": "技藝守衛",
+        "text": "議會的守衛還有兩個屹立未倒，一個在白霜冰架的冰隙群裡，一個陷在燼痕的琉璃原中。銘文稱它們為各自技藝祕密的守護者，它們不會心甘情願地交出祕密，{playerName}。去打倒淬冰守衛和琉璃原蠻獸。",
+        "completion": "兩個守衛都已被擊碎，而且各自帶著一塊刻有巨人輪廓的封印石。議會終究還是一起造過東西，比他們任何一個都要龐大。每一個印記都指向隆岩荒野。",
+        "objectives": {
+          "0": {
+            "label": "已擊倒淬冰守衛"
+          },
+          "1": {
+            "label": "已擊倒琉璃原蠻獸"
+          }
+        }
+      },
+      "q_qi_the_fallen_giant": {
+        "title": "倒下的巨人",
+        "text": "隆岩荒野裡躺著一顆房子大小的石頭頭顱，就在倒下的巨人倒下的地方。挑戰者們說那是座雕像。我認為封印石指的就是它。去找到上面的工匠印記，{playerName}，告訴我是誰的手刻下的。",
+        "completion": "四門技藝的符文，並排刻成了一個印記。議會一同造出了這個巨人，那是他們第一次同心協力。它本該用來鎮住科祖爾，卻在完工之前就倒下了。它的某一部分至今仍守在自己的頭顱旁。",
+        "objectives": {
+          "0": {
+            "label": "已找到巨像工匠印記"
+          }
+        }
+      },
+      "q_qi_the_first_colossus": {
+        "title": "初代巨像",
+        "text": "初代巨像從未鎮住那頭巨獸。它倒下了，議會又造了另一座，那一座做到了。但初代留下的殘軀至今仍守在倒下的巨人旁的崗位上，只雕了一半，早已被遺忘，擊倒任何靠近的人。讓它安息吧，{playerName}。這座島的歷史不該以一個從不知道戰爭已經結束的守衛作結。",
+        "completion": "那麼殘骸安息了，名冊也有了第一個真正的篇章：四個什麼都談不攏的對手，直到那一天，他們不得不一起建造一個巨人。爭鋒鎮欠你一行歷史，{playerName}，我會親手寫下。",
+        "objectives": {
+          "0": {
+            "label": "已擊倒初代巨像殘骸"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺亡唱詩班",
         "text": "那些涉者並非單獨行動。在牠們之間行走的，是溺亡信徒——隨神殿一同沉沒的邪教徒，仍披著腐朽的法衣，仍從岸岩之間唱著那篇禱文。讓其中八人歸於沉寂，並為我帶回他們所攜的六件供品。我想知道他們要獻給女神的究竟是什麼。",
@@ -30381,6 +30524,57 @@ export const zh_TW: EnTranslations = {
           },
           "4": {
             "label": "試煉跑道"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "四分島",
+        "welcome": "一場古老的爭鬥將這座島嶼擊碎成四塊。爭鋒鎮守在旋風峰腳下，俯瞰著當年戰爭中心的隕坑。",
+        "pois": {
+          "0": {
+            "label": "爭鋒鎮"
+          },
+          "1": {
+            "label": "挑戰者競技場"
+          },
+          "2": {
+            "label": "霜橋"
+          },
+          "3": {
+            "label": "白霜冰架"
+          },
+          "4": {
+            "label": "燼痕"
+          },
+          "5": {
+            "label": "隆岩荒野"
+          },
+          "6": {
+            "label": "旋風峰"
+          },
+          "7": {
+            "label": "火冰裂谷"
+          },
+          "8": {
+            "label": "冰隙群"
+          },
+          "9": {
+            "label": "霜鏡湖"
+          },
+          "10": {
+            "label": "焚流渠"
+          },
+          "11": {
+            "label": "琉璃原"
+          },
+          "12": {
+            "label": "鐵鎚峽"
+          },
+          "13": {
+            "label": "隆起石板"
+          },
+          "14": {
+            "label": "倒下的巨人"
           }
         }
       },

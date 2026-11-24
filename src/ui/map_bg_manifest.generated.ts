@@ -30,17 +30,17 @@ export const BAKED_MAP_BG = {
   "drakelands": {
     "w": 640,
     "h": 800,
-    "rowHash": "0296af91"
+    "rowHash": "e5d13d7e"
   },
   "frostveil": {
     "w": 693,
     "h": 693,
-    "rowHash": "b7e55216"
+    "rowHash": "a13ceffc"
   },
   "amberfall": {
     "w": 613,
     "h": 746,
-    "rowHash": "4c562364"
+    "rowHash": "bc55f741"
   },
   "willowfen": {
     "w": 587,
@@ -82,10 +82,15 @@ export const BAKED_MAP_BG = {
     "h": 480,
     "rowHash": "cf87eb8d"
   },
+  "quartered_isle": {
+    "w": 667,
+    "h": 640,
+    "rowHash": "4baed227"
+  },
   "world_strip": {
     "w": 140,
     "h": 337,
-    "rowHash": "952fd0be"
+    "rowHash": "2d6c3959"
   }
 },
 } as const;

@@ -74,8 +74,9 @@ describe('the Honor slots', () => {
   });
 
   it('pins the first cycles, so a zone reorder or salt change cannot ship silently', () => {
-    expect(worldQuestHonorZonesForCycle('wq1_0')).toEqual(['mirefen_marsh', 'farshore_isle']);
-    expect(worldQuestHonorZonesForCycle('wq1_1')).toEqual(['nightbloom', 'thornpeak_heights']);
+    // Re-pinned when the Quartered Isle joined the rotation (one more Honor zone).
+    expect(worldQuestHonorZonesForCycle('wq1_0')).toEqual(['mirefen_marsh', 'quartered_isle']);
+    expect(worldQuestHonorZonesForCycle('wq1_1')).toEqual(['wraithwood', 'thornpeak_heights']);
     expect(worldQuestHonorZonesForCycle('wq1_2')).toEqual(['amberfall', 'evergarden']);
     expect(worldQuestHonorZonesForCycle('wq1_3')).toEqual(['willowfen', 'veiled_hollow']);
   });

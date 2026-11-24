@@ -2538,6 +2538,36 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "beast"
     ]
+  },
+  {
+    "id": "quartered_isle",
+    "name": "The Quartered Isle",
+    "min": 20,
+    "max": 20,
+    "biome": "quartered",
+    "hub": "Rivalmoot",
+    "pois": [
+      "Rivalmoot",
+      "The Challengers' Ring",
+      "The Hoarbridge",
+      "The Hoarshelf",
+      "The Cinderscar",
+      "The Heavestone Wilds",
+      "The Gyre",
+      "The Fireice Rift",
+      "The Crevasses",
+      "The Rimeglass",
+      "The Burnways",
+      "The Glassfield",
+      "The Hammer's Cut",
+      "The Heaved Slabs",
+      "The Fallen Giant"
+    ],
+    "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+    "families": [
+      "beast",
+      "elemental"
+    ]
   }
 ];
 
@@ -2788,6 +2818,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_wolf__9db4c8__s35.webp"
       },
       {
+        "name": "Ember Hound",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "ember_hound",
+        "model": "mob_wolf",
+        "tint": "#3a2a24",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__3a2a24__s35.webp"
+      },
+      {
         "name": "Moonfleece Grazer",
         "min": 20,
         "max": 20,
@@ -2808,6 +2849,15 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#d8d0c0",
         "tintStrength": 0.3,
         "still": "/guide-stills/mob_alpaca__d8d0c0__s30.webp"
+      },
+      {
+        "name": "Rimeglass Bear",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "rimeglass_bear",
+        "model": "mob_rimeglass_bear",
+        "still": "/guide-stills/mob_rimeglass_bear.webp"
       },
       {
         "name": "Shoal Scuttler",
@@ -2863,6 +2913,15 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#4a8a4e",
         "tintStrength": 0.35,
         "still": "/guide-stills/mob_wolf__4a8a4e__s35.webp"
+      },
+      {
+        "name": "Veinback Burrower",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "veinback_burrower",
+        "model": "mob_veinback_burrower",
+        "still": "/guide-stills/mob_veinback_burrower.webp"
       }
     ]
   },
@@ -3413,6 +3472,15 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_ghost__d0f2c8__s55.webp"
       },
       {
+        "name": "Cinderscar Caller",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "cinderscar_caller",
+        "model": "mob_cinderscar_caller",
+        "still": "/guide-stills/mob_cinderscar_caller.webp"
+      },
+      {
         "name": "Gale Wisp",
         "min": 20,
         "max": 20,
@@ -3444,6 +3512,35 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#4e4a3a",
         "tintStrength": 0.72,
         "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
+      },
+      {
+        "name": "Heatsworn Ember",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "heatsworn_ember",
+        "model": "mob_heatsworn_ember",
+        "still": "/guide-stills/mob_heatsworn_ember.webp"
+      },
+      {
+        "name": "Heaved Splinter",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "heaved_shardling",
+        "model": "mob_heaved_shardling",
+        "still": "/guide-stills/mob_heaved_shardling.webp"
+      },
+      {
+        "name": "Quench Splinter",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "quench_shardling",
+        "model": "mob_hoard_rime_elemental",
+        "tint": "#9fd8ff",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_hoard_rime_elemental__9fd8ff__s35.webp"
       },
       {
         "name": "Wood Wraith",
@@ -6471,6 +6568,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": true,
     "rewardTitle": "the Gourdsworn",
     "crest": "/ui/deeds/feat_gourdlight_eve_complete.webp"
+  },
+  {
+    "id": "chr_quartered_isle_gatherer",
+    "name": "Four Quarters' Bounty",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_quartered_isle_first_cast",
+    "name": "A Line Between the Quarters",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
   }
 ];
 
@@ -18877,6 +18988,13 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "material": "Osmium Ore"
       },
       {
+        "zone": "The Quartered Isle",
+        "tier": 1,
+        "toolTier": 1,
+        "count": 2,
+        "material": "Osmium Ore"
+      },
+      {
         "zone": "The Veiled Hollow",
         "tier": 1,
         "toolTier": 1,
@@ -19087,6 +19205,13 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "material": "Highpine Log"
       },
       {
+        "zone": "The Quartered Isle",
+        "tier": 1,
+        "toolTier": 1,
+        "count": 2,
+        "material": "Highpine Log"
+      },
+      {
         "zone": "The Veiled Hollow",
         "tier": 1,
         "toolTier": 1,
@@ -19291,6 +19416,13 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
       },
       {
         "zone": "The Palmreach",
+        "tier": 1,
+        "toolTier": 1,
+        "count": 2,
+        "material": "Sunpetal Herb"
+      },
+      {
+        "zone": "The Quartered Isle",
         "tier": 1,
         "toolTier": 1,
         "count": 2,
@@ -22678,5 +22810,40 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 2.1,
     "tintStrength": 0.35
+  },
+  "mob_hoard_rime_elemental": {
+    "url": "models/creatures/hoard_rime_elemental.glb",
+    "idle": "Idle",
+    "height": 3.9,
+    "yaw": -1.5707963267948966,
+    "tintStrength": 0.35
+  },
+  "mob_rimeglass_bear": {
+    "url": "models/creatures/rimeglass_bear.glb",
+    "idle": "Idle",
+    "height": 2.3
+  },
+  "mob_heatsworn_ember": {
+    "url": "models/creatures/heatsworn_ember.glb",
+    "idle": "Idle",
+    "height": 2.1,
+    "yaw": -1.5707963267948966
+  },
+  "mob_cinderscar_caller": {
+    "url": "models/creatures/hoard_ember_fiend.glb",
+    "idle": "Idle",
+    "height": 2.9
+  },
+  "mob_heaved_shardling": {
+    "url": "models/creatures/heaved_shardling.glb",
+    "idle": "Idle",
+    "height": 1.4,
+    "yaw": -1.5707963267948966
+  },
+  "mob_veinback_burrower": {
+    "url": "models/creatures/veinback_burrower.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966
   }
 };

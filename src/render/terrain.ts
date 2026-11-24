@@ -70,6 +70,7 @@ import {
   SAND_PAINT_GAIN,
   SAND_PAINT_GRAIN,
 } from './meadow_tuning';
+import { quarteredMeshSpacing } from './quartered_ground_core';
 import {
   beginChunkGeometry,
   buildChunkCutFine,
@@ -2869,7 +2870,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   // shipped zone.
   const zoneRects: WorldRect[] = zones.map((zone) => {
     const [minX, maxX] = zoneXBounds(zone);
-    return { minX, maxX, minZ: zone.zMin, maxZ: zone.zMax };
+    return { minX, maxX, minZ: zone.zMin, maxZ: zone.zMax, claimsOverlap: zone.claimsOverlap };
   });
   const insideAnyZone = (x: number, z: number): boolean =>
     zoneRects.some((r) => x >= r.minX && x < r.maxX && z >= r.minZ && z < r.maxZ);
@@ -2925,7 +2926,8 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       x0 + size,
       z0 + size,
     );
-    let out = Math.min(spacing, noise);
+    // the Quartered Isle's shattered ground meshes finer than its band
+    let out = Math.min(spacing, noise, quarteredMeshSpacing(x0, z0, size, lowGfx));
     const regions = content.detailRegions;
     if (!regions || regions.length === 0) return out;
     for (const r of regions) {

@@ -4,7 +4,8 @@
 // inside the window, the realm is warned that a hill will rise in one of the
 // northern zones (hill_zones.ts); HILL_WARNING_SECONDS later it rises,
 // a HILL_RADIUS circle on dry, open ground, clear of the water, the hub
-// settlement and every collider, wholly inside its zone, and it stands for
+// settlement and every collider, wholly inside its zone (or, in a zone with a
+// dedicated arena, always in that arena: ZoneDef.hillArena), and it stands for
 // HILL_DURATION_SECONDS before it falls. Each phase change is announced to the
 // whole realm, and while it stands the realm is reminded where it is every
 // HILL_NOTICE_SECONDS, with the hold standings (hill_ranking.ts). When it falls
@@ -225,13 +226,21 @@ export function hillPlanFor(ctx: SimContext, ordinal: number): HillTimes {
 }
 
 /** A legal spot for a hill in `zone`, or null when HILL_SPAWN_ATTEMPTS random
- *  tries found none (the caller retries later with a fresh attempt salt). */
+ *  tries found none (the caller retries later with a fresh attempt salt). A
+ *  zone with a dedicated arena (`ZoneDef.hillArena`, the Quartered Isle's
+ *  Challengers' Ring) always raises its hill there and draws nothing; the
+ *  arena still answers to the same probe, so a blocked or flooded arena fails
+ *  the attempt and the schedule retries it like any other spot. */
 export function pickHillSpot(
   ctx: SimContext,
   rng: Rng,
   zone: ZoneDef,
   probe: HillSpotProbe = ctx.hillProbe,
 ): { x: number; z: number } | null {
+  if (zone.hillArena) {
+    const { x, z } = zone.hillArena;
+    return hillSpotIsOpen(probe, zone.id, x, z, HILL_RADIUS) ? { x, z } : null;
+  }
   const pad = HILL_RADIUS + HILL_EDGE_MARGIN;
   const xMin = (zone.xMin ?? -180) + pad;
   const xMax = (zone.xMax ?? 180) - pad;

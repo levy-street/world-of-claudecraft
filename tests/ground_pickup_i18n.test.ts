@@ -86,6 +86,11 @@ const PENDING_LOCALE_KEYS = new Set<string>([
   'groundPickup.freightOrderDeny',
   'groundPickup.freightCrateEnough',
   'groundPickup.freightWagonEnough',
+  // The Quartered Isle's Moot Rolls quest objects (same contributor-English model).
+  'groundPickup.councilInscriptionDeny',
+  'groundPickup.councilInscriptionEnough',
+  'groundPickup.colossusMakersMarkDeny',
+  'groundPickup.colossusMakersMarkEnough',
 ]);
 
 describe('ground-pickup line localization (the S3-invisible surface)', () => {
@@ -96,12 +101,12 @@ describe('ground-pickup line localization (the S3-invisible surface)', () => {
     }
   });
 
-  it('covers 96 distinct lines with groundPickup.* keys', () => {
+  it('covers 100 distinct lines with groundPickup.* keys', () => {
     // 42 through the Veiled Hollow merge, plus 40 (20 deny/enough pairs) from
     // the new-realm quest pass, plus the murloc hut pair from the quest-dedupe
     // pass and the item-agnostic already-credited refusal, plus the tutorial
-    // island's castaway crate pair.
-    expect(GROUND_PICKUP_KEYS.length).toBe(96);
+    // island's castaway crate pair, plus the Quartered Isle's two Moot Rolls pairs.
+    expect(GROUND_PICKUP_KEYS.length).toBe(100);
   });
 
   it('recognizes every world-quest activator denial through the sim matcher', () => {

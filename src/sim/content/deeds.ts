@@ -4121,6 +4121,51 @@ export const DEEDS: Record<string, DeedDef> = {
     feat: true,
     reward: { kind: 'title', text: GOURDLIGHT_META_TITLE },
   },
+  // The Quartered Isle's chronicle pair, the gatherer and first-cast deeds
+  // every zone with starter nodes and a fishing tier carries.
+  chr_quartered_isle_gatherer: {
+    id: 'chr_quartered_isle_gatherer',
+    name: "Four Quarters' Bounty",
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch on the Quartered Isle.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'gather:quartered_isle:ore',
+        'gather:quartered_isle:wood',
+        'gather:quartered_isle:herb',
+      ],
+    },
+  },
+  chr_quartered_isle_first_cast: {
+    id: 'chr_quartered_isle_first_cast',
+    name: 'A Line Between the Quarters',
+    desc: 'Catch a fish from the waters of the Quartered Isle.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:quartered_isle' },
+  },
+  // The Gilded Strongbox opened a fourth branch at Rivalmoot. The shipped
+  // three-branch tour (hid_gilded_tour) keeps its trigger untouched (design
+  // rule 9: new coverage lands as a new deed), and the longer tour is its own.
+  hid_gilded_grand_tour: {
+    id: 'hid_gilded_grand_tour',
+    name: 'The Gilded Grand Tour',
+    desc: 'Did business with all four branches of the Gilded Strongbox.',
+    category: 'hidden',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'npc:bursar_fernando',
+        'npc:bursar_petra_vell',
+        'npc:bursar_aldous_crane',
+        'npc:bursar_maud_ashby',
+      ],
+    },
+    hidden: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

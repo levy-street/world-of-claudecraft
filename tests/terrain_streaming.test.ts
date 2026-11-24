@@ -22,6 +22,7 @@ function cellsOwnedBy(zoneId: string, chunkSize: number): [number, number][] {
     maxX: zone.xMax ?? STRIP_MAX_X,
     minZ: zone.zMin,
     maxZ: zone.zMax,
+    claimsOverlap: zone.claimsOverlap,
   }));
   const chunksX = Math.ceil((WORLD_MAX_X * 2) / chunkSize);
   const chunksZ = Math.ceil((WORLD_MAX_Z - WORLD_MIN_Z) / chunkSize);
