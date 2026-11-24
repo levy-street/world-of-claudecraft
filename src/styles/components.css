@@ -20157,12 +20157,6 @@
     width: 0;
     transition: width 80ms linear;
   }
-  #heart-tank-swap.is-taunt {
-    border-color: var(--color-gold-300);
-  }
-  #heart-tank-swap.is-taunt .fa-title {
-    color: var(--color-gold-300);
-  }
   @media (prefers-reduced-motion: no-preference) {
     #heart-tank-swap {
       transition:

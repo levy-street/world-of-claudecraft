@@ -26,7 +26,7 @@
 //
 // Off the slot it paints the Smith's Heart's tank swap alert
 // (tank_swap_alert_view.ts on the same family: Swap for the tank carrying a
-// swap debuff at its count, Taunt for the other tank), small beside the
+// swap debuff at its count, its stacks; nobody else), small beside the
 // target frame, on every tier and whatever the hints setting; it never holds
 // the slot.
 //
@@ -145,8 +145,7 @@ export interface DungeonPromptsFrame {
     /** Select a body (the use prompt's press targets the body, then interacts). */
     targetEntity(id: number | null): void;
   };
-  /** The roster (its rows' spec roles: the tank swap alert's Taunt is a tank's). */
-  party: readonly { pid: number; role?: 'tank' | 'healer' | 'dps' }[] | null | undefined;
+  party: readonly { pid: number }[] | null | undefined;
   /** The interact key's label ('' when unbound). */
   interactKey: string;
   touch: boolean;
@@ -347,7 +346,7 @@ export class DungeonPrompts {
     // the shared slot, so it never makes the use prompt yield).
     this.tankSwap.paint(
       dungeonPromptEnabled('tankSwap', hints)
-        ? buildTankSwapAlertView({ self: p, party: f.party, entity })
+        ? buildTankSwapAlertView({ self: p, entity })
         : HINT_HIDDEN,
     );
     // The Masterless Strength's raid HUD (its phase readout; its Overload

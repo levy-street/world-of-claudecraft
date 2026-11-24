@@ -26196,7 +26196,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.chargedTitle': '천둥 충전 x{stacks}: 탱커 교대!',
   'hudChrome.knotAlert.ruinTitle': '풀무 강타가 당신을 가장자리 밖으로 날립니다!',
   'hudChrome.tankSwap.swapTitle': '교대 x{stacks}',
-  'hudChrome.tankSwap.tauntTitle': '도발',
   'hudChrome.tankSwap.timeAria': '약화 효과 {seconds}초 남음',
   'hudChrome.quenchAlert.temperedTitle': '탱커 교대! x{stacks}',
   'hudChrome.raidAtlas.canvasAria': '공격대 지도',

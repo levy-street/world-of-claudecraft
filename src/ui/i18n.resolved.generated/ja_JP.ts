@@ -7450,7 +7450,6 @@ export const ja_JP: EnTranslations = {
     },
     "tankSwap": {
       "swapTitle": "交代 x{stacks}",
-      "tauntTitle": "挑発",
       "timeAria": "デバフの残り{seconds}秒"
     },
     "heatGuardian": {

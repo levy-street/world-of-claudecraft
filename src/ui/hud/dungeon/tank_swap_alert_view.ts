@@ -10,17 +10,13 @@
 //    still has them as its target (being the boss's target is what "tanking"
 //    means here; the debuffs only ever land on the boss's tank, so no role is
 //    asked). The title the stacks, the thin bar the debuff's time left.
-//  - Taunt: the local player is a TANK by spec role (the role the party and
-//    raid frames show, resolved by both hosts through sim/party_frame_info.ts
-//    partyFrameRole: form-aware), carries fewer than the count of that
-//    family, and a party member carries it at the count while its boss is
-//    still on them. One word, no bar.
-//  - Hidden otherwise: below the count, for every non-tank, once the swap
-//    happened (the boss turned to the other tank), and while dead.
+//  - Hidden otherwise: below the count, for everyone else (the other tank
+//    included: Jose's call of 2026-11-24, the stacks are the whole cue, no
+//    "taunt" prompt), once the swap happened (the boss turned to the other
+//    tank), and while dead.
 // An ACTION prompt: the hints setting never hides it, every graphics tier
 // paints it. The painter is the shared encounter alert's.
 
-import type { Role } from '../../../sim/content/talents';
 import {
   HEART_TANK_SWAPS,
   type HeartTankSwap,
@@ -29,10 +25,10 @@ import {
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
-export type TankSwapAlertKind = 'swap' | 'taunt';
+export type TankSwapAlertKind = 'swap';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
-export const TANK_SWAP_ALERT_KINDS: readonly TankSwapAlertKind[] = ['swap', 'taunt'];
+export const TANK_SWAP_ALERT_KINDS: readonly TankSwapAlertKind[] = ['swap'];
 
 export type TankSwapAlertLive = Omit<EncounterAlertLive, 'kind'> & { kind: TankSwapAlertKind };
 export type TankSwapAlertView = TankSwapAlertLive | EncounterAlertHidden;
@@ -58,9 +54,6 @@ export interface TankSwapBody {
 
 export interface TankSwapAlertInput {
   self: TankSwapBody;
-  /** The party or raid roster (the local player's own row included, which
-   *  carries their spec role); null or empty when not grouped. */
-  party: readonly { pid: number; role?: Role }[] | null | undefined;
   entity: (id: number) => TankSwapBody | undefined;
 }
 
@@ -102,13 +95,6 @@ function dueOn(
   return null;
 }
 
-/** `body`'s stacks of the swap family (its four Elemental Strikes are one). */
-function familyStacks(body: TankSwapBody, swap: HeartTankSwap): number {
-  let n = 0;
-  for (const a of body.auras) if (SWAP_BY_AURA.get(a.id) === swap) n = Math.max(n, stacksOf(a));
-  return n;
-}
-
 const whole = (v: number) => formatNumber(Math.max(0, Math.ceil(v)), { maximumFractionDigits: 0 });
 
 export function buildTankSwapAlertView(input: TankSwapAlertInput): TankSwapAlertView {
@@ -131,33 +117,6 @@ export function buildTankSwapAlertView(input: TankSwapAlertInput): TankSwapAlert
       key: '',
       progress: total > 1e-6 ? Math.max(0, Math.min(1, left / total)) : 0,
       progressAria: t('hudChrome.tankSwap.timeAria', { seconds }),
-      barLabel: '',
-      pressable: false,
-      buttonAria: title,
-    };
-  }
-  const party = input.party;
-  if (!party || party.length < 2) return HIDDEN;
-  let tank = false;
-  for (const m of party) if (m.pid === self.id) tank = m.role === 'tank';
-  if (!tank) return HIDDEN;
-  for (const m of party) {
-    if (m.pid === self.id) continue;
-    const body = input.entity(m.pid);
-    if (!body || body.dead) continue;
-    const due = dueOn(body, input.entity);
-    if (!due) continue;
-    if (familyStacks(self, due.swap) >= heartTankSwapAt(due.swap, due.aura.value3)) continue;
-    const title = t('hudChrome.tankSwap.tauntTitle');
-    return {
-      visible: true,
-      kind: 'taunt',
-      title,
-      line: '',
-      hint: '',
-      key: '',
-      progress: null,
-      progressAria: '',
       barLabel: '',
       pressable: false,
       buttonAria: title,

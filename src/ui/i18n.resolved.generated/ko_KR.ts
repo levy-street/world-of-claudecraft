@@ -7450,7 +7450,6 @@ export const ko_KR: EnTranslations = {
     },
     "tankSwap": {
       "swapTitle": "교대 x{stacks}",
-      "tauntTitle": "도발",
       "timeAria": "약화 효과 {seconds}초 남음"
     },
     "heatGuardian": {

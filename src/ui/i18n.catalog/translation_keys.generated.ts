@@ -18377,7 +18377,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.talents.newBuildWithGear'
   | 'hudChrome.talkingHead.label'
   | 'hudChrome.tankSwap.swapTitle'
-  | 'hudChrome.tankSwap.tauntTitle'
   | 'hudChrome.tankSwap.timeAria'
   | 'hudChrome.targetAuras.all'
   | 'hudChrome.targetAuras.buffs'

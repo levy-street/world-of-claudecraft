@@ -7450,7 +7450,6 @@ export const zh_CN: EnTranslations = {
     },
     "tankSwap": {
       "swapTitle": "换坦 x{stacks}",
-      "tauntTitle": "嘲讽",
       "timeAria": "减益效果剩余{seconds}秒"
     },
     "heatGuardian": {

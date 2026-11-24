@@ -10478,10 +10478,9 @@ export const hudChromeStrings = {
   // The Smith's Heart's tank swap alert (src/ui/hud/dungeon/
   // tank_swap_alert_view.ts): the raid's one tank swap cue, a word each, no
   // sentence (Jose's rule of 2026-11-24). Swap: the tank carrying the swap
-  // debuff at its count (its stacks); Taunt: the other tank.
+  // debuff at its count (its stacks); nobody else is prompted.
   tankSwap: {
     swapTitle: 'Swap x{stacks}',
-    tauntTitle: 'Taunt',
     timeAria: '{seconds} seconds left on the debuff',
   },
   // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):

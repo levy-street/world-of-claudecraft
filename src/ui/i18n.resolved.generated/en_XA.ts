@@ -7450,7 +7450,6 @@ export const en_XA: EnTranslations = {
     },
     "tankSwap": {
       "swapTitle": "[Šŵáþ ẋ{stacks}]",
-      "tauntTitle": "[Ţáúñţ]",
       "timeAria": "[{seconds} šéçóñðš ļéƒţ óñ ţĥé ðéƀúƒƒ]"
     },
     "heatGuardian": {

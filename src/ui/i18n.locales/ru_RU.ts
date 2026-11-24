@@ -26627,7 +26627,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "hudChrome.knotAlert.chargedTitle": "Заряжен громом x{stacks}: смена танков!",
   "hudChrome.knotAlert.ruinTitle": "Удар мехов сбросит вас с края!",
   'hudChrome.tankSwap.swapTitle': 'Смена x{stacks}',
-  'hudChrome.tankSwap.tauntTitle': 'Провокация',
   'hudChrome.tankSwap.timeAria': 'До конца эффекта {seconds} сек',
   "hudChrome.quenchAlert.temperedTitle": "Смена танков! x{stacks}",
   'hudChrome.raidAtlas.canvasAria': 'Карта рейда',

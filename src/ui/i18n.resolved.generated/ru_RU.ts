@@ -7450,7 +7450,6 @@ export const ru_RU: EnTranslations = {
     },
     "tankSwap": {
       "swapTitle": "Смена x{stacks}",
-      "tauntTitle": "Провокация",
       "timeAria": "До конца эффекта {seconds} сек"
     },
     "heatGuardian": {

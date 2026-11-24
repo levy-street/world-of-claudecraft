@@ -24841,7 +24841,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.chargedTitle': '雷霆缠身 x{stacks}：换坦！',
   'hudChrome.knotAlert.ruinTitle': '风箱重击会把你掀出边缘！',
   'hudChrome.tankSwap.swapTitle': '换坦 x{stacks}',
-  'hudChrome.tankSwap.tauntTitle': '嘲讽',
   'hudChrome.tankSwap.timeAria': '减益效果剩余{seconds}秒',
   'hudChrome.quenchAlert.temperedTitle': '换坦！x{stacks}',
   'hudChrome.raidAtlas.canvasAria': '团队副本地图',

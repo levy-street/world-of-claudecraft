@@ -7450,7 +7450,6 @@ export const nl_NL: EnTranslations = {
     },
     "tankSwap": {
       "swapTitle": "Swap x{stacks}",
-      "tauntTitle": "Taunt",
       "timeAria": "{seconds} seconds left on the debuff"
     },
     "heatGuardian": {

@@ -3,7 +3,7 @@
 // sim's swap table (encounters/smith_heart/tank_swap_ids.ts: which debuff, at
 // how many stacks, per boss and tier), the pure view core
 // (src/ui/hud/dungeon/tank_swap_alert_view.ts: Swap for the tank carrying it,
-// Taunt for the other tank, nothing for anyone else) and the composer's mount
+// nothing for anyone else, the other tank included) and the composer's mount
 // (DungeonPrompts: every hints setting, off the shared slot).
 
 import { afterEach, describe, expect, it } from 'vitest';
@@ -89,19 +89,13 @@ function world(
     [HEALER, { id: HEALER, auras: h }],
     [BOSS, { id: BOSS, auras: [], aggroTargetId: bossOn }],
   ]);
-  const party = [
-    { pid: TANK_A, role: 'tank' as const },
-    { pid: TANK_B, role: 'tank' as const },
-    { pid: HEALER, role: 'healer' as const },
-  ];
   const view = (selfId: number, over: Partial<TankSwapAlertInput> = {}) =>
     buildTankSwapAlertView({
       self: bodies.get(selfId) as TankSwapBody,
-      party,
       entity: (id) => bodies.get(id),
       ...over,
     });
-  return { bodies, party, view };
+  return { bodies, view };
 }
 
 describe("the Smith's Heart's swap table (the sim's data)", () => {
@@ -157,7 +151,7 @@ describe('the tank swap alert: who sees what, per boss and tier', () => {
   for (const boss of Object.keys(EXPECTED) as (keyof typeof EXPECTED)[]) {
     for (const tier of TIERS) {
       const at = EXPECTED[boss][tier];
-      it(`${boss} ${tier}: Swap at ${at} for the tank, Taunt for the other, nothing else`, () => {
+      it(`${boss} ${tier}: Swap at ${at} for the tank, nothing for anyone else`, () => {
         // At the count: the tank carrying it reads Swap with the stacks.
         const due = world([swapAura(boss, tier, at)]);
         const mine = due.view(TANK_A);
@@ -167,12 +161,8 @@ describe('the tank swap alert: who sees what, per boss and tier', () => {
         expect(mine.progress).toBeCloseTo(0.5);
         expect(mine.line).toBe('');
         expect(mine.pressable).toBe(false);
-        // The other tank reads Taunt (one word, no bar).
-        const theirs = due.view(TANK_B);
-        if (!theirs.visible) throw new Error('hidden');
-        expect(theirs.kind).toBe('taunt');
-        expect(theirs.title).toBe('Taunt');
-        expect(theirs.progress).toBeNull();
+        // The other tank reads nothing (no Taunt prompt: Jose, 2026-11-24).
+        expect(due.view(TANK_B).visible).toBe(false);
         // A healer reads nothing.
         expect(due.view(HEALER).visible).toBe(false);
         if (at > 1) {
@@ -198,7 +188,7 @@ describe('the tank swap alert: who sees what, per boss and tier', () => {
     ]);
     const v = w.view(TANK_A);
     expect(v.visible && v.kind).toBe('swap');
-    expect(w.view(TANK_B).visible && (w.view(TANK_B) as { kind: string }).kind).toBe('taunt');
+    expect(w.view(TANK_B).visible).toBe(false);
   });
 
   it('once the boss turns to the other tank, both cues go', () => {
@@ -212,54 +202,16 @@ describe('the tank swap alert: who sees what, per boss and tier', () => {
   it('a boss that is out of view or has no target keeps the cue (never hidden on doubt)', () => {
     const lost = world([swapAura('quench', 'heroic', 3, { sourceId: 4242 })]);
     expect(lost.view(TANK_A).visible).toBe(true);
-    expect(lost.view(TANK_B).visible).toBe(true);
     const free = world([swapAura('quench', 'heroic', 3)], [], null);
     expect(free.view(TANK_A).visible).toBe(true);
   });
 
-  it('the other tank still carrying the count of their own is not told to taunt', () => {
-    // Elemental Strike: four debuffs, one family (B still has 4 in another element).
-    const w = world(
-      [swapAura('final', 'normal', 4)],
-      [{ id: STRIKE_AURAS.quench, stacks: 4, remaining: 3, duration: 30, sourceId: BOSS }],
-    );
-    expect(w.view(TANK_B).visible).toBe(false);
-    // Fewer than the count of their own: told to taunt.
-    const low = world(
-      [swapAura('final', 'normal', 4)],
-      [{ id: STRIKE_AURAS.quench, stacks: 2, remaining: 3, duration: 30, sourceId: BOSS }],
-    );
-    expect(low.view(TANK_B).visible).toBe(true);
-    // Hammer's Weight: one is the count, so a tank still under it waits.
-    const weight = world([swapAura('council', 'heroic', 1)], [swapAura('council', 'heroic', 1)]);
-    expect(weight.view(TANK_B).visible).toBe(false);
-  });
-
-  it('hidden for a non-tank, a tank out of a group, a row without a role, and the dead', () => {
+  it('the carrier needs no role or group, and the dead read nothing', () => {
     const w = world([swapAura('breath', 'normal', 4)]);
-    // Not grouped: no other tank to call.
-    expect(w.view(TANK_B, { party: null }).visible).toBe(false);
-    expect(w.view(TANK_B, { party: [] }).visible).toBe(false);
-    // A roster row with no role (an older snapshot) is not a tank.
-    expect(
-      w.view(TANK_B, { party: [{ pid: TANK_A, role: 'tank' }, { pid: TANK_B }] }).visible,
-    ).toBe(false);
-    // A dps (a druid in Wolf Form reads dps: partyFrameRole) is never told to taunt.
-    expect(
-      w.view(TANK_B, {
-        party: [
-          { pid: TANK_A, role: 'tank' },
-          { pid: TANK_B, role: 'dps' },
-        ],
-      }).visible,
-    ).toBe(false);
-    // The carrier needs no role (the boss being on them is the tanking).
-    expect(w.view(TANK_A, { party: null }).visible).toBe(true);
-    // Dead: nothing.
+    expect(w.view(TANK_A).visible).toBe(true);
     const dead = w.bodies.get(TANK_A) as TankSwapBody;
     dead.dead = true;
     expect(w.view(TANK_A).visible).toBe(false);
-    expect(w.view(TANK_B).visible).toBe(false);
   });
 
   it('reads a mirror-shaped aura (no stacks for one, no duration) without NaN', () => {

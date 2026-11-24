@@ -26186,7 +26186,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.chargedTitle': '雷を帯びた x{stacks}：タンク交代！',
   'hudChrome.knotAlert.ruinTitle': 'ふいごの一撃で縁の外へ飛ばされる！',
   'hudChrome.tankSwap.swapTitle': '交代 x{stacks}',
-  'hudChrome.tankSwap.tauntTitle': '挑発',
   'hudChrome.tankSwap.timeAria': 'デバフの残り{seconds}秒',
   'hudChrome.quenchAlert.temperedTitle': 'タンク交代！x{stacks}',
   'hudChrome.raidAtlas.canvasAria': 'レイドマップ',
