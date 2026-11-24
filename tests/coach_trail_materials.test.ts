@@ -161,3 +161,22 @@ describe('coach trail materials', () => {
     )`);
   });
 });
+
+describe('coach trail single-pass draws', () => {
+  it('draws every double-sided material in one pass, exact because each is additive with no depth write', () => {
+    // three's two-pass draw of a transparent double-sided material re-derives
+    // the program twice a frame; additive with no depth write sums the same
+    // in one pass. A material that ever drops either condition must also drop
+    // forceSinglePass, or its back faces could draw over its front.
+    const doubleSided = Object.entries(coachTrailMaterials()).filter(
+      ([, m]) => (m as THREE.Material).side === THREE.DoubleSide,
+    );
+    expect(doubleSided.map(([k]) => k).sort()).toEqual(['areaRing', 'beam', 'ribbon', 'ring']);
+    for (const [name, m] of doubleSided) {
+      const material = m as THREE.MeshBasicMaterial;
+      expect(material.forceSinglePass, name).toBe(true);
+      expect(material.blending, name).toBe(THREE.AdditiveBlending);
+      expect(material.depthWrite, name).toBe(false);
+    }
+  });
+});

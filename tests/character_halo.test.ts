@@ -174,3 +174,17 @@ describe('class halo geometry', () => {
     }
   });
 });
+
+describe('class halo draw', () => {
+  it('draws in one pass, which is exact because it is additive with no depth write', () => {
+    // three draws a transparent double-sided material in two passes (back,
+    // then front), flagging needsUpdate and re-deriving the program for each;
+    // a flat additive quad with no depth write sums the same in one pass.
+    const material = buildHalo(0xffffff).material as THREE.MeshBasicMaterial;
+    expect(material.side).toBe(THREE.DoubleSide);
+    expect(material.transparent).toBe(true);
+    expect(material.forceSinglePass).toBe(true);
+    expect(material.blending).toBe(THREE.AdditiveBlending);
+    expect(material.depthWrite).toBe(false);
+  });
+});
