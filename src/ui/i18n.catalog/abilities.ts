@@ -295,7 +295,7 @@ const classAbilityNamesEn = {
       [
         'charge',
         'Onrush',
-        'Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
+        'Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range, measured to the edge of a large target.',
       ],
       [
         'thunder_clap',

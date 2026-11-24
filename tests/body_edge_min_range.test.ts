@@ -18,6 +18,7 @@ import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { t } from '../src/ui/i18n';
 import { heatFight } from './helpers/heat_fight';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -145,6 +146,20 @@ describe('a gap closer measures its band from a big body edge', () => {
       // Arrived (well inside the 3 s budget) and swinging.
       expect(ticks).toBeLessThan(40);
       expect(p.autoAttack).toBe(true);
+    }
+  });
+});
+
+describe('the banded gap closers say where their band is measured', () => {
+  // docs/design/tooltip-writing.md: state the limit as the live code measures it.
+  it('Onrush and Bruin Rush read their 8-25 yd band to a large target edge', () => {
+    for (const id of ['charge', 'bear_charge']) {
+      const text = t(`entities.abilities.${id}.description` as never);
+      expect(text, id).toContain(
+        `${ABILITIES[id].minRange}-${ABILITIES[id].range} yd range, measured to the edge of a large target.`,
+      );
+      // The sim's own description says the same.
+      expect(ABILITIES[id].description, id).toContain('measured to the edge of a large target');
     }
   });
 });
