@@ -24,7 +24,9 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     // Provisional: 12 base damage per gem, below Vampiric Touch's 13.5 bonus
     // per gem. The standard instant coefficient gives 1/7 Spell Power per gem,
     // also below Touch's 0.15, in exchange for immediate damage and mobility.
-    effects: [{ type: 'directDamage', min: 36, max: 36 }],
+    // 0.7 Spell Power coefficient: the standard instant 1.5/3.5 = 0.43 left the
+    // 3 Gloomtithe spend a wash against the Litany of Woe filler.
+    effects: [{ type: 'directDamage', min: 36, max: 36, spellPowerCoeff: 0.7 }],
     description:
       'Consume 3 Gloomtithe charges to rupture an enemy for $d Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted.',
   },
@@ -74,7 +76,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'dot', total: 90, duration: 15, interval: 3 }],
     description:
-      'Deal $d Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%.',
+      'Deal $d Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 30% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%.',
   },
   veilstep: {
     id: 'veilstep',

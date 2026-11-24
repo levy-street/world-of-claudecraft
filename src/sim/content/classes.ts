@@ -8044,6 +8044,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   power_infusion: {
     id: 'power_infusion',
+    // Off the global cooldown: a once-per-fight buff must not cost a cast.
+    offGcd: true,
     name: 'Anointing',
     class: 'priest',
     learnLevel: 10,

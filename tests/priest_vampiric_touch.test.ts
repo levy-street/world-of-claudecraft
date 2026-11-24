@@ -251,7 +251,7 @@ describe('Vampiric Touch', () => {
     expect(f.p.auras.some((a) => a.kind === 'gloomtithe')).toBe(false);
   });
 
-  it('shares one 20% healing budget among injured party members including the caster', () => {
+  it('shares one 30% healing budget among injured party members including the caster', () => {
     const f = fixture();
     const near = ally(f, 'Near', 30);
     const far = ally(f, 'Far', 31);
@@ -264,8 +264,8 @@ describe('Vampiric Touch', () => {
     const events = tickTouch(f, dot);
     expect(heals(events)).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ sourceId: f.p.id, targetId: f.p.id, amount: 10, crit: false }),
-        expect.objectContaining({ sourceId: f.p.id, targetId: near.id, amount: 10, crit: false }),
+        expect.objectContaining({ sourceId: f.p.id, targetId: f.p.id, amount: 15, crit: false }),
+        expect.objectContaining({ sourceId: f.p.id, targetId: near.id, amount: 15, crit: false }),
       ]),
     );
     expect(heals(events)).toHaveLength(2);
@@ -292,7 +292,7 @@ describe('Vampiric Touch', () => {
     dot.value = 100;
     const events = tickTouch(f, dot);
     expect(heals(events)).toHaveLength(1);
-    expect(heals(events)[0]).toMatchObject({ targetId: near.id, amount: 20 });
+    expect(heals(events)[0]).toMatchObject({ targetId: near.id, amount: 30 });
   });
 
   it.each([0, 50, 100])('heals from actual health lost after %s damage absorption', (absorb) => {
@@ -312,7 +312,7 @@ describe('Vampiric Touch', () => {
         school: 'holy',
       });
     const events = tickTouch(f, dot);
-    const expected = Math.round((100 - absorb) * 0.2);
+    const expected = Math.round((100 - absorb) * 0.3);
     expect(
       heals(events).reduce((sum, event) => sum + (event as { amount: number }).amount, 0),
     ).toBe(expected);
@@ -336,7 +336,7 @@ describe('Vampiric Touch', () => {
     });
     const events = tickTouch(f, dot);
     expect(hits(events)[0]).toMatchObject({ amount: 150, crit: true });
-    expect(heals(events)[0]).toMatchObject({ amount: 20, absorbed: 10, crit: false });
+    expect(heals(events)[0]).toMatchObject({ amount: 35, absorbed: 10, crit: false });
   });
 
   it('uses landed damage before reactive healing and clamps away overkill', () => {
@@ -357,10 +357,10 @@ describe('Vampiric Touch', () => {
       sourceId: f.p.id,
       school: 'holy',
     });
-    expect(heals(tickTouch(f, dot))[0]).toMatchObject({ amount: 20 });
+    expect(heals(tickTouch(f, dot))[0]).toMatchObject({ amount: 30 });
     expect(f.target.hp).toBe(400);
     f.target.hp = 10;
-    expect(heals(tickTouch(f, dot))[0]).toMatchObject({ amount: 2 });
+    expect(heals(tickTouch(f, dot))[0]).toMatchObject({ amount: 3 });
   });
 
   it('does not consume charges when the aura application is rejected', () => {
@@ -443,8 +443,8 @@ describe('Vampiric Touch', () => {
     f.p.hp = Math.floor(f.p.maxHp / 2);
     f.ctx.partyOf(f.p.id)?.members.reverse();
     expect(heals(tickTouch(f, dot))).toEqual([
-      expect.objectContaining({ targetId: f.p.id, amount: 11 }),
-      expect.objectContaining({ targetId: member.id, amount: 10 }),
+      expect.objectContaining({ targetId: f.p.id, amount: 16 }),
+      expect.objectContaining({ targetId: member.id, amount: 16 }),
     ]);
   });
 
@@ -465,7 +465,7 @@ describe('Vampiric Touch', () => {
     expect(total).toBe(dot.value * 5);
     const numbers = damageText.match(/\d+/g)?.map(Number) ?? [];
     expect(numbers.reduce((sum, value) => sum + value, 0)).toBe(total);
-    expect(text).toContain('20%');
+    expect(text).toContain('30%');
     expect(text).toContain('30%');
     expect(en.entities.abilities[ID].name).toBe(NAME);
   });

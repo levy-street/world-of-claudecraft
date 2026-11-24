@@ -6,7 +6,7 @@ import { GLOOMTITHE_AURA_ID } from './presentation';
 export const VAMPIRIC_TOUCH_ID = 'vampiric_touch';
 export const VAMPIRIC_TOUCH_CHARGES = 2;
 export const VAMPIRIC_TOUCH_DAMAGE_MULT = 1.3;
-export const VAMPIRIC_TOUCH_HEAL_RATE = 0.2;
+export const VAMPIRIC_TOUCH_HEAL_RATE = 0.3;
 export const VAMPIRIC_TOUCH_HEAL_RANGE = 30;
 
 function isShadowPriest(ctx: SimContext, priest: Entity | null): priest is Entity {

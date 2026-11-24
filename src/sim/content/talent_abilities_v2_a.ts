@@ -362,6 +362,8 @@ export const TALENT_ABILITIES_V2_A = {
   },
   inner_focus: {
     id: 'inner_focus',
+    // Off the global cooldown: a utility press must not cost a cast.
+    offGcd: true,
     name: 'Stilled Mind',
     class: 'priest',
     learnLevel: 10,

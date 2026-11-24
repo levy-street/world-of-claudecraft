@@ -19,7 +19,7 @@ describe('Void Rupture presentation', () => {
     const hit = res.effects.find((effect) => effect.type === 'directDamage');
     if (hit?.type !== 'directDamage') throw new Error('Void Rupture direct hit missing');
     const scaling = { spellPower, healPower: 0, attackPower: 0, rangedPower: 0 };
-    const bonus = directHitBonus(spellPower, res.def, res.castTime);
+    const bonus = directHitBonus(spellPower, res.def, res.castTime, false, 1, hit.spellPowerCoeff);
     expect(abilityDamageBonus(res, hit, scaling)).toBe(bonus);
     const damage = abilityEffectText(res, scaling);
     const text = abilityDisplayDescription(res, damage, scaling);
