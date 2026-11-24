@@ -263,8 +263,13 @@ export interface HeatWaveRule {
   every: number;
   /** Yards a second a ring rolls out (a player runs 7). */
   speed: number;
-  /** Corridors in each ring (evenly round the wellspring). */
+  /** Corridors in each ring. */
   gaps: number;
+  /** Degrees between neighbouring corridors. 90 since Jose's playtest of
+   *  2026-11-24: two corridors straight across the wellspring left the raid
+   *  only one within reach while it chased the Wellspawn, so both now sit a
+   *  quarter turn apart, either a short walk from the other. */
+  gapSpread: number;
   /** A corridor's half width. */
   gapHalf: number;
 }
@@ -283,8 +288,8 @@ export interface HeatWheelRules {
 /** Heroic's (and Mythic's) lava waves: quicker rings, narrower corridors,
  *  the Wellspawn walking all the while. */
 const HEROIC_WAVES: HeatDifficultyRules['waves'] = [
-  { count: 5, lead: 3, every: 4, speed: 9.5, gaps: 2, gapHalf: 3.5 },
-  { count: 6, lead: 3, every: 3.4, speed: 10.5, gaps: 2, gapHalf: 3 },
+  { count: 5, lead: 3, every: 4, speed: 9.5, gaps: 2, gapSpread: 90, gapHalf: 3.5 },
+  { count: 6, lead: 3, every: 3.4, speed: 10.5, gaps: 2, gapSpread: 90, gapHalf: 3 },
 ];
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
@@ -311,8 +316,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // The rework of 2026-11-18: slow rings, wide corridors, the longest
     // warning; the second overflow a little quicker and narrower.
     waves: [
-      { count: 4, lead: 3.5, every: 4.5, speed: 8, gaps: 2, gapHalf: 4.5 },
-      { count: 5, lead: 3.5, every: 4, speed: 9, gaps: 2, gapHalf: 3.75 },
+      { count: 4, lead: 3.5, every: 4.5, speed: 8, gaps: 2, gapSpread: 90, gapHalf: 4.5 },
+      { count: 5, lead: 3.5, every: 4, speed: 9, gaps: 2, gapSpread: 90, gapHalf: 3.75 },
     ],
   },
   heroic: {

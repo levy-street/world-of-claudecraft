@@ -97,6 +97,19 @@ describe('Guardian of the Heat: the lava waves (pure)', () => {
     expect(ringGaps(1, 0, 2)).not.toEqual(ringGaps(2, 0, 2));
   });
 
+  it('every tier lays its two corridors a quarter turn apart (Jose, 2026-11-24)', () => {
+    for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+      for (const rule of HEAT_DIFFICULTY[tier].waves) {
+        expect(rule.gaps, tier).toBe(2);
+        expect(rule.gapSpread, tier).toBe(90);
+        for (let k = 0; k < 6; k++) {
+          const g = ringGaps(1, k, rule.gaps, rule.gapSpread);
+          expect(apart(g[0], g[1])).toBeCloseTo(Math.PI / 2, 9);
+        }
+      }
+    }
+  });
+
   it("the corridor and the wall: a ring strikes only within its wall's depth, outside a corridor", () => {
     const gaps = [0.6, 0.6 + Math.PI];
     const half = 4;

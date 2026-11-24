@@ -201,18 +201,20 @@ function wrap(a: number): number {
   return r < 0 ? r + TAU : r;
 }
 
-/** Ring `k`'s corridors in overflow `n` (`gaps` of them, evenly round the
- *  wellspring): the first hashed, each next turned a hashed 35 to 75 degrees
- *  one way or the other from the last. Pure. */
-export function ringGaps(n: number, k: number, gaps: number): number[] {
+/** Ring `k`'s corridors in overflow `n` (`gaps` of them, `spreadDeg` apart
+ *  round the wellspring; evenly round it when not given): the first hashed,
+ *  each next turned a hashed 35 to 75 degrees one way or the other from the
+ *  last. Pure. */
+export function ringGaps(n: number, k: number, gaps: number, spreadDeg?: number): number[] {
   let base = ((heatHash(n * 101 + 7, 13) % 360) * Math.PI) / 180;
   for (let i = 1; i <= k; i++) {
     const turn = 35 + (heatHash(n * 31 + i, 17) % 41);
     const sign = heatHash(n * 53 + i, 19) % 2 === 0 ? 1 : -1;
     base += (sign * turn * Math.PI) / 180;
   }
+  const step = spreadDeg === undefined ? TAU / Math.max(1, gaps) : (spreadDeg * Math.PI) / 180;
   const out: number[] = [];
-  for (let g = 0; g < gaps; g++) out.push(wrap(base + (g * TAU) / Math.max(1, gaps)));
+  for (let g = 0; g < gaps; g++) out.push(wrap(base + g * step));
   return out;
 }
 

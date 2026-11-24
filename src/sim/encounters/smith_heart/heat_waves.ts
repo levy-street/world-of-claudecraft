@@ -64,7 +64,7 @@ export function waveRule(s: Pick<HeatScope, 'rules'>, n: 1 | 2): HeatWaveRule {
 /** The next ring's corridors laid out as warnings, `launchIn` seconds to go. */
 function planRing(s: HeatScope, o: HeatOverflow, launchIn: number): HeatRingPlan {
   const rule = waveRule(s, o.n);
-  const gaps = ringGaps(o.n, o.planned, rule.gaps);
+  const gaps = ringGaps(o.n, o.planned, rule.gaps, rule.gapSpread);
   o.planned++;
   const gapIds = gaps.map((g) => {
     const obj = spawnFightObject(
