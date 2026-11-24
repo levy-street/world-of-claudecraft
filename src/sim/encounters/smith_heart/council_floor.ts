@@ -7,7 +7,16 @@
 // Mountain's Rush are not due while what they put on the floor (the marks
 // and the pillars they raise, the Rush's mark and dash) would still be running
 // when the Wrath's bar begins, nor while that bar runs: they wait until it has
-// landed. Heroic and mythic let them overlap. Zero rng.
+// landed. Heroic and mythic let them overlap.
+//
+// The rock guard (every tier): Falling Rock never LANDS inside a Wrath's bar.
+// The bar is when the raid must stand at its cover, so a soak landing then
+// either breaks that cover (every pillar within its reach) or, soaked away,
+// leaves its soakers in the open and the raid under the tremor: the floor
+// gap's own rule (council_floor_gap.ts) that two floor mechanics never land
+// at once. A rock that would land within the Wrath guard's pad of the bar
+// waits until the Wrath has landed (the live playtest of 2026-11-24: the
+// survivor's rock kept landing two seconds before its Wrath). Zero rng.
 
 import { DT } from '../../types';
 import {
@@ -32,17 +41,28 @@ function heldOf(st: CouncilFightState, key: FloorMechanic): number {
 
 /**
  * May a floor mechanic that runs `seconds` start now without running into a
- * Wrath? Always on a tier that lets them overlap; else no Wrath bar in flight
- * and the next Wrath's bar at least `seconds` plus the guard's pad away.
+ * Wrath? Always on a tier that lets them overlap (unless `everyTier`, the
+ * rock's guard); else no Wrath bar in flight and the next Wrath's bar at
+ * least `seconds` plus the guard's pad away.
  */
-export function clearOfWrath(s: CouncilScope, seconds: number): boolean {
-  if (!s.rules.floorAvoidsWrath) return true;
+export function clearOfWrath(s: CouncilScope, seconds: number, everyTier = false): boolean {
+  if (!everyTier && !s.rules.floorAvoidsWrath) return true;
   const holder = jobHolder(s, 'wrath');
-  if (!holder) return true;
+  const left = Math.max(0, T.energyMax - s.st.energy);
+  if (!holder) {
+    // The Guardian's soul still in flight: the Singer takes his energy where
+    // he left it when it lands, and her Wrath may come straight after.
+    const fury = s.st.fury;
+    if (!fury || fury.arrived || fury.fallen !== 'guardian') return true;
+    const haste = 1 + s.rules.furyHaste;
+    const fill = councilFillSeconds(s.st.wraths, s.rules.enrageAfterWraths, haste);
+    const toBar = fury.arriveIn + (left * fill) / T.energyMax;
+    return seconds + T.wrathGuardPad <= toBar + 1e-9;
+  }
   if (s.st.bars[holder.role]?.castId === COUNCIL_CASTS.wrath) return false;
   const per =
     T.energyMax / councilFillSeconds(s.st.wraths, s.rules.enrageAfterWraths, councilHaste(s));
-  const toBar = Math.max(0, T.energyMax - s.st.energy) / per;
+  const toBar = left / per;
   return seconds + T.wrathGuardPad <= toBar + 1e-9;
 }
 
@@ -50,6 +70,12 @@ export function clearOfWrath(s: CouncilScope, seconds: number): boolean {
  *  faster under Grieving Fury; the marks keep their seconds). */
 export function wakeSeconds(s: CouncilScope): number {
   return T.wakeCast / councilHaste(s) + T.wakeMarkSeconds;
+}
+
+/** Seconds a Falling Rock takes from its bar's start to its landing (its bar
+ *  runs faster under Grieving Fury; the mark keeps its seconds). */
+export function rockSeconds(s: CouncilScope): number {
+  return T.rockCast / councilHaste(s) + T.rockMarkSeconds;
 }
 
 /** Seconds a Rush puts on the floor: its mark, the wind-up and a typical
@@ -83,7 +109,11 @@ export function startFloorMechanics(s: CouncilScope): FloorMechanic[] {
       due: rushDue(s) && clearOfWrath(s, RUSH_FLOOR_SECONDS),
       start: () => startRush(s),
     },
-    { key: 'rock', due: st.rockTimer <= 0, start: () => startRock(s) },
+    {
+      key: 'rock',
+      due: st.rockTimer <= 0 && clearOfWrath(s, rockSeconds(s), true),
+      start: () => startRock(s),
+    },
   ];
   const started = runFloorGate(st, T.floorGap, DT, candidates);
   for (const key of started) {
