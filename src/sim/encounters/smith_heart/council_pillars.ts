@@ -23,10 +23,10 @@
 //   Reset        a wipe stands the five columns whole again and the risen ones
 //                go; the council's fall sinks the risen ones and leaves the
 //                broken columns broken (they never stand again on a kill).
-//   Shelter      Mountain's Wrath spares whoever stands inside a FIXED ring
-//                round a pillar (council_ids.ts inCouncilShelter), whatever
-//                the caster's spot; two rings that overlap count a player in
-//                both.
+//   Shelter      Mountain's Wrath spares whoever stands in a pillar's shadow
+//                from its caster (council_ids.ts inCouncilShelter: a strip
+//                straight on from the far face, Jose's call of 2026-11-25);
+//                two shadows that overlap count a player in both.
 //
 // Zero rng in every pick (distance and roster order); the only draws are the
 // damage rolls of the rise's shove and the rubble, in claim-player order.

@@ -63,9 +63,11 @@ function run(
       f.sim.ctx.handleDeath(f.bodies()[first] as Entity, f.players[0]);
       killed = true;
     }
-    const inBar = (['guardian', 'singer'] as const).some(
+    const barRole = (['guardian', 'singer'] as const).find(
       (r) => st.bars[r]?.castId === COUNCIL_CASTS.wrath,
     );
+    const inBar = barRole !== undefined;
+    const caster = barRole ? f.bodies()[barRole] : undefined;
     const cover = shelters();
     if (inBar) {
       if (barIds === null) barIds = new Set(cover.map((p) => p.e.id));
@@ -75,8 +77,14 @@ function run(
           if (p.dead) return;
           const pl = cover[k % cover.length];
           const o = f.local(pl.e);
-          const a = k * 1.3;
-          f.put(p, o.x + Math.sin(a) * (pl.r + 1.2), o.z + Math.cos(a) * (pl.r + 1.2));
+          // Straight behind it from the caster (its shadow), a step apart.
+          const c = caster ? f.local(caster) : o;
+          const d = Math.hypot(o.x - c.x, o.z - c.z) || 1;
+          const ux = (o.x - c.x) / d;
+          const uz = (o.z - c.z) / d;
+          const back = pl.r + 1.2 + (k % 3);
+          const side = ((k % 2) - 0.5) * 1.2;
+          f.put(p, o.x + ux * back + uz * side, o.z + uz * back - ux * side);
         });
       }
     }
@@ -86,7 +94,19 @@ function run(
     const unsheltered = f.players.filter(
       (p) =>
         !p.dead &&
-        !cover.some((pl) => inCouncilShelter(pl.e.pos.x, pl.e.pos.z, pl.r, p.pos.x, p.pos.z)),
+        !cover.some(
+          (pl) =>
+            !!caster &&
+            inCouncilShelter(
+              pl.e.pos.x,
+              pl.e.pos.z,
+              pl.r,
+              caster.pos.x,
+              caster.pos.z,
+              p.pos.x,
+              p.pos.z,
+            ),
+        ),
     ).length;
     f.tick();
     if (st.wraths !== wraths) {

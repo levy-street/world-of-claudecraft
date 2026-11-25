@@ -11,6 +11,7 @@ import {
   COUNCIL_REACH,
   coverSpots,
   faceDistance,
+  inWrathShadow,
   parsePillar,
   pillarBetween,
   rockSpot,
@@ -26,6 +27,7 @@ import {
   councilPillarRadius,
   councilPillarTemplate,
   councilSoulOf,
+  inCouncilShelter,
 } from '../src/sim/encounters/smith_heart/council_ids';
 import {
   riseSpotClear,
@@ -93,6 +95,8 @@ describe('heart council tactics: the template ids', () => {
     expect(COUNCIL_REACH.riseClearOfBodies).toBe(COUNCIL_TUNING.riseClearOfBodies);
     expect(COUNCIL_REACH.riseKnock).toBe(COUNCIL_TUNING.riseKnockRadius);
     expect(COUNCIL_REACH.wrath).toBe(COUNCIL_TUNING.wrathRadius);
+    expect(COUNCIL_REACH.shelterLength).toBe(COUNCIL_TUNING.shelterLength);
+    expect(COUNCIL_REACH.shelterWiden).toBe(COUNCIL_TUNING.shelterWiden);
   });
 });
 
@@ -202,5 +206,14 @@ describe('heart council tactics: the Falling Rock and Wake the Stone', () => {
         Math.hypot(holder.x - raid.x, holder.z - raid.z),
       );
     }
+  });
+  it("reads Mountain's Wrath's shadow exactly as the sim does", () => {
+    const pillar = { x: 10, z: 0, r: COUNCIL_TUNING.risenR };
+    const from = { x: 0, z: 0 };
+    for (let x = -5; x <= 30; x += 0.5)
+      for (let z = -8; z <= 8; z += 0.5)
+        expect(inWrathShadow(pillar, from, { x, z }), `${x},${z}`).toBe(
+          inCouncilShelter(pillar.x, pillar.z, pillar.r, from.x, from.z, x, z),
+        );
   });
 });

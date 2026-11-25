@@ -15,7 +15,7 @@ import {
   COUNCIL_CASTS,
   COUNCIL_DIFFICULTY,
   COUNCIL_NAMES,
-  councilShelterRadius,
+  councilShelterHalf,
   inCouncilShelter,
   COUNCIL_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
@@ -207,26 +207,27 @@ describe('Hammer Council: Narrow Shelter', () => {
     expect(shelterRunes(5, 4)).toEqual({ lit: 4, over: true });
   });
 
-  it('the client counts who shelters at which pillar by the fixed ring, overlaps at both', () => {
+  it('the client counts who shelters in which pillar shadow from the caster, overlaps at both', () => {
     // The cover radius CouncilPillarsFx.shelters hands: the wall plus the breath.
     const pillars = [
       { x: 10, z: 0, r: 2 + COVER_BREATH },
       { x: 17, z: 0, r: 2 + COVER_BREATH },
       { x: 0, z: 10, r: 2 + COVER_BREATH },
     ];
-    const reach = councilShelterRadius(2);
     const players = [
-      // Inside both overlapping rings (counted at BOTH, the 2026-11-17 fix).
-      { x: 13.5, z: 0 },
-      // Only the first ring: on the caster's side of it (never the shadow).
-      { x: 10 - reach + 0.2, z: 0 },
-      // The third ring.
-      { x: 0, z: 10 + reach - 0.2 },
-      // Out of every ring.
-      { x: -20, z: -20 },
+      // Behind the second pillar, still inside the first's shadow: BOTH.
+      { x: 20, z: 0 },
+      // Between the two: the first's shadow only.
+      { x: 13, z: 0 },
+      // Behind the third.
+      { x: 0, z: 14 },
+      // Beside the first (its side, never its shadow).
+      { x: 10, z: 4.5 },
+      // On the caster's side of the third.
+      { x: 0, z: 6 },
     ];
     const out: number[] = [];
-    pillarShelterCounts(players, 4, pillars, 3, out);
+    pillarShelterCounts(0, 0, players, 5, pillars, 3, out);
     expect(out.slice(0, 3)).toEqual([2, 1, 1]);
   });
 
@@ -254,10 +255,11 @@ describe('Hammer Council: Narrow Shelter', () => {
   });
 });
 
-// The team's review of 2026-11-17: the shelter is a FIXED ring round each
-// pillar (never the shadow from the caster's spot), and a player inside two
-// overlapping rings counts at both.
-describe('Hammer Council: the fixed shelter ring', () => {
+// Jose's call of 2026-11-25: the shelter is the space BEHIND each pillar from
+// the Wrath's caster (a strip from the far face `shelterLength` yards on, a
+// little wider than the pillar), never its sides or the caster's side; a
+// player inside two overlapping shadows counts at both.
+describe("Hammer Council: the pillar's shadow from the caster", () => {
   /** Only risen pillars stand: one at each instance-local spot given. */
   function risenOnly(f: CouncilFight, spots: { x: number; z: number }[]): void {
     const g = f.bodies().guardian as Entity;
@@ -278,67 +280,104 @@ describe('Hammer Council: the fixed shelter ring', () => {
     f.sim.ctx.rebucket(g);
   }
 
-  it('the ring spares a player on the caster side of the pillar and strikes one past its reach in the shadow', () => {
+  it('the shape: from the far face a set length on, a little wider than the pillar', () => {
+    const r = T.risenR;
+    expect(T.shelterLength).toBeGreaterThanOrEqual(8);
+    expect(T.shelterLength).toBeLessThanOrEqual(10);
+    // Wide enough for several side by side (a body is about a yard).
+    expect(2 * councilShelterHalf(r, r)).toBeGreaterThanOrEqual(6);
+    expect(councilShelterHalf(r, -0.1)).toBe(0);
+    expect(councilShelterHalf(r, r + T.shelterLength + 0.1)).toBe(0);
+    // A caster on the pillar shelters nobody.
+    expect(inCouncilShelter(0, 0, r, 0.5, 0, -r - 1, 0)).toBe(false);
+  });
+
+  it('spares behind the pillar; strikes its sides, the caster side and past the tip, wherever the caster stands', () => {
     for (const from of [
       { x: MID.x, z: MID.z },
       { x: MID.x - 12, z: MID.z + 10 },
     ]) {
-      const f = pulled(3);
-      const [tank, near, far] = f.players;
-      const at = { x: MID.x + 12, z: MID.z };
+      const f = pulled(7);
+      const [tank, behind, deep, front, beside, past] = f.players;
+      const at = { x: MID.x + 5, z: MID.z };
       risenOnly(f, [at]);
       plantGuardian(f, from.x, from.z);
       const pl = f.pillars()[0];
       const pr = f.local(pl.e);
-      const reach = councilShelterRadius(pl.r);
-      // Between the caster and the pillar, inside the ring: no sight line is
-      // broken, yet the ring shelters.
-      const ux = (pr.x - from.x) / Math.hypot(pr.x - from.x, pr.z - from.z);
-      const uz = (pr.z - from.z) / Math.hypot(pr.x - from.x, pr.z - from.z);
-      f.put(near, pr.x - ux * (reach - 0.5), pr.z - uz * (reach - 0.5));
-      // Straight behind the pillar but past the ring: struck.
-      f.put(far, pr.x + ux * (reach + 1.5), pr.z + uz * (reach + 1.5));
+      const r = pl.r;
+      const d = Math.hypot(pr.x - from.x, pr.z - from.z);
+      const ux = (pr.x - from.x) / d;
+      const uz = (pr.z - from.z) / d;
+      const put = (p: Entity, along: number, lat: number) =>
+        f.put(p, pr.x + ux * along + uz * lat, pr.z + uz * along - ux * lat);
+      // Straight behind, and deep in the shadow off to one side.
+      put(behind, r + 1.5, 0);
+      put(deep, r + T.shelterLength - 1, -(r + T.shelterWiden - 0.5));
+      // Between the caster and the pillar: no cover from the caster.
+      put(front, -(r + 1.5), 0);
+      // Beside it, level with its middle.
+      put(beside, 0, r + 1.5);
+      // Straight behind but past the shadow's tip.
+      put(past, r + T.shelterLength + 1.5, 0);
       f.put(tank, from.x + 3, from.z);
       const ev = land(f);
-      expect(wrathOn(ev, near), `caster at ${from.x},${from.z}`).toEqual([]);
-      expect(wrathOn(ev, far).length, `caster at ${from.x},${from.z}`).toBe(1);
+      const tag = `caster at ${from.x},${from.z}`;
+      expect(wrathOn(ev, behind), tag).toEqual([]);
+      expect(wrathOn(ev, deep), tag).toEqual([]);
+      expect(wrathOn(ev, front).length, tag).toBe(1);
+      expect(wrathOn(ev, beside).length, tag).toBe(1);
+      expect(wrathOn(ev, past).length, tag).toBe(1);
     }
   });
 
-  it('a player inside two overlapping rings counts at both pillars (Narrow Shelter)', () => {
+  it('a player inside two overlapping shadows counts at both pillars (Narrow Shelter)', () => {
     // Heroic (limit 4): A and B overlap; three stand at B alone, two in the
     // overlap. Counted at both, B holds five: one too many.
     const f = pulled(6, 'heroic');
     const [tank, ...rest] = f.players;
-    const a = { x: MID.x + 10, z: MID.z - 4 };
-    const b = { x: MID.x + 10, z: MID.z + 4 };
+    // A, then B straight behind it from the caster: B's near shadow lies in
+    // A's too.
+    const a = { x: MID.x + 4, z: MID.z };
+    const b = { x: MID.x + 11, z: MID.z };
     risenOnly(f, [a, b]);
-    const [pa, pb] = f.pillars().map((p) => f.local(p.e));
+    // Nearest the caster first.
+    const [pa, pb] = f
+      .pillars()
+      .map((p) => f.local(p.e))
+      .sort((u, v) => u.x - v.x);
     const r = T.risenR;
-    expect(Math.hypot(pa.x - pb.x, pa.z - pb.z)).toBeLessThan(2 * councilShelterRadius(r));
+    // The caster on the line through both (the rise snaps to its spots).
+    const gap = Math.hypot(pb.x - pa.x, pb.z - pa.z);
+    expect(gap).toBeLessThan(r + T.shelterLength - r - 1.5);
+    const ux = (pb.x - pa.x) / gap;
+    const uz = (pb.z - pa.z) / gap;
+    const c = { x: pa.x - ux * 10, z: pa.z - uz * 10 };
+    const behindB = (along: number, lat: number) => ({
+      x: pb.x + ux * along + uz * lat,
+      z: pb.z + uz * along - ux * lat,
+    });
     const overlap = rest.slice(0, 2);
     const bOnly = rest.slice(2, 5);
-    const mid = { x: (pa.x + pb.x) / 2, z: (pa.z + pb.z) / 2 };
-    for (const [i, p] of overlap.entries()) f.put(p, mid.x + r + 0.6, mid.z + (i - 0.5) * 0.8);
-    // Past B, away from A: inside B's ring only.
-    const ux = (pb.x - pa.x) / Math.hypot(pb.x - pa.x, pb.z - pa.z);
-    const uz = (pb.z - pa.z) / Math.hypot(pb.x - pa.x, pb.z - pa.z);
-    for (const [i, p] of bOnly.entries())
-      f.put(
-        p,
-        pb.x + ux * (r + 1.5) + (i - 1) * 0.8 * uz,
-        pb.z + uz * (r + 1.5) - (i - 1) * 0.8 * ux,
-      );
-    plantGuardian(f, MID.x - 8, MID.z);
-    f.put(tank, MID.x - 5, MID.z);
+    // Just behind B: in both shadows.
+    for (const [i, p] of overlap.entries()) {
+      const q = behindB(r + 1.5, (i - 0.5) * 0.9);
+      f.put(p, q.x, q.z);
+    }
+    // Deeper behind B, past A's tip: B's shadow only.
+    for (const [i, p] of bOnly.entries()) {
+      const q = behindB(r + T.shelterLength - 1, (i - 1) * 0.9);
+      f.put(p, q.x, q.z);
+    }
+    plantGuardian(f, c.x, c.z);
+    f.put(tank, MID.x - 5, MID.z + 6);
     // Check the census the rule reads before landing.
     for (const p of overlap) {
-      expect(inCouncilShelter(pa.x, pa.z, r, f.local(p).x, f.local(p).z)).toBe(true);
-      expect(inCouncilShelter(pb.x, pb.z, r, f.local(p).x, f.local(p).z)).toBe(true);
+      expect(inCouncilShelter(pa.x, pa.z, r, c.x, c.z, f.local(p).x, f.local(p).z)).toBe(true);
+      expect(inCouncilShelter(pb.x, pb.z, r, c.x, c.z, f.local(p).x, f.local(p).z)).toBe(true);
     }
     for (const p of bOnly) {
-      expect(inCouncilShelter(pa.x, pa.z, r, f.local(p).x, f.local(p).z)).toBe(false);
-      expect(inCouncilShelter(pb.x, pb.z, r, f.local(p).x, f.local(p).z)).toBe(true);
+      expect(inCouncilShelter(pa.x, pa.z, r, c.x, c.z, f.local(p).x, f.local(p).z)).toBe(false);
+      expect(inCouncilShelter(pb.x, pb.z, r, c.x, c.z, f.local(p).x, f.local(p).z)).toBe(true);
     }
     const ev = land(f);
     // B is crowded: everyone counted there takes the share, exactly once (the
@@ -349,24 +388,23 @@ describe('Hammer Council: the fixed shelter ring', () => {
   it('three at B alone and two in the overlap stay safe on Normal (limit 5)', () => {
     const f = pulled(6);
     const [tank, ...rest] = f.players;
-    const a = { x: MID.x + 10, z: MID.z - 4 };
-    const b = { x: MID.x + 10, z: MID.z + 4 };
+    const a = { x: MID.x + 4, z: MID.z };
+    const b = { x: MID.x + 11, z: MID.z };
     risenOnly(f, [a, b]);
-    const [pa, pb] = f.pillars().map((p) => f.local(p.e));
+    const [pa, pb] = f
+      .pillars()
+      .map((p) => f.local(p.e))
+      .sort((u, v) => u.x - v.x);
     const r = T.risenR;
-    const mid = { x: (pa.x + pb.x) / 2, z: (pa.z + pb.z) / 2 };
-    for (const [i, p] of rest.slice(0, 2).entries())
-      f.put(p, mid.x + r + 0.6, mid.z + (i - 0.5) * 0.8);
-    const ux = (pb.x - pa.x) / Math.hypot(pb.x - pa.x, pb.z - pa.z);
-    const uz = (pb.z - pa.z) / Math.hypot(pb.x - pa.x, pb.z - pa.z);
-    for (const [i, p] of rest.slice(2, 5).entries())
-      f.put(
-        p,
-        pb.x + ux * (r + 1.5) + (i - 1) * 0.8 * uz,
-        pb.z + uz * (r + 1.5) - (i - 1) * 0.8 * ux,
-      );
-    plantGuardian(f, MID.x - 8, MID.z);
-    f.put(tank, MID.x - 5, MID.z);
+    const gap = Math.hypot(pb.x - pa.x, pb.z - pa.z);
+    const ux = (pb.x - pa.x) / gap;
+    const uz = (pb.z - pa.z) / gap;
+    const put = (p: Entity, along: number, lat: number) =>
+      f.put(p, pb.x + ux * along + uz * lat, pb.z + uz * along - ux * lat);
+    for (const [i, p] of rest.slice(0, 2).entries()) put(p, r + 1.5, (i - 0.5) * 0.9);
+    for (const [i, p] of rest.slice(2, 5).entries()) put(p, r + T.shelterLength - 1, (i - 1) * 0.9);
+    plantGuardian(f, pa.x - ux * 10, pa.z - uz * 10);
+    f.put(tank, MID.x - 5, MID.z + 6);
     const ev = land(f);
     for (const p of rest) expect(wrathOn(ev, p), p.name).toEqual([]);
   });

@@ -508,11 +508,14 @@ export const COUNCIL_TUNING = {
   /** A carved column's radius and a risen pillar's (the combat wall rows). */
   columnR: 2.6,
   risenR: 2.2,
-  /** Mountain's Wrath's shelter (the team's review of 2026-11-17): a FIXED
-   *  ring this far past a pillar's face, whatever the caster's spot, so a
-   *  player reads the safe floor round a pillar without tracking the boss.
-   *  Two rings that overlap shelter (and count) a player in both. */
-  shelterReach: 4,
+  /** Mountain's Wrath's shelter (Jose's call of 2026-11-25, in place of the
+   *  fixed ring of 2026-11-17): the pillar's SHADOW from the caster, a strip
+   *  straight on from its far face `shelterLength` yards long, its half width
+   *  the pillar's radius plus `shelterWiden` (from the far face on: several
+   *  players stand in it side by side). The sides and the caster's side are
+   *  open. Two shadows that overlap shelter (and count) a player in both. */
+  shelterLength: 9,
+  shelterWiden: 1.2,
   /** Rubble: its radius past the pillar's, how long it lies, its bite. */
   rubblePad: 1.6,
   rubbleSeconds: 8,
@@ -720,17 +723,43 @@ export function councilPillarRadius(risen: boolean): number {
   return risen ? COUNCIL_TUNING.risenR : COUNCIL_TUNING.columnR;
 }
 
-/** The fixed shelter's reach from a pillar's centre (its footprint plus
- *  `shelterReach`). */
-export function councilShelterRadius(r: number): number {
-  return r + COUNCIL_TUNING.shelterReach;
+/** The Wrath's shadow behind a pillar of footprint `r`, at `along` yards
+ *  past its centre on the line from the caster: its half width (0 short of
+ *  the centre or past the tip). It flares from the footprint at the centre
+ *  to the footprint plus `shelterWiden` at the far face, then runs straight
+ *  on `shelterLength` yards. Pure. */
+export function councilShelterHalf(r: number, along: number): number {
+  if (along < 0 || along > r + COUNCIL_TUNING.shelterLength) return 0;
+  return r + COUNCIL_TUNING.shelterWiden * Math.min(1, along / r);
 }
 
 /** Does a pillar centred at (px, pz) with footprint `r` shelter a body at
- *  (x, z) from Mountain's Wrath? Pure: the sim's rule and the client's
- *  gems read the same test. */
-export function inCouncilShelter(px: number, pz: number, r: number, x: number, z: number): boolean {
-  return Math.hypot(x - px, z - pz) <= councilShelterRadius(r) + 1e-6;
+ *  (x, z) from Mountain's Wrath cast from (cx, cz)? The body must stand in
+ *  the pillar's shadow from the caster (councilShelterHalf), never beside it
+ *  or on the caster's side. A caster on the pillar shelters nobody. Pure:
+ *  the sim's rule, the client's drawn shadow and its gems read the same
+ *  test. */
+export function inCouncilShelter(
+  px: number,
+  pz: number,
+  r: number,
+  cx: number,
+  cz: number,
+  x: number,
+  z: number,
+): boolean {
+  const dx = px - cx;
+  const dz = pz - cz;
+  const d = Math.hypot(dx, dz);
+  if (d <= r + 0.1) return false;
+  const ux = dx / d;
+  const uz = dz / d;
+  const qx = x - px;
+  const qz = z - pz;
+  const along = qx * ux + qz * uz;
+  const lat = Math.abs(qx * uz - qz * ux);
+  if (along < 0 || along > r + COUNCIL_TUNING.shelterLength + 1e-6) return false;
+  return lat <= councilShelterHalf(r, along) + 1e-6;
 }
 
 /** Seconds the Wrath's energy takes to fill by Wraths landed (`enrageAfter`:

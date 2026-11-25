@@ -24,7 +24,7 @@ import {
   councilPillarOf,
   councilRiseSpotSeconds,
   councilRoleOf,
-  councilShelterRadius,
+  councilShelterHalf,
   councilSoulOf,
   endlessSongMult,
   inCouncilShelter,
@@ -550,16 +550,10 @@ export const ECHO_SPEC = {
 
 /** How far inside the sim's own cover a drawn shelter's edge stands: the
  *  Echo's cover is `pillarBetween` (the wall's radius plus a 0.35 breath,
- *  council_pillars.ts), Mountain's Wrath's the fixed ring (council_ids.ts
+ *  council_pillars.ts), Mountain's Wrath's the shadow strip (council_ids.ts
  *  inCouncilShelter). Drawn a hair inside each, so a player whose feet are in
  *  the dark is ALWAYS covered. */
 export const SHELTER_PAD = { echo: 0.25, wrath: -0.1 } as const;
-
-/** The Wrath's drawn ring round a pillar of wall radius `r` (yards from its
- *  centre): the sim's shelter, a hair inside. */
-export function wrathRingRadius(r: number): number {
-  return councilShelterRadius(r) + SHELTER_PAD.wrath;
-}
 
 /** The real shadow a round cover (centre p, radius r) casts from a point
  *  source s out to `reach` from s: the floor between the two tangents from
@@ -665,13 +659,15 @@ export function shelterRunes(count: number, limit: number): { lit: number; over:
  *  (council_pillars.ts pillarBetween): CouncilPillarsFx.shelters hands it. */
 export const COVER_BREATH = 0.35;
 
-/** How many of `nPlayers` shelter at each of `nPillars` from Mountain's Wrath:
- *  the sim's FIXED ring round each pillar (council_ids.ts inCouncilShelter,
- *  whatever the caster's spot), a player inside two overlapping rings counted
- *  at BOTH (the team's review of 2026-11-17). Each pillar's `r` is the cover
- *  radius CouncilPillarsFx.shelters hands (the wall plus COVER_BREATH). Fills
+/** How many of `nPlayers` shelter at each of `nPillars` from Mountain's Wrath
+ *  cast from (sx, sz): the sim's shadow behind each pillar (council_ids.ts
+ *  inCouncilShelter), a player inside two overlapping shadows counted at BOTH
+ *  (the team's review of 2026-11-17). Each pillar's `r` is the cover radius
+ *  CouncilPillarsFx.shelters hands (the wall plus COVER_BREATH). Fills
  *  `out`. */
 export function pillarShelterCounts(
+  sx: number,
+  sz: number,
   players: readonly { x: number; z: number }[],
   nPlayers: number,
   pillars: readonly { x: number; z: number; r: number }[],
@@ -682,26 +678,43 @@ export function pillarShelterCounts(
   for (let k = 0; k < nPlayers; k++) {
     for (let i = 0; i < nPillars; i++) {
       const pl = pillars[i];
-      if (inCouncilShelter(pl.x, pl.z, pl.r - COVER_BREATH, players[k].x, players[k].z)) out[i]++;
+      if (inCouncilShelter(pl.x, pl.z, pl.r - COVER_BREATH, sx, sz, players[k].x, players[k].z))
+        out[i]++;
     }
   }
 }
 
-/** A point of the Wrath's fixed shelter ring round a pillar at (cx, cz):
- *  `across` 0 to 1 once round, `along` 0 at the pillar's face (`inner`) to 1
- *  at the ring's edge (`outer`). Fills `out`. Pure. */
-export function shelterRingPoint(
-  cx: number,
-  cz: number,
-  inner: number,
-  outer: number,
+/** A point of Mountain's Wrath's shadow behind a pillar at (px, pz) of wall
+ *  radius `r` from a caster at (sx, sz) (the sim's inCouncilShelter, drawn
+ *  SHELTER_PAD.wrath inside it): `across` 0 to 1 side to side, `along` 0 at
+ *  its foot (the pillar's far face, or where the flare begins beside it) to 1
+ *  at its tip. Fills `out`; false when the caster stands on the pillar (no
+ *  shadow). Pure. */
+export function shelterStripPoint(
+  sx: number,
+  sz: number,
+  px: number,
+  pz: number,
+  r: number,
   across: number,
   along: number,
   out: { x: number; z: number },
-): { x: number; z: number } {
-  const th = Math.max(0, Math.min(1, across)) * Math.PI * 2;
-  const k = inner + (outer - inner) * Math.max(0, Math.min(1, along));
-  out.x = cx + Math.sin(th) * k;
-  out.z = cz + Math.cos(th) * k;
-  return out;
+): boolean {
+  const dx = px - sx;
+  const dz = pz - sz;
+  const d = Math.hypot(dx, dz);
+  if (d <= r + 0.1) return false;
+  const ux = dx / d;
+  const uz = dz / d;
+  const pad = SHELTER_PAD.wrath;
+  const half = councilShelterHalf(r, r) + pad;
+  const lat = (2 * Math.max(0, Math.min(1, across)) - 1) * half;
+  const a = Math.abs(lat);
+  // The foot: the far face behind the wall, the flare's edge beside it.
+  const foot = a <= r ? Math.sqrt(r * r - a * a) : (r * (a - r)) / Math.max(1e-6, half - pad - r);
+  const tip = r + T.shelterLength + pad;
+  const k = foot + (tip - foot) * Math.max(0, Math.min(1, along));
+  out.x = px + ux * k + uz * lat;
+  out.z = pz + uz * k - ux * lat;
+  return true;
 }

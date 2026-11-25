@@ -30,7 +30,11 @@ export const COUNCIL_REACH: {
   readonly riseClearOfBodies: number;
   readonly riseKnock: number;
   readonly wrath: number;
+  readonly shelterLength: number;
+  readonly shelterWiden: number;
 };
+
+export function inWrathShadow(pillar: Circle, from: Point, at: Point, margin?: number): boolean;
 
 export function parsePillar(tid: unknown): PillarState | null;
 

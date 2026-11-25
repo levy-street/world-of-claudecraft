@@ -4,7 +4,7 @@
 // warning is the whole Quarry, never a ring round the caster. The generic
 // trash-engine sight field (a 45 yd ring with line-of-sight wedges) said the
 // wrong thing twice over: an edge a raider could stand past, and shadows that
-// were not the sim's shelter (the fixed ring round each pillar,
+// were not the sim's shelter (each pillar's shadow strip from the caster,
 // council_shelter_fx.ts); it is off for the council (the kit's `ownFloor`).
 //
 //   The floor   a faint lethal tint over the whole pit, swept out from the

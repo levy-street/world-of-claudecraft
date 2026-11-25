@@ -5,7 +5,7 @@
 //                     energy bar (its resource: the target frame draws it, and
 //                     it rides the snapshot like any mob's resource).
 //   Mountain's Wrath  at 100: a 4 s bar, then everyone in the Quarry outside
-//                     every pillar's shelter ring is struck (Normal
+//                     every pillar's shadow from it is struck (Normal
 //                     440 to 520; Heroic and Mythic about 3,500 to 4,100:
 //                     only a tank under a strong defensive or an immunity
 //                     lives through it), and then
@@ -23,10 +23,12 @@
 //                     and bar hastened); on Heroic and Mythic she takes up
 //                     Hammer's Weight too. Mountain's Rush dies with him.
 //
-// The Wrath's shelter is a FIXED ring round every pillar (council_ids.ts
-// inCouncilShelter: the footprint plus `shelterReach`), whatever the caster's
-// spot (the team's review of 2026-11-17; it was the sight line before). Zero
-// rng in every pick; the draws are the damage rolls.
+// The Wrath's shelter is the space BEHIND every pillar from its caster
+// (council_ids.ts inCouncilShelter: a strip from the far face `shelterLength`
+// yards on, a little wider than the pillar), Jose's call of 2026-11-25 in
+// place of the fixed ring of 2026-11-17. The caster is planted through its
+// bar (a casting mob never walks), so the shadow drawn as the bar runs is the
+// one that lands. Zero rng in every pick; the draws are the damage rolls.
 
 import { DT, type Entity } from '../../types';
 import { clearCastIf, dropAuraById, heavySwing } from '../sunken_bastion/claim';
@@ -147,12 +149,11 @@ export function landWrath(s: CouncilScope, caster: Entity): number {
     ability: COUNCIL_CASTS.wrath,
   });
   const all = councilPillars(ctx, inst);
-  // The shelter is a FIXED ring round each pillar (council_ids.ts
-  // inCouncilShelter, the team's review of 2026-11-17), never the shadow from
-  // the caster's spot. A soul pillar (mythic, council_soul.ts) and the cursed
+  // The shelter is each pillar's shadow from the caster (council_ids.ts
+  // inCouncilShelter). A soul pillar (mythic, council_soul.ts) and the cursed
   // pillar (council_rush.ts) shield nobody.
   const pillars = all.filter((p) => p.soul === null && !p.cursed);
-  // Who shelters at which pillar: a player inside two overlapping rings counts
+  // Who shelters at which pillar: a player inside two overlapping shadows counts
   // for BOTH (Narrow Shelter's census), never only the first.
   const shields = new Map<number, Entity[]>();
   const sheltered: { p: Entity; at: number[] }[] = [];
@@ -164,7 +165,8 @@ export function landWrath(s: CouncilScope, caster: Entity): number {
     if (p.dead) continue;
     const at: number[] = [];
     for (const pl of pillars) {
-      if (!inCouncilShelter(pl.e.pos.x, pl.e.pos.z, pl.r, p.pos.x, p.pos.z)) continue;
+      const { x: cx, z: cz } = caster.pos;
+      if (!inCouncilShelter(pl.e.pos.x, pl.e.pos.z, pl.r, cx, cz, p.pos.x, p.pos.z)) continue;
       at.push(pl.e.id);
       const behind = shields.get(pl.e.id);
       if (behind) behind.push(p);

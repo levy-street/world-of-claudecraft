@@ -29,7 +29,33 @@ export const COUNCIL_REACH = {
   /** The Wrath's reach (arena-wide since 2026-11-25: the whole floor from
    *  any spot) and the Echo's. */
   wrath: 110,
+  /** Mountain's Wrath's shelter (council_ids.ts inCouncilShelter, Jose's call
+   *  of 2026-11-25): the pillar's shadow from the caster, from its far face
+   *  this long, its half width the pillar's radius plus the widen. */
+  shelterLength: 9,
+  shelterWiden: 1.2,
 };
+
+/**
+ * Is `at` in `pillar`'s Mountain's Wrath shadow from a caster at `from`
+ * (council_ids.ts inCouncilShelter), with `margin` yards inside its edges to
+ * spare?
+ */
+export function inWrathShadow(pillar, from, at, margin = 0) {
+  const dx = pillar.x - from.x;
+  const dz = pillar.z - from.z;
+  const d = Math.hypot(dx, dz);
+  const r = pillar.r;
+  if (d <= r + 0.1) return false;
+  const ux = dx / d;
+  const uz = dz / d;
+  const qx = at.x - pillar.x;
+  const qz = at.z - pillar.z;
+  const along = qx * ux + qz * uz;
+  const lat = Math.abs(qx * uz - qz * ux);
+  if (along < margin || along > r + COUNCIL_REACH.shelterLength - margin) return false;
+  return lat <= r + COUNCIL_REACH.shelterWiden * Math.min(1, along / r) - margin;
+}
 
 const PILLAR = 'sh_council_pillar_';
 const RISEN = 'sh_council_risen_';

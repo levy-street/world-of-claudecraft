@@ -435,6 +435,8 @@ export class CouncilFx {
   private readonly limitPlayers: Entity[] = [];
   /** When the Wrath's shelters were last laid (the host clock), or -1. */
   private wrathLaidAt = -1;
+  /** The caster spot the Wrath's shadows were last laid from. */
+  private readonly wrathFrom = { x: 0, z: 0 };
   /** The council's sounds (game/smith_heart_council_audio.ts), fed by this
    *  painter's cues, scan and frame. */
   private readonly audio = new CouncilAudio(sfx);
@@ -1862,9 +1864,10 @@ export class CouncilFx {
     this.audio.shelter(crowded, at.x, this.groundY(at.x, at.z), at.z);
   }
 
-  /** Mountain's Wrath's bar on its holder: the real shadow behind every
-   *  pillar that covers from it, laid as the bar begins and again as the
-   *  pillars change, fading in over the bar's first moments. */
+  /** Mountain's Wrath's bar on its holder: the shadow strip behind every
+   *  pillar from it, laid as the bar begins, again at the shelter pace as the
+   *  pillars change and at once whenever the caster shifts (it is planted
+   *  through its bar; a shove or a snapshot correction redraws it). */
   private updateWrathShelters(world: IWorld): void {
     const e = this.haloHolder >= 0 ? world.entities.get(this.haloHolder) : undefined;
     const casting = !!e && !e.dead && e.castingAbility === COUNCIL_CASTS.wrath && e.castTotal > 0;
@@ -1878,13 +1881,16 @@ export class CouncilFx {
       }
       return;
     }
-    if (this.wrathLaidAt < 0 || this.clock - this.wrathLaidAt > 0.25) {
+    const moved = Math.hypot(e.pos.x - this.wrathFrom.x, e.pos.z - this.wrathFrom.z) > 0.05;
+    if (this.wrathLaidAt < 0 || moved || this.clock - this.wrathLaidAt > 0.25) {
       this.wrathLaidAt = this.clock;
-      this.shelters.layRings();
+      this.wrathFrom.x = e.pos.x;
+      this.wrathFrom.z = e.pos.z;
+      this.shelters.layStrips(e.pos.x, e.pos.z);
       this.layLimit(world, e);
     }
     const fill = Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal));
-    // The safe rings stand out from the bar's very start (the team's playtest
+    // The safe shadows stand out from the bar's very start (the team's playtest
     // of 2026-11-25: the safe area was not always seen), over the arena-wide
     // field that lies under them.
     this.shelters.paint('wrath', Math.min(0.96, 0.72 + fill * 1.2));

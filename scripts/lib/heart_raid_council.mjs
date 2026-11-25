@@ -30,6 +30,7 @@ import {
   coverSpots,
   faceDistance,
   hiddenFrom,
+  inWrathShadow,
   onFloor,
   parsePillar,
   pillarBetween,
@@ -895,6 +896,7 @@ function wakeSlot(world, st, p) {
 
 function planCover(world, st, casts, key, pre = false) {
   const sources = casts.map((c) => ({ x: c.x, z: c.z }));
+  const wrathSources = casts.filter((c) => c.kind === 'wrath').map((c) => ({ x: c.x, z: c.z }));
   const remS = Math.min(...casts.map((c) => c.rem));
   // The standing cover and the pillars that rise before the blast lands
   // (with a second to step in behind them).
@@ -977,6 +979,10 @@ function planCover(world, st, casts, key, pre = false) {
           sources.length === 1 ? (pillarBetween(cover, sources[0], raw, 0.35) ?? pl) : pl;
         if (forbidden.has(first.id) || (used.get(first.id) ?? 0) >= SHELTER) continue;
         const spot = first === pl ? raw : { ...raw, pillar: first };
+        // Mountain's Wrath spares only its pillar's shadow from the caster (a
+        // strip from the far face, council_ids.ts inCouncilShelter): never
+        // past its tip, never off its sides.
+        if (!wrathSources.every((s) => inWrathShadow(spot.pillar, s, spot, 0.5))) continue;
         if (!onFloor(spot, world.floor, 5)) continue;
         if (!ringing(p) && rings.some((q) => hypot(q, spot) < COUNCIL_REACH.resonance + 1))
           continue;
