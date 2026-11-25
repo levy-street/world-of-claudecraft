@@ -303,17 +303,8 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'stone', 'heat', [3.2, 4.2, 11], [1.8, 2.1, 0.2], { tiltZ: -0.08 }),
     part('box', 'glow', 'heat', [0.5, 0.3, 10], [0, 0.4, 0]),
   ],
-  // The altar-stone, side-on to the arena's door: its foot, waist and
-  // capstone of basalt, a seam of fire down its table, crystal at its north
-  // end (local +z).
-  sh_giant_anvil: [
-    part('box', 'dark', 'heat', [6.2, 1.4, 16.4], [0, 0.7, 0]),
-    part('box', 'dark', 'heat', [4.8, 2.8, 14.6], [0, 2.8, 0]),
-    part('box', 'stone', 'heat', [6.2, 1.6, 16.2], [0, 5, 0]),
-    part('box', 'glow', 'heat', [0.4, 0.2, 13], [0, 5.85, 0]),
-    part('gem', 'glow', 'heat', [1.4, 4.4, 1.4], [0, 7.6, 6.4]),
-    part('gem', 'glow', 'heat', [1.0, 3.0, 1.0], [0.9, 6.9, 5.6], { tiltZ: -0.4 }),
-  ],
+  // (The altar-stone, `sh_giant_anvil`, left the Hearth with Jose's
+  // playtest of 2026-11-25: the shore runs all the way round the guardian.)
   sh_casting_channel: [
     part('box', 'dark', 'heat', [2.6, 0.06, 64], [0, 0.03, 0]),
     part('box', 'glow', 'heat', [1.4, 0.1, 64], [0, 0.05, 0]),

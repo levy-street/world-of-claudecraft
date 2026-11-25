@@ -1,10 +1,11 @@
 // The Guardian of the Heat's Wheel of the Hearth (docs/design/raid/smith_heart.md
 // section 7.4), every tier, every fighting phase (the rework of 2026-11-18: on Normal
-// the fight never made anyone move): the shore round the wellspring is cut in four
-// slices. Three turn red and erupt; one stays dark and safe. The tier's rounds run back
+// the fight never made anyone move): the shore all the way round the wellspring is
+// cut in four even quarters (Jose's playtest of 2026-11-25: the raid stands behind
+// the guardian too). Three turn red and erupt; one stays dark and safe. The tier's rounds run back
 // to back (three, Mythic four): as one round's fire falls, the next round's slices
-// already show, its safe slice somewhere else, so the raid crosses the moment the fire
-// dies down.
+// already show, its safe slice the next quarter round (either way), so the raid
+// crosses the moment the fire dies down.
 //
 //   A round  each red slice warns the tier's `wheel.warn` s (Normal 5, Heroic 3.5,
 //            Mythic 3), erupts (a near-lethal blow to whoever stands in it, past the
@@ -45,31 +46,37 @@ import {
 import type { HeatWheelRound } from './heat_state';
 import { heatSay } from './heat_voice';
 
-/** Run `run`'s `rounds` safe slices: each a hashed one or two slices from the last,
- *  never the same, always on the shore. Pure. */
+/** Run `run`'s `rounds` safe slices: each the next slice round from the last,
+ *  either way (hashed), never the same. Since Jose's playtest of 2026-11-25 the
+ *  slices are four even quarters all the way round the wellspring, so the step
+ *  is always one: two quarters over is half the shore away, more than any
+ *  tier's warning gives a raider at the ranged ring to walk (it was one or
+ *  two over the two 45 degree front slices before). Pure. */
 export function wheelSafes(run: number, rounds: number): number[] {
   const out: number[] = [];
   let at0 = heatHash(run, 41) % WHEEL_SLICES;
   out.push(at0);
   for (let i = 1; i < rounds; i++) {
-    const step = 1 + (heatHash(run * 7 + i, 43) % 2);
-    const up = at0 + step;
-    const down = at0 - step;
-    const goUp = up < WHEEL_SLICES && (down < 0 || heatHash(run + i, 47) % 2 === 0);
-    at0 = goUp ? up : down;
+    const dir = heatHash(run + i, 47) % 2 === 0 ? 1 : -1;
+    at0 = (at0 + dir + WHEEL_SLICES) % WHEEL_SLICES;
     out.push(at0);
   }
   return out;
 }
 
 /** The slices the raid crosses from round safe slice `from` to the next, `to`:
- *  any slice between them (the short way, over the shore: the safe slices never
- *  wrap round behind the altar-stone), then `to` itself. Pure. */
+ *  any slice between them the short way round the wellspring (the ring wraps:
+ *  slice 3 and slice 0 meet behind it), then `to` itself. Two apart, both ways
+ *  are as short: the way of rising slice numbers (round the shore by rising
+ *  bearings, clockwise seen from above) is the one put out. Pure. */
 export function wheelCrossing(from: number, to: number): number[] {
   if (from === to) return [];
+  const n = WHEEL_SLICES;
+  const up = (((to - from) % n) + n) % n;
+  const step = up <= n - up ? 1 : -1;
   const out: number[] = [];
-  const step = to > from ? 1 : -1;
-  for (let slice = from + step; slice !== to; slice += step) out.push(slice);
+  for (let slice = (from + step + n) % n; slice !== to; slice = (slice + step + n) % n)
+    out.push(slice);
   out.push(to);
   return out;
 }

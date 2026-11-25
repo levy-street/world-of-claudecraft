@@ -1,5 +1,6 @@
 // The static collider set of an authored field, in instance-local yards:
-// generated cliff walls, authored walls, and prop footprints. Built once per
+// generated cliff walls, authored walls (boxes and round ones), and prop
+// footprints. Built once per
 // def (the interior collider seam caches it). Gate colliders are NOT here:
 // they belong to the dungeon's gate list (instances/dungeon_gates.ts), which
 // appends them tagged with their gate id.
@@ -40,6 +41,17 @@ export function authoredFieldColliders(def: AuthoredFieldDef, floorY: number): C
       hw: w.hw,
       hd: w.hd,
       rot: w.rot,
+      cameraTopY: floorY + authoredFieldHeight(def, w.x, w.z) + w.height,
+      ...(w.sightClear ? { sightClear: true } : {}),
+    });
+  }
+  for (const w of def.ringWalls ?? []) {
+    // One circle over the whole band: a body slides round it smoothly.
+    out.push({
+      type: 'circle',
+      x: w.x,
+      z: w.z,
+      r: w.outer,
       cameraTopY: floorY + authoredFieldHeight(def, w.x, w.z) + w.height,
       ...(w.sightClear ? { sightClear: true } : {}),
     });

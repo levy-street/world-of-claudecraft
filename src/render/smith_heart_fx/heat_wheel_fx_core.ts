@@ -61,8 +61,11 @@ export const WHEEL_FX = {
   fade: 2.6,
 } as const;
 
-/** The widest slice's span (radians): a slice shows vents by its share. */
-const WIDEST = Math.max(...WHEEL_ARCS_DEG.map(([a, b]) => b - a)) * (Math.PI / 180);
+/** The span (radians) that shows every vent: a slice shows vents by its share.
+ *  135 degrees, the widest slice before Jose's playtest of 2026-11-25 made the
+ *  four slices even quarters, so the vents keep their density and their count
+ *  over the whole Wheel (a quarter shows two thirds of them). */
+const WIDEST = Math.max(135, ...WHEEL_ARCS_DEG.map(([a, b]) => b - a)) * (Math.PI / 180);
 
 export interface WheelLook {
   /** 0..1 of the warning built (cracks spreading, plates heating). */

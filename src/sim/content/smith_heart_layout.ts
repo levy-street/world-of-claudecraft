@@ -21,7 +21,7 @@
 //     east, the Quench (descends to the Quench Basin at -30: packs q1 to q3,
 //       the Singing Ice, the frozen lake where the Smith cooled his work);
 //     west, the Heat (level, the Hearth, the Smith's first flame: packs f1
-//       to f3, the Pour Channel, the Hearth's mouth and its altar-stone; the
+//       to f3, the Pour Channel, the Hearth's mouth and its wellspring; the
 //       ids below keep the forge names they had before phase 2I);
 //   -> four colours lit on the heart seal, on the Seal Dais in the middle of
 //   the Ring, reached by the Grand Stair down from the Balcony's tip or by the
@@ -51,8 +51,8 @@ import type {
   AuthoredFieldDef,
   FieldPolySurface,
   FieldProp,
+  FieldRingWall,
   FieldSurface,
-  FieldWall,
 } from '../instances/authored_field/types';
 import { bearingDeg, isleFloorSurfaces } from './smith_heart_isle_floor';
 
@@ -431,44 +431,31 @@ export const FORGE_POINTS: readonly (readonly [number, number])[] = [
 /** The Hearth's mouth in the rock behind the west wall (render only; nothing
  *  of it stands over the floor). */
 export const GREAT_HEARTH = { x: -263, z: 0, halfWidth: 18 } as const;
-/** The great altar-stone (once the giant anvil: its footprint and height),
- *  side-on to the arena's door, its crystal crown north. */
-export const GIANT_ANVIL = { x: -236, z: 0, hw: 3.2, hd: 8.5, h: 9 } as const;
 /** The first wellspring (design doc 7.4): the pool of the first flame
- *  before the altar-stone, where the giant Guardian of the Heat stands sunk to
- *  its waist the whole fight (it never leaves it). `r` its burning lip
- *  (HEAT_WELL_R: the guardian's body radius too, melee strikes it from the
- *  shore). Its back lip clears the altar-stone's east face (pass 4 grew it
- *  from 8 to 10.5 and moved its middle 4 yd east: its lip's basalt stumps
- *  clear the stone). Instance-local. */
+ *  where the giant Guardian of the Heat stands sunk to its waist the whole
+ *  fight (it never leaves it). `r` its burning lip (HEAT_WELL_R). Pass 4 grew
+ *  it from 8 to 10.5 and moved its middle 4 yd east; since Jose's playtest of
+ *  2026-11-25 the altar-stone that stood behind it is gone and the shore runs
+ *  all the way round (the raid fights it from every side). Instance-local. */
 export const HEARTH_WELL = { x: -220, z: 0, r: HEAT_WELL_R } as const;
 
-/** The lip wall's collider ring: segments round the wellspring, each an
- *  OBB spanning HEAT_LIP_WALL's band (its outer face flat at `outer` at
- *  each segment's middle), overlapping its neighbours so the ring has no
- *  gap. Sight-clear (a sight line passes over it to the guardian), solid to
- *  every body (Jose's playtest of 2026-11-24: nobody walks into the stumps
- *  and the fire). */
-export const HEARTH_LIP_SEGMENTS = 32;
-export const HEARTH_LIP_WALLS: readonly FieldWall[] = Array.from(
-  { length: HEARTH_LIP_SEGMENTS },
-  (_, i) => {
-    const a = (i / HEARTH_LIP_SEGMENTS) * Math.PI * 2;
-    const mid = (HEAT_LIP_WALL.inner + HEAT_LIP_WALL.outer) / 2;
-    const half = HEAT_LIP_WALL.outer * Math.tan(Math.PI / HEARTH_LIP_SEGMENTS) + 0.15;
-    return {
-      id: `heat_lip_${i}`,
-      x: HEARTH_WELL.x + Math.sin(a) * mid,
-      z: HEARTH_WELL.z + Math.cos(a) * mid,
-      hw: half,
-      hd: (HEAT_LIP_WALL.outer - HEAT_LIP_WALL.inner) / 2,
-      // three.js yaw: local x runs along the ring (tangent), local z out.
-      rot: a,
-      height: HEAT_LIP_WALL.height,
-      sightClear: true,
-    };
-  },
-);
+/** The lip wall round the wellspring: one round wall over HEAT_LIP_WALL's
+ *  band, colliding as a single circle of its outer face (Jose's playtest of
+ *  2026-11-25: the 32 box segments it was built of left corners a melee
+ *  player walking sideways along it snagged on; a circle slides smoothly).
+ *  Sight-clear (a sight line passes over it to the guardian), solid to every
+ *  body (the playtest of 2026-11-24: nobody walks into the stumps and the
+ *  fire). The guardian inside it is pinned to the well's middle by the
+ *  encounter (heat.ts holdStance). */
+export const HEARTH_LIP_RING: FieldRingWall = {
+  id: 'heat_lip',
+  x: HEARTH_WELL.x,
+  z: HEARTH_WELL.z,
+  inner: HEAT_LIP_WALL.inner,
+  outer: HEAT_LIP_WALL.outer,
+  height: HEAT_LIP_WALL.height,
+  sightClear: true,
+};
 
 // ---- the Heart: the separate final room ---------------------------------------------
 
@@ -1363,8 +1350,10 @@ const PROPS: FieldProp[] = [
   { kind: 'sh_ice_blade', x: 170, z: -96, rot: 1.2, r: 0.8, h: 4 },
   // The Heat (the Hearth, phase 2I; the kinds keep their forge names): the
   // crystal clusters (`sh_crucible`), the wellspring (`sh_pour_crucible`),
-  // the Hearth's mouth, its ember boulders (`sh_great_bellows`), the
-  // altar-stone (`sh_giant_anvil`), the seams of fire (`sh_casting_channel`).
+  // the Hearth's mouth, its ember boulders (`sh_great_bellows`), the seams
+  // of fire (`sh_casting_channel`). The altar-stone (`sh_giant_anvil`) that
+  // stood behind the wellspring went with Jose's playtest of 2026-11-25: the
+  // shore runs all the way round the guardian.
   { kind: 'sh_crucible', x: -100, z: 11, rot: 0, r: 2.4, h: 6 },
   { kind: 'sh_crucible', x: -100, z: -11, rot: 0, r: 2.4, h: 6 },
   { kind: 'sh_pour_crucible', x: POUR_CHANNEL.x, z: 31, rot: Math.PI, r: 3, h: 10 },
@@ -1386,15 +1375,6 @@ const PROPS: FieldProp[] = [
     hw: 4,
     hd: 6.5,
     h: 6,
-  },
-  {
-    kind: 'sh_giant_anvil',
-    x: GIANT_ANVIL.x,
-    z: GIANT_ANVIL.z,
-    rot: 0,
-    hw: GIANT_ANVIL.hw,
-    hd: GIANT_ANVIL.hd,
-    h: GIANT_ANVIL.h,
   },
   { kind: 'sh_crucible', x: -196, z: 38, rot: 0, r: 2.4, h: 6 },
   { kind: 'sh_crucible', x: -196, z: -38, rot: 0, r: 2.4, h: 6 },
@@ -1418,7 +1398,8 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   })),
   mapVoid: 'mist',
   surfaces: SURFACES,
-  walls: HEARTH_LIP_WALLS,
+  walls: [],
+  ringWalls: [HEARTH_LIP_RING],
   props: PROPS,
   lightZones: [
     { id: 'cleft', x: -150, z: -222, r: 68, key: 0xc8c0b0, accent: 0xc8903c, fog: 0x5a5448 },

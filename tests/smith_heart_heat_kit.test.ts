@@ -62,7 +62,6 @@ import {
 } from '../src/render/smith_heart/heat_kit_plan_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import {
-  GIANT_ANVIL,
   GREAT_HEARTH,
   HEAT,
   POUR_CHANNEL,
@@ -303,10 +302,7 @@ describe('Smith Heart Heat kit: the measures the plan relies on', () => {
     expect(reach('Kit_Wellspring', 3)).toBeLessThanOrEqual(
       (prop('sh_pour_crucible')?.r ?? 0) + 0.5,
     );
-    // The altar-stone on the old anvil's box, the boulders on the bellows'.
-    const [ax, az] = box('Kit_AltarStone', 3);
-    expect(ax).toBeLessThanOrEqual(GIANT_ANVIL.hw + 0.5);
-    expect(az).toBeLessThanOrEqual(GIANT_ANVIL.hd + 0.5);
+    // The boulders on the bellows' box.
     const bellows = prop('sh_great_bellows');
     const [bx, bz] = box('Kit_EmberBoulder', 3);
     expect(bx).toBeLessThanOrEqual((bellows?.hw ?? 0) + 0.5);
@@ -388,7 +384,10 @@ describe('Smith Heart Heat kit: the plan', () => {
     const of = (piece: string) => plan.filter((p) => p.piece === piece).length;
     const kinds = (kind: string) => F.props.filter((p) => p.kind === kind).length;
     expect(of('Kit_HearthMouth')).toBe(kinds('sh_great_hearth'));
-    expect(of('Kit_AltarStone')).toBe(kinds('sh_giant_anvil'));
+    // The altar-stone went with Jose's playtest of 2026-11-25 (the shore all
+    // the way round the guardian).
+    expect(of('Kit_AltarStone')).toBe(0);
+    expect(kinds('sh_giant_anvil')).toBe(0);
     expect(of('Kit_Wellspring')).toBe(kinds('sh_pour_crucible'));
     expect(of('Kit_EmberBoulder')).toBe(kinds('sh_great_bellows'));
     expect(of('Kit_FireCrystalA') + of('Kit_FireCrystalB')).toBe(kinds('sh_crucible'));
@@ -398,7 +397,7 @@ describe('Smith Heart Heat kit: the plan', () => {
     expect(seams.length).toBeGreaterThanOrEqual(kinds('sh_casting_channel') * 3);
     for (const p of seams) expect(authoredFieldSurfaceAt(F, p.x, p.z)?.id).toBe('smiths_forge');
     // Each piece on its prop's own spot.
-    for (const kind of ['sh_great_hearth', 'sh_giant_anvil', 'sh_pour_crucible']) {
+    for (const kind of ['sh_great_hearth', 'sh_pour_crucible']) {
       const prop = F.props.find((p) => p.kind === kind);
       expect(
         plan.some((p) => p.x === prop?.x && p.z === prop?.z && p.rot === prop?.rot),

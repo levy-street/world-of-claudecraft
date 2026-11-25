@@ -7,8 +7,9 @@
 // id, collider and spot the sim uses keeps its place; only its look changes:
 //   - the great hearth (`sh_great_hearth`) is the Hearth's mouth, a vast
 //     natural mouth in the mountain framed by radiating basalt columns, full
-//     of the first flame's crystal; the giant anvil (`sh_giant_anvil`) is a
-//     great altar-stone of fire-veined basalt on its footprint; the pour
+//     of the first flame's crystal (the giant anvil, `sh_giant_anvil`, was an
+//     altar-stone behind the wellspring until Jose's playtest of 2026-11-25
+//     opened the shore all the way round the guardian); the pour
 //     crucible (`sh_pour_crucible`) is a cracked wellspring brimming with
 //     white-gold fire at the Pour Channel's head; the crucibles
 //     (`sh_crucible`) are clusters of fire crystal; the bellows
@@ -47,7 +48,6 @@ export const HEAT_KIT_KINDS: ReadonlySet<string> = new Set([
   'sh_pour_crucible',
   'sh_great_hearth',
   'sh_great_bellows',
-  'sh_giant_anvil',
   'sh_casting_channel',
 ]);
 
@@ -125,7 +125,7 @@ export function heatChannelRun(): { x: number; z0: number; z1: number } {
 }
 
 /** The layout's props fitted with their pieces: the Hearth's mouth, the
- *  altar-stone, the wellspring, the crystal clusters, the ember boulders,
+ *  wellspring, the crystal clusters, the ember boulders,
  *  and the casting channels' seams of fire. */
 export function planHeatProps(): HeartKitPlacement[] {
   const out: HeartKitPlacement[] = [];
@@ -137,8 +137,6 @@ export function planHeatProps(): HeartKitPlacement[] {
       // Its front (local +Z) to the Forge; no shadow (the key comes from
       // behind it: its mass would darken the whole arena).
       out.push({ piece: 'Kit_HearthMouth', x: p.x, y, z: p.z, rot: p.rot, noShadow: true });
-    } else if (p.kind === 'sh_giant_anvil') {
-      out.push({ piece: 'Kit_AltarStone', x: p.x, y, z: p.z, rot: p.rot });
     } else if (p.kind === 'sh_pour_crucible') {
       out.push({ piece: 'Kit_Wellspring', x: p.x, y, z: p.z, rot: p.rot });
     } else if (p.kind === 'sh_great_bellows') {

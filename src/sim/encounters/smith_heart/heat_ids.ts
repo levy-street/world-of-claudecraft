@@ -4,8 +4,8 @@
 // template-id helpers of its encounter objects. No SimContext, no rng.
 //
 // "The well of the first flame": the guardian stands half sunk in the
-// wellspring at the back of the Hearth and the raid fights on the shore in
-// front of it (inspired by Ragnaros in Firelands as a CONCEPT only: every
+// wellspring in the Hearth and the raid fights on the shore all the way round
+// it (inspired by Ragnaros in Firelands as a CONCEPT only: every
 // name here is our own and was IP-checked, design doc 7.4).
 //
 // EVERY number here is a SKETCH, unmeasured (the design doc's 7.4 table says
@@ -313,10 +313,13 @@ const HEROIC_WAVES: HeatDifficultyRules['waves'] = [
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
   normal: {
     // The parse-calibrated pass of 2026-11-16: the raid's damage and the
-    // swing +15 percent (was 1), the Basalt Fist where it was.
-    damageMult: 1.15,
+    // swing +15 percent (was 1), the Basalt Fist where it was. The team's
+    // playtest of 2026-11-25 ("Normal hits too soft, the tanks most of all"):
+    // the raid's damage 1.15 to 1.3 and the swing 1.15 to 1.5 (+30 percent),
+    // the lethal punishments where they were.
+    damageMult: 1.3,
     punishMult: 1,
-    swingMult: 1.15,
+    swingMult: 1.5,
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
@@ -345,7 +348,9 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // Fist where it was; its pool x1.2 to x1.3.
     damageMult: 1.4375,
     punishMult: 1.25,
-    swingMult: 1.15,
+    // 1.15 to 1.5 with the team's playtest of 2026-11-25 (the tanks' hit +30
+    // percent on every tier).
+    swingMult: 1.5,
     // 1.45 to 1.2 with the base raised to 77,000 (2026-11-12): the Heroic
     // pool stays about where it was (92,800 to 92,400 base).
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
@@ -365,10 +370,11 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   },
   // Heroic whole, its Wheel quicker and a round longer.
   mythic: {
-    // Heroic's numbers of 2026-11-16 (the heroic row whole).
+    // Heroic's numbers of 2026-11-16 (the heroic row whole; its swing 1.5
+    // since 2026-11-25).
     damageMult: 1.4375,
     punishMult: 1.25,
-    swingMult: 1.15,
+    swingMult: 1.5,
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
@@ -421,11 +427,12 @@ export const HEAT_WELL_R = 10.5;
 /** The low wall of basalt stumps round the wellspring's lip (Jose's playtest
  *  of 2026-11-24: players walked into the stumps and the fire behind them).
  *  It is solid from the lip (`inner`) to its outer face (`outer`, yards from
- *  the well's middle): the layout's collider ring (smith_heart_layout.ts
- *  HEARTH_LIP_WALLS) keeps every body out of it and the fire, the renderer
+ *  the well's middle): the layout's round wall (smith_heart_layout.ts
+ *  HEARTH_LIP_RING, one circle collider since 2026-11-25 so a body slides
+ *  along it smoothly) keeps every body out of it and the fire, the renderer
  *  draws its stumps over the same band and clips every floor mark at its
  *  outer face (nothing a player can stand on lies inside it). `height` its
- *  top over the floor: under a player's eye line, and its colliders are
+ *  top over the floor: under a player's eye line, and its collider is
  *  sight-clear, so it never hides the guardian. */
 export const HEAT_LIP_WALL = { inner: HEAT_WELL_R, outer: HEAT_WELL_R + 2, height: 1.4 } as const;
 
@@ -490,7 +497,9 @@ export const HEAT_TUNING = {
   // Cinder Grip (the template's stackPoison): per stack a second.
   // 18 until the bot raid of 2026-11-04: swapped at 5 stacks, both tanks still
   // burned 90 a second each for 15 s, more than two level-20 healers keep up.
-  gripPerTick: 9,
+  // 9 until the team's playtest of 2026-11-25 ("the tank buster and its melee
+  // hit too soft"): 12, a third more, 60 a second at the swap's 5 stacks.
+  gripPerTick: 12,
   gripSeconds: 15,
   gripMaxStacks: 10,
   /** The tanks swap at this many Cinder Grip stacks, every tier (the bot
@@ -690,13 +699,17 @@ export const ZONE_BANDS: readonly (readonly [number, number])[] = [
  *  tier's, HEAT_DIFFICULTY `wheel.rounds`). */
 export const WHEEL_SLICES = 4;
 
-/** A slice's bearings round the wellspring (sim facing, degrees): 45 degrees each
- *  over the shore, the two ends taking in the floor behind it. */
+/** A slice's bearings round the wellspring (sim facing, degrees, 0 north and
+ *  90 east toward the door): four even quarters all the way round since Jose's
+ *  playtest of 2026-11-25 took the altar-stone away (the raid stands behind
+ *  the guardian too). Before, two 45 degree slices over the front shore and
+ *  the two ends taking in the floor behind it. The door's bearing is the line
+ *  between slices 1 and 2, as it was. */
 export const WHEEL_ARCS_DEG: readonly (readonly [number, number])[] = [
-  [-90, 45],
-  [45, 90],
-  [90, 135],
-  [135, 270],
+  [-90, 0],
+  [0, 90],
+  [90, 180],
+  [180, 270],
 ];
 
 export type HeatWheelState = 'warn' | 'burn' | 'safe';

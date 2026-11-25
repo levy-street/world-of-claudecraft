@@ -180,23 +180,14 @@ export function planHeatAir(density = 1): HeatAirPlan {
     const p = hearthThroatPoint(bx, by, hearthThroatFloor(by));
     flames.push({ x: p.x, y: p.y, z: p.z, w, h });
   }
-  // The halos: every crystal cluster, the wellspring, the altar-stone's
-  // crown, and the Hearth's heart (the vein's beacon from the bridge).
+  // The halos: every crystal cluster, the wellspring, and the Hearth's heart
+  // (the vein's beacon from the bridge).
   const halos: HeatCard[] = [];
   for (const p of SMITH_HEART_FIELD.props) {
     const y = heartPropBase(p.x, p.z);
     if (p.kind === 'sh_crucible') halos.push({ x: p.x, y: y + 3.4, z: p.z, size: 7 });
     else if (p.kind === 'sh_pour_crucible')
       halos.push({ x: p.x, y: y + HEAT_WELL_FIRE + 1.4, z: p.z, size: 6.5 });
-    else if (p.kind === 'sh_giant_anvil') {
-      // Its crown at the north end (local +z).
-      halos.push({
-        x: p.x + Math.sin(p.rot) * 6.8,
-        y: y + 7.6,
-        z: p.z + Math.cos(p.rot) * 6.8,
-        size: 6,
-      });
-    }
   }
   const heart = hearthThroatPoint(-0.5, 22, 9);
   halos.push({ x: heart.x, y: heart.y, z: heart.z, size: 20 });

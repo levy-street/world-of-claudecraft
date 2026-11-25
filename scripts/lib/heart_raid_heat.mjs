@@ -192,7 +192,7 @@ export const heat = {
     world.o = o;
   },
 
-  // The lip wall's colliders (smith_heart_layout.ts HEARTH_LIP_WALLS): a bot
+  // The lip wall's collider (smith_heart_layout.ts HEARTH_LIP_RING): a bot
   // crossing the shore walks round them, never into them (a straight line
   // between two Wheel slices near the wall clips it).
   // A Live Coal's bearer, and everyone else round one, steer clear too.

@@ -65,11 +65,16 @@ describe("Smith's Heart: a boss's swing per tier", () => {
 
 describe("Smith's Heart: the pass of 2026-11-16's damage per tier", () => {
   it('Normal: the raid +15 percent on every fight, the Quench 1.75 times (the tank swap pass)', () => {
-    for (const rows of [COUNCIL_DIFFICULTY, BREATH_DIFFICULTY, HEAT_DIFFICULTY, FINAL_DIFFICULTY]) {
+    for (const rows of [COUNCIL_DIFFICULTY, BREATH_DIFFICULTY, FINAL_DIFFICULTY]) {
       expect(rows.normal.damageMult).toBe(1.15);
       expect(rows.normal.swingMult).toBe(1.15);
       expect(rows.normal.punishMult).toBe(1);
     }
+    // The Heat since the team's playtest of 2026-11-25: Normal hit too soft,
+    // the tanks most of all (the raid 1.3, the swing 1.5).
+    expect(HEAT_DIFFICULTY.normal.damageMult).toBe(1.3);
+    expect(HEAT_DIFFICULTY.normal.swingMult).toBe(1.5);
+    expect(HEAT_DIFFICULTY.normal.punishMult).toBe(1);
     expect(QUENCH_DIFFICULTY.normal.damageMult).toBe(1.75);
     // The shatter only +15 percent on Normal.
     const shatter = QUENCH_DIFFICULTY.normal.damageMult * QUENCH_DIFFICULTY.normal.shatterMult;
@@ -87,7 +92,9 @@ describe("Smith's Heart: the pass of 2026-11-16's damage per tier", () => {
     expect(QUENCH_DIFFICULTY.heroic.damageMult).toBe(QUENCH_DIFFICULTY.normal.damageMult);
     expect(QUENCH_DIFFICULTY.heroic.swingMult).toBe(QUENCH_DIFFICULTY.normal.swingMult);
     expect(HEAT_DIFFICULTY.heroic.damageMult).toBeCloseTo(1.25 * 1.15, 6);
-    expect(HEAT_DIFFICULTY.heroic.swingMult).toBe(1.15);
+    // The tanks' hit +30 percent on every tier since 2026-11-25.
+    expect(HEAT_DIFFICULTY.heroic.swingMult).toBe(1.5);
+    expect(HEAT_DIFFICULTY.mythic.swingMult).toBe(1.5);
     // Shattering Cold on Heroic keeps its total (2.5 times the tuning).
     const shatter = QUENCH_DIFFICULTY.heroic.damageMult * QUENCH_DIFFICULTY.heroic.shatterMult;
     expect(shatter).toBeCloseTo(2.5, 6);

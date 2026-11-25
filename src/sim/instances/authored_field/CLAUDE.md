@@ -13,7 +13,9 @@ render-only light zones. Everything else is DERIVED from that record:
 - `cliffs.ts`: every outline edge where the ground drops by more than
   `cliffStep` becomes a cliff run (merged per edge, deduped spatially). The
   renderer dresses the same runs (retaining walls, rock faces, balustrades).
-- `field_colliders.ts`: cliff runs, walls and prop footprints as colliders.
+- `field_colliders.ts`: cliff runs, walls and prop footprints as colliders; a round wall
+  (`FieldRingWall`, `ringWalls`) is ONE circle collider (a body slides round it, no box
+  corners to snag on), and `ring_wall.ts` lays its band out as boxes for the map only.
   Gate colliders are appended by `interior_collider_sets.ts` from the owning
   dungeon's `DungeonDef.gates` (see `../dungeon_gates.ts`).
 - `registry.ts`: interior key to record and to height function. `world.ts`

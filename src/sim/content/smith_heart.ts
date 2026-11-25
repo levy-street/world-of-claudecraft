@@ -1040,7 +1040,7 @@ export const SMITH_HEART_BLADE_OBJECTS: DungeonObjectSpawn[] = QUENCH_BLADE_SPOT
   lootable: false,
 }));
 
-/** The first wellspring at the foot of the Hearth's altar-stone (design doc
+/** The first wellspring in the Hearth's arena (design doc
  *  7.4): spawned with the claim, its state in the template id (calm, the
  *  Hearth overflowing); the Guardian of the
  *  Heat stands half sunk in it (encounters/smith_heart/heat.ts). */

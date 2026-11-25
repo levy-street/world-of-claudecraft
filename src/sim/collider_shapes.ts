@@ -66,6 +66,9 @@ export interface CircleCollider {
    * name itself. Absent = a built-in record collider.
    */
   src?: string;
+  /** See {@link ObbCollider.sightClear} (an authored field's round low wall,
+   *  `FieldRingWall.sightClear`: the Guardian of the Heat's lip wall). */
+  sightClear?: boolean;
 }
 
 export interface ObbCollider {
@@ -169,7 +172,7 @@ export type Collider = CircleCollider | ObbCollider | PrismCollider;
  *  footprint: a sight-clear wall always, and (`skipLow`, where tops are
  *  known) any collider whose top is at or under the line. */
 export function sightPassesOver(c: Collider, sightY: number, skipLow: boolean): boolean {
-  if (c.type === 'obb' && c.sightClear) return true;
+  if ((c.type === 'obb' || c.type === 'circle') && c.sightClear) return true;
   return skipLow && c.cameraTopY !== undefined && c.cameraTopY <= sightY;
 }
 

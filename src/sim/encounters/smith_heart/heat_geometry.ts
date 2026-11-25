@@ -4,8 +4,8 @@
 //
 //   the floor      the Hearth's eight-sided hall (`FORGE_POINTS`, the
 //                  `smiths_forge` surface): the fight's players stand on it
-//   the wellspring `HEARTH_WELL` at the foot of the altar-stone: the
-//                  guardian stands in it, whoever steps in burns, and
+//   the wellspring `HEARTH_WELL` in the hall, the shore all the way round
+//                  it: the guardian stands in it, whoever steps in burns, and
 //                  everything is measured from its middle (Hearth Flare's
 //                  reach, Wakefire's bands, the overflow's rivers)
 //   the lanes      Basalt Fist's three Molten Swell lanes and the overflow's
@@ -16,7 +16,12 @@
 //   the posts      where the Wellspawn climb out, the Wellkeepers rise, and
 //                  the shore points a Rolling Cinder lands on
 
-import { FORGE_POINTS, HEART_ROOM, HEARTH_WELL } from '../../content/smith_heart_layout';
+import {
+  FORGE_POINTS,
+  HEART_ROOM,
+  HEARTH_WELL,
+  SMITH_HEART_FIELD,
+} from '../../content/smith_heart_layout';
 import {
   HEAT_LIP_WALL,
   type HeatWaveRule,
@@ -60,15 +65,14 @@ export function inWell(x: number, z: number): boolean {
 /** Where a body standing at (x, z) inside the lip wall (deeper than half a
  *  yard past its outer face) is set down: straight out along its bearing onto the shore, `body` yards (its
  *  radius) past the wall (due east, toward the door, from the exact middle);
- *  null when it already stands outside. The wall's colliders hold a body
+ *  null when it already stands outside. The wall's collider holds a body
  *  walking in from the shore; this frees one that got inside some other way
  *  (a leap or a teleport onto the well), which the ring would otherwise trap
  *  in the fire. */
 export function outOfLip(x: number, z: number, body: number): HPoint | null {
   const d = wellDistance(x, z);
-  // A body grazing the wall's outer face is the colliders' to settle (behind
-  // the well the altar-stone's foot squeezes it there); only one inside it is
-  // set down.
+  // A body grazing the wall's outer face is the collider's to settle; only
+  // one inside it is set down.
   if (d >= HEAT_LIP_WALL.outer - 0.5) return null;
   const out = HEAT_LIP_WALL.outer + body + 0.05;
   if (d < 1e-6) return { x: HEARTH_WELL.x + out, z: HEARTH_WELL.z };
@@ -320,21 +324,39 @@ export const WELLKEEPER_SPOTS: readonly HPoint[] = [
   { x: -201, z: 17 },
 ];
 
-/** The shore's points (a 6-yard lattice on the floor east of the
- *  wellspring's middle, clear of the walls by 3, and far enough out that a
- *  landing's burning circle, `T.cinderLandR`, stays off the lip wall and the
- *  boss's disc: Jose's playtest of 2026-11-24): where a Rolling Cinder
- *  lands. Built once, in a fixed order. */
 /** The nearest a shore point lies to the well's middle: a landing's circle
  *  edge clear of the lip wall's outer face. */
 export const SHORE_MIN = HEAT_LIP_WALL.outer + T.cinderLandR;
 
+/** Does a landing's circle at (x, z) overlap a prop's solid footprint on the
+ *  Hearth's floor (a crystal cluster, an ember boulder), with a yard spare? */
+function onHearthProp(x: number, z: number): boolean {
+  const reach = T.cinderLandR + 1;
+  for (const p of SMITH_HEART_FIELD.props) {
+    if (!inHearthFloor(p.x, p.z)) continue;
+    if (p.r !== undefined) {
+      if (Math.hypot(x - p.x, z - p.z) < p.r + reach) return true;
+    } else if (p.hw !== undefined && p.hd !== undefined) {
+      const half = Math.hypot(p.hw, p.hd);
+      if (Math.hypot(x - p.x, z - p.z) < half + reach) return true;
+    }
+  }
+  return false;
+}
+
+/** The shore's points (a 6-yard lattice on the floor all the way round the
+ *  wellspring, clear of the walls by 3, and far enough out that a landing's
+ *  burning circle, `T.cinderLandR`, stays off the lip wall and the boss's
+ *  disc: Jose's playtest of 2026-11-24; and off the hall's crystal clusters
+ *  and ember boulders): where a Rolling Cinder lands. East of the well's
+ *  middle only until Jose's playtest of 2026-11-25 took the altar-stone away
+ *  and opened the shore behind the guardian. Built once, in a fixed order. */
 export const SHORE_POINTS: readonly HPoint[] = (() => {
   const out: HPoint[] = [];
   for (let x = -250; x <= -176; x += 6) {
     for (let z = -42; z <= 42; z += 6) {
       if (!inHearthFloor(x, z) || wellDistance(x, z) < SHORE_MIN) continue;
-      if (x < HEARTH_WELL.x - 2) continue;
+      if (onHearthProp(x, z)) continue;
       const clear =
         inHearthFloor(x + 3, z) &&
         inHearthFloor(x - 3, z) &&

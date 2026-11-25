@@ -1,8 +1,9 @@
 // The Guardian of the Heat (docs/design/raid/smith_heart.md section 7.4): the
 // Hearth's boss, a being of the first flame in crystal and basalt, "the well
-// of the first flame". A giant sunk to its waist in the wellspring at the
-// back of the Hearth, it never moves on any difficulty; the raid fights on
-// the shore in front of it.
+// of the first flame". A giant sunk to its waist in the wellspring in the
+// Hearth, it never moves on any difficulty; the raid fights on the shore all
+// the way round it (Jose's playtest of 2026-11-25 took the altar-stone that
+// stood behind it away).
 //
 //   Every phase        the Wheel of the Hearth (heat_wheel.ts): the shore cut
 //                      in four, three slices erupting and one safe, round

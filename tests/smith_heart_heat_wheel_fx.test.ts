@@ -114,10 +114,12 @@ describe('heat_wheel_fx_core: a slice warns, erupts and cools', () => {
     expect(geysers).toBe(Math.ceil(WHEEL_FX.vents / WHEEL_FX.geyserEvery));
     // Deterministic.
     expect(Array.from(wheelVents())).toEqual(Array.from(vents));
-    const wide = wheelArc(0);
-    const narrow = wheelArc(1);
-    expect(wheelVentCount(wide.from, wide.to, true)).toBe(WHEEL_FX.vents);
-    expect(wheelVentCount(narrow.from, narrow.to, true)).toBe(Math.round(WHEEL_FX.vents / 3));
+    // Four even quarters since 2026-11-25: each shows two thirds of the vents
+    // (the density of the old 135 degree slice), the Wheel's whole count kept.
+    for (const slice of WHEEL_ARCS_DEG.keys()) {
+      const q = wheelArc(slice);
+      expect(wheelVentCount(q.from, q.to, true)).toBe(Math.round((WHEEL_FX.vents * 2) / 3));
+    }
     for (const slice of WHEEL_ARCS_DEG.keys()) {
       const a = wheelArc(slice);
       const full = wheelVentCount(a.from, a.to, true);
@@ -378,7 +380,14 @@ describe('the Wheel inside HeatFightFx over a fake world', () => {
     st.fistTimer = 999;
     st.wheelTimer = 999;
     let run = 0;
-    while (!wheelSafes(run, 3).some((v, i, a) => i > 0 && Math.abs(v - a[i - 1]) === 2)) run++;
+    // A run that wraps round behind the well (3 to 0 or 0 to 3: the quarters
+    // run all the way round since 2026-11-25), bounded.
+    while (
+      run < 500 &&
+      !wheelSafes(run, 3).some((v, i, a) => i > 0 && Math.abs(v - a[i - 1]) === 3)
+    )
+      run++;
+    expect(run).toBeLessThan(500);
     st.wheelRuns = run;
     const entities = new Map<number, Entity>();
     const me = entity('player', 'warrior', -206, 2);

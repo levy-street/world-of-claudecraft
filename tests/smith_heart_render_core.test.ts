@@ -870,13 +870,11 @@ describe('heart_plan_core: the props and the lights', () => {
     // The Breath reads by its floating isles (smith_heart_fx/breath_isles_fx.ts).
     expect(tallest('sh_sunk_blade')).toBeGreaterThan(10);
     expect(tallest('sh_great_hearth')).toBeGreaterThan(20);
-    expect(tallest('sh_giant_anvil')).toBeGreaterThan(8);
     // The Heat is smith fire, never a volcano: no lava-red anywhere in it.
     expect(SMITH_HEART_VEIN_COLORS.heat).toBe(0xffe6a0);
-    // The giant anvil stands in the Smith's Forge, before the hearth.
-    const anvil = F.props.find((p) => p.kind === 'sh_giant_anvil');
-    expect(anvil && onFloor(anvil.x, anvil.z)).toBe(true);
-    expect(anvil && anvil.x < HEAT.floor.x0).toBe(true);
+    // The giant anvil (the altar-stone) is gone from the Hearth since Jose's
+    // playtest of 2026-11-25: the shore runs all the way round the guardian.
+    expect(F.props.some((p) => p.kind === 'sh_giant_anvil')).toBe(false);
   });
 
   it('keys each vein in its colour and keeps at most eight lights per light zone', () => {

@@ -57,7 +57,6 @@ import { SMITH_HEART_DUNGEON } from '../src/sim/content/smith_heart';
 import {
   BREATH,
   CORNICE_OPEN_RIM,
-  GIANT_ANVIL,
   HAMMER_PIT,
   HEART_ALTARS,
   HEART_ROOM,
@@ -265,10 +264,9 @@ describe('the guardians', () => {
     expect(
       ((q.x - QUENCH.lake.x) / QUENCH.lake.rx) ** 2 + ((q.z - QUENCH.lake.z) / QUENCH.lake.rz) ** 2,
     ).toBeLessThan(0.85);
-    // The Hearth: out of the wellspring and clear of the altar-stone, inside the hall.
+    // The Hearth: out of the wellspring, inside the hall.
     const h = spot(HEAT_GUARDIAN);
     expect(Math.hypot(h.x - HEARTH_WELL.x, h.z - HEARTH_WELL.z)).toBeGreaterThan(HEARTH_WELL.r + 8);
-    expect(h.x - (GIANT_ANVIL.x + GIANT_ANVIL.hw)).toBeGreaterThan(10);
     expect(h.x).toBeLessThan(-180);
     // The Heart: on the platform, clear of the vein altars.
     const f = spot(FINAL_BOSS);

@@ -54,19 +54,28 @@ function tier(tierName: 'normal' | 'heroic' | 'mythic', n = 4, phase = 2): HeatF
   return f;
 }
 
-/** A spot on the shore in `slice`, `r` yards from the wellspring. */
+/** A spot on the shore in the middle of `slice`, `r` yards from the wellspring. */
 function spot(slice: number, r = 22) {
-  const deg = (slice * 45 + 22.5) * (Math.PI / 180);
+  const [a, b] = WHEEL_ARCS_DEG[slice];
+  const deg = ((a + b) / 2) * (Math.PI / 180);
   return { x: HEARTH_WELL.x + Math.sin(deg) * r, z: HEARTH_WELL.z + Math.cos(deg) * r };
 }
 
-/** A run whose safe slices step two over at least once (the hard crossing). */
-function twoStepRun(rounds: number): number {
+/** Slices apart round the ring (0 to 2: the ring wraps behind the well). */
+function apart(a: number, b: number): number {
+  const d = (((a - b) % WHEEL_SLICES) + WHEEL_SLICES) % WHEEL_SLICES;
+  return Math.min(d, WHEEL_SLICES - d);
+}
+
+/** A run whose safe slices wrap round behind the well at least once (3 to 0
+ *  or 0 to 3: the crossing the altar-stone used to close). */
+function wrapRun(rounds: number): number {
   for (let run = 0; run < 200; run++) {
     const safes = wheelSafes(run, rounds);
-    for (let i = 1; i < safes.length; i++) if (Math.abs(safes[i] - safes[i - 1]) === 2) return run;
+    for (let i = 1; i < safes.length; i++)
+      if (Math.abs(safes[i] - safes[i - 1]) === WHEEL_SLICES - 1) return run;
   }
-  throw new Error('no two-step run');
+  throw new Error('no wrapping run');
 }
 
 /** A slice's bearing span (radians, sim facing). */
@@ -75,17 +84,20 @@ function arcOf(slice: number): [number, number] {
   return [(a * Math.PI) / 180, (b * Math.PI) / 180];
 }
 
-/** The walk from slice `from` to slice `to` at `ring` yards from the
+/** The walk from slice `from` to its neighbour `to` at `ring` yards from the
  *  wellspring: from `inset` inside `from`'s edge toward `to` to `inset` inside
- *  `to`, the short way (over the shore), straight where that line clears the
- *  lip wall by a body's half yard, else round it; one point per tick at run
- *  speed. */
+ *  `to`, the short way round (wrapping behind the well from slice 3 to 0),
+ *  straight where that line clears the lip wall by a body's half yard, else
+ *  round it; one point per tick at run speed. */
 function crossingPath(from: number, to: number, ring: number, inset: number) {
   const [f0, f1] = arcOf(from);
   const [t0, t1] = arcOf(to);
-  const up = to > from;
+  const up = (to - from + WHEEL_SLICES) % WHEEL_SLICES === 1;
   const a0 = up ? f1 - inset : f0 + inset;
-  const a1 = up ? t0 + inset : t1 - inset;
+  // The bearing round from `from`'s edge (unwrapped, so 270 meets -90 + 360).
+  let a1 = up ? t0 + inset : t1 - inset;
+  if (up && a1 < a0 - Math.PI) a1 += 2 * Math.PI;
+  if (!up && a1 > a0 + Math.PI) a1 -= 2 * Math.PI;
   const at = (a: number) => ({
     x: HEARTH_WELL.x + Math.sin(a) * ring,
     z: HEARTH_WELL.z + Math.cos(a) * ring,
@@ -125,27 +137,43 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
     expect(M.hit).toBe(1);
   });
 
-  it('the slices: four round the shore, every bearing in exactly one', () => {
+  it('the slices: four even quarters all the way round, every bearing in exactly one', () => {
+    // Jose's playtest of 2026-11-25: the altar-stone is gone, the shore runs
+    // behind the guardian too, and the Wheel covers it.
+    for (const [a, b] of WHEEL_ARCS_DEG) expect(b - a).toBe(90);
+    expect(WHEEL_ARCS_DEG[WHEEL_SLICES - 1][1] - WHEEL_ARCS_DEG[0][0]).toBe(360);
     for (let slice = 0; slice < WHEEL_SLICES; slice++) {
       const p = spot(slice);
       expect(wheelSliceAt(p.x, p.z)).toBe(slice);
     }
-    // Behind the wellspring it belongs to the slice at that end.
-    expect(wheelSliceAt(HEARTH_WELL.x - 5, HEARTH_WELL.z + 20)).toBe(0);
-    expect(wheelSliceAt(HEARTH_WELL.x - 5, HEARTH_WELL.z - 20)).toBe(3);
+    // Behind the wellspring (west): north of the line slice 0, south slice 3.
+    expect(wheelSliceAt(HEARTH_WELL.x - 20, HEARTH_WELL.z + 5)).toBe(0);
+    expect(wheelSliceAt(HEARTH_WELL.x - 20, HEARTH_WELL.z - 5)).toBe(3);
+    // Every bearing round the well lands in one slice, each slice a quarter.
+    const count = [0, 0, 0, 0];
+    for (let i = 0; i < 360; i++) {
+      const a = ((i + 0.5) * Math.PI) / 180;
+      count[wheelSliceAt(HEARTH_WELL.x + Math.sin(a) * 20, HEARTH_WELL.z + Math.cos(a) * 20)]++;
+    }
+    expect(count).toEqual([90, 90, 90, 90]);
   });
 
   it('the painted arcs are the same slices', () => {
     for (let slice = 0; slice < WHEEL_SLICES; slice++) {
       const arc = wheelArc(slice);
       const p = spot(slice);
-      const bearing = Math.atan2(p.x - HEARTH_WELL.x, p.z - HEARTH_WELL.z);
+      let bearing = Math.atan2(p.x - HEARTH_WELL.x, p.z - HEARTH_WELL.z);
+      // The shader's frame: bearings from -90 degrees round to 270.
+      if (bearing < -Math.PI / 2) bearing += 2 * Math.PI;
       expect(bearing).toBeGreaterThan(arc.from);
       expect(bearing).toBeLessThan(arc.to);
     }
   });
 
-  it('the safe slices: hashed, never the same twice running, one or two apart', () => {
+  it('the safe slices: hashed, never the same twice running, always the next quarter round', () => {
+    let wraps = 0;
+    let ups = 0;
+    let downs = 0;
     for (let run = 0; run < 40; run++) {
       const safes = wheelSafes(run, M.rounds);
       expect(safes.length).toBe(M.rounds);
@@ -153,20 +181,49 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
         expect(safes[i]).toBeGreaterThanOrEqual(0);
         expect(safes[i]).toBeLessThan(WHEEL_SLICES);
         if (i === 0) continue;
-        const gap = Math.abs(safes[i] - safes[i - 1]);
-        expect(gap === 1 || gap === 2).toBe(true);
+        expect(apart(safes[i], safes[i - 1])).toBe(1);
+        if (Math.abs(safes[i] - safes[i - 1]) === WHEEL_SLICES - 1) wraps++;
+        if ((safes[i] - safes[i - 1] + WHEEL_SLICES) % WHEEL_SLICES === 1) ups++;
+        else downs++;
       }
     }
+    // Both ways round, and round behind the well too.
+    expect(wraps).toBeGreaterThan(0);
+    expect(ups).toBeGreaterThan(0);
+    expect(downs).toBeGreaterThan(0);
     expect(wheelSafes(5, 3)).toEqual(wheelSafes(5, 3));
     expect(wheelSafes(5, 4).slice(0, 3)).toEqual(wheelSafes(5, 3));
   });
 
-  it('the crossing: the slices between, then the next safe one, the short way over the shore', () => {
+  it('the crossing: the slices between, then the next safe one, the short way round', () => {
     expect(wheelCrossing(0, 1)).toEqual([1]);
+    expect(wheelCrossing(2, 1)).toEqual([1]);
+    // Round behind the well (the ring wraps).
+    expect(wheelCrossing(3, 0)).toEqual([0]);
+    expect(wheelCrossing(0, 3)).toEqual([3]);
+    // Two apart, both ways as short: the rising way.
     expect(wheelCrossing(0, 2)).toEqual([1, 2]);
-    expect(wheelCrossing(3, 1)).toEqual([2, 1]);
-    expect(wheelCrossing(2, 0)).toEqual([1, 0]);
+    expect(wheelCrossing(3, 1)).toEqual([0, 1]);
     expect(wheelCrossing(2, 2)).toEqual([]);
+  });
+
+  it('a raider behind the guardian is struck by a red slice there and spared on a safe one', () => {
+    const f = mythic();
+    f.dev('/dev heart heat wheel');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const safe = st.wheelSafes[0];
+    const [a, b] = f.players;
+    // Behind the well (due west), each side of the line between slices 3 and 0.
+    const north = { x: HEARTH_WELL.x - 18, z: HEARTH_WELL.z + 4 };
+    const south = { x: HEARTH_WELL.x - 18, z: HEARTH_WELL.z - 4 };
+    const red = wheelSliceAt(north.x, north.z) === safe ? south : north;
+    const ok = red === north ? south : north;
+    f.put(a, red.x, red.z);
+    f.put(b, ok.x, ok.z);
+    const ev = f.tick(ticks(M.warn) + 1);
+    expect(hitsOf(ev, HEAT_NAMES.wheel, a.id).length).toBeGreaterThanOrEqual(1);
+    if (wheelSliceAt(ok.x, ok.z) === safe) expect(hitsOf(ev, HEAT_NAMES.wheel, b.id)).toEqual([]);
   });
 
   it('the templates read back', () => {
@@ -308,7 +365,7 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
       const f = tier(name, 2);
       const st = f.state();
       if (!st) throw new Error('no fight');
-      st.wheelRuns = twoStepRun(w.rounds);
+      st.wheelRuns = wrapRun(w.rounds);
       f.dev('/dev heart heat wheel');
       const safes = [...st.wheelSafes];
       const [a, b] = f.players;
@@ -336,17 +393,17 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
     const f = tier('heroic', 2);
     const st = f.state();
     if (!st) throw new Error('no fight');
-    st.wheelRuns = twoStepRun(w.rounds);
+    st.wheelRuns = wrapRun(w.rounds);
     f.dev('/dev heart heat wheel');
     const safes = [...st.wheelSafes];
     const slices = () => f.objects(HEAT_OBJECTS.wheelPrefix).map((e) => wheelOf(e.templateId));
     const burns = () => slices().filter((o) => o?.state === 'burn');
-    // Walk to the two-step crossing.
+    // Walk to the crossing that wraps round behind the well.
     let k = 1;
-    while (Math.abs(safes[k] - safes[k - 1]) !== 2) k++;
+    while (Math.abs(safes[k] - safes[k - 1]) !== WHEEL_SLICES - 1) k++;
     f.tick((ticks(w.warn) + 1) * k);
     const crossing = wheelCrossing(safes[k - 1], safes[k]);
-    expect(crossing.length).toBe(2);
+    expect(crossing).toEqual([safes[k]]);
     // At the eruption every red flares (the blow is seen), the way across only
     // briefly; the next round's safe slice is shown at once, its warning whole.
     const now = burns();
@@ -395,8 +452,7 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
         [HEAT_LIP_WALL.outer + 7, name === 'mythic' ? 0.3 : 0.75],
       ] as const) {
         for (let from = 0; from < WHEEL_SLICES; from++) {
-          for (const to of [from - 2, from - 1, from + 1, from + 2]) {
-            if (to < 0 || to >= WHEEL_SLICES) continue;
+          for (const to of [(from + 1) % WHEEL_SLICES, (from + WHEEL_SLICES - 1) % WHEEL_SLICES]) {
             const path = crossingPath(from, to, ring, inset);
             for (const p of path.points) {
               expect(inHearthFloor(p.x, p.z)).toBe(true);
@@ -417,7 +473,7 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
       const f = tier(name, 1);
       const st = f.state();
       if (!st) throw new Error('no fight');
-      st.wheelRuns = twoStepRun(w.rounds);
+      st.wheelRuns = wrapRun(w.rounds);
       f.dev('/dev heart heat wheel');
       const safes = [...st.wheelSafes];
       const [a] = f.players;

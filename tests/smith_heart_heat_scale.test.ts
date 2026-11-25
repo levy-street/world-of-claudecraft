@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest';
 import { effectivePlayerAttackRange } from '../src/sim/combat/player_attack_reach';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
-import { GIANT_ANVIL, HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
+import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import { HEAT_PULL_SPOT } from '../src/sim/dev/smith_heart_dev';
 import {
   beyondFlare,
@@ -54,16 +54,13 @@ describe('Guardian of the Heat: the grown wellspring', () => {
     expect(HEAT_BODY_R).toBe(HEAT_LIP_WALL.outer + 1);
   });
 
-  it('keeps its back lip and its stumps clear of the altar-stone', () => {
-    const backLip = HEARTH_WELL.x - HEARTH_WELL.r;
-    const altarFace = GIANT_ANVIL.x + GIANT_ANVIL.hw;
-    // The lip's basalt stumps stand about a yard past the lip.
-    expect(backLip - 1).toBeGreaterThan(altarFace);
-    // The whole pool and a melee ring round its front lie on the floor.
-    for (let a = -90; a <= 90; a += 15) {
+  it('stands the whole pool and a melee ring round it on the floor, all the way round', () => {
+    // Jose's playtest of 2026-11-25: the altar-stone behind it is gone, the
+    // raid strikes it from every side.
+    for (let a = 0; a < 360; a += 15) {
       const r = (a * Math.PI) / 180;
-      const x = HEARTH_WELL.x + Math.sin(Math.PI / 2 + r) * (HEARTH_WELL.r + 5);
-      const z = HEARTH_WELL.z + Math.cos(Math.PI / 2 + r) * (HEARTH_WELL.r + 5);
+      const x = HEARTH_WELL.x + Math.sin(r) * (HEARTH_WELL.r + 5);
+      const z = HEARTH_WELL.z + Math.cos(r) * (HEARTH_WELL.r + 5);
       expect(inHearthFloor(x, z)).toBe(true);
     }
   });

@@ -103,8 +103,27 @@ export interface FieldWall {
   rot: number;
   /** Visual height above the ground under its centre (sight top follows it). */
   height: number;
-  /** A low wall a sight line passes over (the Guardian of the Heat's lip
-   *  wall, under every eye): it blocks bodies, never line of sight. */
+  /** A low wall a sight line passes over (under every eye): it blocks
+   *  bodies, never line of sight. */
+  sightClear?: boolean;
+}
+
+/** A round low wall about a point (the Guardian of the Heat's lip wall round
+ *  its wellspring): a band from `inner` to `outer` yards off (x, z). It
+ *  collides as ONE circle of radius `outer` (field_colliders.ts), so a body
+ *  walking along it slides round a smooth curve (a ring of box segments left
+ *  corners a melee player snagged on: Jose's playtest of 2026-11-25); the map
+ *  draws its band (ring_wall.ts). Nothing stands inside it but what an
+ *  encounter pins there itself. */
+export interface FieldRingWall {
+  id: string;
+  x: number;
+  z: number;
+  inner: number;
+  outer: number;
+  /** Visual height above the ground under its centre (sight top follows it). */
+  height: number;
+  /** A low wall a sight line passes over: it blocks bodies, never sight. */
   sightClear?: boolean;
 }
 
@@ -162,6 +181,8 @@ export interface AuthoredFieldDef {
   /** Ordered: a later surface wins where two overlap. */
   surfaces: readonly FieldSurface[];
   walls: readonly FieldWall[];
+  /** Round low walls (FieldRingWall), each one circle collider. */
+  ringWalls?: readonly FieldRingWall[];
   props: readonly FieldProp[];
   lightZones: readonly FieldLightZone[];
   /** What the painted dungeon map shows in the void round the terraces (the
