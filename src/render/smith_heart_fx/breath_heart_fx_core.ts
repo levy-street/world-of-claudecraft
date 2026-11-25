@@ -40,6 +40,14 @@ export const HEART_FLOOR = {
   load: 38,
 } as const;
 
+/** How far over the Cornice's field floor the Knotted Gale's floor pieces lie
+ *  (its fuse ring, the carrier's load, a portal's disc and letter; yards).
+ *  The painted granite kit stands a hand over the field floor and rolls a
+ *  little, so a ring laid a tenth of a yard up sank into it in places and
+ *  flickered (Jose's playtest of 2026-11-25: the ball's circle clipped the
+ *  floor); the pieces also draw with a polygon offset toward the camera. */
+export const HEART_FLOOR_LIFT = 0.34;
+
 /** The floor rungs the rest of the Breath's fight draws on (its own telegraph kit's
  *  stay below 30). */
 export function heartRungs(): number[] {

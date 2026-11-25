@@ -192,3 +192,18 @@ describe('Knotted Gale: the portal letters read upright', () => {
     expect(glsl.FLOOR_FACING_VERT).toContain('wocCamRelView(vec3(xz.x, c.y, xz.y))');
   });
 });
+
+describe("the Knotted Gale's floor pieces sit on the Cornice's granite", () => {
+  it('lie well over the field floor (the painted kit stands a hand over it)', async () => {
+    const core = await import('../src/render/smith_heart_fx/breath_heart_fx_core');
+    // Jose's playtest of 2026-11-25: the ball's ring at a tenth of a yard
+    // sank into the granite and flickered.
+    expect(core.HEART_FLOOR_LIFT).toBeGreaterThanOrEqual(0.3);
+    expect(core.HEART_FLOOR_LIFT).toBeLessThan(0.6);
+    const { readFileSync } = await import('node:fs');
+    const src = readFileSync('src/render/smith_heart_fx/breath_heart_fx.ts', 'utf8');
+    expect(src).toContain('k.ring.position.set(eAt.x, floor + HEART_FLOOR_LIFT, eAt.z);');
+    expect(src).toContain('polygonOffsetFactor: -4');
+    expect(src).not.toMatch(/floor \+ 0\.1[0-2]?, eAt\.z/);
+  });
+});

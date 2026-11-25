@@ -38,6 +38,7 @@ import {
   flightGhost,
   flightScale,
   HEART_FLOOR,
+  HEART_FLOOR_LIFT,
   HEART_SIDES,
   type HeartObjectKind,
   type HeartPortalSide,
@@ -292,6 +293,10 @@ export class BreathHeartFx {
         depthWrite: false,
         blending: THREE.AdditiveBlending,
         toneMapped: false,
+        // Pulled toward the camera a touch: never z-fighting the granite.
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4,
         ...extra,
       });
       h.materials.push(m);
@@ -802,7 +807,7 @@ export class BreathHeartFx {
       k.shell.visible = true;
       k.core.visible = true;
       k.wind.visible = true;
-      k.ring.position.set(eAt.x, floor + 0.1, eAt.z);
+      k.ring.position.set(eAt.x, floor + HEART_FLOOR_LIFT, eAt.z);
       k.ring.scale.set(look.ringR, 1, look.ringR);
       k.ring.visible = true;
       k.ringColor.setHex(C.storm).lerp(_danger, look.danger);
@@ -816,7 +821,7 @@ export class BreathHeartFx {
       }
       k.load.visible = held;
       if (held) {
-        k.load.position.set(eAt.x, floor + 0.12, eAt.z);
+        k.load.position.set(eAt.x, floor + HEART_FLOOR_LIFT + 0.02, eAt.z);
         k.load.scale.set(1.5, 1, 1.5);
       }
     }
@@ -832,11 +837,11 @@ export class BreathHeartFx {
       const floor = h.groundY(eAt.x, eAt.z);
       const open = Math.min(1, (now - p.bornAt) / 0.5);
       p.open.value = open;
-      p.disc.position.set(eAt.x, floor + 0.08, eAt.z);
+      p.disc.position.set(eAt.x, floor + HEART_FLOOR_LIFT - 0.02, eAt.z);
       p.disc.scale.set(r * open, 1, r * open);
       p.funnel.position.set(eAt.x, floor + 0.05, eAt.z);
       p.funnel.scale.set(r * open, 6.5 * open, r * open);
-      p.letter.position.set(eAt.x, floor + 0.1, eAt.z);
+      p.letter.position.set(eAt.x, floor + HEART_FLOOR_LIFT, eAt.z);
       p.letter.scale.setScalar(r * 0.55 * open);
     }
     // The links of light within each pair: A to B a long flat beam at waist
@@ -866,7 +871,7 @@ export class BreathHeartFx {
       m.fill.value = markFill(aura.remaining, aura.duration);
       const eAt = fxAnchor(e);
       const floor = h.groundY(eAt.x, eAt.z);
-      m.ring.position.set(eAt.x, floor + 0.11, eAt.z);
+      m.ring.position.set(eAt.x, floor + HEART_FLOOR_LIFT + 0.01, eAt.z);
       m.ring.scale.set(T.heartPortalR, 1, T.heartPortalR);
       const letter = m.letter[m.which];
       letter.position.set(eAt.x, eAt.y + 3.6 + 0.12 * Math.sin(now * 4), eAt.z);
