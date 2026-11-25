@@ -23180,7 +23180,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.guardian_bulwark': '我的護盾……被撕開了。那就再嘗嘗狂風吧！',
   'hudChrome.breathGuardian.say.thessaly_isles': '它的護盾靠浮島供能！乘風飛過去，解決癒者再回來！',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。崖台四周沒有牆：被吹出邊緣，你會墜入虛空。只有攀登路口還立著牆，被壓在牆上時每秒受到{pinMin}到{pinMax}點傷害。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+    '氣息守護者的風在你站立時以每秒{speed}碼的速度將你帶往它吹去的方向。行走時你會去往你指向的地方：逆風行走會變慢，順風行走會變快，橫穿風向時它只以{cross}%的力度推你。它不會打斷你的施法。崖台四周沒有牆：被吹出邊緣，你會墜入虛空。',
   'hudChrome.auraEffect.breathGuardian.blast':
     '巔峰咆哮的狂風將你吹離守護者：在其口前每秒{speed}碼，越遠越弱，共持續{seconds}秒。立刻逆風直奔回去，或站進塞薩莉的錨點，否則會被吹下飛簷。',
   'hudChrome.auraEffect.breathGuardian.draw':
@@ -23214,7 +23214,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.portalD':
     '效果結束時，傳送門D會在你所站的位置打開。它只與傳送門C相連。站在遠離傳送門B的崖台邊緣。本輪你無法攜帶結風。',
   'hudChrome.auraEffect.breathGuardian.laden':
-    '你正攜帶結風：移動速度變為{walk}%，無法閃現、衝鋒或跳躍，風、拉扯、衝擊和擊飛都無法移動你。每個傳送門都會把你送到它的另一端：A到B，C到D。在崖台邊緣按下互動鍵，把它扔進虛空。效果結束時它會爆裂，殺死崖台上的所有人。',
+    '你正攜帶結風：移動速度變為{walk}%，無法閃現、衝鋒或跳躍，風、拉扯、衝擊和擊飛都無法移動你。在崖台邊緣按下互動鍵，把它扔進虛空。傳送門是一條捷徑：走進一個，你會從它的另一端出來（A到B；傳奇難度還有C到D）。效果結束時它會爆裂：距離它{core}碼以內的所有人無論有何護盾都會死亡，更遠的人受到的傷害隨距離遞減，在{far}碼或更遠處降至最大生命值的{floor}%。把它帶離團隊。',
   'abilityUi.cast.heart_breath_inhale': '深吸之息',
   'abilityUi.cast.heart_breath_storm_break': '風暴破裂',
   'abilityUi.cast.heart_breath_forking_bolt': '跳躍雷擊',
@@ -24773,7 +24773,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_gale_sentinel.name': '狂風哨兵',
   'entities.mobs.heart_gale_mender.name': '狂風癒者',
   'hudChrome.auraEffect.breathGuardian.cocoon':
-    '守護者引導天裂新星時無法受到傷害。若引導完成，新星對所有人造成最大生命值{share}%的傷害（英雄和傳奇難度：致命）。乘上賽薩莉隊長的上升氣流前往東西兩側的浮空島，引導兩塊靜風石來打斷它：已平息 {stilled}/2。',
+    '守護者引導天裂新星時無法受到傷害。若引導結束，新星會殺死所有人，無論有何護盾。乘上賽薩莉隊長的上升氣流前往東西兩側的浮空島，引導兩塊靜風石來打斷它：已平息 {stilled}/2。靜風石在其島上的敵人倒下後甦醒；島上的所有人都能同時引導它，引導的人越多，它充滿得越快。受到攻擊會打斷你的引導，但不會打斷石頭的進度。',
   'hudChrome.auraEffect.breathGuardian.ward':
     '偏轉來自其正面{arc}度以內攻擊的{cut}%傷害。在其目標將它轉開時攻擊它的背後。英雄和傳奇難度：{heroicCut}%。',
   'hudChrome.breathGuardian.say.thessaly_updraft': '島嶼已肅清！下一道上升氣流已經升起，快走！',
@@ -25002,7 +25002,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pings.enableSettingNote':
     '按住信號鍵開啟信號輪盤，輕按則向游標下的目標發出信號。只有你的隊伍或團隊能看到你的信號，每5秒最多4次。關閉後也會隱藏隊友的所有信號：沒有圖示、聲音、聊天訊息或小地圖標記。',
   'guide.controls.ping': '信號：輕按向游標下的目標發出信號，按住開啟信號輪盤',
-  'hudChrome.auraEffect.finalBoss.devilThrown': '被塵捲風拋出：被捲出旋風 {yards} 碼。在它把你放下之前你無法移動。',
+  'hudChrome.auraEffect.finalBoss.devilThrown':
+    '被塵捲風拋出：被捲出旋風 {yards} 碼。在它把你放下之前你無法移動。',
   'hudChrome.breathWind.turning': '風向轉變',
   'hudChrome.quenchIce.onIce': '冰面上',
   'hudChrome.quenchIce.breaking': '冰面破裂！',

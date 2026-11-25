@@ -22660,7 +22660,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_isles':
     'あの盾は浮島から力を得ている！ 風に乗って渡り、癒し手を倒して戻ってこい！',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。岩棚の周りに壁はない：縁から運び出されれば虚空へ落ちる。壁が残るのは登り口の上だけで、そこに押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
+    '息吹の守護者の風は、立っている間、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。歩けば向いた方へ進む：風に逆らえば遅くなり、風に乗れば速くなり、風を横切る時は{cross}%の強さでしか押されない。詠唱は中断されない。岩棚の周りに壁はない：縁から運び出されれば虚空へ落ちる。',
   'hudChrome.auraEffect.breathGuardian.blast':
     'サミットロアの突風があなたをガーディアンから吹き飛ばす：口元では毎秒{speed}ヤード、離れるほど弱まり、合計{seconds}秒続く。すぐに風に逆らってまっすぐ戻るか、セサリーの錨に立つこと。さもなければコーニスから吹き落とされる。',
   'hudChrome.auraEffect.breathGuardian.draw':
@@ -22695,7 +22695,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.portalD':
     '効果が切れると、あなたの立つ場所にポータルDが開く。ポータルCとだけつながる。ポータルBから離れた岩棚の縁に立とう。このラウンドは結ばれた疾風を運べない。',
   'hudChrome.auraEffect.breathGuardian.laden':
-    '結ばれた疾風を運んでいる：歩く速さは{walk}%になり、ブリンク・突進・跳躍はできず、風も吸引も爆風も吹き飛ばしもあなたを動かせない。各ポータルは対になるポータルへ運ぶ：AからB、CからD。岩棚の縁でインタラクトを押すと虚空へ投げ込む。これが切れると炸裂し、岩棚の全員が死ぬ。',
+    '結ばれた疾風を運んでいる：歩く速さは{walk}%になり、ブリンク・突進・跳躍はできず、風も吸引も爆風も吹き飛ばしもあなたを動かせない。岩棚の縁でインタラクトを押すと虚空へ投げ込む。ポータルは近道：ひとつに入ると対のポータルから出る（AからB、ミシックではCからDも）。これが切れると炸裂する：{core}ヤード以内の者はどんなシールドがあっても死に、それより遠い者は離れるほどダメージが減り、{far}ヤード以上では最大HPの{floor}%になる。レイドから離れて運ぶこと。',
   'abilityUi.cast.heart_breath_inhale': '吸い込む息',
   'abilityUi.cast.heart_breath_storm_break': '嵐の決壊',
   'abilityUi.cast.heart_breath_forking_bolt': '跳ねる雷撃',
@@ -26096,7 +26096,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_gale_sentinel.name': '疾風の哨兵',
   'entities.mobs.heart_gale_mender.name': '疾風の癒し手',
   'hudChrome.auraEffect.breathGuardian.cocoon':
-    'ガーディアンはスカイレンド・ノヴァを詠唱している間、ダメージを受けない。詠唱が終わると、ノヴァが全員に最大HPの{share}%のダメージを与える（ヒロイックとミシック：致死）。テッサリー隊長の上昇気流に乗って東と西の浮遊島へ渡り、2つの静風石を詠唱して止めること：{stilled}/2 鎮静済み。',
+    'ガーディアンはスカイレンド・ノヴァを詠唱している間、ダメージを受けない。詠唱が終わると、ノヴァはどんなシールドがあっても全員を殺す。テッサリー隊長の上昇気流に乗って東と西の浮遊島へ渡り、2つの静風石を詠唱して止めること：{stilled}/2 鎮静済み。静風石はその島の敵が倒れると目覚める。島にいる全員が同時に詠唱でき、多いほど早く満ちる。攻撃を受けるとあなたの詠唱は途切れるが、石の進行は失われない。',
   'hudChrome.auraEffect.breathGuardian.ward':
     '正面{arc}度以内からの攻撃のダメージを{cut}%そらす。ターゲットがこれを向こうに向けている間に背後を攻撃すること。ヒロイックとミシック：{heroicCut}%。',
   'hudChrome.breathGuardian.say.thessaly_updraft': '島は片付いた！次の上昇気流が出たぞ、行け！',
@@ -26331,7 +26331,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pings.enableSettingNote':
     'ピンキーを長押しするとピンホイールが開き、軽く押すとカーソルの下にあるものにピンを送ります。ピンが見えるのはあなたのパーティーまたはレイドだけで、5秒ごとに最大4回までです。オフにすると、グループのピンもすべて非表示になります（アイコン、サウンド、チャット行、ミニマップの印）。',
   'guide.controls.ping': 'ピン：軽く押すとカーソルの下にピン、長押しでピンホイール',
-  'hudChrome.auraEffect.finalBoss.devilThrown': 'ダストデビルに投げ飛ばされた：つむじ風から{yards}ヤード外へ運ばれる。地面に降ろされるまで移動できない。',
+  'hudChrome.auraEffect.finalBoss.devilThrown':
+    'ダストデビルに投げ飛ばされた：つむじ風から{yards}ヤード外へ運ばれる。地面に降ろされるまで移動できない。',
   'hudChrome.breathWind.turning': '風向きが変わる',
   'hudChrome.quenchIce.onIce': '氷の上',
   'hudChrome.quenchIce.breaking': '氷が割れる！',

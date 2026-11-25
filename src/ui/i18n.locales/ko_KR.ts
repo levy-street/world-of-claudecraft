@@ -22636,7 +22636,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_isles':
     '저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다. 오르막 꼭대기에만 벽이 남아 있으며, 그곳에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+    '숨결의 수호자의 바람은 서 있는 동안 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 걸을 때는 향한 곳으로 갑니다: 바람을 거슬러 걸으면 느려지고, 바람을 타고 걸으면 빨라지며, 바람을 가로질러 걸으면 {cross}%의 힘으로만 밀립니다. 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다.',
   'hudChrome.auraEffect.breathGuardian.blast':
     '정상의 포효의 돌풍이 당신을 수호자에게서 밀어냅니다: 입 앞에서는 초당 {speed}미터, 멀어질수록 약해지며 모두 {seconds}초 동안 지속됩니다. 즉시 바람을 거슬러 곧장 돌아가거나 세살리의 닻에 서세요. 그러지 않으면 처마 밖으로 날려갑니다.',
   'hudChrome.auraEffect.breathGuardian.draw':
@@ -22672,7 +22672,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.portalD':
     '효과가 끝나면 당신이 선 자리에 포털 D가 열립니다. 포털 C와만 이어집니다. 포털 B에서 떨어진 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.',
   'hudChrome.auraEffect.breathGuardian.laden':
-    '얽힌 질풍을 나르고 있습니다: 이동 속도가 {walk}%가 되고, 점멸·돌진·도약을 할 수 없으며, 바람도 끌어당김도 폭발도 날려 보내기도 당신을 움직일 수 없습니다. 각 포털은 짝 포털로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 상호작용을 누르면 공허로 던집니다. 이 효과가 끝나면 터져 벼랑 위의 모두가 죽습니다.',
+    '얽힌 질풍을 나르고 있습니다: 이동 속도가 {walk}%가 되고, 점멸·돌진·도약을 할 수 없으며, 바람도 끌어당김도 폭발도 날려 보내기도 당신을 움직일 수 없습니다. 벼랑 가장자리에서 상호작용을 누르면 공허로 던집니다. 포털은 지름길입니다: 하나에 들어가면 짝 포털로 나옵니다(A에서 B, 신화에서는 C에서 D도). 이 효과가 끝나면 터집니다: {core}야드 안의 모두는 어떤 보호막이 있어도 죽고, 더 멀리 있는 대상은 멀수록 피해가 줄어 {far}야드 이상에서는 최대 생명력의 {floor}%까지 내려갑니다. 공격대에서 멀리 가져가십시오.',
   'abilityUi.cast.heart_breath_inhale': '들이쉬는 숨',
   'abilityUi.cast.heart_breath_storm_break': '폭풍 붕괴',
   'abilityUi.cast.heart_breath_forking_bolt': '튀어 오르는 번개',
@@ -26105,7 +26105,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_gale_sentinel.name': '질풍 파수병',
   'entities.mobs.heart_gale_mender.name': '질풍 치유사',
   'hudChrome.auraEffect.breathGuardian.cocoon':
-    '수호자는 하늘가름 회오리를 정신 집중하는 동안 피해를 입지 않습니다. 정신 집중이 끝나면 회오리가 모두에게 최대 생명력의 {share}%에 해당하는 피해를 줍니다(영웅 및 신화: 치명적). 테살리 대장의 상승 기류를 타고 동쪽과 서쪽의 떠 있는 섬으로 건너가 고요석 두 개를 정신 집중해 끊으십시오: {stilled}/2 잠재움.',
+    '수호자는 하늘가름 회오리를 정신 집중하는 동안 피해를 입지 않습니다. 정신 집중이 끝나면 회오리가 어떤 보호막이 있어도 모두를 죽입니다. 테살리 대장의 상승 기류를 타고 동쪽과 서쪽의 떠 있는 섬으로 건너가 고요석 두 개를 정신 집중해 끊으십시오: {stilled}/2 잠재움. 고요석은 그 섬의 적이 쓰러지면 깨어납니다. 섬 위의 모두가 동시에 정신 집중할 수 있으며, 많이 할수록 빨리 찹니다. 공격을 받으면 당신의 정신 집중은 끊기지만 돌의 진행도는 남습니다.',
   'hudChrome.auraEffect.breathGuardian.ward':
     '정면 {arc}도 안에서 들어오는 공격의 피해를 {cut}% 흘려냅니다. 대상이 이것을 돌려세운 동안 등을 공격하십시오. 영웅 및 신화: {heroicCut}%.',
   'hudChrome.breathGuardian.say.thessaly_updraft': '섬 정리 완료! 다음 상승 기류가 떴다, 가라!',
@@ -26341,7 +26341,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pings.enableSettingNote':
     '핑 키를 누르고 있으면 핑 휠이 열리고, 짧게 누르면 커서 아래에 있는 대상에 핑을 보냅니다. 핑은 파티나 공격대원에게만 보이며 5초마다 최대 4번까지 보낼 수 있습니다. 끄면 그룹의 핑도 모두 숨겨집니다: 아이콘, 소리, 채팅 줄, 미니맵 표시가 나타나지 않습니다.',
   'guide.controls.ping': '핑: 짧게 누르면 커서 아래에 핑, 길게 누르면 핑 휠',
-  'hudChrome.auraEffect.finalBoss.devilThrown': '먼지 회오리에 내던져짐: 회오리바람 밖으로 {yards}야드 날아갑니다. 땅에 내려설 때까지 움직일 수 없습니다.',
+  'hudChrome.auraEffect.finalBoss.devilThrown':
+    '먼지 회오리에 내던져짐: 회오리바람 밖으로 {yards}야드 날아갑니다. 땅에 내려설 때까지 움직일 수 없습니다.',
   'hudChrome.breathWind.turning': '바람 방향 전환',
   'hudChrome.quenchIce.onIce': '얼음 위',
   'hudChrome.quenchIce.breaking': '얼음이 깨진다!',

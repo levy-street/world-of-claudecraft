@@ -91,7 +91,8 @@ export const SMITH_HEART_AURA_IMAGE_IDS: readonly string[] = [
  * gathering for Skyrend Nova, the Shieldbearer's Squall Ward is the shield in
  * the wind, and a Stillstone's shared charge is Thessaly's calm stilling it.
  * The Hammer Council survivor's Grieving Fury wears the Masterless Fury's roaring
- * stone head.
+ * stone head, and the Heat's Heroic Live Coal (a burning crust that eats healing
+ * and leaps on) wears its Wellkeepers' Kindling Mark, the same ember on a player.
  */
 export const SMITH_HEART_AURA_ICON_SOURCES: readonly (readonly [string, string])[] = [
   ['heart_breath_blow_thrown', 'heart_breath_roar_thrown'],
@@ -113,6 +114,7 @@ export const SMITH_HEART_AURA_ICON_SOURCES: readonly (readonly [string, string])
   ['heart_final_under_ice', 'heart_quench_trapped'],
   ['heart_grieving_fury', 'heart_final_fury'],
   ['heart_heat_intro', 'heart_council_intro'],
+  ['heart_heat_live_coal', 'heart_heat_kindling'],
   ['heart_quench_intro', 'heart_council_intro'],
   ['heart_quench_rime_slow', 'heart_quench_rime'],
   ['heart_rush_exposed', 'heart_rush_shattered'],
