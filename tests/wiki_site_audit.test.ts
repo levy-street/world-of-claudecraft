@@ -57,12 +57,12 @@ beforeAll(async () => {
         .replace(/\/index\.html$/, '');
     pages.set(path, readFileSync(file, 'utf8'));
   }
-}, 300_000);
+}, 200_000);
 
 // Removing about 5,500 page folders is slow on a busy Windows machine.
 afterAll(() => {
   if (outDir) rmSync(outDir, { recursive: true, force: true });
-}, 300_000);
+}, 60_000);
 
 const text = (html: string) =>
   html
