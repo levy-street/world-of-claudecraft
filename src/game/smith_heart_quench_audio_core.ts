@@ -34,7 +34,6 @@ import {
   QUENCH_CASTS,
   QUENCH_CUES,
   QUENCH_DEV_CUES,
-  QUENCH_TUNING,
 } from '../sim/encounters/smith_heart/quench_ids';
 import { HEART_MARK, type HeartMarkSound } from './smith_heart_mark_audio';
 
@@ -88,6 +87,26 @@ export function quenchSoundClaims(ability: string | undefined): boolean {
 /** The ice groaning under a crack as it appears. */
 export const QUENCH_CRACK_SOUND = { key: 'heart_quench_crack', gain: 0.8, cooldown: 0.4 } as const;
 
+/** The ice giving way under a crack (the team's playtest of 2026-11-25: "make
+ *  it MUCH more visible when the ice is about to break"): the rime's crack
+ *  snapping again at each share of the crack's warning (`at`), each time
+ *  higher and louder (`rate`, `gain`), so the break is heard coming. */
+export const QUENCH_CRACK_STRAIN = {
+  key: 'heart_quench_bite',
+  at: [0.3, 0.55, 0.75, 0.9],
+  rate: [1, 1.2, 1.45, 1.75],
+  gain: [0.5, 0.62, 0.78, 0.95],
+} as const;
+
+/** How many of the strain's snaps a crack `elapsed` seconds into its `warn`
+ *  has reached (0 to QUENCH_CRACK_STRAIN.at.length). */
+export function crackStrainStage(elapsed: number, warn: number): number {
+  const f = warn > 0 ? elapsed / warn : 1;
+  let k = 0;
+  for (const a of QUENCH_CRACK_STRAIN.at) if (f >= a) k++;
+  return k;
+}
+
 /** The local player's own cold: a soft warning past half, an urgent one past
  *  four fifths (a freeze comes at full). */
 export const QUENCH_COLD_SOUNDS = {
@@ -122,18 +141,18 @@ export function coldWarningDue(from: number, to: number): 'warn' | 'danger' | nu
   return null;
 }
 
-/** A slash's line: its WARNING as it is drawn, at its blade; its lock
- *  (`lockAt` seconds before the blade flies, QUENCH_TUNING.slashLock). */
+/** A slash's line: its WARNING as it is drawn, at its blade; its lock (the
+ *  line's own `lock` seconds before the blade flies, the tier's slashLock
+ *  carried on its template: quench_ids.ts laneOf). */
 export const QUENCH_SLASH_SOUNDS = {
   warn: { key: 'heart_quench_slash_warn', gain: 0.95 },
   lock: { key: 'heart_quench_slash_lock', gain: 1 },
-  lockAt: QUENCH_TUNING.slashLock,
 } as const;
 
 /** Has a line `elapsed` seconds into its `seconds` of warning reached its
- *  lock? */
-export function slashLocked(elapsed: number, seconds: number): boolean {
-  return elapsed >= seconds - QUENCH_SLASH_SOUNDS.lockAt;
+ *  `lock` (seconds before the blade flies)? */
+export function slashLocked(elapsed: number, seconds: number, lock: number): boolean {
+  return elapsed >= seconds - lock;
 }
 
 /** The Blades Hunt (mythic): its waking one-shot and the loop while its bar
@@ -165,6 +184,7 @@ export const QUENCH_SFX_KEYS: readonly string[] = [
     ...Object.values(QUENCH_MARK_SOUNDS).map((s) => s.key),
     ...Object.values(QUENCH_MARK_ALARM).map((s) => s.key),
     QUENCH_CRACK_SOUND.key,
+    QUENCH_CRACK_STRAIN.key,
     QUENCH_COLD_SOUNDS.warn.key,
     QUENCH_COLD_SOUNDS.danger.key,
     QUENCH_SLASH_SOUNDS.warn.key,

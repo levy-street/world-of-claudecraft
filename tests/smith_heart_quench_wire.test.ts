@@ -138,9 +138,10 @@ describe('the Guardian of the Quench over the wire', () => {
     // The climb out lands where the server put it.
     expect(Math.hypot(me().pos.x - serverMe.pos.x, me().pos.z - serverMe.pos.z)).toBeLessThan(0.5);
 
-    // The blades: two up with the pull, the rest sunk, then all four floating.
+    // The blades: two up with the pull (one may be mid-slash: flying), the
+    // rest sunk, then all four floating.
     const states = objects(QUENCH_OBJECTS.bladePrefix).map((e: Any) => bladeStateOf(e.templateId));
-    expect(states.filter((x: Any) => x === 'float').length).toBe(2);
+    expect(states.filter((x: Any) => x === 'float' || x === 'fly').length).toBe(2);
     expect(states.filter((x: Any) => x === 'sunk').length).toBe(2);
     sim.chat('/dev heart quench blades', a.pid);
     run(0.5);

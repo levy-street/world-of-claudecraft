@@ -174,6 +174,53 @@ export function frozenLook(elapsed: number): { grow: number; crack: number } {
   };
 }
 
+// ---- the slashes' lines --------------------------------------------------------------
+
+/** A slash line's look this frame (the team's playtest of 2026-11-25: "no
+ *  time to dodge the sword"). */
+export interface SlashLaneLook {
+  /** The footprint's fill, 0 as the line is drawn to 1 the moment the blade
+   *  flies: the strike (the fill IS the warning, never ahead of the sim's). */
+  fill: number;
+  /** The lock's light on the edge (0 while it follows its mark; it jumps to
+   *  SLASH_LOCK_SNAP the moment it locks, so the lock reads as an event,
+   *  then burns up to 1 by the strike, and holds at 1 through the flight). */
+  lock: number;
+  /** Master fade: 1 through the warning, the flight's line fading out as the
+   *  blade runs down it. */
+  fade: number;
+}
+
+/** The edge light the moment a line locks (of 1 at the strike). */
+export const SLASH_LOCK_SNAP = 0.6;
+
+/** The line's look `elapsed` seconds into its `seconds` of warning, its last
+ *  `lock` locked (quench_ids.ts laneOf), or `flown` seconds into the blade's
+ *  `fly` once it flies (null while it warns). Pure. */
+export function slashLaneLook(
+  elapsed: number,
+  seconds: number,
+  lock: number,
+  flown: number | null,
+  fly: number,
+  out: SlashLaneLook = { fill: 0, lock: 0, fade: 1 },
+): SlashLaneLook {
+  if (flown !== null) {
+    out.fill = 1;
+    out.lock = 1;
+    out.fade = Math.max(0.2, 1 - clamp01(fly > 0 ? flown / fly : 1) * 0.8);
+    return out;
+  }
+  out.fill = clamp01(seconds > 0 ? elapsed / seconds : 1);
+  const lockAt = seconds - Math.max(0, lock);
+  out.lock =
+    elapsed >= lockAt
+      ? SLASH_LOCK_SNAP + (1 - SLASH_LOCK_SNAP) * clamp01(lock > 0 ? (elapsed - lockAt) / lock : 1)
+      : 0;
+  out.fade = 1;
+  return out;
+}
+
 // ---- the ice: cracks and holes -------------------------------------------------------
 
 /** A crack `elapsed` seconds into its `warn`: the crack web's spread (0..1

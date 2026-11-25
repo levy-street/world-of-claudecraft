@@ -102,7 +102,7 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return {
         key: `${KEY}.awake`,
         nums: {
-          lock: T.slashLock,
+          lock: QUENCH_DIFFICULTY.normal.slashLock,
           min: tierValue(T.crossMin, NM),
           max: tierValue(T.crossMax, NM),
           cold: T.crossCold,
@@ -115,7 +115,7 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         nums: {
           order: a.value ?? 1,
           count: a.value2 ?? 1,
-          lock: T.slashLock,
+          lock: QUENCH_DIFFICULTY.normal.slashLock,
           min: tierValue(T.crossMin, NM),
           max: tierValue(T.crossMax, NM),
           cold: T.crossCold,

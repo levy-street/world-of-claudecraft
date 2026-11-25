@@ -188,27 +188,30 @@ describe('smith_heart_quench_audio', () => {
   });
 
   it("warns as a slash's line is drawn, clicks as it locks, and strikes as the blade flies", () => {
-    expect(slashLocked(0, 3)).toBe(false);
-    expect(slashLocked(3 - QUENCH_TUNING.slashLock, 3)).toBe(true);
+    // The lock rides the line (its tier's slashLock on its template).
+    expect(slashLocked(0, 3, 0.8)).toBe(false);
+    expect(slashLocked(3 - 0.8, 3, 0.8)).toBe(true);
+    expect(slashLocked(3 - 1.0, 3, 1.2)).toBe(true);
+    expect(slashLocked(3 - 1.0, 3, 0.9)).toBe(false);
     // The flight is its own take now, never the old crossing's.
     expect(QUENCH_CUE_SOUNDS[QUENCH_CUES.cross].key).toBe('heart_quench_slash');
     const { sink, plays } = fakeSink();
     const audio = new QuenchAudio(sink);
     const g = body(9, 0, 0);
     audio.update(g, null, null);
-    audio.line(0, 77, 5, 0, 6, 0, 3, true);
-    audio.line(0, 77, 5, 0, 6, 1, 3, true);
+    audio.line(0, 77, 5, 0, 6, 0, 3, 0.8, true);
+    audio.line(0, 77, 5, 0, 6, 1, 3, 0.8, true);
     expect(plays.map((p) => p.key)).toEqual([QUENCH_SLASH_SOUNDS.warn.key]);
     expect(plays[0]).toMatchObject({ x: 5, z: 6 });
-    audio.line(0, 77, 5, 0, 6, 2.3, 3, true);
-    audio.line(0, 77, 5, 0, 6, 2.6, 3, true);
+    audio.line(0, 77, 5, 0, 6, 2.3, 3, 0.8, true);
+    audio.line(0, 77, 5, 0, 6, 2.6, 3, 0.8, true);
     expect(plays.map((p) => p.key)).toEqual([
       QUENCH_SLASH_SOUNDS.warn.key,
       QUENCH_SLASH_SOUNDS.lock.key,
     ]);
     // A new line in the same slot warns again; a line first seen locked never does.
-    audio.line(0, 78, 5, 0, 6, 0, 3, true);
-    audio.line(1, 79, 5, 0, 6, 2.9, 3, true);
+    audio.line(0, 78, 5, 0, 6, 0, 3, 0.8, true);
+    audio.line(1, 79, 5, 0, 6, 2.9, 3, 0.8, true);
     expect(plays.filter((p) => p.key === QUENCH_SLASH_SOUNDS.warn.key)).toHaveLength(2);
   });
 
@@ -218,11 +221,11 @@ describe('smith_heart_quench_audio', () => {
     const { sink, plays } = fakeSink();
     const audio = new QuenchAudio(sink);
     audio.update(body(9, 0, 0), null, null);
-    audio.line(0, 81, 5, 0, 6, 0, 3, false);
-    audio.line(0, 81, 5, 0, 6, 1, 3, false);
-    audio.line(0, 81, 5, 0, 6, 2.6, 3, false);
+    audio.line(0, 81, 5, 0, 6, 0, 3, 0.8, false);
+    audio.line(0, 81, 5, 0, 6, 1, 3, 0.8, false);
+    audio.line(0, 81, 5, 0, 6, 2.6, 3, 0.8, false);
     expect(plays).toHaveLength(0);
-    audio.line(1, 82, 5, 0, 6, 0, 3, true);
+    audio.line(1, 82, 5, 0, 6, 0, 3, 0.8, true);
     expect(plays.map((p) => p.key)).toEqual([QUENCH_SLASH_SOUNDS.warn.key]);
   });
 
@@ -234,8 +237,8 @@ describe('smith_heart_quench_audio', () => {
     audio.update(hunt, null, null);
     expect(plays.filter((p) => p.key === QUENCH_HUNT_SOUNDS.start.key)).toHaveLength(1);
     expect([...loops.values()]).toEqual([QUENCH_HUNT_SOUNDS.loop.key]);
-    audio.line(0, 90, 1, 0, 1, 0, 1, true);
-    audio.line(0, 90, 1, 0, 1, 0.5, 1, true);
+    audio.line(0, 90, 1, 0, 1, 0, 1, 0.8, true);
+    audio.line(0, 90, 1, 0, 1, 0.5, 1, 0.8, true);
     expect(plays.some((p) => p.key === QUENCH_SLASH_SOUNDS.warn.key)).toBe(false);
     expect(plays.some((p) => p.key === QUENCH_SLASH_SOUNDS.lock.key)).toBe(false);
     audio.update(body(9, 0, 0), null, null);

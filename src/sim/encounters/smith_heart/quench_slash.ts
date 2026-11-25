@@ -81,19 +81,21 @@ function aimLine(s: QuenchScope, line: QuenchLine, target: Entity): void {
   const lane = s.ctx.entities.get(line.laneId);
   if (lane) {
     lane.facing = next.facing;
-    lane.templateId = laneTemplate('warn', line.warn, next.length);
+    lane.templateId = laneTemplate('warn', line.warn, next.length, line.lock);
   }
   const blade = s.ctx.entities.get(s.st.blades[line.blade].objectId);
   if (blade) blade.facing = next.facing;
 }
 
-/** Fill `line` for `blade` going through `target` in `seconds`, its object spawned. */
+/** Fill `line` for `blade` going through `target` in `seconds` (its last
+ *  `lock` locked), its object spawned. */
 function layLine(
   s: QuenchScope,
   line: QuenchLine,
   blade: number,
   target: Entity,
   seconds: number,
+  lock: number,
 ): void {
   const b = s.st.blades[blade];
   line.blade = blade;
@@ -101,11 +103,12 @@ function layLine(
   line.phase = 'aim';
   line.remaining = seconds;
   line.warn = seconds;
+  line.lock = Math.min(seconds, lock);
   line.struck = [];
   line.laneId = spawnFightObject(
     s.ctx,
     s.inst,
-    laneTemplate('warn', seconds, T.slashMinLength),
+    laneTemplate('warn', seconds, T.slashMinLength, line.lock),
     QUENCH_NAMES.cross,
     b.x,
     b.z,
@@ -114,7 +117,8 @@ function layLine(
   aimLine(s, line, target);
 }
 
-/** A new line for the interphase. */
+/** A new line for the interphase: drawn fixed where it is laid, locked its
+ *  whole warning. */
 export function openLine(
   s: QuenchScope,
   blade: number,
@@ -127,12 +131,13 @@ export function openLine(
     phase: 'aim',
     remaining: seconds,
     warn: seconds,
+    lock: seconds,
     from: { x: 0, z: 0 },
     facing: s.boss.facing,
     length: T.slashMinLength,
     struck: [],
   };
-  layLine(s, line, blade, target, seconds);
+  layLine(s, line, blade, target, seconds, seconds);
   return line;
 }
 
@@ -157,7 +162,7 @@ function beginStep(s: QuenchScope, slash: QuenchSlash): void {
     }
     if (!s.rules.slashChain || slash.blade < 0) slash.blade = nextBlade(s);
     if (!s.st.blades[slash.blade]) break;
-    layLine(s, slash, slash.blade, target, s.rules.slashAim);
+    layLine(s, slash, slash.blade, target, s.rules.slashAim, s.rules.slashLock);
     return;
   }
   endRound(s);
@@ -179,6 +184,7 @@ export function startSlashes(s: QuenchScope): boolean {
     phase: 'aim',
     remaining: 0,
     warn: 0,
+    lock: 0,
     from: { x: 0, z: 0 },
     facing: 0,
     length: T.slashMinLength,
@@ -267,7 +273,7 @@ export function stepSlashes(s: QuenchScope): void {
   }
   slash.remaining -= DT;
   if (slash.phase === 'aim') {
-    if (slash.remaining > T.slashLock) {
+    if (slash.remaining > slash.lock) {
       const target = s.players.find((p) => p.id === slash.marks[slash.step] && !p.dead);
       if (!target) {
         // Gone before the line locked: on to the next mark.

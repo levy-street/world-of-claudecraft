@@ -59,7 +59,7 @@ import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { CouncilRushArrow } from './council_rush_arrow';
 import { QUENCH_TELEGRAPH_GLOW_STEP, type QuenchTelegraphKind } from './painted_telegraph_core';
-import { QuenchTelegraphs } from './painted_telegraphs';
+import { type PaintedFan, QuenchTelegraphs } from './painted_telegraphs';
 import {
   QUENCH_FIGHT_COLORS as C,
   crackLook,
@@ -79,6 +79,8 @@ import {
   RIM_SHARDS,
   rimRise,
   rimShard,
+  type SlashLaneLook,
+  slashLaneLook,
   type WarmBody,
   warmthLinks,
 } from './quench_fight_fx_core';
@@ -293,7 +295,17 @@ export class QuenchFightFx {
   // The footprints (every tier).
   private readonly crackFans: FanSlot[] = [];
   private readonly splashFans: FanSlot[] = [];
-  private readonly lanes: { lane: TelegraphLane; id: number; born: number }[] = [];
+  private readonly lanes: {
+    lane: TelegraphLane;
+    id: number;
+    born: number;
+    /** The render time its blade was first seen flying (-1 while it warns). */
+    flewAt: number;
+    paint: PaintedFan<QuenchTelegraphKind>;
+  }[] = [];
+  /** The slash lines' paint (its live lock light, painted_telegraphs.ts). */
+  private readonly lanePaints: QuenchTelegraphs;
+  private readonly laneLook: SlashLaneLook = { fill: 0, lock: 0, fade: 1 };
   // The instanced pools.
   private readonly holes: THREE.InstancedMesh;
   private readonly holeSlots: ObjectSlot[] = [];
@@ -382,6 +394,7 @@ export class QuenchFightFx {
     // Jose's playtest of 2026-11-04 read them as generic red circles): the
     // crack opening to black water, the shatter's ring, the slash's groove.
     const paints = new QuenchTelegraphs(QUENCH_TELEGRAPH_GLOW_STEP, this.materials);
+    this.lanePaints = paints;
     const fans = (
       n: number,
       order: number,
@@ -419,8 +432,8 @@ export class QuenchFightFx {
     for (let i = 0; i < P.lanes; i++) {
       const lane = this.kit.lane(QUENCH_FLOOR.telegraphChar.step);
       lane.group.visible = false;
-      paints.dress(lane, 'slash');
-      this.lanes.push({ lane, id: -1, born: 0 });
+      const paint = paints.dress(lane, 'slash');
+      this.lanes.push({ lane, id: -1, born: 0, flewAt: -1, paint });
     }
 
     // ---- the instanced floor discs ----
@@ -883,6 +896,7 @@ export class QuenchFightFx {
         if (slot && slot.id !== id) {
           slot.id = id;
           slot.born = this.clock;
+          slot.flewAt = -1;
         }
       }
     }
@@ -1028,11 +1042,22 @@ export class QuenchFightFx {
       const l = this.lanes[li];
       const lane = l.id >= 0 ? world.entities.get(l.id) : undefined;
       const lof = lane ? laneOf(lane.templateId) : null;
-      if (!lane || !lof || lof.state !== 'warn') {
+      if (!lane || !lof) {
         l.lane.group.visible = false;
         if (!lane) this.audio.noLine(li);
         continue;
       }
+      // The flight: the line stays, full and burning, fading as the blade
+      // runs down it (it vanished the moment the blade flew before).
+      if (lof.state === 'fly' && l.flewAt < 0) l.flewAt = this.clock;
+      const look = slashLaneLook(
+        this.clock - l.born,
+        lof.seconds,
+        lof.lock,
+        lof.state === 'fly' ? this.clock - l.flewAt : null,
+        T.slashFly,
+        this.laneLook,
+      );
       // Its warning as it is drawn and its lock, at the blade (the sound's).
       const ly = this.groundY(lane.pos.x, lane.pos.z);
       // Its sound in the marked player's own ear only (the line and the arrow
@@ -1040,7 +1065,18 @@ export class QuenchFightFx {
       const marked = this.markedAt(world);
       const target = laneTargetIndex(lane.pos.x, lane.pos.z, lane.facing, marked);
       const mine = target >= 0 && marked[target].id === world.playerId;
-      this.audio.line(li, l.id, lane.pos.x, ly, lane.pos.z, this.clock - l.born, lof.seconds, mine);
+      if (lof.state === 'warn')
+        this.audio.line(
+          li,
+          l.id,
+          lane.pos.x,
+          ly,
+          lane.pos.z,
+          this.clock - l.born,
+          lof.seconds,
+          lof.lock,
+          mine,
+        );
       this.kit.drapeLane(
         l.lane,
         this.groundY,
@@ -1052,8 +1088,15 @@ export class QuenchFightFx {
         T.laneHalf,
         { color: C.danger, accent: C.accent },
       );
-      const fill = Math.min(1, (this.clock - l.born) / Math.max(0.1, lof.seconds));
-      this.kit.paintLane(l.lane, { fill, clock: this.clock, range: lof.length });
+      // The fill completes as the blade flies; once it locks, its edge burns
+      // white-hot (the paint's live light) and the warning pulse runs hard.
+      this.lanePaints.live(l.paint, look.lock);
+      this.kit.paintLane(l.lane, {
+        fill: look.fill,
+        clock: this.clock,
+        range: lof.length,
+        fade: look.fade,
+      });
       l.lane.group.visible = true;
     }
   }

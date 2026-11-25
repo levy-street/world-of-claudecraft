@@ -222,6 +222,14 @@ export interface QuenchDifficultyRules {
   slashMarksAwake: number;
   /** A mark's warning: seconds from its line showing to its blade flying. */
   slashAim: number;
+  /** The last of `slashAim` (seconds): the line stops following its mark
+   *  and locks, then the blade flies (`slashFly`). The team's playtest of
+   *  2026-11-25 ("no time to dodge the sword"): 0.8 s on every tier left
+   *  1.15 s from the lock to the strike; now the lock plus the flight is
+   *  about 1.55 s on Normal, 1.35 s on Heroic and 1.25 s on Mythic (never
+   *  under 1.1 s), and `slashAim` grew by the same so the line still follows
+   *  its mark as long as it did. */
+  slashLock: number;
   /** One blade makes the whole round, each slash from where the last ended. */
   slashChain: boolean;
   /** The Blades Hunt, the interphase at a quarter health (quench_flurry.ts). */
@@ -268,7 +276,8 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     splashCold: 35,
     slashMarksLake: 1,
     slashMarksAwake: 2,
-    slashAim: 3,
+    slashAim: 3.4,
+    slashLock: 1.2,
     slashChain: false,
     flurry: false,
     rimeTargets: 1,
@@ -302,7 +311,8 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     splashCold: 55,
     slashMarksLake: 2,
     slashMarksAwake: 3,
-    slashAim: 2.5,
+    slashAim: 2.7,
+    slashLock: 1,
     slashChain: false,
     flurry: false,
     rimeTargets: 2,
@@ -336,7 +346,8 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     splashCold: 55,
     slashMarksLake: 2,
     slashMarksAwake: 4,
-    slashAim: 2,
+    slashAim: 2.1,
+    slashLock: 0.9,
     slashChain: true,
     flurry: true,
     // Heroic's rime, one more carrier (the decisions of 2026-11-09).
@@ -447,7 +458,6 @@ export const QUENCH_TUNING = {
   slashEveryLake: 10,
   slashEveryAwake: 7.5,
   slashPaceMin: 0.6,
-  slashLock: 0.8,
   slashFly: 0.35,
   slashGap: 0.6,
   slashRimMargin: 2,
@@ -556,22 +566,32 @@ export function bladeStateOf(templateId: string): QuenchBladeState | null {
 /** A slash's line: its warning, then the flight. */
 export type QuenchLaneState = 'warn' | 'fly';
 
-/** A line's template: its state, that state's seconds and its length in whole yards
- *  (the sim rounds the line to a whole length, so both read the same one). */
-export function laneTemplate(state: QuenchLaneState, seconds: number, length: number): string {
-  return `${QUENCH_OBJECTS.lanePrefix}${state}_${tenthsOf(seconds)}_${Math.round(length)}`;
+/** A line's template: its state, that state's seconds, its length in whole yards
+ *  (the sim rounds the line to a whole length, so both read the same one) and
+ *  the warning's locked last stretch (seconds: the tier's slashLock, so every
+ *  client draws and sounds the lock where the sim takes it; 0 in flight). */
+export function laneTemplate(
+  state: QuenchLaneState,
+  seconds: number,
+  length: number,
+  lock = 0,
+): string {
+  return `${QUENCH_OBJECTS.lanePrefix}${state}_${tenthsOf(seconds)}_${Math.round(length)}_${tenthsOf(lock)}`;
 }
 
 export function laneOf(
   templateId: string,
-): { state: QuenchLaneState; seconds: number; length: number } | null {
+): { state: QuenchLaneState; seconds: number; length: number; lock: number } | null {
   if (!templateId.startsWith(QUENCH_OBJECTS.lanePrefix)) return null;
-  const [state, t, l] = templateId.slice(QUENCH_OBJECTS.lanePrefix.length).split('_');
+  const [state, t, l, k] = templateId.slice(QUENCH_OBJECTS.lanePrefix.length).split('_');
   if (state !== 'warn' && state !== 'fly') return null;
   const n = Number(t);
   const length = Number(l);
   if (!Number.isInteger(n) || n < 0 || !Number.isInteger(length) || length < 0) return null;
-  return { state, seconds: n / 10, length };
+  // The lock rides a fourth field (an older template without one: none).
+  const kt = k === undefined ? 0 : Number(k);
+  if (!Number.isInteger(kt) || kt < 0) return null;
+  return { state, seconds: n / 10, length, lock: Math.min(n, kt) / 10 };
 }
 
 /** The wait between two rounds of slashes (seconds) with `half`'s blades

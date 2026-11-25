@@ -262,7 +262,7 @@ describe('Guardian of the Quench: the line', () => {
 
   it('carries its state and length in the template', () => {
     const of = laneOf(laneTemplate('warn', 2.5, 17));
-    expect(of).toEqual({ state: 'warn', seconds: 2.5, length: 17 });
+    expect(of).toEqual({ state: 'warn', seconds: 2.5, length: 17, lock: 0 });
     expect(laneOf(laneTemplate('fly', 0.6, 3))?.state).toBe('fly');
     expect(laneOf('sh_quench_lane_crack_20_3')).toBeNull();
     expect(laneOf('sh_quench_hole')).toBeNull();
@@ -285,7 +285,7 @@ describe('Guardian of the Quench: the line', () => {
     expect(lane.facing).not.toBeCloseTo(before, 1);
     expect(lane.facing).toBeCloseTo(aim(p), 1);
     // Past the lock it holds, whatever the mark does.
-    f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim - T.slashLock));
+    f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim - QUENCH_DIFFICULTY.normal.slashLock));
     const locked = lane.facing;
     f.put(p, f.local(p).x - 12, f.local(p).z + 6);
     f.tick(2);
@@ -313,7 +313,7 @@ describe('Guardian of the Quench: the flight', () => {
     spread(f);
     const slash = round(f);
     const p = playerOf(f, slash.marks[0]);
-    f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim - T.slashLock) + 1);
+    f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim - QUENCH_DIFFICULTY.normal.slashLock) + 1);
     const from = slash.from;
     const to = {
       x: from.x + Math.sin(slash.facing) * slash.length,
@@ -327,7 +327,7 @@ describe('Guardian of the Quench: the flight', () => {
       here.z + Math.cos(side) * (T.laneHalf + 3),
     );
     expect(segmentDistance(from, to, f.local(p))).toBeGreaterThan(T.laneHalf);
-    const ev = f.tick(ticks(T.slashLock + T.slashFly) + 2);
+    const ev = f.tick(ticks(QUENCH_DIFFICULTY.normal.slashLock + T.slashFly) + 2);
     expect(hitsOf(ev, QUENCH_NAMES.cross, p.id)).toEqual([]);
   });
 
@@ -335,7 +335,7 @@ describe('Guardian of the Quench: the flight', () => {
     const f = twoAwake(4);
     spread(f);
     const slash = round(f);
-    f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim - T.slashLock) + 1);
+    f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim - QUENCH_DIFFICULTY.normal.slashLock) + 1);
     const other = f.players.find((e) => e.id !== slash.marks[0]) as Entity;
     const k = Math.min(3, slash.length / 2);
     f.put(
@@ -343,7 +343,7 @@ describe('Guardian of the Quench: the flight', () => {
       slash.from.x + Math.sin(slash.facing) * k,
       slash.from.z + Math.cos(slash.facing) * k,
     );
-    const ev = f.tick(ticks(T.slashLock + T.slashFly) + 2);
+    const ev = f.tick(ticks(QUENCH_DIFFICULTY.normal.slashLock + T.slashFly) + 2);
     expect(hitsOf(ev, QUENCH_NAMES.cross, other.id).length).toBe(1);
   });
 

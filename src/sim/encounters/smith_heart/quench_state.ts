@@ -81,6 +81,9 @@ export interface QuenchLine {
   remaining: number;
   /** Its warning's whole length (seconds; what the painter fills to). */
   warn: number;
+  /** The warning's last stretch, locked (seconds: the tier's slashLock; the
+   *  whole warning for a line drawn fixed, the Blades Hunt's). */
+  lock: number;
   /** Where the line starts, the way it runs and its whole length. */
   from: { x: number; z: number };
   facing: number;

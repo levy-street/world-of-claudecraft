@@ -28,7 +28,8 @@ describe('the Quench frost paint', () => {
     for (const k of KINDS) {
       const L = QUENCH_TELEGRAPH_LOOKS[k];
       expect(L.paint).toBe('frost');
-      expect(L.rim).toBe(1);
+      // A full edge (the slash's a third brighter since 2026-11-25).
+      expect(L.rim).toBeGreaterThanOrEqual(1);
       expect(L.char).toBeGreaterThan(0.5);
       // The shards (uSpin) stand on every edge.
       expect(L.spin).toBeGreaterThan(0.5);

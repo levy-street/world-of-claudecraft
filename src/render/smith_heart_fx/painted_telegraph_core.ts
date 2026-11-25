@@ -176,7 +176,9 @@ export const QUENCH_TELEGRAPH_LOOKS: Readonly<Record<QuenchTelegraphKind, Painte
   breath: look('frost', 0.72, 1, 0.42, 1, { spin: 1.3, curtain: false }),
   crack: look('frost', 0.7, 1, 0.75, 1, { spin: 0.7, flow: 1, curtain: false }),
   splash: look('frost', 0.6, 0.9, 0.6, 0.9, { spin: 0.9, curtain: false }),
-  slash: look('frost', 0.7, 1, 0.55, 1, { spin: 0.85, curtain: false }),
+  // The slash's edge a third brighter (the team's playtest of 2026-11-25:
+  // the line must read at a glance; its lock burns it white, uHeat).
+  slash: look('frost', 0.7, 1, 0.55, 1, { spin: 0.85, rim: 1.35, curtain: false }),
 };
 
 /** The glow passes' encounter rungs, each over every char rung of its owner

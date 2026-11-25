@@ -96,7 +96,7 @@ describe('Guardian of the Quench: tooltips and names', () => {
     const awake = say(
       auraEffectDescriptor({ id: QUENCH_AURAS.awake, kind: 'internal_cd', value: 0 }),
     );
-    expect(awake).toContain(`${T.slashLock} sec before`);
+    expect(awake).toContain(`${QUENCH_DIFFICULTY.normal.slashLock} sec before`);
     expect(awake).toContain(`${nm(T.crossMin)} to ${nm(T.crossMax)}`);
     const marked = say(
       auraEffectDescriptor({
@@ -107,7 +107,7 @@ describe('Guardian of the Quench: tooltips and names', () => {
       }),
     );
     expect(marked).toContain('number 2 of 3');
-    expect(marked).toContain(`${T.slashLock} sec before`);
+    expect(marked).toContain(`${QUENCH_DIFFICULTY.normal.slashLock} sec before`);
     expect(marked).toContain(`${nm(T.crossMin)} to ${nm(T.crossMax)}`);
     const deep = say(
       auraEffectDescriptor({

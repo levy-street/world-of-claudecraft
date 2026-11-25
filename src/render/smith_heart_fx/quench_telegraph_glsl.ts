@@ -138,6 +138,14 @@ ${PAINTED_TELEGRAPH_RIM_GLSL}
   col += uColor * rimCore * 0.85 * uRim * uRimK;
   col += uColor * threatBand * (0.3 + 0.3 * uWarn) * uRimK;
   col += uColor * 0.08 * uWarn * swept * (1.0 - water);
+  // A slash line LOCKED (uHeat, its live lock light: quench_fight_fx_core.ts
+  // slashLaneLook; 0 for every other frost mark): the edge burns white-hot,
+  // the threat band doubles with a fast throb and the blade's groove lights
+  // down its length, so the lock reads as an event on every tier (the
+  // team's playtest of 2026-11-25: "no time to dodge the sword").
+  float lockK = uHeat;
+  col += rimWhite * rimCore * 1.4 * lockK;
+  col += uColor * threatBand * 0.45 * lockK * (0.75 + 0.25 * sin(uTime * 22.0));
   vec3 cDim = vec3(0.16, 0.32, 0.48);
   vec3 cLit = vec3(0.5, 0.82, 1.0);
   vec3 cHot = vec3(0.86, 0.97, 1.0);
@@ -149,8 +157,9 @@ ${PAINTED_TELEGRAPH_RIM_GLSL}
   // Each frozen plate its own cold sheen (ice, never bare stone).
   col += vec3(0.1, 0.22, 0.34) * (0.35 + 0.65 * plate.y) * swept * 0.35 * uBody * (1.0 - water);
   col += cLit * fern * 0.3 * swept * uCrack * pulse;
-  // The groove's bevelled lips catching the light.
+  // The groove's bevelled lips catching the light (the whole groove once locked).
   col += cHot * groove * (1.0 - groove) * 2.2 * swept * uCrack;
+  col += cHot * groove * 0.9 * lockK;
   // Rime along the edges and riding the front.
   col += cLit * feather * (rimeBand * (0.08 + 0.2 * swept) + frontBand * 0.35) * uBody;
   col += cHot * frontBand * 0.5 * uFront * uBody;

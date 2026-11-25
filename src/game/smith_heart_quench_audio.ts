@@ -12,7 +12,9 @@ import {
   coldWarningDue,
   QUENCH_BAR_SOUNDS,
   QUENCH_COLD_SOUNDS,
+  crackStrainStage,
   QUENCH_CRACK_SOUND,
+  QUENCH_CRACK_STRAIN,
   QUENCH_CUE_SOUNDS,
   QUENCH_HUNT_SOUNDS,
   QUENCH_MARK_ALARM,
@@ -58,6 +60,9 @@ export class QuenchAudio {
   /** Per painter line slot: the line it last heard, and whether its lock sounded. */
   private readonly lineIds: number[] = new Array(MAX_LINES).fill(-1);
   private readonly lineLocked: boolean[] = new Array(MAX_LINES).fill(false);
+  /** Each crack slot's object and the strain snaps it has sounded. */
+  private readonly crackIds: number[] = [];
+  private readonly crackStages: number[] = [];
 
   constructor(private readonly sink: QuenchAudioSink) {}
 
@@ -100,6 +105,42 @@ export class QuenchAudio {
     return true;
   }
 
+  /**
+   * A crack in painter slot `slot` this frame: its object `id` at (x, y, z),
+   * `elapsed` seconds into its `warn`. Each strain snap sounds once as the
+   * warning passes it, rising in pitch to the break (QUENCH_CRACK_STRAIN); a
+   * crack first seen part-way sounds only the snaps still to come.
+   */
+  crackStrain(
+    slot: number,
+    id: number,
+    x: number,
+    y: number,
+    z: number,
+    elapsed: number,
+    warn: number,
+  ): void {
+    if (slot < 0) return;
+    const stage = crackStrainStage(elapsed, warn);
+    if (this.crackIds[slot] !== id) {
+      this.crackIds[slot] = id;
+      this.crackStages[slot] = stage;
+      return;
+    }
+    const was = this.crackStages[slot] ?? 0;
+    if (stage <= was) return;
+    this.crackStages[slot] = stage;
+    const k = stage - 1;
+    this.preload();
+    this.sink.playAt(QUENCH_CRACK_STRAIN.key, x, y + 0.4, z, {
+      gain: QUENCH_CRACK_STRAIN.gain[k],
+      rate: QUENCH_CRACK_STRAIN.rate[k],
+      cooldown: 0.1,
+      jitter: false,
+      priority: true,
+    });
+  }
+
   /** A crack appeared at (x, y, z). */
   crack(x: number, y: number, z: number): void {
     this.preload();
@@ -112,7 +153,8 @@ export class QuenchAudio {
 
   /**
    * A slash's line in painter slot `slot` this frame: its object `id` at its
-   * blade (x, y, z), `elapsed` seconds into its `seconds` of warning. Its
+   * blade (x, y, z), `elapsed` seconds into its `seconds` of warning (its last
+   * `lock` seconds locked). Its
    * warning sounds as it is drawn, its lock as it locks, in the ear of the
    * player it is aimed at ONLY (`mine`): the raid sees the line and the arrow
    * over the marked, the marked alone hears the call (the owner's online run
@@ -127,12 +169,13 @@ export class QuenchAudio {
     z: number,
     elapsed: number,
     seconds: number,
+    lock: number,
     mine = false,
   ): void {
     if (slot < 0 || slot >= MAX_LINES) return;
     if (this.lineIds[slot] !== id) {
       this.lineIds[slot] = id;
-      this.lineLocked[slot] = slashLocked(elapsed, seconds);
+      this.lineLocked[slot] = slashLocked(elapsed, seconds, lock);
       if (mine && !this.hunting && !this.lineLocked[slot]) {
         this.preload();
         const s = QUENCH_SLASH_SOUNDS.warn;
@@ -145,7 +188,7 @@ export class QuenchAudio {
       }
       return;
     }
-    if (this.lineLocked[slot] || !slashLocked(elapsed, seconds)) return;
+    if (this.lineLocked[slot] || !slashLocked(elapsed, seconds, lock)) return;
     this.lineLocked[slot] = true;
     if (this.hunting || !mine) return;
     const s = QUENCH_SLASH_SOUNDS.lock;
