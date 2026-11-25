@@ -96,6 +96,7 @@ describe('isCodePath', () => {
       'admin.html',
       'guide.html',
       'editor.html',
+      'encyclopedia.html',
       'wallet-handoff.html',
       'music_editor.html',
       'svelte.config.js',
@@ -110,6 +111,18 @@ describe('isCodePath', () => {
     ]) {
       expect(isCodePath(widened)).toBe(true);
     }
+  });
+
+  it('classifies every root HTML entry vite builds as code', () => {
+    // A new entry page (encyclopedia.html was the miss) must never land in the
+    // docs-only bucket that skips the malware gate, builds and tests.
+    const viteConfig = readFileSync('vite.config.ts', 'utf8');
+    const entries = [...viteConfig.matchAll(/new URL\('([\w-]+\.html)', import\.meta\.url\)/g)].map(
+      (m) => m[1],
+    );
+    expect(entries).toContain('index.html');
+    expect(entries).toContain('encyclopedia.html');
+    for (const entry of entries) expect(isCodePath(entry), entry).toBe(true);
   });
 
   it('leaves documentation surfaces classifiable as non-code', () => {

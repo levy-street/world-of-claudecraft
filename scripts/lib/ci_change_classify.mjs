@@ -62,6 +62,7 @@ const CODE_PATH_EXACT = Object.freeze([
   'admin.html',
   'guide.html',
   'editor.html',
+  'encyclopedia.html',
   'wallet-handoff.html',
   'music_editor.html',
   'svelte.config.js',

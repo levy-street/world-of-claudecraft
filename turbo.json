@@ -247,6 +247,8 @@
         "scripts/wiki_site/build.mjs",
         "scripts/wiki_site/**",
         "scripts/mediawiki/**",
+        "scripts/wiki/**",
+        "server/seasonal_calendar.ts",
         "mediawiki/**",
         "package.json"
       ],

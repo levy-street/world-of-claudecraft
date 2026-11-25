@@ -171,6 +171,9 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'scripts/wiki_site/build.mjs',
       'scripts/wiki_site/**',
       'scripts/mediawiki/**',
+      // Read by the seed writers: attack snapshot lookups and the seasonal calendar.
+      'scripts/wiki/**',
+      'server/seasonal_calendar.ts',
       'mediawiki/**',
       'package.json',
     ],
