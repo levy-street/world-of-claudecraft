@@ -105,7 +105,10 @@ export function inFrontal(s: FinalScope): Entity[] {
   for (const p of livePlayers(s)) {
     const q = at(s, p);
     const d = Math.hypot(q.x - b.x, q.z - b.z);
-    if (d > cleave.range + (tpl?.bodyRadius ?? 0)) continue;
+    // The swing cleave's own reach, from the pivot (mob_swing.ts): its
+    // body's edge (FINAL_BODY_RADIUS) is where melee reaches it, never a
+    // longer frontal.
+    if (d > cleave.range) continue;
     let da = Math.atan2(q.x - b.x, q.z - b.z) - s.boss.facing;
     da = Math.atan2(Math.sin(da), Math.cos(da));
     if (d > 0.5 && Math.abs(da) > half) continue;

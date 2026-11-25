@@ -65,6 +65,7 @@ import {
 } from '../../src/sim/encounters/smith_heart/final_elements_ids';
 import {
   FINAL_AURAS,
+  FINAL_BODY_RADIUS,
   FINAL_CASTS,
   FINAL_OBJECTS,
   FINAL_TUNING,
@@ -382,8 +383,10 @@ export const final = {
       ? { r: loose.id, m: loose, onTank: !!world.players.get(loose.aggro)?.tank }
       : null;
   },
+  // The sim's melee reach on its body (FINAL_BODY_RADIUS + 3 from the pivot
+  // since the team's playtest of 2026-11-25), a half step inside it.
   meleeReach() {
-    return 7;
+    return FINAL_BODY_RADIUS + 2.5;
   },
   // A ranged pull walks the boss off its quarter (Vein Shock on Heroic) and
   // often through the central ring: the casters keep a wider margin under

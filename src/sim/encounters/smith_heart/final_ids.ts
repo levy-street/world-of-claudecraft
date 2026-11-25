@@ -589,6 +589,18 @@ export const FINAL_OVERLOAD = {
 
 // ---- tuning ---------------------------------------------------------------------------
 
+/** Its body's radius (yards; the template's bodyRadius): the team's
+ *  playtest of 2026-11-25 ("make the boss hitbox bigger: melee feel in range
+ *  when they aren't"). The colossus stands about 20 yd tall, its feet some
+ *  3 yd off its pivot and its fists past them, so a raider at its knee read
+ *  as in reach and was not (plain melee reached 5 yd from the pivot). Melee
+ *  now reaches it from 3 yd past this edge (player_attack_reach.ts
+ *  bodyEdgeMeleeRange: 8 yd from the pivot), its own swing a yard further,
+ *  it settles 1.5 yd past the edge on its tank, and its target circle is
+ *  drawn at the edge (render/selection_ring.ts). Its frontal keeps its own
+ *  9 yd from the pivot (final_quench.ts inFrontal). */
+export const FINAL_BODY_RADIUS = 5;
+
 export const FINAL_TUNING = {
   // -- the rules (the Overload bars' numbers are FINAL_OVERLOAD's) --
   /** Heroic: the shockwave of a quarter change, and the mark it leaves. */

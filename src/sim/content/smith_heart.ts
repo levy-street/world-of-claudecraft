@@ -22,6 +22,7 @@ import {
 } from '../encounters/smith_heart/breath_ids';
 import { ISLE_CASTS, ISLE_MOBS } from '../encounters/smith_heart/breath_isle_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
+import { FINAL_BODY_RADIUS } from '../encounters/smith_heart/final_ids';
 import {
   FINAL_ADD_MOBS,
   FINAL_PHASE_NAMES,
@@ -707,6 +708,9 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     loot: [{ itemId: SMITH_HEART_ESSENCE_ITEM, chance: 1, questId: SMITH_HEART_ESSENCE_QUEST }],
     ccImmune: true,
     slowImmune: true,
+    // Its body's edge (the team's playtest of 2026-11-25: the hitbox felt too
+    // small): melee reaches it from bodyRadius + 3.
+    bodyRadius: FINAL_BODY_RADIUS,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Forge Fist' },
   },
 };

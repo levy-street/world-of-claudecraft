@@ -182,8 +182,16 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
     if (st0) st0.anvilClock = 1e9;
     const clocks = { ...f.state()?.kit };
     const firstFist = clocks.fist;
-    // Into the ring...
-    const centre = { x: HEART_ROOM.x - 4, z: HEART_ROOM.z };
+    // Into the ring, straight in along the Heat's own middle (since its body
+    // grew on 2026-11-25 it settles close on its tank, so a line off that
+    // middle would carry it over the Breath's ridge on the way: another
+    // quarter, not this pin's dip)...
+    const home = heartQuarterSpot('heat');
+    const hd = Math.hypot(home.x - HEART_ROOM.x, home.z - HEART_ROOM.z);
+    const centre = {
+      x: HEART_ROOM.x + ((home.x - HEART_ROOM.x) / hd) * 4,
+      z: HEART_ROOM.z + ((home.z - HEART_ROOM.z) / hd) * 4,
+    };
     let inRing = false;
     for (let t = 0; t < sec(20) && !inRing; t++) {
       raidWalk(f, centre);

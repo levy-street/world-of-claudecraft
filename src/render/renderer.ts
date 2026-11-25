@@ -11146,7 +11146,7 @@ export class Renderer {
         x,
         z,
         y,
-        selectionRingScale(target.scale, tv.height),
+        selectionRingScale(target.scale, tv.height, target.templateId),
         hostile,
         heavy,
         dt,

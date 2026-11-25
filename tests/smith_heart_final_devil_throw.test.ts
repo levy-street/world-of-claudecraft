@@ -163,7 +163,7 @@ describe("a Dust Devil's throw slides", () => {
     ).toBeGreaterThan(0.5);
     const d = auraEffectDescriptor({ id: FINAL_AURAS.devilThrown, kind: 'root', value: 0 });
     expect(d?.key).toBe('hudChrome.auraEffect.finalBoss.devilThrown');
-    const text = t(d?.key ?? '', d?.nums);
+    const text = t('hudChrome.auraEffect.finalBoss.devilThrown', d?.nums);
     expect(text).toContain(`${T.devilKnockback} yd`);
   });
 });

@@ -2672,6 +2672,12 @@ the rules `final_rules.ts`, one module per quarter (`final_heat.ts`, `final_quen
 166,000 after the elite factor; 70,000 until the second Heroic pass of 2026-11-05). Its own swing cleave, Forge Fist (110 degrees, 9 yd, every
 third landed swing), is its frontal; the sketch's Forge Wrath and Forge Pour are gone. It
 cannot be controlled or slowed: only its own planted bars hold it (no Taking Root since 2026-11-19).
+Its body (the team's playtest of 2026-11-25, "make the boss hitbox bigger: melee feel in range when
+they aren't"): the template authors a 5 yd `bodyRadius` (`FINAL_BODY_RADIUS`), so melee reaches it from
+8 yd off its pivot (was the stock 5, inside its 20 yd colossus's stance), its own swing a yard past
+that, it settles 6.5 yd off its tank (was about 10, out of the tank's own reach), and its target circle
+is drawn at that edge (`render/selection_ring.ts` `BODY_EDGE_RINGS`); Forge Fist and Mythic's Numbing
+Frost off it keep their 9 yd from the pivot.
 
 
 **The rework of 2026-11-18 (the team's review of 2026-11-17, the owner's design).**
