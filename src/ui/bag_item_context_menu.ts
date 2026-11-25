@@ -23,6 +23,7 @@ import { isSalvageable } from '../sim/professions/salvage';
 import { isSunderable } from '../sim/professions/sundering';
 import { isStackProvenanceItemId } from '../sim/stack_provenance_ids';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
+import { hasEnchantsForItemSlot } from './hud/professions/enchant_apply_view';
 import type { TranslationKey } from './i18n.catalog';
 import { separableMaterialSources } from './material_sources_view';
 
@@ -43,6 +44,7 @@ export type BagItemNewActionId =
   | 'disenchant'
   | 'salvage'
   | 'sunder'
+  | 'enchantItem'
   | 'applyEnchant'
   | 'lock'
   | 'unlock'
@@ -65,6 +67,7 @@ const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
   disenchant: 'hudChrome.itemMenu.disenchant',
   salvage: 'hudChrome.itemMenu.salvage',
   sunder: 'hudChrome.itemMenu.sunder',
+  enchantItem: 'hudChrome.itemMenu.enchant',
   applyEnchant: 'hudChrome.itemMenu.applyEnchant',
   lock: 'hudChrome.bags.lockItem',
   unlock: 'hudChrome.bags.unlockItem',
@@ -107,6 +110,9 @@ export function bagItemNewActions(
   if (isDisenchantable(def)) out.push('disenchant');
   if (isSalvageable(def) && !isItemLocked(instance)) out.push('salvage');
   if (isSunderable(def)) out.push('sunder');
+  // Item-first enchanting: gear whose slot some enchant targets offers Enchant,
+  // which lists only that slot's enchants (enchantSectionsForItemSlot).
+  if (hasEnchantsForItemSlot(def.slot)) out.push('enchantItem');
   if (isEnchantReagentItem(itemId)) out.push('applyEnchant');
   if (includeMaterialActions && isStackProvenanceItemId(itemId)) {
     if (materialSources !== undefined && materialSources.length > 0) {

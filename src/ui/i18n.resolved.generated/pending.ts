@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "es_ES": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "fr_FR": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "fr_CA": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "de_DE": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "nl_NL": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "pl_PL": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "id_ID": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "tr_TR": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "sv_SE": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "vi_VN": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ],
+  "da_DK": [
+    "hudChrome.enchanting.currentEnchantTag",
+    "hudChrome.enchanting.itemPickerTitle",
+    "hudChrome.itemMenu.enchant",
+    "hudChrome.paperdoll.enchantHint"
+  ]
 };

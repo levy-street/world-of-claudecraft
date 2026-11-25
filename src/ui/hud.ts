@@ -5695,6 +5695,7 @@ export class Hud {
       statCellHtml(charStatModel(this.sim, stat), STAT_VIEW_DEPS, { colon: false }),
     statTooltipHtml: (stat) => statTooltipHtml(charStatModel(this.sim, stat), STAT_VIEW_DEPS),
     progressionHtml: (level) => progressionHtml(this.sim, level),
+    openWornEnchant: (slot, x, y) => this.bagItemActionMenu.openWornEnchant(slot, x, y),
     unequip: (slot) => {
       this.sim.unequipItem(slot);
       audio.click();

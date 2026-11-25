@@ -42,6 +42,7 @@ import { writeHotbarDragData } from './hud/action_bar/hotbar';
 import { isUsableTrinketId } from './hud/action_bar/trinket_slot_core';
 import { currenciesTabHtml } from './hud/currencies';
 import { archetypeTitleText, craftNameText } from './hud/professions/craft_name_view';
+import { hasEnchantsForItemSlot } from './hud/professions/enchant_apply_view';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
 import { buildGatheringProficiencyRows } from './hud/professions/gathering_view';
 import { archetypeImageUrl } from './hud/professions/profession_art';
@@ -153,6 +154,9 @@ export interface CharWindowDeps extends Omit<PainterHostPresentation, 'itemToolt
   progressionHtml(level: number): string;
   /** Remove the equipped piece in `slot` to bags and repaint bags + the sheet. */
   unequip(slot: EquipSlot): void;
+  /** Shift + right-click: open the item-first Enchant list for the worn piece
+   *  in `slot` at the pointer (BagItemActionMenu.openWornEnchant). */
+  openWornEnchant(slot: EquipSlot, x: number, y: number): void;
   /** Stage a drag-to-unequip: record the slot HUD-side and reveal the bags drop.
    *  `hotbarAction` is set when the worn piece is also placeable on the action
    *  bar (a usable trinket), so the same drag can drop onto a bar slot. */
@@ -688,7 +692,14 @@ export class CharWindow {
               }),
             )}</div>`
           : '';
-        return `${this.deps.wornItemTooltip(item, instance)}${mwLine}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
+        return `${this.deps.wornItemTooltip(item, instance)}${mwLine}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>${
+          // The shortcut is mouse + keyboard only, so the touch HUD (no Shift,
+          // no right-click) never advertises it; there the bag menu's Enchant
+          // row is the path.
+          hasEnchantsForItemSlot(item.slot) && !document.body.classList.contains('mobile-touch')
+            ? `<div class="tt-sub">${esc(t('hudChrome.paperdoll.enchantHint'))}</div>`
+            : ''
+        }`;
       });
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.
@@ -710,6 +721,13 @@ export class CharWindow {
       // Right-click the slot (classic-MMO muscle memory; matches the bags grid).
       row.addEventListener('contextmenu', (ev) => {
         ev.preventDefault();
+        // Shift + right-click enchants the worn piece in place; a plain
+        // right-click keeps its one-click unequip.
+        if (ev.shiftKey && hasEnchantsForItemSlot(item.slot)) {
+          this.deps.hideTooltip();
+          this.deps.openWornEnchant(slot, ev.clientX, ev.clientY);
+          return;
+        }
         this.doUnequip(slot, false);
       });
       // Drag the piece out onto the bags window to unequip it.

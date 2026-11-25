@@ -13527,6 +13527,21 @@
   #ctx-menu .ctx-item-meta .ctx-reagent.unsat {
     color: var(--color-text-error);
   }
+  /* Each reagent reads icon, name, amount; reagents sit side by side and wrap
+     as whole units. The icon is the material's own item art at the height of
+     the text it sits in (1em), so the line keeps the same size and rhythm. */
+  #ctx-menu .ctx-item-meta .ctx-reagent {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  #ctx-menu .ctx-item-meta .ctx-reagent-icon {
+    width: 1em;
+    height: 1em;
+    flex: none;
+    border-radius: 2px;
+  }
   /* The DESTRUCTIVE meta sub-line in the Apply Enchant target picker: a row
      whose activation will destroy an existing enchant ("Replaces X") must not
      render in the same muted style as the purely informational Worn / Not
@@ -13595,6 +13610,14 @@
     max-height: min(60vh, 560px);
     overflow-y: auto;
     overscroll-behavior: contain;
+  }
+  /* The item-first Enchant picker (right-click gear, Enchant): same width and
+     row styling, capped to about five enchant rows, then the list scrolls.
+     Scoped under the picker class, so a foreign paint that clears the picker
+     modifier also drops this cap. Mirrored by PICKER_COMPACT_MAX_HEIGHT_DESKTOP_PX
+     in bag_item_action_menu.ts for placement. */
+  #ctx-menu.ctx-menu-picker.ctx-menu-picker-compact {
+    max-height: min(60vh, 420px);
   }
 
   /* ---------- ai account tag ---------- */
