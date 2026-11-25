@@ -1,11 +1,15 @@
 // The Guardian of the Heat's Wheel of the Hearth (docs/design/raid/smith_heart.md
 // section 7.4), every tier, every fighting phase (the rework of 2026-11-18: on Normal
-// the fight never made anyone move): the shore all the way round the wellspring is
-// cut in four even quarters (Jose's playtest of 2026-11-25: the raid stands behind
-// the guardian too). Three turn red and erupt; one stays dark and safe. The tier's rounds run back
-// to back (three, Mythic four): as one round's fire falls, the next round's slices
-// already show, its safe slice the next quarter round (either way), so the raid
-// crosses the moment the fire dies down.
+// the fight never made anyone move). Jose's call of 2026-11-25 (in place of the even
+// quarters of the same day): four 45 degree wedges over the shore IN FRONT of the
+// guardian (toward the door) and the same four mirrored BEHIND it
+// (heat_ids.ts WHEEL_ARCS_DEG). On each side three turn red and erupt and one stays
+// dark and safe; the front's safe wedge and the back's are picked apart (hashed, each
+// its own salt), so the melee behind and the ranged in front each read their own side.
+// The tier's rounds run back to back (three, Mythic four): as one round's fire falls,
+// the next round's wedges already show, each side's safe wedge one or two over from
+// its last (never round the far side of the wellspring), so the raid crosses the
+// moment the fire dies down.
 //
 //   A round  each red slice warns the tier's `wheel.warn` s (Normal 5, Heroic 3.5,
 //            Mythic 3), erupts (a near-lethal blow to whoever stands in it, past the
@@ -28,6 +32,7 @@ import {
   HEAT_NAMES,
   heatHash,
   HEAT_TUNING as T,
+  WHEEL_SIDE,
   WHEEL_SLICES,
   wheelTemplate,
 } from './heat_ids';
@@ -46,74 +51,74 @@ import {
 import type { HeatWheelRound } from './heat_state';
 import { heatSay } from './heat_voice';
 
-/** Run `run`'s `rounds` safe slices: each the next slice round from the last,
- *  either way (hashed), never the same. Since Jose's playtest of 2026-11-25 the
- *  slices are four even quarters all the way round the wellspring, so the step
- *  is always one: two quarters over is half the shore away, more than any
- *  tier's warning gives a raider at the ranged ring to walk (it was one or
- *  two over the two 45 degree front slices before). Pure. */
-export function wheelSafes(run: number, rounds: number): number[] {
+/** One side's `rounds` safe wedges for run `run` (0 to 3 on that side): each
+ *  one or two over from the last (hashed), never the same, never off the
+ *  side's ends (no wrap round the wellspring). `salt` keeps the two sides'
+ *  picks apart. Pure. */
+export function wheelSideSafes(run: number, rounds: number, salt: number): number[] {
   const out: number[] = [];
-  let at0 = heatHash(run, 41) % WHEEL_SLICES;
+  let at0 = heatHash(run, 41 + salt) % WHEEL_SIDE;
   out.push(at0);
   for (let i = 1; i < rounds; i++) {
-    const dir = heatHash(run + i, 47) % 2 === 0 ? 1 : -1;
-    at0 = (at0 + dir + WHEEL_SLICES) % WHEEL_SLICES;
+    const step = 1 + (heatHash(run * 7 + i, 43 + salt) % 2);
+    const up = at0 + step;
+    const down = at0 - step;
+    const goUp = up < WHEEL_SIDE && (down < 0 || heatHash(run + i, 47 + salt) % 2 === 0);
+    at0 = goUp ? up : down;
     out.push(at0);
   }
   return out;
 }
 
-/** The slices the raid crosses from round safe slice `from` to the next, `to`:
- *  any slice between them the short way round the wellspring (the ring wraps:
- *  slice 3 and slice 0 meet behind it), then `to` itself. Two apart, both ways
- *  are as short: the way of rising slice numbers (round the shore by rising
- *  bearings, clockwise seen from above) is the one put out. Pure. */
+/** Run `run`'s `rounds` safe wedges in front (0 to 3) and behind (4 to 7),
+ *  each side's its own pick. Pure. */
+export function wheelSafes(run: number, rounds: number): { front: number[]; back: number[] } {
+  return {
+    front: wheelSideSafes(run, rounds, 0),
+    back: wheelSideSafes(run, rounds, 19).map((i) => i + WHEEL_SIDE),
+  };
+}
+
+/** The wedges the raid crosses from round safe wedge `from` to the next, `to`
+ *  (the same side): any wedge between them, then `to` itself. Pure. */
 export function wheelCrossing(from: number, to: number): number[] {
   if (from === to) return [];
-  const n = WHEEL_SLICES;
-  const up = (((to - from) % n) + n) % n;
-  const step = up <= n - up ? 1 : -1;
   const out: number[] = [];
-  for (let slice = (from + step + n) % n; slice !== to; slice = (slice + step + n) % n)
-    out.push(slice);
+  const step = to > from ? 1 : -1;
+  for (let slice = from + step; slice !== to; slice += step) out.push(slice);
   out.push(to);
   return out;
 }
 
-function beginRound(s: HeatScope, safe: number): void {
+function beginRound(s: HeatScope, safe: number, safeBack: number): void {
   const warn = s.rules.wheel.warn;
   const reds: number[] = [];
+  const redSlices: number[] = [];
+  const spawn = (slice: number, state: 'warn' | 'safe') =>
+    spawnFightObject(
+      s.ctx,
+      s.inst,
+      wheelTemplate(slice, state, warn),
+      HEAT_NAMES.wheel,
+      HEARTH_WELL.x,
+      HEARTH_WELL.z,
+      T.wheelOuter,
+    ).id;
   for (let slice = 0; slice < WHEEL_SLICES; slice++) {
-    if (slice === safe) continue;
-    reds.push(
-      spawnFightObject(
-        s.ctx,
-        s.inst,
-        wheelTemplate(slice, 'warn', warn),
-        HEAT_NAMES.wheel,
-        HEARTH_WELL.x,
-        HEARTH_WELL.z,
-        T.wheelOuter,
-      ).id,
-    );
+    if (slice === safe || slice === safeBack) continue;
+    reds.push(spawn(slice, 'warn'));
+    redSlices.push(slice);
   }
-  const safeId = spawnFightObject(
-    s.ctx,
-    s.inst,
-    wheelTemplate(safe, 'safe', warn),
-    HEAT_NAMES.wheel,
-    HEARTH_WELL.x,
-    HEARTH_WELL.z,
-    T.wheelOuter,
-  ).id;
   s.st.wheelRounds.push({
     safe,
+    safeBack,
     state: 'warn',
     remaining: warn,
     tick: 0,
     reds,
-    safeId,
+    redSlices,
+    safeId: spawn(safe, 'safe'),
+    safeBackId: spawn(safeBack, 'safe'),
     doused: [],
     douse: 0,
   });
@@ -123,43 +128,41 @@ function beginRound(s: HeatScope, safe: number): void {
 export function startWheel(s: HeatScope): void {
   const st = s.st;
   st.wheelTimer = s.rules.wheel.every;
-  st.wheelSafes = wheelSafes(st.wheelRuns, s.rules.wheel.rounds);
+  const safes = wheelSafes(st.wheelRuns, s.rules.wheel.rounds);
+  st.wheelSafes = safes.front;
+  st.wheelSafesBack = safes.back;
   st.wheelRuns++;
-  beginRound(s, st.wheelSafes[0]);
+  beginRound(s, st.wheelSafes[0], st.wheelSafesBack[0]);
   st.wheelNext = 1;
   heatSay(s, s.boss, 'wheel');
 }
 
-/** The players in a red slice of `round` now: on the shore, not in its safe
- *  slice (nor, with `burning`, in a slice already put out). */
+/** The players in a red wedge of `round` now: on the shore, in neither safe
+ *  wedge (nor, with `burning`, in a wedge already put out). */
 function inRed(s: HeatScope, round: HeatWheelRound, burning = false) {
   return livePlayers(s).filter((p) => {
     const here = at(s, p);
     if (wellDistance(here.x, here.z) < HEARTH_WELL.r) return false;
     const slice = wheelSliceAt(here.x, here.z);
-    return slice !== round.safe && !(burning && round.doused.includes(slice));
+    if (slice === round.safe || slice === round.safeBack) return false;
+    return !(burning && round.doused.includes(slice));
   });
-}
-
-/** Red object `i`'s slice: the reds are every slice but the safe one, in order. */
-function redSlice(round: HeatWheelRound, i: number): number {
-  return i < round.safe ? i : i + 1;
 }
 
 function setReds(s: HeatScope, round: HeatWheelRound): void {
   round.reds.forEach((id, i) => {
     const e = s.ctx.entities.get(id);
     if (!e) return;
-    const slice = redSlice(round, i);
+    const slice = round.redSlices[i];
     const seconds = round.doused.includes(slice) ? T.wheelDouse : T.wheelBurn;
     e.templateId = wheelTemplate(slice, 'burn', seconds);
   });
 }
 
-/** Put out the doused slices' fire (their objects go; they burn nobody). */
+/** Put out the doused wedges' fire (their objects go; they burn nobody). */
 function douse(s: HeatScope, round: HeatWheelRound): void {
   round.reds.forEach((id, i) => {
-    if (round.doused.includes(redSlice(round, i))) dropFightObject(s.ctx, s.inst, id);
+    if (round.doused.includes(round.redSlices[i])) dropFightObject(s.ctx, s.inst, id);
   });
 }
 
@@ -183,11 +186,15 @@ export function stepWheel(s: HeatScope): void {
       round.remaining = T.wheelBurn;
       round.tick = T.wheelTick;
       if (st.wheelNext < st.wheelSafes.length) {
-        round.doused = wheelCrossing(round.safe, st.wheelSafes[st.wheelNext]);
+        round.doused = [
+          ...wheelCrossing(round.safe, st.wheelSafes[st.wheelNext]),
+          ...wheelCrossing(round.safeBack, st.wheelSafesBack[st.wheelNext]),
+        ];
         round.douse = T.wheelDouse;
       }
       setReds(s, round);
       dropFightObject(s.ctx, s.inst, round.safeId);
+      dropFightObject(s.ctx, s.inst, round.safeBackId);
       cueAt(s, HEAT_CUES.ignite, HEARTH_WELL.x, HEARTH_WELL.z, T.wheelOuter);
       for (const p of inRed(s, round))
         fireHit(
@@ -197,7 +204,10 @@ export function stepWheel(s: HeatScope): void {
           HEAT_NAMES.wheel,
         );
       keep.push(round);
-      if (st.wheelNext < st.wheelSafes.length) beginRound(s, st.wheelSafes[st.wheelNext++]);
+      if (st.wheelNext < st.wheelSafes.length) {
+        beginRound(s, st.wheelSafes[st.wheelNext], st.wheelSafesBack[st.wheelNext]);
+        st.wheelNext++;
+      }
       continue;
     }
     if (round.remaining <= 1e-9) {
@@ -230,9 +240,13 @@ export function stepWheel(s: HeatScope): void {
 export function clearWheel(s: Pick<HeatScope, 'ctx' | 'inst' | 'st'>): void {
   for (const round of s.st.wheelRounds) {
     for (const id of round.reds) dropFightObject(s.ctx, s.inst, id);
-    if (round.state === 'warn') dropFightObject(s.ctx, s.inst, round.safeId);
+    if (round.state === 'warn') {
+      dropFightObject(s.ctx, s.inst, round.safeId);
+      dropFightObject(s.ctx, s.inst, round.safeBackId);
+    }
   }
   s.st.wheelRounds = [];
   s.st.wheelSafes = [];
+  s.st.wheelSafesBack = [];
   s.st.wheelNext = 0;
 }

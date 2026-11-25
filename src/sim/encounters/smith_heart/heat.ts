@@ -193,6 +193,7 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     wheelTimer: HEAT_DIFFICULTY[difficulty].wheel.first,
     wheelRuns: 0,
     wheelSafes: [],
+    wheelSafesBack: [],
     wheelNext: 0,
     wheelRounds: [],
     zoneRun: null,

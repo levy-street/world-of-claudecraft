@@ -102,13 +102,17 @@ export interface HeatZone {
 /** A Wakefire run: the bands in their order, the next one's start. */
 /** One round of the Wheel of the Hearth on the floor. */
 export interface HeatWheelRound {
+  /** The front's safe wedge (0 to 3) and the back's (4 to 7). */
   safe: number;
+  safeBack: number;
   state: 'warn' | 'burn';
   remaining: number;
   tick: number;
-  /** The red slices' objects, in slice order. */
+  /** The red slices' objects, in slice order, and their slices. */
   reds: number[];
+  redSlices: number[];
   safeId: number;
+  safeBackId: number;
   /** Once erupted: the red slices on the way to the next round's safe slice
    *  (heat_wheel.ts wheelCrossing), put out after `douse` more seconds and
    *  never burning anyone meanwhile. Empty on a run's last round. */
@@ -240,6 +244,8 @@ export interface HeatFightState {
   wheelTimer: number;
   wheelRuns: number;
   wheelSafes: number[];
+  /** The back's safe wedges for the run (4 to 7), picked apart from the front's. */
+  wheelSafesBack: number[];
   wheelNext: number;
   wheelRounds: HeatWheelRound[];
   zones: HeatZone[];

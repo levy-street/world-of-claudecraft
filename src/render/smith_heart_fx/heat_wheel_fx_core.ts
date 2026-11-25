@@ -18,9 +18,10 @@ import { HEARTH_WELL } from '../../sim/content/smith_heart_layout';
 import { WHEEL_ARCS_DEG } from '../../sim/encounters/smith_heart/heat_ids';
 
 export const WHEEL_FX = {
-  /** Floor slots: a round warning (four slices) over the last one burning
-   *  (three) and the one before cooling (three), and spares. */
-  slots: 14,
+  /** Floor slots: a round warning (eight wedges, front and back since
+   *  2026-11-25) over the last one burning (six) and the one before cooling
+   *  (six), and spares. */
+  slots: 24,
   /** Geysers laid in the widest slice; a narrower one shows its share (few
    *  and big: a scatter of small flames read as confetti). */
   vents: 16,

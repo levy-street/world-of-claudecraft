@@ -28,6 +28,7 @@ import {
   heatHash,
   HEAT_TUNING as T,
   WHEEL_ARCS_DEG,
+  WHEEL_SIDE,
   ZONE_BANDS,
 } from './heat_ids';
 
@@ -89,8 +90,12 @@ export function beyondFlare(x: number, z: number): boolean {
 export function wheelSliceAt(x: number, z: number): number {
   let deg = (Math.atan2(x - HEARTH_WELL.x, z - HEARTH_WELL.z) * 180) / Math.PI;
   if (deg < -90) deg += 360;
-  for (let i = 0; i < WHEEL_ARCS_DEG.length; i++) if (deg < WHEEL_ARCS_DEG[i][1]) return i;
-  return WHEEL_ARCS_DEG.length - 1;
+  for (let i = 0; i < WHEEL_ARCS_DEG.length; i++) {
+    const [a, b] = WHEEL_ARCS_DEG[i];
+    if (deg >= a && deg < b) return i;
+  }
+  // 270 itself (the range's end) closes the last back wedge round.
+  return WHEEL_SIDE + 1;
 }
 
 /** Is (x, z) in Wakefire band `band` (0 near, 1 the middle, 2 the back)? */

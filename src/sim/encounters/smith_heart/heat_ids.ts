@@ -714,22 +714,34 @@ export const ZONE_BANDS: readonly (readonly [number, number])[] = [
   [HEAT_WELL_R + 23, 70],
 ];
 
-/** The Wheel of the Hearth: how many slices (its rounds per run are the
- *  tier's, HEAT_DIFFICULTY `wheel.rounds`). */
-export const WHEEL_SLICES = 4;
+/** The Wheel of the Hearth: how many slices in all, and on each side (its
+ *  rounds per run are the tier's, HEAT_DIFFICULTY `wheel.rounds`). Jose's call
+ *  of 2026-11-25: four 45 degree wedges over the shore IN FRONT of the guardian
+ *  (toward the door, as before the even quarters of the same day), and the
+ *  same four mirrored BEHIND it, one safe on each side, picked apart (melee
+ *  behind and ranged in front each read their own side). */
+export const WHEEL_SIDE = 4;
+export const WHEEL_SLICES = WHEEL_SIDE * 2;
 
 /** A slice's bearings round the wellspring (sim facing, degrees, 0 north and
- *  90 east toward the door): four even quarters all the way round since Jose's
- *  playtest of 2026-11-25 took the altar-stone away (the raid stands behind
- *  the guardian too). Before, two 45 degree slices over the front shore and
- *  the two ends taking in the floor behind it. The door's bearing is the line
- *  between slices 1 and 2, as it was. */
+ *  90 east toward the door; the range runs -90 to 270): slices 0 to 3 the
+ *  front wedges from north round to south, 4 to 7 each one's mirror behind
+ *  (slice 4 + i mirrors slice i across the north-south line). */
 export const WHEEL_ARCS_DEG: readonly (readonly [number, number])[] = [
-  [-90, 0],
-  [0, 90],
-  [90, 180],
-  [180, 270],
+  [0, 45],
+  [45, 90],
+  [90, 135],
+  [135, 180],
+  [-45, 0],
+  [-90, -45],
+  [225, 270],
+  [180, 225],
 ];
+
+/** Which side slice `slice` lies on: 0 in front, 1 behind. Pure. */
+export function wheelSide(slice: number): 0 | 1 {
+  return slice >= WHEEL_SIDE ? 1 : 0;
+}
 
 export type HeatWheelState = 'warn' | 'burn' | 'safe';
 

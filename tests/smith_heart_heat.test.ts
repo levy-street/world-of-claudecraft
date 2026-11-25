@@ -586,11 +586,14 @@ describe('Guardian of the Heat: Basalt Fist waits out Wakefire and the Wheel', (
     expect(floorHoldsFist({ ...quiet, zones: [band] }, both)).toBe(true);
     const round = {
       safe: 1,
+      safeBack: 5,
       state: 'warn' as const,
       remaining: 2,
       tick: 0,
       reds: [],
+      redSlices: [],
       safeId: 0,
+      safeBackId: 0,
       doused: [],
       douse: 0,
     };
