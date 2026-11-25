@@ -227,6 +227,20 @@ describe('Guardian of the Heat: the lava waves (pure)', () => {
       expect(n[i].gapHalf).toBeGreaterThan(h[i].gapHalf);
       expect(n[i].every).toBeGreaterThan(h[i].every);
     }
+    // Jose's call of 2026-11-25: the second overflow noticeably faster, and
+    // Mythic its own (no longer Heroic's).
+    expect(HEAT_DIFFICULTY.normal.waves[0].speed).toBe(8);
+    expect(HEAT_DIFFICULTY.normal.waves[1].speed).toBeGreaterThanOrEqual(9.5);
+    expect(HEAT_DIFFICULTY.normal.waves[1].speed).toBeLessThanOrEqual(10.5);
+    expect(HEAT_DIFFICULTY.heroic.waves[0].speed).toBe(9.5);
+    expect(HEAT_DIFFICULTY.heroic.waves[1].speed).toBeGreaterThan(10.5);
+    expect(HEAT_DIFFICULTY.heroic.waves[1].speed).toBeLessThanOrEqual(12);
+    const m = HEAT_DIFFICULTY.mythic.waves;
+    expect(m).not.toBe(HEAT_DIFFICULTY.heroic.waves);
+    expect(m[0].speed).toBeGreaterThanOrEqual(9.5);
+    expect(m[0].speed).toBeLessThanOrEqual(10);
+    expect(m[1].speed).toBeGreaterThan(HEAT_DIFFICULTY.heroic.waves[1].speed);
+    expect(m[1].speed).toBeLessThanOrEqual(13);
     // A ring rolls out past the Hearth's farthest wall.
     for (const [x, z] of [
       [-174, -22],
@@ -234,6 +248,21 @@ describe('Guardian of the Heat: the lava waves (pure)', () => {
       [-256, -16],
     ])
       expect(wellDistance(x, z)).toBeLessThan(T.ringEnd);
+  });
+});
+
+describe('Guardian of the Heat: the faster rings still leave the walk', () => {
+  it('a player walking (7 yd/s, half a second to react) reaches the next corridor before its ring', () => {
+    // From the moment a ring leaves the lip the next ring's corridors glow;
+    // the next ring reaches a body `r` yards out `every` plus `r / speed`
+    // seconds later. The farthest a body stands from a corridor's middle
+    // line is `r` (straight across), less the corridor's half width.
+    for (const tier of ['normal', 'heroic', 'mythic'] as const)
+      for (const w of HEAT_DIFFICULTY[tier].waves)
+        for (let r = 6; r <= 34; r += 2) {
+          const time = w.every + Math.max(0, r - T.ringStart) / w.speed - 0.5;
+          expect(7 * time, `${tier} ${w.speed} at ${r}`).toBeGreaterThan(r - w.gapHalf);
+        }
   });
 });
 

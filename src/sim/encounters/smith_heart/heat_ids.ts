@@ -303,11 +303,21 @@ export interface HeatWheelRules {
   hit: number;
 }
 
-/** Heroic's (and Mythic's) lava waves: quicker rings, narrower corridors,
- *  the Wellspawn walking all the while. */
+/** Heroic's lava waves: quicker rings, narrower corridors, the Wellspawn
+ *  walking all the while. The second (40 percent) noticeably faster since
+ *  Jose's call of 2026-11-25 (10.5 to 11.5), its spacing kept (the walk to
+ *  the next corridor still fits: tests/smith_heart_heat_waves.test.ts). */
 const HEROIC_WAVES: HeatDifficultyRules['waves'] = [
   { count: 5, lead: 3, every: 4, speed: 9.5, gaps: 2, gapSpread: 90, gapHalf: 3.5 },
-  { count: 6, lead: 3, every: 3.4, speed: 10.5, gaps: 2, gapSpread: 90, gapHalf: 3 },
+  { count: 6, lead: 3, every: 3.4, speed: 11.5, gaps: 2, gapSpread: 90, gapHalf: 3 },
+];
+
+/** Mythic's own lava waves (Jose's call of 2026-11-25: no longer Heroic's):
+ *  a quicker first overflow and the fastest second (the walk to a corridor
+ *  still fits, pinned). */
+const MYTHIC_WAVES: HeatDifficultyRules['waves'] = [
+  { count: 5, lead: 3, every: 4, speed: 9.75, gaps: 2, gapSpread: 90, gapHalf: 3.5 },
+  { count: 6, lead: 3, every: 3.4, speed: 12, gaps: 2, gapSpread: 90, gapHalf: 3 },
 ];
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
@@ -339,7 +349,9 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // warning; the second overflow a little quicker and narrower.
     waves: [
       { count: 4, lead: 3.5, every: 4.5, speed: 8, gaps: 2, gapSpread: 90, gapHalf: 4.5 },
-      { count: 5, lead: 3.5, every: 4, speed: 9, gaps: 2, gapSpread: 90, gapHalf: 3.75 },
+      // The second noticeably faster since Jose's call of 2026-11-25 (was 9);
+      // its spacing kept (the walk to the corridor still fits, pinned).
+      { count: 5, lead: 3.5, every: 4, speed: 10, gaps: 2, gapSpread: 90, gapHalf: 3.75 },
     ],
   },
   heroic: {
@@ -389,7 +401,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     wheel: { first: 10, every: 28, warn: 3, rounds: 4, hit: 1 },
     cinderLateAfter: 240,
     cinderLateEvery: 20,
-    waves: HEROIC_WAVES,
+    waves: MYTHIC_WAVES,
   },
 };
 
