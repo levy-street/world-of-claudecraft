@@ -44,8 +44,26 @@ interface Run {
 }
 
 /** One player `d` yards from the guardian along `bearing` as the Roar lands,
- *  standing still (with `prep` run on the fight first). */
+ *  standing still (with `prep` run on the fight first). The throw alone:
+ *  its follow-through gust is held off here (its own pins:
+ *  tests/smith_heart_breath_roar_gust.test.ts). */
 function roar(
+  tier: 'normal' | 'heroic' | 'mythic',
+  d: number,
+  prep?: (f: BreathFight) => void,
+  bearing = BEARING,
+): Run {
+  const rules = BREATH_DIFFICULTY[tier] as { roarGustSpeed: number };
+  const saved = rules.roarGustSpeed;
+  rules.roarGustSpeed = 0;
+  try {
+    return roarRun(tier, d, prep, bearing);
+  } finally {
+    rules.roarGustSpeed = saved;
+  }
+}
+
+function roarRun(
   tier: 'normal' | 'heroic' | 'mythic',
   d: number,
   prep?: (f: BreathFight) => void,

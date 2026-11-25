@@ -98,6 +98,7 @@ import {
 } from './breath_intro';
 import { ISLE_DEV_VERBS, isleDevTrigger, isleReadout } from './breath_isle_dev';
 import { clearIsles, freshIsles, lockForIsles, startIsles, stepIsles } from './breath_isles';
+import { clearRoarGusts } from './breath_roar_gust';
 import {
   type BreathScope,
   corniceListeners,
@@ -208,6 +209,7 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     cradles: [],
     isles: freshIsles(),
     roar: null,
+    roarGusts: [],
     drawn: null,
     blowTimer: T.blowFirst,
     thunderTimer: T.thunderFirst,
@@ -327,6 +329,7 @@ function clearFight(
     // A throw still sliding lets go (its hold dropped, never left rooted).
     if (st.roar) clearShoves({ ctx }, st.roar.slides);
     st.roar = null;
+    clearRoarGusts({ ctx }, st);
     st.pinned = {};
     clearBlow({ ctx }, st, corniceListeners(ctx, inst));
   }

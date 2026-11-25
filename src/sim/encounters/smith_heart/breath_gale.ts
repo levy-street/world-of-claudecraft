@@ -38,7 +38,7 @@
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
-import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../../wind_drift';
+import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_GUST_AURA, WIND_PULL_AURA } from '../../wind_drift';
 import { looseGalePos, pinnedAgainstRim } from './breath_geometry';
 import {
   BREATH_AURAS,
@@ -55,6 +55,7 @@ import {
   windRamp,
 } from './breath_ids';
 import { startRoar, stepRoar } from './breath_roar';
+import { stepRoarGusts } from './breath_roar_gust';
 import {
   auraOf,
   type BreathScope,
@@ -222,8 +223,9 @@ function syncWindAuras(s: BreathScope): void {
     const held = heldFast(p) || p.carriedBy !== undefined;
     if (held || !blowing) dropAura(p, WIND_DRIFT_AURA);
     if (held || !pulling) dropAura(p, WIND_PULL_AURA);
-    // An anchor caught mid-blast holds the body from then on.
+    // An anchor caught mid-blast (or mid-gust) holds the body from then on.
     if (held) dropAura(p, WIND_BLAST_AURA);
+    if (held) dropAura(p, WIND_GUST_AURA);
     if (held) continue;
     if (blowing)
       keepWind(s, p, WIND_DRIFT_AURA, BREATH_NAMES.wind, {
@@ -239,7 +241,7 @@ function syncWindAuras(s: BreathScope): void {
   }
 }
 
-const WIND_AURA_IDS = new Set([WIND_DRIFT_AURA, WIND_PULL_AURA, WIND_BLAST_AURA]);
+const WIND_AURA_IDS = new Set([WIND_DRIFT_AURA, WIND_PULL_AURA, WIND_BLAST_AURA, WIND_GUST_AURA]);
 
 /** Take the wind, pull and blast auras one guardian put on `p` off it. */
 function dropWindFrom(p: Entity, sourceId: number): void {
@@ -507,6 +509,7 @@ export function stepWind(s: BreathScope): void {
   stepPinned(s);
   stepVortex(s);
   stepRoar(s);
+  stepRoarGusts(s);
   stepGales(s);
 }
 

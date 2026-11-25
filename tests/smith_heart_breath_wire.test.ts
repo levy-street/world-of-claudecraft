@@ -142,6 +142,9 @@ describe('the Guardian of the Breath over the wire', () => {
     // carry him out of the fight this run then reads): no knockback moves him.
     aleph.knockbackResistance = 1;
     run(T.inhaleCast + T.gustCast + 0.5);
+    // ...nor the Roar's follow-through gust (the switch to Heroic below would
+    // carry him off): the wind's mirror is read above.
+    aleph.auras = aleph.auras.filter((x: Any) => x.id !== 'wind_gust');
 
     // Heroic's loose gales: their positions follow the server's.
     sim.chat('/dev heart breath heroic', a.pid);

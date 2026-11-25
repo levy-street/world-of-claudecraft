@@ -22,7 +22,7 @@ import {
   BREATH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
 import { DT } from '../src/sim/types';
-import { WIND_BLAST_AURA } from '../src/sim/wind_drift';
+import { WIND_BLAST_AURA, WIND_GUST_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { t } from '../src/ui/i18n';
 import { type BreathFight, breathFight } from './helpers/breath_fight';
@@ -154,6 +154,37 @@ describe('the Breath moves bodies the online client can draw', () => {
     }
     expect(thrown).toBeGreaterThan(ticks(T.roarThrowSlide) - 3);
     expect(thrown).toBeLessThanOrEqual(ticks(T.roarThrowSlide) + 1);
+  });
+
+  it("the Roar's follow-through gust is predicted: no override, no epoch edge while it blows", () => {
+    // Jose's call of 2026-11-25: the gust is the kernel's steady wind
+    // (WIND_GUST_AURA), stepped by both hosts, so the client predicts it.
+    const f = pulled(4);
+    const b = f.boss();
+    const C = BREATH.cornice;
+    const bw = f.world(C.x, C.z);
+    b.pos.x = bw.x;
+    b.pos.z = bw.z;
+    b.pos.y = f.sim.ctx.groundPos(bw.x, bw.z).y;
+    f.sim.ctx.rebucket(b);
+    const near = f.players[1];
+    const s = sessionOf(f, near.id);
+    const w = watch(f, s);
+    f.dev('/dev heart breath roar');
+    let landed = false;
+    let gusted = 0;
+    let epoch = -1;
+    for (let k = 0; k < ticks(T.inhaleCast + T.gustCast + T.roarThrowSlide + 5); k++) {
+      if (!landed) f.put(near, C.x + 4, C.z);
+      const ev = w.tick();
+      if (ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust)) landed = true;
+      if (!landed || !near.auras.some((a) => a.id === WIND_GUST_AURA)) continue;
+      gusted++;
+      expect(s.movementOverrideActive).toBe(false);
+      if (epoch < 0) epoch = s.movementOverrideEpoch;
+      expect(s.movementOverrideEpoch).toBe(epoch);
+    }
+    expect(gusted).toBeGreaterThan(ticks(1));
   });
 
   it('the throw says its rule', () => {

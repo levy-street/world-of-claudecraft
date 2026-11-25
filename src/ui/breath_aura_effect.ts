@@ -22,6 +22,7 @@ import {
   WIND_BLAST_AURA,
   WIND_CROSS_GRIP,
   WIND_DRIFT_AURA,
+  WIND_GUST_AURA,
   WIND_PULL_AURA,
 } from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
@@ -67,6 +68,17 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
               : BREATH_DIFFICULTY.normal.blastSeconds,
         },
       };
+    case WIND_GUST_AURA:
+      return {
+        key: `${KEY}.gust`,
+        // Its full speed (the ramp's half steps read the tier's whole pace).
+        nums: {
+          speed:
+            (a.value2 ?? 0) > BREATH_DIFFICULTY.normal.roarGustSpeed
+              ? BREATH_DIFFICULTY.heroic.roarGustSpeed
+              : BREATH_DIFFICULTY.normal.roarGustSpeed,
+        },
+      };
     case WIND_PULL_AURA:
       return {
         key: `${KEY}.draw`,
@@ -79,6 +91,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           gustMax: tierValue(T.gustMax, NM),
           throw: BREATH_DIFFICULTY.normal.gustThrow,
           heroicThrow: BREATH_DIFFICULTY.heroic.gustThrow,
+          gustSpeed: BREATH_DIFFICULTY.normal.roarGustSpeed,
+          heroicGustSpeed: BREATH_DIFFICULTY.heroic.roarGustSpeed,
           ...tierRange('heroic', T.vortexMin, T.vortexMax, HM),
           ...tierRange('heroicGust', T.gustMin, T.gustMax, HM),
         },

@@ -123,4 +123,6 @@ export const SMITH_HEART_AURA_ICON_SOURCES: readonly (readonly [string, string])
   ['heart_quench_rime_slow', 'heart_quench_rime'],
   ['heart_rush_exposed', 'heart_rush_shattered'],
   ['mob_dormant', 'heart_council_intro'],
+  // The Summit Roar's follow-through gust is the blow's wind on one body.
+  ['wind_gust', 'wind_drift'],
 ];

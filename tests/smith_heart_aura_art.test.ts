@@ -18,7 +18,12 @@ import { HEAT_AURAS } from '../src/sim/encounters/smith_heart/heat_ids';
 import { QUENCH_AURAS } from '../src/sim/encounters/smith_heart/quench_ids';
 import { TANK_BUSTER_AURA } from '../src/sim/encounters/smith_heart/tank_buster_ids';
 import { DORMANT_AURA_ID } from '../src/sim/mob/dormant_state';
-import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../src/sim/wind_drift';
+import {
+  WIND_BLAST_AURA,
+  WIND_DRIFT_AURA,
+  WIND_GUST_AURA,
+  WIND_PULL_AURA,
+} from '../src/sim/wind_drift';
 import { resolveHudAuraIconId } from '../src/ui/aura_icon_runtime';
 import { AURA_FILE_IMAGE_IDS, auraImageUrl } from '../src/ui/icons';
 import {
@@ -42,6 +47,7 @@ const LIVE_RAID_AURA_IDS = new Set<string>([
   ...Object.values(HARD_ENRAGE_AURAS),
   TANK_BUSTER_AURA,
   WIND_DRIFT_AURA,
+  WIND_GUST_AURA,
   WIND_PULL_AURA,
   WIND_BLAST_AURA,
   DORMANT_AURA_ID,
@@ -61,12 +67,12 @@ const painted = new Set(SMITH_HEART_AURA_IMAGE_IDS);
 const aliases = new Map(SMITH_HEART_AURA_ICON_SOURCES);
 
 describe("Smith's Heart aura art", () => {
-  it('keeps 67 paintings and 26 shared aliases, sorted and disjoint', () => {
+  it('keeps 67 paintings and 27 shared aliases, sorted and disjoint', () => {
     expect(SMITH_HEART_AURA_IMAGE_IDS).toHaveLength(67);
     expect(painted.size).toBe(67);
     expect([...SMITH_HEART_AURA_IMAGE_IDS]).toEqual([...SMITH_HEART_AURA_IMAGE_IDS].sort());
-    expect(SMITH_HEART_AURA_ICON_SOURCES).toHaveLength(26);
-    expect(aliases.size).toBe(26);
+    expect(SMITH_HEART_AURA_ICON_SOURCES).toHaveLength(27);
+    expect(aliases.size).toBe(27);
     for (const [alias, source] of aliases) {
       expect(painted.has(alias), `${alias} is an alias, not a painting`).toBe(false);
       expect(painted.has(source), `${alias} shares a real painting (${source})`).toBe(true);

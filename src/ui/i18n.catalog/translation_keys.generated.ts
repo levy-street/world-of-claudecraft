@@ -12764,6 +12764,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.breathGuardian.cradled'
   | 'hudChrome.auraEffect.breathGuardian.draw'
   | 'hudChrome.auraEffect.breathGuardian.drawn'
+  | 'hudChrome.auraEffect.breathGuardian.gust'
   | 'hudChrome.auraEffect.breathGuardian.intro'
   | 'hudChrome.auraEffect.breathGuardian.laden'
   | 'hudChrome.auraEffect.breathGuardian.pinned'

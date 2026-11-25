@@ -307,6 +307,14 @@ export interface BreathDifficultyRules {
   /** Normal: the Roar's throw stops short of every lip (it displaces, never
    *  kills: breath_blow.ts safeThrowReach). */
   roarSafe: boolean;
+  /** The Roar's follow-through gust (breath_roar_gust.ts; Jose's call of
+   *  2026-11-25): once a body's throw settles, a steady wind blows it on the
+   *  way it was thrown for `roarGustSeconds` at `roarGustSpeed` yd/s, a little
+   *  slower than a run so a body walking straight back gains ground (about 2
+   *  yd/s on Normal, 1 on Heroic and Mythic) and one left standing is carried
+   *  some 15 (Normal, let go short of a lip: roarSafe) or 21 yards. */
+  roarGustSpeed: number;
+  roarGustSeconds: number;
   /** The Roar's old blast (wind_drift.ts WIND_BLAST_AURA): its speed by the
    *  guardian (yd/s) and how long it blew (s). 0 on every tier since the
    *  throw came back (2026-11-25): no slow drift lingers after the shove. */
@@ -453,6 +461,8 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     pullSpeed: 6.2,
     gustThrow: 16,
     roarSafe: true,
+    roarGustSpeed: 5,
+    roarGustSeconds: 3,
     blastSpeed: 0,
     blastSeconds: 0,
     // The parse-calibrated pass of 2026-11-16: the raid's damage and the
@@ -491,6 +501,8 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     pullSpeed: 6.7,
     gustThrow: 20,
     roarSafe: false,
+    roarGustSpeed: 6,
+    roarGustSeconds: 3.5,
     blastSpeed: 0,
     blastSeconds: 0,
     // The pass of 2026-11-16: the raid's damage +25 percent (1.25 to
@@ -533,6 +545,8 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     pullSpeed: 6.7,
     gustThrow: 20,
     roarSafe: false,
+    roarGustSpeed: 6,
+    roarGustSeconds: 3.5,
     blastSpeed: 0,
     blastSeconds: 0,
     // Heroic's numbers of 2026-11-16 (the heroic row whole).

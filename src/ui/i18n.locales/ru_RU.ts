@@ -26776,4 +26776,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchIce.onIce': 'На льду',
   'hudChrome.quenchIce.breaking': 'Лёд трескается!',
   'hudChrome.quenchIce.water': 'В воде!',
+  'hudChrome.auraEffect.breathGuardian.gust':
+    'Порыв Рёва вершины несёт вас туда, куда вас отбросило, {speed} м в секунду, несколько секунд. Идите прямо к Стражу, чтобы устоять, или встаньте в якорь Тессали, иначе вас унесёт к краю Карниза.',
 };

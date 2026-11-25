@@ -14,6 +14,7 @@
 // changes. DOM-free; allocates nothing per frame.
 
 import { BREATH_OBJECTS, breathWindOf } from '../../../sim/encounters/smith_heart/breath_ids';
+import { WIND_GUST_AURA } from '../../../sim/wind_drift';
 import { t } from '../../i18n';
 
 /** A body as the scan reads it. */
@@ -78,20 +79,41 @@ export function makeBreathWindView(): BreathWindView {
  */
 export function buildBreathWindView(
   wind: BreathWindBody | null,
-  player: { pos: { x: number; z: number }; facing?: number; dead?: boolean },
+  player: {
+    pos: { x: number; z: number };
+    facing?: number;
+    dead?: boolean;
+    auras?: readonly { id: string; value?: number }[];
+  },
   out: BreathWindView,
 ): BreathWindView {
   out.visible = false;
+  if (player.dead) return out;
+  // The Summit Roar's follow-through gust on this body (wind_drift.ts
+  // WIND_GUST_AURA, its heading in radians) outranks the Cornice's wind.
+  const gust = player.auras?.find((a) => a.id === WIND_GUST_AURA);
+  if (gust) return pointBadge(out, player.facing ?? 0, ((gust.value ?? 0) * 180) / Math.PI, false);
   const of = wind ? breathWindOf(wind.templateId) : null;
-  if (!wind || !of || !SHOWN.has(of.phase) || player.dead) return out;
+  if (!wind || !of || !SHOWN.has(of.phase)) return out;
   if (Math.hypot(player.pos.x - wind.pos.x, player.pos.z - wind.pos.z) > BREATH_WIND_REACH)
     return out;
+  return pointBadge(out, player.facing ?? 0, of.bearingDeg, TURNING.has(of.phase));
+}
+
+/** The badge pointed at the wind's bearing (degrees) for a body facing
+ *  `facing` (sim radians). */
+function pointBadge(
+  out: BreathWindView,
+  facing: number,
+  bearingDeg: number,
+  turning: boolean,
+): BreathWindView {
   // Both are angles in the sim's (sin a, cos a) frame, where a larger angle
   // turns LEFT (a right turn lowers the facing): the wind lies (bearing -
   // facing) to the left of ahead, so the arrow turns clockwise by its negation.
-  const facingDeg = ((player.facing ?? 0) * 180) / Math.PI;
-  out.rotDeg = Math.round((((facingDeg - of.bearingDeg) % 360) + 360) % 360) % 360;
-  out.turning = TURNING.has(of.phase);
+  const facingDeg = (facing * 180) / Math.PI;
+  out.rotDeg = Math.round((((facingDeg - bearingDeg) % 360) + 360) % 360) % 360;
+  out.turning = turning;
   out.label = out.turning ? t('hudChrome.breathWind.turning') : t('hudChrome.breathWind.blowing');
   out.visible = true;
   return out;

@@ -33,6 +33,7 @@ import { DT, type Entity } from '../../types';
 import { WIND_BLAST_AURA } from '../../wind_drift';
 import { safeThrowReach } from './breath_blow';
 import { BREATH_AURAS, BREATH_CUES, BREATH_NAMES, BREATH_TUNING as T } from './breath_ids';
+import { startRoarGust } from './breath_roar_gust';
 import { type BreathScope, heldFast, livePlayers, local, putMarker, roll } from './breath_scope';
 import { beginShove, stepShoves } from './breath_shove';
 import { breathSay } from './breath_voice';
@@ -131,7 +132,10 @@ export function stepRoar(s: BreathScope): void {
         dx /= d;
         dz /= d;
       }
-      throwFromRoar(s, p, dx, dz);
+      // Thrown, then its gust (breath_roar_gust.ts) as the throw settles; a
+      // body the throw could not move (a resistance, an immunity) takes the
+      // gust at once, a body still sliding under another shove none.
+      if (throwFromRoar(s, p, dx, dz) <= 0 && !sliding(s, p)) startRoarGust(s, p, dx, dz);
       // The blast: from the maw outward, easing with the distance, for the
       // tier's seconds (wind_drift.ts: both hosts step it, so it is
       // predicted online, never a server-driven slide). Run straight back
@@ -144,6 +148,14 @@ export function stepRoar(s: BreathScope): void {
         });
     }
   }
+  // A throw that settles this tick hands its body to the gust, on the way it
+  // was thrown (a body that went over a lip is falling, not gusted).
+  const before = w.slides.slice();
   stepShoves(s, w.slides);
+  for (const sl of before) {
+    if (w.slides.includes(sl)) continue;
+    const p = s.ctx.entities.get(sl.id);
+    if (p && !p.dead && p.onGround) startRoarGust(s, p, sl.ux, sl.uz);
+  }
   if (w.r >= w.reach && w.slides.length === 0) s.st.roar = null;
 }

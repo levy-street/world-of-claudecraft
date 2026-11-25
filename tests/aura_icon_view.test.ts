@@ -300,6 +300,7 @@ const SMITH_HEART_SHARED_AURA_SOURCES = [
   ['heart_quench_rime_slow', 'heart_quench_rime'],
   ['heart_rush_exposed', 'heart_rush_shattered'],
   ['mob_dormant', 'heart_council_intro'],
+  ['wind_gust', 'wind_drift'],
 ] as const;
 
 const AURA_RESPONSE_KINDS = new Set(['empowerNext', 'absorb', 'aura', 'echo']);

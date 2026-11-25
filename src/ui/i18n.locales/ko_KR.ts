@@ -26360,4 +26360,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchIce.onIce': '얼음 위',
   'hudChrome.quenchIce.breaking': '얼음이 깨진다!',
   'hudChrome.quenchIce.water': '물속!',
+  'hudChrome.auraEffect.breathGuardian.gust':
+    '정상의 포효의 돌풍이 당신이 던져진 방향으로 몇 초 동안 계속 밀어냅니다(초당 {speed}미터). 수호자 쪽으로 곧장 걸어가 버티거나 세살리의 닻에 서세요. 그러지 않으면 처마 가장자리로 밀려갑니다.',
 };

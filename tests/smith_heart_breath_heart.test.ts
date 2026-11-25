@@ -899,6 +899,20 @@ describe('Knotted Gale: when', () => {
   });
 
   it('never starts into the indrawn breath, nor a fuse short of it', () => {
+    // The Roar's follow-through gust would carry the standing raid off the
+    // Cornice before the wait ends: held off here (its own pins:
+    // tests/smith_heart_breath_roar_gust.test.ts).
+    const rules = BREATH_DIFFICULTY.mythic as { roarGustSpeed: number };
+    const saved = rules.roarGustSpeed;
+    rules.roarGustSpeed = 0;
+    try {
+      knotWaitsOutTheBreath();
+    } finally {
+      rules.roarGustSpeed = saved;
+    }
+  });
+
+  function knotWaitsOutTheBreath(): void {
     const f = mythic();
     const st = f.state();
     if (!st) throw new Error('no fight');
@@ -917,7 +931,7 @@ describe('Knotted Gale: when', () => {
     expect(st.wind.phase).not.toBe('inhale');
     expect(st.wind.phase).not.toBe('exhale');
     expect(st.heart).not.toBeNull();
-  });
+  }
 
   it('phase 2: two balls apart, two pairs of portals, never during the barrage', () => {
     const f = mythic(8);

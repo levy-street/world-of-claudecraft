@@ -5,6 +5,7 @@
 // players' auras and the fight's objects (breath_ids.ts says which).
 
 import type { BreathDifficulty, BreathWindPhase } from './breath_ids';
+import type { RoarGust } from './breath_roar_gust';
 import type { BreathShove } from './breath_shove';
 import type { SmithHeartFeatAttempt } from './feat_attempt';
 import type { HardEnrageState } from './hard_enrage';
@@ -301,6 +302,8 @@ export interface BreathFightState {
   galeShoves: BreathShove[];
   /** The Summit Roar's wave in flight (breath_roar.ts), or null. */
   roar: BreathRoar | null;
+  /** The Roar's follow-through gusts still blowing (breath_roar_gust.ts). */
+  roarGusts: RoarGust[];
   /** The storm breaking: the barrage's clock (seconds left, next volley). */
   barrage: { remaining: number; next: number; volleys: number } | null;
   spots: BreathSpot[];

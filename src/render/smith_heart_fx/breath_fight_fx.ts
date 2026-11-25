@@ -57,6 +57,7 @@ import {
   timedOf,
 } from '../../sim/encounters/smith_heart/breath_ids';
 import { ISLE_MOBS } from '../../sim/encounters/smith_heart/breath_isle_ids';
+import { WIND_GUST_AURA } from '../../sim/wind_drift';
 
 /** Every mob of the Islands of the Wind (its adds and its Stillstones). */
 const ISLE_MOB_IDS: ReadonlySet<string> = new Set(Object.values(ISLE_MOBS));
@@ -1276,6 +1277,7 @@ export class BreathFightFx {
       return;
     }
     this.readWind(world);
+    this.readGust(world);
     this.paintField(dt);
     this.paintObjects(world, dt);
     this.paintMarks(world, dt);
@@ -1544,6 +1546,19 @@ export class BreathFightFx {
     this.windPhase = of.phase;
     this.windBearing = of.bearingDeg;
     this.windFill = of.seconds > 0 ? Math.min(1, (this.clock - this.windSince) / of.seconds) : 0;
+  }
+
+  /** The Summit Roar's follow-through gust on the local player (wind_drift.ts
+   *  WIND_GUST_AURA): while it blows, the wind's whole look (the storm wall,
+   *  the gust ribbons, the side arrows, the blow's sound from upwind) reads
+   *  ITS way, the way the player is being carried. */
+  private readGust(world: IWorld): void {
+    const me = world.entities.get(world.playerId);
+    const g = me?.auras.find((a) => a.id === WIND_GUST_AURA);
+    if (!g) return;
+    this.windPhase = 'gust';
+    this.windBearing = ((((g.value * 180) / Math.PI) % 360) + 360) % 360;
+    this.windFill = 1;
   }
 
   private paintField(dt: number): void {

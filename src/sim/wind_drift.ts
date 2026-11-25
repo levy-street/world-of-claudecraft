@@ -33,6 +33,14 @@
 //                    falls to a run, and one left standing is carried on and
 //                    on. A function of the position alone, like the pull.
 //
+//   WIND_GUST_AURA   the Summit Roar's follow-through (Jose's call of
+//                    2026-11-25): a steady wind on one body, like the
+//                    drift (value = heading, value2 = speed), blowing it on
+//                    the way it was just thrown. It outranks the drift (a
+//                    blow begun under it waits) and is steered to the walk
+//                    like it, so a body walking straight back against it
+//                    gains ground slowly and one left standing is carried.
+//
 // Both ride a quiet `internal_cd` marker (no stat, no speed: never a slow a
 // cleanse would strip). Pure: no SimContext, no rng.
 
@@ -40,6 +48,9 @@ import type { Entity } from './types';
 
 /** A steady wind (value: heading, value2: speed). */
 export const WIND_DRIFT_AURA = 'wind_drift';
+/** The Roar's follow-through gust on one body (value: heading, value2:
+ *  speed), steady and steered like the drift, outranking it. */
+export const WIND_GUST_AURA = 'wind_gust';
 /** A pull toward a point (value, value2: world x, z; value3: speed). Never
  *  an id ending in `_pull`: that suffix is the Oath Chain's travel aura
  *  (combat/paladin_control.ts), which the aura tick would end at once. */
@@ -85,6 +96,7 @@ export function windDrift(
   out.x = 0;
   out.z = 0;
   let drift: (typeof e.auras)[number] | null = null;
+  let gust: (typeof e.auras)[number] | null = null;
   let blast: (typeof e.auras)[number] | null = null;
   for (const a of e.auras) {
     if (a.id === WIND_PULL_AURA) {
@@ -101,6 +113,7 @@ export function windDrift(
       return true;
     }
     if (a.id === WIND_BLAST_AURA) blast = a;
+    else if (a.id === WIND_GUST_AURA && gust === null) gust = a;
     else if (a.id === WIND_DRIFT_AURA && drift === null) drift = a;
   }
   // The blast outranks the blow (it is the gust the blow pauses for).
@@ -116,6 +129,8 @@ export function windDrift(
     out.z = (dz / len) * speed;
     return true;
   }
+  // The Roar's gust outranks the blow it follows.
+  if (gust !== null) drift = gust;
   if (drift === null) return false;
   const speed = drift.value2 ?? 0;
   if (!(speed > 0)) return false;
@@ -140,7 +155,7 @@ export function windIsSteady(e: Pick<Entity, 'auras'>): boolean {
   let steady = false;
   for (const a of e.auras) {
     if (a.id === WIND_PULL_AURA || a.id === WIND_BLAST_AURA) return false;
-    if (a.id === WIND_DRIFT_AURA) steady = true;
+    if (a.id === WIND_DRIFT_AURA || a.id === WIND_GUST_AURA) steady = true;
   }
   return steady;
 }
@@ -170,7 +185,8 @@ export function windDriftSpeed(e: Pick<Entity, 'auras'>): number {
   let speed = 0;
   for (const a of e.auras) {
     if (a.id === WIND_PULL_AURA || a.id === WIND_BLAST_AURA) speed = Math.max(speed, a.value3 ?? 0);
-    else if (a.id === WIND_DRIFT_AURA) speed = Math.max(speed, a.value2 ?? 0);
+    else if (a.id === WIND_DRIFT_AURA || a.id === WIND_GUST_AURA)
+      speed = Math.max(speed, a.value2 ?? 0);
   }
   return speed;
 }

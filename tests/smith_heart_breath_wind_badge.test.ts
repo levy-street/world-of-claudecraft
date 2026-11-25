@@ -6,6 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { breathWindTemplate } from '../src/sim/encounters/smith_heart/breath_ids';
+import { WIND_GUST_AURA } from '../src/sim/wind_drift';
 import {
   BREATH_WIND_REACH,
   BreathWindScan,
@@ -70,6 +71,21 @@ describe('the Breath wind badge', () => {
       false,
     );
     expect(buildBreathWindView(null, at(0), out).visible).toBe(false);
+  });
+
+  it("points along the Roar's follow-through gust on the body, outranking the Cornice's wind", () => {
+    const out = makeBreathWindView();
+    // Thrown east (heading 90 degrees), facing north: the arrow turns right.
+    const gusted = { ...at(0), auras: [{ id: WIND_GUST_AURA, value: Math.PI / 2 }] };
+    expect(buildBreathWindView(wind('calm', 0), gusted, out)).toMatchObject({
+      visible: true,
+      rotDeg: 270,
+      turning: false,
+    });
+    // Over a blow the other way: the gust still names the way it carries.
+    expect(buildBreathWindView(wind('blow', 270), gusted, out).rotDeg).toBe(270);
+    expect(buildBreathWindView(null, gusted, out).visible).toBe(true);
+    expect(buildBreathWindView(null, { ...gusted, dead: true }, out).visible).toBe(false);
   });
 
   it('finds the wind object once per roster', () => {

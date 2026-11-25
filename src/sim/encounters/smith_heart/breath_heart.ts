@@ -57,7 +57,7 @@ import { displacePlayer } from '../../displacement';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
-import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../../wind_drift';
+import { WIND_DRIFT_AURA, WIND_GUST_AURA, WIND_PULL_AURA } from '../../wind_drift';
 import { windBlowing } from './breath_gale';
 import { atGapLip, gapDistance, inBreathArena, knotSpot, nearestLipSpot } from './breath_geometry';
 import {
@@ -381,6 +381,7 @@ function takeKnot(s: BreathScope, rules: BreathKnotRules, k: BreathKnot, p: Enti
   a.duration = rules.fuse;
   // The load holds from this tick: no wind left over to carry them a step.
   dropAura(p, WIND_DRIFT_AURA);
+  dropAura(p, WIND_GUST_AURA);
   dropAura(p, WIND_PULL_AURA);
   cue(s, BREATH_CUES.knotTake, k.x, k.z, T.heartPickR);
 }
