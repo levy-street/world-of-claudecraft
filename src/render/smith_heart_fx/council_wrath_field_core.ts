@@ -23,16 +23,17 @@ import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core'
 
 export const WRATH_FIELD = {
   /** The pit's own ellipse plus its worked rim and the stair's foot. */
-  rx: HAMMER_PIT.rx + 4,
-  rz: HAMMER_PIT.rz + 4,
+  rx: HAMMER_PIT.rx + 2,
+  rz: HAMMER_PIT.rz + 2,
   /** Draped stations: rings out from the middle, stations round. */
   rings: 12,
   around: 128,
   /** Lift over the floor (yards). */
   lift: 0.1,
   color: TELEGRAPH_THREAT_COLORS.lethal,
-  /** The tint behind the sweep at its strongest (low: telegraphs on top). */
-  tint: 0.16,
+  /** The tint behind the sweep at its strongest (low: telegraphs on top;
+   *  0.16 read as a heavy red wash in the capture of 2026-11-25). */
+  tint: 0.09,
   /** The edge's strength. */
   edge: 0.9,
   /** The landing's shockwave: seconds, and its look (a room-sized wave). */

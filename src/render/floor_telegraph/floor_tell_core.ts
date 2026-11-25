@@ -44,7 +44,7 @@ export const FLOOR_TELL: Readonly<Record<FloorTellKind, FloorTellSpec>> = {
 };
 
 /** Where the soakers' pips sit (a share of the radius) and their size. */
-export const FLOOR_TELL_PIPS = { at: 0.84, size: 0.075, most: 10 } as const;
+export const FLOOR_TELL_PIPS = { at: 0.82, size: 0.1, most: 10 } as const;
 
 /** The frame's look: the pattern's phase (cycles), the rim's throb (0..1),
  *  how strong the whole tell draws. */

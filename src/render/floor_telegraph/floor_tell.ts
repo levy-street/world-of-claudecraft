@@ -77,9 +77,9 @@ void main() {
     // An unlit pip is a hollow socket, a lit one a full bright gem.
     pip = mix(ring, pip, lit);
   }
-  vec3 col = uColor * (0.85 + 0.5 * chev) + uHot * (rimLine * 0.6 + lit * pip);
+  vec3 col = uColor * (0.85 + 0.7 * chev) + uHot * (rimLine * 0.6 + lit * pip);
   col = mix(col, uColor * 0.45, (1.0 - lit) * pip * 0.5);
-  float a = uAlpha * (0.1 + 0.62 * chev + rimLine + halo) + pip * min(1.0, uAlpha + 0.35);
+  float a = uAlpha * (0.1 + 0.85 * chev + rimLine + halo) + pip * min(1.0, uAlpha + 0.35);
   gl_FragColor = vec4(col, min(1.0, a));
   #include <colorspace_fragment>
 }
