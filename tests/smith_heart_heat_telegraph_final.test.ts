@@ -70,7 +70,9 @@ describe('Guardian of the Heat: a filling mark is full the instant it strikes', 
     // frame its object arrives).
     for (const f of ['heat_fx.ts', 'heat_fight_fx.ts']) {
       const src = readFileSync(`src/render/smith_heart_fx/${f}`, 'utf8');
-      expect(src, f).toMatch(/scanTimer <= 0 \|\|\s*\(this\.\w+[^)]*&& world\.entityRosterVersion !== this\.rosterSeen\)/);
+      expect(src, f).toMatch(
+        /scanTimer <= 0 \|\|\s*\(this\.\w+[^)]*&& world\.entityRosterVersion !== this\.rosterSeen\)/,
+      );
     }
   });
 });

@@ -10,9 +10,9 @@ import type { Entity, SimEvent } from '../sim/types';
 import { HeartMarkEar } from './smith_heart_mark_audio';
 import {
   coldWarningDue,
+  crackStrainStage,
   QUENCH_BAR_SOUNDS,
   QUENCH_COLD_SOUNDS,
-  crackStrainStage,
   QUENCH_CRACK_SOUND,
   QUENCH_CRACK_STRAIN,
   QUENCH_CUE_SOUNDS,
