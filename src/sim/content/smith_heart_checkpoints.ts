@@ -31,11 +31,10 @@ export const SMITH_HEART_CHECKPOINTS: Readonly<
   // On the Gallery's descent, just past the Pit Mouth: 55 yd from the pit's
   // middle, outside the council's reach (council_scope.ts COUNCIL_ARENA_R).
   hammer: { gates: ['hammer_pit_mouth'], pos: { x: -44, z: -188 } },
-  // The top of the Cornice's climb, just past the Cornice Mouth and west of
-  // the arena's line (breath_geometry.ts CLIMB_ARENA_X); the west rim keeps
-  // its wall, so no gap of the void opens near it.
+  // The top of the Cornice's climb, on its landing a chasm short of the
+  // Cornice (no gate on the climb since 2026-11-25: it opens with the Slab).
   breath: {
-    gates: ['hammer_pit_mouth', 'the_slab', 'cornice_mouth'],
+    gates: ['hammer_pit_mouth', 'the_slab'],
     pos: { x: -68, z: 192 },
   },
   // The basin's shelf, just past the Lake Mouth: off the lake's ice (its holes

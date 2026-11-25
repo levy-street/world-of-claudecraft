@@ -288,7 +288,7 @@ describe('/dev heart', () => {
     });
     expect(sealMasks(sim, fresh).every((t) => t === `${SMITH_HEART_SEAL_PREFIX}0`)).toBe(true);
     expect(sealMasks(sim, fresh).length).toBeGreaterThan(0);
-    for (const id of ['the_slab', 'hammer_pit_mouth', 'cornice_mouth'])
+    for (const id of ['the_slab', 'hammer_pit_mouth', 'lake_mouth'])
       expect(dungeonGateState(sim.ctx, fresh, gate(id)), id).not.toBe('open');
   });
 

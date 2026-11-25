@@ -868,17 +868,10 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
     openText:
       'The living stone splits from end to end. Beyond the Slab, the heart of the mountain lies open.',
   },
-  {
-    id: 'cornice_mouth',
-    name: 'Cornice Mouth',
-    kind: 'forge_seal',
-    x: -70,
-    z: 191,
-    hw: 7.6,
-    rot: across(40, 14),
-    packs: [...SMITH_HEART_PACKS.breath],
-    sealWhileEngaged: SMITH_HEART_GUARDIANS.breath,
-  },
+  // No gate on the Cornice's climb since Jose's playtest of 2026-11-25: its
+  // standing stones read as two walls in the middle of the ramp. The chasm
+  // and the Gale Crossing (encounters/smith_heart/breath_crossing.ts) are
+  // the way onto the Cornice; the Breath's packs no longer hold a door.
   {
     id: 'lake_mouth',
     name: 'Lake Mouth',

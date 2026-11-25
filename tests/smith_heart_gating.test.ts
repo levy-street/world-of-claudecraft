@@ -147,8 +147,9 @@ function local(sim: Sim, pid: number, inst: InstanceSlot): { x: number; z: numbe
 function near(a: { x: number; z: number }, b: { x: number; z: number }, d: number): boolean {
   return Math.hypot(a.x - b.x, a.z - b.z) < d;
 }
-const ARENA_MOUTH: Record<Exclude<SmithHeartVein, 'hammer'>, string> = {
-  breath: 'cornice_mouth',
+// The Breath's climb holds no gate since Jose's playtest of 2026-11-25 (its
+// standing stones read as walls on the ramp): its packs open nothing.
+const ARENA_MOUTH: Partial<Record<Exclude<SmithHeartVein, 'hammer'>, string>> = {
   quench: 'lake_mouth',
   heat: 'anvil_mouth',
 };
@@ -243,10 +244,11 @@ describe("the Smith's Heart gating", () => {
       let mask = SMITH_HEART_VEIN_BITS.hammer;
       for (const vein of order) {
         const v = vein as Exclude<SmithHeartVein, 'hammer'>;
-        expect(state(sim, inst, ARENA_MOUTH[v])).toBe('closed');
+        const mouth = ARENA_MOUTH[v];
+        if (mouth) expect(state(sim, inst, mouth)).toBe('closed');
         kill(sim, inst, SMITH_HEART_PACKS[v]);
         sim.tick();
-        expect(state(sim, inst, ARENA_MOUTH[v])).toBe('open');
+        if (mouth) expect(state(sim, inst, mouth)).toBe('open');
         kill(sim, inst, [SMITH_HEART_GUARDIANS[v]]);
         const events = sim.tick();
         mask |= SMITH_HEART_VEIN_BITS[v];
@@ -348,11 +350,12 @@ describe("the Smith's Heart gating", () => {
   it('the Heart Bridge seals for the final boss, every arena mouth for its guardian', () => {
     expect(gate('heart_bridge').sealWhileEngaged).toBe(SMITH_HEART_FINAL_BOSS);
     expect(gate('hammer_pit_mouth').sealWhileEngaged).toBe(SMITH_HEART_GUARDIANS.hammer);
-    for (const [vein, id] of Object.entries(ARENA_MOUTH)) {
+    expect(SMITH_HEART_GATES.some((g) => g.id === 'cornice_mouth')).toBe(false);
+    for (const [vein, id] of Object.entries(ARENA_MOUTH) as [string, string][]) {
       expect(gate(id).sealWhileEngaged).toBe(SMITH_HEART_GUARDIANS[vein as SmithHeartVein]);
     }
     // No gate of one free vein waits on another vein's guardian or packs.
-    for (const [vein, id] of Object.entries(ARENA_MOUTH)) {
+    for (const [vein, id] of Object.entries(ARENA_MOUTH) as [string, string][]) {
       const g = gate(id);
       expect(g.bosses ?? []).toEqual([]);
       expect(g.packs).toEqual([...SMITH_HEART_PACKS[vein as keyof typeof ARENA_MOUTH]]);

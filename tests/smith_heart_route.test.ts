@@ -349,17 +349,19 @@ describe("the Smith's Heart route", () => {
       'breathMouth',
       'q3',
       'f3',
+      // No gate on the Cornice's climb since 2026-11-25 (its standing stones
+      // read as walls on the ramp): the Gale Crossing is its only door.
+      'cornice',
     ] as const) {
       expect(reaches(seen, SPOTS[k]), k).toBe(true);
     }
-    for (const k of ['cornice', 'lake', 'anvil'] as const) {
+    for (const k of ['lake', 'anvil'] as const) {
       expect(reaches(seen, SPOTS[k]), k).toBe(false);
     }
-    // Each arena mouth is independent of the other two veins.
+    // Each arena mouth is independent of the other vein.
     for (const [mouth, inside, others] of [
-      ['cornice_mouth', 'cornice', ['lake', 'anvil']],
-      ['lake_mouth', 'lake', ['cornice', 'anvil']],
-      ['anvil_mouth', 'anvil', ['cornice', 'lake']],
+      ['lake_mouth', 'lake', ['anvil']],
+      ['anvil_mouth', 'anvil', ['lake']],
     ] as const) {
       const one = flood(['hammer_pit_mouth', 'the_slab', mouth]);
       expect(reaches(one, SPOTS[inside]), inside).toBe(true);

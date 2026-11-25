@@ -58,7 +58,6 @@ export const HEART_SEAL_BARRIER = {
 export type HeartGateVein = SmithHeartVein | 'heart';
 
 const GATE_VEINS: Readonly<Record<string, HeartGateVein>> = {
-  cornice_mouth: 'breath',
   lake_mouth: 'quench',
   anvil_mouth: 'heat',
   heart_bridge: 'heart',

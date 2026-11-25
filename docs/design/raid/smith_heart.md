@@ -273,7 +273,7 @@ Each point stands at its room's **door**, never on its fighting floor
 | Room | Point | Why there |
 |---|---|---|
 | Quarry (Hammer) | (-44, -188), just past the Pit Mouth on the Gallery's descent | 55 yd from the pit's middle, outside the council's reach (`COUNCIL_ARENA_R`) |
-| Storm Cornice (Breath) | (-68, 192), the climb's top just past the Cornice Mouth | west of the arena's line (`CLIMB_ARENA_X`), on the walled west side: no open lip near it |
+| Storm Cornice (Breath) | (-68, 192), the climb's top, on its landing (no gate on the climb since 2026-11-25) | west of the arena's line (`CLIMB_ARENA_X`), on the walled west side: no open lip near it |
 | Quench Basin | (183, -52), the shelf just past the Lake Mouth | off the lake's ice (its holes stay for the claim's life) and outside the shore ice's ring |
 | Hearth (Heat) | (-171.5, 0), the bridge just past the Hearth Mouth | short of the Hearth's floor and its fires |
 | The Heart | the Arrival Terrace (`HEART_ARRIVAL`) | where the portal sets the raid down, outside the Heart Bridge and the boss's reach, clear of the return portal |
@@ -364,7 +364,7 @@ the other veins are warder, caller, warder.
 | h2 | Gallery landing h2 | +34 | 3 Hammer Vein Warder | `hammer_pit_mouth` |
 | h3 | Gallery landing h3 | +28 | 3 Hammer Vein Warder | `hammer_pit_mouth` |
 | r1 to r8 | Ring at the eight `RING_PACK_DEGREES` | 0 | 3 Ring Forge Warder | the portal (with the four guardians) |
-| b1, b2, b3 | Breath landings | 0, +16, +40 | 2 Breath Vein Warder, 1 Breath Vein Caller | `cornice_mouth` |
+| b1, b2, b3 | Breath landings | 0, +16, +40 | 2 Breath Vein Warder, 1 Breath Vein Caller | none (the climb lost its gate on 2026-11-25: its standing stones read as walls on the ramp) |
 | q1, q2 | Quench landings | -8, -16 | 2 Quench Vein Warder, 1 Quench Vein Caller | `lake_mouth` |
 | q3 | the Singing Ice | -24 | same | `lake_mouth` |
 | f1 | the forge hall | 0 | 2 Heat Vein Warder, 1 Heat Vein Caller | `anvil_mouth` |
@@ -388,7 +388,6 @@ and while it stays engaged; open otherwise. Every gate is at least 12 yd wide.
 |---|---|---|---|---|
 | `hammer_pit_mouth` | `stone_slab` | the Pit descent, near its top | packs h1, h2, h3 | the Hammer Council (either of the two fighting: `sealWithBodies`) |
 | `the_slab` | `stone_slab` | the Slab Stair | bosses: the Hammer Council's two | nothing |
-| `cornice_mouth` | `forge_seal` | the Cornice climb, near its top | packs b1, b2, b3 | Breath guardian |
 | `lake_mouth` | `forge_seal` | the lake descent | packs q1, q2, q3 | Quench guardian |
 | `anvil_mouth` | `forge_seal` | the anvil bridge | packs f1, f2, f3 | Heat guardian |
 | `heart_bridge` | `forge_seal` | the Heart Bridge | nothing (the portal is its door) | final boss |

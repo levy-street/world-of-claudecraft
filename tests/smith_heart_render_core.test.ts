@@ -703,11 +703,11 @@ describe('heart_gates_core: the gate poses', () => {
     }
   });
   it("each vein gate burns its vein's colour, the Heart Bridge the Heart's white-gold", () => {
-    expect(heartGateVein('cornice_mouth')).toBe('breath');
+    expect(heartGateVein('lake_mouth')).toBe('quench');
     expect(heartGateVein('lake_mouth')).toBe('quench');
     expect(heartGateVein('anvil_mouth')).toBe('heat');
     expect(heartGateVein('heart_bridge')).toBe('heart');
-    expect(heartGateTint('cornice_mouth')).toBe(SMITH_HEART_VEIN_COLORS.breath);
+    expect(heartGateTint('lake_mouth')).toBe(SMITH_HEART_VEIN_COLORS.quench);
     expect(heartGateTint('lake_mouth')).toBe(SMITH_HEART_VEIN_COLORS.quench);
     expect(heartGateTint('anvil_mouth')).toBe(SMITH_HEART_VEIN_COLORS.heat);
     expect(heartGateTint('heart_bridge')).toBe(HEART_GATE_HEART_TINT);
@@ -751,7 +751,8 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
   it('plans every family of solid (the pin is not vacuous)', () => {
     expect(heartWallSolids(5).length).toBeGreaterThan(300);
     expect(heartPropSolids().length).toBeGreaterThan(100);
-    expect(heartGateSolids(0).length).toBeGreaterThan(30);
+    // Five gates since the Cornice's climb lost its own (2026-11-25).
+    expect(heartGateSolids(0).length).toBeGreaterThan(24);
     expect(heartRockSolids().length).toBeGreaterThan(900);
     const g = SMITH_HEART_GATES.find((x) => x.id === 'anvil_mouth');
     if (!g) throw new Error('no anvil mouth gate');
