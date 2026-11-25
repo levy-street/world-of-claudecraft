@@ -1,8 +1,10 @@
 import { DEV_KIT_ROLES } from '../sim/content/dev_kit_roles';
+import { ENCHANTS } from '../sim/content/enchants';
 import { GATHERING_PROFESSIONS } from '../sim/content/professions';
 import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, QUESTS } from '../sim/data';
+import { devBisKitChoices } from '../sim/dev/bis_kits';
 import { devTownTargets } from '../sim/dev/town_teleport';
-import { ALL_CLASSES, MAX_LEVEL } from '../sim/types';
+import { ALL_CLASSES, ALL_EQUIP_SLOTS, type ItemSlot, MAX_LEVEL } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   buildDevCommand,
@@ -21,6 +23,7 @@ import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { getLanguage, type SupportedLanguage, type TranslationKey, t } from './i18n';
+import { itemSlotLabel, sharedSlotLabelIndex } from './item_slot_labels';
 import { svgIcon } from './ui_icons';
 
 // Localized candidate list for the item picker, built once on first use. 672 items
@@ -116,6 +119,40 @@ function itemPickerField(): string {
   </label>`;
 }
 
+// The enchant card: the worn slot (rings numbered, the trinket left out since no
+// enchant fits it) and every enchant grouped by the item slot it fits, the way the
+// enchanting window groups them. The sim refuses an enchant that does not fit.
+function enchantFields(): string {
+  const slots = ALL_EQUIP_SLOTS.filter((slot) => slot !== 'trinket')
+    .map((slot) => {
+      const index = sharedSlotLabelIndex(slot);
+      const label =
+        index === undefined
+          ? itemSlotLabel(slot)
+          : t('devCommand.slotIndexed', { slot: itemSlotLabel(slot), index });
+      return `<option value="${esc(slot)}">${esc(label)}</option>`;
+    })
+    .join('');
+  const bySlot = new Map<ItemSlot, string[]>();
+  for (const enchant of Object.values(ENCHANTS)) {
+    const list = bySlot.get(enchant.itemSlot as ItemSlot) ?? [];
+    list.push(enchant.id);
+    bySlot.set(enchant.itemSlot as ItemSlot, list);
+  }
+  const enchants = [...bySlot.entries()]
+    .map(([slot, ids]) => {
+      const options = ids
+        .map((id) => {
+          const name = t(`hudChrome.enchantName.${id}` as TranslationKey);
+          return `<option value="${esc(id)}">${esc(name)} (${esc(id)})</option>`;
+        })
+        .join('');
+      return `<optgroup label="${esc(itemSlotLabel(slot))}">${options}</optgroup>`;
+    })
+    .join('');
+  return `${selectField('devCommand.fields.slot', 'enchantSlot', slots)}${selectField('devCommand.fields.enchant', 'enchant', enchants)}`;
+}
+
 function actionFields(actionId: string): string {
   switch (actionId) {
     case 'level':
@@ -136,17 +173,31 @@ function actionFields(actionId: string): string {
       // talent tree does. Only this character's class actually applies, but the field
       // is built statically without a world handle, so the server does the rejecting
       // and names the legal specs back. Blank = the spec already chosen. The BIS-20
-      // card shares the selector (its own field key) so both kits read identically.
-      return selectField(
+      // card shares the selector (its own field key) so both kits read identically,
+      // and puts the Nyth / Forge tier picker in front of it.
+      return `${
+        actionId === 'biskit'
+          ? selectField(
+              'devCommand.fields.bisTier',
+              'bisTier',
+              `<option value="nyth">${esc(t('devCommand.bisTier.nyth'))}</option><option value="forge">${esc(t('devCommand.bisTier.forge'))}</option>`,
+            )
+          : ''
+      }${selectField(
         'devCommand.fields.spec',
         actionId === 'kit' ? 'kitSpec' : 'bisSpec',
         `<option value="">${esc(t('devCommand.kitCurrentSpec'))}</option>${ALL_CLASSES.map(
           (cls) =>
-            `<optgroup label="${esc(classDisplayName(cls))}">${(DEV_KIT_ROLES[cls] ?? [])
-              .map((role) => `<option value="${esc(role.spec)}">${esc(role.spec)}</option>`)
+            `<optgroup label="${esc(classDisplayName(cls))}">${(actionId === 'biskit'
+              ? devBisKitChoices(cls)
+              : (DEV_KIT_ROLES[cls] ?? []).map((role) => role.spec)
+            )
+              .map((spec) => `<option value="${esc(spec)}">${esc(spec)}</option>`)
               .join('')}</optgroup>`,
         ).join('')}`,
-      );
+      )}`;
+    case 'enchant':
+      return enchantFields();
     case 'gold':
       return textField('devCommand.fields.gold', 'gold', '100', 'number');
     case 'quest':

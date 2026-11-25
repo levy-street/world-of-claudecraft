@@ -166,6 +166,7 @@ export const da_DK: EnTranslations = {
     "itemUnknown": "Ingen genstand har det id.",
     "itemHeroicTag": "Heroisk",
     "kitCurrentSpec": "Nuværende specialisering",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Serverfusk kræver stadig ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Vælg gyldige værdier, før du kører kommandoen.",
     "sent": "Sendt: {command}",
@@ -186,11 +187,18 @@ export const da_DK: EnTranslations = {
       "difficulty": "Sværhedsgrad",
       "name": "Navn",
       "spec": "Specialisering",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Bed-id (valgfrit)"
     },
     "difficulty": {
       "normal": "Normal",
       "heroic": "Heroisk"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge"
     },
     "actions": {
       "heal": {
@@ -252,6 +260,10 @@ export const da_DK: EnTranslations = {
       "biskit": {
         "label": "Udrust BIS 20-sæt",
         "description": "Ifør en specialiserings bedste episke sæt i hver plads. Kun udstyr."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Tilføj guld",

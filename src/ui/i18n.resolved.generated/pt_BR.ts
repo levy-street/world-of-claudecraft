@@ -166,6 +166,7 @@ export const pt_BR: EnTranslations = {
     "itemUnknown": "Nenhum item tem esse id.",
     "itemHeroicTag": "Heroico",
     "kitCurrentSpec": "Especialização atual",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Os comandos de trapaça do servidor ainda exigem ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Escolha valores válidos antes de executar este comando.",
     "sent": "Enviado: {command}",
@@ -186,11 +187,18 @@ export const pt_BR: EnTranslations = {
       "difficulty": "Dificuldade",
       "name": "Nome",
       "spec": "Especialização",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Id do canteiro (opcional)"
     },
     "difficulty": {
       "normal": "Normal",
       "heroic": "Heroica"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge"
     },
     "actions": {
       "heal": {
@@ -252,6 +260,10 @@ export const pt_BR: EnTranslations = {
       "biskit": {
         "label": "Equipar kit BIS de nível 20",
         "description": "Veste o conjunto épico ideal de uma especialização em todas as posições. Somente equipamento."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Adicionar ouro",

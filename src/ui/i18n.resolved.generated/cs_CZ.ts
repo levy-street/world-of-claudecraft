@@ -166,6 +166,7 @@ export const cs_CZ: EnTranslations = {
     "itemUnknown": "Žádný předmět nemá toto id.",
     "itemHeroicTag": "Hrdinské",
     "kitCurrentSpec": "Aktuální specializace",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Serverové cheaty stále vyžadují ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Před spuštěním tohoto příkazu vyber platné hodnoty.",
     "sent": "Odesláno: {command}",
@@ -186,11 +187,18 @@ export const cs_CZ: EnTranslations = {
       "difficulty": "Obtížnost",
       "name": "Jméno",
       "spec": "Specializace",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "ID políčka (volitelné)"
     },
     "difficulty": {
       "normal": "Normální",
       "heroic": "Hrdinská"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge"
     },
     "actions": {
       "heal": {
@@ -252,6 +260,10 @@ export const cs_CZ: EnTranslations = {
       "biskit": {
         "label": "Vybavit BIS sadu na 20. úroveň",
         "description": "Obleč nejlepší epickou výbavu dané specializace do všech pozic. Pouze výbava."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Přidat zlato",

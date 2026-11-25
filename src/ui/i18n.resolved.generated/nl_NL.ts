@@ -166,6 +166,7 @@ export const nl_NL: EnTranslations = {
     "itemUnknown": "Geen voorwerp heeft dat id.",
     "itemHeroicTag": "Heroïsch",
     "kitCurrentSpec": "Huidige spec",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Servercheats vereisen nog steeds ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Kies geldige waarden voordat je deze opdracht uitvoert.",
     "sent": "Verzonden: {command}",
@@ -186,11 +187,18 @@ export const nl_NL: EnTranslations = {
       "difficulty": "Moeilijkheidsgraad",
       "name": "Naam",
       "spec": "Spec",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Akker-id (optioneel)"
     },
     "difficulty": {
       "normal": "Normaal",
       "heroic": "Heroïsch"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge"
     },
     "actions": {
       "heal": {
@@ -252,6 +260,10 @@ export const nl_NL: EnTranslations = {
       "biskit": {
         "label": "BIS-kit voor niveau 20 uitrusten",
         "description": "Rust de beste epische set van een spec uit in elk vak. Alleen uitrusting."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Goud toevoegen",

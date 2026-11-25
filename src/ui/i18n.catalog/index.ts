@@ -119,6 +119,8 @@ export const en = {
     itemUnknown: 'No item has that id.',
     itemHeroicTag: 'Heroic',
     kitCurrentSpec: 'Current spec',
+    // A slot whose label is shared (the two rings): "Finger 2".
+    slotIndexed: '{slot} {index}',
     serverRequirement: 'Server cheats still require ALLOW_DEV_COMMANDS=1.',
     invalidValues: 'Choose valid values before running this command.',
     sent: 'Sent: {command}',
@@ -139,11 +141,15 @@ export const en = {
       difficulty: 'Difficulty',
       name: 'Name',
       spec: 'Spec',
+      bisTier: 'Kit',
+      slot: 'Slot',
+      enchant: 'Enchant',
       // Blank means every planted bed, which is what the farmgrow command
       // itself does without an argument; the action description says so.
       bed: 'Bed id (optional)',
     },
     difficulty: { normal: 'Normal', heroic: 'Heroic' },
+    bisTier: { nyth: 'Nyth', forge: 'Forge' },
     actions: {
       heal: { label: 'Restore health', description: 'Fill the health pool.' },
       resource: {
@@ -186,7 +192,12 @@ export const en = {
       biskit: {
         label: 'Equip BIS-20 kit',
         description:
-          'Wear the strongest complete raid-parse loadout observed for a spec. Gear only.',
+          'Wear a best-in-slot loadout for a spec, enchants included: Nyth (Nythraxis raid) or Forge (Ignivar raid, crafted pieces and legendary weapons).',
+      },
+      enchant: {
+        label: 'Enchant item',
+        description:
+          'Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed.',
       },
       gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
       quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },

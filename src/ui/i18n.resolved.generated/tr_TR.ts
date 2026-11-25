@@ -166,6 +166,7 @@ export const tr_TR: EnTranslations = {
     "itemUnknown": "O kimliğe sahip öğe yok.",
     "itemHeroicTag": "Kahramanca",
     "kitCurrentSpec": "Mevcut uzmanlık",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Sunucu hileleri için yine de ALLOW_DEV_COMMANDS=1 gerekir.",
     "invalidValues": "Bu komutu çalıştırmadan önce geçerli değerler seç.",
     "sent": "Gönderildi: {command}",
@@ -186,11 +187,18 @@ export const tr_TR: EnTranslations = {
       "difficulty": "Zorluk",
       "name": "Ad",
       "spec": "Uzmanlık",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Yatak kimliği (isteğe bağlı)"
     },
     "difficulty": {
       "normal": "Normal",
       "heroic": "Kahramanca"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge"
     },
     "actions": {
       "heal": {
@@ -252,6 +260,10 @@ export const tr_TR: EnTranslations = {
       "biskit": {
         "label": "BIS-20 takımını kuşan",
         "description": "Uzmanlık için her yuvada en iyi epik seti kuşandır. Yalnızca teçhizat."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Altın ekle",

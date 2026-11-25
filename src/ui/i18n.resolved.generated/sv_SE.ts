@@ -166,6 +166,7 @@ export const sv_SE: EnTranslations = {
     "itemUnknown": "Inget föremål har detta id.",
     "itemHeroicTag": "Heroisk",
     "kitCurrentSpec": "Aktuell specialisering",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Serverfusk kräver fortfarande ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Välj giltiga värden innan du kör kommandot.",
     "sent": "Skickat: {command}",
@@ -186,11 +187,18 @@ export const sv_SE: EnTranslations = {
       "difficulty": "Svårighetsgrad",
       "name": "Namn",
       "spec": "Specialisering",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Bädd-id (valfritt)"
     },
     "difficulty": {
       "normal": "Normal",
       "heroic": "Heroisk"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge"
     },
     "actions": {
       "heal": {
@@ -252,6 +260,10 @@ export const sv_SE: EnTranslations = {
       "biskit": {
         "label": "Utrusta BIS nivå 20-kit",
         "description": "Ta på en specialiserings bästa episka set i varje plats. Endast utrustning."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Lägg till guld",

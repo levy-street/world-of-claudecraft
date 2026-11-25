@@ -10,10 +10,19 @@ import {
 
 describe('developer command view', () => {
   it('builds the BIS-20 kit command with the same optional-spec contract as the fresh kit', () => {
-    expect(buildDevCommand('biskit', { bisSpec: '' })).toBe('/dev bis');
-    expect(buildDevCommand('biskit', { bisSpec: 'protection' })).toBe('/dev bis protection');
+    expect(buildDevCommand('biskit', { bisSpec: '' })).toBe('/dev bis nyth');
+    expect(buildDevCommand('biskit', { bisSpec: 'protection' })).toBe('/dev bis nyth protection');
     // Token-gated like every other field: an injection-shaped value never ships.
-    expect(buildDevCommand('biskit', { bisSpec: 'prot; /dev gold 999' })).toBe('/dev bis');
+    expect(buildDevCommand('biskit', { bisSpec: 'prot; /dev gold 999' })).toBe('/dev bis nyth');
+    expect(buildDevCommand('biskit', { bisTier: 'forge', bisSpec: 'bear' })).toBe(
+      '/dev bis forge bear',
+    );
+    expect(
+      buildDevCommand('enchant', { enchantSlot: 'ring2', enchant: 'enchant_ring_strength' }),
+    ).toBe('/dev enchant ring2 enchant_ring_strength');
+    expect(
+      buildDevCommand('enchant', { enchantSlot: 'ring2', enchant: 'x; /dev gold 1' }),
+    ).toBeNull();
   });
 
   it('builds the town teleport from a slug and refuses a crafted value', () => {
@@ -86,12 +95,13 @@ describe('developer command view', () => {
     expect(filteredDevActions('spawns', 'selected', searchCopy).map((action) => action.id)).toEqual(
       ['killtarget', 'despawntarget'],
     );
-    // give, kit, biskit, gold. Named rather than counted so a future add says WHICH
+    // give, kit, biskit, enchant, gold. Named rather than counted so a future add says WHICH
     // action appeared instead of just moving a number.
     expect(filteredDevActions('inventory', '').map((action) => action.id)).toEqual([
       'give',
       'kit',
       'biskit',
+      'enchant',
       'gold',
     ]);
   });
