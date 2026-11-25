@@ -174,6 +174,10 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
           ...tiers(T.skyMin, T.skyMax),
         },
       };
+    // A Dust Devil's throw sliding its player out (final_heat.ts
+    // throwOutOfDevil): held until it sets them down.
+    case FINAL_AURAS.devilThrown:
+      return { key: `${KEY}.devilThrown`, nums: { yards: T.devilKnockback } };
     case FINAL_AURAS.anvilMark: {
       const total = (t: 'normal' | 'heroic' | 'mythic') =>
         Math.round(FINAL_DIFFICULTY[t].anvilTotal * FINAL_DIFFICULTY[t].punishMult);

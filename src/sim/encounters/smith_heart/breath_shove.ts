@@ -20,9 +20,18 @@
 //
 // The anchored and the Knotted Gale's carrier keep their feet (heldFast):
 // they are never held and never slide. Zero rng.
+//
+// The Masterless Strength's Dust Devils (final_heat.ts stepWhirls) throw
+// through the same slide (Jose's team, 2026-11-25: a devil's one-tick
+// knockback read as a teleport backwards), so the scope is the few fields
+// every fight's scope carries (ShoveScope), not the Breath's own.
 
 import { DT, type Entity } from '../../types';
 import { type BreathScope, heldFast, throwPlayer } from './breath_scope';
+
+/** What a shove needs of its fight's scope (the Breath's, the final boss's). */
+export type ShoveScope = Pick<BreathScope, 'ctx' | 'inst' | 'boss' | 'players'>;
+
 import { dropAura } from './fight_kit';
 
 export type BreathShoveEase = 'linear' | 'out' | 'knock';
@@ -62,7 +71,7 @@ export function shoveStep(ease: BreathShoveEase, yards: number, k: number, n: nu
 /** Begin sliding `p` `yards` along the unit (ux, uz) over `seconds`, held by
  *  `aura` (named `name`). The anchored and the carrier keep their feet: null. */
 export function beginShove(
-  s: BreathScope,
+  s: ShoveScope,
   p: Entity,
   ux: number,
   uz: number,
@@ -102,7 +111,7 @@ export function beginShove(
 
 /** Every shove in `list` one tick along its line (finished ones leave the
  *  list, their hold dropped). */
-export function stepShoves(s: BreathScope, list: BreathShove[]): void {
+export function stepShoves(s: ShoveScope, list: BreathShove[]): void {
   for (let i = list.length - 1; i >= 0; i--) {
     const sl = list[i];
     const p = s.ctx.entities.get(sl.id);
@@ -140,7 +149,7 @@ export function stepShoves(s: BreathScope, list: BreathShove[]): void {
 }
 
 /** Drop every shove's hold (a reset, the gales gone). */
-export function clearShoves(s: Pick<BreathScope, 'ctx'>, list: BreathShove[]): void {
+export function clearShoves(s: Pick<ShoveScope, 'ctx'>, list: BreathShove[]): void {
   for (const sl of list) {
     const p = s.ctx.entities.get(sl.id);
     if (p) dropAura(p, sl.aura);

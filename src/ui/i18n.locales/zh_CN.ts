@@ -24983,4 +24983,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pings.enableSettingNote':
     '按住信号键打开信号轮盘，轻按则向光标下的目标发出信号。只有你的小队或团队能看到你的信号，每5秒最多4次。关闭后也会隐藏队友的所有信号：没有图标、声音、聊天消息或小地图标记。',
   'guide.controls.ping': '信号：轻按向光标下的目标发出信号，按住打开信号轮盘',
+  'hudChrome.auraEffect.finalBoss.devilThrown': '被尘卷风抛出：被卷出旋风 {yards} 码。在它把你放下之前你无法移动。',
+  'hudChrome.breathWind.turning': '风向转变',
 };

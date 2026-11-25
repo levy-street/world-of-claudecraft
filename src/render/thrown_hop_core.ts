@@ -1,5 +1,6 @@
 // The hop of a body an encounter THROWS (render-only): the Guardian of the
-// Breath's Summit Roar, its loose gales and its Bellows Blow slide a struck body along the floor
+// Breath's Summit Roar, its loose gales and its Bellows Blow (and the final
+// boss's Dust Devils) slide a struck body along the floor
 // (sim/encounters/smith_heart/breath_shove.ts, an ease that starts fast and
 // settles), and the sim keeps that body on the floor the whole way. Drawn
 // flat it read as a sled, not a blow (Jose's playtest of 2026-11-07), so the
@@ -17,6 +18,7 @@
 // softly. Pure: no three.js, no DOM, no clock of its own (`now` is passed in).
 
 import { BREATH_AURAS, BREATH_TUNING as T } from '../sim/encounters/smith_heart/breath_ids';
+import { FINAL_TUNING as F, FINAL_AURAS } from '../sim/encounters/smith_heart/final_ids';
 
 /** Each throwing hold aura's hop: its seconds (its slide's) and its height (yards). */
 export const THROWN_HOPS: Readonly<Record<string, { seconds: number; height: number }>> = {
@@ -24,6 +26,9 @@ export const THROWN_HOPS: Readonly<Record<string, { seconds: number; height: num
   // Bellows Blow's throw (breath_blow.ts): the Roar's blow on one body.
   [BREATH_AURAS.blown]: { seconds: T.roarSlide, height: 1.6 },
   [BREATH_AURAS.tossed]: { seconds: T.galeSlide, height: 0.7 },
+  // The Masterless Strength's Dust Devil (final_heat.ts throwOutOfDevil): the
+  // gale's toss, thrown a little higher off the whirlwind's lift.
+  [FINAL_AURAS.devilThrown]: { seconds: F.devilSlide, height: 0.9 },
 };
 
 /** The arc's shape over its time `u` (0 to 1): 0 at both ends, 1 at its

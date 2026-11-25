@@ -105,6 +105,7 @@ export const SMITH_HEART_AURA_ICON_SOURCES: readonly (readonly [string, string])
   ['heart_breath_squall_ward', 'heart_breath_wind_battered'],
   ['heart_breath_stone_charge', 'heart_breath_anchor'],
   ['heart_final_blade_mark', 'heart_quench_slash_mark'],
+  ['heart_final_devil_thrown', 'heart_breath_roar_thrown'],
   ['heart_final_drawn', 'heart_breath_drawn_lightning'],
   ['heart_final_phase', 'heart_final_state'],
   ['heart_final_rising', 'heart_final_shield'],

@@ -6098,6 +6098,8 @@ export const hudChromeStrings = {
         'Lightning falls where you stand in {seconds} sec: {min} to {max} Nature damage to everyone within {radius} yd. Move out. Lightning that falls within {arcReach} yd of a pillar arcs round it and leaves it Storm-Charged. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
       bladeMark:
         'A Crossing Blade aims its line through you: it follows you, then locks {lock} sec before it flies. Lead the line through the pillars to shatter them, then step off it. Everyone on the line takes {min} to {max} Frost damage. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      devilThrown:
+        'Thrown by a Dust Devil: carried {yards} yd out of the whirlwind. You cannot move until it sets you down.',
       anvilMark:
         'Weight of the Anvil follows you: its {radius} yd circle moves with you and plants {lock} sec before it falls. Gather the raid inside it: {total} Physical damage is split between everyone in it, half as much again each with fewer than {fewer}. Heroic: {heroicTotal}. Mythic: {mythicTotal}.',
       // Its own elements (src/ui/final_elements_aura_effect.ts; the numbers

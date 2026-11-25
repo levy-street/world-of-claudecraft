@@ -4844,6 +4844,7 @@ export const ja_JP: EnTranslations = {
         "shell": "次に受ける回復{value}を吸収する。",
         "skyMark": "{seconds}秒後、あなたの立つ場所に雷が落ちる：{radius}ヤード以内の全員に{min}～{max}の自然ダメージ。その場を離れること。柱から{arcReach}ヤード以内に落ちた雷は柱の周りに弧を描き、柱を嵐に帯電させる。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。",
         "bladeMark": "交差する刃があなたを貫く線を狙っている：線はあなたを追い、飛ぶ{lock}秒前に固定される。線を柱に通して砕き、それから線から離れること。線上の全員が{min}～{max}の冷気ダメージを受ける。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。",
+        "devilThrown": "ダストデビルに投げ飛ばされた：つむじ風から{yards}ヤード外へ運ばれる。地面に降ろされるまで移動できない。",
         "anvilMark": "アンヴィルの重みがあなたを追う：{radius}ヤードの円があなたと共に動き、落ちる{lock}秒前に固定される。レイドをその中に集めること：{total}の物理ダメージが中の全員で分けられ、{fewer}人未満ならそれぞれ1.5倍を受ける。ヒロイック：{heroicTotal}。ミシック：{mythicTotal}。",
         "strikeHeat": "灼熱の火傷：毎秒{total}の火炎ダメージを受ける（{stacks}スタックそれぞれにつき{per}）。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。ボスが立つ区画の元素のスタックを付与する。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイック：スタックごとに{heroicPer}、一撃はスタックごとに{heroicGrowth}%強化。ミシック：スタックごとに{mythicPer}、{mythicGrowth}%強化。",
         "strikeQuench": "刺すような霜：移動速度が{pct}%低下（{stacks}スタックそれぞれにつき{per}%、最大{cap}%）。{freeze}スタック以上では一撃ごとに足元へ固まる霜を置く：{radius}ヤードの氷の輪が{warn}秒後に閉じ、中に残った者を{frozen}秒間凍りつかせる。輪から出ること。古いスタックを霜に変える一撃では置かれない。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイックとミシックではスタックごとに{heroicGrowth}%と{mythicGrowth}%強化。",
@@ -7509,7 +7510,7 @@ export const ja_JP: EnTranslations = {
     },
     "breathWind": {
       "blowing": "Wind",
-      "turning": "Wind turning"
+      "turning": "風向きが変わる"
     },
     "finalOverload": {
       "kneeling": "膝をついた",

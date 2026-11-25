@@ -105,6 +105,10 @@ export const FINAL_AURAS = {
   /** On the player Weight of the Anvil follows through its bar (Jose's
    *  playtest of 2026-11-19): its circle rides with them, then plants. */
   anvilMark: 'heart_final_anvil_mark',
+  /** On players: thrown by a Dust Devil (an unbreakable root held while the
+   *  throw slides them out, breath_shove.ts: the online client draws the
+   *  server's slide; the renderer lifts the body on its arc, thrown_hop_core.ts). */
+  devilThrown: 'heart_final_devil_thrown',
 } as const;
 
 /** One Overload bar's aura id on the boss (`value` 0 to 100). */
@@ -749,6 +753,11 @@ export const FINAL_TUNING = {
   devilMin: 130,
   devilMax: 150,
   devilKnockback: 8,
+  // The throw SLIDES over devilSlide seconds, eased out (fast off the eye,
+  // settling), never a one-tick knockback (the team's playtest of
+  // 2026-11-25: it read as a teleport backwards). The Breath's loose gale
+  // throws 11 yd over 0.6 s the same way.
+  devilSlide: 0.6,
   boltCast: 2,
   /** The bolt jumps to every player this near a struck one. */
   boltJump: 6,

@@ -4844,6 +4844,7 @@ export const ko_KR: EnTranslations = {
         "shell": "다음에 받는 치유 {value}을(를) 흡수합니다.",
         "skyMark": "{seconds}초 후 당신이 선 자리에 번개가 떨어집니다: {radius}미터 안의 모두에게 {min}~{max}의 자연 피해. 자리를 벗어나세요. 기둥에서 {arcReach}미터 안에 떨어진 번개는 기둥 주위로 호를 그리며 기둥을 폭풍으로 충전합니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.",
         "bladeMark": "교차하는 칼날이 당신을 지나는 선을 겨눕니다: 선은 당신을 따라오다가 날아가기 {lock}초 전에 고정됩니다. 선을 기둥에 통과시켜 부순 뒤 선에서 벗어나세요. 선 위의 모두가 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.",
+        "devilThrown": "먼지 회오리에 내던져짐: 회오리바람 밖으로 {yards}야드 날아갑니다. 땅에 내려설 때까지 움직일 수 없습니다.",
         "anvilMark": "모루의 무게가 당신을 따라옵니다: {radius}미터 원이 당신과 함께 움직이다가 떨어지기 {lock}초 전에 고정됩니다. 공격대를 원 안에 모으세요: {total}의 물리 피해를 안에 있는 모두가 나누어 받으며, {fewer}명 미만이면 각자 1.5배를 받습니다. 영웅: {heroicTotal}. 신화: {mythicTotal}.",
         "strikeHeat": "작열하는 화상: 매초 {total}의 화염 피해를 받습니다({stacks}중첩마다 {per}). {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 우두머리가 서 있는 구역의 원소 중첩을 부여합니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅: 중첩마다 {heroicPer}, 일격은 중첩마다 {heroicGrowth}% 강화. 신화: 중첩마다 {mythicPer}, {mythicGrowth}% 강화.",
         "strikeQuench": "살을 에는 서리: 이동 속도가 {pct}% 감소합니다({stacks}중첩마다 {per}%, 최대 {cap}%). {freeze}중첩부터는 일격마다 발밑에 굳어가는 서리를 남깁니다: {radius}야드 얼음 고리가 {warn}초 후 닫히며 안에 남은 대상을 {frozen}초 동안 얼립니다. 고리 밖으로 나가세요. 기존 중첩을 서리로 바꾸는 일격은 이를 남기지 않습니다. {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅과 신화에서는 중첩마다 {heroicGrowth}%와 {mythicGrowth}% 강화됩니다.",
@@ -7509,7 +7510,7 @@ export const ko_KR: EnTranslations = {
     },
     "breathWind": {
       "blowing": "Wind",
-      "turning": "Wind turning"
+      "turning": "바람 방향 전환"
     },
     "finalOverload": {
       "kneeling": "무릎을 꿇었다",

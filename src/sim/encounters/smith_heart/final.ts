@@ -242,6 +242,7 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     fist: null,
     swells: [],
     whirls: [],
+    devilShoves: [],
     embers: [],
     pools: [],
     poolTick: T.poolTick,

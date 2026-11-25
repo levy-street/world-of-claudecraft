@@ -5,6 +5,7 @@
 
 import type { SmithHeartVein } from '../../content/smith_heart_layout';
 import type { HeartQuarterZone } from '../../content/smith_heart_quarters';
+import type { BreathShove } from './breath_shove';
 import type { SmithHeartFeatAttempt } from './feat_attempt';
 import type { FinalElementsState } from './final_elements_state';
 import type { FinalDifficulty, FinalPoolKind } from './final_ids';
@@ -316,6 +317,8 @@ export interface FinalFightState {
   fist: FinalFist | null;
   swells: FinalSwell[];
   whirls: FinalWhirl[];
+  /** The Dust Devils' throws sliding their players out (breath_shove.ts). */
+  devilShoves: BreathShove[];
   embers: FinalMark[];
   pools: FinalPool[];
   poolTick: number;

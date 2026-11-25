@@ -27,8 +27,10 @@
 // derived; the only rng draws are the damage rolls, in player order.
 
 import { HEART_ROOM } from '../../content/smith_heart_layout';
+import { knockbackDistanceAfterGuards } from '../../knockback';
 import { DT, type Entity } from '../../types';
 import { clearCastIf } from '../sunken_bastion/claim';
+import { beginShove, clearShoves, stepShoves } from './breath_shove';
 import {
   devilTemplate,
   FINAL_AURAS,
@@ -250,9 +252,46 @@ export function raiseWhirls(s: FinalScope): number {
   return n;
 }
 
+/** A Dust Devil at (instance-local) `eye` throws `pl` straight out of it:
+ *  the knockback's yards after every immunity and resistance, slid over
+ *  `devilSlide` with its root held (the online client draws the server's
+ *  slide). A body still sliding is not thrown again (two throws never
+ *  stack). Exported for the tests. */
+export function throwOutOfDevil(s: FinalScope, pl: Entity, eye: FPoint): boolean {
+  if (s.st.devilShoves.some((sl) => sl.id === pl.id)) return false;
+  const here = at(s, pl);
+  const dx = here.x - eye.x;
+  const dz = here.z - eye.z;
+  const d = Math.hypot(dx, dz);
+  // Dead centre: out along the devil's own path's side, a fixed bearing.
+  const ux = d > 1e-3 ? dx / d : 0;
+  const uz = d > 1e-3 ? dz / d : 1;
+  // Every knockback immunity and the target's resistance (the guards read
+  // only who throws, never where from).
+  const yards = knockbackDistanceAfterGuards(s.ctx, s.boss, pl, T.devilKnockback);
+  if (yards <= 0) return false;
+  const shove = beginShove(
+    s,
+    pl,
+    ux,
+    uz,
+    yards,
+    T.devilSlide,
+    'out',
+    FINAL_AURAS.devilThrown,
+    FINAL_NAMES.devil,
+  );
+  if (!shove) return false;
+  s.st.devilShoves.push(shove);
+  return true;
+}
+
 /** One tick of every Fire Whirl (and every Breath Dust Devil). */
 export function stepWhirls(s: FinalScope): void {
   const st = s.st;
+  // The throws already under way slide on a step (before the devils move,
+  // so a body thrown last tick never waits on the loop below).
+  if (st.devilShoves.length > 0) stepShoves(s, st.devilShoves);
   if (st.whirls.length === 0) return;
   const keep: typeof st.whirls = [];
   for (const w of st.whirls) {
@@ -323,8 +362,10 @@ export function stepWhirls(s: FinalScope): void {
       if (wind) {
         w.cooldown[pl.id] = T.devilHitEvery;
         hit(s, pl, roll(s, T.devilMin, T.devilMax), FINAL_NAMES.devil, 'nature');
-        // Thrown out of it, away from its eye.
-        if (!pl.dead) s.ctx.applyKnockback(obj, pl, T.devilKnockback);
+        // Thrown out of it, away from its eye: a SLIDE eased out over
+        // devilSlide (breath_shove.ts), never a one-tick knockback (the
+        // team's playtest of 2026-11-25 read that as a teleport backwards).
+        if (!pl.dead) throwOutOfDevil(s, pl, next);
       } else {
         w.cooldown[pl.id] = T.whirlHitEvery;
         hit(s, pl, roll(s, T.whirlMin, T.whirlMax), FINAL_NAMES.whirl, 'fire');
@@ -492,6 +533,7 @@ export function clearFist(s: Pick<FinalScope, 'ctx' | 'inst' | 'st' | 'boss'>): 
 export function clearHeat(s: Pick<FinalScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
   clearFist(s);
   for (const w of s.st.whirls) dropFightObject(s.ctx, s.inst, w.objectId);
+  clearShoves(s, s.st.devilShoves);
   for (const p of s.st.pools) dropFightObject(s.ctx, s.inst, p.objectId);
   s.st.whirls = [];
   s.st.pools = [];

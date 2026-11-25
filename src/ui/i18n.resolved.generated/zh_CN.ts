@@ -4844,6 +4844,7 @@ export const zh_CN: EnTranslations = {
         "shell": "吸收你受到的下{value}点治疗。",
         "skyMark": "{seconds}秒后闪电会劈在你所站之处：对{radius}码内的所有人造成{min}到{max}点自然伤害。快离开。落在石柱{arcReach}码内的闪电会环绕石柱形成电弧，使其被风暴充能。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。",
         "bladeMark": "一把交错之刃把它的直线瞄准了你：直线会跟随你，并在飞出前{lock}秒锁定。把直线引过石柱将其击碎，然后离开直线。直线上的所有人受到{min}到{max}点冰霜伤害。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。",
+        "devilThrown": "被尘卷风抛出：被卷出旋风 {yards} 码。在它把你放下之前你无法移动。",
         "anvilMark": "铁砧之重跟随着你：它的{radius}码法圈随你移动，并在落下前{lock}秒固定。让团队聚集在圈内：{total}点物理伤害由圈内所有人分担，少于{fewer}人时每人多承受一半。英雄：{heroicTotal}。史诗：{mythicTotal}。",
         "strikeHeat": "灼烧：你每秒受到{total}点火焰伤害（{stacks}层中每层{per}点）。每{every}秒，元素打击对坦克造成1层时{min}到{max}点伤害，每层提高{growth}%。它会附加首领所站区域元素的一层。层数在最后一击后持续{seconds}秒：达到{swap}层时，让另一名坦克接手首领。英雄：每层{heroicPer}点，打击每层强化{heroicGrowth}%。史诗：每层{mythicPer}点，强化{mythicGrowth}%。",
         "strikeQuench": "刺骨冰霜：移动速度降低{pct}%（{stacks}层中每层{per}%，最多{cap}%）。达到{freeze}层后，每次打击还会在你脚下布下凝结寒霜：一个{radius}码的冰环，{warn}秒后闭合，将仍在其中的人冻结{frozen}秒。离开冰环。将旧层数转化为冰霜的那一击不会布下它。每{every}秒，元素打击对坦克造成1层时{min}到{max}点伤害，每层提高{growth}%。层数在最后一击后持续{seconds}秒：达到{swap}层时，让另一名坦克接手首领。英雄和史诗中，打击每层分别强化{heroicGrowth}%和{mythicGrowth}%。",
@@ -7509,7 +7510,7 @@ export const zh_CN: EnTranslations = {
     },
     "breathWind": {
       "blowing": "Wind",
-      "turning": "Wind turning"
+      "turning": "风向转变"
     },
     "finalOverload": {
       "kneeling": "它跪下了",

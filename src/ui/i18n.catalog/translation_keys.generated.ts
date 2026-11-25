@@ -12848,6 +12848,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.finalBoss.bladeMark'
   | 'hudChrome.auraEffect.finalBoss.chill'
   | 'hudChrome.auraEffect.finalBoss.coal'
+  | 'hudChrome.auraEffect.finalBoss.devilThrown'
   | 'hudChrome.auraEffect.finalBoss.drawn'
   | 'hudChrome.auraEffect.finalBoss.ember'
   | 'hudChrome.auraEffect.finalBoss.frozen'
