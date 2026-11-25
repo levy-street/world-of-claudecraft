@@ -16255,8 +16255,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Jejak Surya',
   'entities.abilities.sunlance.description':
     'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan sebesar {damage} kerusakan Alam ditambah bakaran {overTime} selama 9 dtk, dan memulihkan 35 mana: pilihan mana. Gelombang Rembulan menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
-  'guide.abilityHook.moonseed':
-    'Menambah tahap Pasang Rembulan dan memperpanjang Badai Rembulan selama kamu dalam Wujud Burung Bulan.',
   'hudChrome.auraEffect.moontide':
     'Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya',
   'hudChrome.auraEffect.oldBlood':

@@ -972,6 +972,8 @@ const COMBAT_KEYS = [
   'showShieldTrack',
   'fctScale',
   'classicCombatText',
+  // The Moonwing Tidewheel screen-edge glow, right under the combat text style.
+  'tidewheelEdgeGlow',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   general: GENERAL_KEYS,

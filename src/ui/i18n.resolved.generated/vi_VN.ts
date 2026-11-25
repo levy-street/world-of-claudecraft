@@ -1037,6 +1037,17 @@ export const vi_VN: EnTranslations = {
       "fateThreadsConsumeReady": "Ba Sợi Định Mệnh: Nuốt Chửng có thể dệt chúng thành Kết Án bổ sung.",
       "fateThreadsSentenceReady": "Ba Sợi Định Mệnh: Phán Quyết có thể tiêu thụ chúng để tăng 18% sát thương."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Thuế Bóng Tối",
       "bombLabel": "Bom Thập Phân",
@@ -2893,6 +2904,7 @@ export const vi_VN: EnTranslations = {
       "showFriendlyTrack": "Hiện buff của tôi trên đồng minh",
       "showShieldTrack": "Hiện khiên của tôi",
       "classicCombatText": "Chữ chiến đấu cổ điển",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "Gợn nước (sóng rẽ nước)",
       "spellEffects": "Hiệu ứng phép",
       "actionCam": "Camera Hành Động",
@@ -4842,6 +4854,9 @@ export const vi_VN: EnTranslations = {
       "coldsightRead": "Kéo Cung Dài tiếp theo của bạn gây thêm {longDrawPct}% sát thương, hoặc Đòn Bắn Sa Ngã tiếp theo của bạn gây thêm {fellShotPct}%",
       "duskEconomy": "Kỹ năng tốn ít hơn {pct}% năng lượng",
       "moontide": "Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "Huyết Cổ {stacks}/{max}. Đòn trúng từ Vuốt Xé, Lóc Xé, Vết Nứt Máu, Cắn Xé Máu, Vuốt Quét Ngang và Nghiền Xương mỗi lần cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin",
       "verdance": "Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai",
       "freeExecute": "Kỹ năng kết liễu hợp lệ tiếp theo của bạn không tốn gì",
@@ -9668,6 +9683,7 @@ export const vi_VN: EnTranslations = {
       "framesGovernedShardpike": "Sửa Khung cũng mở khóa thanh Thương Mảnh Vỡ, hàng ngắn gồm thao tác công cụ nhiệm vụ cạnh thanh hành động chỉ khi bạn mang thương. Khi mở khóa nó có nhãn tên, để bạn đặt trước trận thay vì trong trận.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Chỉnh sửa Khung cũng cho phép di chuyển huy hiệu Thuế Bóng Tối và Bom Thập Phân của tư tế Bóng tối.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Bật Tách thanh tài nguyên trong thẻ Khung để Chỉnh Sửa Khung cũng mở khóa thanh tài nguyên, cho phép đặt thanh năng lượng phép, năng lượng hoặc nộ riêng ở bất kỳ đâu. Chiều rộng thanh tài nguyên và Chiều cao thanh tài nguyên trong cùng thẻ sẽ điều chỉnh kích thước của thanh. Chỉnh Sửa Khung cũng mở khóa thanh Vua của Đồi. Độ đục nền Vua của Đồi trong thẻ đó làm mờ nền bảng trong khi chữ vẫn rõ ràng.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
@@ -10168,7 +10184,7 @@ export const vi_VN: EnTranslations = {
       "healing_touch": "Một đòn trị liệu đơn mục tiêu lớn với thời gian niệm dài, dùng để hồi đầy cho ai đó.",
       "mark_of_the_wild": "Một phúc lành lâu dài bạn ban cho bản thân hoặc đồng đội trước trận đấu.",
       "moonfire": "Giáng đòn tức thời và khiến mục tiêu cháy âm ỉ, hữu dụng khi đang di chuyển.",
-      "moonseed": "Thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt khi bạn ở Dạng Cú Mặt Trăng.",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "Niệm tức thời và hồi máu cho đồng đội theo thời gian, để bạn cứ tiếp tục hành động.",
       "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn."
     },
@@ -18389,7 +18405,8 @@ export const vi_VN: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Rễ Siết Chặt",
-        "description": "Trói chân mục tiêu tại chỗ trong tối đa 12 giây."
+        "description": "Trói chân mục tiêu tại chỗ trong tối đa 12 giây.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Hình Bruin",
@@ -18492,7 +18509,8 @@ export const vi_VN: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Bầy Đốt Chích",
-        "description": "Kẻ địch bị bầy côn trùng bủa vây, nhận {damage} sát thương Tự Nhiên trong 12 giây."
+        "description": "Kẻ địch bị bầy côn trùng bủa vây, nhận {damage} sát thương Tự Nhiên trong 12 giây.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Huyết Linh Miêu",

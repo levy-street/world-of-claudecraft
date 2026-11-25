@@ -16173,8 +16173,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Sluneční brázda',
   'entities.abilities.sunlance.description':
     'Spotřebuje 3 Měsíčního přílivu na úder za {damage} přírodního poškození plus popálení za {overTime} během 9 s a obnoví 35 many: volba many. Měsíční vzedmutí spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu.',
-  'guide.abilityHook.moonseed':
-    'Přidá stupeň Měsíčního přílivu a prodlouží Měsíční bouři, dokud jsi v Podobě měsíčního křídla.',
   'hudChrome.auraEffect.moontide':
     'Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá',
   'hudChrome.auraEffect.oldBlood':

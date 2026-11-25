@@ -21,6 +21,7 @@ import { resolveActionReplacement } from './action_replacement';
 import { aetherSurgeCostMult } from './chronomancy';
 import { bruinRushMakesCatFormFree, verdanceWildmendCastTime } from './druid_engines';
 import { naturesBoonCastTime } from './druid_natures_boon';
+import { tidewheelCastTime } from './druid_tidewheel';
 import { resolveColdsightAbilityForSpec } from './hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from './hunter_shared';
 import { radiantResonanceCastTime } from './paladin_radiant_resonance';
@@ -73,7 +74,11 @@ export function resolveAbilityChain(
   const castTime = naturesBoonCastTime(
     actor.auras,
     known.def.id,
-    verdanceWildmendCastTime(actor, known.def.id, resonanceCastTime),
+    tidewheelCastTime(
+      actor,
+      known.def.id,
+      verdanceWildmendCastTime(actor, known.def.id, resonanceCastTime),
+    ),
   );
   if (castTime !== resonanceCastTime) {
     return { ...ascensionResolved, castTime, scalingCastTime: resonanceCastTime };

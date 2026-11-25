@@ -93,6 +93,7 @@ export const ENGINE_AURAS: Readonly<Record<PlayerClass, readonly EngineRow[]>> =
   druid: [
     { kind: 'old_blood', name: 'Old Blood' },
     { kind: 'moontide', name: 'Moontide' },
+    { kind: 'suntide', name: 'Suntide' },
     { kind: 'verdance', name: 'Verdance' },
   ],
 };

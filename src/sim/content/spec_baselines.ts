@@ -253,8 +253,17 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [
         { ability: 'entangling_roots', costPct: -0.18, castPct: -0.24 },
         { ability: 'healing_touch', castPct: -0.16 },
-        { ability: 'wrath', dmgPct: 0.15, castPct: -0.2 },
-        { ability: 'starfire', castPct: -0.16 },
+        // Tidewheel (combat/druid_tidewheel.ts): the builders and both payoffs
+        // pay for the two-bank loop and its Tidecross bonus. Skyfall carries
+        // the larger cut because it is most of what one-button Skyfall spam
+        // casts and under a quarter of the full rotation: on the best-in-slot
+        // Moonscorch kit (Monte Carlo, level 22 dummy, 5 seeds) the full
+        // rotation lands +3.9% over the pre-Tidewheel Skyfall spam, and the
+        // spam itself at 85% of the rotation.
+        { ability: 'wrath', dmgPct: 0.035, castPct: -0.2 },
+        { ability: 'starfire', dmgPct: -0.205, castPct: -0.16 },
+        { ability: 'moonlash', dmgPct: -0.15 },
+        { ability: 'sunlance', dmgPct: -0.15 },
       ],
     },
     feral: {

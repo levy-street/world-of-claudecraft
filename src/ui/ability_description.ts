@@ -254,14 +254,19 @@ function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): st
 
 /** Which description field the RESOLVED ability should read: the stealth-free
  *  variant once a talent has retired the stealth gate (Cheap Trick on Gut Punch),
- *  the base description otherwise. Pure: the caller resolves the field through
- *  i18n and falls back to 'description' when the active locale has not filled the
- *  variant. */
+ *  the damage-over-time variant when the known rank adds a dot the first rank
+ *  lacks (Gripping Roots from rank 2), the base description otherwise. Pure: the
+ *  caller resolves the field through i18n and falls back to 'description' when
+ *  the active locale has not filled the variant (or the ability has none). */
 export function abilityDescriptionField(
   res: ResolvedAbility,
-): 'description' | 'descriptionNoStealth' {
-  return res.def.requiresStealth === true && res.ignoreStealthRequirement === true
-    ? 'descriptionNoStealth'
+): 'description' | 'descriptionNoStealth' | 'descriptionWithDot' {
+  if (res.def.requiresStealth === true && res.ignoreStealthRequirement === true) {
+    return 'descriptionNoStealth';
+  }
+  const isDot = (effect: AbilityEffect): boolean => effect.type === 'dot';
+  return res.effects.some(isDot) && !res.def.effects.some(isDot)
+    ? 'descriptionWithDot'
     : 'description';
 }
 
@@ -392,13 +397,13 @@ export function abilityDisplayDescription(
   // lines already prefer resolved values. A locale that has not TRANSLATED the
   // variant yet resolves null (tEntityOptional declines the English fill) and gets
   // its own base description instead of one English sentence mid-tooltip.
-  const stealthFreeVariant =
-    abilityDescriptionField(res) === 'descriptionNoStealth'
-      ? tEntityOptional({ kind: 'ability', id: res.def.id, field: 'descriptionNoStealth', values })
-      : null;
+  const variantField = abilityDescriptionField(res);
+  const variant =
+    variantField === 'description'
+      ? null
+      : tEntityOptional({ kind: 'ability', id: res.def.id, field: variantField, values });
   const text =
-    stealthFreeVariant ??
-    tEntity({ kind: 'ability', id: res.def.id, field: 'description', values });
+    variant ?? tEntity({ kind: 'ability', id: res.def.id, field: 'description', values });
   // Spec-aware teaching line: a shared button explains its interaction ONLY
   // for the player's current spec, so a new player never reads another
   // spec's rules on their own tooltip.

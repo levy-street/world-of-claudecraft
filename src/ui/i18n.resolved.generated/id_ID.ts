@@ -1037,6 +1037,17 @@ export const id_ID: EnTranslations = {
       "fateThreadsConsumeReady": "Tiga Benang Takdir: Melahap dapat menganyamnya menjadi Kecaman tambahan.",
       "fateThreadsSentenceReady": "Tiga Benang Takdir: Vonis dapat mengonsumsinya untuk 18% kerusakan tambahan."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Upeti Kelam",
       "bombLabel": "Bom Persepuluhan",
@@ -2893,6 +2904,7 @@ export const id_ID: EnTranslations = {
       "showFriendlyTrack": "Tampilkan Buff-ku pada Sekutu",
       "showShieldTrack": "Tampilkan Perisaiku",
       "classicCombatText": "Teks tempur klasik",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "Riak Air (Ombak Jejak)",
       "spellEffects": "Efek mantra",
       "actionCam": "Kamera Aksi",
@@ -4842,6 +4854,9 @@ export const id_ID: EnTranslations = {
       "coldsightRead": "Tarikan Panjangmu berikutnya menghasilkan {longDrawPct}% lebih banyak kerusakan, atau Tembakan Jatuhmu berikutnya menghasilkan {fellShotPct}% lebih banyak",
       "duskEconomy": "Kemampuan menghabiskan {pct}% lebih sedikit energi",
       "moontide": "Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Serangan Kucing dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi",
       "verdance": "Kehijauan: tahap {stacks} dari {max}. Setiap Pemulihan Spora, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya",
       "freeExecute": "Kemampuan eksekusi berikutnya yang memenuhi syarat tidak memakan biaya apa pun",
@@ -9668,6 +9683,7 @@ export const id_ID: EnTranslations = {
       "framesGovernedShardpike": "Edit Bingkai juga membebaskan bilah Tombak Serpih, deretan pendek tindakan alat misi yang muncul di samping bilah aksi hanya saat kamu membawa Tombak Serpih itu sendiri; label namanya muncul saat bebas agar bisa ditempatkan sebelum pertempuran.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Edit Bingkai juga memungkinkanmu memindahkan medali Upeti Kelam dan Bom Persepuluhan milik priest Bayangan.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Aktifkan Pisahkan bilah sumber daya pada tab Bingkai agar Edit Bingkai juga membuka kunci bilah sumber dayamu, sehingga mana, energi, atau amarah dapat ditempatkan sendiri di mana saja. Lebar bilah sumber daya dan Tinggi bilah sumber daya pada tab yang sama mengatur ukurannya. Edit Bingkai juga membuka kunci bilah Raja Bukit. Opasitas latar Raja Bukit pada tab itu memudarkan panelnya tanpa mengurangi kejelasan teks.",
       "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
       "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
@@ -10168,7 +10184,7 @@ export const id_ID: EnTranslations = {
       "healing_touch": "Penyembuhan besar sasaran tunggal dengan rapalan panjang, untuk memenuhi nyawa seseorang.",
       "mark_of_the_wild": "Berkah tahan lama yang kamu pasang pada dirimu atau sekutu sebelum pertarungan.",
       "moonfire": "Menghantam seketika dan meninggalkan sasaran terbakar, bagus sambil bergerak.",
-      "moonseed": "Menambah tahap Pasang Rembulan dan memperpanjang Badai Rembulan selama kamu dalam Wujud Burung Bulan.",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "Dirapalkan seketika dan menyembuhkan sekutu seiring waktu, sehingga kamu bisa terus bertindak.",
       "thorns": "Melindungi sekutu sehingga penyerang jarak dekat melukai diri sendiri saat memukul."
     },
@@ -18389,7 +18405,8 @@ export const id_ID: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Akar Cengkeram",
-        "description": "Mengakar target di tempatnya hingga 12 detik."
+        "description": "Mengakar target di tempatnya hingga 12 detik.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Wujud Bruin",
@@ -18492,7 +18509,8 @@ export const id_ID: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Kerumunan Penyengat",
-        "description": "Musuh dikerumuni serangga, menerima {damage} kerusakan Alam selama 12 detik."
+        "description": "Musuh dikerumuni serangga, menerima {damage} kerusakan Alam selama 12 detik.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Darah Lynx",

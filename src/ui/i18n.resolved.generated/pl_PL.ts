@@ -1037,6 +1037,17 @@ export const pl_PL: EnTranslations = {
       "fateThreadsConsumeReady": "Trzy Nici Przeznaczenia: Pochłonięcie może wpleść je w dodatkowe Potępienie.",
       "fateThreadsSentenceReady": "Trzy Nici Przeznaczenia: Wyrok może je zużyć, zyskując 18% zwiększonych obrażeń."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Mroczna dziesięcina",
       "bombLabel": "Bomba dziesięciny",
@@ -2893,6 +2904,7 @@ export const pl_PL: EnTranslations = {
       "showFriendlyTrack": "Pokaż moje wzmocnienia na sojusznikach",
       "showShieldTrack": "Pokaż moje tarcze",
       "classicCombatText": "Klasyczny tekst walki",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "Zmarszczki na wodzie (kilwater)",
       "spellEffects": "Efekty zaklęć",
       "actionCam": "Kamera akcji",
@@ -4842,6 +4854,9 @@ export const pl_PL: EnTranslations = {
       "coldsightRead": "Twój następny Długi naciąg zadaje o {longDrawPct}% więcej obrażeń albo twój następny Plugawy strzał zadaje o {fellShotPct}% więcej",
       "duskEconomy": "Umiejętności kosztują o {pct}% mniej energii",
       "moontide": "Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "Stara Krew: stopień {stacks} z {max}. Trafione ciosy kota i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości",
       "verdance": "Zieleń {stacks}/{max}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu lub Dzikiego ukojenia dodaje 1, a każdy punkt skraca czas rzucania Dzikiego ukojenia. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit",
       "freeExecute": "Twoja następna dostępna zdolność dobijająca nic nie kosztuje",
@@ -9668,6 +9683,7 @@ export const pl_PL: EnTranslations = {
       "framesGovernedShardpike": "Edytuj ramki odblokowuje także pasek Odłamkowej Piki: krótki rząd działań narzędzia zadania, pojawiający się obok pasków akcji tylko podczas noszenia samej piki. W odblokowanym stanie ma etykietę nazwy, dzięki czemu możesz ustawić go przed walką, zamiast w jej trakcie.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Edycja ramek pozwala też przenieść medalion kapłana Cienia z Mroczną dziesięciną i Bombą dziesięciny.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Włącz Odłącz pasek zasobów na karcie Ramki. Opcja Edytuj ramki odblokuje wtedy także pasek zasobów, dzięki czemu możesz umieścić manę, energię lub gniew osobno w dowolnym miejscu. Szerokość paska zasobów i Wysokość paska zasobów na tej samej karcie zmieniają jego rozmiar. Edytuj ramki odblokowuje także pasek Władcy wzgórza. Krycie tła Władcy wzgórza na tej karcie wygasza jego panel, zachowując czytelność tekstu.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",
@@ -10168,7 +10184,7 @@ export const pl_PL: EnTranslations = {
       "healing_touch": "Potężne leczenie pojedynczego celu o długim czasie rzucania, do uzupełnienia komuś zdrowia.",
       "mark_of_the_wild": "Trwałe błogosławieństwo, które nakładasz na siebie lub sojusznika przed walką.",
       "moonfire": "Trafia natychmiast i pozostawia płonący cel, dobre w ruchu.",
-      "moonseed": "Dodaje stopień Księżycowego przypływu i przedłuża Księżycową nawałnicę, gdy jesteś w Postaci księżycowej sowy.",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "Rzucane natychmiast, leczy sojusznika z czasem, byś mógł działać dalej.",
       "thorns": "Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu."
     },
@@ -18389,7 +18405,8 @@ export const pl_PL: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Chwytające korzenie",
-        "description": "Unieruchamia cel w miejscu nawet na 12 sek."
+        "description": "Unieruchamia cel w miejscu nawet na 12 sek.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Postać Bruina",
@@ -18492,7 +18509,8 @@ export const pl_PL: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Żądlący rój",
-        "description": "Wroga oblepia rój owadów, zadając {damage} obrażeń od natury w ciągu 12 sek."
+        "description": "Wroga oblepia rój owadów, zadając {damage} obrażeń od natury w ciągu 12 sek.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Rysia krew",

@@ -159,6 +159,7 @@ const CEILINGS: Record<string, number> = {
   // authored: it joins the ratchet pinned at zero.
   'hud.gathering-goal.css': 0,
   'hud.priest.css': 0,
+  'hud.druid.css': 0,
   'hud.mobile.css': 29,
   'index.css': 0,
   'index.extra.css': 43,

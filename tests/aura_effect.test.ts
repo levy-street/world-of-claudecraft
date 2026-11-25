@@ -466,7 +466,7 @@ describe('auraEffectDescriptor', () => {
   it('teaches every visible Druid engine bank and its live stage', () => {
     expect(desc({ id: 'moontide', kind: 'moontide', value: 0, stacks: 2 })).toEqual({
       key: 'hudChrome.auraEffect.moontide',
-      nums: { stacks: 2, max: 3 },
+      nums: { stacks: 2, max: 5 },
     });
     expect(desc({ id: 'old_blood', kind: 'old_blood', value: 0, stacks: 3 })).toEqual({
       key: 'hudChrome.auraEffect.oldBlood',
@@ -476,6 +476,47 @@ describe('auraEffectDescriptor', () => {
       key: 'hudChrome.auraEffect.verdance',
       nums: { stacks: 3, max: 3 },
     });
+    expect(desc({ id: 'suntide', kind: 'suntide', value: 0, stacks: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.suntide',
+      nums: { stacks: 1, max: 5 },
+    });
+    expect(desc({ id: 'suntide', kind: 'suntide', value: 0, stacks: 5 })).toEqual({
+      key: 'hudChrome.auraEffect.suntide',
+      nums: { stacks: 5, max: 5 },
+    });
+    // Tidewheel: each bank's tooltip names only its own builders and payoff.
+    // Moonseed retired with the separate payoff buttons, so Skyfall is the one
+    // Moontide cast. Both banks hold 5: the payoff is ready from 3 and spends
+    // every point, 20 percent stronger for each one past 3.
+    expect(hudChromeStrings.auraEffect.moontide).toContain('Skyfall casts each add 1');
+    expect(hudChromeStrings.auraEffect.moontide).toContain('From 3, Moonsurge is ready');
+    for (const bank of ['moontide', 'suntide'] as const) {
+      expect(hudChromeStrings.auraEffect[bank], bank).toContain('spends them all');
+      expect(hudChromeStrings.auraEffect[bank], bank).toContain(
+        '20% stronger for each point past 3',
+      );
+    }
+    expect(hudChromeStrings.auraEffect.moontide).not.toContain('Moonseed');
+    expect(hudChromeStrings.auraEffect.moontide).not.toContain('Wildbolt');
+    expect(hudChromeStrings.auraEffect.moontide).not.toContain('Sunwake');
+    expect(hudChromeStrings.auraEffect.suntide).toContain('Wildbolt');
+    expect(hudChromeStrings.auraEffect.suntide).toContain('From 3, Sunwake is ready');
+    expect(hudChromeStrings.auraEffect.suntide).not.toContain('becomes');
+  });
+
+  it('teaches the Tidewheel windows from the sim constants', () => {
+    // crossPct is Tidecross (TIDECROSS_PAYOFF_DMG_MULT 1.3): the payoff cast
+    // inside the other window strikes 30 percent harder.
+    expect(desc({ id: 'sunrise', kind: 'internal_cd', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.sunrise',
+      nums: { castPct: 20, tickPct: 20, crossPct: 30 },
+    });
+    expect(desc({ id: 'moonrise', kind: 'internal_cd', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.moonrise',
+      nums: { dmgPct: 25, tickPct: 20, crossPct: 30 },
+    });
+    expect(hudChromeStrings.auraEffect.sunrise).toContain('Moonsurge cast now deals {crossPct}%');
+    expect(hudChromeStrings.auraEffect.moonrise).toContain('Sunwake cast now deals {crossPct}%');
   });
 
   it('reports a movement slow as a percent reduction from the multiplier', () => {

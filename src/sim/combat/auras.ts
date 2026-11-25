@@ -60,6 +60,7 @@ import { druidEngineOnBleedTick } from './druid_engines';
 import { naturesBoonOnHotTick } from './druid_natures_boon';
 import { secondBloomOnHotExpired } from './druid_second_bloom';
 import { sporemenderHealingDoneMult } from './druid_sporemender';
+import { tidewheelTickRate } from './druid_tidewheel';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
@@ -352,7 +353,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
     if (a.kind === 'thorns') tickThornsCooldown(a);
     if (a.tickInterval) {
-      a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
+      a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT * tidewheelTickRate(ctx, a);
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
         if (a.kind === 'pyre_guardian') {

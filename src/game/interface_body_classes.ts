@@ -22,6 +22,9 @@ export const INTERFACE_BODY_CLASSES = {
   // per spawn (src/ui/fct_style_mode.ts) and, when set, keeps the shipped white /
   // gold numbers instead of the vivid school colours and emphasis.
   classicCombatText: 'classic-combat-text',
+  // Interface > Moonwing Tidewheel Screen Glow: the druid HUD's edge glow CSS
+  // shows only under this class (src/styles/hud.druid.css).
+  tidewheelEdgeGlow: 'tidewheel-edge-glow',
 } as const satisfies Partial<Record<BoolSettingKey, string>>;
 
 export type InterfaceBodyClassSetting = keyof typeof INTERFACE_BODY_CLASSES;

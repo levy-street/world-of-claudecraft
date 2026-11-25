@@ -16251,8 +16251,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Solspår',
   'entities.abilities.sunlance.description':
     'Förbrukar dina 3 Månflod för ett slag som ger {damage} naturskada plus en brännskada på {overTime} under 9 sek och återställer 35 mana: manavalet. Månsvall förbrukar samma 3 Månflod, så välj ett.',
-  'guide.abilityHook.moonseed':
-    'Lägger till ett Månflod-steg och förlänger Månstorm medan du är i Månugglaform.',
   'hudChrome.auraEffect.moontide':
     'Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den',
   'hudChrome.auraEffect.oldBlood':

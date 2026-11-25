@@ -1037,6 +1037,17 @@ export const tr_TR: EnTranslations = {
       "fateThreadsConsumeReady": "Üç Kader İpliği: Tüketme onları ek Mahkûmiyete dönüştürebilir.",
       "fateThreadsSentenceReady": "Üç Kader İpliği: Hüküm onları %18 artan hasar için tüketebilir."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Kasvet Öşrü",
       "bombLabel": "Öşür Bombası",
@@ -2893,6 +2904,7 @@ export const tr_TR: EnTranslations = {
       "showFriendlyTrack": "Müttefiklerdeki Güçlendirmelerimi Göster",
       "showShieldTrack": "Kalkanlarımı Göster",
       "classicCombatText": "Klasik savaş metni",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
       "spellEffects": "Büyü efektleri",
       "actionCam": "Aksiyon Kamerası",
@@ -4842,6 +4854,9 @@ export const tr_TR: EnTranslations = {
       "coldsightRead": "Sonraki Uzun Çekişin %{longDrawPct} daha fazla hasar verir veya sonraki Düşüş Atışın %{fellShotPct} daha fazla verir",
       "duskEconomy": "Yetenekler {pct}% daha az enerji harcar",
       "moontide": "Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "Kadim Kan: aşama {stacks} / {max}. İsabet eden Kedi ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür",
       "verdance": "Yeşillik: aşama {stacks} / {max}. Kullandığın her Spor Şifası, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
       "freeExecute": "Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz",
@@ -9668,6 +9683,7 @@ export const tr_TR: EnTranslations = {
       "framesGovernedShardpike": "Çerçeveleri Düzenle, Kıymık Kargısı çubuğunu da serbest bırakır. Bu, yalnızca kargıyı taşırken eylem çubuklarının yanında görünen kısa görev aracı eylem sırasıdır. Serbestken ad etiketini taşır; böylece savaş sırasında değil, öncesinde yerleştirebilirsin.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Çerçeveleri Düzenle, Gölge rahibinin Kasvet Öşrü ve Öşür Bombası madalyonunu da taşımana izin verir.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Çerçeveler sekmesinde Kaynak Çubuğunu Ayır seçeneğini açtığında Çerçeveleri Düzenle, kaynak çubuğunun kilidini de açar. Böylece mana, enerji veya öfke çubuğunu bağımsız olarak istediğin yere yerleştirebilirsin. Aynı sekmedeki Kaynak Çubuğu Genişliği ve Kaynak Çubuğu Yüksekliği boyutunu ayarlar. Çerçeveleri Düzenle, Tepede Kral çubuğunun kilidini de açar. Bu sekmedeki Tepede Kral Arka Plan Opaklığı, yazı net kalırken paneli saydamlaştırır.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
@@ -10168,7 +10184,7 @@ export const tr_TR: EnTranslations = {
       "healing_touch": "Uzun süreli, birini tam dolduran büyük tek hedefli bir iyileştirme.",
       "mark_of_the_wild": "Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.",
       "moonfire": "Anında vurur ve hedefi yanar halde bırakır, hareket halindeyken iyidir.",
-      "moonseed": "Aykuşu Formundayken bir Ay Gelgiti aşaması ekler ve Ay Fırtınasını uzatır.",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "Anında okunur ve bir dostu zamanla iyileştirir, böylece harekete devam edebilirsin.",
       "thorns": "Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir."
     },
@@ -18389,7 +18405,8 @@ export const tr_TR: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Kavrayan Kökler",
-        "description": "Hedefi 12 saniyeye kadar yerine sabitler."
+        "description": "Hedefi 12 saniyeye kadar yerine sabitler.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Bruin Formu",
@@ -18492,7 +18509,8 @@ export const tr_TR: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Sokan Sürü",
-        "description": "Düşman böceklerce sarılır ve 12 saniye boyunca {damage} Doğa hasarı alır."
+        "description": "Düşman böceklerce sarılır ve 12 saniye boyunca {damage} Doğa hasarı alır.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Vaşak Kanı",

@@ -211,6 +211,16 @@
     --color-debuff-shadow: #9b59d0;
     --color-debuff-nature: #35a835;
     --color-debuff-holy: #d8b56b;
+    /* Moonwing Tidewheel orbs (src/ui/hud/druid/): Suntide gold, Moontide violet. */
+    --color-tide-sun: #f2a94e;
+    --color-tide-sun-deep: #b8650f;
+    --color-tide-sun-hi: #fbd9a0;
+    --color-tide-moon: #a99ef5;
+    --color-tide-moon-deep: #4b3fb0;
+    --color-tide-moon-hi: #e2ddfd;
+    --color-tide-empty: #221f33;
+    --color-tide-rim: #3a3552;
+    --color-tide-strip: #151320;
     --color-aura-rpg-gold: #ffe14d;
     --color-aura-rpg-violet: #bd63ff;
     --color-aura-rpg-electric: #3dc7ff;

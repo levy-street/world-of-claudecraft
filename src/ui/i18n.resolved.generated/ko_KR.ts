@@ -1037,6 +1037,17 @@ export const ko_KR: EnTranslations = {
       "fateThreadsConsumeReady": "운명의 실타래 3개: 집어삼키기로 추가 단죄를 자아낼 수 있습니다.",
       "fateThreadsSentenceReady": "운명의 실타래 3개: 선고로 소모하면 피해가 18% 증가합니다."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "암흑 십일조",
       "bombLabel": "헌납 폭탄",
@@ -2893,6 +2904,7 @@ export const ko_KR: EnTranslations = {
       "showFriendlyTrack": "아군에게 건 내 버프 표시",
       "showShieldTrack": "내 보호막 표시",
       "classicCombatText": "클래식 전투 문자",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "수면 물결 (물살)",
       "spellEffects": "주문 효과",
       "actionCam": "액션 카메라",
@@ -4842,6 +4854,9 @@ export const ko_KR: EnTranslations = {
       "coldsightRead": "다음 긴 시위가 입히는 피해가 {longDrawPct}% 증가하거나, 다음 사악한 사격이 입히는 피해가 {fellShotPct}% 증가합니다",
       "duskEconomy": "기술의 기력 소모가 {pct}% 감소합니다",
       "moontide": "달물결: {stacks}/{max}단계. 달날개 형상에서 야생 벼락, 창공 낙하, 달씨앗 시전이 각각 1단계를 쌓습니다. {max}단계에서 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변하며, 어느 쪽을 써도 3단계를 모두 소모합니다",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "오랜 피: {stacks}/{max}단계. 가르는 발톱, 저미기, 피의 균열, 유혈 물어뜯기, 휩쓰는 발톱, 뼈 분쇄의 적중한 공격이 각각 1단계를 쌓습니다. {max}단계에서 표범 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다",
       "verdance": "푸른 생장: {stacks}/{max}단계. 포자치유, 두 번째 개화, 야생 치유를 시전할 때마다 1단계가 쌓이고, 단계마다 야생 치유의 시전 시간이 줄어듭니다. {max}단계에서 신속한 치유가 만개로 변합니다",
       "freeExecute": "다음 적용 가능한 처형 기술이 자원을 소모하지 않습니다",
@@ -9668,6 +9683,7 @@ export const ko_KR: EnTranslations = {
       "framesGovernedShardpike": "프레임 편집은 조각창 바도 해제합니다. 조각창 바는 조각창을 들고 있는 동안에만 행동 단축바 옆에 나타나는 퀵스트 도구 행동의 짧은 줄이며, 해제된 동안에는 자신의 이름 칩을 표시합니다. 덕분에 전투 중이 아니라 전투 전에 자리를 잡아 둘 수 있습니다.",
       "framesGovernedUnitTooltip": "\"프레임 편집\"은 툴팁 프레임도 풀어 줍니다. 마우스를 올린 대상의 카드가 나타나는 자리로, 생물이면 레벨과 종류, 다른 플레이어면 칭호, 길드, 레벨과 직업, 그리고 전문화와 그 역할이 표시됩니다. 원하는 곳으로 끌어 놓으면 카드는 그 자리에서 가장 가까운 화면 가장자리를 피하는 방향으로 펼쳐집니다. \"프레임 설정\"의 \"프레임 표시 및 숨기기\"에서 툴팁 체크를 해제하면 이 카드를 완전히 숨길 수 있습니다.",
       "framesGovernedPriest": "프레임 편집으로 암흑 사제의 암흑 십일조와 헌납 폭탄 메달도 이동할 수 있습니다.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "프레임 탭에서 자원 바 분리를 켜면 프레임 편집으로 자원 바도 풀려, 마나, 기력, 분노를 원하는 곳에 따로 둘 수 있습니다. 같은 탭의 자원 바 너비와 자원 바 높이로 크기를 조절합니다. 프레임 편집은 언덕의 왕 바도 풀어 주며, 같은 탭의 언덕의 왕 배경 투명도로 글자는 선명하게 둔 채 패널을 흐리게 할 수 있습니다.",
       "barsTitle": "바와 시간 표시, 전투 문자",
       "barsBody": "주문을 시전하거나 정신을 집중할 때마다 화면 한가운데, 행동 단축바 바로 위에 시전 바가 나타나 주문 이름과 남은 시간을 알려 줍니다. 대상도 자기 프레임에 시전 바를 가지므로, 무엇이 날아오는지 보고 답할 수 있습니다.\n\n시전 바 아래에는 가느다란 공격 속도 바가 있어 무기를 휘두르는 사이를 채웁니다. 근접이나 원거리 공격자는 다음 자동 공격이 언제 들어가는지 볼 수 있습니다.\n\n경험치 바는 행동 단축바 아래를 가로질러 화면 전체 폭으로 이어지며 눈금으로 나뉘어 있고, 밝게 표시된 구간이 쌓아 둔 휴식 경험치를 보여 줍니다.\n\n물속으로 헤엄쳐 들어가면 화면 위쪽에 파란 호흡 바가 나타납니다. 머리가 잠겨 있는 동안 줄어들고, 다 떨어져 익사가 시작되면 붉게 깜빡이며, 물 위로 올라오는 순간 빠르게 다시 찹니다. 스페이스로 위로 헤엄치고, 기본값이 Ctrl인 아래로 헤엄치기 키로 더 깊이 내려갑니다.\n\n피해와 치유는 맞은 대상 위로 작은 숫자가 되어 떠오르므로, 글을 읽지 않고도 전투를 읽어 낼 수 있습니다. 채팅창의 전투 탭에는 온전한 기록이 글로 남습니다.",
@@ -10168,7 +10184,7 @@ export const ko_KR: EnTranslations = {
       "healing_touch": "시전 시간이 긴 강력한 단일 대상 치유로, 체력을 가득 채울 때 씁니다.",
       "mark_of_the_wild": "전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.",
       "moonfire": "즉시 타격하고 대상을 계속 불태우므로, 이동 중에 쓰기 좋습니다.",
-      "moonseed": "달날개 형상일 때 달물결을 1단계 진행시키고 달빛 폭풍 지속시간을 연장합니다.",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "즉시 시전되어 아군을 지속적으로 치유하므로, 계속 행동할 수 있습니다.",
       "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다."
     },
@@ -18389,7 +18405,8 @@ export const ko_KR: EnTranslations = {
       },
       "entangling_roots": {
         "name": "옥죄는 뿌리",
-        "description": "대상을 최대 12초 동안 제자리에 묶습니다."
+        "description": "대상을 최대 12초 동안 제자리에 묶습니다.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "큰곰 변신",
@@ -18492,7 +18509,8 @@ export const ko_KR: EnTranslations = {
       },
       "insect_swarm": {
         "name": "쏘는 벌레 떼",
-        "description": "적이 곤충 떼에 휩싸여 12초에 걸쳐 {damage}의 자연 피해를 입습니다."
+        "description": "적이 곤충 떼에 휩싸여 12초에 걸쳐 {damage}의 자연 피해를 입습니다.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "스라소니의 피",

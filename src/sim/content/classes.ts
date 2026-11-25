@@ -30,7 +30,6 @@ import {
   GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
   GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT,
   HEXTHREAD_2PC_NEEDLE_DOOM_BONUS,
-  MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC,
   setBonusFlag,
   WILDFANG_2PC_REDHARVEST_ENERGY_MULT,
 } from './ignivar_set_bonuses';
@@ -594,7 +593,10 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'healing_touch',
       'mark_of_the_wild',
       'moonfire',
-      'moonseed',
+      // Moonseed retired with the Tidewheel's separate payoff buttons: the two
+      // payoffs are learned buttons of their own, usable from 3 points.
+      'moonlash',
+      'sunlance',
       'rejuvenation',
       'thorns',
       'entangling_roots',
@@ -6406,7 +6408,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Hurls a bolt of nature energy for $d Nature damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
+        'In Moonwing Form, each completed cast adds 1 Suntide (max 5) and extends your Stinging Swarm by 2 sec, up to 6 sec per application. Deals 25% more damage during Moonrise.',
     },
   },
   healing_touch: {
@@ -6512,17 +6514,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Burns the enemy with moonfire for $d Arcane damage plus damage over time.',
+    description:
+      'Burns the enemy with moonfire for $d Arcane damage, then $o Arcane damage over $t sec.',
     specNotes: {
-      balance: 'Keep it burning: Moonseed extends it by 6 sec.',
+      balance:
+        'Keep it burning: Skyfall extends it by 2 sec, up to 12 sec per application. In Moonwing Form, its ticks add 1 Moontide, at most once every 8 sec. Moonsurge refreshes it, and it ticks 20% faster during Sunrise.',
     },
   },
+  // RETIRED with the Tidewheel's separate payoff buttons: Moonsurge took its
+  // place in the druid kit and on the default bar. The def stays (hidden, the
+  // paladin legacy-id contract) so a saved hotbar or replay that still names
+  // it resolves instead of crashing; no class list teaches it any more.
   moonseed: {
     id: 'moonseed',
     name: 'Moonseed',
     class: 'druid',
     specs: ['balance'],
     learnLevel: 10,
+    hiddenFromPlayer: true,
     cost: 35,
     castTime: 0,
     cooldown: 8,
@@ -6531,21 +6540,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     requiresAuraKind: 'form_moonkin',
     consumesRequiredAura: false,
-    actionReplacement: {
-      abilityId: 'moonlash',
-      auraKind: 'moontide',
-      minStacks: 3,
-      actorAuraKind: 'form_moonkin',
-    },
     effects: [
       { type: 'directDamage', min: 20, max: 26 },
       { type: 'extendDot', dot: 'moonfire', seconds: 6, maxBonus: 6 },
     ],
-    // The per-application extension cap is the $t splice (the resolved
-    // extendDot maxBonus, see abilityDurationValue): Moonscorch 2pc wearers
-    // read 12 there, everyone else the base 6.
     description:
-      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to $t sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to $t sec per application. At 3 Moontide, this button becomes Moonsurge.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -6639,7 +6639,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Roots the target in place for up to 12 sec.',
+    description:
+      'Roots the target in place for up to 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails.',
   },
   bear_form: {
     id: 'bear_form',
@@ -7049,16 +7050,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 135, max: 185 }],
-    actionReplacement: {
-      abilityId: 'sunlance',
-      auraKind: 'moontide',
-      minStacks: 3,
-      actorAuraKind: 'form_moonkin',
-    },
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3.',
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 5) and extends your Lunar Tempest by 2 sec, up to 12 sec per application. Casts 20% faster during Sunrise.',
     },
   },
   travel_form: {
@@ -7259,6 +7254,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'dot', total: 48, duration: 12, interval: 3 }],
     description: 'The enemy is swarmed by insects, taking $d Nature damage over 12 sec.',
+    specNotes: {
+      balance:
+        'Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise.',
+    },
   },
   tigers_fury: {
     id: 'tigers_fury',
@@ -8224,7 +8223,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Summons a spore burster onto the target area. After $t sec it bursts, healing allies for $h and dealing $d Nature damage to enemies within 8 yards.',
     specNotes: {
-      balance: 'At 3 Moontide it is 25% stronger and spends your Moontide.',
+      balance:
+        'At 3 or more Moontide it is 25% stronger, plus 20% for each Moontide past 3, and spends your Moontide.',
       restoration:
         'Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance.',
     },
@@ -8302,14 +8302,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'arcane',
     requiresTarget: true,
-    // The Moontide-3 gate lives on the Skyfall transform rules, the only
-    // path to this def; the form guard blocks a stale out-of-form resolve
-    // and must never eat the form itself.
-    requiresAuraKind: 'form_moonkin',
+    // Its own button since the Tidewheel follow-up: usable at a full
+    // Moontide bank. The bank is NOT taken at cast commit; the engine
+    // (druid_engines.ts druidEngineOnCast) spends it with the window swap.
+    // A bank outlives the form, so casting_lifecycle also refuses the press
+    // outside Moonwing Form (druid_tidewheel.ts tidewheelPayoffBlocked).
+    requiresAuraKind: 'moontide',
+    requiresAuraStacks: 3,
+    requiresOwnAura: true,
     consumesRequiredAura: false,
     effects: [{ type: 'directDamage', min: 136, max: 162, spellPowerCoeff: 0.32 }],
     description:
-      'Spends your 3 Moontide for a heavy strike of $d Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
+      'Moonwing Form only, usable at 3 or more Moontide. Spends all your Moontide for a heavy strike of $d Arcane damage, 20% more for each Moontide past 3 (up to 5), refreshes your Lunar Tempest to full duration, and opens Moonrise for 10 sec: Wildbolt deals 25% more damage and Stinging Swarm ticks 20% faster. Opening Moonrise closes Sunrise. Tidecross: cast during Sunrise, the strike deals 30% more damage.',
   },
   sunlance: {
     id: 'sunlance',
@@ -8323,9 +8327,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'nature',
     requiresTarget: true,
-    // Same contract as Moonlash: the transform rules own the Moontide-3
-    // gate, the def guards only the form and must never eat it.
-    requiresAuraKind: 'form_moonkin',
+    // Same contract as Moonsurge, on the Suntide bank.
+    requiresAuraKind: 'suntide',
+    requiresAuraStacks: 3,
+    requiresOwnAura: true,
     consumesRequiredAura: false,
     effects: [
       { type: 'directDamage', min: 80, max: 100, spellPowerCoeff: 0.32 },
@@ -8333,7 +8338,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'gainResource', amount: 35 },
     ],
     description:
-      'Spends your 3 Moontide for a strike of $d Nature damage plus a $o burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one.',
+      'Moonwing Form only, usable at 3 or more Suntide. Spends all your Suntide for a strike of $d Nature damage (20% more for each Suntide past 3, up to 5) plus $o Nature damage over 9 sec, restores 35 mana, refreshes your Stinging Swarm to full duration, and opens Sunrise for 10 sec: Skyfall casts 20% faster and Lunar Tempest ticks 20% faster. Opening Sunrise closes Moonrise. Tidecross: cast during Moonrise, the strike deals 30% more damage.',
   },
   redharvest: {
     id: 'redharvest',
@@ -9487,17 +9492,6 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
   if (entry.def.id === 'needle_of_fate' && mods.selected[setBonusFlag('hexthread', 2)] === true) {
     entry.effects = entry.effects.map((e) =>
       e.type === 'afflictionNeedle' ? { ...e, doom: e.doom + HEXTHREAD_2PC_NEEDLE_DOOM_BONUS } : e,
-    );
-  }
-  // Moonscorch 2pc (the Crucible set doc): Moonseed may extend Lunar Tempest
-  // twice per application. The per-application cap is baked into the RESOLVED
-  // extendDot effect (6 -> 12), the ONE number the extendOwnedDot dispatch
-  // and the {duration} description splice both read; the per-press extension
-  // (seconds 6) stays untouched, so each press still adds 6 sec and the
-  // third press stays dead. Deterministic, no rng involved.
-  if (entry.def.id === 'moonseed' && mods.selected[setBonusFlag('moonscorch', 2)] === true) {
-    entry.effects = entry.effects.map((e) =>
-      e.type === 'extendDot' ? { ...e, maxBonus: MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC } : e,
     );
   }
   // Wildfang 2pc (the Crucible set doc): Redharvest restores 45 energy, up

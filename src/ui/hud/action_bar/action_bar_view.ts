@@ -37,6 +37,7 @@ import {
   naturesBoonFormAllows,
 } from '../../../sim/combat/druid_natures_boon';
 import { sporeBurstFullBankGlowActive } from '../../../sim/combat/druid_spore_burst';
+import { tidewheelPayoffBlocked } from '../../../sim/combat/druid_tidewheel';
 import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
@@ -938,6 +939,9 @@ export function createActionBarView(
               break;
             }
           }
+          // Sunwake and Moonsurge gate on their bank, which outlives Moonwing
+          // Form: a full bank out of form is not a ready button.
+          if (windowOpen && tidewheelPayoffBlocked(player, def.id)) windowOpen = false;
           windowGlow = windowOpen;
         }
         const ascensionReady =

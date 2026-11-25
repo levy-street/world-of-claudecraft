@@ -389,7 +389,7 @@ const DRUID_SPECS: SpecDef[] = [
     'Moongrove',
     'dps',
     '*',
-    'A Moonwing caster whose casts fill the Moontide; at 3 you choose how to spend it: Moonsurge for damage or Sunwake for mana.',
+    'A Moonwing caster who turns the Tidewheel: Skyfall fills Moontide for Moonsurge, Wildbolt fills Suntide for Sunwake, and each payoff hits harder in the opposite window.',
     'moonkin_form',
     'Moonrage',
     'Increases your spell damage by 15% and your spell haste by 10%.',

@@ -203,7 +203,10 @@ const EXPECTED = {
     'moonkin_form',
     'wrath',
     'starfire',
-    'moonseed',
+    // The Tidewheel payoffs are their own buttons (Moonseed retired): Sunwake
+    // and Moonsurge sit beside the casts that fill their banks.
+    'sunlance',
+    'moonlash',
     'moonfire',
     'spore_burst',
     'barkskin',

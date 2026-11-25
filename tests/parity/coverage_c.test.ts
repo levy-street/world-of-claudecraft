@@ -615,7 +615,11 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
   it('druid_engines: all three live buttons arm and their payoffs fire', () => {
     const rec = run('druid_engines');
     expect(rec.notes.moonlashArmed).toBe(true);
+    // Tidewheel: Skyfall fills Moontide, never Suntide, and Moonsurge leaves
+    // the Suntide bank (and the armed Sunwake) alone.
+    expect(rec.notes.sunlanceArmedBySkyfall).toBe(false);
     expect(rec.notes.sunlanceArmed).toBe(true);
+    expect(rec.notes.sunlanceArmedAfterMoonsurge).toBe(true);
     expect(rec.notes.redharvestArmed).toBe(true);
     expect(rec.notes.marrowbreakArmed).toBe(true);
     expect(rec.notes.overbloomArmed).toBe(true);

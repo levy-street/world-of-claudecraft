@@ -171,8 +171,13 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     abilities: {
       entangling_roots: { costPct: -0.18, castPct: -0.24 },
       healing_touch: { castPct: -0.16 },
-      wrath: { dmgPct: 0.15, castPct: -0.2 },
-      starfire: { castPct: -0.16 },
+      // Moonwing Tidewheel: Skyfall and both payoff buttons pay for the
+      // two-bank loop; the 2026-11-24 follow-up (separate payoff buttons,
+      // Tidecross) retuned Wildbolt 0.15 -> 0.035 and Skyfall -0.1 -> -0.205.
+      wrath: { dmgPct: 0.035, castPct: -0.2 },
+      starfire: { dmgPct: -0.205, castPct: -0.16 },
+      moonlash: { dmgPct: -0.15 },
+      sunlance: { dmgPct: -0.15 },
     },
   },
   // v0.42.0 Wildfang +10%: apPct 0 -> 0.1 (feeds autos in both forms). The

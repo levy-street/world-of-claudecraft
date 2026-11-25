@@ -68,6 +68,7 @@ export type EntityTranslationField =
   | 'name'
   | 'description'
   | 'descriptionNoStealth'
+  | 'descriptionWithDot'
   | 'title'
   | 'text'
   | 'completion'
@@ -100,7 +101,12 @@ export type EntityTranslationRequest =
   | {
       kind: 'ability';
       id: string;
-      field: 'name' | 'description' | 'descriptionNoStealth' | AbilitySpecNoteField;
+      field:
+        | 'name'
+        | 'description'
+        | 'descriptionNoStealth'
+        | 'descriptionWithDot'
+        | AbilitySpecNoteField;
       values?: InterpolationValues;
     }
   | { kind: 'item'; id: string; field: 'name'; values?: InterpolationValues }

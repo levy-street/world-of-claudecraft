@@ -16710,8 +16710,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Estela Solar',
   'entities.abilities.sunlance.description':
     'Consume tus 3 de Marea Lunar para un golpe de {damage} de daño de Naturaleza más una quemadura de {overTime} a lo largo de 9 s, y restaura 35 de maná: la opción de maná. Oleada Lunar consume los mismos 3 de Marea Lunar, así que elige una.',
-  'guide.abilityHook.moonseed':
-    'Añade una fase de Marea Lunar y extiende Tempestad Lunar mientras estás en Forma de lechúcico lunar.',
   'hudChrome.auraEffect.moontide':
     'Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta',
   'hudChrome.auraEffect.oldBlood':

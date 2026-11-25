@@ -728,14 +728,19 @@ function castMoongrove(state: RunState): void {
     return !tempest || tempest.remaining <= 3;
   });
   if (missingTempest && tryCast(state, 'moonfire', missingTempest)) return;
-  const moontide = state.sim.player.auras.find((aura) => aura.id === 'moontide');
-  if ((moontide?.stacks ?? 0) >= 3) {
-    // The spend choice: Sunwake when mana runs thin, Moonsurge otherwise.
-    const lowMana = state.sim.player.resource < state.sim.player.maxResource * 0.4;
-    if (tryCast(state, lowMana ? 'starfire' : 'moonseed')) return;
-  }
-  if (!state.sim.player.cooldowns.has('moonseed') && tryCast(state, 'moonseed')) return;
-  tryCast(state, 'wrath');
+  // Tidewheel (combat/druid_tidewheel.ts): keep Stinging Swarm up too (the
+  // payoffs refresh both effects), spend each full bank on its own button,
+  // Skyfall in Sunrise, Wildbolt in Moonrise, else fill the lower bank.
+  const swarm = ownAura(state.primary, 'insect_swarm', state.sim.playerId);
+  if (!swarm && tryCast(state, 'insect_swarm')) return;
+  const player = state.sim.player;
+  const bank = (id: string) => player.auras.find((aura) => aura.id === id)?.stacks ?? 0;
+  const open = (id: string) => player.auras.some((aura) => aura.id === id);
+  if (bank('suntide') >= 3 && tryCast(state, 'sunlance')) return;
+  if (bank('moontide') >= 3 && tryCast(state, 'moonlash')) return;
+  if (open('sunrise') && tryCast(state, 'starfire')) return;
+  if (open('moonrise') && tryCast(state, 'wrath')) return;
+  tryCast(state, bank('suntide') <= bank('moontide') ? 'wrath' : 'starfire');
 }
 
 function castWildfang(state: RunState): void {

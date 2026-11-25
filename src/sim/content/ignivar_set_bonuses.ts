@@ -276,21 +276,24 @@ export const RUINCALLER_4PC_CHAOS_BOLT_DMG_PCT = 0.242;
 
 // Audited constants for the bespoke druid bends (read by the class-module
 // call sites AND pinned by tests, so the copy cannot drift from the code).
-/** Moonscorch 2pc: Moonseed's per-application Lunar Tempest extension cap
- *  (base extendDot maxBonus 6). The RESOLVED effect is rewritten in
- *  applyTalentMods, the ONE number the extendOwnedDot dispatch and the
- *  {duration} description splice both read: two 6-sec extensions fit per
- *  application, and the third press stays dead (the set doc's honesty note). */
-export const MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC = 12;
+/** Moonscorch 2pc: Lunar Tempest's ticks add Moontide at most once per this
+ *  many seconds (the Tidewheel base is TIDE_TICK_ICD, 8). The bonus used to
+ *  let Moonseed extend Lunar Tempest twice per application; Moonseed retired
+ *  when the Tidewheel payoffs got their own buttons, so the 2pc moved to the
+ *  Moontide bank it fed (recorded as a deviation from the set doc in the PR).
+ *  Read by druid_engines.ts druidEngineOnBleedTick; draws no rng. */
+export const MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC = 4;
 /** Moonscorch 4pc: the moonlash/sunlance dmgPct row. The printed number is 25
  *  percent DELIVERED: the accumulator is additive (talent_hit_mult.ts,
  *  1 + spellDmgPct + dmgPct) and a committed Moongrove at the raid's level
  *  20+ carries the 0.08 spec-baseline spellDmgPct floor PLUS the fully
  *  scaled Moonrage mastery's 0.15, so the real baseline is 1.23 and the row
- *  is 0.25 x 1.23 = 0.3075 (1.5375 / 1.23 = 1.25 exactly). The set doc's
+ *  was 0.25 x 1.23 = 0.3075. The Tidewheel rework's -0.15 payoff spec rows
+ *  (spec_baselines.ts) drop that baseline to 1.08, so the row is now
+ *  0.25 x 1.08 = 0.27 (1.35 / 1.08 = 1.25 exactly). The set doc's
  *  bracketed dmgPct assumed a bare baseline (the Warspirit 4pc deviation
  *  shape); recorded as a deviation in the wave's PR notes. */
-export const MOONSCORCH_4PC_PAYOFF_DMG_PCT = 0.3075;
+export const MOONSCORCH_4PC_PAYOFF_DMG_PCT = 0.27;
 /** Wildfang 2pc: multiplier on Redharvest's RESOLVED gainResource energy
  *  restore (base rank ladder 15/22/30; Math.floor lands the bent ladder at
  *  22/33/45, the set doc's rank truth, with 45 the raid-tier rank-3 value the
@@ -1074,24 +1077,22 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   moonscorch: [
     {
       pieces: 2,
-      // Moonseed may extend Lunar Tempest twice per application: the resolved
-      // extendDot cap goes 6 -> 12 (applyTalentMods rewrite), and the
-      // extendedBy bookkeeping already enforces the per-application budget
-      // (a fresh Lunar Tempest application replaces the aura object, so the
-      // budget resets exactly at the copy's "per application" boundary). The
-      // caster 2pc pushback rider rides the generic global knob. Draws no rng.
+      // Lunar Tempest's ticks add Moontide every 4 sec instead of every 8: a
+      // bespoke bend in druid_engines.ts druidEngineOnBleedTick, gated on the
+      // wearer flag. The caster 2pc pushback rider rides the generic global
+      // knob. Draws no rng.
       effect: {
         global: { castPushbackReduction: 1 },
-        tuning: { tempestExtendCapSec: MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC },
+        tuning: { moontideTickIcdSec: MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC },
       },
     },
     {
       pieces: 4,
       // Moonsurge and Sunwake strike 25 percent harder, DELIVERED: the
       // additive accumulator folds each row beside the committed spec's 0.08
-      // spellDmgPct floor plus the Moonrage mastery's 0.15, so the row is
-      // 0.3075 (1.5375 / 1.23 = 1.25 exactly; the constant's doc note records
-      // the sizing). The rows reach BOTH arms: Sunwake's burn is a plain dot
+      // spellDmgPct floor plus the Moonrage mastery's 0.15, less the Tidewheel
+      // payoff rows' 0.15, so the row is 0.27 (1.35 / 1.08 = 1.25 exactly; the
+      // constant's doc note records the sizing). The rows reach BOTH arms: Sunwake's burn is a plain dot
       // (no directPct, no perCombo), so scaleEffect's dot arm carries the
       // same multiplier into the resolved burn total. Wild Apex's 1.25
       // payoff multiplier stays MULTIPLICATIVE on top (dispatch-side),

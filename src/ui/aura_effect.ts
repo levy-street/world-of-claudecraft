@@ -37,6 +37,15 @@ import {
   SPOREMENDER_MOVE_SPEED_MULT,
 } from '../sim/combat/druid_sporemender';
 import {
+  MOONRISE_ID,
+  MOONRISE_WILDBOLT_DMG_MULT,
+  SUNRISE_ID,
+  SUNRISE_SKYFALL_CAST_MULT,
+  SUNTIDE_STAGES,
+  TIDECROSS_PAYOFF_DMG_MULT,
+  TIDEWHEEL_TICK_RATE,
+} from '../sim/combat/druid_tidewheel';
+import {
   COLDSIGHT_READ_AURA_ID,
   COLDSIGHT_READ_FELL_SHOT_MULT,
   COLDSIGHT_READ_LONG_DRAW_MULT,
@@ -482,6 +491,30 @@ export function auraEffectDescriptor(
   }
   if (a.id === 'moontide' && a.kind === 'moontide') {
     return { key: `${KEY}.moontide`, nums: { stacks: a.stacks ?? 0, max: MOONTIDE_STAGES } };
+  }
+  if (a.id === 'suntide' && a.kind === 'suntide') {
+    return { key: `${KEY}.suntide`, nums: { stacks: a.stacks ?? 0, max: SUNTIDE_STAGES } };
+  }
+  // Tidewheel windows (combat/druid_tidewheel.ts): inert markers on the druid.
+  if (a.id === SUNRISE_ID && a.kind === 'internal_cd') {
+    return {
+      key: `${KEY}.sunrise`,
+      nums: {
+        castPct: pctFromFrac(1 - SUNRISE_SKYFALL_CAST_MULT),
+        tickPct: pctFromFrac(TIDEWHEEL_TICK_RATE - 1),
+        crossPct: pctFromFrac(TIDECROSS_PAYOFF_DMG_MULT - 1),
+      },
+    };
+  }
+  if (a.id === MOONRISE_ID && a.kind === 'internal_cd') {
+    return {
+      key: `${KEY}.moonrise`,
+      nums: {
+        dmgPct: pctFromFrac(MOONRISE_WILDBOLT_DMG_MULT - 1),
+        tickPct: pctFromFrac(TIDEWHEEL_TICK_RATE - 1),
+        crossPct: pctFromFrac(TIDECROSS_PAYOFF_DMG_MULT - 1),
+      },
+    };
   }
   if (a.id === 'old_blood' && a.kind === 'old_blood') {
     return {

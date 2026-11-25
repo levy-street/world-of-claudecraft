@@ -16130,8 +16130,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Vệt Dương',
   'entities.abilities.sunlance.description':
     'Tiêu 3 Triều Nguyệt của bạn cho một đòn gây {damage} sát thương Tự Nhiên cộng thêm {overTime} thiêu đốt trong 9 giây, và hồi 35 mana: lựa chọn mana. Nguyệt Trào cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một.',
-  'guide.abilityHook.moonseed':
-    'Thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt khi bạn ở Dạng Cú Mặt Trăng.',
   'hudChrome.auraEffect.moontide':
     'Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó',
   'hudChrome.auraEffect.oldBlood':

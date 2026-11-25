@@ -1,10 +1,10 @@
 // Druid Crucible set bonuses (docs/prd/ignivar-set-bonus-final.md): each
 // bonus proven at the seam it rides, across the four form engines. Moonscorch
-// 2pc is a RESOLVED rewrite of Moonseed's extendDot cap (6 to 12), the one
-// number the extendOwnedDot dispatch and the {duration} tooltip splice both
-// read; 4pc is a dmgPct pair on Moonsurge and Sunwake sized DELIVERED (0.3075
-// against the 1.23 committed baseline: 0.08 spec floor plus the 0.15 Moonrage
-// mastery). Wildfang 2pc rewrites Redharvest's resolved energy restore
+// 2pc shortens Lunar Tempest's Moontide tick cooldown (8 to 4 sec) in the
+// engine's bleed-tick hook (it used to let the now retired Moonseed extend
+// Lunar Tempest twice); 4pc is a dmgPct pair on Moonsurge and Sunwake sized DELIVERED (0.27
+// against the 1.08 committed payoff baseline: 0.08 spec floor plus the 0.15
+// Moonrage mastery, less the Tidewheel rework's 0.15 payoff rows). Wildfang 2pc rewrites Redharvest's resolved energy restore
 // (floor(x1.5): 22/33/45 by rank); 4pc replants a fresh Flense after the
 // consumeDot cash-out, aura-only. Cinderbark 2pc is the one wearer-only rng
 // draw of the wave (a 30 percent extra Old Blood roll per landed Sweeping
@@ -18,12 +18,20 @@
 // Nature's Fury seed.
 import { describe, expect, it, vi } from 'vitest';
 import {
+  druidEngineOnBleedTick,
   druidEngineOnHotPlanted,
   druidEngineOnLandedStrike,
+  MOONTIDE_ID,
   OLD_BLOOD_ID,
   VERDANCE_ID,
 } from '../src/sim/combat/druid_engines';
-import type { onCastCompleted } from '../src/sim/combat/talent_procs';
+import {
+  LUNAR_TEMPEST_ID,
+  STINGING_SWARM_ID,
+  SUNTIDE_ID,
+  TIDE_TICK_ICD,
+} from '../src/sim/combat/druid_tidewheel';
+import { type onCastCompleted, tickProcState } from '../src/sim/combat/talent_procs';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE,
@@ -31,8 +39,9 @@ import {
   GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
   GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT,
   GROVESPRING_4PC_VERDANCE_BANK,
-  MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC,
+  MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC,
   MOONSCORCH_4PC_PAYOFF_DMG_PCT,
+  SET_ENGINE_BONUSES,
   setBonusFlag,
   WILDFANG_2PC_REDHARVEST_ENERGY_MULT,
 } from '../src/sim/content/ignivar_set_bonuses';
@@ -57,6 +66,12 @@ function worn(setId: string, pieces: number): Partial<Record<string, string>> {
 
 function druidMods(spec: DruidSpec, equipment: Partial<Record<string, string>>) {
   return computeCharacterModifiers('druid', { spec, rows: {} }, 25, equipment);
+}
+
+/** The Balance spec baseline's dmgPct row for a payoff (Tidewheel rework). */
+function payoffBaselineDmgPct(abilityId: 'moonlash' | 'sunlance'): number {
+  const rows = specBaselineFor('druid', 'balance')?.ability ?? [];
+  return rows.find((row) => row.ability === abilityId)?.dmgPct ?? 0;
 }
 
 function entryOf(spec: DruidSpec, equipment: Partial<Record<string, string>>, abilityId: string) {
@@ -127,13 +142,6 @@ function readyCast(sim: Sim, abilityId: string): void {
   sim.player.resource = sim.player.maxResource;
 }
 
-// Non-physical spells travel as projectiles: tick until every pending bolt
-// has landed so an extendDot/dot payload has actually been applied.
-function settleProjectiles(sim: Sim): void {
-  const host = sim as unknown as { ctx: { pendingProjectiles: unknown[] } };
-  for (let i = 0; i < 200 && host.ctx.pendingProjectiles.length > 0; i++) sim.tick();
-}
-
 function bankOldBlood(sim: Sim, stacksWanted: number): void {
   const current = sim.player.auras.find((aura) => aura.id === OLD_BLOOD_ID)?.stacks ?? 0;
   for (let i = current; i < stacksWanted; i++) {
@@ -177,121 +185,98 @@ describe('druid Crucible sets: the resolver registration', () => {
   });
 });
 
-describe('Moonscorch 2pc: Moonseed extends Lunar Tempest twice per application', () => {
-  it('the resolved cap: 12 for wearers, 6 base, and unequipping re-resolves to 6', () => {
-    const capOf = (equipment: Partial<Record<string, string>>) => {
-      const eff = entryOf('balance', equipment, 'moonseed').effects.find(
-        (
-          candidate,
-        ): candidate is Extract<
-          (typeof ABILITIES.moonseed.effects)[number],
-          { type: 'extendDot' }
-        > => candidate.type === 'extendDot',
-      );
-      return expectDefined(eff);
-    };
-    expect(capOf({}).maxBonus).toBe(6);
-    expect(capOf(worn('moonscorch', 2)).maxBonus).toBe(MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC);
-    // The per-press extension itself never moves: two 6-sec presses fill the
-    // wearer cap, the copy's "twice per application".
-    expect(capOf(worn('moonscorch', 2)).seconds).toBe(6);
+describe('Moonscorch 2pc: Lunar Tempest ticks add Moontide every 4 sec, not 8', () => {
+  /** A live Moongrove in Moonwing Form with its own Lunar Tempest and Stinging
+   *  Swarm auras; the tests drive the bleed-tick hook and the internal
+   *  cooldown clock directly, so no rng and no tick timing is involved. */
+  function tickRig(seed: number, pieces: number) {
+    const sim = liveDruid(seed, 'balance');
+    if (pieces > 0) equipSet(sim, 'moonscorch', pieces);
+    const p = sim.player;
+    p.auras.push(formAura(p, 'form_moonkin'));
+    const dot = (id: string): Aura => ({
+      id,
+      name: id,
+      kind: 'dot',
+      remaining: 12,
+      duration: 12,
+      value: 10,
+      tickInterval: 3,
+      tickTimer: 3,
+      sourceId: p.id,
+      school: id === STINGING_SWARM_ID ? 'nature' : 'arcane',
+    });
+    const onTick = (aura: Aura) => druidEngineOnBleedTick(ctxOf(sim), p, aura);
+    return { p, onTick, tempest: dot(LUNAR_TEMPEST_ID), swarm: dot(STINGING_SWARM_ID) };
+  }
 
-    const sim = liveDruid(611, 'balance');
-    equipSet(sim, 'moonscorch', 2);
-    const resolvedCap = sim
-      .resolvedAbility('moonseed')
-      ?.effects.find((eff) => eff.type === 'extendDot');
-    expect(resolvedCap && 'maxBonus' in resolvedCap ? resolvedCap.maxBonus : 0).toBe(
-      MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC,
-    );
-    sim.unequipItem('helmet');
-    const reResolved = sim
-      .resolvedAbility('moonseed')
-      ?.effects.find((eff) => eff.type === 'extendDot');
-    expect(reResolved && 'maxBonus' in reResolved ? reResolved.maxBonus : 0).toBe(6);
+  it('a wearer banks the next Lunar Tempest tick 4 sec later; the control waits the full 8', () => {
+    expect(MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC).toBeLessThan(TIDE_TICK_ICD);
+    for (const [pieces, icd] of [
+      [2, MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC],
+      [1, TIDE_TICK_ICD],
+    ] as const) {
+      const { p, onTick, tempest } = tickRig(631, pieces);
+      onTick(tempest);
+      expect(stacks(p, MOONTIDE_ID), `${pieces}pc first tick`).toBe(1);
+      // Just short of the cooldown: still locked.
+      tickProcState(p, icd - 0.5);
+      onTick(tempest);
+      expect(stacks(p, MOONTIDE_ID), `${pieces}pc inside the cooldown`).toBe(1);
+      // At it: the next tick banks again.
+      tickProcState(p, 0.5);
+      onTick(tempest);
+      expect(stacks(p, MOONTIDE_ID), `${pieces}pc after the cooldown`).toBe(2);
+    }
   });
 
-  it('two presses extend a wearer application by 12; the third stays dead (control caps at 6)', () => {
-    function tempestAfterThreePresses(wearer: boolean): Aura {
-      const sim = liveDruid(612, 'balance');
-      if (wearer) equipSet(sim, 'moonscorch', 2);
-      const target = addHostileTarget(sim, 8);
-      sim.player.auras.push(formAura(sim.player, 'form_moonkin'));
-      target.auras.push({
-        id: 'moonfire',
-        name: 'Lunar Tempest',
-        kind: 'dot',
-        remaining: 12,
-        duration: 12,
-        value: 10,
-        tickInterval: 3,
-        tickTimer: 3,
-        sourceId: sim.player.id,
-        school: 'arcane',
-      });
-      for (let press = 0; press < 3; press++) {
-        readyCast(sim, 'moonseed');
-        sim.castAbility('moonseed');
-        settleProjectiles(sim);
-      }
-      return expectDefined(ownDot(target, sim.player.id, 'moonfire'));
+  it('at the 4 sec mark a wearer has banked twice and a one-piece control once', () => {
+    function moontideAtFourSeconds(pieces: number): number {
+      const { p, onTick, tempest } = tickRig(632, pieces);
+      onTick(tempest);
+      tickProcState(p, 4);
+      onTick(tempest);
+      return stacks(p, MOONTIDE_ID);
     }
-    // duration (unlike remaining) never decays, so it reads the extension
-    // budget exactly: 12 authored + the extendedBy total.
-    const bent = tempestAfterThreePresses(true);
-    expect(bent.extendedBy).toBe(MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC);
-    expect(bent.duration).toBe(12 + MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC);
-    const control = tempestAfterThreePresses(false);
-    expect(control.extendedBy).toBe(6);
-    expect(control.duration).toBe(12 + 6);
+    expect(moontideAtFourSeconds(2)).toBe(2);
+    expect(moontideAtFourSeconds(1)).toBe(1);
   });
 
-  it('a fresh application resets the budget (per application, not per target)', () => {
-    const sim = liveDruid(613, 'balance');
-    equipSet(sim, 'moonscorch', 2);
-    const target = addHostileTarget(sim, 8);
-    sim.player.auras.push(formAura(sim.player, 'form_moonkin'));
-    const plant = () =>
-      target.auras.push({
-        id: 'moonfire',
-        name: 'Lunar Tempest',
-        kind: 'dot',
-        remaining: 12,
-        duration: 12,
-        value: 10,
-        tickInterval: 3,
-        tickTimer: 3,
-        sourceId: sim.player.id,
-        school: 'arcane',
-      });
-    plant();
-    for (let press = 0; press < 2; press++) {
-      readyCast(sim, 'moonseed');
-      sim.castAbility('moonseed');
-      settleProjectiles(sim);
-    }
-    expect(expectDefined(ownDot(target, sim.player.id, 'moonfire')).extendedBy).toBe(12);
-    // Re-apply: applyAura replaces the aura OBJECT, so extendedBy starts
-    // clean and the wearer gets a full budget on the new application.
-    target.auras = target.auras.filter((aura) => aura.id !== 'moonfire');
-    plant();
-    readyCast(sim, 'moonseed');
-    sim.castAbility('moonseed');
-    settleProjectiles(sim);
-    expect(expectDefined(ownDot(target, sim.player.id, 'moonfire')).extendedBy).toBe(6);
+  it('bends only Moontide: a wearer Stinging Swarm keeps the 8 sec Suntide cooldown', () => {
+    const { p, onTick, swarm } = tickRig(633, 2);
+    onTick(swarm);
+    expect(stacks(p, SUNTIDE_ID)).toBe(1);
+    tickProcState(p, MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC);
+    onTick(swarm);
+    expect(stacks(p, SUNTIDE_ID)).toBe(1);
+    tickProcState(p, TIDE_TICK_ICD - MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC);
+    onTick(swarm);
+    expect(stacks(p, SUNTIDE_ID)).toBe(2);
+    expect(stacks(p, MOONTIDE_ID)).toBe(0);
+  });
+
+  it('registers the audited tuning beside the unchanged pushback rider', () => {
+    const tier = expectDefined(SET_ENGINE_BONUSES.moonscorch.find((t) => t.pieces === 2));
+    expect(tier.effect.tuning).toEqual({
+      moontideTickIcdSec: MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC,
+    });
+    expect(tier.effect.global).toEqual({ castPushbackReduction: 1 });
   });
 });
 
 describe('Moonscorch 4pc: Moonsurge and Sunwake strike 25 percent harder, delivered', () => {
-  it('the accumulator: 1.5375 for wearers against the 1.23 committed baseline', () => {
+  it('the accumulator: the 4pc row on top of the committed payoff baseline', () => {
     for (const abilityId of ['moonlash', 'sunlance'] as const) {
       const wearerMult = resolveTalentHitMult(
         ABILITIES[abilityId],
         druidMods('balance', worn('moonscorch', 4)),
       ).dmgMult;
       const baseMult = resolveTalentHitMult(ABILITIES[abilityId], druidMods('balance', {})).dmgMult;
-      expect(baseMult, abilityId).toBeCloseTo(1.23, 10);
-      expect(wearerMult, abilityId).toBeCloseTo(1.23 + MOONSCORCH_4PC_PAYOFF_DMG_PCT, 10);
+      // The Tidewheel rework gave both payoffs a Balance baseline dmgPct row
+      // (spec_baselines.ts), so the committed baseline is 1.23 plus that row.
+      const committed = 1.23 + payoffBaselineDmgPct(abilityId);
+      expect(baseMult, abilityId).toBeCloseTo(committed, 10);
+      expect(wearerMult, abilityId).toBeCloseTo(committed + MOONSCORCH_4PC_PAYOFF_DMG_PCT, 10);
       // Delivered: exactly the 25 percent the copy promises.
       expect(wearerMult / baseMult, abilityId).toBeCloseTo(1.25, 10);
     }
@@ -302,25 +287,14 @@ describe('Moonscorch 4pc: Moonsurge and Sunwake strike 25 percent harder, delive
   });
 
   it('the resolved damage scales on both arms, including the Sunwake burn dot', () => {
-    // Moonsurge and Sunwake only exist through the Moontide-3 transform, so
-    // the pins resolve them the way play does: the armed payoff buttons.
+    // Moonsurge and Sunwake are learned buttons of their own since the
+    // Tidewheel follow-up, so the pins resolve them directly.
     function payoffEffects(wearer: boolean) {
       const sim = liveDruid(624, 'balance');
       if (wearer) equipSet(sim, 'moonscorch', 4);
       sim.player.auras.push(formAura(sim.player, 'form_moonkin'));
-      sim.player.auras.push({
-        id: 'moontide',
-        name: 'Moontide',
-        kind: 'moontide',
-        remaining: 3600,
-        duration: 3600,
-        value: 0,
-        stacks: 3,
-        sourceId: sim.player.id,
-        school: 'nature',
-      });
-      const moonlash = expectDefined(sim.resolvedAbility('moonseed'));
-      const sunlance = expectDefined(sim.resolvedAbility('starfire'));
+      const moonlash = expectDefined(sim.resolvedAbility('moonlash'));
+      const sunlance = expectDefined(sim.resolvedAbility('sunlance'));
       expect(moonlash.def.id).toBe('moonlash');
       expect(sunlance.def.id).toBe('sunlance');
       const direct = (res: typeof moonlash) =>
@@ -328,17 +302,24 @@ describe('Moonscorch 4pc: Moonsurge and Sunwake strike 25 percent harder, delive
       const burn = expectDefined(sunlance.effects.find((eff) => eff.type === 'dot'));
       return { moonlash: direct(moonlash), sunlance: direct(sunlance), burn };
     }
+    // Authored 136-162 / 80-100 / 45 burn, rounded at the 1.08 committed
+    // multiplier (1.23 less the Tidewheel payoff rows' 0.15).
     const base = payoffEffects(false);
-    expect(base.moonlash).toMatchObject({ min: 167, max: 199 });
-    expect(base.sunlance).toMatchObject({ min: 98, max: 123 });
-    expect('total' in base.burn ? base.burn.total : 0).toBe(55);
+    expect(base.moonlash).toMatchObject({ min: 147, max: 175 });
+    expect(base.sunlance).toMatchObject({ min: 86, max: 108 });
+    expect('total' in base.burn ? base.burn.total : 0).toBe(49);
+    // The same authored values at 1.08 + MOONSCORCH_4PC_PAYOFF_DMG_PCT.
     const bent = payoffEffects(true);
-    expect(bent.moonlash).toMatchObject({ min: 209, max: 249 });
-    expect(bent.sunlance).toMatchObject({ min: 123, max: 154 });
-    expect('total' in bent.burn ? bent.burn.total : 0).toBe(69);
-    // The 2pc alone must NOT move the damage (the rows are the 4pc's).
-    expect(druidMods('balance', worn('moonscorch', 2)).abilities.moonlash?.dmgPct ?? 0).toBe(0);
-    expect(druidMods('balance', worn('moonscorch', 2)).abilities.sunlance?.dmgPct ?? 0).toBe(0);
+    expect(bent.moonlash).toMatchObject({ min: 184, max: 219 });
+    expect(bent.sunlance).toMatchObject({ min: 108, max: 135 });
+    expect('total' in bent.burn ? bent.burn.total : 0).toBe(61);
+    // The 2pc alone must NOT move the damage (the rows are the 4pc's): the
+    // payoff rows read only the Balance baseline.
+    for (const abilityId of ['moonlash', 'sunlance'] as const) {
+      expect(
+        druidMods('balance', worn('moonscorch', 2)).abilities[abilityId]?.dmgPct ?? 0,
+      ).toBeCloseTo(payoffBaselineDmgPct(abilityId), 10);
+    }
   });
 });
 
@@ -805,8 +786,8 @@ describe('Grovespring 4pc: Overbloom harvests 75 percent and banks 1 Verdance', 
 
 describe('the wearer literals against the authored copy', () => {
   it('pins every audited druid constant', () => {
-    expect(MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC).toBe(12);
-    expect(MOONSCORCH_4PC_PAYOFF_DMG_PCT).toBeCloseTo(0.3075, 10);
+    expect(MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC).toBe(4);
+    expect(MOONSCORCH_4PC_PAYOFF_DMG_PCT).toBeCloseTo(0.27, 10);
     expect(WILDFANG_2PC_REDHARVEST_ENERGY_MULT).toBeCloseTo(1.5, 10);
     expect(CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE).toBeCloseTo(0.3, 10);
     // v0.42.0: re-sized to 0.495 so it still delivers exactly 30% on top of
@@ -816,9 +797,8 @@ describe('the wearer literals against the authored copy', () => {
     expect(GROVESPRING_2PC_SWIFTMEND_HEAL_MULT).toBeCloseTo(1.25, 10);
     expect(GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT).toBeCloseTo(0.75, 10);
     expect(GROVESPRING_4PC_VERDANCE_BANK).toBe(1);
-    // The base literals the copy's claims lean on.
-    const extend = ABILITIES.moonseed.effects.find((eff) => eff.type === 'extendDot');
-    expect(extend && 'maxBonus' in extend ? extend.maxBonus : 0).toBe(6);
+    // The base literals the copy's claims lean on ("instead of every 8 sec").
+    expect(TIDE_TICK_ICD).toBe(8);
     const guard = ABILITIES.marrowbreak.effects.find((eff) => eff.type === 'druidMarrowbreakGuard');
     expect(guard).toMatchObject({ belowFrac: 0.5, healPctMaxHp: 0.18, rage: 15 });
     expect(ABILITIES.marrowbreak.threat).toEqual({ flat: 110, mult: 2 });
@@ -835,7 +815,8 @@ describe('the wearer literals against the authored copy', () => {
     // The ability_damage $t/$b arms for these two types are unconditional
     // first-match returns, safe ONLY while each type has exactly one content
     // user. A second ability adopting either type must widen the splice
-    // scoping (gate on the ability id) before this pin is re-anchored.
+    // scoping (gate on the ability id) before this pin is re-anchored. The
+    // extendDot user is the retired, hidden Moonseed def, kept for saved bars.
     const usersOf = (type: string): string[] =>
       Object.values(ABILITIES)
         .filter((def) => def.effects.some((eff) => eff.type === type))

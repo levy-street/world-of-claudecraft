@@ -19775,8 +19775,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Наполняет оружие целебной водой и усиливает непрерывный поток исцеления.',
   'guide.abilityHook.measured_shot':
     'Выверенный дальний выстрел, восстанавливающий концентрацию для более мощных атак.',
-  'guide.abilityHook.moonseed':
-    'В облике Лунного крыла добавляет стадию Лунного прилива и продлевает Лунную бурю.',
   'guide.abilityHook.oath_chain':
     'Притягивает далекого врага к вашей группе и замедляет его отступление.',
   'guide.abilityHook.pack_command':

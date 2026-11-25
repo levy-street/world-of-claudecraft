@@ -16596,8 +16596,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Scia Solare',
   'entities.abilities.sunlance.description':
     'Consuma 3 Marea Lunare per un colpo da {damage} danni di Natura più una bruciatura di {overTime} in 9 sec, e ripristina 35 mana: la scelta del mana. Ondata Lunare consuma le stesse 3 Marea Lunare, quindi scegline una.',
-  'guide.abilityHook.moonseed':
-    'Aggiunge uno stadio di Marea Lunare ed estende Tempesta Lunare mentre sei in Forma di Lunagufo.',
   'hudChrome.auraEffect.moontide':
     'Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono',
   'hudChrome.auraEffect.oldBlood':

@@ -1037,6 +1037,17 @@ export const da_DK: EnTranslations = {
       "fateThreadsConsumeReady": "Tre Skæbnetråde: Fortær kan flette dem ind i yderligere Fordømmelse.",
       "fateThreadsSentenceReady": "Tre Skæbnetråde: Dom kan forbruge dem for 18% øget skade."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Mørketiende",
       "bombLabel": "Tiendebombe",
@@ -2893,6 +2904,7 @@ export const da_DK: EnTranslations = {
       "showFriendlyTrack": "Vis mine styrkelser på allierede",
       "showShieldTrack": "Vis mine skjolde",
       "classicCombatText": "Klassisk kamptekst",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "Vandkrusninger (kølvand)",
       "spellEffects": "Besværgelseseffekter",
       "actionCam": "Handlingskamera",
@@ -4842,6 +4854,9 @@ export const da_DK: EnTranslations = {
       "coldsightRead": "Dit næste Langtræk giver {longDrawPct}% mere skade, eller dit næste Skæbneskud giver {fellShotPct}% mere",
       "duskEconomy": "Evner koster {pct}% mindre energi",
       "moontide": "Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "Gammelt Blod: trin {stacks} af {max}. Landede Katte- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus",
       "verdance": "Grønske {stacks}/{max}. Hver Sporeheling, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring",
       "freeExecute": "Din næste kvalificerede henrettelsesevne koster ingenting",
@@ -9668,6 +9683,7 @@ export const da_DK: EnTranslations = {
       "framesGovernedShardpike": "Rediger rammer frigør også Skårpikelinjen, den korte række af opgaveværktøjshandlinger, der vises ved siden af dine handlingslinjer, kun mens du bærer selve Skårpiken; den bærer sit navneskilt, mens den er løs, så du kan placere den før kampen i stedet for under den.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Rediger rammer lader dig også flytte Skyggepræstens medaljon for Mørketiende og Tiendebombe.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Slå Frigør ressourcebjælke til på fanen Rammer. Så frigør Rediger rammer også din ressourcebjælke, så du kan placere mana, energi eller raseri separat, hvor du vil. Ressourcebjælkens bredde og Ressourcebjælkens højde på samme fane ændrer størrelsen. Rediger rammer frigør også Bakkekonge-bjælken. Baggrundens uigennemsigtighed for Bakkekonge på samme fane nedtoner panelet, mens teksten forbliver tydelig.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
@@ -10168,7 +10184,7 @@ export const da_DK: EnTranslations = {
       "healing_touch": "En stor helbredelse på ét mål med lang besværgelsestid, til at fylde nogen op.",
       "mark_of_the_wild": "En vedvarende velsignelse du lægger på dig selv eller en allieret før en kamp.",
       "moonfire": "Rammer øjeblikkeligt og efterlader målet brændende, god mens du bevæger dig.",
-      "moonseed": "Tilføjer et Måneflod-trin og forlænger Månestorm, mens du er i Månekinform.",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "Kastes øjeblikkeligt og helbreder en allieret over tid, så du kan blive ved med at handle.",
       "thorns": "Beskytter en allieret så nærkampsangribere skader sig selv når de slår."
     },
@@ -18389,7 +18405,8 @@ export const da_DK: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Gribende Rødder",
-        "description": "Forankrer målet på stedet i op til 12 sek."
+        "description": "Forankrer målet på stedet i op til 12 sek.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Bruin-form",
@@ -18492,7 +18509,8 @@ export const da_DK: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Stikkende Sværm",
-        "description": "Fjenden sværmes af insekter og tager {damage} naturskade over 12 sek."
+        "description": "Fjenden sværmes af insekter og tager {damage} naturskade over 12 sek.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Losblod",

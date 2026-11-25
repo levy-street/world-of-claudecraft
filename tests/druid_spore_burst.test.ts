@@ -20,8 +20,10 @@ import {
 import {
   SPORE_BURST_FULL_BANK_POWER,
   SPORE_BURST_ID,
+  sporeBurstBankPower,
   sporeBurstFullBankGlowActive,
 } from '../src/sim/combat/druid_spore_burst';
+import { TIDE_PAYOFF_MIN_STACKS } from '../src/sim/combat/druid_tidewheel';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -393,17 +395,63 @@ describe('Spore Burst: the full-bank payoff', () => {
   }
 
   it('3 Moontide makes it 25% stronger, spends the bank, and still costs its mana', () => {
+    expect(TIDE_PAYOFF_MIN_STACKS).toBe(3);
     const plain = burstDamage('balance', null);
-    const banked = burstDamage('balance', MOONTIDE_STAGES);
+    const banked = burstDamage('balance', TIDE_PAYOFF_MIN_STACKS);
     expect(Math.abs(banked - Math.round(plain * SPORE_BURST_FULL_BANK_POWER))).toBeLessThanOrEqual(
       1,
     );
     const d = druid('balance');
-    bank(d.me, 'moontide', MOONTIDE_STAGES);
+    bank(d.me, 'moontide', TIDE_PAYOFF_MIN_STACKS);
     const mana = d.me.resource;
     d.sim.castAbility('spore_burst', d.pid, AIM);
     expect(d.me.resource).toBe(mana - 90);
     expect(d.me.auras.find((aura) => aura.id === 'moontide')?.stacks ?? 0).toBe(0);
+  });
+
+  it('each Moontide past 3 adds 20% more, and the cast spends all of them', () => {
+    expect(MOONTIDE_STAGES).toBe(5);
+    const plain = burstDamage('balance', null);
+    // Below 3 the bank does nothing and is kept.
+    expect(burstDamage('balance', TIDE_PAYOFF_MIN_STACKS - 1)).toBe(plain);
+    const p = druid('balance');
+    bank(p.me, 'moontide', TIDE_PAYOFF_MIN_STACKS - 1);
+    p.sim.castAbility('spore_burst', p.pid, AIM);
+    expect(p.me.auras.find((aura) => aura.id === 'moontide')?.stacks).toBe(
+      TIDE_PAYOFF_MIN_STACKS - 1,
+    );
+    for (const [points, surplus] of [
+      [4, 1.2],
+      [5, 1.4],
+    ] as const) {
+      const banked = burstDamage('balance', points);
+      expect(
+        Math.abs(banked - Math.round(plain * SPORE_BURST_FULL_BANK_POWER * surplus)),
+        `${points} Moontide`,
+      ).toBeLessThanOrEqual(2);
+      const d = druid('balance');
+      bank(d.me, 'moontide', points);
+      d.sim.castAbility('spore_burst', d.pid, AIM);
+      expect(d.me.auras.find((aura) => aura.id === 'moontide')?.stacks ?? 0).toBe(0);
+    }
+  });
+
+  it('sporeBurstBankPower: 1.25 from 3 Moontide, times the surplus past 3; Verdance unchanged', () => {
+    const owner = 7;
+    const moontide = (stacks: number) => [{ id: 'moontide', stacks, sourceId: owner }];
+    expect(SPORE_BURST_FULL_BANK_POWER).toBe(1.25);
+    expect(sporeBurstBankPower([], owner)).toBe(1);
+    expect(sporeBurstBankPower(moontide(2), owner)).toBe(1);
+    expect(sporeBurstBankPower(moontide(3), owner)).toBeCloseTo(1.25, 10);
+    expect(sporeBurstBankPower(moontide(4), owner)).toBeCloseTo(1.25 * 1.2, 10);
+    expect(sporeBurstBankPower(moontide(5), owner)).toBeCloseTo(1.25 * 1.4, 10);
+    // Only the caster's own bank counts.
+    expect(sporeBurstBankPower(moontide(5), owner + 1)).toBe(1);
+    // Verdance keeps its 3-stage bank and its flat 25%.
+    expect(VERDANCE_STAGES).toBe(3);
+    const verdance = (stacks: number) => [{ id: 'verdance', stacks, sourceId: owner }];
+    expect(sporeBurstBankPower(verdance(VERDANCE_STAGES - 1), owner)).toBe(1);
+    expect(sporeBurstBankPower(verdance(VERDANCE_STAGES), owner)).toBeCloseTo(1.25, 10);
   });
 
   it('full Verdance does the same for Groveheart; a partial bank does nothing', () => {
@@ -426,10 +474,22 @@ describe('Spore Burst: the full-bank payoff', () => {
 
   it('the action bar glow reads the same full-bank predicate', () => {
     const owner = 7;
-    const full = [{ id: 'moontide', stacks: MOONTIDE_STAGES, sourceId: owner }];
-    expect(sporeBurstFullBankGlowActive(full, owner, 'spore_burst')).toBe(true);
-    expect(sporeBurstFullBankGlowActive(full, owner, 'wrath')).toBe(false);
-    expect(sporeBurstFullBankGlowActive(full, owner + 1, 'spore_burst')).toBe(false);
+    // Moontide lights it from 3 points, below its 5-point cap.
+    for (const stacks of [TIDE_PAYOFF_MIN_STACKS, 4, MOONTIDE_STAGES]) {
+      const ready = [{ id: 'moontide', stacks, sourceId: owner }];
+      expect(sporeBurstFullBankGlowActive(ready, owner, 'spore_burst'), `${stacks}`).toBe(true);
+      expect(sporeBurstFullBankGlowActive(ready, owner, 'wrath'), `${stacks}`).toBe(false);
+      expect(sporeBurstFullBankGlowActive(ready, owner + 1, 'spore_burst'), `${stacks}`).toBe(
+        false,
+      );
+    }
+    expect(
+      sporeBurstFullBankGlowActive(
+        [{ id: 'moontide', stacks: TIDE_PAYOFF_MIN_STACKS - 1, sourceId: owner }],
+        owner,
+        'spore_burst',
+      ),
+    ).toBe(false);
     expect(
       sporeBurstFullBankGlowActive(
         [{ id: 'verdance', stacks: VERDANCE_STAGES - 1, sourceId: owner }],

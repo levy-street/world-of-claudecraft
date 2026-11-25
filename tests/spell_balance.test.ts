@@ -65,8 +65,8 @@ describe('nuke damage is proportional to cast time (the balance framework rule)'
 
   it('Skyfall (3s) at least matches Wildbolt (shorter cast) per second', () => {
     // Only the floor survives the Balance rework (owner ruling 2026-08-09).
-    // Skyfall is the spec engine now: each Moonwing cast builds Moontide and
-    // the button transforms into Sunwake at 3, so its base is deliberately
+    // Skyfall is the spec engine now: each Moonwing cast builds Moontide for
+    // the Moonsurge payoff button (the Tidewheel), so its base is deliberately
     // super-proportional (~2.5x Wildbolt's per-second base; spell power
     // compresses the real ratio toward ~1.3). Wildbolt is the level-1 filler.
     // A CEILING here would fight that design; the floor still catches the

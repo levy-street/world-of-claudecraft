@@ -16251,8 +16251,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Güneş İzi',
   'entities.abilities.sunlance.description':
     '3 Ay Gelgitini, {damage} Doğa hasarı ve 9 saniyede {overTime} yanık veren bir vuruş için tüketir ve 35 mana geri kazandırır: mana seçimi. Ay Kabarışı da aynı 3 Ay Gelgitini tüketir, o yüzden birini seç.',
-  'guide.abilityHook.moonseed':
-    'Aykuşu Formundayken bir Ay Gelgiti aşaması ekler ve Ay Fırtınasını uzatır.',
   'hudChrome.auraEffect.moontide':
     'Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar',
   'hudChrome.auraEffect.oldBlood':

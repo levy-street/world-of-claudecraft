@@ -1037,6 +1037,17 @@ export const ja_JP: EnTranslations = {
       "fateThreadsConsumeReady": "運命の糸が3本: 喰らうで追加の断罪へ紡げます。",
       "fateThreadsSentenceReady": "運命の糸が3本: 宣告で消費するとダメージが18%増加します。"
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "闇の献納",
       "bombLabel": "献納の爆弾",
@@ -2893,6 +2904,7 @@ export const ja_JP: EnTranslations = {
       "showFriendlyTrack": "味方へのバフを表示",
       "showShieldTrack": "自分のシールドを表示",
       "classicCombatText": "クラシック戦闘テキスト",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "水面の波紋（航跡）",
       "spellEffects": "呪文エフェクト",
       "actionCam": "アクションカメラ",
@@ -4842,6 +4854,9 @@ export const ja_JP: EnTranslations = {
       "coldsightRead": "次に放つ「引き絞り」のダメージが{longDrawPct}%増加するか、次に放つ「凶弾」のダメージが{fellShotPct}%増加する",
       "duskEconomy": "アビリティの消費エナジーが{pct}%減少する",
       "moontide": "月潮：{stacks}/{max}段階。月翼形態での野生の稲妻・天墜・月の種の詠唱ごとに1段階進む。{max}段階で月の種はムーンサージに、天墜は陽醒に変化し、どちらを使っても3段階すべてを消費する",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "古き血：{stacks}/{max}段階。裂き爪・皮剥ぎ・血の亀裂・血噛み・薙ぎ払う爪・骨砕きの命中ごとに1段階蓄える。{max}段階で、キャットフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する",
       "verdance": "翠成：{stacks}/{max}段階。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに1段階進み、1段階ごとに野生の癒しの詠唱時間が短くなる。{max}段階でスウィフトメンドが満開に変化する",
       "freeExecute": "次の対象となる処刑アビリティはコストを消費しない",
@@ -9668,6 +9683,7 @@ export const ja_JP: EnTranslations = {
       "framesGovernedShardpike": "「フレームを編集」ではシャードパイクバーも動かせるようになります。シャードパイクバーは、シャードパイクを持っているあいだだけアクションバーの横に現れるクエスト道具の短い列で、ロック解除中は名前チップを表示します。戦闘中ではなく戦闘前に配置しておけます。",
       "framesGovernedUnitTooltip": "「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。",
       "framesGovernedPriest": "フレーム編集では、シャドウプリーストの闇の献納と献納の爆弾を表示するメダリオンも移動できます。",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "「フレーム」タブで「リソースバーを分離」をオンにすると、「フレーム編集」でリソースバーも動かせるようになり、マナ、エネルギー、怒りを好きな場所に単独で置けます。同じタブの「リソースバーの幅」と「リソースバーの高さ」でサイズを変えられます。「フレーム編集」では丘の王のバーも動かせ、同じタブの「丘の王の背景の不透明度」で文字はそのままにパネルを薄くできます。",
       "barsTitle": "バー、タイマー、戦闘テキスト",
       "barsBody": "詠唱やチャネルを行うと、画面中央、アクションバーのすぐ上にキャストバーが現れ、呪文の名前と残り時間を伝えます。ターゲットにもそのフレーム上に専用のキャストバーが出るので、何が来るのかを見て応じられます。\n\nキャストバーの下には細いスイングバーがあり、武器を振るたびに満ちていきます。近接や遠隔で戦う人は、次の自動攻撃がいつ当たるのかを見て取れます。\n\n経験値バーはアクションバーの下を画面幅いっぱいに走り、区切りが刻まれ、明るく伸びた部分が蓄えている休息経験値を示します。\n\n水中を泳ぐと、画面上部に青い息バーが現れます。頭が沈んでいる間は減り続け、尽きて溺れ始めると赤く点滅し、水面に出た瞬間に素早く戻ります。スペースで浮上し、初期設定でCtrlの「潜水」キーを押せばさらに深く潜れます。\n\nダメージと回復は、当たった相手の上に小さな数字となって浮かび上がるので、文字を読まなくても戦いの流れがつかめます。書かれた記録はすべて、チャットボックスの「戦闘」タブに残ります。",
@@ -10168,7 +10184,7 @@ export const ja_JP: EnTranslations = {
       "healing_touch": "詠唱は長いものの回復量の大きい単体ヒールで、体力を満タンに戻します。",
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
       "moonfire": "即座に当たり標的を燃焼させるため、移動中にも向いています。",
-      "moonseed": "月翼形態中、月潮を1段階進め、月の嵐の効果時間を延長します。",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "即座に唱えられ、味方を継続的に回復するので、行動を続けられます。",
       "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
     },
@@ -18389,7 +18405,8 @@ export const ja_JP: EnTranslations = {
       },
       "entangling_roots": {
         "name": "締めつける根",
-        "description": "対象を最大12秒間その場に根付かせます。"
+        "description": "対象を最大12秒間その場に根付かせます。",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "ブルーインフォーム",
@@ -18492,7 +18509,8 @@ export const ja_JP: EnTranslations = {
       },
       "insect_swarm": {
         "name": "刺す虫の群れ",
-        "description": "敵が虫の群れに襲われ、12秒かけて{damage}の自然ダメージを受けます。"
+        "description": "敵が虫の群れに襲われ、12秒かけて{damage}の自然ダメージを受けます。",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "山猫の血",

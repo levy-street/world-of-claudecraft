@@ -15912,8 +15912,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Solspor',
   'entities.abilities.sunlance.description':
     'Forbruger dine 3 Måneflod til et slag med {damage} naturskade plus en forbrænding på {overTime} over 9 sek. og gendanner 35 mana: manavalget. Månebølge forbruger de samme 3 Måneflod, så vælg et.',
-  'guide.abilityHook.moonseed':
-    'Tilføjer et Måneflod-trin og forlænger Månestorm, mens du er i Månekinform.',
   'hudChrome.auraEffect.moontide':
     'Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den',
   'hudChrome.auraEffect.oldBlood':

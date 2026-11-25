@@ -19,10 +19,12 @@ import type { AuraKind } from '../src/sim/types';
 
 const wearing = (kind: AuraKind) => [{ kind }];
 
-/** Every druid button that leaves the form when pressed: the caster kit, plus
- *  the transforms an action replacement swaps in (Moonsurge, Sunwake,
- *  Overbloom). Anything absent must have a reason, and the split assertions
- *  below name the reasons this list depends on. */
+/** Every druid button that leaves the form when pressed: the caster kit
+ *  (Moonsurge and Sunwake are kit buttons of their own now), plus the
+ *  transform an action replacement swaps in (Overbloom). The predicate reads
+ *  the def alone, so the retired, hidden Moonseed def still classifies here.
+ *  Anything absent must have a reason, and the split assertions below name the
+ *  reasons this list depends on. */
 const AUTO_UNSHIFTING_DRUID_ABILITIES = [
   'healing_touch',
   'hurricane',

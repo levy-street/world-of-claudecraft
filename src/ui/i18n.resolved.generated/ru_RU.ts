@@ -1037,6 +1037,17 @@ export const ru_RU: EnTranslations = {
       "fateThreadsConsumeReady": "Три Нити судьбы: «Поглощение» может сплести их в дополнительное Осуждение.",
       "fateThreadsSentenceReady": "Три Нити судьбы: «Приговор» может израсходовать их ради 18% дополнительного урона."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Мрачная десятина",
       "bombLabel": "Бомба подношения",
@@ -2893,6 +2904,7 @@ export const ru_RU: EnTranslations = {
       "showFriendlyTrack": "Показывать мои эффекты на союзниках",
       "showShieldTrack": "Показывать мои щиты",
       "classicCombatText": "Классический боевой текст",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "Рябь на воде (кильватер)",
       "spellEffects": "Эффекты заклинаний",
       "actionCam": "Экшен-камера",
@@ -4842,6 +4854,9 @@ export const ru_RU: EnTranslations = {
       "coldsightRead": "Следующий «Долгий натяг» наносит на {longDrawPct}% больше урона, или следующий «Зловещий выстрел» наносит на {fellShotPct}% больше",
       "duskEconomy": "Способности стоят на {pct}% меньше энергии",
       "moontide": "Лунный прилив: стадия {stacks} из {max}. Применения Дикой стрелы, Падения небес и Лунного семени в облике Лунного крыла добавляют по 1 стадии. На {max}: Лунное семя становится Лунным всплеском, а Падение небес — Пробуждением солнца; любое из них тратит все 3 стадии",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "Старая кровь: стадия {stacks} из {max}. Попавшие удары Рвущего когтя, Свежевания, Кровавого разлома, Кровавого укуса, Разящих когтей и Костолома добавляют по 1 стадии. На {max}: Кровавый укус становится Кровавой жатвой в облике кота, а Костолом — Дроблением костей в облике бурого",
       "verdance": "Зелень: стадия {stacks} из {max}. Каждый применённый Спороисцеление, Второй расцвет или Дикое заживление добавляет 1, и каждая стадия сокращает время применения Дикого заживления. При {max} Быстрое восстановление становится Сверхцветением",
       "freeExecute": "Следующее подходящее добивающее умение не требует ресурсов",
@@ -9668,6 +9683,7 @@ export const ru_RU: EnTranslations = {
       "framesGovernedShardpike": "«Редактировать фреймы» также освобождает панель Осколочной пики: это короткий ряд действий квестового предмета, который появляется рядом с панелями команд, только пока вы несёте саму Осколочную пику. Она носит свою табличку с именем, пока откреплена, так что её можно поставить на место до боя, а не во время него.",
       "framesGovernedUnitTooltip": "«Редактирование фреймов» также освобождает фрейм подсказки: место, где появляется карточка того, на что наведён курсор. Для существа это уровень и вид, для другого игрока: звание, гильдия, уровень и класс, а также специализация с её ролью. Перетащите фрейм куда угодно, и карточка будет раскрываться оттуда в сторону от ближайших краёв экрана. Снимите флажок «Подсказка» в разделе «Показать или скрыть фреймы» в «Настройках фреймов», чтобы совсем скрыть эту карточку.",
       "framesGovernedPriest": "Редактирование рамок также позволяет перемещать медальон жреца Тьмы с Мрачной десятиной и Бомбой подношения.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Включите «Отделить полосу ресурса» на вкладке «Рамки», и «Редактирование фреймов» освободит и полосу ресурса: ману, энергию или ярость можно поставить куда угодно отдельно, а «Ширина полосы ресурса» и «Высота полосы ресурса» на той же вкладке задают её размер. «Редактирование фреймов» освобождает и полосу «Короля горы», а «Прозрачность фона „Короля горы“» на той же вкладке приглушает её панель, не трогая текст.",
       "barsTitle": "Полосы, таймеры и боевой текст",
       "barsBody": "Ваша полоса чтения появляется посреди экрана, прямо над панелями способностей, каждый раз, когда вы читаете или поддерживаете заклинание, и несёт его название и оставшееся время. У вашей цели своя полоса чтения на её рамке, так что вы видите, что вам готовят, и можете ответить.\n\nПод полосой чтения идёт тонкая полоса замаха: она заполняется между ударами вашего оружия, чтобы боец ближнего или дальнего боя видел, когда придёт следующий автоматический удар.\n\nПолоса опыта тянется во всю ширину под панелями способностей, разбитая на отрезки, а более светлый участок показывает накопленный отдохнувший опыт.\n\nНырните под воду, и наверху экрана появится синяя полоса дыхания. Она убывает, пока голова под водой, вспыхивает красным, когда воздух кончился и вы начинаете тонуть, и быстро наполняется, едва вы всплывёте. Пробел выносит вас наверх, а клавиша погружения, по умолчанию Ctrl, уводит глубже.\n\nУрон и лечение всплывают маленькими числами над тем, по кому они пришлись, так что бой можно читать, не читая текста. Вкладка «Бой» в окне чата хранит полную запись словами.",
@@ -10168,7 +10184,7 @@ export const ru_RU: EnTranslations = {
       "healing_touch": "Большое лечение одной цели с долгим временем накладывания, чтобы кого-то долечить.",
       "mark_of_the_wild": "Длительное благословение, которое вы накладываете на себя или союзника перед боем.",
       "moonfire": "Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.",
-      "moonseed": "В облике Лунного крыла добавляет стадию Лунного прилива и продлевает Лунную бурю.",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "Накладывается мгновенно и лечит союзника со временем, так что вы можете продолжать действовать.",
       "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе."
     },
@@ -18389,7 +18405,8 @@ export const ru_RU: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Хватающие корни",
-        "description": "Оплетает цель корнями на месте на срок до 12 сек."
+        "description": "Оплетает цель корнями на месте на срок до 12 сек.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Облик бурого",
@@ -18492,7 +18509,8 @@ export const ru_RU: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Жалящий рой",
-        "description": "Враг атакован роем насекомых и получает {damage} ед. урона от сил Природы в течение 12 сек."
+        "description": "Враг атакован роем насекомых и получает {damage} ед. урона от сил Природы в течение 12 сек.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Рысья кровь",

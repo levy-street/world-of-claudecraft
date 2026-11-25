@@ -508,6 +508,7 @@ describe('createAurasView: derivation per mode', () => {
       'shaman_thunder_charges',
       'shaman_warspirit_cadence',
       'moontide',
+      'suntide',
       'sunwake',
       'old_blood',
       'verdance',
@@ -541,6 +542,7 @@ describe('createAurasView: derivation per mode', () => {
   it('always badges Druid engine stages, including zero and one', () => {
     const v = createAurasView('all', deps());
     expect(v.tick(entity([aura({ id: 'moontide', stacks: 0 })])).slots[0].stacksText).toBe('0');
+    expect(v.tick(entity([aura({ id: 'suntide', stacks: 1 })])).slots[0].stacksText).toBe('1');
     expect(v.tick(entity([aura({ id: 'old_blood', stacks: 1 })])).slots[0].stacksText).toBe('1');
   });
 

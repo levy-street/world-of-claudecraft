@@ -1983,8 +1983,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Lunar Tempest"
       },
       {
-        "id": "moonseed",
-        "name": "Moonseed"
+        "id": "moonlash",
+        "name": "Moonsurge"
       },
       {
         "id": "rejuvenation",
@@ -2009,8 +2009,12 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Lunar Tempest"
       },
       {
-        "id": "moonseed",
-        "name": "Moonseed"
+        "id": "moonlash",
+        "name": "Moonsurge"
+      },
+      {
+        "id": "sunlance",
+        "name": "Sunwake"
       },
       {
         "id": "rejuvenation",

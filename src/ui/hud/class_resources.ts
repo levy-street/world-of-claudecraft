@@ -1,6 +1,8 @@
 import { esc } from '../esc';
 import { formatNumber, t, tPlural } from '../i18n';
 import type { PainterHostWriters } from '../painter_host';
+import { createTideOrbsMeter } from './druid';
+import type { TideOrbsPlayer } from './druid/tide_orbs_view';
 import { createShadowChargeMeter } from './priest';
 import type { ShadowChargePlayer } from './priest/shadow_charge_view';
 import { createDoomMeter } from './warlock';
@@ -15,7 +17,7 @@ export function createClassResourceMeters(
   attachTooltip: (element: HTMLElement, html: () => string) => void,
 ): {
   paint(input: DoomMeterInput): void;
-  paintShadow(player: ShadowChargePlayer, spec: string | null): void;
+  paintSpecMeters(player: ShadowChargePlayer & TideOrbsPlayer, spec: string | null): void;
   relocalize(): void;
 } {
   const count = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
@@ -52,12 +54,40 @@ export function createClassResourceMeters(
     },
     attachTooltip,
   );
+  const tide = createTideOrbsMeter(
+    doc,
+    doc.getElementById('ui') ?? parent,
+    writers,
+    {
+      sunLabel: () => t('hudChrome.druid.suntideLabel'),
+      moonLabel: () => t('hudChrome.druid.moontideLabel'),
+      sunStatus: (value, max) =>
+        t('hudChrome.druid.suntideStatus', { value: count(value), max: count(max) }),
+      moonStatus: (value, max) =>
+        t('hudChrome.druid.moontideStatus', { value: count(value), max: count(max) }),
+      windowStatus: (window) =>
+        t(
+          window === 'sun'
+            ? 'hudChrome.druid.sunriseOpen'
+            : window === 'moon'
+              ? 'hudChrome.druid.moonriseOpen'
+              : 'hudChrome.druid.noWindow',
+        ),
+      sunTooltip: () => esc(t('hudChrome.druid.suntideTooltip')),
+      moonTooltip: () => esc(t('hudChrome.druid.moontideTooltip')),
+    },
+    attachTooltip,
+  );
   return {
     paint: doom.paint,
-    paintShadow: shadow.paint,
+    paintSpecMeters(player, spec) {
+      shadow.paint(player, spec);
+      tide.paint(player, spec);
+    },
     relocalize() {
       doom.relocalize();
       shadow.relocalize();
+      tide.relocalize();
     },
   };
 }

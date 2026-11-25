@@ -796,6 +796,8 @@ export const guideStrings = {
     // hudChrome.options values. Wordy (M16): non-Latin fills ride along.
     framesGovernedPriest:
       "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+    framesGovernedDruid:
+      "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
     framesGovernedResourceAndHill:
       'Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.',
 
@@ -1600,7 +1602,8 @@ export const guideStrings = {
     healing_touch: 'A big single-target heal with a long cast, for topping someone off.',
     mark_of_the_wild: 'A lasting blessing you put on yourself or an ally before a fight.',
     moonfire: 'Hits instantly and leaves the target burning, good while moving.',
-    moonseed: 'Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.',
+    moonlash:
+      'Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.',
     rejuvenation: 'Casts instantly and heals an ally over time, so you can keep acting.',
     thorns: 'Wards an ally so melee attackers hurt themselves for striking.',
   },

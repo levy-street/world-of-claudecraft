@@ -1037,6 +1037,17 @@ export const es: EnTranslations = {
       "fateThreadsConsumeReady": "Tres Hilos del destino: Consumir puede tejerlos en Condena adicional.",
       "fateThreadsSentenceReady": "Tres Hilos del destino: Sentencia puede consumirlos para un 18% más de daño."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open: cast Skyfall, and Moonsurge strikes harder",
+      "moonriseOpen": "Moonrise is open: cast Wildbolt, and Sunwake strikes harder",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Diezmo sombrío",
       "bombLabel": "Bomba del diezmo",
@@ -2893,6 +2904,7 @@ export const es: EnTranslations = {
       "showFriendlyTrack": "Mostrar mis beneficios sobre aliados",
       "showShieldTrack": "Mostrar mis escudos",
       "classicCombatText": "Texto de combate clásico",
+      "tidewheelEdgeGlow": "Moonwing Tidewheel Screen Glow",
       "waterRipples": "Ondas en el agua (estelas)",
       "spellEffects": "Efectos de hechizos",
       "actionCam": "Cámara de acción",
@@ -4842,6 +4854,9 @@ export const es: EnTranslations = {
       "coldsightRead": "Tu siguiente Tiro largo inflige un {longDrawPct}% más de daño, o tu siguiente Tiro aciago inflige un {fellShotPct}% más",
       "duskEconomy": "Las habilidades cuestan un {pct}% menos de energía",
       "moontide": "Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage",
       "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de gato y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
       "verdance": "Verdor {stacks}/{max}. Cada Remiendo de Esporas, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración",
       "freeExecute": "Tu próxima facultad de ejecución válida no cuesta recursos",
@@ -9668,6 +9683,7 @@ export const es: EnTranslations = {
       "framesGovernedShardpike": "Editar marcos también permite mover la barra de la Pica de Fragmentos, la fila breve de acciones de herramienta de misión que aparece junto a tus barras de acción solo mientras llevas la propia Pica de Fragmentos. Muestra su etiqueta de nombre mientras está desbloqueada para que puedas colocarla antes del combate en lugar de durante él.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Editar marcos también te permite mover el medallón de Diezmo sombrío y Bomba del diezmo del sacerdote de Sombras.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Activa Separar barra de recursos en la pestaña Marcos y Editar marcos también desbloqueará tu barra de recursos, para que puedas colocar el maná, la energía o la ira por separado en cualquier lugar; Anchura de la barra de recursos y Altura de la barra de recursos, en esa misma pestaña, ajustan su tamaño. Editar marcos también desbloquea la barra de El Rey de la Colina, y Opacidad del fondo de El Rey de la Colina, en esa pestaña, atenúa su panel sin reducir la claridad del texto.",
       "barsTitle": "Barras, temporizadores y texto de combate",
       "barsBody": "Tu barra de lanzamiento aparece en el centro de la pantalla, justo encima de tus barras de acción, cada vez que lanzas o canalizas, y muestra el nombre del hechizo y el tiempo restante. Tu objetivo tiene su propia barra de lanzamiento en su marco, para que puedas ver lo que viene y responder a ello.\n\nUna fina barra de golpe se sitúa bajo tu barra de lanzamiento y se llena entre los golpes de tu arma, para que un atacante cuerpo a cuerpo o a distancia pueda ver cuándo llega el próximo golpe automático.\n\nTu barra de experiencia ocupa el ancho completo bajo tus barras de acción, dividida en segmentos, con un tramo más claro que muestra la experiencia de descanso que tienes acumulada.\n\nNada bajo el agua y aparecerá una barra de aliento azul en la parte superior de la pantalla. Se vacía mientras tienes la cabeza sumergida, parpadea en rojo en cuanto se agota y empiezas a ahogarte, y se rellena rápido en cuanto sales a la superficie. Space te hace nadar hacia arriba, y la tecla Nadar hacia abajo, Ctrl de forma predeterminada, te lleva más profundo.\n\nEl daño y la sanación flotan hacia arriba sobre aquello que los recibió en forma de pequeños números, para que puedas leer un combate sin leer texto. La pestaña Combate de tu caja de chat conserva el registro escrito completo.",
@@ -10168,7 +10184,7 @@ export const es: EnTranslations = {
       "healing_touch": "Una gran sanación de un solo objetivo con lanzamiento largo, para reponer a alguien por completo.",
       "mark_of_the_wild": "Una bendición duradera que pones sobre ti o un aliado antes de un combate.",
       "moonfire": "Golpea al instante y deja al objetivo ardiendo, ideal mientras te mueves.",
-      "moonseed": "Añade una fase de Marea Lunar y extiende Tempestad Lunar mientras estás en Forma de lechúcico lunar.",
+      "moonlash": "Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.",
       "rejuvenation": "Se lanza al instante y sana a un aliado con el tiempo, para que puedas seguir actuando.",
       "thorns": "Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo."
     },
@@ -18389,7 +18405,8 @@ export const es: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Raíces Aferradoras",
-        "description": "Enraíza al objetivo en el sitio durante hasta 12 s."
+        "description": "Enraíza al objetivo en el sitio durante hasta 12 s.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Forma de Bruin",
@@ -18492,7 +18509,8 @@ export const es: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Enjambre Punzante",
-        "description": "Un enjambre de insectos acosa al enemigo, causando {damage} de daño de Naturaleza durante 12 s."
+        "description": "Un enjambre de insectos acosa al enemigo, causando {damage} de daño de Naturaleza durante 12 s.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Sangre de Lobo",

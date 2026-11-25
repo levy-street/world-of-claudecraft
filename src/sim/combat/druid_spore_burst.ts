@@ -12,10 +12,12 @@
 // timer. It fizzles if the caster dies or leaves before the burst, the rule
 // every caster-owned persistent ground effect follows.
 //
-// A full engine bank empowers it: at full Verdance (Groveheart) or 3 Moontide
-// (Moongrove) the cast is 25% stronger and spends the whole bank, like the
-// spec's other payoffs (druid_engines.ts druidEngineOnCast); it still costs
-// its mana. That stacks with an armed Nature's Boon window (free, +25%).
+// A full engine bank empowers it: at full Verdance (Groveheart) or 3 or more
+// Moontide (Moongrove) the cast is 25% stronger and spends the whole bank, like
+// the spec's other payoffs (druid_engines.ts druidEngineOnCast); it still costs
+// its mana. Each Moontide past 3 adds another 20% (the Tidewheel surplus,
+// druid_tidewheel.ts tidewheelSurplusMult), the same as Moonsurge. That
+// stacks with an armed Nature's Boon window (free, +25%).
 //
 // Numbers are snapshotted when the cast resolves, the way groundAoE snapshots
 // its Spell Power rider: the Healing Power and Spell Power riders, the talent
@@ -33,11 +35,11 @@ import type { AbilityEffect, Entity, Vec3 } from '../types';
 import {
   druidEngineOnHotPlanted,
   MOONTIDE_ID,
-  MOONTIDE_STAGES,
   replantSporemending,
   VERDANCE_ID,
   VERDANCE_STAGES,
 } from './druid_engines';
+import { TIDE_PAYOFF_MIN_STACKS, tidewheelSurplusMult } from './druid_tidewheel';
 import { spellDamageMultFromAuras } from './spell_combat';
 
 export const SPORE_BURST_ID = 'spore_burst';
@@ -59,8 +61,21 @@ export function sporeBurstFullBank(
     (aura) =>
       aura.sourceId === ownerId &&
       ((aura.id === VERDANCE_ID && (aura.stacks ?? 0) >= VERDANCE_STAGES) ||
-        (aura.id === MOONTIDE_ID && (aura.stacks ?? 0) >= MOONTIDE_STAGES)),
+        (aura.id === MOONTIDE_ID && (aura.stacks ?? 0) >= TIDE_PAYOFF_MIN_STACKS)),
   );
+}
+
+/** The cast's bank empowerment: 1 without a usable bank, else
+ *  SPORE_BURST_FULL_BANK_POWER, times the Tidewheel surplus for Moontide
+ *  past 3 (+20% per point). */
+export function sporeBurstBankPower(
+  auras: readonly { id?: string; stacks?: number; sourceId?: number }[],
+  ownerId: number,
+): number {
+  if (!sporeBurstFullBank(auras, ownerId)) return 1;
+  const moontide = auras.find((aura) => aura.sourceId === ownerId && aura.id === MOONTIDE_ID);
+  const surplus = moontide ? tidewheelSurplusMult(moontide.stacks ?? 0) : 1;
+  return SPORE_BURST_FULL_BANK_POWER * surplus;
 }
 
 /** The action bar's flashing proc glow on Spore Burst at a full bank. */

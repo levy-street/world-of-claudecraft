@@ -484,14 +484,17 @@ export type AuraKind =
   | 'redline'
   | 'veiled_edge'
   // Druid spec engines (combat/druid_engines.ts): pure stage markers, one per
-  // engine. moontide is Moongrove's single bank: wrath, starfire, and
-  // moonseed casts fill it, and at full bank BOTH payoff buttons light up
-  // (Moonseed becomes Moonsurge, Skyfall becomes Sunwake); pressing either
-  // spends the bank. old_blood is Wildfang's shared bank: form strikes fill
+  // engine. moontide and suntide are Moongrove's Tidewheel banks
+  // (combat/druid_tidewheel.ts): Skyfall and Moonseed fill Moontide
+  // (Moonseed becomes Moonsurge at full), Wildbolt fills Suntide (Skyfall
+  // becomes Sunwake at full), and each payoff spends its own bank. old_blood is Wildfang's shared bank: form strikes fill
   // it in either form and the form worn at the spend decides the payoff
   // (Redharvest in Cat, Marrowbreak in Bruin). verdance is Groveheart's
   // garden: completed HoT casts plant stages toward Overbloom.
   | 'moontide'
+  // Tidewheel's Solar bank (combat/druid_tidewheel.ts): Wildbolt casts and
+  // Stinging Swarm ticks fill it; at 3, Skyfall becomes Sunwake.
+  | 'suntide'
   | 'old_blood'
   | 'verdance'
   // Cauterize lockout (fire mage, combat/fire_mage.ts): a pure debuff marking that

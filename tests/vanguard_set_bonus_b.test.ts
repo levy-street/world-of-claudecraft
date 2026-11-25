@@ -8,6 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import { HOURBINDER_HASTE_ID } from '../src/sim/combat/chronomancy';
 import { gainRuin, ruinAmount } from '../src/sim/combat/destruction';
+import { starfallSnarePending } from '../src/sim/combat/druid_starfall_snare';
 import { refundFlitstep } from '../src/sim/combat/frost_mage';
 import { BRINEWARD_SHIELD_ID, brinewardMendingCastTime } from '../src/sim/combat/shaman_spiritmend';
 import { spellHasteMult } from '../src/sim/combat/spell_combat';
@@ -631,13 +632,12 @@ describe('Slagcrown Vestments (destruction)', () => {
 describe('Starwarden Raiment (balance)', () => {
   const SET = 'vanguard_druid_balance';
 
-  it('2pc: Gripping Roots casts 0.5 sec faster, not at 1 piece', () => {
+  it('2pc: Gripping Roots becomes instant, not at 1 piece', () => {
     const worn = resolved(live('druid', 'balance', SET, 2), 'entangling_roots').castTime;
     const bare = resolved(live('druid', 'balance', SET, 1), 'entangling_roots').castTime;
-    expect(bare - worn).toBeCloseTo(B.VANGUARD_BALANCE_2PC_ROOTS_CAST_CUT_SEC, 6);
+    expect(worn).toBe(0);
+    expect(bare).toBeGreaterThan(0);
   });
-
-  const SET_AURAS = [B.VANGUARD_BALANCE_4PC_MOBILE_AURA_ID, B.VANGUARD_BALANCE_4PC_SPEED_AURA_ID];
 
   function rooted(pieces: number) {
     const sim = live('druid', 'balance', SET, pieces);
@@ -647,37 +647,54 @@ describe('Starwarden Raiment (balance)', () => {
     return { sim, mob, p: sim.player };
   }
 
-  it('4pc: Gripping Roots grants cast-while-moving and +20 percent speed for 4 sec', () => {
+  /** Presses a hard cast at the target and reports whether a cast bar started. */
+  function hasCastBar(sim: Sim, mob: Entity, abilityId: 'starfire' | 'wrath'): boolean {
+    sim.targetEntity(mob.id);
+    ready(sim, abilityId);
+    sim.castAbility(abilityId);
+    const hard = sim.player.castingAbility === abilityId;
+    for (let i = 0; i < 20 * 5 && sim.player.castingAbility; i++) sim.tick();
+    for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++) sim.tick();
+    return hard;
+  }
+  const skyfallHasCastBar = (sim: Sim, mob: Entity) => hasCastBar(sim, mob, 'starfire');
+
+  it('4pc: the first Skyfall into your own Gripping Roots is instant and 20 percent stronger', () => {
     const { sim, mob, p } = rooted(4);
-    const speed = expectDefined(auraOn(p, B.VANGUARD_BALANCE_4PC_SPEED_AURA_ID));
-    expect(speed.kind).toBe('buff_speed');
-    expect(speed.value).toBe(B.VANGUARD_BALANCE_4PC_SPEED_MULT);
-    expect(speed.duration).toBe(B.VANGUARD_BALANCE_4PC_DURATION_SEC);
-    const mobile = expectDefined(auraOn(p, B.VANGUARD_BALANCE_4PC_MOBILE_AURA_ID));
-    expect(mobile.kind).toBe('processional_grace');
-    expect(mobile.duration).toBe(B.VANGUARD_BALANCE_4PC_DURATION_SEC);
-    expect(moveSpeedMult(p)).toBeCloseTo(B.VANGUARD_BALANCE_4PC_SPEED_MULT, 6);
-    expect(castWhileMoving(sim, 'wrath', mob)).toBe(true);
-    const bare = rooted(3);
-    expect(bare.p.auras.some((aura) => SET_AURAS.includes(aura.id))).toBe(false);
-    expect(moveSpeedMult(bare.p)).toBe(1);
-    expect(castWhileMoving(bare.sim, 'wrath', bare.mob)).toBe(false);
+    expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(true);
+    // Wildbolt is covered too (to open a Suntide cycle instead); the Moonsurge
+    // payoff is not.
+    expect(starfallSnarePending(sim.ctx, p, 'wrath', mob)).toBe(true);
+    expect(starfallSnarePending(sim.ctx, p, 'moonlash', mob)).toBe(false);
+    expect(skyfallHasCastBar(sim, mob)).toBe(false);
+    // Spent for the rest of this root: the next Skyfall is an ordinary cast.
+    expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(false);
+    expect(starfallSnarePending(sim.ctx, p, 'wrath', mob)).toBe(false);
+    expect(skyfallHasCastBar(sim, mob)).toBe(true);
   });
 
-  it('4pc: at most once every 20 sec (the icd arms on the proc)', () => {
+  it('4pc: a Wildbolt opener takes it instead, and then Skyfall casts normally', () => {
     const { sim, mob, p } = rooted(4);
-    // Armed at the proc (the cast helper rides out the Roots projectile after).
-    const icd = expectDefined(p.procState?.icds.set_vanguard_druid_balance_4pc);
-    expect(icd).toBeLessThanOrEqual(B.VANGUARD_BALANCE_4PC_ICD_SEC);
-    expect(icd).toBeGreaterThan(B.VANGUARD_BALANCE_4PC_ICD_SEC - 1);
-    p.auras = p.auras.filter((aura) => !SET_AURAS.includes(aura.id));
+    expect(hasCastBar(sim, mob, 'wrath')).toBe(false);
+    expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(false);
+    expect(skyfallHasCastBar(sim, mob)).toBe(true);
+  });
+
+  it('4pc: a fresh Gripping Roots arms it again', () => {
+    const { sim, mob, p } = rooted(4);
+    expect(skyfallHasCastBar(sim, mob)).toBe(false);
     cast(sim, 'entangling_roots', mob);
-    expect(p.auras.some((aura) => SET_AURAS.includes(aura.id))).toBe(false);
-    for (let i = 0; i < 20 * B.VANGUARD_BALANCE_4PC_ICD_SEC; i++) sim.tick();
-    expect(p.procState?.icds.set_vanguard_druid_balance_4pc).toBeUndefined();
-    cast(sim, 'entangling_roots', mob);
-    expect(auraOn(p, B.VANGUARD_BALANCE_4PC_SPEED_AURA_ID)).toBeDefined();
-    expect(auraOn(p, B.VANGUARD_BALANCE_4PC_MOBILE_AURA_ID)).toBeDefined();
+    expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(true);
+  });
+
+  it('4pc: nothing at 3 pieces, and nothing without your own root', () => {
+    const bare = rooted(3);
+    expect(starfallSnarePending(bare.sim.ctx, bare.p, 'starfire', bare.mob)).toBe(false);
+    expect(skyfallHasCastBar(bare.sim, bare.mob)).toBe(true);
+    const sim = live('druid', 'balance', SET, 4);
+    const mob = addHostile(sim, 10);
+    expect(starfallSnarePending(sim.ctx, sim.player, 'starfire', mob)).toBe(false);
+    expect(skyfallHasCastBar(sim, mob)).toBe(true);
   });
 });
 
@@ -807,14 +824,7 @@ describe('Vanguard B sets: tooltip numbers match the constants', () => {
       [B.VANGUARD_DESTRUCTION_2PC_CINDERHIDE_COOLDOWN_CUT_SEC],
       [B.VANGUARD_DESTRUCTION_4PC_WINDOW_SEC],
     ],
-    vanguard_druid_balance: [
-      [B.VANGUARD_BALANCE_2PC_ROOTS_CAST_CUT_SEC],
-      [
-        pct(B.VANGUARD_BALANCE_4PC_SPEED_MULT),
-        B.VANGUARD_BALANCE_4PC_DURATION_SEC,
-        B.VANGUARD_BALANCE_4PC_ICD_SEC,
-      ],
-    ],
+    vanguard_druid_balance: [[], [pct(B.VANGUARD_BALANCE_4PC_SKYFALL_DMG_MULT)]],
     vanguard_druid_feral: [
       [B.VANGUARD_FERAL_2PC_LUNGE_COOLDOWN_CUT_SEC],
       [B.VANGUARD_FERAL_4PC_DASH_COOLDOWN_CUT_SEC],

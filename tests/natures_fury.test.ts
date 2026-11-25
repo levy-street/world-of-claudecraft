@@ -34,13 +34,21 @@ describe("Nature's Echo", () => {
         ctx: Parameters<typeof onCastCompleted>[0];
       }
     ).ctx;
-    for (let cast = 0; cast < 3; cast++) {
-      onCastCompleted(engineCtx, player, 'wrath');
-    }
-    onCastCompleted(engineCtx, player, 'moonlash');
+    const bank = (id: string) => player.auras.find((entry) => entry.id === id)?.stacks;
+    // Moontide to its 5-point cap, Suntide to the payoffs' 3.
+    for (let cast = 0; cast < 5; cast++) onCastCompleted(engineCtx, player, 'starfire');
+    for (let cast = 0; cast < 3; cast++) onCastCompleted(engineCtx, player, 'wrath');
+    expect(bank('moontide')).toBe(5);
+    expect(bank('suntide')).toBe(3);
 
-    // One Moontide bank: the chosen payoff reseeds it with the capstone.
-    expect(player.auras.find((entry) => entry.id === 'moontide')?.stacks).toBe(1);
+    // Tidewheel: each payoff spends all its points and reseeds only the bank
+    // it spent with the capstone, from 5 points as from 3.
+    onCastCompleted(engineCtx, player, 'moonlash');
+    expect(bank('moontide')).toBe(1);
+    expect(bank('suntide')).toBe(3);
+    onCastCompleted(engineCtx, player, 'sunlance');
+    expect(bank('suntide')).toBe(1);
+    expect(bank('moontide')).toBe(1);
   });
 
   it('starts the next Wildfang bank with one stage after Redharvest', () => {
