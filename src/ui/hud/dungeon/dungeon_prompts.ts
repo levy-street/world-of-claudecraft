@@ -52,6 +52,13 @@
 // holds the slot are both decided in dungeon_prompt_policy_core.ts.
 
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
+import { BreathWindBadge } from './breath_wind_painter';
+import {
+  type BreathWindBody,
+  BreathWindScan,
+  buildBreathWindView,
+  makeBreathWindView,
+} from './breath_wind_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
 import { buildCoalAlertView, COAL_ALERT_KINDS } from './coal_alert_view';
@@ -110,6 +117,8 @@ export interface DungeonPromptsFrame {
   player: {
     id: number;
     pos: { x: number; z: number };
+    /** Where the player faces (the wind badge turns to it). */
+    facing?: number;
     auras: readonly {
       id: string;
       sourceId?: number;
@@ -141,7 +150,8 @@ export interface DungeonPromptsFrame {
         TempleSceneEntity &
         KitUseBody &
         FinalPhaseBoss &
-        TankSwapBody
+        TankSwapBody &
+        BreathWindBody
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -172,6 +182,9 @@ export class DungeonPrompts {
   private readonly finalPhase: HeartFinalPhasePanel;
   private readonly finalPhaseView = makeFinalPhaseView();
   private readonly finalScan = new HeartFinalScan();
+  private readonly breathWind: BreathWindBadge;
+  private readonly breathWindView = makeBreathWindView();
+  private readonly breathWindScan = new BreathWindScan();
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly temple: EncounterAlert;
   private readonly templeScene = new TempleAlertSceneScan();
@@ -247,6 +260,7 @@ export class DungeonPrompts {
       kinds: COAL_ALERT_KINDS,
     });
     this.finalPhase = new HeartFinalPhasePanel(deps);
+    this.breathWind = new BreathWindBadge(deps);
     this.temple = new EncounterAlert(deps, {
       id: 'temple-alert',
       className: 'ui-panel-strong encounter-alert temple-alert',
@@ -367,6 +381,11 @@ export class DungeonPrompts {
     // bars are the room's ring): no personal alert since Jose's playtest of
     // 2026-11-19 (its marks read in the world).
     this.finalPhase.paint(buildFinalPhaseView(this.finalScan.frame(f.world), this.finalPhaseView));
+    // The Breath's wind badge: every preset, never behind the hints setting
+    // (the wind's way is what the player acts on).
+    this.breathWind.paint(
+      buildBreathWindView(this.breathWindScan.frame(f.world), p, this.breathWindView),
+    );
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
           selfPos: p.pos,
@@ -419,6 +438,7 @@ export class DungeonPrompts {
     this.tankSwap.dispose();
     this.liveCoal.dispose();
     this.finalPhase.dispose();
+    this.breathWind.dispose();
     this.temple.dispose();
     this.kitUse.dispose();
   }

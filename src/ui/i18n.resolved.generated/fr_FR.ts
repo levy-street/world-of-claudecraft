@@ -7507,6 +7507,10 @@ export const fr_FR: EnTranslations = {
         "death": "Useless... all of them. The Guardians... Varkhul... useless, every one. But you cannot kill the elements. Stone, fire, wind and ice do not die... they wait. We will return... and the mountain will remember your names."
       }
     },
+    "breathWind": {
+      "blowing": "Wind",
+      "turning": "Wind turning"
+    },
     "finalOverload": {
       "kneeling": "It kneels",
       "rising": "The Heart beats",

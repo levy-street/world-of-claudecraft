@@ -2194,6 +2194,14 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   Windworn back (one ride per player, so the groups cannot merge), the Shieldbearer's ward
   turning on its own, the stones needing two channellers at once, the nova pulsing damage
   that grows as it gathers.
+- **The wind's way, on every preset** (the owner's playtest of 2026-11-25: players moved the
+  wrong way, and the low and medium presets drew the dust and streaks faint). A grid of chevrons
+  marches over the Cornice's floor the way the wind blows (half bright while the gather
+  telegraphs the coming bearing, whole in the blow, pointing in to the maw while the guardian
+  draws breath; `render/smith_heart_fx/breath_wind_arrows.ts`), and a small badge at the top of
+  the screen turns an arrow to where the wind will carry you, up being ahead
+  (`ui/hud/dungeon/breath_wind_view.ts`, the heading compass's convention: the player's facing).
+  Neither thins on any preset nor hides behind the hints setting.
 - **What the raid reads.** No banner: the nova's bar and growing light, the pads and their
   routes, each isle's closing ring, the Herald's line, the ward's shield, the stone's glow and
   beam (`render/smith_heart_fx/breath_isles_fx.ts`), Thessaly's lines (`isles`, `updraft`,

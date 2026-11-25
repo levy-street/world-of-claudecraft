@@ -10557,6 +10557,12 @@ export const hudChromeStrings = {
   // the switch mark and part 2's clocks; the quarter names also label the room's
   // Overload ring (src/render/smith_heart_fx/final_overload_ring.ts). title, unbound
   // and the three aria rows are retired (scripts/i18n_retired_keys.mjs). Wordy (M16).
+  // The Guardian of the Breath's wind badge (src/ui/hud/dungeon/breath_wind_view.ts):
+  // its label under the arrow while the wind blows, and while it turns.
+  breathWind: {
+    blowing: 'Wind',
+    turning: 'Wind turning',
+  },
   finalOverload: {
     kneeling: 'It kneels',
     rising: 'The Heart beats',

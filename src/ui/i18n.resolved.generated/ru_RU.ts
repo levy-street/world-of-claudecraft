@@ -7507,6 +7507,10 @@ export const ru_RU: EnTranslations = {
         "death": "Рука... так и не вернулась. Один уголёк ещё горит... Возьмите его и дайте горе уснуть."
       }
     },
+    "breathWind": {
+      "blowing": "Wind",
+      "turning": "Wind turning"
+    },
     "finalOverload": {
       "kneeling": "Преклонил колени",
       "rising": "Сердце бьётся",

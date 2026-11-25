@@ -5,9 +5,11 @@
 // white at their heads, slate at their tails, wavering as they run, over the
 // whole Cornice (never only round the player), behind the gather's rolling
 // front, drawn inward to the guardian while it draws breath. With the dust
-// streaming over the floor they are how the wind reads its direction (Jose's
-// playtest: no arrows on the floor). Every tier draws them; the low tier
-// fewer (WIND_STREAKS), the floor's dust carrying the direction alone.
+// streaming over the floor they are the wind's mood; its direction reads
+// first in the floor's chevrons (breath_wind_arrows.ts, the owner's playtest
+// of 2026-11-25 reversed the old "no arrows on the floor": players moved the
+// wrong way) and the HUD's wind badge. Every tier draws them; the low tier
+// fewer (WIND_STREAKS).
 //
 // One instanced draw, positions computed in the vertex shader from the
 // shared clock and the field's own flow (no per-frame allocation, no CPU

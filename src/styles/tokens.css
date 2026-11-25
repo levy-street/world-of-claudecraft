@@ -866,6 +866,18 @@
     --color-gold-400: #f0c86d;
     --color-gold-300: #ffe5a3;
 
+    /* The Guardian of the Breath's wind badge (components.css #heart-breath-wind,
+       src/ui/hud/dungeon/breath_wind_painter.ts): a storm-dark dial, a pale wind
+       arrow, gold while the wind turns. */
+    --color-breath-wind-dial: rgb(20 40 60 / 0.85);
+    --color-breath-wind-dial-edge: rgb(10 20 32 / 0.9);
+    --color-breath-wind-glow: rgb(120 200 255 / 0.45);
+    --color-breath-wind-arrow: #dff4ff;
+    --color-breath-wind-arrow-edge: #0b1a28;
+    --color-breath-wind-turning: #fff1b8;
+    --color-breath-wind-turning-glow-soft: rgb(255 220 120 / 0.35);
+    --color-breath-wind-turning-glow: rgb(255 220 120 / 0.9);
+
     /* Performance Overlay gilded-ornament shape defaults. perf_ornament_svg.ts
        overwrites these with the real generated mask-image/gradient values once at
        boot (applyPerfOrnamentVars, called next to hydrateIcons() in main.ts); an

@@ -765,6 +765,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/tank_swap_alert_view.ts',
   'src/ui/hud/dungeon/coal_alert_view.ts',
   'src/ui/hud/dungeon/heart_final_phase_view.ts',
+  // The Guardian of the Breath's wind badge (every preset).
+  'src/ui/hud/dungeon/breath_wind_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.

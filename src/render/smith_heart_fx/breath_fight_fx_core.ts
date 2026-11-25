@@ -198,6 +198,37 @@ export function inhaleSwirlAngle(angle0: number, reach: number, r: number): numb
  *  how much faster than the dust it runs. */
 export const WIND_STREAKS = { detail: 150, low: 56, span: 120, rate: 1.6 } as const;
 
+/** The wind's floor arrows (breath_wind_arrows.ts; the owner's playtest of
+ *  2026-11-25: players moved the wrong way and the low and medium presets read
+ *  the streaks faint): chevrons on a grid over the Cornice's floor, each
+ *  marching along its cell the way the wind blows. The same count and look on
+ *  EVERY tier (the wind's way is information a player acts on). `spacing` the
+ *  grid's yards, `width` and `depth` a chevron's, `rate` its march in yards a
+ *  second at full flow. */
+export const WIND_ARROWS = { spacing: 8, width: 2.6, depth: 1.5, rate: 5 } as const;
+
+/** The floor arrows' strength for the wind's phase (0 hidden, 1 whole) and
+ *  whether they point in to the guardian (its indrawn breath): bright while
+ *  it blows, half while the gather telegraphs the coming bearing, gone in the
+ *  calm. */
+export function windArrowLook(
+  phase: BreathWindPhase | null,
+  fill: number,
+): { strength: number; inward: boolean } {
+  switch (phase) {
+    case 'gather':
+    case 'gustgather':
+      return { strength: 0.35 + 0.35 * smooth(clamp01(fill)), inward: false };
+    case 'blow':
+    case 'gust':
+      return { strength: 1, inward: false };
+    case 'inhale':
+      return { strength: 0.85, inward: true };
+    default:
+      return { strength: 0, inward: false };
+  }
+}
+
 /** Streak `i`'s seed (deterministic): `across` -1..1 over the span, `lift`
  *  0..1 (squared into 0.4 to 6.5 yd over the floor: most hug it), `phase`
  *  0..1 along its wrap, `length` 0..1 (4 to 11 yd). */

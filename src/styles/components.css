@@ -20349,6 +20349,82 @@
     }
   }
 
+  /* The Guardian of the Breath's wind badge: self-mounted by src/ui/hud/dungeon/breath_wind_painter.ts (view:
+     breath_wind_view.ts). Top centre while the wind turns or blows: an arrow
+     the way it carries you (up is ahead). Every graphics preset: the wind's way
+     is what a player acts on. It never takes the pointer. */
+  #heart-breath-wind {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    z-index: 31;
+    padding: 5px 10px 4px;
+    pointer-events: none;
+    user-select: none;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-gold-700);
+  }
+  #heart-breath-wind .hbw-dial {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--color-debuff-nature);
+    background: radial-gradient(
+      circle,
+      var(--color-breath-wind-dial) 55%,
+      var(--color-breath-wind-dial-edge)
+    );
+    box-shadow: 0 0 8px var(--color-breath-wind-glow);
+  }
+  #heart-breath-wind .hbw-arrow {
+    width: 100%;
+    height: 100%;
+  }
+  #heart-breath-wind .hbw-arrow-shape {
+    fill: var(--color-breath-wind-arrow);
+    stroke: var(--color-breath-wind-arrow-edge);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+  }
+  #heart-breath-wind .hbw-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-text-light);
+  }
+  #heart-breath-wind.is-turning .hbw-dial {
+    animation: hbw-turning 0.6s ease-in-out infinite alternate;
+  }
+  #heart-breath-wind.is-turning .hbw-arrow-shape {
+    fill: var(--color-breath-wind-turning);
+  }
+  @keyframes hbw-turning {
+    from {
+      box-shadow: 0 0 4px var(--color-breath-wind-turning-glow-soft);
+    }
+    to {
+      box-shadow: 0 0 14px var(--color-breath-wind-turning-glow);
+    }
+  }
+  body.mobile-touch #heart-breath-wind {
+    top: 4px;
+    padding: 3px 6px 3px;
+  }
+  body.mobile-touch #heart-breath-wind .hbw-dial {
+    width: 36px;
+    height: 36px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-breath-wind.is-turning .hbw-dial {
+      animation: none;
+    }
+  }
+
   /* ---------- The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) ---------- */
   /* Self-mounted by the shared encounter alert painter
      (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/sanctum_alert_view.ts.

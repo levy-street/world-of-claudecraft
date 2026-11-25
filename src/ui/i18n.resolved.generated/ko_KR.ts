@@ -7507,6 +7507,10 @@ export const ko_KR: EnTranslations = {
         "death": "그 손은... 결코 돌아오지 않았다. 불씨 하나가 아직 타오른다... 그것을 가져가라. 그리고 산을 잠들게 하라."
       }
     },
+    "breathWind": {
+      "blowing": "Wind",
+      "turning": "Wind turning"
+    },
     "finalOverload": {
       "kneeling": "무릎을 꿇었다",
       "rising": "심장이 고동친다",

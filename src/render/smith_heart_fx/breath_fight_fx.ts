@@ -105,6 +105,7 @@ import {
   strikeFill,
   VORTEX_FUNNEL,
   type WindFieldLook,
+  windArrowLook,
   windFieldLook,
 } from './breath_fight_fx_core';
 import { FUNNEL_FRAG, GALE_FOOT_DUST, GALE_GRIT, WIND_FUNNEL_VERT } from './breath_gale_glsl';
@@ -113,6 +114,7 @@ import { BreathInhaleStreams } from './breath_inhale_streams';
 import { BreathIslesFx } from './breath_isles_fx';
 import { BreathRoarFx } from './breath_roar_fx';
 import { BreathTossFx } from './breath_toss_fx';
+import { BreathWindArrows } from './breath_wind_arrows';
 import { BreathWindStreaks } from './breath_wind_streaks';
 import { CouncilRushArrow } from './council_rush_arrow';
 import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
@@ -541,6 +543,7 @@ export class BreathFightFx {
     inward: false,
   };
   private readonly streaks: BreathWindStreaks;
+  private readonly arrows: BreathWindArrows;
   private flowAt = 0;
   // The objects' footprints.
   private readonly calmFans: FanSlot[] = [];
@@ -723,6 +726,8 @@ export class BreathFightFx {
     this.local.add(this.field);
     // The streaks of wind in the air over it (every tier, fewer on the low).
     this.streaks = new BreathWindStreaks(this.local, this.uTime, this.detail, CORNICE_FLOOR_H);
+    // The wind's way on the floor: marching chevrons, the same on every tier.
+    this.arrows = new BreathWindArrows(this.local, CORNICE_FLOOR_H);
 
     // ---- the gaps' lethal lips (every tier) ----
     const lipUniforms = (floor: number) => ({
@@ -1542,6 +1547,8 @@ export class BreathFightFx {
     if (g && this.origin) u.uFocus.value.set(g.pos.x - this.origin.x, g.pos.z - this.origin.z);
     this.field.visible = u.uDust.value > 0.01 || u.uStrength.value > 0.01 || look.front >= 0;
     this.streaks.paint(u.uStrength.value, d, look.inward, u.uFocus.value, this.flowAt, look.front);
+    const arrow = windArrowLook(this.windPhase, this.windFill);
+    this.arrows.paint(arrow.strength, d, arrow.inward, u.uFocus.value, dt, this.reducedMotion());
     // The gaps' lips flare when the wind blows their way.
     const th = this.lipMat.uniforms.uThreat.value as THREE.Vector4;
     const th2 = this.lipMat.uniforms.uThreat2.value as THREE.Vector4;
@@ -2300,6 +2307,7 @@ export class BreathFightFx {
     this.particles.dispose();
     this.kit.dispose();
     this.streaks.dispose();
+    this.arrows.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
     this.glowTex?.dispose();

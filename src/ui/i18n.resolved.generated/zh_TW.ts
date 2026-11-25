@@ -7507,6 +7507,10 @@ export const zh_TW: EnTranslations = {
         "death": "那隻手……再也不會回來了。還有一點餘燼在燃燒……帶上它，讓大山安眠吧。"
       }
     },
+    "breathWind": {
+      "blowing": "Wind",
+      "turning": "Wind turning"
+    },
     "finalOverload": {
       "kneeling": "它跪下了",
       "rising": "心臟搏動",

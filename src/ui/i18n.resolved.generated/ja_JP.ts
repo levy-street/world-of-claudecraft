@@ -7507,6 +7507,10 @@ export const ja_JP: EnTranslations = {
         "death": "あの手は……二度と戻らなかった。ひとつの残り火が、まだ燃えている……それを持って行け。そして山を眠らせよ。"
       }
     },
+    "breathWind": {
+      "blowing": "Wind",
+      "turning": "Wind turning"
+    },
     "finalOverload": {
       "kneeling": "膝をついた",
       "rising": "心臓が脈打つ",

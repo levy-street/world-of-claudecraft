@@ -13779,6 +13779,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.breathGuardian.say.thessaly_updraft'
   | 'hudChrome.breathGuardian.say.thessaly_victory'
   | 'hudChrome.breathGuardian.say.thessaly_wipe'
+  | 'hudChrome.breathWind.blowing'
+  | 'hudChrome.breathWind.turning'
   | 'hudChrome.buddyMenu.autolootDisable'
   | 'hudChrome.buddyMenu.autolootEnable'
   | 'hudChrome.buddyMenu.autolootHint'
