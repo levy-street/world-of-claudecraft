@@ -16,7 +16,9 @@ import {
   parseBalgathDevCommand,
 } from './dev/balgath_dev_mechanics';
 import { parseBalgathQuestDevCommand, runBalgathQuestDev } from './dev/balgath_dev_quests';
-import { equipBestInSlotForDev } from './dev/bis_gear';
+import { applyDevEnchant } from './dev/bis_enchants';
+import { equipBestInSlotForDev, parseDevBisArgs } from './dev/bis_gear';
+import { devBisKitChoices, resolveDevBisKit } from './dev/bis_kits';
 import {
   parseServerTimeCommand,
   restoreServerTime,
@@ -78,7 +80,7 @@ import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
 import { revivePlayerAt } from './spirit';
-import { MAX_LEVEL, type RiftTier } from './types';
+import { isEquipSlot, MAX_LEVEL, type RiftTier } from './types';
 import { setupVarkhulDevRaid } from './varkhul_dev_raid';
 import { recordWeeklyPvpWin } from './weekly_rewards';
 import {
@@ -919,25 +921,49 @@ export function handleDevChat(
     return null;
   }
 
-  const bisMatch = /^\/(?:dev\s+bis|devbis)(?:\s+(\S+))?\s*$/i.exec(raw);
+  const bisMatch = /^\/(?:dev\s+bis|devbis)((?:\s+\S+)*)\s*$/i.exec(raw);
   if (bisMatch) {
     const meta = ctx.players.get(pid);
     if (!meta) return null;
-    const spec = bisMatch[1] ?? meta.talents.spec ?? null;
-    if (spec && !devKitRole(meta.cls, spec)) {
-      const known = (DEV_KIT_ROLES[meta.cls] ?? []).map((role) => role.spec).join(', ');
+    const args = parseDevBisArgs(bisMatch[1].trim().split(/\s+/).filter(Boolean));
+    if (!args) {
+      ctx.error(pid, '[dev] Usage: /dev bis [nyth|forge] [spec].');
+      return null;
+    }
+    const spec = args.spec ?? meta.talents.spec ?? null;
+    if (spec && !resolveDevBisKit(meta.cls, spec)) {
+      const known = devBisKitChoices(meta.cls).join(', ');
       ctx.error(pid, `[dev] '${spec}' is not a ${meta.cls} spec. Try: ${known}.`);
       return null;
     }
-    const equipped = equipBestInSlotForDev(ctx, pid, spec ?? undefined);
+    const tierName = args.tier === 'forge' ? 'Forge' : 'Nyth';
+    const equipped = equipBestInSlotForDev(ctx, pid, spec ?? undefined, args.tier);
     if (equipped === 0) ctx.error(pid, '[dev] Could not outfit best-in-slot gear.');
     else if (spec) {
       emitDevLog(
         ctx,
         pid,
-        `[dev] Equipped the top-parse ${meta.cls} ${spec} loadout: ${equipped} pieces.`,
+        `[dev] Equipped the ${tierName} BiS ${meta.cls} ${spec} loadout: ${equipped} pieces.`,
       );
     } else emitDevLog(ctx, pid, `[dev] Equipped ${equipped} best-in-slot epic pieces.`);
+    return null;
+  }
+
+  const enchantMatch = /^\/(?:dev\s+enchant|devenchant)\s+(\S+)\s+(\S+)\s*$/i.exec(raw);
+  if (enchantMatch) {
+    const slotWord = enchantMatch[1].toLowerCase();
+    const slot = isEquipSlot(slotWord) ? slotWord : null;
+    if (!slot) {
+      ctx.error(pid, '[dev] Usage: /dev enchant <slot> <enchant id>.');
+      return null;
+    }
+    const enchantId = enchantMatch[2].toLowerCase();
+    const result = applyDevEnchant(ctx, pid, slot, enchantId);
+    if (result === 'ok') emitDevLog(ctx, pid, `[dev] Enchanted ${slot} with ${enchantId}.`);
+    else if (result === 'empty_slot') ctx.error(pid, `[dev] Nothing is worn in ${slot}.`);
+    else if (result === 'unknown_enchant')
+      ctx.error(pid, `[dev] No enchant has the id '${enchantId}'.`);
+    else ctx.error(pid, `[dev] ${enchantId} does not fit the item worn in ${slot}.`);
     return null;
   }
 
@@ -1542,7 +1568,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev pvpbot [name], /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout|wake|sleep], /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev sanctum [enter|tp|gates|kill|pack|spawn|trigger|face|reset], /dev trashkit [demo|cast|wall|pool|split|freeze|brand|quench|clear], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev pvpbot [name], /dev vendor, /dev bg, /dev bis [nyth|forge] [spec], /dev enchant <slot> <enchant id>, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout|wake|sleep], /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev sanctum [enter|tp|gates|kill|pack|spawn|trigger|face|reset], /dev trashkit [demo|cast|wall|pool|split|freeze|brand|quench|clear], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }
