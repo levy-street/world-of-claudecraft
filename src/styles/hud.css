@@ -11731,6 +11731,82 @@
     opacity: var(--lhv-opacity);
   }
 
+  /* ---------- Quench frost and water screen effects ---------- */
+  /* The Guardian of the Quench's screen effects, self-mounted by
+     src/ui/hud/dungeon/quench_screen_painter.ts from quench_screen_view.ts.
+     The frost: a frosty blue border creeping in from the edges as the cold bar
+     fills (--hqs-frost, 0 to 1), deepest and whitest frozen solid. It starts
+     at the screen's edges (the sides sit at about 71 percent of the corner
+     distance) and its clear middle shrinks to the inner 42 percent of that
+     distance and never further, and the overlay sits under every HUD
+     frame (below the low-health vignette's band), so the raid stays in view.
+     The water: a blue tint while the player is held in a hole. Every tier
+     shows both (the low tier sheds only the rime texture); it never takes
+     the pointer. */
+  #heart-quench-screen {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 3;
+    pointer-events: none;
+    --hqs-frost: 0;
+    --hqs-clear: calc(74% - var(--hqs-frost) * 32%);
+  }
+  #heart-quench-screen .hqs-water,
+  #heart-quench-screen .hqs-frost {
+    position: absolute;
+    inset: 0;
+  }
+  #heart-quench-screen .hqs-water {
+    background: radial-gradient(
+      ellipse at center,
+      var(--color-quench-water-centre) 0%,
+      var(--color-quench-water-edge) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease-out;
+  }
+  #heart-quench-screen.is-submerged .hqs-water {
+    opacity: 1;
+  }
+  #heart-quench-screen .hqs-frost {
+    background:
+      var(--quench-frost-texture),
+      radial-gradient(
+        ellipse at center,
+        var(--color-quench-frost-clear) 30%,
+        var(--color-quench-frost-haze) 72%,
+        var(--color-quench-frost-rim) 100%
+      );
+    background-size:
+      360px 360px,
+      100% 100%;
+    -webkit-mask-image: radial-gradient(
+      ellipse at center,
+      transparent var(--hqs-clear),
+      var(--color-quench-mask) calc(var(--hqs-clear) + 24%)
+    );
+    mask-image: radial-gradient(
+      ellipse at center,
+      transparent var(--hqs-clear),
+      var(--color-quench-mask) calc(var(--hqs-clear) + 24%)
+    );
+    opacity: min(0.9, calc(var(--hqs-frost) * 2.5));
+    transition: box-shadow 0.25s ease-out;
+  }
+  #heart-quench-screen.is-frozen .hqs-frost {
+    opacity: 1;
+    box-shadow: inset 0 0 56px 14px var(--color-quench-frost-glint);
+  }
+  :root[data-fx-level="low"] #heart-quench-screen .hqs-frost {
+    background: radial-gradient(
+      ellipse at center,
+      var(--color-quench-frost-clear) 30%,
+      var(--color-quench-frost-haze) 72%,
+      var(--color-quench-frost-rim) 100%
+    );
+  }
+
   /* ---------- death overlay ---------- */
   #death-overlay {
     position: absolute;

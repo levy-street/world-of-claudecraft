@@ -13,7 +13,10 @@
 // (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
 // melody, its answer and her broken voice), the Smith's Heart's Guardian of
 // the Quench's cold bar (quench_alert_view.ts:
-// the player's own gauge, never advisory), plus the trash engine's
+// the player's own gauge, never advisory) and its screen effects
+// (quench_screen_view.ts and quench_screen_painter.ts: the frost border
+// creeping in as the bar fills, the blue tint in the water; never advisory
+// either), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
@@ -85,6 +88,8 @@ import {
 } from './kit_use_prompt_view';
 import { buildKnotAlertView, KNOT_ALERT_KINDS } from './knot_alert_view';
 import { buildQuenchAlertView, QUENCH_ALERT_KINDS } from './quench_alert_view';
+import { QuenchScreenOverlay } from './quench_screen_painter';
+import { buildQuenchScreenView, makeQuenchScreenView } from './quench_screen_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 import {
@@ -166,6 +171,8 @@ export class DungeonPrompts {
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
   private readonly quench: EncounterAlert;
+  private readonly quenchScreen: QuenchScreenOverlay;
+  private readonly quenchScreenView = makeQuenchScreenView();
   private readonly knot: EncounterAlert;
   private readonly tankSwap: EncounterAlert;
   private readonly liveCoal: EncounterAlert;
@@ -231,6 +238,8 @@ export class DungeonPrompts {
         kinds: QUENCH_ALERT_KINDS,
       },
     );
+    // The frost border and the water's tint: the HUD layer, under the frames.
+    this.quenchScreen = new QuenchScreenOverlay(deps);
     this.knot = new EncounterAlert(deps, {
       id: 'heart-knot-alert',
       className: 'ui-panel-strong encounter-alert heart-knot-alert',
@@ -339,6 +348,11 @@ export class DungeonPrompts {
       ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
       : HINT_HIDDEN;
     this.quench.paint(quench);
+    // The frost and the water on the screen: the player's own state, every
+    // tier and whatever the hints setting.
+    this.quenchScreen.paint(
+      buildQuenchScreenView({ auras: p.auras, dead: p.dead }, this.quenchScreenView),
+    );
     // The Knotted Gale's part in the fight (the panel is the throw's button).
     const knot = dungeonPromptEnabled('knot', hints)
       ? buildKnotAlertView({
@@ -415,6 +429,7 @@ export class DungeonPrompts {
     this.sanctum.dispose();
     this.crypt.dispose();
     this.quench.dispose();
+    this.quenchScreen.dispose();
     this.knot.dispose();
     this.tankSwap.dispose();
     this.liveCoal.dispose();

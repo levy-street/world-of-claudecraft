@@ -179,6 +179,7 @@ const INDEX_SECTIONS = [
   '2v2 Fiesta HUD',
   'center messages',
   'low-health screen vignette',
+  'Quench frost and water screen effects',
   'death overlay',
   'start screen layout overhaul',
   'loading screen (entering the world)',
@@ -257,11 +258,12 @@ describe('css_corpus section manifest', () => {
     // + the launcher turntable's loading silhouette (shell.css, in both entries): 79, 77.
     // + the phone creator's pinch hint (shell.css, in both entries): 80, 78.
     // + the raid atlas (components.css, in both entries): 83, 81.
-    expect(INDEX_SECTIONS.length).toBe(83);
-    expect(PLAY_SECTIONS.length).toBe(81);
-    expect(MANIFEST.length).toBe(83);
-    expect(new Set(INDEX_SECTIONS).size).toBe(83);
-    expect(new Set(PLAY_SECTIONS).size).toBe(81);
+    // + the Quench frost and water screen effects (hud.css, in both entries): 84, 82.
+    expect(INDEX_SECTIONS.length).toBe(84);
+    expect(PLAY_SECTIONS.length).toBe(82);
+    expect(MANIFEST.length).toBe(84);
+    expect(new Set(INDEX_SECTIONS).size).toBe(84);
+    expect(new Set(PLAY_SECTIONS).size).toBe(82);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

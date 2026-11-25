@@ -879,6 +879,16 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 7 },
     reflowAllow: {},
   },
+  // The Guardian of the Quench's screen effects (hud/dungeon/) build their
+  // self-mounted overlay ONCE in ensure (two construction-only class
+  // assignments, the water and the frost layers, and the overlay's
+  // aria-hidden); every per-frame value (the display, the frost's reach,
+  // the frozen and submerged classes) rides the elided writers.
+  {
+    file: 'hud/dungeon/quench_screen_painter.ts',
+    allow: { '.className': 2, '.setAttribute': 1 },
+    reflowAllow: {},
+  },
   // The death screen's PvP Resurrect button and note (hud/death/): every write,
   // the countdown text, the disabled attribute and the two displays, rides the
   // elided writers; the press is bound once at construction.
