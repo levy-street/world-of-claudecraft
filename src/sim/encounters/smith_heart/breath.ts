@@ -62,8 +62,8 @@ import {
   startBlowBars,
   stepBlow,
 } from './breath_blow';
+import { stepBridge } from './breath_bridge';
 import { dischargeCradles, landCradle, startCradle } from './breath_cradle';
-import { stepCrossing } from './breath_crossing';
 import {
   clearGales,
   clearWindAuras,
@@ -210,6 +210,8 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     isles: freshIsles(),
     roar: null,
     roarGusts: [],
+    bridgeGone: 0,
+    bridgeShoves: [],
     drawn: null,
     blowTimer: T.blowFirst,
     thunderTimer: T.thunderFirst,
@@ -330,6 +332,7 @@ function clearFight(
     if (st.roar) clearShoves({ ctx }, st.roar.slides);
     st.roar = null;
     clearRoarGusts({ ctx }, st);
+    clearShoves({ ctx }, st.bridgeShoves);
     st.pinned = {};
     clearBlow({ ctx }, st, corniceListeners(ctx, inst));
   }
@@ -404,13 +407,13 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   // The void is the void's whether the guardian fights or not.
   const fell = stepVoidDeaths(ctx, inst);
   const boss = breathGuardian(ctx, inst);
-  // The Gale Crossing over the chasm to the Cornice, fight or no fight (its
-  // way home only while the guardian is not fighting).
-  stepCrossing(ctx, inst, boss !== null && fighting(boss));
+  // The Wind Bridge over the chasm: up out of the fight, gone in it.
+  const st0 = boss?.smithHeartBreath ?? null;
+  const fighting0 = boss !== null && fighting(boss);
+  const fellOffBridge = stepBridge(ctx, inst, boss, fighting0 ? st0 : null);
   if (!boss) return;
-  const st0 = boss.smithHeartBreath ?? null;
   // A raider lost to the void mid-fight breaks the feat (feats.ts).
-  if (fell > 0 && st0) breakFeat(st0);
+  if (fell + fellOffBridge > 0 && st0) breakFeat(st0);
   if (!living(boss)) {
     // Down before the Cornice woke (a dev kill): nothing left gathered.
     spendBreathIntro(boss);

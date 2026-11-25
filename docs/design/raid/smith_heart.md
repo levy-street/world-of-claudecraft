@@ -2141,7 +2141,7 @@ Stone, Echo of Wrath and Endless Song returned no game use (CLEAR; the nearest w
 
 ### 7.2 Guardian of the Breath
 
-**The chasm and the Gale Crossing (the owner's playtest of 2026-11-25, "no safe zones").**
+**The chasm and the Wind Bridge (the owner's playtest of 2026-11-25, "no safe zones").**
 Where it and anything below disagree, this block wins.
 
 - **No safe zone.** A raid could stand against the climb's head, the one walled stretch of the
@@ -2155,15 +2155,21 @@ Where it and anything below disagree, this block wins.
 - **No walls along the approach.** The climb and the landing stand open too
   (`CORNICE_APPROACH_LIPS`): a step off them is the void's, the body laid back on the approach's
   centre line, never over the chasm (`voidCorpseSpot`). The checkpoint stays on the landing.
-- **The Gale Crossing** (`breath_crossing.ts`, `breath_crossing_ids.ts`): an Updraft on the
-  landing's east edge carries whoever steps on (alive, or a spirit on its corpse run; never a
-  body not yet released) on a FIXED arc over the chasm to the Cornice's west (2.6 s, 5 yd over
-  the floors, `rideArc`), carried and stunned under the shipped Riding the Gale aura, never a
-  fall. A second Updraft on the Cornice carries home to the landing, up only while the guardian
-  is not fighting, so the crossing is never a way out of the fight. Both run in the fight and out
-  of it; the pads, the ride and its cues are the isles' own look. The entrance wakes from the
-  landing (`BREATH_INTRO.reach` 66 yd): the raid watches the storm gather across the void.
-  Tests: `tests/smith_heart_breath_crossing.test.ts`.
+- **The Wind Bridge** (`breath_bridge.ts`, `breath_bridge_ids.ts`; Jose's call of the same day,
+  in place of the first Gale Crossing's pads and stun-carried rides): a walkable strip of packed
+  air 12 yd wide spans the chasm from the landing to the Cornice (`CORNICE_BRIDGE`, the field's
+  hidden `cornice_bridge` floor, its sides open lips), walked both ways on foot or mounted, by
+  the living and by spirits on a corpse run. It stands while the guardian is not fighting (its
+  object `sh_breath_airbridge`; the look forms over 1.5 s, `render/smith_heart_fx/
+  breath_bridge_fx.ts`). On the pull it dissolves over 1.5 s: any body on it is carried off,
+  gently, to the Cornice when it was heading there or stood nearer it, else to the landing, under
+  the shipped Riding the Gale hold, never killed by the bridge going. Once dissolved its strip is
+  the void's while the fight runs (a living body that steps or is blown onto it falls,
+  `breath_void.ts` `fallIntoVoid`; a spirit is set back on the landing to wait). It forms again
+  after a wipe's reset or the kill. Nothing of it is drawn during the fight. The entrance wakes
+  from the landing (`BREATH_INTRO.reach` 66 yd): the raid watches the storm gather across the
+  void. The raid bots teleport onto the Cornice (`/dev heart tp cornice`), so they need no walk.
+  Tests: `tests/smith_heart_breath_bridge.test.ts`.
 
 
 **The Islands of the Wind, the 50 percent phase (the team's design of 2026-11-17, built

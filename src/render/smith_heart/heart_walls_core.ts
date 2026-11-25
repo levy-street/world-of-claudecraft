@@ -345,7 +345,7 @@ export function heartIsleRockCap(x: number, z: number): number {
   return cap;
 }
 
-/** The chasm the Gale Crossing spans (smith_heart_layout.ts CORNICE_LANDING,
+/** The chasm the Wind Bridge spans (smith_heart_layout.ts CORNICE_LANDING,
  *  CORNICE_WEST_CUT): from the landing's east edge to the Cornice's carved
  *  west rim, a little wider than the crossing's road. */
 export function inBreathChasm(x: number, z: number): boolean {

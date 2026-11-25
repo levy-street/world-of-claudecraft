@@ -13,7 +13,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   BREATH,
-  CORNICE_CROSSING,
+  CORNICE_BRIDGE,
   CORNICE_GAPS,
   CORNICE_LANDING,
   SMITH_HEART_FIELD,
@@ -39,6 +39,7 @@ import {
   BREATH_TUNING as T,
   THESSALY_POST,
 } from '../src/sim/encounters/smith_heart';
+import { onBridgeStrip } from '../src/sim/encounters/smith_heart/breath_bridge';
 import { WIND_RAMP, windRamp } from '../src/sim/encounters/smith_heart/breath_ids';
 import { authoredFieldCliffRuns, authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
@@ -352,11 +353,11 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     // Six on every difficulty (Jose's playtest).
     expect(CORNICE_GAPS.map((g) => g.deg)).toEqual([22, 78, 128, 182, 228, 332]);
     for (const g of CORNICE_GAPS) {
-      // Clear of the crossing's landing on the Cornice and of the walk from it.
-      expect(dist(g, CORNICE_CROSSING.arrive)).toBeGreaterThan(12);
-      for (let x = CORNICE_CROSSING.arrive.x; x <= 0; x += 2) {
-        const k = (x - CORNICE_CROSSING.arrive.x) / -CORNICE_CROSSING.arrive.x;
-        const z = CORNICE_CROSSING.arrive.z + (196 - CORNICE_CROSSING.arrive.z) * k;
+      // Clear of the Wind Bridge's end on the Cornice and of the walk from it.
+      expect(dist(g, CORNICE_BRIDGE.to)).toBeGreaterThan(12);
+      for (let x = CORNICE_BRIDGE.to.x; x <= 0; x += 2) {
+        const k = (x - CORNICE_BRIDGE.to.x) / -CORNICE_BRIDGE.to.x;
+        const z = CORNICE_BRIDGE.to.z + (196 - CORNICE_BRIDGE.to.z) * k;
         expect(dist(g, { x, z })).toBeGreaterThan(g.r + 6);
       }
     }
@@ -366,13 +367,17 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     );
     expect(runs.filter((r) => r.open).length).toBeGreaterThan(80);
     expect(runs.filter((r) => !r.open)).toEqual([]);
-    // No floor joins the Cornice: from the landing's edge to its rim lies
-    // the void, wider than any jump (14 yd and more).
+    // Only the Wind Bridge joins the Cornice (breath_bridge.ts: gone in the
+    // fight): beside its strip, from the landing's edge to the rim lies the
+    // void, wider than any jump (14 yd and more).
     const L = CORNICE_LANDING;
-    for (let x = L.x + L.r + 0.5; x < L.x + L.r + 14; x += 0.5)
-      expect(authoredFieldHeight(SMITH_HEART_FIELD, x, L.z)).toBeLessThanOrEqual(
+    const beside = CORNICE_BRIDGE.from.z + CORNICE_BRIDGE.halfWidth + 2.5;
+    for (let x = L.x + L.r + 0.5; x < L.x + L.r + 14; x += 0.5) {
+      expect(onBridgeStrip(x, L.z)).toBe(true);
+      expect(authoredFieldHeight(SMITH_HEART_FIELD, x, beside)).toBeLessThanOrEqual(
         SMITH_HEART_FIELD.voidHeight + 1,
       );
+    }
     expect(inBreathArena(L.x, L.z)).toBe(false);
     expect(inBreathArena(THESSALY_POST.x, THESSALY_POST.z)).toBe(false);
     // No rod, cheek stone or horn stands on the Cornice any more.

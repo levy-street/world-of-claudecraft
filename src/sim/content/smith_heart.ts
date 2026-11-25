@@ -870,7 +870,7 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
   },
   // No gate on the Cornice's climb since Jose's playtest of 2026-11-25: its
   // standing stones read as two walls in the middle of the ramp. The chasm
-  // and the Gale Crossing (encounters/smith_heart/breath_crossing.ts) are
+  // and the Wind Bridge (encounters/smith_heart/breath_bridge.ts) are
   // the way onto the Cornice; the Breath's packs no longer hold a door.
   {
     id: 'lake_mouth',

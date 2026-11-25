@@ -71,7 +71,7 @@ import {
   smithHeartSealTemplate,
   tickSmithHeartSeal,
 } from '../src/sim/encounters/smith_heart';
-import { CROSSING_OBJECTS } from '../src/sim/encounters/smith_heart/breath_crossing_ids';
+import { BRIDGE_OBJECT } from '../src/sim/encounters/smith_heart/breath_bridge_ids';
 import { writeSealMarkers } from '../src/sim/encounters/smith_heart/seal';
 import {
   COMBAT_WALL_SHAPES,
@@ -300,8 +300,8 @@ describe('the crystal object', () => {
     const c = crystal(sim, inst);
     const o = originOf(inst);
     // The last of the dungeon's objects the claim spawned; behind it only the
-    // Gale Crossing's pads, which the Breath's tick raises from the first tick
-    // (breath_crossing.ts keepPads, the chasm of 2026-11-25).
+    // Wind Bridge's object, which the Breath's tick raises from the first tick
+    // (breath_bridge.ts, 2026-11-25).
     const objects = DUNGEON.objects ?? [];
     expect(inst.objectIds[objects.length - 1]).toBe(c.id);
     expect(
@@ -309,7 +309,7 @@ describe('the crystal object', () => {
         .slice(objects.length)
         .map((id) => sim.ctx.entities.get(id)?.templateId)
         .sort(),
-    ).toEqual([CROSSING_OBJECTS.home, CROSSING_OBJECTS.out]);
+    ).toEqual([BRIDGE_OBJECT]);
     expect(c.templateId).toBe(SMITH_HEART_SEAL_CRYSTAL_TEMPLATE);
     expect(c.name).toBe('The Heart Seal Crystal');
     expect(c.pos.x - o.x).toBeCloseTo(SEAL_CRYSTAL.x, 6);

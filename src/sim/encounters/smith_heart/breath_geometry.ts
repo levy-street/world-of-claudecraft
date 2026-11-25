@@ -21,14 +21,14 @@ const F = SMITH_HEART_FIELD;
 const C = BREATH.cornice;
 
 /** The Cornice's floor id, its climb's and its landing's (the climb's head,
- *  a chasm short of the Cornice since 2026-11-25: the Gale Crossing carries
- *  the raid over, breath_crossing.ts). */
+ *  a chasm short of the Cornice since 2026-11-25: the Wind Bridge spans it,
+ *  breath_bridge.ts). */
 const CORNICE_FLOOR = 'storm_cornice';
 const CORNICE_CLIMB = 'cornice_climb';
 const CORNICE_LANDING_FLOOR = 'cornice_landing';
 
-/** Captain Thessaly's post: on the landing at the climb's head, by the Gale
- *  Crossing's pad, facing the Cornice across the chasm (out of the fight:
+/** Captain Thessaly's post: on the landing at the climb's head, beside the
+ *  Wind Bridge's end, facing the Cornice across the chasm (out of the fight:
  *  the wind never reaches an NPC). */
 export const THESSALY_POST = { x: -60, z: 189.5 } as const;
 

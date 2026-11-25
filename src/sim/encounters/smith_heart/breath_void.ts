@@ -115,28 +115,36 @@ export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): number {
       }
       continue;
     }
-    if (p.gm || (p.profilerInvulnerable && ctx.devCommands)) {
-      layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
-      continue;
-    }
-    ctx.dealDamage(null, p, p.hp + p.maxHp * 10, false, 'physical', 'Falling', 'hit', true);
-    if (!p.dead) {
-      ctx.emit({
-        type: 'damage',
-        sourceId: -1,
-        targetId: p.id,
-        amount: p.hp,
-        crit: false,
-        school: 'physical',
-        ability: 'Falling',
-        kind: 'hit',
-      });
-      ctx.handleDeath(p, null, 'Falling');
-    }
-    layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
-    fell++;
+    if (fallIntoVoid(ctx, p, o.x + back.x, o.z + back.z)) fell++;
   }
   return fell;
+}
+
+/** The void takes living `p` (whatever shields it: the fall's hit, then a
+ *  death of its own), its body laid on the floor at world (x, z). A real
+ *  game master is set down there alive instead. Returns whether it died.
+ *  Shared with the Wind Bridge's vanished strip (breath_bridge.ts). */
+export function fallIntoVoid(ctx: SimContext, p: Entity, x: number, z: number): boolean {
+  if (p.gm || (p.profilerInvulnerable && ctx.devCommands)) {
+    layOnFloor(ctx, p, x, z);
+    return false;
+  }
+  ctx.dealDamage(null, p, p.hp + p.maxHp * 10, false, 'physical', 'Falling', 'hit', true);
+  if (!p.dead) {
+    ctx.emit({
+      type: 'damage',
+      sourceId: -1,
+      targetId: p.id,
+      amount: p.hp,
+      crit: false,
+      school: 'physical',
+      ability: 'Falling',
+      kind: 'hit',
+    });
+    ctx.handleDeath(p, null, 'Falling');
+  }
+  layOnFloor(ctx, p, x, z);
+  return true;
 }
 
 /** Is claim-local (x, z) under this claim's summit: in its band, and under

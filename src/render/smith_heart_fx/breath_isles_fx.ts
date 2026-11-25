@@ -50,8 +50,8 @@ import {
 } from '../smith_heart/heart_kit';
 import { radialGlowTexture } from '../textures';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { BreathBridgeFx } from './breath_bridge_fx';
 import { BreathCocoonFx } from './breath_cocoon_fx';
-import { BreathCrossingFx } from './breath_crossing_fx';
 import { CORNICE_FLOOR_H } from './breath_fight_fx_core';
 import { BreathIsleAddsFx } from './breath_isle_adds_fx';
 import { BreathIsleStormFx } from './breath_isle_storm_fx';
@@ -137,7 +137,7 @@ const DUST_RGB = [0.74, 0.72, 0.68] as const;
 
 export class BreathIslesFx {
   private readonly circles: CircleSlot[] = [];
-  private readonly crossing: BreathCrossingFx;
+  private readonly bridge: BreathBridgeFx;
   private readonly runeMats: THREE.ShaderMaterial[] = [];
   private readonly wake: number[] = BREATH_ISLES.map(() => 0);
   /** Each isle's calm (0 free on the wind, 1 held still for the round). */
@@ -399,8 +399,8 @@ export class BreathIslesFx {
     this.stillstones = new BreathStillstoneFx(h, this.isles, this.glow);
     this.adds = new BreathIsleAddsFx(h, { kit: h.kit, paints: h.paints });
     this.ride = new BreathRideFx(h);
-    // The Gale Crossing over the chasm to the Cornice (every tier).
-    this.crossing = new BreathCrossingFx(h);
+    // The Wind Bridge over the chasm to the Cornice (every tier).
+    this.bridge = new BreathBridgeFx(h);
   }
 
   /** Put the kit's sculpts on the isles and its stones round them, once
@@ -448,7 +448,7 @@ export class BreathIslesFx {
   // ---- the scan --------------------------------------------------------------------
 
   beginScan(): void {
-    this.crossing.beginScan();
+    this.bridge.beginScan();
     this.seenCircles.length = 0;
     this.seenRiders.length = 0;
     this.isleMobs.length = 0;
@@ -461,7 +461,7 @@ export class BreathIslesFx {
   /** An object of the claim: an Updraft, a ride's carrier or a Closing
    *  Storm is this part's (true). */
   takeObject(e: Entity): boolean {
-    if (this.crossing.takeObject(e)) return true;
+    if (this.bridge.takeObject(e)) return true;
     if (this.storm.takeObject(e)) return true;
     const kind = isleObjectKind(e.templateId);
     if (!kind) return false;
@@ -532,7 +532,7 @@ export class BreathIslesFx {
       }
     }
     this.ride.setRiders(this.seenRiders);
-    this.crossing.endScan(world);
+    this.bridge.endScan(world);
     this.storm.endScan();
     this.stillstones.endScan(world);
     this.adds.endScan();
@@ -645,7 +645,7 @@ export class BreathIslesFx {
       }
     }
     this.ride.update(world, dt);
-    this.crossing.update(dt);
+    this.bridge.update(dt);
     const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
     const seen = this.stillstones.stilledSides(world, _stilled);
     this.cocoon.update(g, this.cocoonUp, this.cocoonStilled, seen, dt);
@@ -833,7 +833,7 @@ export class BreathIslesFx {
       c.group.visible = false;
     }
     this.ride.leave();
-    this.crossing.leave();
+    this.bridge.leave();
     this.cocoon.leave();
     this.storm.leave();
     this.stillstones.leave();

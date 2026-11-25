@@ -1266,8 +1266,8 @@ const RENDER_PURE_CORES = [
   // The Guardian of the Breath's body (its storm form) and its fight's effects.
   'src/render/smith_heart_fx/breath_body_core.ts',
   'src/render/smith_heart_fx/breath_fight_fx_core.ts',
-  // The Gale Crossing's road of wind over the chasm (2026-11-25).
-  'src/render/smith_heart_fx/breath_crossing_fx_core.ts',
+  // The Wind Bridge over the chasm (2026-11-25).
+  'src/render/smith_heart_fx/breath_bridge_fx_core.ts',
   'src/render/smith_heart_fx/quench_body_core.ts',
   'src/render/smith_heart_fx/quench_wake_core.ts',
   'src/render/smith_heart_fx/quench_breath_core.ts',

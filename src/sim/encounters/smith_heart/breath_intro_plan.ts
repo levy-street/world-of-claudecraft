@@ -15,7 +15,7 @@ export const BREATH_INTRO = {
    *  SMITH_HEART_BOSS_SPOTS.breath, the Cornice's middle) a living player
    *  wakes it: since the chasm (2026-11-25) the landing at the climb's head,
    *  its east half (its middle some 65 yd west of it), so the raid watches
-   *  the storm gather across the void before the Gale Crossing carries it
+   *  the storm gather across the void before it walks the Wind Bridge
    *  over; the stairs below it wake nothing. Far past its aggro reach: a
    *  raider who runs straight in pulls nothing until the scene ends. */
   reach: 66,
