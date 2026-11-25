@@ -232,6 +232,10 @@ export type HeatDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface HeatDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** Players each Basalt Fist marks (heat_fist.ts): Normal one; Heroic and
+   *  Mythic two since Jose's call of 2026-11-25, each slamming its own spot
+   *  and rolling its own swells, the two spots kept apart. */
+  fistMarks: number;
   /** A lethal punishment's damage factor, in place of damageMult (Basalt
    *  Fist, Wakefire's and the Wheel's ignite; a Rolling Cinder's catch kills
    *  on its own): the parse-calibrated
@@ -322,6 +326,7 @@ const MYTHIC_WAVES: HeatDifficultyRules['waves'] = [
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
   normal: {
+    fistMarks: 1,
     // The parse-calibrated pass of 2026-11-16: the raid's damage and the
     // swing +15 percent (was 1), the Basalt Fist where it was. The team's
     // playtest of 2026-11-25 ("Normal hits too soft, the tanks most of all"):
@@ -355,6 +360,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     ],
   },
   heroic: {
+    fistMarks: 2,
     // The pass of 2026-11-16 (no Heroic parse yet: Normal's call): the
     // raid's damage and the swing +15 percent (1.25 to 1.4375), the Basalt
     // Fist where it was; its pool x1.2 to x1.3.
@@ -382,6 +388,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   },
   // Heroic whole, its Wheel quicker and a round longer.
   mythic: {
+    fistMarks: 2,
     // Heroic's numbers of 2026-11-16 (the heroic row whole; its swing 1.5
     // since 2026-11-25).
     damageMult: 1.4375,

@@ -182,6 +182,7 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     fistHeld: 0,
     fists: 0,
     fist: null,
+    fistTwin: null,
     swells: [],
     flareTimer: T.flareEvery,
     wellTick: T.wellTick,
@@ -724,7 +725,15 @@ export function heatDevTrigger(
     const me = ctx.entities.get(pid);
     const o = ctx.instanceOriginOf(inst);
     const spot = me ? { x: me.pos.x - o.x, z: me.pos.z - o.z } : undefined;
-    return startFist(s, spot) ? 'Basalt Fist: it comes down where you stand in 3 s.' : null;
+    // Heroic and Mythic mark two: the second a quarter turn round the
+    // wellspring from you (a dev run alone has no second player to mark).
+    let twin: { x: number; z: number } | undefined;
+    if (spot && s.rules.fistMarks >= 2) {
+      const dx = spot.x - HEARTH_WELL.x;
+      const dz = spot.z - HEARTH_WELL.z;
+      twin = { x: HEARTH_WELL.x - dz, z: HEARTH_WELL.z + dx };
+    }
+    return startFist(s, spot, twin) ? 'Basalt Fist: it comes down where you stand in 3 s.' : null;
   }
   if (verb === 'flare') return `Hearth Flare (${flare(s).length} struck).`;
   if (verb === 'seeds') return `${dropSeeds(s)} Hearthseeds fall.`;

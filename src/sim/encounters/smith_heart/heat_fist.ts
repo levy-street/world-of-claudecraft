@@ -4,7 +4,11 @@
 //   Basalt Fist    every 22 s (first 8 s into the fight) a 3 s bar, planted,
 //                  its facing locked on a spot on the shore: where a hashed
 //                  player (never the tank while anyone else stands) stood as
-//                  it began. The spot shows at its exact radius, and the
+//                  it began. Heroic and Mythic mark TWO (Jose's call of
+//                  2026-11-25, HEAT_DIFFICULTY `fistMarks`): a second spot
+//                  where another marked player stands, at least
+//                  FIST_TWIN_APART from the first, slammed with it, its own
+//                  swells rolling from it. The spot shows at its exact radius, and the
 //                  three lanes its swells will roll down show with it. At the
 //                  end of the bar the fist slams the spot: whoever is inside
 //                  its radius takes a lethal blow.
@@ -54,7 +58,7 @@ import {
   roll,
   spawnFightObject,
 } from './heat_scope';
-import type { HeatFightState, HeatSwell } from './heat_state';
+import type { HeatFightState, HeatFist, HeatSwell } from './heat_state';
 import { heatSay } from './heat_voice';
 
 /** How long a Basalt Fist holds the floor from its cast: its bar, the
@@ -86,22 +90,13 @@ export function fistSpot(p: HPoint): HPoint {
   return { x: HEARTH_WELL.x + Math.sin(f) * min, z: HEARTH_WELL.z + Math.cos(f) * min };
 }
 
-/** Begin Basalt Fist at the spot of a hashed player (or `forced`, a dev
- *  spot). Returns false with nobody to aim at. Exported for the dev trigger. */
-export function startFist(s: HeatScope, forced?: HPoint): boolean {
-  const st = s.st;
-  st.fistTimer = T.fistEvery;
-  let aim: HPoint | null = forced ?? null;
-  if (!aim) {
-    const [victim] = pickPlayers(s, 1, st.fists + 101);
-    if (!victim) return false;
-    aim = at(s, victim);
-  }
-  st.fists++;
-  // Time spent waiting out Wakefire or the Wheel comes off the next one's wait.
-  st.fistTimer = Math.max(T.fistEvery / 2, T.fistEvery - st.fistHeld);
-  st.fistHeld = 0;
-  const spot = fistSpot(aim);
+/** How far apart two marked fists' spots must lie (yards): their slams and
+ *  their swells' starts read as two, never one blot. */
+export const FIST_TWIN_APART = T.fistR * 2 + 4;
+
+/** Lay one fist's spot and its lanes at `spot` (its object and lane
+ *  objects spawned). */
+function layFist(s: HeatScope, spot: HPoint): HeatFist {
   const obj = spawnFightObject(
     s.ctx,
     s.inst,
@@ -126,27 +121,57 @@ export function startFist(s: HeatScope, forced?: HPoint): boolean {
     lane.facing = b;
     lanes.push(lane.id);
   }
-  st.fist = { objectId: obj.id, x: spot.x, z: spot.z, lanes, bearings };
+  return { objectId: obj.id, x: spot.x, z: spot.z, lanes, bearings };
+}
+
+/** Begin Basalt Fist at the spot of a hashed player (or `forced`, a dev
+ *  spot), and on Heroic and Mythic a second at another marked player's spot
+ *  well apart from it (never the tank while anyone else stands). Returns
+ *  false with nobody to aim at. Exported for the dev trigger (its own
+ *  spots: `forced`, and `forcedTwin` for the second). */
+export function startFist(s: HeatScope, forced?: HPoint, forcedTwin?: HPoint): boolean {
+  const st = s.st;
+  st.fistTimer = T.fistEvery;
+  let aim: HPoint | null = forced ?? null;
+  let twin: HPoint | null = forcedTwin ? fistSpot(forcedTwin) : null;
+  if (!aim) {
+    const victims = pickPlayers(s, Math.max(1, s.rules.fistMarks) + 3, st.fists + 101);
+    const first = victims[0];
+    if (!first) return false;
+    aim = at(s, first);
+    if (s.rules.fistMarks >= 2) {
+      const spot0 = fistSpot(aim);
+      for (const v of victims.slice(1)) {
+        const here = fistSpot(at(s, v));
+        if (Math.hypot(here.x - spot0.x, here.z - spot0.z) < FIST_TWIN_APART) continue;
+        twin = here;
+        break;
+      }
+    }
+  }
+  st.fists++;
+  // Time spent waiting out Wakefire or the Wheel comes off the next one's wait.
+  st.fistTimer = Math.max(T.fistEvery / 2, T.fistEvery - st.fistHeld);
+  st.fistHeld = 0;
+  const spot = fistSpot(aim);
+  st.fist = layFist(s, spot);
+  st.fistTwin = twin ? layFist(s, twin) : null;
   const here = local(s.ctx, s.inst, s.boss);
   beginBar(s, HEAT_CASTS.fist, T.fistCast, facingTo(here, spot));
   heatSay(s, s.boss, 'fist');
   return true;
 }
 
-/** The fist slams its spot (its bar ran out, or was cut: the slam lands all
- *  the same) and its swells begin. Returns who the slam struck. */
-export function landFist(s: HeatScope): Entity[] {
+/** One fist slams its spot and its swells begin; whoever it struck goes
+ *  into `hit`. */
+function slamFist(s: HeatScope, f: HeatFist, hit: Entity[]): void {
   const st = s.st;
-  const f = st.fist;
-  if (!f) return [];
-  st.fist = null;
   dropFightObject(s.ctx, s.inst, f.objectId);
   cueAt(s, HEAT_CUES.fist, f.x, f.z, T.fistR);
-  const hit: Entity[] = [];
   for (const p of livePlayers(s)) {
     const here = at(s, p);
     if (Math.hypot(here.x - f.x, here.z - f.z) > T.fistR) continue;
-    hit.push(p);
+    if (!hit.includes(p)) hit.push(p);
     fireHit(s, p, roll(s, T.fistMin, T.fistMax, punishMult(s)), HEAT_NAMES.fist);
   }
   f.lanes.forEach((laneId, i) => {
@@ -161,6 +186,17 @@ export function landFist(s: HeatScope): Entity[] {
       struck: [],
     });
   });
+}
+
+/** The fist slams its spot (its bar ran out, or was cut: the slam lands all
+ *  the same), the twin's with it, and their swells begin. Returns who the
+ *  slams struck. */
+export function landFist(s: HeatScope): Entity[] {
+  const st = s.st;
+  const hit: Entity[] = [];
+  for (const f of [st.fist, st.fistTwin]) if (f) slamFist(s, f, hit);
+  st.fist = null;
+  st.fistTwin = null;
   return hit;
 }
 
@@ -227,11 +263,13 @@ export function stepSwells(s: HeatScope): void {
  *  an overflow, or the fight's end), and every swell with them. */
 export function clearFist(s: Pick<HeatScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
   const st = s.st;
-  if (st.fist) {
-    dropFightObject(s.ctx, s.inst, st.fist.objectId);
-    for (const id of st.fist.lanes) dropFightObject(s.ctx, s.inst, id);
-    st.fist = null;
+  for (const f of [st.fist, st.fistTwin]) {
+    if (!f) continue;
+    dropFightObject(s.ctx, s.inst, f.objectId);
+    for (const id of f.lanes) dropFightObject(s.ctx, s.inst, id);
   }
+  st.fist = null;
+  st.fistTwin = null;
   for (const w of st.swells) {
     dropFightObject(s.ctx, s.inst, w.laneId);
     dropFightObject(s.ctx, s.inst, w.waveId);

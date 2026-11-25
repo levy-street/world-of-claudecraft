@@ -224,6 +224,9 @@ export interface HeatFightState {
   fistHeld: number;
   fists: number;
   fist: HeatFist | null;
+  /** Heroic and Mythic: the second marked player's fist, slammed with the
+   *  first (heat_fist.ts; HEAT_DIFFICULTY `fistMarks`). */
+  fistTwin: HeatFist | null;
   swells: HeatSwell[];
   flareTimer: number;
   wellTick: number;
