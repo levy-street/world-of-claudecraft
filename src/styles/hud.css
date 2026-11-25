@@ -11738,16 +11738,17 @@
      fills (--hqs-frost, 0 to 1), deepest and whitest frozen solid. It starts
      at the screen's edges (the sides sit at about 71 percent of the corner
      distance) and its clear middle shrinks to the inner 42 percent of that
-     distance and never further, and the overlay sits under every HUD
-     frame (below the low-health vignette's band), so the raid stays in view.
-     The water: a blue tint while the player is held in a hole. Every tier
-     shows both (the low tier sheds only the rime texture); it never takes
-     the pointer. */
+     distance and never further; the band stays translucent (its rime is a
+     light veil, the layer capped below opaque). The water: a blue tint while
+     the player is held in a hole. The overlay mounts just before #nameplates
+     (outside #ui) at the nameplates' own z-index, so it paints over the 3D
+     world but under every nameplate and every HUD frame: the raid stays in
+     view. Every tier draws the same coverage; it never takes the pointer. */
   #heart-quench-screen {
     position: fixed;
     inset: 0;
     display: none;
-    z-index: 3;
+    z-index: 1;
     pointer-events: none;
     --hqs-frost: 0;
     --hqs-clear: calc(74% - var(--hqs-frost) * 32%);
@@ -11791,20 +11792,32 @@
       transparent var(--hqs-clear),
       var(--color-quench-mask) calc(var(--hqs-clear) + 24%)
     );
-    opacity: min(0.9, calc(var(--hqs-frost) * 2.5));
+    opacity: min(0.8, calc(var(--hqs-frost) * 2.5));
     transition: box-shadow 0.25s ease-out;
   }
   #heart-quench-screen.is-frozen .hqs-frost {
-    opacity: 1;
+    opacity: 0.9;
     box-shadow: inset 0 0 56px 14px var(--color-quench-frost-glint);
   }
+  /* Motion-calming: the fades snap, on all three axes. */
+  @media (prefers-reduced-motion: reduce) {
+    #heart-quench-screen .hqs-water,
+    #heart-quench-screen .hqs-frost {
+      transition: none;
+    }
+  }
+  body.reduce-motion #heart-quench-screen .hqs-water,
+  body.reduce-motion #heart-quench-screen .hqs-frost,
+  :root[data-fx-level="low"] #heart-quench-screen .hqs-water,
   :root[data-fx-level="low"] #heart-quench-screen .hqs-frost {
-    background: radial-gradient(
-      ellipse at center,
-      var(--color-quench-frost-clear) 30%,
-      var(--color-quench-frost-haze) 72%,
-      var(--color-quench-frost-rim) 100%
-    );
+    transition: none;
+  }
+  /* Forced colours: the effects carry no information the cold bar does not,
+     and a forced palette would flatten them to opaque fills. */
+  @media (forced-colors: active) {
+    #heart-quench-screen {
+      display: none !important;
+    }
   }
 
   /* ---------- death overlay ---------- */

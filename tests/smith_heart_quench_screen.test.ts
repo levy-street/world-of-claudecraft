@@ -8,13 +8,14 @@
 //   - hidden out of the fight and dead;
 //   - read off a REAL fight's mirrored auras, not hand-built ones only;
 //   - the painter writes nothing on a still frame and mounts one overlay;
-//   - the stylesheet keeps the screen's middle clear and the overlay under
-//     the HUD frames (the raid stays in view).
+//   - the stylesheet keeps the screen's middle clear, the overlay under the
+//     nameplates and every HUD frame, and the same coverage on every tier.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { QUENCH_AURAS, QUENCH_TUNING as T } from '../src/sim/encounters/smith_heart/quench_ids';
 import { DT, type Entity } from '../src/sim/types';
+import { quenchScreenAnchor } from '../src/ui/hud/dungeon/dungeon_prompts';
 import { QuenchScreenOverlay } from '../src/ui/hud/dungeon/quench_screen_painter';
 import {
   buildQuenchScreenView,
@@ -156,17 +157,28 @@ describe('Guardian of the Quench: the screen painter', () => {
       },
       () => {},
     );
-    const overlay = new QuenchScreenOverlay({ layer: () => layer, writers: facet });
+    // The page's nameplates layer: the overlay mounts just before it.
+    const plates = document.createElement('div');
+    plates.id = 'nameplates';
+    document.body.append(plates);
+    const overlay = new QuenchScreenOverlay({
+      layer: () => layer,
+      before: () => quenchScreenAnchor(layer),
+      writers: facet,
+    });
     // Hidden before the fight: nothing is mounted.
     overlay.paint(makeQuenchScreenView());
-    expect(layer.querySelector('#heart-quench-screen')).toBeNull();
+    expect(document.querySelector('#heart-quench-screen')).toBeNull();
     const view = buildQuenchScreenView(
       { auras: [{ id: QUENCH_AURAS.cold, value: 50 }] },
       makeQuenchScreenView(),
     );
     overlay.paint(view);
-    const el = layer.querySelector('#heart-quench-screen') as HTMLElement;
+    const el = document.querySelector('#heart-quench-screen') as HTMLElement;
     expect(el).not.toBeNull();
+    // Outside the HUD layer, right before the nameplates.
+    expect(layer.contains(el)).toBe(false);
+    expect(el.nextElementSibling).toBe(plates);
     expect(el.getAttribute('aria-hidden')).toBe('true');
     expect(el.querySelector('.hqs-frost')).not.toBeNull();
     expect(el.querySelector('.hqs-water')).not.toBeNull();
@@ -196,11 +208,13 @@ describe('Guardian of the Quench: the screen painter', () => {
     expect(el.classList.contains('is-frozen')).toBe(true);
     expect(el.classList.contains('is-submerged')).toBe(true);
     expect(el.style.getPropertyValue('--hqs-frost')).toBe('1.00');
-    expect(layer.querySelectorAll('#heart-quench-screen').length).toBe(1);
+    expect(document.querySelectorAll('#heart-quench-screen').length).toBe(1);
     overlay.paint(buildQuenchScreenView({ auras: [] }, view));
     expect(el.style.display).toBe('none');
     overlay.dispose();
-    expect(layer.querySelector('#heart-quench-screen')).toBeNull();
+    expect(document.querySelector('#heart-quench-screen')).toBeNull();
+    plates.remove();
+    layer.remove();
   });
 });
 
@@ -219,11 +233,20 @@ describe('Guardian of the Quench: the screen stylesheet', () => {
     expect(body).toContain('transparent var(--hqs-clear)');
   });
 
-  it('sits under the HUD frames and never takes the pointer', () => {
+  it('sits over the world but under the nameplates and the HUD, and never takes the pointer', () => {
+    const base = readFileSync('src/styles/base.css', 'utf8');
     const z = Number(body.match(/#heart-quench-screen \{[^}]*z-index: (\d+);/)?.[1]);
-    const vignette = Number(css.match(/#low-health-vignette \{[^}]*z-index: (\d+);/)?.[1]);
-    expect(z).toBeGreaterThan(0);
-    expect(z).toBeLessThanOrEqual(vignette);
+    const plates = Number(base.match(/#nameplates \{[^}]*z-index: (\d+);/)?.[1]);
+    const ui = Number(base.match(/#ui \{[^}]*z-index: (\d+);/)?.[1]);
+    // Same band as the nameplates, mounted BEFORE them (painter test), so
+    // they paint over it; #ui (every HUD frame) is a higher band still.
+    expect(z).toBe(plates);
+    expect(ui).toBeGreaterThan(z);
     expect(body).toMatch(/#heart-quench-screen \{[^}]*pointer-events: none;/);
+  });
+
+  it('draws the same coverage on every graphics tier', () => {
+    // No tier rule may swap the frost's look (only its fades are calmed).
+    expect(body).not.toMatch(/data-fx-level="low"\][^{]*\.hqs-frost \{[^}]*background/);
   });
 });

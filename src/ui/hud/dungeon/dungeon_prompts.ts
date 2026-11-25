@@ -238,8 +238,12 @@ export class DungeonPrompts {
         kinds: QUENCH_ALERT_KINDS,
       },
     );
-    // The frost border and the water's tint: the HUD layer, under the frames.
-    this.quenchScreen = new QuenchScreenOverlay(deps);
+    // The frost border and the water's tint: over the world, under the
+    // nameplates and every HUD frame (mounted before the nameplates layer).
+    this.quenchScreen = new QuenchScreenOverlay({
+      ...deps,
+      before: () => quenchScreenAnchor(deps.layer()),
+    });
     this.knot = new EncounterAlert(deps, {
       id: 'heart-knot-alert',
       className: 'ui-panel-strong encounter-alert heart-knot-alert',
@@ -443,4 +447,10 @@ export class DungeonPrompts {
  *  else the HUD layer itself. */
 export function quenchDock(layer: HTMLElement | null): HTMLElement | null {
   return layer?.ownerDocument.getElementById('player-frame') ?? layer;
+}
+
+/** Where the Quench screen effects mount: just before the nameplates layer
+ *  (outside the HUD root), so they sit under the nameplates and the HUD. */
+export function quenchScreenAnchor(layer: HTMLElement | null): HTMLElement | null {
+  return layer?.ownerDocument.getElementById('nameplates') ?? null;
 }
