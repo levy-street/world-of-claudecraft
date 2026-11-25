@@ -80,7 +80,7 @@ const classes = Object.keys(CLASSES) as PlayerClass[];
 const gearPages = [...pages.keys()].filter((t) =>
   classes.some((c) => t.startsWith(CLASSES[c].name + ' ') && t.endsWith(' (Items index)')),
 );
-const NO_DASH = /[–—]|\p{Extended_Pictographic}/u;
+const NO_DASH = /[\u2013\u2014]|\p{Extended_Pictographic}/u;
 
 describe('gear by class', () => {
   it('lists one gear page per class on the Items hub, in class order', () => {

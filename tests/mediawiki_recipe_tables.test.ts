@@ -27,7 +27,7 @@ const links = {
   recipe: (r: ProfessionRecipeRecord) => `[[recipe:${r.id}]]`,
 };
 const recipeName = (r: ProfessionRecipeRecord) => ITEMS[r.resultItemId]?.name ?? r.id;
-const DASH_OR_EMOJI = /[‒-―−]|\p{Extended_Pictographic}/u;
+const DASH_OR_EMOJI = /[\u2012-\u2015\u2212]|\p{Extended_Pictographic}/u;
 
 function tableRows(table: string): string[][] {
   return table
