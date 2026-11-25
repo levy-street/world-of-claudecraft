@@ -21,7 +21,7 @@
 //                          bites whoever stands in it; then the Summit Roar
 //                          (Bellows Gust's id), a 1.5 s bar and a wave racing
 //                          out of its maw that hurts and throws each player far
-//                          from the guardian as it reaches them (26 yd, 30 on
+//                          from the guardian as it reaches them (16 yd, 20 on
 //                          heroic, slid over a moment: breath_roar.ts; tanked
 //                          by the edge, the raid goes over it; the anchored
 //                          stay put).

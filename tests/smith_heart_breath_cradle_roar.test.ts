@@ -152,7 +152,7 @@ describe('the Summit Roar', () => {
     expect(victims.some((p) => p.dead)).toBe(true);
   });
 
-  it('its wave races out of the maw: the near struck first, each body blasted, never a blink', () => {
+  it('its wave races out of the maw: the near struck first, each body thrown, never a blink', () => {
     const f = pulled(4);
     const b = f.boss();
     // The guardian in the Cornice's middle, one raider at its feet and one
@@ -186,9 +186,9 @@ describe('the Summit Roar', () => {
       if (nearHit < 0 && hitsOf(ev, roarName, near.id).length) {
         nearHit = i;
         Object.assign(nearStart, f.local(near));
-        // The blast has only begun: a tick or so of it, not the whole way.
+        // The throw has only begun: its first hard step, not the whole way.
         expect(Math.hypot(nearStart.x - C.x - 4, nearStart.z - C.z)).toBeLessThan(
-          BREATH_DIFFICULTY.normal.blastSpeed * DT * 2 + 0.1,
+          BREATH_DIFFICULTY.normal.gustThrow / 5,
         );
       }
       if (farHit < 0 && hitsOf(ev, roarName, far.id).length) farHit = i;
@@ -199,7 +199,7 @@ describe('the Summit Roar', () => {
     expect(farHit).toBeGreaterThan(nearHit);
     expect((farHit - landed) * DT).toBeGreaterThan(27 / T.roarSpeed - 0.15);
     expect((farHit - landed) * DT).toBeLessThan(27 / T.roarSpeed + 0.2);
-    // And the near one is carried out by its blast (or off the lip) by now.
+    // And the near one is thrown out (or off the lip) by now.
     const end = f.local(near);
     expect(Math.hypot(end.x - nearStart.x, end.z - nearStart.z)).toBeGreaterThan(8);
     expect(f.state()?.roar ?? null).toBeNull();

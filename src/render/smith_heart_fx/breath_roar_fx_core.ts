@@ -46,7 +46,7 @@ export function roarWaveLook(
 
 /** The Roar's longest throw on any tier (the client cannot tell the tier,
  *  so the landing it shows is the farthest one: a spot that reads safe is).
- *  0 since the owner's call of 2026-11-17: the blast carries the body. */
+ *  The throw again since Jose's playtest of 2026-11-25 (the blast is 0). */
 export const ROAR_THROW = Math.max(
   BREATH_DIFFICULTY.normal.gustThrow,
   BREATH_DIFFICULTY.heroic.gustThrow,
@@ -100,7 +100,7 @@ export function roarLanding(
 
 /** Seconds a struck body's trail streams behind it (its slide, and a
  *  moment more). */
-export const ROAR_TRAIL_SECONDS = T.roarSlide + 0.35;
+export const ROAR_TRAIL_SECONDS = T.roarThrowSlide + 0.35;
 
 /** The screen's wind at its strongest: held well under full so the floor,
  *  the landing marker and the rim stay readable through the indrawn breath

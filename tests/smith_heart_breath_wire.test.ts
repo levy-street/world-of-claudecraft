@@ -138,6 +138,9 @@ describe('the Guardian of the Breath over the wire', () => {
     expect(vortex?.scale).toBe(T.vortexR);
     const aleph = sim.entities.get(a.pid);
     expect(aleph.auras.some((x: Any) => x.id === WIND_PULL_AURA)).toBe(true);
+    // Keep Aleph on his feet from here (the Roar's throw and the blows would
+    // carry him out of the fight this run then reads): no knockback moves him.
+    aleph.knockbackResistance = 1;
     run(T.inhaleCast + T.gustCast + 0.5);
 
     // Heroic's loose gales: their positions follow the server's.

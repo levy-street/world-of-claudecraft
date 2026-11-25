@@ -16,18 +16,24 @@
 // client stands its prediction down once and draws the slide, instead of a
 // server-driven step every tick bumping the override epoch (a jerky throw).
 // The slide itself is breath_shove.ts' (shared with the loose gales' toss).
-// The owner's call of 2026-11-17 (no moment made anyone fear the fall): the
-// throw is gone (every tier's gustThrow is 0) and the wave sets a BLAST on
-// each body it reaches (wind_drift.ts WIND_BLAST_AURA), strongest by the maw
-// and easing outward: whoever runs straight back against it at once holds,
-// whoever stands is carried over the rim. The anchored and the carrier keep
-// their feet.
+// The owner's call of 2026-11-17 swapped the throw for a BLAST (wind_drift.ts
+// WIND_BLAST_AURA) easing outward for seconds; Jose's playtest of 2026-11-25
+// read it as the body walking backwards by itself, slowly, never a blow. The
+// throw is back as a short hard shove (each tier's gustThrow over
+// roarThrowSlide, 'knock'), and no blast lingers after it (blastSpeed 0):
+// every knockback immunity and resistance holds (knockbackDistanceAfterGuards),
+// a body already sliding (a gale's toss, Bellows Blow) is never thrown twice,
+// and Normal's throw stops short of every lip (roarSafe). Drawn in to the maw
+// you land well inside the rim; stood far out against the pull, you can go
+// over it. The anchored and the carrier keep their feet.
 // Zero rng but the damage rolls (in player order, as each is struck).
 
-import { DT } from '../../types';
+import { knockbackDistanceAfterGuards } from '../../knockback';
+import { DT, type Entity } from '../../types';
 import { WIND_BLAST_AURA } from '../../wind_drift';
+import { safeThrowReach } from './breath_blow';
 import { BREATH_AURAS, BREATH_CUES, BREATH_NAMES, BREATH_TUNING as T } from './breath_ids';
-import { type BreathScope, heldFast, livePlayers, putMarker, roll } from './breath_scope';
+import { type BreathScope, heldFast, livePlayers, local, putMarker, roll } from './breath_scope';
 import { beginShove, stepShoves } from './breath_shove';
 import { breathSay } from './breath_voice';
 
@@ -45,6 +51,43 @@ export function startRoar(s: BreathScope): void {
     reach = Math.max(reach, Math.hypot(p.pos.x - b.pos.x, p.pos.z - b.pos.z));
   s.st.roar = { x: b.pos.x, z: b.pos.z, r: 0, reach: reach + 1, struck: [], slides: [] };
   breathSay(s, b, 'guardian', 'roar');
+}
+
+/** Is `p` already sliding under one of the fight's shoves (the Roar's own, a
+ *  loose gale's toss, Bellows Blow)? Two shoves never stack. */
+function sliding(s: BreathScope, p: Entity): boolean {
+  const on = (list: readonly { id: number }[] | undefined) => !!list?.some((sl) => sl.id === p.id);
+  return on(s.st.roar?.slides) || on(s.st.galeShoves) || on(s.st.blowSlides);
+}
+
+/** The Roar throws `p` along the unit (ux, uz): the tier's yards after every
+ *  knockback immunity and resistance (Normal's held short of every lip),
+ *  slid over roarThrowSlide. Returns the yards thrown (0: none). Exported for
+ *  the tests. */
+export function throwFromRoar(s: BreathScope, p: Entity, ux: number, uz: number): number {
+  const w = s.st.roar;
+  if (!w || p.dead || sliding(s, p)) return 0;
+  let yards = knockbackDistanceAfterGuards(s.ctx, s.boss, p, s.rules.gustThrow);
+  if (yards > 0 && s.rules.roarSafe) {
+    const at = local(s.ctx, s.inst, p);
+    yards = safeThrowReach(at.x, at.z, ux, uz, yards);
+  }
+  if (yards <= 0) return 0;
+  const shove = beginShove(
+    s,
+    p,
+    ux,
+    uz,
+    yards,
+    T.roarThrowSlide,
+    'knock',
+    BREATH_AURAS.thrown,
+    BREATH_NAMES.gust,
+  );
+  // The anchored and the carrier keep their feet (the blow still lands).
+  if (!shove) return 0;
+  w.slides.push(shove);
+  return yards;
 }
 
 /** One tick of the wave: its front moves out, strikes whoever it reaches,
@@ -88,19 +131,7 @@ export function stepRoar(s: BreathScope): void {
         dx /= d;
         dz /= d;
       }
-      const shove = beginShove(
-        s,
-        p,
-        dx,
-        dz,
-        s.rules.gustThrow,
-        T.roarSlide,
-        'knock',
-        BREATH_AURAS.thrown,
-        BREATH_NAMES.gust,
-      );
-      // The anchored and the carrier keep their feet (the blow still lands).
-      if (shove) w.slides.push(shove);
+      throwFromRoar(s, p, dx, dz);
       // The blast: from the maw outward, easing with the distance, for the
       // tier's seconds (wind_drift.ts: both hosts step it, so it is
       // predicted online, never a server-driven slide). Run straight back

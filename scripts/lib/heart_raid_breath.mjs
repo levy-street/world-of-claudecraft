@@ -68,10 +68,10 @@ import {
 
 const RULES = BREATH_DIFFICULTY[DIFF];
 const BREATH_AT = (process.env.BREATH_AT ?? '').toLowerCase();
-// How far out the Roar leaves a body that runs straight back against its
-// blast at once (its throw, 0 since 2026-11-17, and where the blast falls
-// to a run: wind_drift.ts), plus a margin for the bots' late start.
-const THROW = RULES.gustThrow + (RULES.blastSpeed - 7) / BLAST_FALLOFF + 3;
+// How far out the Roar leaves a body: its throw (back since 2026-11-25), any
+// blast's carry past a run (wind_drift.ts; 0 while the tiers set none), and
+// a margin.
+const THROW = RULES.gustThrow + Math.max(0, (RULES.blastSpeed - 7) / BLAST_FALLOFF) + 3;
 const WIND = RULES.windSpeed;
 const PORTAL_TIDS = {
   [BREATH_OBJECTS.portalA]: 'A',

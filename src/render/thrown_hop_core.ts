@@ -22,7 +22,7 @@ import { FINAL_TUNING as F, FINAL_AURAS } from '../sim/encounters/smith_heart/fi
 
 /** Each throwing hold aura's hop: its seconds (its slide's) and its height (yards). */
 export const THROWN_HOPS: Readonly<Record<string, { seconds: number; height: number }>> = {
-  [BREATH_AURAS.thrown]: { seconds: T.roarSlide, height: 1.6 },
+  [BREATH_AURAS.thrown]: { seconds: T.roarThrowSlide, height: 1.6 },
   // Bellows Blow's throw (breath_blow.ts): the Roar's blow on one body.
   [BREATH_AURAS.blown]: { seconds: T.roarSlide, height: 1.6 },
   [BREATH_AURAS.tossed]: { seconds: T.galeSlide, height: 0.7 },

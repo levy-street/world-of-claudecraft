@@ -296,16 +296,20 @@ export interface BreathDifficultyRules {
    *  (Normal about 0.8 yd a second, Heroic about 0.3), a body that stands or
    *  casts through the 5 s bar is drawn some 30 yards into the vortex. */
   pullSpeed: number;
-  /** The exhale (Bellows Gust) throws everyone this far outward (yards):
-   *  0 since the owner's call of 2026-11-17, the Roar's blast carries them
-   *  instead (a slid throw left no answer, and read jerky online). */
+  /** The Summit Roar's THROW (yards), straight away from the guardian as its
+   *  wave reaches each body, slid over BREATH_TUNING.roarThrowSlide (fast off
+   *  the blow, settling: breath_shove.ts 'knock'). Jose's playtest of
+   *  2026-11-25: the old blast (below) read as the body walking backwards by
+   *  itself for seconds, never a blow; a short hard shove replaces it. A body
+   *  drawn in to the maw lands well inside the rim; one that stood far out
+   *  against the pull can go over it (Heroic and Mythic; see roarSafe). */
   gustThrow: number;
-  /** The Roar's blast (wind_drift.ts WIND_BLAST_AURA): its speed by the
-   *  guardian (yd/s, easing off outward), and how long it blows on each
-   *  body (s). Tuned so a body left standing after the pull is carried off
-   *  the Cornice, and one that runs straight back against it at once holds
-   *  some 12 (Normal) or 17 (Heroic) yards out; a late start is carried far
-   *  toward the rim (tests/smith_heart_breath_roar_blast.test.ts). */
+  /** Normal: the Roar's throw stops short of every lip (it displaces, never
+   *  kills: breath_blow.ts safeThrowReach). */
+  roarSafe: boolean;
+  /** The Roar's old blast (wind_drift.ts WIND_BLAST_AURA): its speed by the
+   *  guardian (yd/s) and how long it blew (s). 0 on every tier since the
+   *  throw came back (2026-11-25): no slow drift lingers after the shove. */
   blastSpeed: number;
   blastSeconds: number;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
@@ -447,9 +451,10 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   normal: {
     windSpeed: 5.8,
     pullSpeed: 6.2,
-    gustThrow: 0,
-    blastSpeed: 12,
-    blastSeconds: 5,
+    gustThrow: 16,
+    roarSafe: true,
+    blastSpeed: 0,
+    blastSeconds: 0,
     // The parse-calibrated pass of 2026-11-16: the raid's damage and the
     // swing +15 percent (was 1), the Cradle's discharge where it was.
     damageMult: 1.15,
@@ -484,9 +489,10 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   heroic: {
     windSpeed: 6.6,
     pullSpeed: 6.7,
-    gustThrow: 0,
-    blastSpeed: 14,
-    blastSeconds: 6,
+    gustThrow: 20,
+    roarSafe: false,
+    blastSpeed: 0,
+    blastSeconds: 0,
     // The pass of 2026-11-16: the raid's damage +25 percent (1.25 to
     // 1.5625) and the swing's, the Cradle's discharge where it was; its pool
     // x1.65 to x1.79 (+30 percent with the base's +20).
@@ -525,9 +531,10 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   mythic: {
     windSpeed: 6.6,
     pullSpeed: 6.7,
-    gustThrow: 0,
-    blastSpeed: 14,
-    blastSeconds: 6,
+    gustThrow: 20,
+    roarSafe: false,
+    blastSpeed: 0,
+    blastSeconds: 0,
     // Heroic's numbers of 2026-11-16 (the heroic row whole).
     damageMult: 1.5625,
     punishMult: 1.25,
@@ -627,6 +634,11 @@ export const BREATH_TUNING = {
    *  2026-11-07, 1 s now so the settle reads). */
   roarSpeed: 30,
   roarSlide: 1,
+  /** How long the Summit Roar's throw slides (seconds, 'knock': three times
+   *  its mean pace off the blow, settling on the feet; the renderer lifts
+   *  the body on its hop meanwhile, so it never plays a walk). Jose's
+   *  playtest of 2026-11-25: a strong short shove, never a slow drift. */
+  roarThrowSlide: 0.8,
   // Heroic: the loose gales after each indrawn breath.
   galeCount: 3,
   galeSeconds: 20,

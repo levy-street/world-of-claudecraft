@@ -15,6 +15,7 @@ import {
 import { BREATH } from '../src/sim/content/smith_heart_layout';
 import {
   BREATH_AURAS,
+  BREATH_DIFFICULTY,
   BREATH_OBJECTS,
   BREATH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
@@ -262,9 +263,9 @@ describe("the Summit Roar's throw is a blow", () => {
     expect(T.roarSlide).toBeGreaterThanOrEqual(1);
   });
 
-  it('a struck body is blasted out, fast by the maw and easing, never held', () => {
-    // The owner's call of 2026-11-17: the Roar throws no one (its slide is
-    // the loose gales' alone now); its blast carries the body, a wind.
+  it('a struck body is thrown out, fast off the blow and easing, held while it slides', () => {
+    // Jose's playtest of 2026-11-25: the Roar throws again (the blast read as
+    // a slow walk backwards): a slide under its hold, then nothing.
     const f = pulled();
     const b = f.boss();
     const C = BREATH.cornice;
@@ -281,23 +282,26 @@ describe("the Summit Roar's throw is a blow", () => {
       if (!start) f.put(p, C.x + 4, C.z);
       const prev = f.local(p);
       f.tick(1, true);
-      expect(has(p, BREATH_AURAS.thrown)).toBe(false);
-      if (p.auras.some((a) => a.id === WIND_BLAST_AURA)) {
+      expect(has(p, WIND_BLAST_AURA)).toBe(false);
+      if (has(p, BREATH_AURAS.thrown)) {
         start ??= prev;
         const now = f.local(p);
         steps.push(Math.hypot(now.x - prev.x, now.z - prev.z));
       } else if (start) break;
     }
-    if (!start) throw new Error('never blasted');
+    if (!start) throw new Error('never thrown');
     const carried = steps.reduce((a, v) => a + v, 0);
     const end = f.local(p);
-    // Straight away from the guardian (east), far.
+    // Straight away from the guardian (east), its whole throw (Normal's,
+    // short of the lip at most).
     expect(end.x - (start as { x: number }).x).toBeGreaterThan(carried * 0.9);
-    expect(carried).toBeGreaterThan(20);
-    // Fast by the maw, easing farther out (its first second against its
-    // second: the kernel's falloff).
-    const moving = steps.filter((v) => v > 1e-6);
-    const pace = (from: number) => moving.slice(from, from + 10).reduce((a, v) => a + v, 0);
-    expect(pace(0)).toBeGreaterThan(pace(20) * 1.25);
+    expect(carried).toBeGreaterThan(10);
+    expect(carried).toBeLessThan(BREATH_DIFFICULTY.normal.gustThrow + 0.5);
+    // Held only for its slide.
+    expect(steps.length * DT).toBeLessThan(T.roarThrowSlide + 0.2);
+    // Fast off the blow, easing (its first quarter against its last).
+    const q = Math.max(1, Math.floor(steps.length / 4));
+    const pace = (from: number) => steps.slice(from, from + q).reduce((a, v) => a + v, 0);
+    expect(pace(0)).toBeGreaterThan(pace(steps.length - q) * 3);
   });
 });

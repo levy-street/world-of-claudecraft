@@ -119,10 +119,11 @@ describe('the Breath moves bodies the online client can draw', () => {
     expect(s.movementOverrideEpoch).toBe(startEpoch);
   });
 
-  it("the Summit Roar's blast is predicted: no override, no epoch edge, every step a wind's", () => {
-    // The owner's call of 2026-11-17: the Roar's slid throw (a root the
-    // override stood the client down for) read jerky online; its blast is the
-    // shared kernel's wind (wind_drift.ts), stepped by both hosts.
+  it("the Summit Roar's throw holds the override its whole slide: one epoch edge, never one a tick", () => {
+    // Jose's playtest of 2026-11-25: the Roar throws again (the blast read as
+    // a slow walk backwards). Its slide wears an unbreakable root, so the
+    // server's override stays active through it: the online client stands
+    // its prediction down once and draws the server's motion.
     const f = pulled(4);
     const b = f.boss();
     const C = BREATH.cornice;
@@ -136,29 +137,23 @@ describe('the Breath moves bodies the online client can draw', () => {
     const w = watch(f, s);
     f.dev('/dev heart breath roar');
     let landed = false;
-    let blasted = 0;
-    let last = -1;
-    let bumps = 0;
+    let thrown = 0;
+    let startEpoch = -1;
     for (let k = 0; k < ticks(T.inhaleCast + T.gustCast + 5); k++) {
       if (!landed) f.put(near, C.x + 4, C.z);
-      const before = s.movementOverrideEpoch;
       const ev = w.tick();
-      if (ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust)) {
-        landed = true;
-        last = s.movementOverrideEpoch;
-        continue;
-      }
+      if (ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust)) landed = true;
       if (!landed) continue;
-      if (near.auras.some((a) => a.id === WIND_BLAST_AURA)) {
-        blasted++;
-        expect(s.movementOverrideActive).toBe(false);
-        expect(near.auras.some((a) => a.id === BREATH_AURAS.thrown)).toBe(false);
-        if (s.movementOverrideEpoch !== before) bumps++;
+      expect(near.auras.some((a) => a.id === WIND_BLAST_AURA)).toBe(false);
+      if (near.auras.some((a) => a.id === BREATH_AURAS.thrown)) {
+        thrown++;
+        expect(s.movementOverrideActive).toBe(true);
+        if (startEpoch < 0) startEpoch = s.movementOverrideEpoch;
+        expect(s.movementOverrideEpoch).toBe(startEpoch);
       }
     }
-    expect(last).toBeGreaterThanOrEqual(0);
-    expect(blasted).toBeGreaterThan(ticks(3));
-    expect(bumps).toBe(0);
+    expect(thrown).toBeGreaterThan(ticks(T.roarThrowSlide) - 3);
+    expect(thrown).toBeLessThanOrEqual(ticks(T.roarThrowSlide) + 1);
   });
 
   it('the throw says its rule', () => {

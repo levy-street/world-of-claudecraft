@@ -29,7 +29,7 @@ describe('the thrown hop', () => {
 
   it('starts on the hold aura, lasts its slide, and runs whole once started', () => {
     const hop = THROWN_HOPS[BREATH_AURAS.thrown];
-    expect(hop.seconds).toBe(T.roarSlide);
+    expect(hop.seconds).toBe(T.roarThrowSlide);
     expect(THROWN_HOPS[BREATH_AURAS.tossed].seconds).toBe(T.galeSlide);
     expect(THROWN_HOPS[BREATH_AURAS.tossed].height).toBeLessThan(hop.height);
     const st = newThrownHop();
