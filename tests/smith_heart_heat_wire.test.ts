@@ -158,12 +158,14 @@ describe('the Guardian of the Heat over the wire', () => {
     sim.chat('/dev heart heat fist', b.pid);
     run(0.3);
     expect(boss().castingAbility).toBe(HEAT_CASTS.fist);
+    // One spot (two on Heroic and Mythic: the dev verb lays the twin too).
     const spot = objects(HEAT_OBJECTS.fistPrefix);
-    expect(spot).toHaveLength(1);
+    expect(spot.length).toBeGreaterThanOrEqual(1);
+    expect(spot.length).toBeLessThanOrEqual(2);
     expect(spot[0].scale).toBe(T.fistR);
     expect(heatTimedOf(HEAT_OBJECTS.fistPrefix, spot[0].templateId)).toBeCloseTo(T.fistCast, 5);
     const lanes = objects(HEAT_OBJECTS.lanePrefix);
-    expect(lanes).toHaveLength(3);
+    expect(lanes).toHaveLength(3 * spot.length);
     for (const l of lanes) {
       expect(swellLaneOf(l.templateId)?.state).toBe('warn');
       expect(l.scale).toBe(T.laneHalf);
@@ -175,7 +177,7 @@ describe('the Guardian of the Heat over the wire', () => {
     );
     expect(objects(HEAT_OBJECTS.fistPrefix)).toHaveLength(0);
     const waves = objects(HEAT_OBJECTS.wave);
-    expect(waves.length).toBe(3);
+    expect(waves.length).toBe(3 * spot.length);
     const before = { ...waves[0].pos };
     run(0.5);
     const after = objects(HEAT_OBJECTS.wave).find((w: Any) => w.id === waves[0].id);
