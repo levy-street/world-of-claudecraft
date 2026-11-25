@@ -4770,7 +4770,7 @@
       "auraId": "heart_quench_cold",
       "sourcePack": "quench-cold-icon-2026-11-25",
       "sourceFile": "docs/design/raid/kit/quench_cold_icon_src/heart_quench_cold.svg",
-      "sourceBytes": 1922,
+      "sourceBytes": 1954,
       "output": "heart_quench_cold.webp",
       "source": "Hand-authored SVG, rasterized with sharp",
       "owner": "World of ClaudeCraft",
@@ -4786,7 +4786,7 @@
           "role": "The vector source, rasterized to the shipped 128px opaque WebP with sharp (resize 128, flatten, webp quality 88)."
         }
       ],
-      "sourceSha256": "8a68f9698dc03b4614a17941b78aecac162bc38b5b506a4773bcaa4bf2eb00ca",
+      "sourceSha256": "9bb20296338e9e4a12ae4ad249148de75cf679a0f706a344cae3dde522ebd8bc",
       "acceptedSha256": "09bb58a793dfbde890f3d0be30c1d9b66bdc8454fd24a6408140b7d2bfb27ca7",
       "acceptedBytes": 3984,
       "acceptedArtManifest": "docs/achievements/quench-cold-icon-2026-11-25/accepted-aura-art.json",

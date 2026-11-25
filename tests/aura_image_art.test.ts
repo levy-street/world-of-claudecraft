@@ -29,7 +29,7 @@ describe('exact runtime aura paintings', () => {
   // that single painting. The 2026-11-19 record stays as it was accepted.
   const quenchColdManifest = 'docs/achievements/quench-cold-icon-2026-11-25/accepted-aura-art.json';
   const quenchColdManifestSha256 =
-    '5af1a96d93b677ea265a6810d5fc664f1b312ce33853996ddf90492efe550a63';
+    'd9b3cdc0fb0e067ef402e7ca7ed58475cd7d0c9e721e9703e66fb0a847851751';
   const HAND_AUTHORED = 'Hand-authored SVG, rasterized with sharp';
   const secondPassManifestSha256 =
     'bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe';
