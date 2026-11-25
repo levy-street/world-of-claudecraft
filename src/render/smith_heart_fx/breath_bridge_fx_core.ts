@@ -14,14 +14,30 @@ import {
 } from '../../sim/content/smith_heart_layout';
 import { BRIDGE_TUNING } from '../../sim/encounters/smith_heart/breath_bridge_ids';
 
-/** The path's look: its deck's opacity at whole, how far its side curtains
- *  hang under the deck (yards), and the deck's cells along and across. */
+/** The path's look (the AAA pass of 2026-11-25: a volume of cloud, never a
+ *  plane): its top sheet's opacity at whole; `layers` stacked translucent
+ *  sheets `layerStep` yards apart under it (each a little narrower, darker
+ *  and thinner, so the deck reads thick); `wisp` how far past the walkable
+ *  edge the torn wisps stream (a share of the half width: the drop reads
+ *  there); how far the side curtains hang (yards); the cells along and
+ *  across each sheet. */
 export const BRIDGE_LOOK = {
-  opacity: 0.82,
-  curtain: 1.6,
+  opacity: 0.86,
+  layers: 4,
+  layerStep: 0.5,
+  wisp: 0.3,
+  curtain: 2.2,
   along: 40,
-  across: 6,
+  across: 10,
 } as const;
+
+/** Sheet `k`'s (0 the top) reach as a share of the half width (the top one
+ *  past the edge into its wisps, each lower one narrower) and its opacity
+ *  share (the lower ones thinner). Pure. */
+export function bridgeLayer(k: number): { reach: number; alpha: number } {
+  if (k <= 0) return { reach: 1 + BRIDGE_LOOK.wisp, alpha: 1 };
+  return { reach: 1 - k * 0.07, alpha: 0.5 - k * 0.08 };
+}
 
 /** The bridge's deck in instance-local yards: its middle, length (along x)
  *  and width. It is drawn over the chasm alone, a yard onto each rim (the

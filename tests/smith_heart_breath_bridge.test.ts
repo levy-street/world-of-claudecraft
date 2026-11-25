@@ -6,7 +6,9 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  BRIDGE_LOOK,
   bridgeDeck,
+  bridgeLayer,
   bridgeShown,
   stepBridgeForm,
 } from '../src/render/smith_heart_fx/breath_bridge_fx_core';
@@ -179,6 +181,20 @@ describe('the Wind Bridge look (pure core)', () => {
     expect(onBridgeStrip(west + 2, D.z)).toBe(true);
     expect(onBridgeStrip(east - 2, D.z)).toBe(true);
     expect(D.width).toBe(B.halfWidth * 2);
+  });
+
+  it('reads as a volume: stacked sheets, each lower one narrower and thinner, wisps past the edge', () => {
+    expect(BRIDGE_LOOK.layers).toBeGreaterThanOrEqual(3);
+    const top = bridgeLayer(0);
+    expect(top.reach).toBeGreaterThan(1);
+    expect(top.alpha).toBe(1);
+    for (let k = 1; k < BRIDGE_LOOK.layers; k++) {
+      const a = bridgeLayer(k);
+      const b = bridgeLayer(k - 1);
+      expect(a.reach).toBeLessThan(b.reach);
+      expect(a.alpha).toBeLessThan(b.alpha);
+      expect(a.alpha).toBeGreaterThan(0);
+    }
   });
 
   it('forms over its seconds while up and is gone (nothing drawn) over its dissolve', () => {
