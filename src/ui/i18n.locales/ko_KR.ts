@@ -26343,4 +26343,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.ping': '핑: 짧게 누르면 커서 아래에 핑, 길게 누르면 핑 휠',
   'hudChrome.auraEffect.finalBoss.devilThrown': '먼지 회오리에 내던져짐: 회오리바람 밖으로 {yards}야드 날아갑니다. 땅에 내려설 때까지 움직일 수 없습니다.',
   'hudChrome.breathWind.turning': '바람 방향 전환',
+  'hudChrome.quenchIce.onIce': '얼음 위',
+  'hudChrome.quenchIce.breaking': '얼음이 깨진다!',
+  'hudChrome.quenchIce.water': '물속!',
 };

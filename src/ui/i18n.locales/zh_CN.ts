@@ -24985,4 +24985,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.ping': '信号：轻按向光标下的目标发出信号，按住打开信号轮盘',
   'hudChrome.auraEffect.finalBoss.devilThrown': '被尘卷风抛出：被卷出旋风 {yards} 码。在它把你放下之前你无法移动。',
   'hudChrome.breathWind.turning': '风向转变',
+  'hudChrome.quenchIce.onIce': '冰面上',
+  'hudChrome.quenchIce.breaking': '冰面破裂！',
+  'hudChrome.quenchIce.water': '落入水中！',
 };

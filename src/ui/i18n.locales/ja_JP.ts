@@ -26333,4 +26333,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.ping': 'ピン：軽く押すとカーソルの下にピン、長押しでピンホイール',
   'hudChrome.auraEffect.finalBoss.devilThrown': 'ダストデビルに投げ飛ばされた：つむじ風から{yards}ヤード外へ運ばれる。地面に降ろされるまで移動できない。',
   'hudChrome.breathWind.turning': '風向きが変わる',
+  'hudChrome.quenchIce.onIce': '氷の上',
+  'hudChrome.quenchIce.breaking': '氷が割れる！',
+  'hudChrome.quenchIce.water': '水中！',
 };

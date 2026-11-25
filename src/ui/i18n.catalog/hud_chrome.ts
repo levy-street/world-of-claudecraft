@@ -10565,6 +10565,14 @@ export const hudChromeStrings = {
     blowing: 'Wind',
     turning: 'Wind turning',
   },
+  // The Guardian of the Quench's ice-state badge (src/ui/hud/dungeon/
+  // quench_ice_view.ts): on the lake's ice, on ice breaking under you, in the
+  // freezing water (its seconds are quenchAlert.secondsBar). Wordy (M16).
+  quenchIce: {
+    onIce: 'On the ice',
+    breaking: 'Ice breaking!',
+    water: 'In the water!',
+  },
   finalOverload: {
     kneeling: 'It kneels',
     rising: 'The Heart beats',

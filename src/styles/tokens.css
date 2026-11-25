@@ -878,6 +878,25 @@
     --color-breath-wind-turning-glow-soft: rgb(255 220 120 / 0.35);
     --color-breath-wind-turning-glow: rgb(255 220 120 / 0.9);
 
+    /* The Guardian of the Quench's ice badge and water veil (components.css
+       #heart-quench-ice / #heart-quench-veil, src/ui/hud/dungeon/
+       quench_ice_painter.ts): a glacier dial, a white glyph on the ice, red
+       on breaking ice, bright blue in the water; the veil's frosted edge and
+       its light blue tint. */
+    --color-quench-ice-dial: rgb(14 38 62 / 0.88);
+    --color-quench-ice-dial-edge: rgb(6 18 32 / 0.92);
+    --color-quench-ice-ring: #8fd6ff;
+    --color-quench-ice-glyph: #eaf8ff;
+    --color-quench-ice-glow: rgb(140 210 255 / 0.45);
+    --color-quench-ice-break: #ff4a3a;
+    --color-quench-ice-break-glow: rgb(255 80 60 / 0.95);
+    --color-quench-ice-break-glow-soft: rgb(255 80 60 / 0.3);
+    --color-quench-ice-water: #5fc4ff;
+    --color-quench-ice-water-glow: rgb(80 190 255 / 0.85);
+    --color-quench-veil-tint: rgb(120 196 255 / 0.13);
+    --color-quench-veil-frost: rgb(214 240 255 / 0.85);
+    --color-quench-veil-frost-mid: rgb(130 200 255 / 0.4);
+
     /* Performance Overlay gilded-ornament shape defaults. perf_ornament_svg.ts
        overwrites these with the real generated mask-image/gradient values once at
        boot (applyPerfOrnamentVars, called next to hydrateIcons() in main.ts); an

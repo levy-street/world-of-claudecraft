@@ -186,7 +186,7 @@ import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
-import { easeSink } from './water_sink_core';
+import { easeSink, treadsWater } from './water_sink_core';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import { fixedHandPropsShown, swappedClip, weaponLoadout } from './weapon_loadout_core';
 import {
@@ -1880,6 +1880,9 @@ export class CharacterVisual {
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
     if (this.waterSink !== this.waterSinkTarget)
       this.waterSink = easeSink(this.waterSink, this.waterSinkTarget, dt);
+    // Sunk in water it stands in (a Quench hole): it treads the water, never
+    // stands sunk in the floor (water_sink_core.ts treadsWater).
+    if (treadsWater(this.waterSinkTarget)) s.swimming = true;
     // A streamed armor file that landed (or a better tier of one): the dressing
     // attaches it (at once with no work queue behind this body, else as a unit
     // of it), and the re-dress that follows is here, on the per-frame path.

@@ -98,11 +98,14 @@ void main() {
     float B = dot(p0, d);
     float Cc = dot(p0, p0) - R * R;
     float tc = A > 1e-6 ? (-B + sqrt(max(B * B - A * Cc, 0.0))) / A : 1e9;
-    // The deep water's colours, linear (the colorspace chunk lifts them): a
-    // blue-black, near black at the bottom (the owner's review of 2026-11-17:
-    // it must read as a hole from above and from a grazing angle alike).
-    vec3 abyss = vec3(0.0012, 0.0028, 0.0065);
-    vec3 deepBlue = vec3(0.004, 0.012, 0.03);
+    // The deep water's colours, linear (the colorspace chunk lifts them). It
+    // read as a black hole (the owner's review of 2026-11-17 asked it read as a
+    // hole from above and from a grazing angle alike); the team's playtest of
+    // 2026-11-25 found the pools hard to see on the dark lake, so the water is
+    // a clear glacier blue now, deepest in the middle and still well apart
+    // from the white ice round it, a cyan band of light where it meets the walls.
+    vec3 abyss = vec3(0.006, 0.05, 0.16);
+    vec3 deepBlue = vec3(0.03, 0.2, 0.5);
     if (tc < tw) {
       // The ice wall, its height below the lip: a thin lit band under the lip,
       // falling fast into the dark.
@@ -123,10 +126,11 @@ void main() {
       vec2 q = hit * 1.6 + vec2(seed);
       float swell = n(q + vec2(t * 0.35, -t * 0.25)) * 0.6 + n(q * 2.3 - vec2(t * 0.55, t * 0.42)) * 0.4;
       vec3 water = mix(abyss, deepBlue, smoothstep(0.0, 1.0, toEdge) * (0.6 + 0.4 * swell));
+      water += vec3(0.05, 0.28, 0.42) * smoothstep(0.72, 1.0, toEdge);
       // The fresh break churns for a moment (dark slush, never white).
       float churn = vP.x;
       float slush = smoothstep(0.65, 0.9, n(q * 1.4 + vec2(t * 0.6, t * 0.4))) * churn;
-      water = mix(water, deepBlue * 3.0, slush * 0.3);
+      water = mix(water, deepBlue * 1.6, slush * 0.3);
       float glint = max(0.0, n(q * 3.1 + vec2(t * 0.8, -t * 0.6)) - 0.66) * 2.9;
       water += uLit * 0.18 * glint * glint * glint;
       col = water;

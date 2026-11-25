@@ -92,6 +92,13 @@ import {
 } from './kit_use_prompt_view';
 import { buildKnotAlertView, KNOT_ALERT_KINDS } from './knot_alert_view';
 import { buildQuenchAlertView, QUENCH_ALERT_KINDS } from './quench_alert_view';
+import { QuenchIceBadge } from './quench_ice_painter';
+import {
+  buildQuenchIceView,
+  makeQuenchIceView,
+  type QuenchIceBody,
+  QuenchIceScan,
+} from './quench_ice_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 import {
@@ -151,7 +158,8 @@ export interface DungeonPromptsFrame {
         KitUseBody &
         FinalPhaseBoss &
         TankSwapBody &
-        BreathWindBody
+        BreathWindBody &
+        QuenchIceBody
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -185,6 +193,9 @@ export class DungeonPrompts {
   private readonly breathWind: BreathWindBadge;
   private readonly breathWindView = makeBreathWindView();
   private readonly breathWindScan = new BreathWindScan();
+  private readonly quenchIce: QuenchIceBadge;
+  private readonly quenchIceView = makeQuenchIceView();
+  private readonly quenchIceScan = new QuenchIceScan();
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly temple: EncounterAlert;
   private readonly templeScene = new TempleAlertSceneScan();
@@ -261,6 +272,7 @@ export class DungeonPrompts {
     });
     this.finalPhase = new HeartFinalPhasePanel(deps);
     this.breathWind = new BreathWindBadge(deps);
+    this.quenchIce = new QuenchIceBadge(deps);
     this.temple = new EncounterAlert(deps, {
       id: 'temple-alert',
       className: 'ui-panel-strong encounter-alert temple-alert',
@@ -386,6 +398,12 @@ export class DungeonPrompts {
     this.breathWind.paint(
       buildBreathWindView(this.breathWindScan.frame(f.world), p, this.breathWindView),
     );
+    // The Quench's ice-state badge and the water's frost veil: every preset,
+    // never behind the hints setting (the ice breaking under you is what
+    // you act on).
+    this.quenchIce.paint(
+      buildQuenchIceView(f.world, this.quenchIceScan.frame(f.world), p, this.quenchIceView),
+    );
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
           selfPos: p.pos,
@@ -439,6 +457,7 @@ export class DungeonPrompts {
     this.liveCoal.dispose();
     this.finalPhase.dispose();
     this.breathWind.dispose();
+    this.quenchIce.dispose();
     this.temple.dispose();
     this.kitUse.dispose();
   }

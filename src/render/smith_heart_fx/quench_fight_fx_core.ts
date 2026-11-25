@@ -223,17 +223,26 @@ export function slashLaneLook(
 
 // ---- the ice: cracks and holes -------------------------------------------------------
 
+/** Where a crack's warning starts to flash (share of its warning): the
+ *  team's playtest of 2026-11-25 asked the ice about to break to read
+ *  MUCH more strongly, so its last stretch strobes, faster to the break. */
+export const CRACK_FLASH_FROM = 0.5;
+
 /** A crack `elapsed` seconds into its `warn`: the crack web's spread (0..1
- *  of the hole's radius), its light, and the telegraph's fill. */
+ *  of the hole's radius), its light, the telegraph's fill, and its flash
+ *  (0..1, a strobe quickening from CRACK_FLASH_FROM to the break; 0 before). */
 export function crackLook(
   elapsed: number,
   warn: number,
-): { spread: number; light: number; fill: number } {
+): { spread: number; light: number; fill: number; flash: number } {
   const f = clamp01(warn > 0 ? elapsed / warn : 1);
+  const late = clamp01((f - CRACK_FLASH_FROM) / (1 - CRACK_FLASH_FROM));
+  const flash = f > CRACK_FLASH_FROM ? 0.5 + 0.5 * Math.sin(elapsed * (12 + 30 * late)) : 0;
   return {
     spread: 0.25 + 0.75 * smooth(f * 1.1),
-    light: 0.4 + 0.6 * f + (f > 0.8 ? 0.4 * Math.sin(elapsed * 30) : 0),
+    light: 0.5 + 0.6 * f + 0.6 * flash * late,
     fill: f,
+    flash,
   };
 }
 

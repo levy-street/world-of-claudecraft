@@ -20,6 +20,11 @@ export const HOLE_SHARDS = 9;
 /** Mist breathing off the open water: puffs a second at full density. */
 export const HOLE_MIST_RATE = 3;
 
+/** The break's shards and water that draw on EVERY preset (the low tier sheds
+ *  only what is past this): the team's playtest of 2026-11-25 asked the ice
+ *  giving way to be a moment a raid sees whatever its settings. */
+export const HOLE_BREAK_FLOOR = 10;
+
 function hash(a: number, b: number): number {
   let h = (Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263)) | 0;
   h = Math.imul(h ^ (h >>> 13), 1274126177);
