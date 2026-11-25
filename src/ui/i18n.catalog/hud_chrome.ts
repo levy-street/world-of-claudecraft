@@ -4762,6 +4762,9 @@ export const hudChromeStrings = {
     trinketSlot: 'Trinket',
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
+    // Worn gear whose slot takes an enchant: Shift + right-click opens the
+    // Enchant list for it, enchanting it in place.
+    enchantHint: 'Shift + right-click to enchant',
     // The helmet-visibility eye on the head socket: each string is the action
     // the press performs (so the shown-state button says "Hide helmet").
     hideHelmAria: 'Hide helmet',
@@ -9182,6 +9185,9 @@ export const hudChromeStrings = {
     disenchant: 'Disenchant',
     salvage: 'Salvage',
     applyEnchant: 'Apply Enchant',
+    // Item-first enchanting: right-click a piece of gear to see only the
+    // enchants for its slot.
+    enchant: 'Enchant',
     // The Sundered Essence extraction row (Masterwrought phase 04), offered
     // on raid-won epic GEAR only (bag_item_context_menu.ts isSunderable).
     sunder: 'Sunder',
@@ -9283,6 +9289,11 @@ export const hudChromeStrings = {
       'This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.',
     pickerTitle: 'Apply Enchant',
     targetTitle: 'Choose an item to enchant',
+    // The item-first picker (right-click gear, Enchant): its title names the
+    // copy, and only that item's slot's enchants are listed beneath it.
+    itemPickerTitle: 'Enchant {item}',
+    // The tag on the item-first picker row whose enchant the copy already carries.
+    currentEnchantTag: 'Current enchant',
     noEnchants: 'No enchant uses this reagent.',
     noTargets: 'No eligible item to enchant.',
     // The tag on a WORN target row in the Apply Enchant picker: worn gear is

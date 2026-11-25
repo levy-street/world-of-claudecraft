@@ -81,6 +81,7 @@ function harness() {
     statTooltipHtml: () => '',
     progressionHtml: () => '',
     unequip: vi.fn(),
+    openWornEnchant: vi.fn(),
     beginUnequipDrag: (slot) => {
       unequipDragSlot = slot;
     },

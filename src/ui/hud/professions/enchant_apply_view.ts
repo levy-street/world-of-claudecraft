@@ -204,9 +204,47 @@ export function enchantsForReagent(
   reagentItemId: string,
   viewer: EnchantViewerInput = GATED_VIEWER,
 ): EnchantPickRow[] {
+  return enchantPickRows(
+    inventory,
+    (enchant) => enchant.reagents.some((reagent) => reagent.itemId === reagentItemId),
+    viewer,
+  );
+}
+
+/** The enchants that target `itemSlot` (EnchantDef.itemSlot, the same compare
+ *  the sim's wrong_slot gate makes against ItemDef.slot), in ENCHANTS
+ *  declaration order, each with the exact row facts enchantsForReagent
+ *  carries. The item-first picker's step: the player right-clicked a piece of
+ *  gear, so only its slot's enchants are offered. */
+export function enchantsForItemSlot(
+  inventory: readonly InvSlot[],
+  itemSlot: string,
+  viewer: EnchantViewerInput = GATED_VIEWER,
+): EnchantPickRow[] {
+  return enchantPickRows(inventory, (enchant) => enchant.itemSlot === itemSlot, viewer);
+}
+
+/** Whether any enchant targets `itemSlot`, so the bag menu offers Enchant only
+ *  on gear that can take one (a trinket or a bag never can). */
+export function hasEnchantsForItemSlot(itemSlot: string | undefined): boolean {
+  return itemSlot !== undefined && ENCHANT_ITEM_SLOTS.has(itemSlot);
+}
+
+/** Every slot at least one enchant targets, derived once from the static table. */
+const ENCHANT_ITEM_SLOTS: ReadonlySet<string> = new Set(
+  Object.values(ENCHANTS).map((enchant) => enchant.itemSlot),
+);
+
+/** One picker row per enchant `include` admits: the shared builder behind the
+ *  reagent-first and the item-first steps, so both answer every gate alike. */
+function enchantPickRows(
+  inventory: readonly InvSlot[],
+  include: (enchant: EnchantDef) => boolean,
+  viewer: EnchantViewerInput,
+): EnchantPickRow[] {
   const rows: EnchantPickRow[] = [];
   for (const enchant of Object.values(ENCHANTS)) {
-    if (!enchant.reagents.some((reagent) => reagent.itemId === reagentItemId)) continue;
+    if (!include(enchant)) continue;
     const reagents = enchant.reagents.map((reagent) => ({
       itemId: reagent.itemId,
       required: reagent.count,
@@ -434,8 +472,22 @@ export function enchantSectionsForReagent(
   reagentItemId: string,
   viewer: EnchantViewerInput = GATED_VIEWER,
 ): EnchantPickSection[] {
+  return sectionsByTier(enchantsForReagent(inventory, reagentItemId, viewer));
+}
+
+/** enchantsForItemSlot, grouped exactly as enchantSectionsForReagent groups
+ *  (tier sections in ladder order, gated rows bucketed, never dropped). */
+export function enchantSectionsForItemSlot(
+  inventory: readonly InvSlot[],
+  itemSlot: string,
+  viewer: EnchantViewerInput = GATED_VIEWER,
+): EnchantPickSection[] {
+  return sectionsByTier(enchantsForItemSlot(inventory, itemSlot, viewer));
+}
+
+function sectionsByTier(picks: readonly EnchantPickRow[]): EnchantPickSection[] {
   const byTier = new Map<EnchantTier, EnchantPickRow[]>();
-  for (const row of enchantsForReagent(inventory, reagentItemId, viewer)) {
+  for (const row of picks) {
     const tier = enchantTier(row.enchantId);
     const bucket = byTier.get(tier);
     if (bucket) bucket.push(row);

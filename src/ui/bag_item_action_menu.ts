@@ -45,6 +45,7 @@ import {
   captureMaterialStackSelection,
   type MaterialStackSelection,
 } from '../sim/material_stack_selection';
+import { isEnchantedInstance } from '../sim/professions/enchanting';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
@@ -59,19 +60,23 @@ import { esc } from './esc';
 import { craftNameKey } from './hud/professions/craft_name_view';
 import { disenchantYieldLines } from './hud/professions/disenchant_yield_view';
 import {
+  type EnchantPickRow,
   type EnchantReplaceTargetInfo,
   type EnchantTargetRow,
   type EnchantViewerInput,
   enchantNameKey,
+  enchantSectionsForItemSlot,
   enchantSectionsForReagent,
   enchantTargets,
   HEROIC_TAG_KEY,
+  hasEnchantsForItemSlot,
   preservedTraitKey,
   type WornEnchantTargetRow,
   wornEnchantTargets,
 } from './hud/professions/enchant_apply_view';
 import { formatNumber, t } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
+import { iconDataUrl } from './icons';
 import { openItemHistoryDialog } from './item_history_dialog';
 import { itemNumber, itemStatName } from './item_instance_tooltip';
 import type { MaterialSourcesDialogOptions } from './material_sources_dialog';
@@ -99,6 +104,10 @@ export const CTX_ITEM_DANGER_CLASS = 'ctx-item-danger';
  *  touch stylesheet sizes it with the danger line for exactly that reason. */
 export const CTX_ITEM_GATE_CLASS = 'ctx-item-gate';
 
+/** The material icon in front of each reagent on an enchant row, sized to the
+ *  text it sits in (hud.css #ctx-menu .ctx-reagent-icon). */
+export const CTX_REAGENT_ICON_CLASS = 'ctx-reagent-icon';
+
 /** The craft id this picker gates on: the same one the sim's insufficient_skill
  *  arm reads (professions/enchanting.ts, skillInCraft(..., 'enchanting')) and a
  *  live CRAFT_RING id, so craftNameKey resolves a printable name for it. */
@@ -109,6 +118,18 @@ const ENCHANTING_CRAFT_ID = 'enchanting';
  *  rendered box instead of the full uncapped list estimate. */
 const PICKER_MAX_HEIGHT_VIEWPORT_FRACTION = 0.6;
 const PICKER_MAX_HEIGHT_DESKTOP_PX = 560;
+
+/** Modifier class for the COMPACT picker (the item-first Enchant list): the same
+ *  width and row styling as every picker, height-capped to about five enchant
+ *  rows so the box stays small, then it scrolls. Mirrored below for placement. */
+export const CTX_MENU_PICKER_COMPACT_CLASS = 'ctx-menu-picker-compact';
+const PICKER_COMPACT_MAX_HEIGHT_DESKTOP_PX = 420;
+
+/** One routing rule over every dimension: an enchant row is selectable only
+ *  when it clears ALL of them, so hover and click agree. */
+function isPickSelectable(pick: EnchantPickRow): boolean {
+  return pick.affordable && pick.skillMet && pick.known && pick.perfectedMet;
+}
 
 /** One painted row of the shared #ctx-menu popup: a selectable action (`act`),
  *  an inert disabled row, or a non-interactive tier section caption. */
@@ -239,6 +260,7 @@ export class BagItemActionMenu {
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId, target.index);
       else if (id === 'sunder') this.confirmDestroy('sunder', itemId, target.index);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
+      else if (id === 'enchantItem') this.openItemEnchantPicker(def, itemId, x, y, instance);
       else if (id === 'viewSources' && materialSources !== undefined) {
         this.openMaterialSources(def, materialSources, target.opener);
       } else if (id === 'separateByGatherer') {
@@ -271,6 +293,18 @@ export class BagItemActionMenu {
       else if (id === 'lock') this.setLocked(itemId, target, true);
       else if (id === 'unlock') this.setLocked(itemId, target, false);
     });
+  }
+
+  /** Shift + right-click on a worn piece (the character sheet): the same
+   *  item-first Enchant list, filtered to that piece's slot, enchanting the
+   *  worn copy in place. Nothing worn in the slot, or a slot no enchant
+   *  targets, opens nothing. */
+  openWornEnchant(slot: EquipSlot, x: number, y: number): void {
+    const world = this.deps.world();
+    const itemId = world.equipment[slot];
+    const def = itemId ? ITEMS[itemId] : undefined;
+    if (!itemId || !def || !hasEnchantsForItemSlot(def.slot)) return;
+    this.openItemEnchantPicker(def, itemId, x, y, world.equipmentInstances?.[slot], slot);
   }
 
   private openMaterialSources(
@@ -510,59 +544,12 @@ export class BagItemActionMenu {
     for (const section of sections) {
       rows.push({ html: esc(t(section.titleKey)), header: true });
       for (const pick of section.rows) {
-        // Each unsatisfied reagent carries a class the CSS tints (the crafting
-        // window's reagent-line idiom): redundant beside the have/required
-        // counts the text already carries, so the color is a hint, never the
-        // only signal (fairness).
-        const reagentsHtml = pick.reagents
-          .map(
-            (reagent) =>
-              `<span class="ctx-reagent${reagent.have >= reagent.required ? '' : ' unsat'}">${esc(
-                t('hudChrome.crafting.reagentLine', {
-                  name: itemDisplayName(ITEMS[reagent.itemId]),
-                  have: reagent.have,
-                  required: reagent.required,
-                }),
-              )}</span>`,
-          )
-          .join(', ');
-        // The effect line reuses the item tooltip's own stat-line key and stat
-        // names, so "+4 Stamina" reads identically here and on the enchanted
-        // copy's tooltip; no new i18n for the effect itself.
-        const effectsText = ENCHANTS[pick.enchantId]?.weaponProc
-          ? t(`hudChrome.enchantDescription.${pick.enchantId}` as TranslationKey)
-          : pick.effects
-              .map((effect) =>
-                t('itemUi.tooltip.stat', {
-                  value: itemNumber(effect.value),
-                  stat: itemStatName(effect.stat),
-                }),
-              )
-              .join(', ');
-        const effectHtml = effectsText
-          ? `<span class="ctx-item-effect">${esc(effectsText)}</span>`
-          : '';
-        // Each unmet GATE gets its own sub-line, in the plain meta style the
-        // Worn and heroic tags use: a standing fact about the crafter or the
-        // enchant, not a destructive warning, so neither carries the danger
-        // tint. They sit beside the reagent line rather than replacing it,
-        // because a climbing enchanter wants to know the bill as well as the
-        // rung. Both take the gate class, which is what earns them the touch
-        // size bump: on a phone this sub-line is the ONLY explanation of why a
-        // visible row cannot be tapped, so it is not reference fine print.
-        const skillHtml = pick.skillMet ? '' : this.gateMeta(this.skillGateText(pick.skillReq));
-        const knownHtml = pick.known
-          ? ''
-          : this.gateMeta(t('hudChrome.enchanting.recipeNotLearned'));
-        const perfectedHtml = pick.perfectedMet
-          ? ''
-          : this.gateMeta(t('hudChrome.enchanting.notPerfected'));
-        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>${skillHtml}${knownHtml}${perfectedHtml}`;
+        const html = this.enchantPickHtml(pick, true);
         // One routing rule over every dimension: a row is selectable only when
         // it clears ALL of them, so hover and click agree and no gate can be
         // answered later, on the target list, with a sentence about the bags.
         rows.push(
-          pick.affordable && pick.skillMet && pick.known && pick.perfectedMet
+          isPickSelectable(pick)
             ? { act: `enchant:${pick.enchantId}`, html }
             : { html, disabled: true },
         );
@@ -576,6 +563,167 @@ export class BagItemActionMenu {
       title,
       true,
     );
+  }
+
+  // Item-first enchanting: the player right-clicked ONE piece of gear and chose
+  // Enchant, so only the enchants for that item's slot are listed (grouped by
+  // tier, every gate answered on the row exactly as the reagent-first picker
+  // does). Picking one applies it to this item: a plain copy sends the apply,
+  // an enchanted copy goes through the same replace confirm as the target
+  // picker's replace rows. The box is the compact picker (five rows, then it
+  // scrolls), same width as the reagent-first picker.
+  private openItemEnchantPicker(
+    def: ItemDef,
+    itemId: string,
+    x: number,
+    y: number,
+    instance?: ItemInstancePayload,
+    wornSlot?: EquipSlot,
+  ): void {
+    const world = this.deps.world();
+    const viewer = this.enchantViewer();
+    const sections = def.slot ? enchantSectionsForItemSlot(world.inventory, def.slot, viewer) : [];
+    const title = esc(
+      t('hudChrome.enchanting.itemPickerTitle', { item: wornItemCellParts(def, instance).name }),
+    );
+    if (sections.length === 0) {
+      this.paint(
+        [{ html: esc(t('hudChrome.enchanting.noTargets')), disabled: true }],
+        x,
+        y,
+        () => {},
+        title,
+        true,
+        true,
+      );
+      return;
+    }
+    const current = instance?.enchant;
+    const rows: PickerRow[] = [];
+    for (const section of sections) {
+      rows.push({ html: esc(t(section.titleKey)), header: true });
+      for (const pick of section.rows) {
+        const currentHtml =
+          pick.enchantId === current
+            ? `<span class="ctx-item-meta">${esc(t('hudChrome.enchanting.currentEnchantTag'))}</span>`
+            : '';
+        const html = `${this.enchantPickHtml(pick, false)}${currentHtml}`;
+        rows.push(
+          isPickSelectable(pick)
+            ? { act: `item-enchant:${pick.enchantId}`, html }
+            : { html, disabled: true },
+        );
+      }
+    }
+    this.paint(
+      rows,
+      x,
+      y,
+      (act) => this.applyToItem(itemId, act.slice('item-enchant:'.length), instance, wornSlot),
+      title,
+      true,
+      true,
+    );
+  }
+
+  // Send the item-first pick. The bagged apply is itemId-keyed (the sim picks
+  // the copy), so the arm follows the clicked copy's state: an enchanted copy
+  // is a confirmed replace (its confirm names what is lost), a plain copy is
+  // the plain apply. The target builder decides whether the sim would accept
+  // that arm at all, so a refused combination is never sent blind.
+  private applyToItem(
+    itemId: string,
+    enchantId: string,
+    instance?: ItemInstancePayload,
+    wornSlot?: EquipSlot,
+  ): void {
+    const world = this.deps.world();
+    if (wornSlot !== undefined) {
+      // A WORN copy enchants in place, keyed by its equipment slot (the target
+      // picker's worn arm): the worn builder decides plain versus replace.
+      const worn = wornEnchantTargets(
+        world.equipment,
+        world.equipmentInstances,
+        enchantId,
+        this.enchantViewer(),
+      ).find((row) => row.slot === wornSlot && row.itemId === itemId);
+      if (worn?.replace) {
+        this.confirmReplace(itemId, enchantId, worn.replace, wornSlot);
+        return;
+      }
+      world.applyEnchant(itemId, enchantId, wornSlot);
+      this.deps.afterAction();
+      return;
+    }
+    const enchanted = !!instance && isEnchantedInstance(instance);
+    const row = enchantTargets(world.inventory, enchantId, [], this.enchantViewer()).find(
+      (target) => target.itemId === itemId && (target.replace !== undefined) === enchanted,
+    );
+    if (row?.replace) {
+      this.confirmReplace(itemId, enchantId, row.replace, undefined, instance);
+      return;
+    }
+    world.applyEnchant(itemId, enchantId);
+    this.deps.afterAction();
+  }
+
+  // One enchant row's HTML, shared by both pickers: the localized name, what
+  // the enchant does, the reagent bill (with the target slot on the
+  // reagent-first picker, where rows span slots), and one sub-line per unmet
+  // gate.
+  private enchantPickHtml(pick: EnchantPickRow, showSlot: boolean): string {
+    // Each unsatisfied reagent carries a class the CSS tints (the crafting
+    // window's reagent-line idiom): redundant beside the have/required
+    // counts the text already carries, so the color is a hint, never the
+    // only signal (fairness).
+    // Each reagent reads icon, name, amount: the material's own item icon,
+    // sized to the line's text (CSS .ctx-reagent-icon, 1em), decorative
+    // (alt="") because the name beside it already says what it is.
+    const reagentsHtml = pick.reagents
+      .map(
+        (reagent) =>
+          `<span class="ctx-reagent${reagent.have >= reagent.required ? '' : ' unsat'}"><img class="${CTX_REAGENT_ICON_CLASS}" src="${esc(
+            iconDataUrl('item', reagent.itemId),
+          )}" alt="" draggable="false">${esc(
+            t('hudChrome.crafting.reagentLine', {
+              name: itemDisplayName(ITEMS[reagent.itemId]),
+              have: reagent.have,
+              required: reagent.required,
+            }),
+          )}</span>`,
+      )
+      .join(' ');
+    // The effect line reuses the item tooltip's own stat-line key and stat
+    // names, so "+4 Stamina" reads identically here and on the enchanted
+    // copy's tooltip; no new i18n for the effect itself.
+    const effectsText = ENCHANTS[pick.enchantId]?.weaponProc
+      ? t(`hudChrome.enchantDescription.${pick.enchantId}` as TranslationKey)
+      : pick.effects
+          .map((effect) =>
+            t('itemUi.tooltip.stat', {
+              value: itemNumber(effect.value),
+              stat: itemStatName(effect.stat),
+            }),
+          )
+          .join(', ');
+    const effectHtml = effectsText
+      ? `<span class="ctx-item-effect">${esc(effectsText)}</span>`
+      : '';
+    // Each unmet GATE gets its own sub-line, in the plain meta style the
+    // Worn and heroic tags use: a standing fact about the crafter or the
+    // enchant, not a destructive warning, so neither carries the danger
+    // tint. They sit beside the reagent line rather than replacing it,
+    // because a climbing enchanter wants to know the bill as well as the
+    // rung. Both take the gate class, which is what earns them the touch
+    // size bump: on a phone this sub-line is the ONLY explanation of why a
+    // visible row cannot be tapped, so it is not reference fine print.
+    const skillHtml = pick.skillMet ? '' : this.gateMeta(this.skillGateText(pick.skillReq));
+    const knownHtml = pick.known ? '' : this.gateMeta(t('hudChrome.enchanting.recipeNotLearned'));
+    const perfectedHtml = pick.perfectedMet
+      ? ''
+      : this.gateMeta(t('hudChrome.enchanting.notPerfected'));
+    const slotHtml = showSlot ? `${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ` : '';
+    return `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${slotHtml}${reagentsHtml}</span>${skillHtml}${knownHtml}${perfectedHtml}`;
   }
 
   // The plain-text description of what a REPLACE would destroy (#2415), for
@@ -855,9 +1003,11 @@ export class BagItemActionMenu {
     onActivate: (act: string) => void,
     titleHtml?: string,
     picker = false,
+    compact = false,
   ): void {
     const el = this.deps.ctxMenu.element();
     el.classList.toggle(CTX_MENU_PICKER_CLASS, picker);
+    el.classList.toggle(CTX_MENU_PICKER_COMPACT_CLASS, picker && compact);
     let html = titleHtml ? `<div class="ctx-title">${titleHtml}</div>` : '';
     // A tier caption opens a labelled GROUP around the rows beneath it, so the
     // ladder reaches assistive tech too: the rows are role=button stops
@@ -886,7 +1036,7 @@ export class BagItemActionMenu {
       ? window.innerHeight * PICKER_MAX_HEIGHT_VIEWPORT_FRACTION
       : Math.min(
           window.innerHeight * PICKER_MAX_HEIGHT_VIEWPORT_FRACTION,
-          PICKER_MAX_HEIGHT_DESKTOP_PX,
+          compact ? PICKER_COMPACT_MAX_HEIGHT_DESKTOP_PX : PICKER_MAX_HEIGHT_DESKTOP_PX,
         );
     const reserveBottom = picker
       ? Math.min(naturalReserve, Math.round(cappedReserve) + 24)
