@@ -105,7 +105,6 @@ import {
   stormWallLook,
   strikeBoltPath,
   strikeFill,
-  turnArrowAlpha,
   upwindHeardAt,
   VORTEX_FUNNEL,
   WIND_CUE,
@@ -738,7 +737,7 @@ export class BreathFightFx {
     this.local.add(this.field);
     // The gusts of wind in the air over it (the same few on every tier).
     this.streaks = new BreathWindStreaks(this.local, this.uTime, CORNICE_FLOOR_H);
-    // The wind's way: the storm wall upwind and the turn arrow, every tier.
+    // The wind's way: the storm wall upwind and the turn arrows, every tier.
     this.cue = new BreathWindCue(this.local, CORNICE_FLOOR_H);
 
     // ---- the gaps' lethal lips (every tier) ----
@@ -1592,11 +1591,10 @@ export class BreathFightFx {
       this.cueTurnAt = this.clock;
     }
     if (shows) easeDir(this.cueDir, d, Math.min(1, dt * WIND_CUE.wallTurn));
-    const arrow = shows ? turnArrowAlpha(this.clock - this.cueTurnAt) : 0;
     this.cue.paint(
       stormWallLook(this.windPhase, this.windFill),
       this.cueDir,
-      arrow,
+      shows ? this.clock - this.cueTurnAt : -1,
       d,
       dt,
       this.reducedMotion(),

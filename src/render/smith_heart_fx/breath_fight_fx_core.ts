@@ -21,6 +21,7 @@
 
 import { BREATH, SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
+import { inBreathArena, lipDistance } from '../../sim/encounters/smith_heart/breath_geometry';
 import {
   BREATH_CUES,
   BREATH_OBJECTS,
@@ -211,23 +212,77 @@ export const WIND_STREAKS = {
  *  floor's chevron grid, which cluttered the Cornice and hid other
  *  telegraphs): a STORM WALL of cloud on the upwind edge of the Cornice (the
  *  side the wind blows from: a storm behind you pushes you forward), and on
- *  each turn of the wind ONE big arrow at the Cornice's middle for
- *  `arrowSeconds`. The same on every tier. `wallHeight` the wall's top over
- *  the floor and `wallDrop` how far it hangs below the rim (yards), `wallOut`
- *  how far past the rim it stands (a share of the radii), `wallTurn` how
- *  fast it swings round to a new bearing (per second, eased), `arrowLength`
- *  and `arrowWidth` the arrow's yards, `arrowIn` and `arrowOut` its fades. */
+ *  each turn of the wind a few small arrows down the Cornice's two SIDES
+ *  (the edges parallel to the wind; Jose's look of 2026-11-25: the one big
+ *  arrow in the middle was too big and sat where the raid fights),
+ *  `arrowPerSide` a side, staggered along the flow, each lit `arrowSeconds`
+ *  a little after the one upwind of it (`arrowStagger`), slightly
+ *  translucent (`arrowOpacity`). The same on every tier. `wallHeight` the
+ *  wall's top over the floor and `wallDrop` how far it hangs below the rim
+ *  (yards), `wallOut` how far past the rim it stands (a share of the radii),
+ *  `wallTurn` how fast it swings round to a new bearing (per second, eased),
+ *  `arrowLength` and `arrowWidth` an arrow's yards, `arrowSide` how far out
+ *  toward the rim a side's arrows stand (a share of the radius that way),
+ *  `arrowSpacing` the yards between a side's arrows, `arrowIn` and
+ *  `arrowOut` their fades. */
 export const WIND_CUE = {
   wallHeight: 16,
   wallDrop: 10,
   wallOut: 1.04,
   wallTurn: 1.6,
-  arrowSeconds: 2,
+  arrowSeconds: 1.6,
+  arrowStagger: 0.15,
   arrowIn: 0.2,
-  arrowOut: 0.6,
-  arrowLength: 20,
-  arrowWidth: 13,
+  arrowOut: 0.5,
+  arrowPerSide: 3,
+  arrowLength: 8,
+  arrowWidth: 5,
+  arrowSide: 0.72,
+  arrowSpacing: 12,
+  arrowOpacity: 0.72,
 } as const;
+
+/** One small turn arrow's spot over the Cornice (claim-local) and its place
+ *  along the flow (`k` 0 upwind first). */
+export interface TurnArrowSpot {
+  x: number;
+  z: number;
+  k: number;
+}
+
+/** The turn arrows' spots for the wind blowing along the unit `dir`: down the
+ *  Cornice's two sides (the edges parallel to the wind), `arrowPerSide` a
+ *  side spaced along the flow, the far side half a space on (staggered); each
+ *  kept on the floor and clear of a lip (drawn in toward the middle or slid
+ *  along a little if not, never in past 0.45 of its way out: nothing in the
+ *  middle where the raid fights). Pure over the layout. */
+export function turnArrowSpots(dir: { x: number; z: number }): TurnArrowSpot[] {
+  const A = WIND_CUE;
+  const C = BREATH.cornice;
+  const sx = dir.z;
+  const sz = -dir.x;
+  const out: TurnArrowSpot[] = [];
+  for (const side of [1, -1]) {
+    // The Cornice's radius along the side's way (its ellipse).
+    const r = 1 / Math.hypot((sx * side) / C.rx, (sz * side) / C.rz);
+    const shift = side > 0 ? 0 : A.arrowSpacing / 2;
+    for (let k = 0; k < A.arrowPerSide; k++) {
+      const along = (k - (A.arrowPerSide - 1) / 2) * A.arrowSpacing + shift - A.arrowSpacing / 4;
+      // Drawn in toward the middle (never past 0.45 of the way), or slid a
+      // little along the flow, until it stands on the floor clear of a lip.
+      search: for (let f = A.arrowSide; f >= 0.45 - 1e-9; f -= 0.05) {
+        for (const slide of [0, -4, 4]) {
+          const x = C.x + sx * side * r * f + dir.x * (along + slide);
+          const z = C.z + sz * side * r * f + dir.z * (along + slide);
+          if (!inBreathArena(x, z) || lipDistance(x, z) < A.arrowLength * 0.45) continue;
+          out.push({ x, z, k });
+          break search;
+        }
+      }
+    }
+  }
+  return out;
+}
 
 /** The storm wall's strength for the wind's phase (0 hidden, 1 whole): whole
  *  while it blows, rising through the gather that telegraphs the coming
@@ -251,9 +306,17 @@ export function windShowsBearing(phase: BreathWindPhase | null): boolean {
   return phase === 'gather' || phase === 'gustgather' || phase === 'blow' || phase === 'gust';
 }
 
-/** The turn arrow's opacity `t` seconds after the wind turned (0 before and
- *  after its window): a quick fade in, held, then faded out by
- *  `arrowSeconds`. */
+/** A turn arrow's opacity `t` seconds after the wind turned, `k` places down
+ *  the flow (each lit `arrowStagger` after the one upwind of it, so the row
+ *  reads as the wind running along it): a quick fade in, held, faded out,
+ *  times the arrows' translucency. All done by `arrowSeconds` plus the
+ *  stagger of the last (about two seconds). */
+export function turnArrowAlphaAt(t: number, k: number): number {
+  return turnArrowAlpha(t - k * WIND_CUE.arrowStagger) * WIND_CUE.arrowOpacity;
+}
+
+/** One arrow's fade `t` seconds after it lit (0 before and after its
+ *  window): a quick fade in, held, then faded out by `arrowSeconds`. */
 export function turnArrowAlpha(t: number): number {
   const A = WIND_CUE;
   if (!(t >= 0) || t >= A.arrowSeconds) return 0;

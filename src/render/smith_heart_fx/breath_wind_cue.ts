@@ -11,8 +11,12 @@
 //                    back pushes you forward. It swings round with each turn
 //                    of the wind (its direction eased, never snapped) and
 //                    fades in the calm.
-//   The turn arrow   on each turn of the wind, ONE big arrow on the floor at
-//                    the Cornice's middle for two seconds, then gone.
+//   The turn arrows  on each turn of the wind, a few small arrows on the
+//                    floor down the Cornice's two sides (the edges parallel
+//                    to the wind), lit one after another down the flow for
+//                    about two seconds, then gone. Nothing in the middle,
+//                    where the raid fights (Jose's look of 2026-11-25: the
+//                    one big centre arrow was too big).
 //
 // Both look the same on EVERY tier: the wind's way is information a player
 // acts on (docs/design/graphics-settings-fairness.md). Reduced motion stills
@@ -24,7 +28,20 @@ import * as THREE from 'three';
 import { BREATH } from '../../sim/content/smith_heart_layout';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
-import { WIND_CUE } from './breath_fight_fx_core';
+import {
+  type TurnArrowSpot,
+  turnArrowAlphaAt,
+  turnArrowSpots,
+  WIND_CUE,
+} from './breath_fight_fx_core';
+
+/** The most turn arrows (both sides' rows). */
+const ARROW_MAX = WIND_CUE.arrowPerSide * 2;
+const _m = new THREE.Matrix4();
+const _q = new THREE.Quaternion();
+const _p = new THREE.Vector3();
+const _s = new THREE.Vector3(1, 1, 1);
+const _up = new THREE.Vector3(0, 1, 0);
 
 /** Columns round the wall's ring. */
 const WALL_SEGMENTS = 96;
@@ -91,10 +108,17 @@ void main() {
 
 const ARROW_VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
+attribute float aAlpha;
 varying vec2 vUv;
+varying float vAlpha;
 void main() {
   vUv = uv;
+  vAlpha = aAlpha;
+  #ifdef USE_INSTANCING
+  vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  #else
   vec4 wp = modelMatrix * vec4(position, 1.0);
+  #endif
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
@@ -102,10 +126,10 @@ void main() {
 /** One broad arrow in its quad's uv: u across (0..1), v along (0 tail, 1
  *  point): a shaft and a head, a dark rim round a bright core. */
 const ARROW_FRAG = /* glsl */ `
-uniform float uAlpha;
 uniform vec3 uColor;
 uniform vec3 uEdge;
 varying vec2 vUv;
+varying float vAlpha;
 float arrowMask(vec2 uv, float grow) {
   float x = abs(uv.x - 0.5) * 2.0;
   float shaft = step(x, 0.3 + grow) * step(0.02 - grow, uv.y) * step(uv.y, 0.6);
@@ -114,12 +138,12 @@ float arrowMask(vec2 uv, float grow) {
 }
 void main() {
   float outer = arrowMask(vUv, 0.05);
-  if (outer < 0.5 || uAlpha < 0.01) discard;
+  if (outer < 0.5 || vAlpha < 0.01) discard;
   float core = arrowMask(vUv, 0.0);
   // A white-hot spine down the middle of the cyan body.
   float spine = 1.0 - smoothstep(0.0, 0.35, abs(vUv.x - 0.5) * 2.0);
   vec3 col = mix(uEdge, mix(uColor, vec3(1.0), spine * 0.35) * 1.15, core);
-  gl_FragColor = vec4(col, uAlpha * mix(0.9, 0.8, core));
+  gl_FragColor = vec4(col, vAlpha * mix(0.95, 0.85, core));
   #include <colorspace_fragment>
 }
 `;
@@ -134,14 +158,18 @@ const CUE_RGB = {
   arrowEdge: 0x0d2a3a,
 } as const;
 
-/** The storm wall and the turn arrow over the Storm Cornice. */
+/** The storm wall and the turn arrows over the Storm Cornice. */
 export class BreathWindCue {
   readonly wall: THREE.Mesh;
-  readonly arrow: THREE.Mesh;
+  readonly arrow: THREE.InstancedMesh;
   private readonly wallGeo: THREE.BufferGeometry;
   private readonly wallMat: THREE.ShaderMaterial;
   private readonly arrowGeo: THREE.PlaneGeometry;
   private readonly arrowMat: THREE.ShaderMaterial;
+  private readonly arrowAlpha: THREE.InstancedBufferAttribute;
+  /** The row's spots for the bearing it was laid for. */
+  private spots: TurnArrowSpot[] = [];
+  private readonly spotDir = { x: Number.NaN, z: Number.NaN };
   private time = 0;
 
   /** Under `parent` (instance-local coordinates), round the Cornice whose
@@ -217,7 +245,6 @@ export class BreathWindCue {
     this.arrowMat = new THREE.ShaderMaterial({
       name: 'smithHeartBreathTurnArrow',
       uniforms: {
-        uAlpha: { value: 0 },
         uColor: { value: new THREE.Color(CUE_RGB.arrow) },
         uEdge: { value: new THREE.Color(CUE_RGB.arrowEdge) },
       },
@@ -231,10 +258,15 @@ export class BreathWindCue {
       polygonOffsetFactor: -2,
       polygonOffsetUnits: -2,
     });
-    this.arrow = new THREE.Mesh(this.arrowGeo, this.arrowMat);
+    this.arrowAlpha = new THREE.InstancedBufferAttribute(new Float32Array(ARROW_MAX), 1);
+    this.arrowAlpha.setUsage(THREE.DynamicDrawUsage);
+    this.arrowGeo.setAttribute('aAlpha', this.arrowAlpha);
+    this.arrow = new THREE.InstancedMesh(this.arrowGeo, this.arrowMat, ARROW_MAX);
+    this.arrow.count = 0;
     this.arrow.name = 'smithHeartBreathTurnArrow';
-    // Over the painted granite (its kit stands a hand over the field floor).
-    this.arrow.position.set(C.x, floorY + 0.35, C.z);
+    // Over the painted granite (its kit stands a hand over the field floor);
+    // each arrow's spot is claim-local, on its instance matrix.
+    this.arrow.position.y = floorY + 0.35;
     this.arrow.renderOrder = floorVfxRenderOrder('encounter', 12);
     this.arrow.frustumCulled = false;
     this.arrow.visible = false;
@@ -242,13 +274,13 @@ export class BreathWindCue {
   }
 
   /** One frame: the wall's strength (0 hides it) and the wind's way (a unit
-   *  x, z, already eased round by the caller), the turn arrow's opacity (0
-   *  hides it) along the wind's NEW way; `still` (reduced motion) holds the
-   *  clouds. */
+   *  x, z, already eased round by the caller), the seconds since the wind
+   *  turned (negative: no arrows) and its NEW way the arrows point along;
+   *  `still` (reduced motion) holds the clouds. */
   paint(
     wallStrength: number,
     dir: { x: number; z: number },
-    arrowAlpha: number,
+    sinceTurn: number,
     arrowDir: { x: number; z: number },
     dt: number,
     still: boolean,
@@ -261,15 +293,43 @@ export class BreathWindCue {
       u.uTime.value = this.time;
       (u.uDir.value as THREE.Vector2).set(dir.x, dir.z);
     }
-    this.arrowMat.uniforms.uAlpha.value = arrowAlpha;
-    this.arrow.visible = arrowAlpha > 0.01;
-    if (this.arrow.visible) this.arrow.rotation.y = Math.atan2(arrowDir.x, arrowDir.z);
+    this.paintArrows(sinceTurn, arrowDir);
+  }
+
+  /** The turn arrows: laid down the sides for a new way, each faded on its
+   *  own clock down the flow. */
+  private paintArrows(since: number, dir: { x: number; z: number }): void {
+    let any = false;
+    if (since >= 0) {
+      if (dir.x !== this.spotDir.x || dir.z !== this.spotDir.z) this.layArrows(dir);
+      const a = this.arrowAlpha.array as Float32Array;
+      for (let i = 0; i < this.spots.length; i++) {
+        a[i] = turnArrowAlphaAt(since, this.spots[i].k);
+        if (a[i] > 0.01) any = true;
+      }
+      if (any) this.arrowAlpha.needsUpdate = true;
+    }
+    this.arrow.visible = any;
+  }
+
+  /** Each arrow's spot and heading for the wind along `dir` (only on a turn). */
+  private layArrows(dir: { x: number; z: number }): void {
+    this.spotDir.x = dir.x;
+    this.spotDir.z = dir.z;
+    this.spots = turnArrowSpots(dir);
+    _q.setFromAxisAngle(_up, Math.atan2(dir.x, dir.z));
+    for (let i = 0; i < this.spots.length; i++) {
+      _p.set(this.spots[i].x, 0, this.spots[i].z);
+      this.arrow.setMatrixAt(i, _m.compose(_p, _q, _s));
+    }
+    this.arrow.count = this.spots.length;
+    this.arrow.instanceMatrix.needsUpdate = true;
   }
 
   /** Gone at once (the fight over or reset). */
   hide(): void {
     this.wallMat.uniforms.uStrength.value = 0;
-    this.arrowMat.uniforms.uAlpha.value = 0;
+    this.spotDir.x = Number.NaN;
     this.wall.visible = false;
     this.arrow.visible = false;
   }

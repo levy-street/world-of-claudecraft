@@ -2268,7 +2268,9 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   redesign the same day). A STORM WALL of churning cloud stands on the upwind edge of the
   Cornice, rising out of the void past the floor: the side the wind blows from (a storm at your
   back pushes you forward), swinging round with each turn and fading in the calm. On each turn
-  ONE big arrow lies at the Cornice's middle for 2 s, then fades. A few big gust ribbons (eight)
+  a few small arrows (three a side) light down the Cornice's two sides, the edges parallel to
+  the wind, one after another down the flow for about 2 s, then fade (Jose's look of the same
+  day: one big arrow in the middle was too big and sat where the raid fights). A few big gust ribbons (eight)
   race over the floor the way it blows, and the blow's sound is heard from upwind of the player
   (`render/smith_heart_fx/breath_wind_cue.ts`, `breath_wind_streaks.ts`, the look in
   `breath_fight_fx_core.ts` `WIND_CUE`). A small badge at the top of the screen turns an arrow
