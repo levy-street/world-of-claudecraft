@@ -14,7 +14,7 @@
 // because a new import has no pin until someone remembers to write one. This
 // test derives the set from the config's own imports instead.
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   collectLocalImportClosure,
@@ -60,6 +60,60 @@ describe('server bundle entries survive the image build context', () => {
     expect(entries).toContain('server/main.ts');
     expect(entries).toContain('scripts/migrate_release_gifts.ts');
     expect(entries.filter((path) => isIgnoredByDockerignore(dockerignore, path))).toEqual([]);
+  });
+});
+
+describe('the build:bundle scripts survive the image build context', () => {
+  // build:bundle runs after the image copies the repo, so every script it names, and
+  // everything those scripts import or read, has to reach the build stage. The
+  // static encyclopedia step (PR #4825) was the first one the Dockerfile missed.
+  const pkg = JSON.parse(readRepoFile('package.json') ?? '{}');
+  const command: string = pkg.scripts?.['build:bundle'] ?? '';
+  const scripts = [...command.matchAll(/node (scripts\/[\w./-]+\.mjs)/g)].map((m) => m[1]);
+
+  function listFiles(dir: string): string[] {
+    return readdirSync(new URL(dir, repoRoot), { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? listFiles(`${dir}/${entry.name}`)
+        : [`${dir}/${entry.name}`.replace(/^\.\//, '')],
+    );
+  }
+
+  it('keeps every script build:bundle runs, with its import closure', () => {
+    expect(scripts).toContain('scripts/wiki_site/build.mjs');
+    const dropped = scripts
+      .flatMap((script) => collectLocalImportClosure(script, readRepoFile))
+      .filter((path) => isIgnoredByDockerignore(dockerignore, path));
+    expect(dropped).toEqual([]);
+  });
+
+  it('keeps the seed writers, which the seed build bundles from generated source', () => {
+    // build_seed.mjs imports them from a source string the import walker cannot see.
+    const sources = [...listFiles('scripts/mediawiki'), ...listFiles('scripts/wiki')].filter(
+      (path) => !path.endsWith('.md'),
+    );
+    expect(sources).toContain('scripts/mediawiki/build_seed.mjs');
+    expect(sources).toContain('scripts/wiki/attack_snapshots.json');
+    expect(sources.filter((path) => isIgnoredByDockerignore(dockerignore, path))).toEqual([]);
+  });
+
+  it('copies every vite HTML entry and the encyclopedia reader into the build stage', () => {
+    const dockerfile = readRepoFile('Dockerfile') ?? '';
+    const viteConfig = readRepoFile('vite.config.ts') ?? '';
+    const entries = [...viteConfig.matchAll(/new URL\('([\w-]+\.html)', import\.meta\.url\)/g)].map(
+      (m) => m[1],
+    );
+    expect(entries).toContain('encyclopedia.html');
+    const copyLine = dockerfile.split('\n').find((line) => line.includes(' index.html ')) ?? '';
+    for (const entry of entries) {
+      expect(copyLine.split(/\s+/), `Dockerfile copies ${entry}`).toContain(entry);
+      expect(isIgnoredByDockerignore(dockerignore, entry), entry).toBe(false);
+    }
+    expect(dockerfile).toMatch(/^COPY mediawiki \.\/mediawiki$/m);
+    for (const path of ['mediawiki/site_paths.json', 'mediawiki/reader/page_render.js'])
+      expect(isIgnoredByDockerignore(dockerignore, path), path).toBe(false);
+    // The build regenerates the seed, so the committed 30 MB copy stays out.
+    expect(isIgnoredByDockerignore(dockerignore, 'mediawiki/seed/pages.xml')).toBe(true);
   });
 });
 

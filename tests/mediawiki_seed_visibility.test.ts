@@ -23,9 +23,12 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path, { resolve } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { ABILITIES } from '../src/sim/data';
+import { WEEKLY_QUESTS } from '../src/sim/content/weekly_quests';
+import { WORLD_QUESTS } from '../src/sim/content/world_quests';
+import { ABILITIES, ITEMS, MOBS, QUESTS } from '../src/sim/data';
 
 let xml = '';
+let cards: Record<string, string>;
 let workDir = '';
 
 beforeAll(() => {
@@ -36,6 +39,7 @@ beforeAll(() => {
     stdio: 'pipe',
   });
   xml = readFileSync(out, 'utf8');
+  cards = JSON.parse(readFileSync(path.join(workDir, 'pages.tooltips.json'), 'utf8'));
 }, 120_000);
 
 afterAll(() => {
@@ -44,27 +48,30 @@ afterAll(() => {
 
 describe('MediaWiki ability visibility', () => {
   it('publishes exactly the player-visible abilities', () => {
-    const actualTitles = [...xml.matchAll(/<title>([^<]+ \(Ability\)(?: \(\d+\))?)<\/title>/g)]
-      .map((match) => match[1])
+    // Abilities that share a name are told apart by a qualifier, "(Ability, arcane)",
+    // never by a bare number.
+    const published = [...xml.matchAll(/<title>([^<]+ \(Ability(?:, [^<)]+)?\))<\/title>/g)].map(
+      (match) => match[1],
+    );
+    expect(new Set(published).size).toBe(published.length);
+    const actualTitles = published
+      .map((t) => t.replace(/ \(Ability, [^)]+\)$/, ' (Ability)'))
       .sort();
-    const titleCounts = new Map<string, number>();
     const expectedTitles = Object.values(ABILITIES)
       .filter((ability) => ability.hiddenFromPlayer !== true)
-      .map((ability) => {
-        const base = `${ability.name} (Ability)`.replace(
+      .map((ability) =>
+        `${ability.name} (Ability)`.replace(
           /[&<>"']/g,
           (char) =>
             ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char] ??
             char,
-        );
-        const count = (titleCounts.get(base) ?? 0) + 1;
-        titleCounts.set(base, count);
-        return count === 1 ? base : `${base} (${count})`;
-      })
+        ),
+      )
       .sort();
 
     expect(actualTitles).toEqual(expectedTitles);
-    expect(xml).not.toContain('<title>Sacred Goad (Ability) (2)</title>');
+    expect(xml).not.toMatch(/<title>[^<]+ \(Ability\) \(\d+\)<\/title>/);
+    expect(xml).not.toMatch(/<title>Sacred Goad \(Ability, /);
     expect(xml).not.toContain('[[undefined]]');
   });
 
@@ -73,7 +80,7 @@ describe('MediaWiki ability visibility', () => {
     expect(article).toBeDefined();
     expect(article).toContain('85 Physical damage at zero Ranged Attack Power over 15 sec');
     expect(article).toContain('5 times, once every 3 sec');
-    expect(article).toContain('each tick is rounded to a whole number');
+    expect(article).toContain('Each tick is rounded to a whole number');
     expect(article).not.toMatch(/\$d|\{damage\}/);
   });
 
@@ -81,4 +88,252 @@ describe('MediaWiki ability visibility', () => {
     expect(xml).toContain('<title>Debt of Light (Ability)</title>');
     expect(xml).not.toContain('Faithforged Guard (Ability)');
   });
+});
+
+describe('the searchable player encyclopedia', () => {
+  it('has unique article destinations and resolves every internal article link', () => {
+    const titles = [...xml.matchAll(/<title>([^<]+)<\/title>/g)].map((m) => m[1]);
+    const published = new Set(titles);
+    expect(published.size).toBe(titles.length);
+    const missing = new Set<string>();
+    for (const [, title] of xml.matchAll(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g)) {
+      if (!title.startsWith('Category:') && !published.has(title)) missing.add(title);
+    }
+    expect([...missing]).toEqual([]);
+  });
+
+  it('publishes every item and creature and maps every standard, world, and weekly quest', () => {
+    const pages = xml.split('<page>').slice(1);
+    const count = (category: string) =>
+      pages.filter((p) => p.includes('[[Category:' + category + ']]'));
+    expect(count('Items').length).toBe(Object.keys(ITEMS).length);
+    // Every creature is published: enemies under Mobs, the rest as friendly creatures.
+    expect(count('Mobs').length + count('Friendly creatures').length).toBe(
+      Object.keys(MOBS).length,
+    );
+    expect(count('Friendly creatures').length).toBeGreaterThan(20);
+    const systemMaps = count('Gameplay Systems').filter((p) => p.includes('== Route map =='));
+    expect(systemMaps).toHaveLength(count('Gameplay Systems').length - 6);
+    for (const page of systemMaps)
+      expect(page).toMatch(/class=&quot;woc-map&quot;|=== Action route ===/);
+    // Dungeon and raid entrance pages carry route maps too; count quest pages only.
+    const questCategories = ['Quests', 'World quests', 'Weekly quests'];
+    const routes = pages.filter(
+      (p) =>
+        p.includes('== Route map ==') &&
+        questCategories.some((c) => p.includes('[[Category:' + c + ']]')),
+    );
+    expect(routes.length).toBe(
+      Object.keys(QUESTS).length + WORLD_QUESTS.length + WEEKLY_QUESTS.length,
+    );
+    for (const page of routes) {
+      expect(page).toContain('class=&quot;woc-map&quot;');
+      expect(page).toContain('class=&quot;woc-pin&quot;');
+    }
+    const standard = routes.filter((p) => p.includes('[[Category:Quests]]'));
+    expect(standard.length).toBe(Object.keys(QUESTS).length);
+    for (const page of standard) {
+      expect(page).toContain('== Walkthrough ==');
+      expect(page).toMatch(/title=&quot;[^&]*?\([-\d.]+, [-\d.]+\)/);
+      expect(page).toMatch(/class=&quot;woc-pin&quot; title=&quot;[S0-9/]*H(?:[/0-9]* )/);
+    }
+  });
+});
+
+describe('encyclopedia organization', () => {
+  const page = (title: string) => {
+    const m = xml.match(
+      new RegExp(
+        '<title>' +
+          title.replace(/[()]/g, '\\$&') +
+          '</title>[\\s\\S]*?<text[^>]*>([\\s\\S]*?)</text>',
+      ),
+    );
+    return m ? m[1].replaceAll('&quot;', '"').replaceAll('&amp;', '&') : '';
+  };
+  const titles = () => [...xml.matchAll(/<title>([^<]+)<\/title>/g)].map((m) => m[1]);
+  it('lists delves and rifts on the Dungeons hub and quest interiors on Zones', () => {
+    const dungeons = page('Dungeons');
+    expect(dungeons).toContain('== Delves ==');
+    expect(dungeons).toContain('== Rifts ==');
+    expect(dungeons).toContain('[[The Collapsed Reliquary (Delve)|The Collapsed Reliquary]]');
+    expect(dungeons).toContain('[[Rank S (Rift)|Rank S]]');
+    expect(dungeons).not.toContain('[[The Last Keep]]');
+    const zones = page('Zones');
+    expect(zones).toContain('== Interiors ==');
+    expect(zones).toMatch(/\[\[The Last Keep\]\] · Zone: /);
+  });
+  it('titles contracts and ferries as players read them', () => {
+    const all = titles();
+    expect(all.filter((t) => /\((?:boss|heroic|task)\) \(Contract\)$/.test(t))).toEqual([]);
+    expect(all).toContain('Morthen the Gravecaller, Heroic (Contract)');
+    expect(all).toContain('Eastbrook to Nightbloom (Ferry)');
+    expect(all.filter((t) => t.endsWith('(Ferry)') && /^[a-z]/.test(t))).toEqual([]);
+  });
+  it('names the forge trainer for the trades it teaches and groups pets and companions', () => {
+    // The NPC keeps its in-game title, but the wiki's service label and NPC group name the
+    // professions the forge actually teaches.
+    expect(titles()).not.toContain('Blacksmithing Trainer (NPCs index)');
+    expect(titles()).toContain('Armorcrafting and Weaponcrafting Trainer (NPCs index)');
+    expect(xml).not.toMatch(/! Service\n\| Blacksmithing Trainer/);
+    expect(xml).toMatch(/! Service\n\| Armorcrafting and Weaponcrafting Trainer/);
+    const systems = page('Gameplay Systems');
+    const pets = systems.split('== Pets and companions ==')[1].split('\n== ')[0];
+    for (const topic of ['Combat pets', 'Hunter pets', 'Delve companions', 'Cosmetic companions'])
+      expect(pets, topic).toContain(topic);
+  });
+});
+
+describe('headline numbers', () => {
+  it('gives every ability, talent, specialization and enemy page a stat strip', () => {
+    const pages = xml.split('<page>').slice(1);
+    const has = (p: string) => p.includes('== At a glance ==') || p.includes('== Ability stats ==');
+    for (const category of ['Talent choices', 'Specializations', 'Mobs']) {
+      const group = pages.filter((p) => p.includes('[[Category:' + category + ']]'));
+      expect(group.length, category).toBeGreaterThan(20);
+      expect(group.filter((p) => !has(p)).length, category).toBe(0);
+    }
+    const abilities = pages.filter((p) => p.includes('[[Category:Abilities]]'));
+    // The one exception is the item-used bomb, which has its own layout.
+    expect(abilities.filter((p) => !has(p)).length).toBe(1);
+    // No ability page is left with a bare formula where a percent label belongs.
+    expect(abilities.filter((p) => p.includes('&lt;woc-math&gt;')).length).toBe(0);
+  });
+  it('lists a creature with several levels in level order', () => {
+    const boar = xml.split('<page>').find((p) => p.includes('<title>Wild Boar (Mob)</title>'))!;
+    const glance = boar.split('== At a glance ==')[1].split('== Facts ==')[0];
+    expect(glance).toMatch(/! Level\n\| \d+ \/ \d+/);
+    expect(glance).toMatch(/! Health\n\| \d+ \/ \d+/);
+  });
+});
+
+describe('pages agree with themselves', () => {
+  const plain = (text: string) =>
+    text
+      .replace(/\[\[(?:[^\]|]*\|)?([^\]]+)\]\]/g, '$1')
+      .split(', ')
+      .sort();
+  it('never says an item is locked to fewer classes than its info box lets equip it', () => {
+    const pages = xml
+      .split('<page>')
+      .slice(1)
+      .map((p) => p.replaceAll('&quot;', '"'));
+    let checked = 0;
+    for (const page of pages) {
+      const locked = /Only these classes can use it: ([^\n.]+)\./.exec(page);
+      const equip = /! Can equip\n\| ([^\n]+)/.exec(page);
+      if (!locked || !equip) continue;
+      checked++;
+      expect(plain(locked[1]), page.slice(0, 80)).toEqual(plain(equip[1]));
+    }
+    expect(checked).toBeGreaterThan(50);
+    // Armor meant for one class but wearable by others says so in both places.
+    const chain = pages.find((p) => p.includes('<title>Stormkindled Chain</title>'))!;
+    expect(chain).toContain('! Made for\n| [[Shaman]]');
+    expect(chain).toContain('It is not locked to them.');
+    expect(chain).not.toContain('Only these classes can use it');
+  });
+  it('lists every Finder encounter on a dungeon page, matching the hub count', () => {
+    const crypt = xml.split('<page>').find((p) => p.includes('<title>The Hollow Crypt</title>'))!;
+    const encounters = crypt.split('== Encounters ==')[1].split('\n== ')[0];
+    const hub = xml.split('<page>').find((p) => p.includes('<title>Dungeons</title>'))!;
+    const stated = Number(/\[\[The Hollow Crypt\]\][^\n]*· (\d+) encounters/.exec(hub)![1]);
+    expect(encounters.split('\n').filter((l) => /^[*#] /.test(l))).toHaveLength(stated);
+    expect(crypt).not.toContain('== Bosses ==');
+  });
+});
+
+describe('game names, not internal names', () => {
+  // The names the specializations had before they were renamed; the ids still use them.
+  const oldSpecs = [
+    'Protection',
+    'Retribution',
+    'Restoration',
+    'Enhancement',
+    'Affliction',
+    'Destruction',
+    'Demonology',
+    'Marksmanship',
+    'Survival',
+    'Beast Mastery',
+    'Assassination',
+    'Subtlety',
+    'Discipline',
+    'Balance',
+    'Feral',
+    'Arms',
+    'Fury',
+  ].join('|');
+  it('never names a specialization by its old or internal name', () => {
+    // A tag such as "(Protection)" or "(Fury signature)", or "Protection paladin".
+    const tag = new RegExp('\\((?:' + oldSpecs + ')(?: signature)?[;)]', 'g');
+    const withClass = new RegExp(
+      '\\b(?:' +
+        oldSpecs +
+        ') (?:warrior|paladin|hunter|rogue|priest|shaman|mage|warlock|druid)\\b',
+      'gi',
+    );
+    expect(xml.match(tag) ?? []).toEqual([]);
+    expect(xml.match(withClass) ?? []).toEqual([]);
+    // The paladin tank specialization goes by its game name.
+    expect(xml).toContain('<title>Faithwarden (Specialization)</title>');
+  });
+  it('shows info rows with the game label, not a lowercase code id', () => {
+    // Zones have no player-facing biome name, so zone pages carry no Biome row.
+    expect(xml).not.toContain('! Biome');
+    for (const row of ['Quality', 'Armor type', 'Family', 'School'])
+      expect(xml.match(new RegExp('! ' + row + '\\n\\| [a-z]', 'g')) ?? [], row).toEqual([]);
+  });
+});
+
+describe('boss sections on activity pages', () => {
+  it('lists the hoard bosses on Buried hoards and the rift bosses on Rifts', () => {
+    const page = (title: string) =>
+      xml.split('<page>').find((p) => p.includes('<title>' + title + '</title>'))!;
+    const hoards = page('Buried hoards').split('== Hoard bosses ==')[1].split('\n== ')[0];
+    expect(hoards.match(/^\* /gm)).toHaveLength(12);
+    expect(hoards).toContain('Cave hoards (common and rare maps)');
+    expect(hoards).toContain('(Hoard encounter)|how the fight works]]');
+    const rifts = page('Rifts').split('== Rift bosses ==')[1].split('\n== ')[0];
+    expect(rifts.match(/^\* /gm)).toHaveLength(10);
+    expect(rifts).toContain('(Rift floor)|');
+  });
+});
+
+describe('the encyclopedia hover catalog', () => {
+  it('maps every item and visible ability to its reserved article title', () => {
+    const expected = xml
+      .split('<page>')
+      .slice(1)
+      .filter(
+        (page) => page.includes('[[Category:Items]]') || page.includes('[[Category:Abilities]]'),
+      )
+      .map((page) => page.match(/<title>([^<]+)<\/title>/)![1])
+      .sort();
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&apos;',
+    };
+    expect(
+      Object.keys(cards)
+        .map((title) => title.replace(/[&<>"']/g, (c) => entities[c]))
+        .sort(),
+    ).toEqual(expected);
+    for (const [title, html] of Object.entries(cards)) {
+      expect(html, title).toContain('class="tt-title"');
+    }
+    expect(cards['Clockwork Shock Bomb (Ability)']).toBe(cards['Clockwork Shock Bomb']);
+  });
+  it.runIf(process.env.MEDIAWIKI_SEED_RELEASE_TIER === '1')(
+    'ships the regenerated tooltips',
+    () => {
+      expect(
+        readFileSync('mediawiki/seed/pages.tooltips.json', 'utf8') ===
+          readFileSync(path.join(workDir, 'pages.tooltips.json'), 'utf8'),
+      ).toBe(true);
+    },
+  );
 });

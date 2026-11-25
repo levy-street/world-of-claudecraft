@@ -9211,6 +9211,7 @@ export const ja_JP: EnTranslations = {
     "related": "関連項目",
     "nav": {
       "overview": "概要",
+      "encyclopedia": "百科事典",
       "howToPlay": "遊び方",
       "classes": "クラス",
       "bestiary": "モンスター図鑑",
@@ -9316,6 +9317,7 @@ export const ja_JP: EnTranslations = {
       "subtitle": "世界を探索し、クエストに挑み、仲間とダンジョンを攻略しよう。",
       "ctaPlay": "今すぐプレイ",
       "ctaLearn": "遊び方",
+      "encyclopedia": "百科事典",
       "what": {
         "heading": "気軽に始められる、クラシックMMO",
         "pillarPlayTitle": "サイトを開いて遊ぶ",

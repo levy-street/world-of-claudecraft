@@ -10411,6 +10411,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.nav.gear': 'Utrustning och föremål',
   'guide.nav.glossary': 'Ordlista',
   'guide.nav.howToPlay': 'Så spelar du',
+  'guide.nav.encyclopedia': 'Uppslagsverk',
+  'guide.home.encyclopedia': 'Uppslagsverk',
   'guide.nav.models': '3D-modeller',
   'guide.nav.onThisPage': 'På den här sidan',
   'guide.nav.openMenu': 'Öppna menyn',

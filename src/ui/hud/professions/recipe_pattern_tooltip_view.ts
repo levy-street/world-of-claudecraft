@@ -271,10 +271,15 @@ function patternProductLines(
  *  the gate lines (see the header). */
 export function recipePatternTooltipLines(
   item: ItemDef,
-  viewer: RecipePatternViewerInput,
+  viewer: RecipePatternViewerInput | null,
   productCard?: RecipeProductCard,
 ): string {
-  const model = recipePatternTooltipModel(item, viewer);
+  // A public item reference knows the recipe requirement but has no character's
+  // craft snapshot to color it against or learned list to decorate it with.
+  const model = recipePatternTooltipModel(
+    item,
+    viewer ?? { synced: false, knownRecipes: [], craftSkills: {} },
+  );
   if (!model) return '';
   return patternGateLines(model, viewer) + patternProductLines(model, productCard);
 }
@@ -282,7 +287,7 @@ export function recipePatternTooltipLines(
 /** The teaches line, then (once synced) the requirement and known lines. */
 function patternGateLines(
   model: RecipePatternTooltipModel,
-  viewer: RecipePatternViewerInput,
+  viewer: RecipePatternViewerInput | null,
 ): string {
   let html = '';
   // hasOwn-gated like icons.ts itemFallback: ITEMS is a prototype-bearing
@@ -307,7 +312,7 @@ function patternGateLines(
   // client does not have until its first cprof snapshot lands. Stop at the
   // teaches line until then: a possibly-wrong red gate is worse than a short
   // tooltip, and the lines reappear a snapshot later on their own.
-  if (!viewer.synced) return html;
+  if (viewer && !viewer.synced) return html;
   // The same requirement line the crafting window and the gathering tool card
   // render, with the same guard as gather_tool_tooltip.ts: no printable craft
   // name means no line, because falling back to the raw id would print
@@ -316,7 +321,7 @@ function patternGateLines(
   const professionNameKey = craftNameKey(model.professionId);
   if (model.skillReq > 0 && professionNameKey !== undefined) {
     html += tooltipLine(
-      model.skillMet ? 'tt-sub' : 'tt-red',
+      viewer && !model.skillMet ? 'tt-red' : 'tt-sub',
       t('hudChrome.crafting.skillReqLine', {
         craft: t(professionNameKey),
         skill: formatNumber(model.skillReq, { maximumFractionDigits: 0 }),

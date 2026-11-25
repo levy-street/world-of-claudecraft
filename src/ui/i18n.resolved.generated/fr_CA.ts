@@ -9211,6 +9211,7 @@ export const fr_CA: EnTranslations = {
     "related": "À voir aussi",
     "nav": {
       "overview": "Aperçu",
+      "encyclopedia": "Encyclopédie",
       "howToPlay": "Comment jouer",
       "classes": "Classes",
       "bestiary": "Bestiaire",
@@ -9316,6 +9317,7 @@ export const fr_CA: EnTranslations = {
       "subtitle": "Explorez le monde, accomplissez des quêtes et affrontez des donjons entre amis.",
       "ctaPlay": "Jouer maintenant",
       "ctaLearn": "Comment jouer",
+      "encyclopedia": "Encyclopédie",
       "what": {
         "heading": "Un MMO classique, conçu pour être pris en main",
         "pillarPlayTitle": "Ouvrez le site et jouez",

@@ -19,6 +19,9 @@ const RUNTIME_SFX_PACK = '/audio/sfx/runtime-pack.json';
 // to verify against a live re-hash the way the SFX Studio pack requires.
 const VERSIONED_VOICE = /^\/audio\/voice\/[a-z0-9_]+\/[a-z0-9_]+\.mp3\?v=[a-f0-9]{12}$/;
 const VERSIONED_MUSIC = /^\/audio\/music\/[a-z0-9_]+\.mp3\?v=[a-f0-9]{12}$/;
+// The encyclopedia's search index and hover cards (scripts/wiki_site/build.mjs) carry a
+// content hash in the file name. Its redirects.json has none and stays revalidated.
+const HASHED_WIKI_DATA = /^\/encyclopedia-data\/(?:search|cards)\.[a-f0-9]{10}\.json$/;
 
 export function isPublicSfxPath(urlPath: string): boolean {
   return (
@@ -47,7 +50,8 @@ export function cacheControlFor(urlPath: string, actualSfxHash?: string): string
   return IMMUTABLE_PREFIXES.some((prefix) => urlPath.startsWith(prefix)) ||
     (requested !== null && actualSfxHash?.startsWith(requested)) ||
     VERSIONED_VOICE.test(urlPath) ||
-    VERSIONED_MUSIC.test(urlPath)
+    VERSIONED_MUSIC.test(urlPath) ||
+    HASHED_WIKI_DATA.test(urlPath)
     ? 'public, max-age=31536000, immutable'
     : 'no-cache';
 }

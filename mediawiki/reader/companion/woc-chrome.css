@@ -1,0 +1,1156 @@
+/* ==========================================================================
+   WoC chrome: the shared look of the World of ClaudeCraft companion sites
+   (Parses, Scout, Records).
+
+   Every site carries a VERBATIM copy of this file. The canonical copy lives
+   at woc-parse-service/dashboard/public/woc-chrome.css: edit it there, then
+   copy it across. Site-specific rules belong in each site's own stylesheet,
+   loaded after this one, so anything here can be overridden per site.
+
+   The look: Cinzel display + Alegreya Sans UI, gold on near-black, with a
+   parchment "day" theme behind body.day. Fonts are served from each site's
+   own /assets/fonts (SIL OFL 1.1); no network assets.
+
+   Responsive tiers, mobile first (base rules are the phone layout):
+     mobile   0-767px      header brand + icon tools, menu as a scrolling strip
+     tablet   768-1023px   subtitle and tool labels return, menu on its own row
+     laptop   1024-1439px  the desktop header on one row, content column fluid
+     desktop  1440px+      the reference design, content column at 1280px
+   Sites align their own breakpoints to these widths.
+
+   Header contract (see woc-chrome.js for the tools):
+
+     <header class="app-header">
+       <a class="app-brand" href="...">
+         <img class="app-logo" src="/assets/woc-logo-guide.webp" alt="World of ClaudeCraft">
+         <span class="app-titles">
+           <h1 class="app-title">WoC Parses</h1>
+           <p class="app-subtitle">Combat parse archive</p>
+         </span>
+       </a>
+       <nav class="app-nav" aria-label="Sections">
+         <a class="active" href="#/">Characters</a> ...        (or <button data-view>)
+       </nav>
+       <div class="app-tools" data-woc-tools></div>              (switcher + theme toggle)
+     </header>
+     <main>...</main>
+     <footer class="app-footer" data-woc-footer></footer>
+   ========================================================================== */
+
+/* ---- fonts --------------------------------------------------------------- */
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/assets/fonts/cinzel-400-700-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Alegreya Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/alegreya-sans-400-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Alegreya Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/assets/fonts/alegreya-sans-500-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Alegreya Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/alegreya-sans-700-latin.woff2') format('woff2');
+}
+
+/* ---- palette ------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --bg: #0c1016;
+  --bg-2: #11151b;
+  --panel: #1a2029;
+  --gold: #e9cf8c;
+  --gold-dim: #c8ad72;
+  --border: #675c45;
+  --border-soft: #30363e;
+  --text: #f3efe1;
+  --text-dim: #c0c4cb;
+  --muted: #a0a8b4;
+  --on-gold: #1a1405;
+  --wash-gold: #ffd1000f;
+  --wash-gold-strong: #ffd1001a;
+  --grid: #2a2418;
+  --baseline: #463a1c;
+  --field: #0c141f;
+  --chipbg: #151c25;
+  --title-shadow: 1px 1px 2px #000;
+  --body-glow: #15131d;
+  --header-grad: #11151b;
+  --pop-shadow: 0 12px 32px #000c;
+  --font-display: 'Cinzel', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-ui: 'Alegreya Sans', 'Segoe UI', system-ui, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ornament: linear-gradient(
+    90deg,
+    transparent 0%,
+    #6f5a2a 18%,
+    #c8a838 50%,
+    #6f5a2a 82%,
+    transparent 100%
+  );
+  --ornament-gem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Crect x='2.2' y='2.2' width='5.6' height='5.6' transform='rotate(45 5 5)' fill='%23c8a838'/%3E%3C/svg%3E");
+  /* functional colours shared by every site */
+  --good: #4fae57;
+  --bad: #d9564e;
+  --neutral: var(--muted);
+  --epic: #a335ee;
+  --legendary: #ff8000;
+  --on-badge: #14161a;
+  /* shared measurements: every site's header, logo and content column match.
+     The gutter and logo grow with the tier (see the media queries below). */
+  --content-width: 1280px;
+  --gutter: 12px;
+  --logo-height: 38px;
+}
+
+/* day theme: the parchment variant of the same tokens. The golds darken so
+   titles, links and lit chips keep their contrast on the light ground. */
+body.day {
+  color-scheme: light;
+  --bg: #ece3c8;
+  --bg-2: #f6f0dd;
+  --panel: #f6f0e0;
+  --gold: #8a660f;
+  --gold-dim: #75590f;
+  --border: #b39a55;
+  --border-soft: #d5c69a;
+  --text: #2a2313;
+  --text-dim: #5d5231;
+  --muted: #6f6245;
+  --on-gold: #fffbe9;
+  --wash-gold: #8a6d2a14;
+  --wash-gold-strong: #8a6d2a26;
+  --grid: #d8cba3;
+  --baseline: #b39a55;
+  --field: #fbf6e7;
+  --chipbg: #f6f0dd;
+  --title-shadow: none;
+  --body-glow: #f8f2df;
+  --header-grad: #f6f0dd;
+  --pop-shadow: 0 12px 32px #6b543244;
+  --ornament: linear-gradient(
+    90deg,
+    transparent 0%,
+    #b39a55 18%,
+    #8a6d2a 50%,
+    #b39a55 82%,
+    transparent 100%
+  );
+  --good: #2c7a38;
+  --bad: #b23a32;
+  --epic: #8a2bd0;
+  --legendary: #c25e00;
+}
+
+/* ---- base ---------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* nothing on any site may widen the page sideways; wide tables scroll
+     inside their own cards instead */
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font: 15px/1.5 var(--font-ui);
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, var(--body-glow) 0%, transparent 60%),
+    var(--bg);
+  min-height: 100vh;
+  overflow-wrap: anywhere;
+}
+
+/* content images never exceed their column; explicitly sized art (icons,
+   portraits, the header logo) keeps its own rules */
+main img,
+main svg,
+main video {
+  max-width: 100%;
+}
+
+a {
+  color: var(--gold-dim);
+}
+
+a:hover {
+  color: var(--gold);
+}
+
+/* Page titles: display face with the ornament rule drawn beneath. Sites that
+   render the ornament as their own element disable the ::after rule. */
+h2 {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(24px, 1.1rem + 1.3vw, 32px);
+  line-height: 1.2;
+  color: var(--text);
+  text-shadow: var(--title-shadow);
+}
+
+h2::after,
+.ornament {
+  content: '';
+  display: block;
+  height: 9px;
+  margin: 8px 0 6px;
+  max-width: 420px;
+  background:
+    center / 9px 9px no-repeat var(--ornament-gem),
+    center / 100% 1px no-repeat var(--ornament);
+}
+
+.ornament {
+  margin: 10px 0 12px;
+}
+
+h3 {
+  margin: 18px 0 8px;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.crumb {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sub {
+  margin: 0 0 18px;
+  color: var(--text-dim);
+  font-size: 14px;
+  max-width: 78ch;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.hint {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.error {
+  color: var(--bad);
+  margin: 8px 0;
+}
+
+button {
+  background: var(--bg-2);
+  color: var(--text-dim);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 4px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--gold-dim);
+  color: var(--text);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+input,
+select {
+  background: var(--field);
+  color: var(--text);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font: inherit;
+  font-size: 13.5px;
+  max-width: 100%;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--gold-dim);
+  border-color: var(--border-soft);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--gold-dim);
+  outline-offset: 1px;
+}
+
+/* ---- header (mobile first) ----------------------------------------------- */
+.app-header {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 8px var(--gutter);
+  background: var(--header-grad);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+}
+
+.app-brand:hover {
+  color: inherit;
+}
+
+.app-brand:hover .app-title {
+  color: var(--gold);
+  text-shadow: var(--title-shadow), 0 0 14px #ffd10055;
+}
+
+body.day .app-brand:hover .app-title {
+  text-shadow: none;
+}
+
+.app-logo {
+  flex: none;
+  height: var(--logo-height);
+  width: auto;
+  filter: drop-shadow(0 2px 6px #0009);
+}
+
+body.day .app-logo {
+  filter: drop-shadow(0 2px 5px #6b543255);
+}
+
+.app-titles {
+  display: block;
+  min-width: 0;
+}
+
+.app-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(19px, 1.05rem + 0.5vw, 22px);
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  text-shadow: var(--title-shadow);
+  white-space: nowrap;
+}
+
+.app-subtitle {
+  display: none;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Primary menu. On phones it is a strip of pills on its own row that scrolls
+   sideways; wider tiers turn it back into the inline row of the reference
+   design. */
+.app-nav {
+  display: flex;
+  align-items: center;
+  order: 10;
+  flex: 1 0 100%;
+  flex-wrap: nowrap;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.app-nav a,
+.app-nav button {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.3;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.app-nav a:hover,
+.app-nav button:hover:not(:disabled) {
+  background: var(--wash-gold);
+  color: var(--text);
+  border-color: var(--border-soft);
+}
+
+.app-nav a.active,
+.app-nav button.active {
+  background: var(--wash-gold-strong);
+  color: var(--gold);
+  border-color: var(--gold-dim);
+}
+
+.app-nav .n {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tools: site switcher, theme toggle and any site-specific buttons, always at
+   the header's right edge and centred on the brand. */
+.app-tools {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--bg-2);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.tool-btn:hover:not(:disabled),
+.tool-btn[aria-expanded='true'] {
+  border-color: var(--gold-dim);
+  color: var(--text);
+}
+
+.tool-btn svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tool-btn svg.filled {
+  fill: currentColor;
+  stroke: none;
+}
+
+.tool-btn .chev {
+  width: 12px;
+  height: 12px;
+  margin-left: -2px;
+  opacity: 0.7;
+}
+
+/* phones show the tools as icons; the label returns from the tablet tier */
+.tool-btn .tool-label {
+  display: none;
+}
+
+.theme-toggle .sun {
+  display: none;
+}
+
+body.day .theme-toggle .sun {
+  display: block;
+}
+
+body.day .theme-toggle .moon {
+  display: none;
+}
+
+/* Site switcher: the family menu, one popover on every site. */
+.site-switch {
+  position: relative;
+}
+
+.site-switch-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 60;
+  width: min(262px, calc(100vw - 2 * var(--gutter)));
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--pop-shadow);
+}
+
+.site-switch-pop .pop-head {
+  padding: 6px 10px 5px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.site-link {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.site-link:hover {
+  background: var(--wash-gold);
+  color: var(--text);
+}
+
+.site-link.current {
+  background: var(--wash-gold-strong);
+  cursor: default;
+}
+
+.site-link b {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--gold);
+}
+
+.site-link span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---- layout -------------------------------------------------------------- */
+main {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 16px var(--gutter) 56px;
+}
+
+/* Back to the parent page, filters preserved: the same pill on every site. */
+.back-link,
+.backbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  padding: 5px 14px 5px 11px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--bg-2);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 13.5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.back-link:hover,
+.backbtn:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
+.app-footer {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 14px var(--gutter) 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.app-footer .foot-family {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.app-footer .foot-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-right: 4px;
+}
+
+.app-footer a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  color: var(--gold);
+  text-decoration: underline;
+}
+
+.app-footer .current {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* ---- panels -------------------------------------------------------------- */
+.card {
+  background: var(--bg-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 12px 14px 10px;
+  margin: 0 0 14px;
+  box-shadow: 0 1px 2px #00000040;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-bottom: 8px;
+}
+
+.card-head h3,
+.card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--gold-dim);
+}
+
+.card-title {
+  margin-bottom: 6px;
+}
+
+.card-head .toggle {
+  margin-left: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+  background: none;
+  padding: 2px 10px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.card-head .toggle:hover {
+  border-color: var(--gold-dim);
+}
+
+/* Headline tiles: two per row on phones, a wrapping row from the tablet tier. */
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.tile {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: inset 0 1px 0 #ffffff0d;
+}
+
+.tile .label {
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tile .value {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 1.1rem + 0.9vw, 28px);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--gold);
+  text-shadow: var(--title-shadow);
+  font-variant-numeric: tabular-nums;
+}
+
+.tile .note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Filter bars: fields pair up on phones and fill their half; from the tablet
+   tier they sit at their natural width. */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 #ffffff0d;
+}
+
+label.field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.filter-bar > label.field {
+  flex: 1 1 calc(50% - 5px);
+  min-width: 0;
+}
+
+.filter-bar > label.field > input:not([type='checkbox']),
+.filter-bar > label.field > select,
+.filter-bar > label.field > .multi-select,
+.filter-bar > label.field > .multi-select > .multi-summary {
+  width: 100%;
+}
+
+.filter-bar > button {
+  flex: 1 1 100%;
+}
+
+/* ---- tables -------------------------------------------------------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 7px 12px 7px 0;
+  border-bottom: 1px solid var(--border-soft);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Long tables keep their header in view; inside a card it takes the card's
+   ground so rows scroll cleanly beneath it. (Below the desktop tier a table
+   card scrolls sideways instead, which also parks the sticky header.) */
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg);
+}
+
+.card thead th {
+  background: var(--bg-2);
+}
+
+td.num,
+th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+tbody tr:hover td {
+  background: var(--wash-gold);
+}
+
+tr.clickable {
+  cursor: pointer;
+}
+
+.card table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Wide tables scroll inside their own container instead of the page: the
+   root clips sideways overflow, so a table that widened the page would leave
+   its last columns unreachable. Every card scrolls, so a bare <table> under
+   .card is covered; wrap tables outside cards in .table-scroll. */
+.table-scroll,
+.tbl-wrap,
+.table-card,
+.card {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+thead th[data-sort]::after {
+  content: '';
+  display: inline-block;
+  margin-left: 5px;
+  vertical-align: 2px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+thead th[data-sort='asc']::after {
+  border-bottom: 5px solid var(--gold);
+}
+
+thead th[data-sort='desc']::after {
+  border-top: 5px solid var(--gold);
+}
+
+/* ---- badges, chips and bars ---------------------------------------------- */
+.badge {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-2);
+  color: var(--text-dim);
+}
+
+.badge.class-badge {
+  color: var(--on-badge);
+  border: none;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.badge.heroic {
+  color: var(--gold);
+  border-color: var(--border);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  margin: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--chipbg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  border-color: var(--gold-dim);
+}
+
+.chip.on {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--on-gold);
+  font-weight: 700;
+}
+
+.bar-track {
+  position: relative;
+  background: var(--field);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  height: 14px;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--gold-dim);
+  border-radius: 3px;
+}
+
+/* ---- tablet: 768px and up ------------------------------------------------ */
+@media (min-width: 768px) {
+  :root {
+    --gutter: 24px;
+    --logo-height: 42px;
+  }
+
+  .app-header {
+    gap: 8px 16px;
+    padding: 10px var(--gutter);
+    min-height: 64px;
+  }
+
+  .app-brand {
+    gap: 14px;
+  }
+
+  .app-subtitle {
+    display: block;
+  }
+
+  /* the menu keeps its own row but wraps as plain pills instead of scrolling */
+  .app-nav {
+    flex-wrap: wrap;
+    gap: 2px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .app-nav a,
+  .app-nav button {
+    padding: 6px 12px;
+    border: 0;
+    border-radius: 8px;
+  }
+
+  .tool-btn {
+    height: 34px;
+    padding: 0 13px;
+  }
+
+  .tool-btn .tool-label {
+    display: inline;
+  }
+
+  main {
+    padding: 20px var(--gutter) 60px;
+  }
+
+  .app-footer {
+    padding: 16px var(--gutter) 28px;
+  }
+
+  .card {
+    padding: 14px 18px 12px;
+  }
+
+  .tiles {
+    gap: 12px;
+  }
+
+  .tile {
+    flex: 1 1 160px;
+    max-width: 240px;
+    padding: 12px 16px;
+  }
+
+  .filter-bar {
+    padding: 11px 14px;
+  }
+
+  .filter-bar > label.field {
+    flex: 0 1 auto;
+  }
+
+  .filter-bar > label.field > input:not([type='checkbox']),
+  .filter-bar > label.field > select,
+  .filter-bar > label.field > .multi-select,
+  .filter-bar > label.field > .multi-select > .multi-summary {
+    width: auto;
+  }
+
+  .filter-bar > button {
+    flex: none;
+  }
+}
+
+/* ---- laptop: 1024px and up ----------------------------------------------- */
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 30px;
+    --logo-height: 46px;
+  }
+
+  /* the reference header: brand, menu and tools on one row. This is the
+     tightest tier, so the tools go icon-only (tooltips carry the labels) and
+     a long subtitle is capped; a menu that is still too wide scrolls sideways
+     rather than wrapping. */
+  .app-header {
+    flex-wrap: nowrap;
+    gap: 10px 18px;
+    padding: 11px 26px;
+    min-height: 70px;
+  }
+
+  .app-subtitle {
+    max-width: 240px;
+  }
+
+  .app-nav {
+    order: 0;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0;
+  }
+
+  .tool-btn {
+    padding: 0 10px;
+  }
+
+  .tool-btn .tool-label {
+    display: none;
+  }
+
+  main {
+    padding: 24px var(--gutter) 70px;
+  }
+
+  .app-footer {
+    padding: 16px var(--gutter) 30px;
+  }
+}
+
+/* ---- desktop: 1440px and up ---------------------------------------------- */
+@media (min-width: 1440px) {
+  .app-subtitle {
+    max-width: none;
+  }
+
+  .tool-btn {
+    padding: 0 13px;
+  }
+
+  .tool-btn .tool-label {
+    display: inline;
+  }
+
+  /* everything fits: tables stop scrolling inside their cards so the sticky
+     column headers work on the long lists */
+  .table-card,
+  .card {
+    overflow-x: visible;
+  }
+}
+
+/* Language picker: a native select dressed as a tool pill (woc-chrome.js
+   pickerHtml). The endonym list is the same on every WoC site. */
+.lang-picker {
+  position: relative;
+  padding-right: 10px;
+}
+
+.lang-picker .lang-select {
+  appearance: none;
+  -webkit-appearance: none;
+  max-width: 11em;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.lang-picker .lang-select:focus {
+  outline: none;
+}
+
+.lang-picker:focus-within {
+  border-color: var(--gold-dim);
+  color: var(--text);
+}
+
+.lang-picker .lang-select option {
+  color: var(--text);
+  background: var(--bg-2);
+}
+
+/* phones: the globe and the chevron frame a narrow select */
+@media (max-width: 767px) {
+  .lang-picker .lang-select {
+    max-width: 7em;
+    font-size: 12px;
+  }
+}
+
+/* visually hidden, still read by assistive technology (labels, live regions) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

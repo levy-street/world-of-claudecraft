@@ -10566,6 +10566,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.nav.gear': 'Uitrusting & Voorwerpen',
   'guide.nav.glossary': 'Begrippenlijst',
   'guide.nav.howToPlay': 'Hoe te spelen',
+  'guide.nav.encyclopedia': 'Encyclopedie',
+  'guide.home.encyclopedia': 'Encyclopedie',
   'guide.nav.models': '3D-modellen',
   'guide.nav.onThisPage': 'Op deze pagina',
   'guide.nav.openMenu': 'Menu openen',

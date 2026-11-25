@@ -9211,6 +9211,7 @@ export const vi_VN: EnTranslations = {
     "related": "Liên quan",
     "nav": {
       "overview": "Tổng Quan",
+      "encyclopedia": "Bách khoa toàn thư",
       "howToPlay": "Cách Chơi",
       "classes": "Lớp Nhân Vật",
       "bestiary": "Bách Thú",
@@ -9316,6 +9317,7 @@ export const vi_VN: EnTranslations = {
       "subtitle": "Khám phá thế giới, nhận nhiệm vụ và chinh phục hầm ngục cùng bạn bè.",
       "ctaPlay": "Chơi Ngay",
       "ctaLearn": "Cách Chơi",
+      "encyclopedia": "Bách khoa toàn thư",
       "what": {
         "heading": "Một MMO cổ điển, được làm ra để dễ bắt nhịp",
         "pillarPlayTitle": "Mở trang và chơi",

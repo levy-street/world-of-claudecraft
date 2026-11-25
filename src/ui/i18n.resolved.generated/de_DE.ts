@@ -9211,6 +9211,7 @@ export const de_DE: EnTranslations = {
     "related": "Verwandtes",
     "nav": {
       "overview": "Übersicht",
+      "encyclopedia": "Enzyklopädie",
       "howToPlay": "So wird gespielt",
       "classes": "Klassen",
       "bestiary": "Bestiarium",
@@ -9316,6 +9317,7 @@ export const de_DE: EnTranslations = {
       "subtitle": "Erkunde die Welt, nimm Quests an und meistere Dungeons mit Freunden.",
       "ctaPlay": "Jetzt spielen",
       "ctaLearn": "So wird gespielt",
+      "encyclopedia": "Enzyklopädie",
       "what": {
         "heading": "Ein klassisches MMO, gemacht zum Loslegen",
         "pillarPlayTitle": "Seite öffnen und spielen",

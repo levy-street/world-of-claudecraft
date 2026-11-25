@@ -422,3 +422,249 @@ body {
     font-size: 1.9rem;
   }
 }
+
+.woc-map {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  aspect-ratio: 1.65;
+  max-width: 820px;
+  margin: 12px 0;
+  border: 1px solid #849687;
+  border-radius: 4px;
+  background-color: #c7d6bd;
+  background-image:
+    linear-gradient(90deg, #aabbab55 1px, transparent 1px),
+    linear-gradient(#aabbab55 1px, transparent 1px);
+  background-size: 10% 10%;
+  background-repeat: no-repeat;
+}
+.woc-map::after {
+  content: "N ↑";
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  color: #17362b;
+  background: #fbf9eddd;
+  padding: 0 5px;
+  font: 700 12px / 23px system-ui;
+  border-radius: 3px;
+}
+.woc-pin,
+.woc-radius {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.woc-pin {
+  z-index: 2;
+  min-width: 17px;
+  text-align: center;
+  padding: 1px 4px;
+  border-radius: 9px;
+  background: #183f31;
+  color: #fff9d8;
+  border: 1px solid #fff7d6;
+  font: 700 11px / 15px system-ui;
+  box-shadow: 0 1px 2px #0008;
+}
+.woc-radius {
+  border-radius: 50%;
+  border: 2px dashed #98631f;
+  background: #f1cb7940;
+}
+
+.woc-map[data-zone="amberfall"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/amberfall.webp");
+}
+.woc-map[data-zone="drakelands"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/drakelands.webp");
+}
+.woc-map[data-zone="eastbrook_vale"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/eastbrook_vale.webp");
+}
+.woc-map[data-zone="evergarden"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/evergarden.webp");
+}
+.woc-map[data-zone="farshore_isle"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/farshore_isle.webp");
+}
+.woc-map[data-zone="frostveil"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/frostveil.webp");
+}
+.woc-map[data-zone="galecrest"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/galecrest.webp");
+}
+.woc-map[data-zone="mirefen_marsh"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/mirefen_marsh.webp");
+}
+.woc-map[data-zone="nightbloom"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/nightbloom.webp");
+}
+.woc-map[data-zone="palmreach"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/palmreach.webp");
+}
+.woc-map[data-zone="proving_shore"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/proving_shore.webp");
+}
+.woc-map[data-zone="thornpeak_heights"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/thornpeak_heights.webp");
+}
+.woc-map[data-zone="veiled_hollow"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/veiled_hollow.webp");
+}
+.woc-map[data-zone="willowfen"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/willowfen.webp");
+}
+.woc-map[data-zone="wraithwood"] {
+  background-image: url("/wiki/resources/assets/game/map_bg/wraithwood.webp");
+}
+
+.woc-page-art {
+  display: block;
+  max-width: 180px;
+  height: 88px;
+  object-fit: contain;
+  margin: 12px 0;
+}
+
+.woc-inline-art {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 0.3em;
+}
+.woc-landmark {
+  position: absolute;
+  transform: translate(-50%, 14px);
+  color: #fff4d6;
+  background: #18251ddd;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font: 600 11px / 16px system-ui;
+  white-space: nowrap;
+}
+
+/* Formulas (<woc-math>): a set-apart chip with real stacked fractions. */
+.woc-math {
+  display: inline-block;
+  padding: 0.1em 0.4em;
+  margin: 0.15em 0;
+  background: var(--woc-parchment-2);
+  border: 1px solid var(--woc-rule);
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+  vertical-align: middle;
+}
+.woc-frac {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  margin: 0 0.2em;
+  font-size: 0.9em;
+  line-height: 1.2;
+  text-align: center;
+}
+.woc-frac-top {
+  padding: 0 0.25em 0.1em;
+  border-bottom: 1px solid currentColor;
+}
+.woc-frac-bottom {
+  padding: 0.1em 0.25em 0;
+}
+.woc-math-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.woc-math sup {
+  font-size: 0.75em;
+}
+
+/* Power bonus: a short label, with the working in a pop-up on hover, focus or tap. */
+.woc-scale {
+  position: relative;
+  color: var(--woc-link);
+  white-space: nowrap;
+  border-bottom: 1px dotted currentColor;
+  cursor: help;
+}
+.woc-scale-tip {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  width: max-content;
+  max-width: min(420px, 80vw);
+  padding: 10px 12px;
+  background: var(--woc-parchment);
+  border: 1px solid var(--woc-rule-strong);
+  border-radius: 5px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  white-space: normal;
+  font-weight: 400;
+  cursor: default;
+}
+.woc-scale:hover .woc-scale-tip,
+.woc-scale:focus .woc-scale-tip,
+.woc-scale:focus-within .woc-scale-tip {
+  display: block;
+}
+.woc-scale-tip .woc-math {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.woc-scale-tip small {
+  display: block;
+  margin-top: 6px;
+  color: var(--woc-ink-soft);
+  font-size: 13px;
+}
+
+/* Loot tables: header band, zebra rows, aligned numbers. */
+.loot-table {
+  width: 100%;
+}
+.loot-table th {
+  text-align: left;
+}
+.loot-table td:nth-child(3) {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.loot-table .woc-inline-art {
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* A creature's or NPC's model render. */
+.woc-model-art {
+  float: right;
+  width: 260px;
+  max-width: 45%;
+  height: auto;
+  margin: 0 0 12px 16px;
+}
+
+/* A boss attack's in-game snapshot. */
+.woc-attack-art {
+  float: left;
+  width: 192px;
+  height: auto;
+  margin: 0 14px 8px 0;
+  border: 1px solid #3a3f4b;
+  border-radius: 4px;
+}
+li:has(> .woc-attack-art) {
+  list-style: none;
+  overflow: hidden;
+}

@@ -26,6 +26,7 @@ dependency set. The one sanctioned exception is the standalone admin dashboard
 | `src/net/` | Online client: REST auth + WebSocket world mirror (`ClientWorld`), reconnect, native-app glue, wallet glue. |
 | `src/admin/` | Admin dashboard SPA (separate `admin.html` entry). |
 | `src/guide/` | Public guide/wiki SPA (separate `guide.html` entry, served at `/wiki`); spoiler-safe content generated from `src/sim/`. |
+| `scripts/wiki_site/` + `mediawiki/reader/` | The static player encyclopedia under `/wiki/<section>/<slug>`, built from the game data on every `npm run build` (`docs/wiki-encyclopedia.md`). |
 | `src/editor/` | World editor SPA (separate root-level `editor.html` entry); its 3D viewport composes the real `Sim` + `Renderer`. |
 | `src/world_api.ts` + `src/world_api/` | `IWorld`, the seam render/ui depend on: one facet interface per domain file under `src/world_api/`, re-aggregated by the barrel (see Architecture). |
 | `src/main.ts` | Client entry (index.html reaches it through `src/boot.ts`); fixes the world seed. |
@@ -248,7 +249,9 @@ Use the seams this repo already has, do not invent new ones:
   `src/sim/content/`, merged by `data.ts`, never a content table inline in `sim.ts`. Every
   content change carries ALL of its same-change obligations: wiki regen
   (`npm run wiki:content`, freshness-gated by `tests/guide.test.ts`) plus any new `guide.*`
-  prose keys; Book of Deeds records in `src/sim/content/deeds.ts` for every new piece of
+  prose keys; encyclopedia addresses (`npm run wiki:paths` pins new, renamed or removed
+  pages in `mediawiki/site_paths.json`, audited by `tests/wiki_site_audit.test.ts`; see
+  `docs/wiki-encyclopedia.md`); Book of Deeds records in `src/sim/content/deeds.ts` for every new piece of
   conquerable content (`docs/design/deeds.md`, pinned by `tests/deeds_content.test.ts`;
   deeds are cosmetic-only, never power); Reliquary pages for new conquerable unique loot
   (`docs/design/reliquary.md`, pinned by `tests/reliquary_content.test.ts`); committed WebP

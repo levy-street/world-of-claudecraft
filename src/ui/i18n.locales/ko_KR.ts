@@ -9394,6 +9394,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.docTitle': '{page} - {brand}',
   'guide.nav.overview': '개요',
   'guide.nav.howToPlay': '플레이 방법',
+  'guide.nav.encyclopedia': '백과사전',
+  'guide.home.encyclopedia': '백과사전',
   'guide.nav.classes': '직업',
   'guide.nav.bestiary': '몬스터 도감',
   'guide.nav.world': '세계',

@@ -11338,6 +11338,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.docTitle': '{page} - {brand}',
   'guide.nav.overview': 'Обзор',
   'guide.nav.howToPlay': 'Как играть',
+  'guide.nav.encyclopedia': 'Энциклопедия',
+  'guide.home.encyclopedia': 'Энциклопедия',
   'guide.nav.classes': 'Классы',
   'guide.nav.bestiary': 'Бестиарий',
   'guide.nav.world': 'Мир',

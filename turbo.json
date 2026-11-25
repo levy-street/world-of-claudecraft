@@ -236,6 +236,7 @@
         "play.html",
         "guide.html",
         "editor.html",
+        "encyclopedia.html",
         "vite.config.ts",
         "tsconfig.json",
         "scripts/build_bundle_pregen.mjs",
@@ -243,6 +244,12 @@
         "scripts/build_sfx_manifest.mjs",
         "scripts/build_media_manifest.mjs",
         "scripts/check_backdrop_survival.mjs",
+        "scripts/wiki_site/build.mjs",
+        "scripts/wiki_site/**",
+        "scripts/mediawiki/**",
+        "scripts/wiki/**",
+        "server/seasonal_calendar.ts",
+        "mediawiki/**",
         "package.json"
       ],
       "outputs": ["dist/**"]

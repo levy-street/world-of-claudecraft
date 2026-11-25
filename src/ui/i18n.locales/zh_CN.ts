@@ -10709,6 +10709,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.docTitle': '{page} | {brand}',
   'guide.nav.overview': '概览',
   'guide.nav.howToPlay': '游戏入门',
+  'guide.nav.encyclopedia': '百科全书',
+  'guide.home.encyclopedia': '百科全书',
   'guide.nav.classes': '职业',
   'guide.nav.bestiary': '生物图鉴',
   'guide.nav.world': '世界',

@@ -9211,6 +9211,7 @@ export const nl_NL: EnTranslations = {
     "related": "Gerelateerd",
     "nav": {
       "overview": "Overzicht",
+      "encyclopedia": "Encyclopedie",
       "howToPlay": "Hoe te spelen",
       "classes": "Klassen",
       "bestiary": "Bestiarium",
@@ -9316,6 +9317,7 @@ export const nl_NL: EnTranslations = {
       "subtitle": "Verken de wereld, voltooi quests en trotseer dungeons met vrienden.",
       "ctaPlay": "Speel nu",
       "ctaLearn": "Hoe te spelen",
+      "encyclopedia": "Encyclopedie",
       "what": {
         "heading": "Een klassieke MMO, gemaakt om zo op te pakken",
         "pillarPlayTitle": "Open de site en speel",

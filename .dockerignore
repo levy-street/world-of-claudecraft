@@ -40,7 +40,16 @@ scripts/*
 !scripts/sfx/
 !scripts/sfx/**
 !scripts/wiki/
-!scripts/wiki/*.mjs
+!scripts/wiki/**
+# The static encyclopedia build in build:bundle: the site builder and the seed writers
+# it runs (tests/dockerignore_context.test.ts checks they reach the image).
+!scripts/wiki_site/
+!scripts/wiki_site/**
+!scripts/mediawiki/
+!scripts/mediawiki/**
 deploy
+# The build regenerates the encyclopedia seed from the game data, so the committed copy
+# (about 30 MB) stays out of the context.
+mediawiki/seed
 *.md
 .venv

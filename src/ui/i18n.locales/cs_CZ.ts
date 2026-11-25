@@ -12124,6 +12124,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.related': 'Související',
   'guide.nav.overview': 'Přehled',
   'guide.nav.howToPlay': 'Jak hrát',
+  'guide.nav.encyclopedia': 'Encyklopedie',
+  'guide.home.encyclopedia': 'Encyklopedie',
   'guide.nav.classes': 'Třídy',
   'guide.nav.bestiary': 'Bestiář',
   'guide.nav.models': '3D modely',

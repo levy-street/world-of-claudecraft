@@ -24,6 +24,8 @@ export const guideStrings = {
   // Top navigation + sidebar controls.
   nav: {
     overview: 'Overview',
+    // The static player encyclopedia at /wiki/encyclopedia (its pages are English-only).
+    encyclopedia: 'Encyclopedia',
     howToPlay: 'How to Play',
     classes: 'Classes',
     bestiary: 'Bestiary',
@@ -153,6 +155,7 @@ export const guideStrings = {
     subtitle: 'Explore the world, take on quests, and tackle dungeons with friends.',
     ctaPlay: 'Play Now',
     ctaLearn: 'How to Play',
+    encyclopedia: 'Encyclopedia',
 
     // "What is it" benefit trio.
     what: {

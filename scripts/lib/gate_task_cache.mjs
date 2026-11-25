@@ -151,6 +151,7 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'play.html',
       'guide.html',
       'editor.html',
+      'encyclopedia.html',
       'vite.config.ts',
       'tsconfig.json',
       // Every script the build:bundle command line runs is an input, the pregen
@@ -164,6 +165,16 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'scripts/build_sfx_manifest.mjs',
       'scripts/build_media_manifest.mjs',
       'scripts/check_backdrop_survival.mjs',
+      // The static encyclopedia build (docs/wiki-encyclopedia.md) runs after vite
+      // build and writes dist/wiki/**: its builder, the seed generator it runs and
+      // the reader renderer it uses all change that output.
+      'scripts/wiki_site/build.mjs',
+      'scripts/wiki_site/**',
+      'scripts/mediawiki/**',
+      // Read by the seed writers: attack snapshot lookups and the seasonal calendar.
+      'scripts/wiki/**',
+      'server/seasonal_calendar.ts',
+      'mediawiki/**',
       'package.json',
     ],
     outputs: ['dist/**'],

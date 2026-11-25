@@ -11804,6 +11804,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.nav.faq': 'Preguntas frecuentes',
   'guide.nav.glossary': 'Glosario',
   'guide.nav.howToPlay': 'Cómo jugar',
+  'guide.nav.encyclopedia': 'Enciclopedia',
+  'guide.home.encyclopedia': 'Enciclopedia',
   'guide.nav.onThisPage': 'En esta página',
   'guide.nav.openMenu': 'Abrir menú',
   'guide.nav.overview': 'Resumen',

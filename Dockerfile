@@ -11,12 +11,15 @@ COPY package.json pnpm-lock.yaml .npmrc ./
 # install needs the patch files present or it fails with ENOENT.
 COPY patches ./patches
 RUN pnpm install --frozen-lockfile
-COPY .browserslistrc tsconfig.json vite.config.ts svelte.config.js index.html admin.html play.html guide.html editor.html wallet-handoff.html ./
+COPY .browserslistrc tsconfig.json vite.config.ts svelte.config.js index.html admin.html play.html guide.html editor.html encyclopedia.html wallet-handoff.html ./
 COPY src ./src
 COPY server ./server
 COPY bot ./bot
 COPY headless ./headless
 COPY scripts ./scripts
+# The static encyclopedia build (scripts/wiki_site/build.mjs, run by build:bundle) renders
+# through mediawiki/reader and pins addresses in mediawiki/site_paths.json.
+COPY mediawiki ./mediawiki
 COPY public ./public
 # Optional private extensions live under ./private. Public checkouts contain only
 # a placeholder, so builds still fall back to public stubs; deploys can clone the

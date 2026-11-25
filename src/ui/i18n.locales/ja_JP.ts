@@ -9436,6 +9436,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.docTitle': '{page} - {brand}',
   'guide.nav.overview': '概要',
   'guide.nav.howToPlay': '遊び方',
+  'guide.nav.encyclopedia': '百科事典',
+  'guide.home.encyclopedia': '百科事典',
   'guide.nav.classes': 'クラス',
   'guide.nav.bestiary': 'モンスター図鑑',
   'guide.nav.world': 'ワールド',

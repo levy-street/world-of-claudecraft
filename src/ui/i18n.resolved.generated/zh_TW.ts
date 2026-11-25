@@ -9211,6 +9211,7 @@ export const zh_TW: EnTranslations = {
     "related": "相關內容",
     "nav": {
       "overview": "總覽",
+      "encyclopedia": "百科全書",
       "howToPlay": "如何遊玩",
       "classes": "職業",
       "bestiary": "生物圖鑑",
@@ -9316,6 +9317,7 @@ export const zh_TW: EnTranslations = {
       "subtitle": "探索世界、接受任務，與好友一起挑戰地下城。",
       "ctaPlay": "立即遊玩",
       "ctaLearn": "如何遊玩",
+      "encyclopedia": "百科全書",
       "what": {
         "heading": "一款上手即玩的經典MMO",
         "pillarPlayTitle": "打開網站即可開玩",

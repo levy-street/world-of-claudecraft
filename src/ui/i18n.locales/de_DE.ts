@@ -11718,6 +11718,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.nav.faq': 'FAQ',
   'guide.nav.glossary': 'Glossar',
   'guide.nav.howToPlay': 'So wird gespielt',
+  'guide.nav.encyclopedia': 'Enzyklopädie',
+  'guide.home.encyclopedia': 'Enzyklopädie',
   'guide.nav.onThisPage': 'Auf dieser Seite',
   'guide.nav.openMenu': 'Menü öffnen',
   'guide.nav.overview': 'Übersicht',

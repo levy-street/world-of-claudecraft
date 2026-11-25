@@ -3,7 +3,7 @@
 // back/forward, initial load). Clean URLs (/guide/classes/warrior) work because both
 // vite.config.ts and server/main.ts fall back to guide.html for /guide* paths.
 
-import { GUIDE_BASE } from './routes';
+import { GUIDE_BASE, matchRoute } from './routes';
 
 export type NavigateHandler = (pathname: string) => void;
 
@@ -65,6 +65,9 @@ export class GuideRouter {
     if (anchor.origin !== window.location.origin) return;
     const path = anchor.pathname;
     if (path !== GUIDE_BASE && !path.startsWith(`${GUIDE_BASE}/`)) return;
+    // The static encyclopedia also lives under /wiki (/wiki/encyclopedia, /wiki/item/...);
+    // only paths a Guide route owns are routed here, the rest load as real pages.
+    if (!matchRoute(path)) return;
     ev.preventDefault();
     this.go(path + anchor.hash);
   };

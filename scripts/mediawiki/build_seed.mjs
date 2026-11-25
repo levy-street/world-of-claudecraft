@@ -1,11 +1,12 @@
 import { execFile } from 'node:child_process';
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { promisify } from 'node:util';
 import { build } from 'esbuild';
 
 const outDir = resolve('mediawiki/seed');
-const tmpDir = resolve('tmp/mediawiki-seed');
+await mkdir(resolve('tmp'), { recursive: true });
+const tmpDir = await mkdtemp(resolve('tmp/mediawiki-seed-'));
 const sourcePath = resolve(tmpDir, 'seed-source.ts');
 const bundlePath = resolve(tmpDir, 'seed-source.mjs');
 // MEDIAWIKI_SEED_OUT lets a caller build the seed somewhere else (the visibility
@@ -16,16 +17,40 @@ const outputPath = process.env.MEDIAWIKI_SEED_OUT
   : resolve(outDir, 'pages.xml');
 const execFileAsync = promisify(execFile);
 
-await mkdir(tmpDir, { recursive: true });
 await mkdir(outDir, { recursive: true });
 
-const css = await readFile('mediawiki/theme/Common.css', 'utf8');
+const css = (await readFile('mediawiki/theme/Common.css', 'utf8')).replaceAll('\r\n', '\n');
 
 await writeFile(
   sourcePath,
   `
-import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUEST_ORDER, QUESTS, ZONES } from '../../src/sim/data';
-import { mediawikiAbilityDescription } from '../../scripts/mediawiki/ability_description';
+import { writeFileSync } from 'node:fs';
+import { linkArticleMentions } from '../../scripts/mediawiki/article_mentions';
+import { tooltipCatalog } from '../../scripts/mediawiki/tooltip_catalog';
+import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUESTS, ZONES, zoneContaining, BUILTIN_WORLD } from '../../src/sim/data';
+import { addCatalogPortals } from '../../scripts/mediawiki/catalog_portals';
+import { entityTitles } from '../../scripts/mediawiki/entity_titles';
+import { addDisambiguation, articleName } from '../../scripts/mediawiki/disambiguation';
+import { qualify } from '../../scripts/mediawiki/title_names';
+import { addZoneAndClassHubs } from '../../scripts/mediawiki/hub_portals';
+import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
+import { subjects } from '../../mediawiki/reader/browse';
+import { abilityIndexGroup } from '../../scripts/mediawiki/ability_access';
+import { articleArt, modelStills } from '../../scripts/mediawiki/article_art';
+import { attackShots, withAttackShots } from '../../scripts/mediawiki/attack_art';
+import { classAbilitySections } from '../../scripts/mediawiki/class_ability_sections';
+import { classGearSection } from '../../scripts/mediawiki/class_gear';
+import { abilityArticle } from '../../scripts/mediawiki/ability_article';
+import { addTalentPages, classSpecSections, talentGrid } from '../../scripts/mediawiki/talent_articles';
+import { addSystemArticles } from '../../scripts/mediawiki/system_articles';
+import { addEntityArticles, questZoneName } from '../../scripts/mediawiki/entity_articles';
+import { homeZones, npcArticle } from '../../scripts/mediawiki/npc_article';
+import { dungeonDetails } from '../../scripts/mediawiki/dungeon_article';
+import { addDungeonCatalog } from '../../scripts/mediawiki/dungeon_catalog';
+import { dungeonRecovery } from '../../scripts/mediawiki/dungeon_recovery';
+import { coreSystemRules } from '../../scripts/mediawiki/core_system_rules';
+import { questMap } from '../../scripts/mediawiki/quest_map';
+import { addRotatingQuests } from '../../scripts/mediawiki/rotating_quest_articles';
 
 const css = ${JSON.stringify(css)};
 const pages = [];
@@ -44,10 +69,6 @@ function escXml(text) {
   return String(text ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[ch]));
 }
 
-function titleCase(id) {
-  return String(id).split('_').map((p) => p ? p[0].toUpperCase() + p.slice(1) : '').join(' ');
-}
-
 function money(copper) {
   if (!copper) return 'None';
   const gold = Math.floor(copper / 10000);
@@ -58,13 +79,6 @@ function money(copper) {
 
 function link(title, label = title) {
   return title === label ? '[[' + title + ']]' : '[[' + title + '|' + label + ']]';
-}
-
-function kindWording(kind) {
-  // kind 'recipe' is the physical PATTERN item (it teaches a recipe when
-  // used), so prose, facts, and categories say 'pattern': an item page must
-  // never read as the recipe it teaches. Every other kind is its own word.
-  return kind === 'recipe' ? 'pattern' : kind;
 }
 
 function section(title, body) {
@@ -84,11 +98,14 @@ function categories(names) {
 }
 
 function add(title, text, cats = []) {
-  pages.push({ title, text: text.trim() + categories(cats) });
+  text = text.replaceAll('$N', 'adventurer').replaceAll('$C', 'champion').split('\\n').map(line => line.trimEnd()).join('\\n');
+  pages.push({ title, text: text.trim() + '\\n\\n' + coreSystemRules(title, section, table) + categories(cats) });
 }
 
-function unique(base, used) {
+// A later page that shares a name says what it is (hint) before falling back to a number.
+function unique(base, used, hint) {
   if (!used.has(base)) { used.add(base); return base; }
+  if (hint && !used.has(qualify(base, hint))) { used.add(qualify(base, hint)); return qualify(base, hint); }
   let i = 2;
   while (used.has(base + ' (' + i + ')')) i++;
   const title = base + ' (' + i + ')';
@@ -99,53 +116,23 @@ function unique(base, used) {
 const usedTitles = new Set();
 const visibleAbilities = Object.entries(ABILITIES).filter(([, ability]) => ability.hiddenFromPlayer !== true);
 
-for (const [id, cls] of Object.entries(CLASSES)) titleBy.class.set(id, unique(cls.name, usedTitles));
-for (const [id, ability] of visibleAbilities) titleBy.ability.set(id, unique(ability.name + ' (Ability)', usedTitles));
-for (const zone of ZONES) titleBy.zone.set(zone.id, unique(zone.name, usedTitles));
-for (const dungeon of DUNGEON_LIST) titleBy.dungeon.set(dungeon.id, unique(dungeon.name, usedTitles));
-for (const [id, npc] of Object.entries(NPCS)) titleBy.npc.set(id, unique(npc.name + ' (NPC)', usedTitles));
-for (const [id, quest] of Object.entries(QUESTS)) titleBy.quest.set(id, unique(quest.name, usedTitles));
-for (const [id, mob] of Object.entries(MOBS)) titleBy.mob.set(id, unique(mob.name + ' (Mob)', usedTitles));
-for (const [id, item] of Object.entries(ITEMS)) titleBy.item.set(id, unique(item.name, usedTitles));
+for (const [kind, titles] of Object.entries(entityTitles(usedTitles))) for (const [id, title] of titles) titleBy[kind].set(id, title);
 
-function zoneForQuest(id) {
-  const index = QUEST_ORDER.indexOf(id);
-  if (index < 0) return 'Unknown';
-  if (index < 12) return 'Eastbrook Vale';
-  if (index < 24) return 'Mirefen Marsh';
-  return 'Thornpeak Heights';
-}
-
+const writer = { questMap, titleBy, section, link, bullets, table, add, unique, usedTitles };
+const dungeonWriter = {section, bullets, table, mob: id => link(titleBy.mob.get(id),MOBS[id]?.name ?? id)};
+const zoneForQuest = id => questZoneName(QUESTS[id]);
+const reserve = (title, hint) => unique(title, usedTitles, hint);
 add('MediaWiki:Common.css', css, []);
-
-add('Main Page', \`
-<div class="woc-main">
-<div class="woc-hero">
-<div>
-<p class="woc-kicker">Community player encyclopedia</p>
-<h1>World of Claudecraft Wiki</h1>
-World of Claudecraft is a browser-playable, classic-style micro-MMO with online persistence, offline play, deterministic simulation logic, and a launch-week community that quickly turned jokes, dungeon clears, level races, bug reports, and feature requests into game history.
-
-'''Start here:''' [[Quick Start]] · [[All Pages]] · [[Zones]] · [[Classes]] · [[Gameplay Systems]] · [[Community Lore]] · [[Development Timeline]]
-</div>
-<div class="woc-card"><div class="woc-crest">World of Claudecraft</div></div>
-</div>
-</div>
-\` + section('Featured portals', bullets([
-  link('Zones') + ': Eastbrook Vale, Mirefen Marsh, Thornpeak Heights.',
-  link('Classes') + ': all nine playable class kits.',
-  link('Quests') + ': the full source-defined quest chain.',
-  link('Dungeons') + ': Hollow Crypt, Sunken Bastion, and Gravewyrm Sanctum.',
-  link('Community Lore') + ': launch-week player culture from Discord, Reddit, and X.',
-  link('Development Timeline') + ': issue, PR, and release themes.',
-])), ['Wiki']);
+add('Main Page', section('World of ClaudeCraft', 'Look up a reward, plan your character, or read about a boss fight before you go in. Every page explains how things work in this version of the game.') +
+  subjects.map(([name,entries])=>section(name,bullets(entries.map(([title,label,description])=>link(title,label)+' · '+description)))).join('')+
+  section('Reference', link('Quick Start') + ' · ' + link('All Pages','A to Z index')), ['Wiki']);
 
 add('Quick Start', section('First hour route', bullets([
-  'Create an online character for persistence, or use offline play for a quick solo test.',
+  'Make an online character if you want to keep your progress. Or play offline for a quick try on your own.',
   'Speak to ' + link(titleBy.npc.get('marshal_redbrook'), 'Marshal Redbrook') + ' for ' + link(titleBy.quest.get('q_wolves'), 'Wolves at the Door') + '.',
-  'Collect nearby Eastbrook quests before leaving town so wolf, boar, spider, lake, mine, bandit, and chapel objectives overlap.',
-  'Sell poor-quality junk, buy food and water, and keep your action bar filled.',
-  'Follow ' + link(titleBy.npc.get('brother_aldric'), 'Brother Aldric') + ' into the Gravecaller story once the Fallen Chapel quests open.',
+  'Pick up the other Eastbrook quests before you leave town. That way you can do the wolf, boar, spider, lake, mine, bandit and chapel quests on the same trip.',
+  'Sell your gray (poor-quality) junk, buy food and water, and keep your action bar full.',
+  'Follow ' + link(titleBy.npc.get('brother_aldric'), 'Brother Aldric') + ' into the Gravecaller story once the Fallen Chapel quests unlock.',
 ])) + section('Controls', table([
   ['WASD', 'Move and turn'], ['Q / E', 'Strafe'], ['Space', 'Jump'], ['Tab', 'Target nearest enemy'],
   ['F', 'Interact, loot, talk'], ['1-0, -, =', 'Action bar'], ['C / P / L / M / B / G', 'Character, spellbook, quest log, map, bags, arena'], ['Enter', 'Open chat'],
@@ -182,7 +169,11 @@ add('Development Timeline', section('Release themes', table([
   'Headless environment and agent support for Codex/Claude-driven players.',
 ])), ['Development', 'GitHub']);
 
-add('Sources Used', section('Local sources', bullets([
+add('Sources Used', section('Game mechanics', bullets([
+  'The simulation content in src/sim/data.ts supplies the item, quest, creature and NPC catalogs. The quest maps use the standard world placements after the built-in world touchup.',
+  'Ability articles use the spellbook resolver and combat scaling formulas. Dungeon encounters use the Normal and Heroic encounter journals. Crafting and collection articles read their respective simulation registries.',
+  'Personal corpses, procedurally selected targets and custom maps can change where an objective appears. The walkthroughs distinguish fixed coordinates from search areas and activity-dependent locations.',
+])) + section('Launch history sources', bullets([
   'Repository README, design docs, screenshots, source code, tests, sim content, class definitions, dungeon data, and server routes.',
   'GitHub CLI exports of 45 issues and 141 pull requests.',
   'Discord export of 3,205 messages from the World of Claudecraft community general channel.',
@@ -195,97 +186,64 @@ add('Sources Used', section('Local sources', bullets([
   '[https://x.com/i/communities/2030944892999135272 World Of Claudecraft X community]',
 ])), ['Sources']);
 
-const systemRows = [
-  ['Combat', 'Classic-era combat math, resources, GCD, threat, leashing, death, food, drink, and recovery.'],
-  ['Parties', 'Five-player grouping, shared tap rights, shared kill credit, XP bonuses, party chat, and shared instances.'],
-  ['Guilds', 'Guild creation, ranks, roster management, invites, guild chat, and public-discovery roadmap requests.'],
-  ['Trading', 'Nearby players stage items and copper; both sides accept; walking apart cancels.'],
-  ['World Market', 'The Merchant runs player listings, purchases, cancellations, and collections.'],
-  ['Duels', 'Friendly PvP challenges end at 1 HP.'],
-  ['Ashen Coliseum', 'Ranked 1v1 arena with matchmaking, private arena instances, Elo, ladder, and leaderboard.'],
-  ['Fishing', 'First professions slice: pole purchase, water checks, casting, and starter catch results.'],
-  ['Mobile Play', 'Touch controls, joystick fixes, quest-log access, fullscreen polish, and launch-week mobile testing.'],
-  ['Agents and Bots', 'Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.'],
-];
-add('Gameplay Systems', section('Systems index', bullets(systemRows.map(([name, desc]) => link(name) + ': ' + desc))), ['Systems']);
-for (const [name, desc] of systemRows) {
-  add(name, section('Overview', desc), ['Systems']);
-}
+addTalentPages(writer);
+addSystemArticles({ add, unique: reserve, titleBy });
+addRotatingQuests({ ...writer, reserve });
+const { classGear, enemyIndex } = addCatalogPortals({ ...writer, reserve });
+const zoneDirectories = addQuestDirectory({ ...writer, reserve });
 
-const portals = [
-  ['Zones', ZONES.map((z) => titleBy.zone.get(z.id))],
-  ['Classes', Object.keys(CLASSES).map((id) => titleBy.class.get(id))],
-  ['Dungeons', DUNGEON_LIST.map((d) => titleBy.dungeon.get(d.id))],
-  ['NPCs', Object.keys(NPCS).map((id) => titleBy.npc.get(id))],
-  ['Quests', QUEST_ORDER.map((id) => titleBy.quest.get(id)).filter(Boolean)],
-  ['Mobs', Object.keys(MOBS).map((id) => titleBy.mob.get(id))],
-  ['Items', Object.keys(ITEMS).map((id) => titleBy.item.get(id))],
-  ['Abilities', visibleAbilities.map(([id]) => titleBy.ability.get(id))],
-];
+addZoneAndClassHubs({ ...writer, reserve });
+const raidParents = addDungeonCatalog({ ...writer, reserve });
 
-for (const [portal, titles] of portals) {
-  add(portal, section('Articles', bullets(titles.sort().map((title) => link(title)))), ['Portals']);
-}
-
-for (const zone of ZONES) {
-  const npcs = Object.entries(NPCS).filter(([, npc]) => npc.pos.z >= zone.zMin && npc.pos.z < zone.zMax).map(([id]) => titleBy.npc.get(id));
-  const quests = Object.keys(QUESTS).filter((id) => zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
-  add(titleBy.zone.get(zone.id), section('Overview', zone.welcome) + section('Facts', table([
-    ['Level range', zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', zone.biome], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
-  ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quest chain', bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
-}
+// Zone articles and mount routes (world_directories.ts).
+const { addWorldDirectories } = await import('../../scripts/mediawiki/world_directories');
+addWorldDirectories({ ...writer, money, reserve, raidParents, zoneDirectories, enemyIndex, pages });
 
 for (const [id, cls] of Object.entries(CLASSES)) {
-  const abilities = cls.abilities
-    .filter((abilityId) => titleBy.ability.has(abilityId))
-    .map((abilityId) => link(titleBy.ability.get(abilityId), ABILITIES[abilityId]?.name ?? abilityId));
-  add(titleBy.class.get(id), section('Overview', cls.name + ' starts with ' + (ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + ' and uses ' + cls.resourceType + '.') + section('Stats', table(Object.entries(cls.baseStats).map(([k, v]) => [k.toUpperCase(), String(v)]))) + section('Abilities', bullets(abilities)), ['Classes']);
+  add(titleBy.class.get(id), section('Overview', cls.name + ' is a class you can play. It uses ' + cls.resourceType + ' to power its abilities. A new character of this class starts with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classGearSection(id, classGear, writer) + classSpecSections(id, writer) + section('Talents', 'At each of these levels you pick one talent from the row. See every class side by side on ' + link('Talent choices') + '.\\n\\n' + talentGrid(id, writer)) + classAbilitySections(id, writer, ['Specialization abilities', 'Talent choices']), ['Classes']);
 }
 
 for (const dungeon of DUNGEON_LIST) {
   const bosses = dungeon.spawns.map((s) => MOBS[s.mobId]).filter((mob) => mob?.boss);
-  add(titleBy.dungeon.get(dungeon.id), section('Overview', dungeon.name + ' is a private party instance with ' + dungeon.spawns.length + ' source-defined spawns.') + section('Facts', table([
-    ['Interior', dungeon.interior], ['Spawn count', String(dungeon.spawns.length)], ['Door position', dungeon.doorPos.x + ', ' + dungeon.doorPos.z],
-  ])) + section('Bosses', bullets(bosses.map((mob) => link(titleBy.mob.get(mob.id), mob.name)))) + section('Spawn list', bullets(dungeon.spawns.map((spawn) => link(titleBy.mob.get(spawn.mobId), MOBS[spawn.mobId]?.name ?? spawn.mobId) + ' at ' + spawn.x + ', ' + spawn.z))), ['Dungeons']);
+  add(titleBy.dungeon.get(dungeon.id), (raidParents.has(dungeon.id) ? 'Part of ' + link(raidParents.get(dungeon.id)) + '. See the raid overview for its entrance, complete route and encounters.\\n\\n' : '') + section('Overview', dungeon.enterText) + dungeonDetails(dungeon,dungeonWriter) + (bosses.length && !dungeonDetails(dungeon,dungeonWriter).includes('== Encounters ==') ? section('Bosses', bullets(bosses.map((mob) => link(titleBy.mob.get(mob.id), mob.name)))) : '') + dungeonRecovery(dungeon, writer) + (dungeon.spawns.length ? section('Spawn list', bullets(dungeon.spawns.map((spawn) => link(titleBy.mob.get(spawn.mobId), MOBS[spawn.mobId]?.name ?? spawn.mobId) + ' at ' + spawn.x + ', ' + spawn.z))) : ''), ['Dungeons', ...(raidParents.has(dungeon.id) ? [raidParents.get(dungeon.id)] : [])]);
 }
 
-for (const [id, npc] of Object.entries(NPCS)) {
-  add(titleBy.npc.get(id), section('Greeting', npc.greeting) + section('Facts', table([
-    ['Title', npc.title ?? 'NPC'], ['Position', npc.pos.x + ', ' + npc.pos.z], ['Quest count', String(npc.questIds?.length ?? 0)], ['Vendor', npc.vendorItems?.length ? 'Yes' : npc.market ? 'World Market' : 'No'],
-  ])) + (npc.questIds?.length ? section('Quests', bullets(npc.questIds.map((qid) => link(titleBy.quest.get(qid), QUESTS[qid]?.name ?? qid)))) : '') + (npc.vendorItems?.length ? section('Vendor stock', bullets(npc.vendorItems.map((itemId) => link(titleBy.item.get(itemId), ITEMS[itemId]?.name ?? itemId)))) : ''), ['NPCs']);
+for (const [id,npc] of Object.entries(NPCS)) {
+  add(titleBy.npc.get(id),npcArticle(npc,{...writer,money}),['NPCs']);
 }
 
-for (const [id, quest] of Object.entries(QUESTS)) {
-  const objectives = quest.objectives.map((obj) => (obj.label ?? obj.type) + ': ' + (obj.count ?? 1));
-  const rewards = Object.values(quest.itemRewards ?? {}).map((itemId) => ITEMS[itemId]).filter(Boolean);
-  add(titleBy.quest.get(id), section('Quest text', quest.text) + section('Facts', table([
-    ['Zone', zoneForQuest(id)], ['XP reward', String(quest.xpReward)], ['Copper reward', money(quest.copperReward)], ['Minimum level', quest.minLevel ? String(quest.minLevel) : 'None'], ['Requires quest', quest.requiresQuest ? (QUESTS[quest.requiresQuest]?.name ?? quest.requiresQuest) : 'None'],
-  ])) + section('Objectives', bullets(objectives)) + section('Completion', quest.completionText) + (rewards.length ? section('Rewards', bullets(rewards.map((item) => link(titleBy.item.get(item.id), item.name)))) : ''), ['Quests', zoneForQuest(id)]);
-}
-
-for (const [id, mob] of Object.entries(MOBS)) {
-  const mechanics = [mob.boss ? 'Boss' : '', mob.elite ? 'Elite' : '', mob.rare ? 'Rare' : '', mob.aoePulse ? 'AoE: ' + mob.aoePulse.name : '', mob.enrage ? 'Enrage below ' + Math.round(mob.enrage.belowHpPct * 100) + '%' : ''].filter(Boolean);
-  const loot = mob.loot.map((entry) => entry.itemId ? ITEMS[entry.itemId] : null).filter(Boolean);
-  add(titleBy.mob.get(id), section('Overview', mob.name + ' is a level ' + (mob.minLevel === mob.maxLevel ? mob.minLevel : mob.minLevel + '-' + mob.maxLevel) + ' ' + mob.family + '.') + section('Facts', table([
-    ['Family', mob.family], ['Level', mob.minLevel === mob.maxLevel ? String(mob.minLevel) : mob.minLevel + '-' + mob.maxLevel], ['Aggro radius', String(mob.aggroRadius)], ['Attack speed', String(mob.attackSpeed)],
-  ])) + (mechanics.length ? section('Mechanics', bullets(mechanics)) : '') + (loot.length ? section('Loot', bullets(loot.map((item) => link(titleBy.item.get(item.id), item.name)))) : ''), ['Mobs', mob.family]);
-}
-
-for (const [id, item] of Object.entries(ITEMS)) {
-  add(titleBy.item.get(id), section('Overview', item.name + ' is a ' + (item.quality ?? 'common') + ' ' + kindWording(item.kind) + (item.slot ? ' for ' + item.slot : '') + '.') + section('Facts', table([
-    ['Kind', kindWording(item.kind)], ['Quality', item.quality ?? 'common'], ['Slot', item.slot ?? 'None'], ['Sell value', money(item.sellValue)], ['Buy value', money(item.buyValue)], ['Required class', item.requiredClass?.join(', ') ?? 'Any'],
-  ])) + (item.weapon ? section('Weapon', table([['Damage', item.weapon.min + '-' + item.weapon.max], ['Speed', String(item.weapon.speed)], ['Dagger', item.weapon.dagger ? 'Yes' : 'No']])) : '') + (item.stats ? section('Stats', table(Object.entries(item.stats).map(([k, v]) => [k.toUpperCase(), String(v)]))) : '') + (item.foodHp || item.drinkMana ? section('Consumable', table([['Health restored', String(item.foodHp ?? 0)], ['Mana restored', String(item.drinkMana ?? 0)]])) : ''), ['Items', kindWording(item.kind), item.quality ?? 'common']);
-}
-
+addEntityArticles({ ...writer, money });
 for (const [id, ability] of visibleAbilities) {
-  add(titleBy.ability.get(id), section('Description', mediawikiAbilityDescription(ability)) + section('Facts', table([
-    ['Class', link(titleBy.class.get(ability.class), CLASSES[ability.class]?.name ?? ability.class)], ['Learn level', String(ability.learnLevel)], ['Cost', String(ability.cost)], ['Cooldown', ability.cooldown + 's'], ['Range', ability.range ? ability.range + ' yd' : 'Melee/self'], ['School', ability.school],
-  ])) + section('Base effects', bullets(ability.effects.map((effect) => effect.type))) + (ability.ranks?.length ? section('Ranks', table(ability.ranks.map((rank) => ['Rank ' + rank.rank, 'Level ' + rank.level + ', cost ' + rank.cost]))) : ''), ['Abilities', CLASSES[ability.class]?.name ?? ability.class]);
+  add(titleBy.ability.get(id), abilityArticle(ability, writer), ['Abilities', abilityIndexGroup(ability)]);
 }
 
-add('All Pages', section('Complete index', bullets(pages.map((page) => link(page.title)).sort())), ['Wiki']);
+const letters = new Map();
+for (const page of pages.filter(p=>!p.title.startsWith('MediaWiki:')).sort((a,b)=>a.title.localeCompare(b.title,'en'))) {
+  const letter = page.title[0].toUpperCase();
+  if(!letters.has(letter))letters.set(letter,[]);
+  letters.get(letter).push(link(page.title));
+}
+// One index page per first letter: a single page of every title is several thousand links,
+// which crawlers and Lighthouse handle badly, so the A to Z hub links one page per letter.
+const letterPage = (letter) => 'All Pages (' + letter + ')';
+for (const [letter, titles] of letters) add(letterPage(letter), bullets(titles), ['Portals', 'All Pages']);
+add('All Pages', bullets([...letters].map(([letter, titles]) => link(letterPage(letter), letter) + ' (' + titles.length + ')')), ['Portals', 'Wiki']);
 
-const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-06-15T23:47:51Z';
+const illustrations = articleArt(titleBy);
+const models = modelStills(titleBy);
+const attacks = attackShots(titleBy);
+for(const page of pages) {
+  const shots = attacks.get(page.title);
+  if(shots) page.text = withAttackShots(page.text, shots);
+  // A large model render rides second, after the icon line the lists and tiles use.
+  const model = models.get(page.title);
+  if(model) page.text = '<woc-art path="' + model + '" size="model" />\\n' + page.text;
+  const path = illustrations.get(page.title);
+  if(path) page.text = '<woc-art path="' + path + '" />\\n' + page.text;
+}
+linkArticleMentions(pages);
+pages.push(...addDisambiguation(pages, articleName));
+const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-05T00:00:01Z';
 const now = new Date(seedTimestamp).toISOString().replace(/\\.\\d{3}Z$/, 'Z');
 const body = pages.map((page, index) => \`
   <page>
@@ -321,6 +279,7 @@ const xml = \`<?xml version="1.0" encoding="UTF-8"?>
 </mediawiki>
 \`;
 
+writeFileSync(new URL('./tooltips.json', import.meta.url), JSON.stringify(tooltipCatalog(titleBy), null, 1) + '\\n');
 console.log(xml);
 `,
 );
@@ -332,11 +291,16 @@ await build({
   format: 'esm',
   outfile: bundlePath,
   logLevel: 'silent',
+  define: { 'import.meta.env.PROD': 'true' },
 });
 
 const { stdout } = await execFileAsync(process.execPath, [bundlePath], {
-  maxBuffer: 50 * 1024 * 1024,
+  maxBuffer: 256 * 1024 * 1024,
 });
 await writeFile(outputPath, stdout);
+await copyFile(
+  resolve(tmpDir, 'tooltips.json'),
+  outputPath.replace(/\.xml$/i, '') + '.tooltips.json',
+);
 await rm(tmpDir, { recursive: true, force: true });
 console.log(`wrote ${outputPath}`);

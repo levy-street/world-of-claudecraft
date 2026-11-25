@@ -11213,6 +11213,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.gear': 'Trang Bị & Vật Phẩm',
   'guide.nav.glossary': 'Thuật Ngữ',
   'guide.nav.howToPlay': 'Cách Chơi',
+  'guide.nav.encyclopedia': 'Bách khoa toàn thư',
+  'guide.home.encyclopedia': 'Bách khoa toàn thư',
   'guide.nav.models': 'Mô Hình 3D',
   'guide.nav.onThisPage': 'Trên trang này',
   'guide.nav.openMenu': 'Mở menu',

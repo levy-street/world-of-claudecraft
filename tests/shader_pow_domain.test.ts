@@ -80,6 +80,15 @@ interface ProvenSafeBase {
 /** Bases that are non-negative by provenance rather than by syntax. */
 const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
   {
+    file: 'scripts/mediawiki/core_system_rules.ts',
+    base: '10',
+    sites: 1,
+    // Wiki prose, not GLSL: the encyclopedia writes the Elo expected-score formula
+    // inside a <woc-math> tag. The base is the constant 10.
+    anchor: /<woc-math>Expected win chance = frac\(1, 1 \+ pow\(10, /,
+    why: 'a constant base of 10 in the encyclopedia Elo formula text, not shader code',
+  },
+  {
     file: 'src/render/campfire_flame.ts',
     base: 'flameH',
     sites: 1,
@@ -146,6 +155,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/battleground_ward.ts': 1,
   'src/render/sprites_buddy_flame.ts': 1,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
+  // Not a shader: the player encyclopedia shows the arena Elo formula as math text.
+  'scripts/mediawiki/core_system_rules.ts': 1,
   // Authored Warrior materials are part of the same fail-closed domain scan.
   'src/render/ability_vfx/baked_impact_layers.ts': 1,
   'src/render/ability_vfx/ribbons.ts': 1,

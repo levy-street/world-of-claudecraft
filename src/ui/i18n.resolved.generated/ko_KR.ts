@@ -9211,6 +9211,7 @@ export const ko_KR: EnTranslations = {
     "related": "관련 항목",
     "nav": {
       "overview": "개요",
+      "encyclopedia": "백과사전",
       "howToPlay": "플레이 방법",
       "classes": "직업",
       "bestiary": "몬스터 도감",
@@ -9316,6 +9317,7 @@ export const ko_KR: EnTranslations = {
       "subtitle": "세계를 탐험하고, 퀘스트를 수행하고, 친구들과 던전에 도전하세요.",
       "ctaPlay": "지금 플레이",
       "ctaLearn": "플레이 방법",
+      "encyclopedia": "백과사전",
       "what": {
         "heading": "누구나 쉽게 시작하는 클래식 MMO",
         "pillarPlayTitle": "사이트를 열고 바로 플레이",

@@ -11092,6 +11092,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.gear': 'Teçhizat ve Eşyalar',
   'guide.nav.glossary': 'Sözlük',
   'guide.nav.howToPlay': 'Nasıl Oynanır',
+  'guide.nav.encyclopedia': 'Ansiklopedi',
+  'guide.home.encyclopedia': 'Ansiklopedi',
   'guide.nav.models': '3B Modeller',
   'guide.nav.onThisPage': 'Bu sayfada',
   'guide.nav.openMenu': 'Menüyü aç',

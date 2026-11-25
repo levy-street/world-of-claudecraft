@@ -10,6 +10,9 @@
 // so a visitor following an old or mistyped link sees the homepage exactly as
 // before; only the status changes to 404. Asset paths are not decided here:
 // serveStatic 404s a missing asset before it ever reaches the fallback.
+// Guide routes under /wiki keep 200 only when src/guide/routes.ts owns the path.
+
+import { matchRoute } from '../src/guide/routes';
 
 /** Pretty URLs that serve standalone static HTML pages (serveStatic rewrites to the file). */
 export const STATIC_PAGE_ALIASES: ReadonlyMap<string, string> = new Map([
@@ -57,9 +60,15 @@ export const SHELL_CLIENT_ROUTES: ReadonlySet<string> = new Set([
   '/leaderboard',
 ]);
 
-/** The guide/wiki SPA routes its own paths, so every /wiki path keeps 200 (out of scope here). */
+/**
+ * A /wiki path the Guide SPA owns (src/guide/routes.ts matchRoute). Other /wiki paths still
+ * get the guide shell as their body, but with 404: the static encyclopedia pages under /wiki
+ * are files served before this fallback (server/wiki_site.ts), so an unknown article address
+ * is a real 404 rather than a soft one.
+ */
 function isGuidePath(pathname: string): boolean {
-  return pathname === '/wiki' || pathname.startsWith('/wiki/');
+  if (pathname !== '/wiki' && !pathname.startsWith('/wiki/')) return false;
+  return matchRoute(pathname) !== null;
 }
 
 /**

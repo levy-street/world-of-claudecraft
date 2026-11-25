@@ -5,7 +5,7 @@
 import { esc } from '../../ui/esc';
 import { formatNumber, t } from '../../ui/i18n';
 import { CLASS_CHIPS, LEVEL_CAP, ZONE_COUNT, ZONE_TEASERS } from '../data';
-import { hrefFor } from '../routes';
+import { ENCYCLOPEDIA_HOME, hrefFor } from '../routes';
 import type { GuidePage } from './types';
 
 function heroHtml(): string {
@@ -17,6 +17,7 @@ function heroHtml(): string {
         <p class="guide-hero-sub">${esc(t('guide.home.subtitle'))}</p>
         <div class="guide-hero-cta">
           <a class="guide-cta" href="/play">${esc(t('guide.home.ctaPlay'))}</a>
+          <a class="guide-cta guide-cta-ghost" href="${ENCYCLOPEDIA_HOME}">${esc(t('guide.home.encyclopedia'))}</a>
           <a class="guide-cta guide-cta-ghost" href="${esc(hrefFor('how-to-play'))}">${esc(t('guide.home.ctaLearn'))}</a>
         </div>
       </div>

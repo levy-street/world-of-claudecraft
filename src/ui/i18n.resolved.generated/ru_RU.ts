@@ -9211,6 +9211,7 @@ export const ru_RU: EnTranslations = {
     "related": "Связанное",
     "nav": {
       "overview": "Обзор",
+      "encyclopedia": "Энциклопедия",
       "howToPlay": "Как играть",
       "classes": "Классы",
       "bestiary": "Бестиарий",
@@ -9316,6 +9317,7 @@ export const ru_RU: EnTranslations = {
       "subtitle": "Исследуйте мир, выполняйте задания и проходите подземелья с друзьями.",
       "ctaPlay": "Играть",
       "ctaLearn": "Как играть",
+      "encyclopedia": "Энциклопедия",
       "what": {
         "heading": "Классическая MMO, в которую легко погрузиться",
         "pillarPlayTitle": "Откройте сайт и играйте",

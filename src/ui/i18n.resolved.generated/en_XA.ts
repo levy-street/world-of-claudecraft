@@ -9211,6 +9211,7 @@ export const en_XA: EnTranslations = {
     "related": "[Ŕéļáţéð]",
     "nav": {
       "overview": "[Óʋéŕʋíéŵ]",
+      "encyclopedia": "[Éñçýçļóþéðíá]",
       "howToPlay": "[Ĥóŵ ţó Þļáý]",
       "classes": "[Çļáššéš]",
       "bestiary": "[Ɓéšţíáŕý]",
@@ -9316,6 +9317,7 @@ export const en_XA: EnTranslations = {
       "subtitle": "[Éẋþļóŕé ţĥé ŵóŕļð, ţáķé óñ ɋúéšţš, áñð ţáçķļé ðúñĝéóñš ŵíţĥ ƒŕíéñðš.]",
       "ctaPlay": "[Þļáý Ñóŵ]",
       "ctaLearn": "[Ĥóŵ ţó Þļáý]",
+      "encyclopedia": "[Éñçýçļóþéðíá]",
       "what": {
         "heading": "[Á çļáššíç ⱮⱮÓ, ɱáðé ţó ƀé þíçķéð úþ]",
         "pillarPlayTitle": "[Óþéñ ţĥé šíţé áñð þļáý]",
