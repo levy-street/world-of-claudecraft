@@ -9211,7 +9211,7 @@ export const sv_SE: EnTranslations = {
     "related": "Relaterat",
     "nav": {
       "overview": "Översikt",
-      "encyclopedia": "Encyclopedia",
+      "encyclopedia": "Uppslagsverk",
       "howToPlay": "Så spelar du",
       "classes": "Klasser",
       "bestiary": "Bestiarium",
@@ -9317,7 +9317,7 @@ export const sv_SE: EnTranslations = {
       "subtitle": "Utforska världen, ta dig an uppdrag och kämpa dig igenom dungeons med vänner.",
       "ctaPlay": "Spela nu",
       "ctaLearn": "Så spelar du",
-      "encyclopedia": "Encyclopedia",
+      "encyclopedia": "Uppslagsverk",
       "what": {
         "heading": "Ett klassiskt MMO, gjort för att tas upp",
         "pillarPlayTitle": "Öppna sidan och spela",

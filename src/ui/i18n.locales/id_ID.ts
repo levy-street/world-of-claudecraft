@@ -11238,6 +11238,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.nav.gear': 'Perlengkapan & Barang',
   'guide.nav.glossary': 'Glosarium',
   'guide.nav.howToPlay': 'Cara Bermain',
+  'guide.nav.encyclopedia': 'Ensiklopedia',
+  'guide.home.encyclopedia': 'Ensiklopedia',
   'guide.nav.models': 'Model 3D',
   'guide.nav.onThisPage': 'Di halaman ini',
   'guide.nav.openMenu': 'Buka menu',

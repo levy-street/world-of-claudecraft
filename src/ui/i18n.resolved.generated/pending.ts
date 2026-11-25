@@ -9,70 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "es_ES": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "fr_FR": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "fr_CA": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "de_DE": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "nl_NL": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "pl_PL": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "id_ID": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "tr_TR": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "sv_SE": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "vi_VN": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "da_DK": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

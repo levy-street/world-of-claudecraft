@@ -10276,6 +10276,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.nav.gear': 'Udstyr & Genstande',
   'guide.nav.glossary': 'Ordliste',
   'guide.nav.howToPlay': 'Sådan spiller du',
+  'guide.nav.encyclopedia': 'Encyklopædi',
+  'guide.home.encyclopedia': 'Encyklopædi',
   'guide.nav.models': '3D-modeller',
   'guide.nav.onThisPage': 'På denne side',
   'guide.nav.openMenu': 'Åbn menu',

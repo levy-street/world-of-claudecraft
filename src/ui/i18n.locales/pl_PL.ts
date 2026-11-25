@@ -10578,6 +10578,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.nav.gear': 'Ekwipunek i przedmioty',
   'guide.nav.glossary': 'Słowniczek',
   'guide.nav.howToPlay': 'Jak grać',
+  'guide.nav.encyclopedia': 'Encyklopedia',
+  'guide.home.encyclopedia': 'Encyklopedia',
   'guide.nav.models': 'Modele 3D',
   'guide.nav.onThisPage': 'Na tej stronie',
   'guide.nav.openMenu': 'Otwórz menu',

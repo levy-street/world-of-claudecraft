@@ -9211,7 +9211,7 @@ export const id_ID: EnTranslations = {
     "related": "Terkait",
     "nav": {
       "overview": "Ikhtisar",
-      "encyclopedia": "Encyclopedia",
+      "encyclopedia": "Ensiklopedia",
       "howToPlay": "Cara Bermain",
       "classes": "Kelas",
       "bestiary": "Bestiari",
@@ -9317,7 +9317,7 @@ export const id_ID: EnTranslations = {
       "subtitle": "Jelajahi dunia, selesaikan quest, dan taklukkan dungeon bersama teman.",
       "ctaPlay": "Main Sekarang",
       "ctaLearn": "Cara Bermain",
-      "encyclopedia": "Encyclopedia",
+      "encyclopedia": "Ensiklopedia",
       "what": {
         "heading": "MMO klasik, dibuat agar mudah dimainkan",
         "pillarPlayTitle": "Buka situsnya dan mainkan",
