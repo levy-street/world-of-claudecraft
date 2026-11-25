@@ -146,11 +146,18 @@ export const quench = {
         const ln = laneOf(t);
         const f = e.f ?? 0;
         const d = { x: Math.sin(f), z: Math.cos(f) };
+        // When this line was first seen (its warning's clock: the template
+        // carries the whole warning and its locked last stretch, laneOf).
+        world.laneSeen ??= new Map();
+        if (!world.laneSeen.has(e.id)) world.laneSeen.set(e.id, Date.now());
+        const left = ln.seconds - (Date.now() - world.laneSeen.get(e.id)) / 1000;
         o.lanes.push({
           from: { x: e.x, z: e.z },
           to: add(e, d, ln.length),
           state: ln.state,
           secs: ln.seconds,
+          // Still following its mark (not yet locked), with a breath to spare.
+          aiming: ln.state === 'warn' && left > ln.lock + 0.25,
           id: e.id,
         });
       } else if (t.startsWith(QUENCH_OBJECTS.bladePrefix))
@@ -422,8 +429,8 @@ function duty(world, st, b, me) {
       .filter((ln) => ln.state === 'warn')
       .sort((x, y) => segDist(me, x.from, x.to) - segDist(me, y.from, y.to))[0];
     const blade = lane?.from;
-    // Locked (its last second): off the line like everyone else.
-    if (blade && lane.secs > 1.0) {
+    // Locked (the tier's lock, carried on the line): off it like everyone else.
+    if (blade && lane.aiming) {
       const spot = aimSpot(world, st, b, me, blade);
       return { goal: spot, tol: 0.8, duty: 'aim the slash' };
     }
