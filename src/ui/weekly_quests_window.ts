@@ -12,6 +12,7 @@ import type { FactionId } from '../sim/factions';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import { focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { t } from './i18n';
 import { svgIcon } from './ui_icons';
 import {
@@ -29,6 +30,15 @@ export interface WeeklyQuestsWindowDeps {
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
 }
+
+// The controls a data-driven rebuild carries focus back to, by identity.
+const WK_FOCUS_ATTRS = [
+  'data-close',
+  'data-wk-choose',
+  'data-wk-commend',
+  'data-wk-accept',
+  'data-wk-decline',
+] as const;
 
 export class WeeklyQuestsWindow {
   private opened = false;
@@ -51,7 +61,6 @@ export class WeeklyQuestsWindow {
       this.dialogQuestId = null;
       audio.bagOpen();
     }
-    this.lastSig = '';
     this.render('open');
     this.deps.root().style.display = 'flex';
   }
@@ -83,21 +92,49 @@ export class WeeklyQuestsWindow {
     ]);
   }
 
-  /** Slow-band refresh: repaint when the pick changes or every minute for the clock. */
-  /** Language fan-out arm: the sheet is signature-gated on locale-free data,
-   *  so a switch rebuilds it once here; render() re-latches the signature. */
-  relocalize(): void {
-    if (!this.opened) return;
-    this.lastSig = '';
-    this.render(null);
+  /** The signature plus the countdown's displayed minute: what render() latches
+   *  and refreshIfChanged() compares. */
+  private currentSig(): string {
+    return `${this.sig()}:${Math.floor(Date.now() / 60_000)}`;
   }
 
-  refreshIfChanged(): void {
+  /** Language fan-out arm: the sheet is signature-gated on locale-free data,
+   *  so a switch rebuilds it once here; render() re-latches the signature
+   *  (never cleared, or the next poll would rebuild a second time). */
+  relocalize(): void {
     if (!this.opened) return;
-    const sig = `${this.sig()}:${Math.floor(Date.now() / 60_000)}`;
+    this.rebuildKeepingFocus();
+  }
+
+  /** Slow-band refresh: repaint when the pick changes or every minute for the
+   *  clock. Skipped while the inner confirm dialog is up, with the signature
+   *  left unmoved so the first poll after it closes catches up: a rebuild
+   *  under the dialog would yank focus off Accept mid-decision. */
+  refreshIfChanged(): void {
+    if (!this.opened || this.dialogQuestId !== null) return;
+    const sig = this.currentSig();
     if (sig === this.lastSig) return;
-    this.lastSig = sig;
+    this.rebuildKeepingFocus();
+  }
+
+  /** A data-driven rebuild (poll or locale) carries keyboard focus to the same
+   *  control, matched by its data attribute, its value and its position among
+   *  equals (the dialog has two decline controls), else to Close. Compared over
+   *  the rebuilt controls, never interpolated into a selector. */
+  private rebuildKeepingFocus(): void {
+    const root = this.deps.root();
+    const focused = focusedWithin(root);
+    const attr = focused ? WK_FOCUS_ATTRS.find((name) => focused.hasAttribute(name)) : undefined;
+    const peers = (name: string, value: string | null): HTMLElement[] =>
+      [...root.querySelectorAll<HTMLElement>(`[${name}]`)].filter(
+        (el) => el.getAttribute(name) === value,
+      );
+    const value = focused && attr ? focused.getAttribute(attr) : null;
+    const index = focused && attr ? peers(attr, value).indexOf(focused) : -1;
     this.render(null);
+    if (!focused) return;
+    const same = attr ? peers(attr, value)[index] : undefined;
+    restoreFirstEnabled([same, root.querySelector<HTMLElement>('[data-close]')]);
   }
 
   private render(focus: 'open' | 'dialog' | null): void {
@@ -128,7 +165,6 @@ export class WeeklyQuestsWindow {
     root.querySelectorAll<HTMLButtonElement>('[data-wk-choose]').forEach((button) => {
       button.addEventListener('click', () => {
         this.dialogQuestId = button.dataset.wkChoose ?? null;
-        this.lastSig = '';
         this.render('dialog');
       });
     });
@@ -136,22 +172,23 @@ export class WeeklyQuestsWindow {
       const questId = this.dialogQuestId;
       this.dialogQuestId = null;
       if (questId) world.chooseWeeklyQuest(questId);
-      this.lastSig = '';
       this.render(null);
     });
     root.querySelector('[data-wk-decline]')?.addEventListener('click', () => {
       this.dialogQuestId = null;
-      this.lastSig = '';
       this.render(null);
     });
     root.querySelectorAll<HTMLButtonElement>('[data-wk-commend]').forEach((button) => {
       button.addEventListener('click', () => {
         const factionId = button.dataset.wkCommend as FactionId | undefined;
         if (factionId) world.commendWeeklyQuest(factionId);
-        this.lastSig = '';
         this.render(null);
       });
     });
+    // Re-latch: the DOM now shows the current data (and the dialog state this
+    // paint settled on), so the next poll stays quiet. Every caller (open, a
+    // card or dialog click, a poll, the language arm) gets this for free.
+    this.lastSig = this.currentSig();
     if (focus === 'open') (root.querySelector('[data-close]') as HTMLElement | null)?.focus();
     if (focus === 'dialog') (root.querySelector('[data-wk-accept]') as HTMLElement | null)?.focus();
   }

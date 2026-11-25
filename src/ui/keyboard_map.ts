@@ -106,6 +106,10 @@ export interface KeyboardMapRebindDeps {
 export interface KeyboardMapHandle {
   /** Redraw the board from the live bindings (after an outside rebind). */
   repaint: () => void;
+  /** True while the player is mid-interaction on this board (a key capture
+   *  armed, or the Unbind / assign row up): repaint() would drop it, so a
+   *  background poll waits until this clears. */
+  busy: () => boolean;
   /** Drop any key capture this board armed. Call before discarding the board
    *  (a panel rebuild, the window closing), or the one-shot capture outlives
    *  it and the player's next keypress rebinds through a detached board. */
@@ -649,6 +653,7 @@ export function paintKeyboardMap(root: HTMLElement, deps: KeyboardMapPaintDeps):
       if (armed || !actions.hidden) resetInteraction();
       paintBoard();
     },
+    busy: () => armed !== null || !actions.hidden,
     dispose: () => {
       disposed = true;
       resetInteraction();

@@ -1386,6 +1386,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'closes the Rift Forge window when the player leaves the Riftwright (the market rule; the sim place gate refuses the commands regardless)',
   },
   {
+    call: 'this.riftForgeWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.riftForgeWindow.isOpen && !(!riftForgeInReach(p, this.sim.entities.values(), NPC_WINDOW_CLOSE_RANGE))',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/rift_forge/rift_forge_window.ts',
+      proof: 'if (riftForgeSig(this.buildView()) === this.lastSig) return;',
+    },
+    why: 'the Rift Forge in reach: essence, gem counts and each band level and sockets, held while a click awaits its result or a gem picker has focus',
+  },
+  {
     call: 'this.marketWindow.refreshIfChanged',
     band: 'slow',
     gate: "this.marketWindow.isOpen && !(!nearbyServiceNpc(this.sim, 'market'))",
@@ -1479,6 +1491,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'DELIBERATELY has no isOpen gate: the money-footer backstop (#2373) that converges every copper credit reaching no bags arm',
   },
   {
+    call: 'this.serviceLatch.refreshIfChanged',
+    band: 'slow',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/vendor/service_window_refresh.ts',
+      proof: 'if (sig === this.lastSig) return false;',
+    },
+    why: 'the service-window family (vendor, heroic, crucible, warfare, train, unbind): rebuilds the open ones when the purse, balances, bags, rep, quests or in-flight Learns move, held under a buy prompt or confirm dialog',
+  },
+  {
     call: 'this.deedsWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.deedsWindow.isOpen',
@@ -1520,12 +1544,16 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'repaints the character window and the crafting window when a profession number moves',
   },
   {
-    call: 'this.refreshCharSheetIfChanged',
+    call: 'this.charWindow.refreshIfChanged',
     band: 'slow',
     gate: '',
     surface: 'window',
-    guard: { kind: 'hud', proof: 'if (sig === this.lastCharSheetSig) return;' },
-    why: 'converges the open character sheet on its whole progression block: the WORN title / border (the deeds picker repaints only itself), the earned border badges, and the Reliquary pair plus Curator rank',
+    guard: {
+      kind: 'module',
+      module: 'char_window.ts',
+      proof: 'if (!this.isOpen || this.refreshSig() === this.lastSig) return;',
+    },
+    why: 'converges the open character sheet on everything it paints (char_sheet_sig_core.ts): stats and buffs, the header, the visible tab, the WORN title / border, the badges and the Reliquary pair; closed it reads nothing',
   },
   {
     call: 'this.professionsWindow.refreshIfChanged',
@@ -1555,7 +1583,19 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       module: 'hud/professions/farming_plant_sheet_window.ts',
       proof: 'if (view.status !== this.paintedStatus) this.paint();',
     },
-    why: 'refreshes the open harvest choice after an event precedes its plot snapshot',
+    why: 'refreshes the open harvest choice after an event precedes its plot snapshot, and the open plant view when bags, seeds or skill move under it',
+  },
+  {
+    call: 'this.commissionBoardPainter.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.commissionBoardOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/professions/commission_order_window.ts',
+      proof: SIG_RETURN,
+    },
+    why: 'other players accepting, delivering, cancelling or posting orders (and an own result that beats the corder mirror) repaint only the row sections of an open board, leaving the order form untouched',
   },
   {
     call: 'this.questDialog.refreshIfChanged',
@@ -1612,6 +1652,51 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: { kind: 'module', module: 'calendar_window.ts', proof: SIG_RETURN },
     why: 'the guild calendar window',
+  },
+  {
+    call: 'this.questlogWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.questlogWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/quest/questlog_window.ts',
+      proof: 'if (!this.isOpen || this.signature() === this.lastSig) return;',
+    },
+    why: 'quest progress, state, accept and turn-in, selection and reward spec, keeping focus and scroll',
+  },
+  {
+    call: 'this.talentsWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.talentsWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'talents_window.ts',
+      proof: 'if (this.signature() === this.lastSig) return;',
+    },
+    why: 'level, allocation, active loadout and loadout names; held while the loadout menu is open',
+  },
+  {
+    call: 'this.treasureMapWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.treasureMapWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/treasure/treasure_map_window.ts',
+      proof:
+        'if (this.isOpen && this.signature(this.deps.world()) !== this.lastSig) this.render();',
+    },
+    why: 'held ink, map rarity and site, and the read map still in the bags (closes when it leaves)',
+  },
+  {
+    call: 'this.keyboardPopout.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.keyboardPopout.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'keyboard_map_window.ts', proof: SIG_RETURN },
+    why: 'bindings and action-bar slot names; held while a key capture or action row is up',
   },
   {
     call: 'this.updateMailIndicator',
@@ -1974,7 +2059,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 55, chrome: 101, none: 21 });
+    ).toEqual({ window: 62, chrome: 101, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1999,12 +2084,13 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // refreshing instead of only closing.
       // The courier window owns both revision and content signature guards.
       // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
-      module: 32,
-      // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
-      // HUD fields (lastCharSheetSig et al) because the cold char_window painter
-      // holds no signature of its own to diff. The release's trade row left this
-      // bucket when its lastTradeSig latch moved into the woc_trade module.
-      hud: 6,
+      module: 40,
+      // The profession-surface latch and its siblings. Their latches are HUD
+      // fields because the painters they gate hold no signature of their own.
+      // The release's trade row left this bucket when its lastTradeSig latch
+      // moved into the woc_trade module, and the character sheet's when its
+      // latch moved into char_window (its paints now re-latch it).
+      hud: 5,
       // Up to 12 with the crucible vendor's out-of-range close: the same
       // callsite-guarded shape as the copper and heroic vendor closes.
       // Up one more on the release arm's own callsite-guarded row, beside the
@@ -2047,6 +2133,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',
+        'char_window.ts: if (!this.isOpen || this.refreshSig() === this.lastSig) return;',
         'card_duel_window.ts: if (sig === this.lastSig) return;',
         'daily_rewards_window.ts: if (!this.charterFit.changedFrom(this.deps.world().bankPurchasedSlots)) return;',
         'deeds_window.ts: if (sig === this.lastSig) return;',
@@ -2058,8 +2145,6 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
-        // Phase 20: the progression-block latch for the open character sheet.
-        'hud.ts: if (sig === this.lastCharSheetSig) return;',
         'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud/woc_trade/woc_trade_controller.ts: if (sig === this.lastTradeSig) return;',
@@ -2090,6 +2175,15 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'weekly_quests_window.ts: if (sig === this.lastSig) return;',
         'hud/guild_hall/guild_hall_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
+        // The live-window pass: the windows that were open-time snapshots, and the
+        // service-window family's shared latch.
+        'hud/professions/commission_order_window.ts: if (sig === this.lastSig) return;',
+        'hud/quest/questlog_window.ts: if (!this.isOpen || this.signature() === this.lastSig) return;',
+        'hud/rift_forge/rift_forge_window.ts: if (riftForgeSig(this.buildView()) === this.lastSig) return;',
+        'hud/treasure/treasure_map_window.ts: if (this.isOpen && this.signature(this.deps.world()) !== this.lastSig) this.render();',
+        'hud/vendor/service_window_refresh.ts: if (sig === this.lastSig) return false;',
+        'keyboard_map_window.ts: if (sig === this.lastSig) return;',
+        'talents_window.ts: if (this.signature() === this.lastSig) return;',
       ].sort(),
     );
     expect(
@@ -2115,6 +2209,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(modules.filter((m) => !adapterName.test(m)).sort()).toEqual([
       'dungeon_finder_proposal_popup.ts',
       'hud/battleground/battleground_proposal_popup.ts',
+      // A latch, not a painter: it writes no DOM itself and repaints through the
+      // family's own render methods, which the sweep already covers.
+      'hud/vendor/service_window_refresh.ts',
       'meters.ts',
       'mount_race_controls.ts',
       'mount_race_strip.ts',

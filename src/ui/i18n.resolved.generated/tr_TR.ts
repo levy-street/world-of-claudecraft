@@ -1366,6 +1366,7 @@ export const tr_TR: EnTranslations = {
         "stackTerms": "Ödeme şimdi alınır. Süre, mevcut üyeliğinin sonuna eklenir; ardından üyeliğin bu planla yenilenir.",
         "stackCapped": "Bir seferde en fazla 2 yıllık üyelik süresi biriktirebilirsin. Yenileme tarihin yaklaştığında tekrar dene.",
         "stackUnavailable": "Üyelik süresi ekleme şu anda kullanılamıyor. Kısa süre sonra tekrar dene.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Üyelik süresi eklemeden önce Aboneliği yönet bölümünden ödeme bilgilerini güncelle.",
         "renewsOn": "Yenileme tarihi: {date}",
         "endsOn": "Üyelik bitiş tarihi: {date}",

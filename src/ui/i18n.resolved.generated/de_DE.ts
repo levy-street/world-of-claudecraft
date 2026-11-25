@@ -1366,6 +1366,7 @@ export const de_DE: EnTranslations = {
         "stackTerms": "Die Zahlung erfolgt sofort. Die Zeit wird an deine aktuelle Mitgliedschaft angehängt. Danach verlängert sie sich mit diesem Tarif.",
         "stackCapped": "Du kannst bis zu 2 Jahre Mitgliedschaft auf einmal ansammeln. Versuche es näher an deinem Verlängerungsdatum erneut.",
         "stackUnavailable": "Das Hinzufügen von Mitgliedschaftszeit ist derzeit nicht verfügbar. Versuche es in Kürze erneut.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Aktualisiere deine Zahlungsdaten unter Abonnement verwalten, bevor du Mitgliedschaftszeit hinzufügst.",
         "renewsOn": "Verlängert sich am {date}",
         "endsOn": "Mitgliedschaft endet am {date}",

@@ -657,7 +657,15 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
   const detail = model.browse.detail
     ? `${model.browse.detail.row.id}:${model.browse.detail.estimateAmount?.base ?? ''}:${model.browse.detail.sales.length}`
     : '';
-  const sell = model.sell.rows.map((r) => `${r.index}:${r.itemId}`).join(',');
+  // A row renders its quality (frame and name color) and its copy's payload
+  // (loot-quality name, tooltip, enchant), so a re-rolled or enchanted copy in
+  // the SAME slot must move the digest too. Sellable rows are the few
+  // epic-and-up copies, so the payload digest stays cheap.
+  const sell = model.sell.rows
+    .map(
+      (r) => `${r.index}:${r.itemId}:${r.quality}:${r.instance ? JSON.stringify(r.instance) : ''}`,
+    )
+    .join(',');
   const activity = model.activity
     ? [
         // currentCents rides too: the seller's Cancel button is gated on an

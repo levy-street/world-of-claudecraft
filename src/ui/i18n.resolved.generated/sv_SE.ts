@@ -1366,6 +1366,7 @@ export const sv_SE: EnTranslations = {
         "stackTerms": "Betalningen sker nu. Tiden läggs till efter ditt nuvarande medlemskap, som sedan förnyas enligt denna plan.",
         "stackCapped": "Du kan samla upp till 2 års medlemskap åt gången. Försök igen närmare ditt förnyelsedatum.",
         "stackUnavailable": "Det går inte att lägga till medlemstid just nu. Försök igen om en stund.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Uppdatera dina betalningsuppgifter under Hantera prenumeration innan du lägger till medlemstid.",
         "renewsOn": "Förnyas den {date}",
         "endsOn": "Medlemskapet upphör den {date}",

@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.checkoutPending': 'Оформление покупки ожидает подтверждения.',
   "bossJournal.wildheart.zulgar.pulseSummaryRework": "Каждые {every} сек. он читает заклинание {cast} сек. и наносит от {min} до {max} урона всем в радиусе {radius} ярд. Пригвождённые получают в {pinMult} раза больше урона на любом расстоянии.",
   "bossJournal.wildheart.zulgar.spearSummary": "За {cast} сек. пригвождает игрока, кроме танка; танка выбирает, если больше никого нет. Обездвиживание длится до {seconds} сек. и наносит {bleed} урона каждые {tick} сек.",
   "bossJournal.wildheart.zulgar.spearResponse": "Выберите копьё и взаимодействуйте с ним в пределах {range} ярд.: извлечение занимает {pull} сек. Урон его не прерывает. Если на террасе нет свободных союзников, жертва может освободиться сама за {self} сек.",

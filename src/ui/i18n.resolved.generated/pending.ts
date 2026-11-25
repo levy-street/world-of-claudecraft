@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "es_ES": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "fr_FR": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "fr_CA": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "de_DE": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "nl_NL": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "pl_PL": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "id_ID": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "tr_TR": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "sv_SE": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "vi_VN": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ],
+  "da_DK": [
+    "hudChrome.wocStore.subscription.checkoutPending"
+  ]
 };

@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.checkoutPending': '購入手続きは保留中です。確認を待っています。',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '{every}秒ごとに{cast}秒詠唱し、{radius}ヤード以内の全員に{min}から{max}ダメージ。串刺しのプレイヤーは距離に関係なく{pinMult}倍のダメージを受ける。',
   'bossJournal.wildheart.zulgar.spearSummary':

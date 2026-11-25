@@ -91,7 +91,6 @@ export class CalendarWindow {
     this.year = today.year;
     this.month = today.month;
     this.selectedIso = this.todayIso();
-    this.lastSig = '';
     this.render();
     this.deps.root().style.display = 'flex';
     audio.bagOpen();
@@ -122,21 +121,38 @@ export class CalendarWindow {
     this.lastSig = '';
   }
 
-  // The repaint signature: the visible month, the selected day, and the guild-event
-  // mirror. Every member is an id, a number or a date string, so a language switch
-  // alone can never move it, which is why relocalize() exists below.
+  // The repaint signature: the visible month, the selected day, today's date (the
+  // grid's today ring and each day's past/future booking gate roll over at
+  // midnight), whether the viewer is in a guild at all (the guild-only note), the
+  // viewer's event-management right (the booking form and every delete button,
+  // which a promotion or demotion grants or revokes), and the guild-event mirror.
+  // Every member is an id, a boolean, a number or a date string, so a language
+  // switch alone can never move it, which is why relocalize() exists below.
   private sig(): string {
     const guild = this.deps.world().socialInfo?.guild ?? null;
-    return JSON.stringify([this.year, this.month, this.selectedIso, guild?.events ?? []]);
+    return JSON.stringify([
+      this.year,
+      this.month,
+      this.selectedIso,
+      this.todayIso(),
+      guild !== null,
+      canManageGuildEvents(guild),
+      guild?.events ?? [],
+    ]);
   }
 
-  // Slow-band refresh: repaint when the guild-event mirror changes.
+  // Slow-band refresh: repaint when anything the signature covers moves. The
+  // rebuild re-emits the booking form empty, so a half-typed booking (and the
+  // focus inside it) is carried across it the way relocalize() does: a poll that
+  // lands mid-typing must not eat the officer's draft. render() re-latches.
   refreshIfChanged(): void {
     if (!this.opened) return;
     const sig = this.sig();
     if (sig === this.lastSig) return;
-    this.lastSig = sig;
+    const root = this.deps.root();
+    const draft = captureFormDraft(root);
     this.render();
+    restoreFormDraft(root, draft);
   }
 
   /**
@@ -148,11 +164,11 @@ export class CalendarWindow {
    * booking form, which renderDayPane emits with empty inputs, so the draft is
    * carried across the rebuild.
    *
-   * The signature is RE-LATCHED rather than cleared. Clearing it is what the
-   * window's own interactive paths do, and each of those pays one extra rebuild
-   * on the next slow tick; here that second rebuild would land after the restore
-   * and wipe the draft again. The render below already painted the current data,
-   * so latching the current signature is what makes refreshIfChanged correct.
+   * The signature is RE-LATCHED rather than cleared (render() latches it too;
+   * the explicit line keeps this arm's contract visible). A cleared signature
+   * buys one extra rebuild on the next slow tick. The render below already
+   * painted the current data, so latching the current signature is what makes
+   * refreshIfChanged correct.
    */
   relocalize(): void {
     if (!this.opened) return;
@@ -253,7 +269,6 @@ export class CalendarWindow {
         const next = shiftMonth(this.year, this.month, Number(btn.dataset.calNav));
         this.year = next.year;
         this.month = next.month;
-        this.lastSig = '';
         audio.click();
         this.render();
         (el.querySelector(`[data-cal-nav="${btn.dataset.calNav}"]`) as HTMLElement | null)?.focus();
@@ -262,13 +277,15 @@ export class CalendarWindow {
     el.querySelectorAll<HTMLButtonElement>('[data-cal-day]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.selectedIso = btn.dataset.calDay ?? null;
-        this.lastSig = '';
         audio.click();
         this.render();
         (el.querySelector(`[data-cal-day="${this.selectedIso}"]`) as HTMLElement | null)?.focus();
       });
     });
     this.renderDayPane(view.cells);
+    // Re-latch: whatever triggered this paint (open, a month or day click, a
+    // poll), the DOM now shows the current data, so the next poll stays quiet.
+    this.lastSig = this.sig();
   }
 
   private renderDayPane(cells: CalendarCell[]): void {

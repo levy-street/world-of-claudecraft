@@ -917,12 +917,8 @@ export class BankWindow {
         this.tab === 'vault' && v.nextUpgradeCost !== null
           ? this.deps.world().copper >= v.nextUpgradeCost
           : null,
-        // The deposit-all button's enabled state reads the CARRIED bags, which
-        // no other signature term covers: without this arm, looting a material
-        // while the pane is open leaves the button stale-disabled until some
-        // other bank data happens to move. Vault-pane-scoped like the purse
-        // term (the personal tab's twin button has the same pre-existing gap,
-        // recorded as a family follow-up).
+        // Deposit All reads the CARRIED bags, which no other term covers, so a
+        // looted material would leave it stale-disabled (Personal twin below).
         this.tab === 'vault'
           ? hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds())
           : null,
@@ -970,6 +966,10 @@ export class BankWindow {
       this.deps.world().player?.membershipActive,
       this.deps.world().player?.referralInviterName,
       this.tab === 'account' ? this.deps.world().inventory : null,
+      // The Personal Deposit All twin of the vault arm above.
+      this.tab === 'personal'
+        ? hasDepositableMaterials(this.deps.world().inventory, (id) => knownItemDef(ITEMS, id))
+        : null,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;

@@ -683,9 +683,9 @@ describe('WOC Store window contract', () => {
     // focusKeyAttr joined the import when the top-up button gained a key (phase 17
     // QA): a pin on the whole import LINE is a same-change obligation for any
     // widening, which is the point of pinning the line rather than the symbols.
-    // findFocusKey joined with the Memberships tab, whose repaint restores focus by key.
+    // Membership focus restoration lives in its dedicated painter.
     expect(storeWindow).toContain(
-      "import { captureFocusKey, findFocusKey, focusedWithin, focusKeyAttr } from './focus_restore'",
+      "import { captureFocusKey, focusedWithin, focusKeyAttr } from './focus_restore'",
     );
     // restoreFirstEnabled moved BEHIND store_focus_policy in Phase 15 QA, so the
     // reach this pin used to have over the shared helper is kept by following it

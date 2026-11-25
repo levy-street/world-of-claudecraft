@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.checkoutPending': '結帳待處理。正在等待確認。',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '每{every}秒施法{cast}秒，對{radius}碼內所有玩家造成{min}至{max}點傷害。被釘住的玩家無論距離多遠都會受到{pinMult}倍傷害。',
   'bossJournal.wildheart.zulgar.spearSummary':

@@ -1366,6 +1366,7 @@ export const es_ES: EnTranslations = {
         "stackTerms": "Se paga ahora. El tiempo se añade al final de tu membresía actual y después se renueva con este plan.",
         "stackCapped": "Puedes acumular hasta 2 años de membresía a la vez. Inténtalo de nuevo cuando se acerque la fecha de renovación.",
         "stackUnavailable": "Ahora no se puede añadir tiempo de membresía. Inténtalo de nuevo en breve.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Actualiza tus datos de pago en Gestionar suscripción antes de añadir tiempo de membresía.",
         "renewsOn": "Se renueva el {date}",
         "endsOn": "La membresía termina el {date}",

@@ -4,7 +4,7 @@
 // against for bag-item drags, see tests/bags_window_drag_render_defer.test.ts): a
 // native HTML5 drag started by dragging an equipped item off the paperdoll to
 // unequip it loses its dragend when the row it started on is destroyed mid-drag by
-// a full sheet rebuild. Hud.refreshCharSheetIfChanged repaints an OPEN character
+// a full sheet rebuild. CharWindow.refreshIfChanged repaints an OPEN character
 // sheet within 500 ms of a loot, deed, or mount gain (routine, not rare), and
 // browsers never fire dragend on a source node that has left the document, so the
 // HUD's drag-to-unequip slot (cleared only from dragend) is then stuck for the

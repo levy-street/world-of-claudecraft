@@ -5,7 +5,10 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { buildCommissionOrderBoardModel } from '../src/ui/hud/professions/commission_order_view';
+import {
+  buildCommissionOrderBoardModel,
+  commissionOrderBoardSig,
+} from '../src/ui/hud/professions/commission_order_view';
 import type { CommissionOrderView } from '../src/world_api/professions';
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
@@ -137,5 +140,42 @@ describe('buildCommissionOrderBoardModel', () => {
     );
     expect(model.myOrders[0].item).toBeUndefined();
     expect(model.myOrders[0].itemId).toBe('qa_no_such_item');
+  });
+});
+
+describe('commissionOrderBoardSig', () => {
+  it('is stable across identical content in a fresh array', () => {
+    expect(commissionOrderBoardSig([order()])).toBe(commissionOrderBoardSig([order()]));
+    expect(commissionOrderBoardSig([])).toBe(commissionOrderBoardSig([]));
+  });
+
+  it('moves on every field the board renders or gates a button on', () => {
+    const base = commissionOrderBoardSig([order()]);
+    const moves: Partial<CommissionOrderView>[] = [
+      { id: 2 },
+      { recipeId: POTION_RECIPE },
+      { itemId: POTION },
+      { requesterName: 'Borin' },
+      { scope: 'crafter' },
+      { crafterName: 'Borin' },
+      { status: 'accepted' },
+      { acceptedByName: 'Borin' },
+      { crafterMasterworks: 3 },
+      { crafterLegendaries: 1 },
+      { mine: true },
+      { mineToCraft: true },
+    ];
+    for (const move of moves) {
+      expect(commissionOrderBoardSig([order(move)]), JSON.stringify(move)).not.toBe(base);
+    }
+  });
+
+  it('moves on a new posting, a removal, and a reorder', () => {
+    const one = commissionOrderBoardSig([order({ id: 1 })]);
+    const two = commissionOrderBoardSig([order({ id: 1 }), order({ id: 2 })]);
+    const swapped = commissionOrderBoardSig([order({ id: 2 }), order({ id: 1 })]);
+    expect(two).not.toBe(one);
+    expect(swapped).not.toBe(two);
+    expect(commissionOrderBoardSig([])).not.toBe(one);
   });
 });

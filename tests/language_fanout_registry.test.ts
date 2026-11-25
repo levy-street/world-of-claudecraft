@@ -191,9 +191,11 @@ const FANOUT_ARMS: readonly string[] = [
   // grip's name, the arrange-mode name chip, the mobile handle) is written
   // once at init by ChatGeometryController; its relocalize() rewrites them.
   'this.chatGeometry.relocalize|',
-  'this.questlogWindow.render|this.questlogWindow.isOpen',
+  'this.questlogWindow.relocalize|',
+  'this.talentsWindow.relocalize|',
+  'this.treasureMapWindow.relocalize|',
   "this.renderBags|$('#bags').style.display !== 'none'",
-  // The four service windows (copper vendor, heroic quartermaster, train,
+  // The service windows (copper, heroic and crucible vendors, warfare, train,
   // unbind) repaint through the shared helper; its per-window open-plus-shown
   // guards are pinned by tests/train_window_hud.test.ts, since this half only
   // sees refreshLocalizedDynamicUi's OWN statement-position calls.
@@ -218,6 +220,7 @@ const FANOUT_ARMS: readonly string[] = [
   // The plant sheet's relocalize gates itself (paint only while open), so the
   // arm carries no guard of its own.
   'this.plantSheetWindow.relocalize|',
+  'this.commissionBoardPainter.relocalize|',
   // The Perfecting window's relocalize gates itself the same way; its repaint
   // signature is ids/ranks/counts (text-independent), so the arm forces the
   // one rebuild (Masterwrought phase 14).
@@ -435,6 +438,48 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the Skull Bag pane is mounted only inside the open bags window; the bags language arm rebuilds that window, remounts the pane, resets lastSignature, and repaints the title, row labels, aria labels and buttons in the new locale',
   },
   {
+    file: 'hud/professions/commission_order_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.commissionBoardPainter.relocalize',
+    why: 'the board signature digests order ids, statuses, names and flags (text-free); relocalize self-gates on the open board, rebuilds once carrying the order form across, and re-latches lastSig',
+  },
+  {
+    file: 'hud/quest/questlog_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.questlogWindow.relocalize',
+    why: 'quest ids, states, counts, the selection and the reward spec digest into lastSig (text-free); relocalize self-gates on the open log, rebuilds once keeping focus and scroll, and render() re-latches it',
+  },
+  {
+    file: 'hud/rift_forge/rift_forge_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.riftForgeWindow.relocalize',
+    why: 'essence, gem counts and each band id, place, tier, level and sockets (text-free); relocalize clears the status line and rebuilds once, and render() re-latches the signature',
+  },
+  {
+    file: 'hud/treasure/treasure_map_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.treasureMapWindow.relocalize',
+    why: 'map rarity, site, ink held and map presence (text-free); relocalize self-gates on the open parchment, rebuilds once, and render() re-latches it',
+  },
+  {
+    file: 'keyboard_map_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.optionsWindow.relocalize',
+    why: 'the bindings and action-bar slot-name digest; the options relocalize forwards to the pop-out, whose repaint re-latches the signature in the current language',
+  },
+  {
+    file: 'talents_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.talentsWindow.relocalize',
+    why: 'class, level, allocation, active loadout and loadout names (text-free); relocalize self-gates on the open window, rebuilds once, and render() re-latches it',
+  },
+  {
+    file: 'char_window.ts',
+    memos: ['lastSig', 'paintedTab'],
+    answer: 'this.charWindow.renderIfOpen',
+    why: 'lastSig is the sheet data signature (stat numbers, ids, ranks and counts, none of which a locale moves) and paintedTab is the sidebar tab the last paint showed, read only to keep the panel scroll across a same-tab rebuild; the fan-out renderIfOpen rebuilds the whole sheet in the current language and re-latches both',
+  },
+  {
     file: 'calendar_window.ts',
     memos: ['lastSig'],
     answer: 'this.calendarWindow.relocalize',
@@ -528,9 +573,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'mailbox_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastSig', 'lastParcelSig'],
     answer: 'this.mailboxWindow.relocalize',
-    why: 'the tab, the open letter id and the mail mirror (#2529)',
+    why: 'the tab, the open letter id and the mail mirror (#2529); lastParcelSig is the Send tab parcel row, and relocalize -> render -> renderSend -> renderParcels re-latches it in the current language',
   },
   {
     file: 'market_sweep_panel.ts',
@@ -546,9 +591,16 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'market_window.ts',
-    memos: ['lastSig', 'lastSellPriceRefSig', 'searchEcho'],
+    memos: [
+      'lastSig',
+      'lastSellPriceRefSig',
+      'lastSellShapeSig',
+      'lastSellHave',
+      'lastSellNoteSig',
+      'searchEcho',
+    ],
     answer: 'this.marketWindow.render',
-    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig. searchEcho is answered DIFFERENTLY and deliberately: it memoizes the typed-to-sent Browse search translation, whose resolution reads localized item names, so it keys the active language into the memo itself (LANGUAGE_KEYED below verifies that structurally) rather than riding this arm. A repaint cannot fix it: the stale value is the string the client SENDS to the server, so it has to be re-resolved rather than re-painted',
+    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellShapeSig, lastSellHave and lastSellNoteSig are the Sell tab stock and listing-count patches (form layout, the have count, the note used/max): render() -> renderContent -> renderSell re-stamps all three with current-language text. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig. searchEcho is answered DIFFERENTLY and deliberately: it memoizes the typed-to-sent Browse search translation, whose resolution reads localized item names, so it keys the active language into the memo itself (LANGUAGE_KEYED below verifies that structurally) rather than riding this arm. A repaint cannot fix it: the stale value is the string the client SENDS to the server, so it has to be re-resolved rather than re-painted',
   },
   {
     file: 'weekly_rewards_window.ts',
@@ -560,7 +612,7 @@ const ANSWERED: readonly AnsweredSurface[] = [
     file: 'weekly_quests_window.ts',
     memos: ['lastSig'],
     answer: 'this.weeklyQuestsWindow.relocalize',
-    why: 'the held pick, the reset instant, the dialog and the standing map digest into lastSig, none of them text; relocalize() self-gates on the open sheet, clears the latch and rebuilds once, and render() re-latches the signature in the current language',
+    why: 'the held pick, the reset instant, the dialog and the standing map digest into lastSig, none of them text; relocalize() self-gates on the open sheet and rebuilds once, and render() re-latches the signature in the current language (never cleared, so no second rebuild follows)',
   },
   {
     file: 'hud/guild_hall/guild_hall_window.ts',
@@ -576,9 +628,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud/professions/farming_plant_sheet_window.ts',
-    memos: ['paintedStatus'],
+    memos: ['paintedPlantSig', 'paintedStatus'],
     answer: 'this.plantSheetWindow.relocalize',
-    why: 'the crop status memo gates cold refresh; relocalize repaints and re-latches it',
+    why: 'the crop status memo (harvest) and the plant view JSON memo (plant) gate the cold refresh; relocalize repaints and re-latches both',
   },
   {
     file: 'hud/professions/professions_window.ts',
@@ -686,9 +738,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud.ts',
-    memos: ['lastCharSheetSig', 'lastProfessionSurfaceSig'],
+    memos: ['lastProfessionSurfaceSig'],
     answer: 'this.charWindow.renderIfOpen',
-    why: "the character sheet's stat signature and the profession surface signature: stat numbers, ids, ranks and counts, none of which a locale moves. Both gate the same window, and the fan-out drives charWindow.renderIfOpen(), which rebuilds it wholesale with fresh t() when it is open",
+    why: 'the profession surface signature: ids, ranks and counts, none of which a locale moves. It gates the character window, and the fan-out drives charWindow.renderIfOpen(), which rebuilds it wholesale with fresh t() when it is open',
   },
   {
     file: 'hud.ts',
@@ -790,6 +842,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     memos: ['paintedStoreBody', 'paintedStoreMarkup'],
     reason:
       'paintedStoreBody / paintedStoreMarkup retain the RESOLVED store markup and the element it was written into, compared against freshly built markup in replaceStoreBody, so a locale change produces different markup and repaints. Same write-elision shape as claudium_window.',
+  },
+  {
+    file: 'store_membership_controller.ts',
+    memos: ['paintedMarkup'],
+    reason:
+      'paintedMarkup retains resolved membership markup, compared against freshly localized subscription HTML on every render. A locale change changes the resolved markup and repaints without a separate data invalidation signal.',
   },
   {
     file: 'guild_bank_log_window.ts',
@@ -1301,8 +1359,8 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     // Both halves of the predicate must be load-bearing, or the sweep is really
     // just "every module in src/ui" or "every module with a memo".
     expect(
-      discoveredByFile.has('talents_window.ts'),
-      'talents_window.ts has t() and no repaint memo: the memo half of the predicate stopped filtering',
+      discoveredByFile.has('inspect_window.ts'),
+      'inspect_window.ts has t() and no repaint memo: the memo half of the predicate stopped filtering',
     ).toBe(false);
     expect(
       discoveredByFile.has('party_below_target_painter.ts'),
@@ -1740,7 +1798,8 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-    ).toBe(39);
+      // 40: the extracted membership controller compares resolved localized markup.
+    ).toBe(40);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

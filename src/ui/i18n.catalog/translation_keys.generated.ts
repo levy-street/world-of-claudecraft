@@ -18953,6 +18953,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocStore.subscription.benefitsTitle'
   | 'hudChrome.wocStore.subscription.billingBlocked'
   | 'hudChrome.wocStore.subscription.checkoutClosed'
+  | 'hudChrome.wocStore.subscription.checkoutPending'
   | 'hudChrome.wocStore.subscription.ending'
   | 'hudChrome.wocStore.subscription.endsOn'
   | 'hudChrome.wocStore.subscription.error'

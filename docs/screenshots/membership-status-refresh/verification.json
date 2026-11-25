@@ -1,0 +1,74 @@
+[
+  {
+    "name": "desktop",
+    "mode": "before",
+    "errors": [],
+    "overflow": false,
+    "hasPending": false,
+    "hasPaymentWarning": true
+  },
+  {
+    "name": "desktop",
+    "mode": "pending",
+    "errors": [],
+    "overflow": false,
+    "hasPending": true,
+    "hasPaymentWarning": false
+  },
+  {
+    "name": "desktop",
+    "mode": "confirmed",
+    "errors": [],
+    "overflow": false,
+    "hasPending": false,
+    "hasPaymentWarning": false
+  },
+  {
+    "name": "mobile",
+    "mode": "before",
+    "errors": [],
+    "overflow": false,
+    "hasPending": false,
+    "hasPaymentWarning": true
+  },
+  {
+    "name": "mobile",
+    "mode": "pending",
+    "errors": [],
+    "overflow": false,
+    "hasPending": true,
+    "hasPaymentWarning": false
+  },
+  {
+    "name": "mobile",
+    "mode": "confirmed",
+    "errors": [],
+    "overflow": false,
+    "hasPending": false,
+    "hasPaymentWarning": false
+  },
+  {
+    "name": "landscape",
+    "mode": "before",
+    "errors": [],
+    "overflow": false,
+    "hasPending": false,
+    "hasPaymentWarning": true
+  },
+  {
+    "name": "landscape",
+    "mode": "pending",
+    "errors": [],
+    "overflow": false,
+    "hasPending": true,
+    "hasPaymentWarning": false
+  },
+  {
+    "name": "landscape",
+    "mode": "confirmed",
+    "errors": [],
+    "overflow": false,
+    "hasPending": false,
+    "hasPaymentWarning": false
+  }
+]

@@ -44,11 +44,12 @@ export function subscriptionPurchase(
   state: SubscriptionSnapshot,
   plan: GameSubscriptionPlan,
   nowSeconds: number,
-): 'new' | 'stack' | 'capped' | 'unavailable' | 'billing' {
+): 'new' | 'stack' | 'capped' | 'unavailable' | 'billing' | 'pending' {
   if (state.canCheckout) return 'new';
   if (state.canStack === true)
     return stackWouldPassLimit(state, plan, nowSeconds) ? 'capped' : 'stack';
-  return ['active', 'trialing'].includes(state.status) ? 'unavailable' : 'billing';
+  if (['none', 'canceled', 'incomplete_expired'].includes(state.status)) return 'pending';
+  return ['past_due', 'unpaid', 'incomplete'].includes(state.status) ? 'billing' : 'unavailable';
 }
 
 interface BadgeParts {
@@ -123,7 +124,9 @@ function planBadgeHtml(
           ? 'hudChrome.wocStore.subscription.stackUnavailable'
           : purchase === 'billing'
             ? 'hudChrome.wocStore.subscription.billingBlocked'
-            : null;
+            : purchase === 'pending'
+              ? 'hudChrome.wocStore.subscription.checkoutPending'
+              : null;
   if (note) action += `<p class="membership-badge-note">${esc(t(note))}</p>`;
   return membershipBadgeHtml({
     id: offer.plan,
@@ -178,10 +181,14 @@ export function subscriptionOffersHtml(
 ): string {
   const offers = state.plans ?? [GAME_SUBSCRIPTION_PLANS.game_monthly];
   const badges = offers.map((offer) => planBadgeHtml(offer, state, busy, nowSeconds)).join('');
+  const status =
+    subscriptionPurchase(state, state.plan ?? 'game_monthly', nowSeconds) === 'pending'
+      ? t('hudChrome.wocStore.subscription.checkoutPending')
+      : t(`hudChrome.wocStore.subscription.status.${state.status}`);
   return (
     `<div class="membership-badges" data-subscription-section>${badges}${tokenBadge}</div>` +
     `<section class="ui-card membership-status" data-membership-status><div class="charter-body"><h2 class="ui-h">${esc(t('hudChrome.wocStore.subscription.title'))}</h2>` +
-    `<p>${esc(t(`hudChrome.wocStore.subscription.status.${state.status}`))}</p>` +
+    `<p data-membership-summary>${esc(status)}</p>` +
     (['active', 'trialing'].includes(state.status) || state.cancelAtPeriodEnd
       ? `<p>${esc(statusLine(state))}</p>`
       : '') +

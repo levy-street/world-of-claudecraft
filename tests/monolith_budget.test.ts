@@ -554,7 +554,9 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // LOWERED 17736 -> 17705 by the live window refresh: the character sheet's
+    // latch moved into char_window (its paints re-latch it). wc -l, exact.
+    ceiling: 17705,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -2577,7 +2579,8 @@ const MONOLITHS: MonolithRow[] = [
     // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
     // controllers now build over one seam object (store_spend_controllers.ts).
     // Summary and countdown formatting live in daily_rewards_chrome_view.ts.
-    ceiling: 1249,
+    // Membership painting and reward task markup now live in tested siblings.
+    ceiling: 1235,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

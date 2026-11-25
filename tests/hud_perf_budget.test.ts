@@ -1169,11 +1169,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // Preserve the courier body and its two storage grids' scroll offsets (one
   // read and one write each) only across a changed render, never per frame.
   { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
-  // The scroll pair and the rAF both belonged to the mount picker's
-  // scroll-the-selected-card-into-view path, which went away when reins became
-  // usable items and the picker was deleted. The sheet now reads nothing and
-  // arms nothing.
-  { file: 'char_window.ts', reflowAllow: {}, driverAllow: {} },
+  // The mount picker's old scroll pair went with the picker. The one pair now is
+  // the sidebar panel's: read before a SAME-TAB rebuild (the slow-band latch
+  // repainting a buff or a reputation gain), written back after, so a long
+  // panel does not jump to the top. Rebuild-only, never per poll.
+  { file: 'char_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   {
     file: 'hud/professions/crafting_window.ts',
     // Three scroll regions carried across the rebuild, capture + write-back
@@ -1186,10 +1186,12 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   // Same scroll pair as the vendor family's cold windows above: read the
   // position before the rebuild, write it back after, so the order list
-  // does not jump under the player on their own action's repaint.
+  // does not jump under the player on their own action's repaint. The second
+  // pair is the live poll's sections-only rebuild (other players' orders
+  // moving), which runs only when the board signature changed.
   {
     file: 'hud/professions/commission_order_window.ts',
-    reflowAllow: { '.scrollTop': 2 },
+    reflowAllow: { '.scrollTop': 4 },
     driverAllow: {},
   },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s
@@ -1250,6 +1252,8 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       },
     ],
   },
+  // Membership paints preserve body scroll only when the resolved markup changes.
+  { file: 'store_membership_controller.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'deeds_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The Harvest Journal's countdown clock: ONE 1 Hz interval armed on open and
   // cleared on close, the finest resolution any line in that window renders. It
@@ -1460,7 +1464,20 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       '.scrollHeight': 1,
       getComputedStyle: 1,
       getUiScale: 2,
+      // The body scroll pair the live poll carries across a signature-changed
+      // rebuild (a level-up, a loadout swap elsewhere); never per poll.
+      '.scrollTop': 2,
     },
+    driverAllow: {},
+  },
+  // The list and detail scroll the live poll carries across a quest-progress
+  // rebuild (one read and one write each), only when the log signature moved.
+  { file: 'hud/quest/questlog_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The band list scroll the live poll carries across a rebuild (one read, one
+  // write), only when the forge signature moved.
+  {
+    file: 'hud/rift_forge/rift_forge_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
     driverAllow: {},
   },
   { file: 'town_focus_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },

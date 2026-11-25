@@ -1366,6 +1366,7 @@ export const pl_PL: EnTranslations = {
         "stackTerms": "Płatność następuje teraz. Czas zostanie dodany na koniec obecnego członkostwa, które następnie odnowi się zgodnie z tym planem.",
         "stackCapped": "Możesz zgromadzić maksymalnie 2 lata członkostwa naraz. Spróbuj ponownie bliżej daty odnowienia.",
         "stackUnavailable": "Dodawanie czasu członkostwa jest obecnie niedostępne. Spróbuj ponownie za chwilę.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Zaktualizuj dane płatności w sekcji Zarządzaj subskrypcją, zanim dodasz czas członkostwa.",
         "renewsOn": "Odnowienie: {date}",
         "endsOn": "Członkostwo kończy się {date}",

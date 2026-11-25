@@ -7,7 +7,9 @@
 // class, and Hud.closeManagedWindow routes its id through
 // OptionsWindow.closeKeyboardWindow (the CODE_BUILT row in
 // tests/managed_window_close_registry.test.ts). No trap, no timer: every open
-// repaints from the live bindings.
+// repaints from the live bindings, and the Hud slow-band poll (on the instance
+// OptionsWindow.keyboardPopout hands it) repaints the board when a bound action's
+// name moves underneath it (an ability dragged onto the action bar).
 // Desktop only: the panel offers the Pop Out button only off touch. Registered
 // in tests/architecture.test.ts UI_DOM_MODULES.
 
@@ -31,10 +33,29 @@ export interface KeyboardMapWindowFocus {
   openFocusTrap: (root: () => HTMLElement, returnFocusTo: HTMLElement) => FocusTrapHandle;
 }
 
+/**
+ * What the board draws its caps from: the bindings, plus the resolved name of
+ * every action-bar slot action (the one family whose name follows what sits in
+ * the slot rather than the locale alone). Other action names move only with the
+ * language, which relocalize() covers.
+ */
+function boardSignature(deps: KeyboardMapPaintDeps): string {
+  const bindings = deps.bindings();
+  let sig = JSON.stringify(bindings);
+  for (const id of Object.keys(bindings))
+    if (id.startsWith('slot')) sig += `|${deps.actionName(id)}`;
+  return sig;
+}
+
 export class KeyboardMapWindow {
   private rootEl: HTMLElement | null = null;
   private map: KeyboardMapHandle | null = null;
   private trap: FocusTrapHandle | null = null;
+  // The deps the open board was painted with, reused by the poll so it does not
+  // rebuild them every half second.
+  private boardDeps: KeyboardMapPaintDeps | null = null;
+  // The board signature the last paint / repaint drew from (boardSignature).
+  private lastSig = '';
 
   /** `deps` is read at every open so the board always reflects the live
    *  bindings and the panel's current modifier layer. */
@@ -71,7 +92,24 @@ export class KeyboardMapWindow {
 
   /** Redraw from the live bindings (a rebind made elsewhere while open). */
   repaint(): void {
-    if (this.isOpen) this.map?.repaint();
+    if (!this.isOpen || !this.map) return;
+    this.map.repaint();
+    if (this.boardDeps) this.lastSig = boardSignature(this.boardDeps);
+  }
+
+  /**
+   * The slow-band poll: repaint the board when its bindings or a slot's action
+   * name moved (an ability dragged onto the bar while the pop-out is up). Held
+   * while the player is mid-interaction, since a repaint drops an armed capture;
+   * lastSig stays put so the first poll after it clears catches up. A repeated
+   * identical poll touches no DOM.
+   */
+  refreshIfChanged(): void {
+    if (!this.isOpen || !this.map || !this.boardDeps || this.map.busy()) return;
+    const sig = boardSignature(this.boardDeps);
+    if (sig === this.lastSig) return;
+    this.lastSig = sig;
+    this.map.repaint();
   }
 
   /** A runtime language switch: rebuild the whole window while open (title,
@@ -99,6 +137,8 @@ export class KeyboardMapWindow {
     const body = document.createElement('div');
     body.className = 'keyboard-map-body';
     root.appendChild(body);
-    this.map = paintKeyboardMap(body, this.deps());
+    this.boardDeps = this.deps();
+    this.map = paintKeyboardMap(body, this.boardDeps);
+    this.lastSig = boardSignature(this.boardDeps);
   }
 }

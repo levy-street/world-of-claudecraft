@@ -22,7 +22,7 @@ import {
 import { SubscriptionCheckoutIntents } from './subscription_checkout_intents';
 import { usdText } from './usd_text';
 
-/** Cold store section. Status refreshes on user entry/refresh, never the store polling timer. */
+/** Store section with full entry reads and a status-only background refresh. */
 export class StoreSubscription {
   private state: SubscriptionSnapshot = { ...SUBSCRIPTION_OFF };
   private tokenState = { ...MEMBERSHIP_TOKEN_OFF };
@@ -35,6 +35,8 @@ export class StoreSubscription {
     }
   }
   private flight: Promise<void> | null = null;
+  private flightStatusOnly = false;
+  private entryRefresh: Promise<void> | null = null;
   private busy = false;
   private owner: SubscriptionStoreHooks | undefined;
   private readonly intents = new SubscriptionCheckoutIntents({
@@ -48,10 +50,23 @@ export class StoreSubscription {
   private checkoutCompleted: () => void = () => {};
   constructor(private readonly hooks: () => SubscriptionStoreHooks | undefined) {}
 
+  get refreshBlocked(): boolean {
+    return (
+      this.busy ||
+      this.flight !== null ||
+      document.getElementById('stripe-checkout-overlay') !== null
+    );
+  }
+
   /** Embedded Checkout mounts in the game like a Claudium top-up, so no tab or popup is
    *  needed. A hosted link (a service without embedding) still opens a tab. */
   private async openCheckout(result: SubscriptionLink): Promise<void> {
     if (result.stripe) {
+      const owner = this.hooks();
+      const accountId = this.state.accountId;
+      const completed = () => {
+        if (owner === this.hooks() && accountId === this.state.accountId) this.checkoutCompleted();
+      };
       await openStripeCheckout(
         result.stripe,
         {
@@ -62,8 +77,8 @@ export class StoreSubscription {
         },
         {
           onComplete: () => {
-            this.checkoutCompleted();
-            window.setTimeout(this.checkoutCompleted, 4000);
+            completed();
+            window.setTimeout(completed, 4000);
           },
         },
       );
@@ -80,29 +95,55 @@ export class StoreSubscription {
     tab.opener = null;
   }
 
-  refresh(): Promise<void> {
-    if (this.flight) return this.flight;
+  refresh(statusOnly = false): Promise<void> {
+    if (this.flight) {
+      // A foreground entry must still fetch offers and deliver rewards when it
+      // arrives during a cheaper status-only read. Coalesce repeated entries.
+      if (!statusOnly && this.flightStatusOnly) {
+        this.entryRefresh ??= this.flight
+          .then(() => this.refresh())
+          .finally(() => {
+            this.entryRefresh = null;
+          });
+        return this.entryRefresh;
+      }
+      return this.flight;
+    }
+    if (statusOnly && this.busy) return Promise.resolve();
+    const hooks = this.hooks();
+    this.flightStatusOnly = statusOnly;
     this.flight = Promise.resolve()
       .then(async () => {
-        const hooks = this.hooks();
         const [state, tokenState] = await Promise.all([
           hooks?.snapshot() ?? Promise.resolve({ ...SUBSCRIPTION_OFF }),
-          hooks?.tokenOffer?.() ?? Promise.resolve({ ...MEMBERSHIP_TOKEN_OFF }),
+          statusOnly
+            ? Promise.resolve(this.tokenState)
+            : (hooks?.tokenOffer?.() ?? Promise.resolve({ ...MEMBERSHIP_TOKEN_OFF })),
         ]);
         if (hooks !== this.hooks()) return;
+        // A transient failed read must not erase a confirmed membership, and a
+        // poll started before a purchase must not replace its in-flight state.
+        if (statusOnly && (!state.available || this.busy)) return;
         const ownerChanged = this.owner !== hooks;
-        if (ownerChanged || this.state.accountId !== state.accountId) this.annualDelivered = false;
+        const accountChanged = ownerChanged || this.state.accountId !== state.accountId;
+        if (accountChanged) this.annualDelivered = false;
         this.intents.scope(state.accountId, ownerChanged && state.accountId === undefined);
         this.owner = hooks;
         this.state = state;
-        this.tokenState = tokenState;
+        this.tokenState = statusOnly && accountChanged ? { ...MEMBERSHIP_TOKEN_OFF } : tokenState;
         if (state.available && ['active', 'trialing'].includes(state.status))
           this.intents.complete('game_monthly');
         // Return/reload only retries reward delivery; it never creates a paid checkout.
-        if (state.available && this.intents.pending('game_annual') && hooks?.annualMountClaim)
+        if (
+          !statusOnly &&
+          state.available &&
+          this.intents.pending('game_annual') &&
+          hooks?.annualMountClaim
+        )
           await this.collectAnnual(hooks).catch(() => false);
       })
       .catch(() => {
+        if (statusOnly || hooks !== this.hooks()) return;
         this.state = { ...SUBSCRIPTION_OFF };
         this.tokenState = { ...MEMBERSHIP_TOKEN_OFF };
       })

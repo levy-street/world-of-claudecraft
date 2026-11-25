@@ -122,3 +122,30 @@ export function buildCommissionOrderBoardModel(
     .map((r) => ({ recipeId: r.id, itemId: r.resultItemId, item: items[r.resultItemId] }));
   return { myOrders, toCraft, board, openableRecipes };
 }
+
+/**
+ * The board's repaint signature: a cheap, text-free digest of every
+ * per-order field the three row sections render or gate a button on, in the
+ * projection's own order (the sections paint in that order). The live poll
+ * compares it so another player's accept, deliver, cancel or new posting
+ * shows on an open board, and an unchanged board writes nothing. Locale-free
+ * BY DESIGN, so a language switch needs the window's relocalize arm.
+ */
+export function commissionOrderBoardSig(orders: readonly CommissionOrderView[]): string {
+  return JSON.stringify(
+    orders.map((o) => [
+      o.id,
+      o.recipeId,
+      o.itemId,
+      o.requesterName,
+      o.scope,
+      o.crafterName ?? null,
+      o.status,
+      o.acceptedByName ?? null,
+      o.crafterMasterworks ?? null,
+      o.crafterLegendaries ?? null,
+      o.mine,
+      o.mineToCraft,
+    ]),
+  );
+}

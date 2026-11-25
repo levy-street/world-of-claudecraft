@@ -2,7 +2,7 @@
 //
 // The weekly window painter (src/ui/weekly_quests_window.ts) over jsdom: the
 // four cards, the inner confirm dialog, the pick command, and the held state.
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { WeeklyQuestProgress } from '../src/sim/types';
 import { WeeklyQuestsWindow } from '../src/ui/weekly_quests_window';
 
@@ -116,5 +116,105 @@ describe('weekly quests window', () => {
     expect(r.el.querySelector('.wk-commend-note')?.textContent).toBe(
       "This week's commendation went to the Church Order.",
     );
+  });
+});
+
+// The slow-band signature latch. render() re-latches on EVERY paint (open, a
+// card or dialog click, a poll, the language arm), so an explicit repaint is
+// never followed by a second rebuild on the next poll; relocalize() used to
+// clear the signature and every action path did too, which bought exactly that
+// redundant rebuild (and the focus loss that rides it).
+describe('weekly quests window: refresh signature', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    document.body.innerHTML = '';
+  });
+
+  it('does not rebuild on the first poll after open', () => {
+    const r = rig();
+    r.window.open();
+    const cards = r.el.querySelector('.wk-cards');
+    r.window.refreshIfChanged();
+    expect(r.el.querySelector('.wk-cards'), 'the poll after open rebuilt again').toBe(cards);
+  });
+
+  it('relocalize rebuilds once and re-latches: the next poll is quiet', () => {
+    const r = rig();
+    r.window.open();
+    const before = r.el.querySelector('.wk-cards');
+    r.window.relocalize();
+    const after = r.el.querySelector('.wk-cards');
+    expect(after, 'relocalize must force a rebuild').not.toBe(before);
+    r.window.refreshIfChanged();
+    expect(r.el.querySelector('.wk-cards'), 'relocalize left the signature cleared').toBe(after);
+  });
+
+  it('a dialog decline re-latches: the next poll is quiet', () => {
+    const r = rig();
+    r.window.open();
+    (r.el.querySelector('[data-wk-choose="wk_raid"]') as HTMLButtonElement).click();
+    (r.el.querySelector('[data-wk-decline]') as HTMLButtonElement).click();
+    const cards = r.el.querySelector('.wk-cards');
+    r.window.refreshIfChanged();
+    expect(r.el.querySelector('.wk-cards')).toBe(cards);
+  });
+
+  it('still rebuilds when the countdown minute rolls over', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-10T12:00:10Z'));
+    const r = rig();
+    r.window.open();
+    const cards = r.el.querySelector('.wk-cards');
+    vi.setSystemTime(new Date('2026-07-10T12:00:50Z'));
+    r.window.refreshIfChanged();
+    expect(r.el.querySelector('.wk-cards'), 'same minute must not rebuild').toBe(cards);
+    vi.setSystemTime(new Date('2026-07-10T12:01:01Z'));
+    r.window.refreshIfChanged();
+    expect(r.el.querySelector('.wk-cards'), 'the next minute must rebuild').not.toBe(cards);
+  });
+
+  it('holds the confirm dialog through a poll, then catches up once it closes', () => {
+    const r = rig();
+    r.window.open();
+    (r.el.querySelector('[data-wk-choose="wk_raid"]') as HTMLButtonElement).click();
+    const accept = r.el.querySelector<HTMLButtonElement>('[data-wk-accept]');
+    expect(document.activeElement).toBe(accept);
+    // Data moves under the open dialog: no rebuild, focus stays on Accept.
+    r.world.factions = { ...r.world.factions, church_order: 500 };
+    r.window.refreshIfChanged();
+    expect(r.el.querySelector('[data-wk-accept]')).toBe(accept);
+    expect(document.activeElement).toBe(accept);
+    // The pick lands elsewhere (another client, an authority echo) while the
+    // dialog is still up: the poll holds, so the cards still read the old state.
+    r.world.weeklyQuest = { questId: 'wk_dungeons', week: 'wk_1', count: 1, state: 'active' };
+    r.window.refreshIfChanged();
+    expect(r.el.querySelector('[data-wk-accept]')).toBe(accept);
+    expect(
+      [...r.el.querySelectorAll<HTMLButtonElement>('[data-wk-choose]')].map((b) => b.disabled),
+    ).toEqual([false, false, false, false]);
+    // Catch-up: the dialog closes and the moved data is what the window now shows
+    // (asserted on the painted cards, since the decline's own render re-latches).
+    (r.el.querySelector('[data-wk-decline]') as HTMLButtonElement).click();
+    r.window.refreshIfChanged();
+    expect(r.el.querySelector('.wk-dialog')).toBeNull();
+    const buttons = [...r.el.querySelectorAll<HTMLButtonElement>('[data-wk-choose]')];
+    expect(buttons.map((b) => b.disabled)).toEqual([true, true, true, true]);
+    expect(r.el.querySelector('[data-wk-choose="wk_dungeons"]')?.textContent).toBe(
+      'In progress (1/3)',
+    );
+    expect(r.el.querySelector('.wk-card-active')?.getAttribute('data-wk-card')).toBe('wk_dungeons');
+  });
+
+  it('keeps focus on the same control across a poll-driven rebuild', () => {
+    const r = rig({ questId: 'wk_raid', week: 'wk_2', count: 1, state: 'completed' });
+    r.window.open();
+    const church = r.el.querySelector<HTMLButtonElement>('[data-wk-commend="church_order"]');
+    church?.focus();
+    expect(document.activeElement).toBe(church);
+    r.world.factions = { ...r.world.factions, automatons: 10 };
+    r.window.refreshIfChanged();
+    const rebuilt = r.el.querySelector<HTMLButtonElement>('[data-wk-commend="church_order"]');
+    expect(rebuilt, 'the poll must really rebuild').not.toBe(church);
+    expect(document.activeElement).toBe(rebuilt);
   });
 });
