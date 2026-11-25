@@ -32,9 +32,6 @@ export const ASCENSION_PILLAR_FADE = 0.6;
 export const ASCENSION_ENTRANCE = 1.3;
 /** Seconds the halo and circle take to fade once Ascension ends. */
 export const ASCENSION_EXIT = 0.6;
-/** How high the Paladin is borne up while ascended, before the size scale. */
-const LIFT = 0.14;
-const BOB = 0.03;
 const PILLAR_HEIGHT = 30;
 const MOTES = 28;
 /** The halo's centre, as a share of character height: behind the head. */
@@ -478,23 +475,11 @@ export class PaladinAscensionVisual {
   }
 
   /**
-   * Advance the column, circle, halo, orbs and wings, and lift the rig
-   * (`hoverTarget`, the rider root) by the hover while Ascension is up.
-   *
-   * The lift is ADDED to the height the renderer placed the rig at THIS frame,
-   * so call it after the rider placement (placeRider, or the mount attitude
-   * pass in updateMountPresentation), which rewrites that height every frame.
-   * It must never latch a base height of its own: the visual lives for the
-   * whole view once built, and a latched height pinned the paladin to wherever
-   * the first Ascension caught them, on the ground under every later mount or
-   * floating at seat height after a dismount.
+   * Advance the column, circle, halo, orbs and wings. The Paladin stays
+   * planted while ascended: the visual never moves the character rig, so the
+   * rider placement (on foot or in the saddle) is the renderer's alone.
    */
-  update(
-    plan: PaladinAscensionVisualPlan,
-    dt: number,
-    reducedMotion: boolean,
-    hoverTarget: THREE.Object3D | null = null,
-  ): void {
+  update(plan: PaladinAscensionVisualPlan, dt: number, reducedMotion: boolean): void {
     // Idle: no Ascension, its fade and its wings all done. Nothing to draw or
     // write until the aura returns (the view keeps the visual once built).
     if (
@@ -559,15 +544,7 @@ export class PaladinAscensionVisual {
     this.group.visible = shown;
     this.crown.visible = shown;
 
-    // Borne up off the ground, gently rising and falling.
-    const lift = shown
-      ? (LIFT * ramp(this.age, 0, 0.4) +
-          (reducedMotion ? 0 : BOB * Math.sin(this.clock * 2.2) * ramp(this.age, 0.4, 0.8))) *
-        this.size *
-        this.presence
-      : 0;
-    if (hoverTarget && lift !== 0) hoverTarget.position.y += lift;
-    this.syncWings(plan, dt, reducedMotion, shown, lift);
+    this.syncWings(plan, dt, reducedMotion, shown);
     // Gone with the Paladin mid-flight: the wings burn out with the body.
     for (const wings of [this.wings, this.furlingWings]) {
       if (!wings) continue;
@@ -618,7 +595,7 @@ export class PaladinAscensionVisual {
       (0.6 + 0.4 * easeOutBack(ramp(this.age, 0.08, 0.5))) *
       (1 + 0.25 * fading);
     copyInto(halo.uPop.value as number[], this.pops);
-    this.halo.position.y = this.height * HALO_HEIGHT + lift;
+    this.halo.position.y = this.height * HALO_HEIGHT;
 
     const motes = this.motes.material.uniforms;
     motes.uTime.value = this.clock;
@@ -635,7 +612,6 @@ export class PaladinAscensionVisual {
     dt: number,
     reducedMotion: boolean,
     shown: boolean,
-    lift: number,
   ): void {
     // The pair left below when Avenging Wrath ended folds away where it is.
     this.furlingWings = syncPaladinAvengingWrathVisual(
@@ -676,7 +652,7 @@ export class PaladinAscensionVisual {
         // place, already spread.
         this.furlingWings?.dispose();
         // This frame's sync posed it afresh: back below before it furls.
-        this.placeWings(wings, lift, 1);
+        this.placeWings(wings, 1);
         this.furlingWings = syncPaladinAvengingWrathVisual(
           wings,
           this.crown,
@@ -702,17 +678,17 @@ export class PaladinAscensionVisual {
         fresh.elapsed = 1;
         fresh.material.uniforms.uOpen.value = 1;
         this.wings = fresh;
-        this.placeWings(fresh, lift, 0);
+        this.placeWings(fresh, 0);
         return;
       }
     }
-    this.placeWings(wings, lift, lower ? 1 : 0);
+    this.placeWings(wings, lower ? 1 : 0);
   }
 
   /** Ascension's pair at the shoulders (0) or as the lower pair (1). */
-  private placeWings(wings: PaladinAvengingWrathVisual, lift: number, low: number): void {
+  private placeWings(wings: PaladinAvengingWrathVisual, low: number): void {
     wings.root.position.y =
-      this.height * (PALADIN_BODY_FIT.wingRoot - PALADIN_BODY_FIT.lowerWingDrop * low) + lift;
+      this.height * (PALADIN_BODY_FIT.wingRoot - PALADIN_BODY_FIT.lowerWingDrop * low);
     wings.root.position.z = -0.05 * low;
     wings.wingRig.scale.multiplyScalar(1 - (1 - LOWER_WINGS_SIZE) * low);
     // Mirrored, the left wing tips down with a positive turn, the right negative.
@@ -756,7 +732,6 @@ export function syncPaladinAscensionVisual(
   plan: PaladinAscensionVisualPlan,
   dt: number,
   reducedMotion: boolean,
-  hoverTarget: THREE.Object3D | null = null,
 ): PaladinAscensionVisual | null {
   let current = visual;
   if (plan.active && !current) {
@@ -764,7 +739,7 @@ export function syncPaladinAscensionVisual(
     parent.add(current.group);
     riderParent.add(current.crown);
   }
-  current?.update(plan, dt, reducedMotion, hoverTarget);
+  current?.update(plan, dt, reducedMotion);
   return current;
 }
 

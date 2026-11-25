@@ -10939,7 +10939,6 @@ export class Renderer {
         ascensionPlan,
         dt,
         this.reducedMotion(),
-        v.visual.root,
       );
       v.goblinRocketSledFx?.update(
         dt,
