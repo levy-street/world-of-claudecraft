@@ -2708,7 +2708,8 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 150, agi: 8, sta: 9 },
+    // Strength, not Agility: feral (the only druid wearer) is a Strength spec.
+    stats: { armor: 150, str: 8, sta: 9 },
     hitRating: 60,
     critRating: 25,
     sellValue: 10000,
@@ -2722,7 +2723,8 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 145, agi: 7, sta: 9 },
+    // Strength, not Agility: feral (the only druid wearer) is a Strength spec.
+    stats: { armor: 145, str: 7, sta: 9 },
     critRating: 60,
     hasteRating: 25,
     sellValue: 10000,

@@ -277,7 +277,9 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   warlock: [{ id: 'demonology', weights: { int: 1, sta: 0.6, spi: 0.5 }, melee: false }],
   druid: [
     { id: 'balance', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
-    { id: 'feral', weights: { str: 1, agi: 0.6, sta: 0.6 }, melee: true },
+    // Agility pays a cat nothing and a bear 1.5 AP plus a little armor and
+    // dodge per point, so it stays a small tiebreak, never a co-primary.
+    { id: 'feral', weights: { str: 1, agi: 0.2, sta: 0.6 }, melee: true },
   ],
 };
 
@@ -717,7 +719,10 @@ export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
 // (Loop of Quiet Springs joins the holy priest and holy paladin rings), and
 // casters now weigh a two-hander against a one-hander plus its offhand so the
 // healer staff's new Crit cannot strip the holy kits' orb and shield.
-export const BOOST_KIT_VERSION = 7;
+// v8: feral finishes the Strength flip (agi weight 0.6 to 0.2) and the last
+// agi-lined druid-only pieces (Crucible Guardian leather, Cinderbark Cinch,
+// Ashenbark Treads) re-stat to Strength; the bump re-kits the fleet.
+export const BOOST_KIT_VERSION = 8;
 
 /**
  * Bring one live player up to the current boost kit: level 20, the best

@@ -86,7 +86,9 @@ const PROFILES: readonly Profile[] = [
     role: 'tank',
     armorType: 'leather',
     classes: ['druid'],
-    primary: { agi: 7, str: 3, sta: 15 },
+    // Strength-primary like every feral line: druid attack power is 2 per
+    // Strength and never reads Agility outside the bear's small 1.5 per point.
+    primary: { str: 7, agi: 3, sta: 15 },
   },
   {
     id: 'crucible_caster_leather',
