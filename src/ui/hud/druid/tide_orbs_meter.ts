@@ -15,12 +15,12 @@ export interface TideOrbsStrings extends TideOrbsFormatters {
   moonTooltip(): string;
 }
 
-/** The Moonwing Tidewheel banks in the Eclipse layout (108 by 100): the window
+/** The Moonwing Tidewheel banks in the Eclipse layout (108 by 90): the window
  *  gem in the middle with five Suntide and five Moontide orbs around it,
  *  plus the screen-edge glow overlay. The gem shows the icon of the spell the
  *  open window favors: Skyfall during Sunrise, Wildbolt during Moonrise. The
  *  bank being charged sits in an arc of full-size orbs above the gem and the
- *  other in an arc of small orbs below it (see tideTopBank and tidePlace in
+ *  other as small beads below it (see tideTopBank and tidePlace in
  *  tide_orbs_view.ts). */
 export function createTideOrbsMeter(
   doc: Document,

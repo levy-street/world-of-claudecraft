@@ -16,7 +16,7 @@ export type TideWindow = 'none' | 'sun' | 'moon';
 /** Where a bank's orbs sit in the Eclipse layout around the gem, always
  *  horizontal:
  *  - top: the bank being charged, five full-size orbs in an arc above the gem;
- *  - below: the other bank, five small orbs in an arc below the gem. */
+ *  - below: the other bank, five small beads hugging the gem's lower edge. */
 export type TidePlace = 'top' | 'below';
 export type TideBank = 'sun' | 'moon';
 

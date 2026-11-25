@@ -1,8 +1,8 @@
-/* The Moonwing Tidewheel in the Eclipse layout: the window gem on a 108 by 100
+/* The Moonwing Tidewheel in the Eclipse layout: the window gem on a 108 by 90
    plate with the two banks' five orbs each around it, always horizontal. The bank
    being charged (the favored spell's school; with no window open, the one charged
-   last) sits in an arc of full-size orbs above the gem, the other in a row of small
-   orbs below it (tidePlace in tide_orbs_view.ts). Swapping banks glides the orbs
+   last) sits in an arc of full-size orbs above the gem, the other as five small
+   beads hugging the gem's lower edge (tidePlace in tide_orbs_view.ts). Swapping banks glides the orbs
    between the two arcs. A filled orb glows in its school's color, a bank at 3 or
    more (payoff ready) breathes, and the gem shows the spell the open window favors
    (Skyfall in moon blue during Sunrise, Wildbolt in sun gold during Moonrise) with a
@@ -24,11 +24,11 @@
     --tide-orb: 20px;
     --tide-gem: 32px;
     --tide-r: 44px;
-    --tide-cy: 9px;
+    --tide-cy: 15px;
     --tide-plate-tint: var(--color-tide-rim);
     display: none;
     width: 108px;
-    height: 100px;
+    height: 90px;
     box-sizing: border-box;
     border: 1px solid var(--color-tide-rim);
     border-radius: 20px;
@@ -85,26 +85,30 @@
   .druid-tide-bank.place-top .druid-tide-orb:nth-child(5) {
     --tide-a: 328deg;
   }
-  /* The other bank: five small orbs in a tighter arc below the gem, filling
-     left to right. They still light per point and breathe from 3. */
+  /* The other bank: five small beads hugging the lower edge of the gem's
+     ring, filling left to right. They still light per point (unlit ones
+     dimmed) and breathe from 3. */
   .druid-tide-bank.place-below {
-    --tide-rr: 0.68;
-    --tide-s: 0.55;
+    --tide-rr: 0.48;
+    --tide-s: 0.35;
+  }
+  .druid-tide-bank.place-below .druid-tide-orb:not(.on) {
+    --tide-o: 0.55;
   }
   .druid-tide-bank.place-below .druid-tide-orb:nth-child(1) {
-    --tide-a: 148deg;
+    --tide-a: 138deg;
   }
   .druid-tide-bank.place-below .druid-tide-orb:nth-child(2) {
-    --tide-a: 119deg;
+    --tide-a: 114deg;
   }
   .druid-tide-bank.place-below .druid-tide-orb:nth-child(3) {
     --tide-a: 90deg;
   }
   .druid-tide-bank.place-below .druid-tide-orb:nth-child(4) {
-    --tide-a: 61deg;
+    --tide-a: 66deg;
   }
   .druid-tide-bank.place-below .druid-tide-orb:nth-child(5) {
-    --tide-a: 32deg;
+    --tide-a: 42deg;
   }
   .druid-tide-orb {
     position: absolute;
@@ -412,10 +416,10 @@
     --tide-orb: 16px;
     --tide-gem: 26px;
     --tide-r: 35px;
-    --tide-cy: 7px;
+    --tide-cy: 12px;
     top: 66%;
     width: 86px;
-    height: 80px;
+    height: 72px;
     border-radius: 16px;
     pointer-events: auto;
     touch-action: none;
