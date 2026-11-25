@@ -25,12 +25,15 @@ import {
   type WorldContent,
 } from '../src/sim/types';
 import {
+  steerDriftToWalk,
+  WIND_CROSS_GRIP,
   WIND_DRIFT_AURA,
   WIND_PULL_AURA,
   WIND_PULL_EASE,
   WIND_PULL_STOP,
   windDrift,
   windDriftSpeed,
+  windIsSteady,
 } from '../src/sim/wind_drift';
 import { terrainHeight } from '../src/sim/world';
 
@@ -154,6 +157,43 @@ describe('wind drift: the motion kernel on the live Sim', () => {
     const per = (w0 - walker.player.pos.x) / (40 * DT);
     expect(per).toBeGreaterThan(RUN_SPEED - 3.2 - 0.4);
     expect(per).toBeLessThan(RUN_SPEED - 3.2 + 0.4);
+  });
+
+  it('a walk across the wind keeps its line: the push across it held to the grip', () => {
+    // The owner's playtest of 2026-11-25: no crabbing sideways like ice.
+    const walker = makeSim();
+    walker.player.auras.push(wind(Math.PI / 2, 4));
+    walker.player.facing = 0; // north, the wind blowing east
+    const x0 = walker.player.pos.x;
+    const z0 = walker.player.pos.z;
+    hold(walker, mi({ forward: true }), 40);
+    const east = (walker.player.pos.x - x0) / (40 * DT);
+    const north = (walker.player.pos.z - z0) / (40 * DT);
+    expect(east).toBeGreaterThan(4 * WIND_CROSS_GRIP - 0.3);
+    expect(east).toBeLessThan(4 * WIND_CROSS_GRIP + 0.3);
+    expect(north).toBeGreaterThan(RUN_SPEED - 0.4);
+    // A tailwind speeds the walk whole; the pull is never steered.
+    const tail = makeSim();
+    tail.player.auras.push(wind(0, 4));
+    tail.player.facing = 0;
+    const t0 = tail.player.pos.z;
+    hold(tail, mi({ forward: true }), 40);
+    expect((tail.player.pos.z - t0) / (40 * DT)).toBeGreaterThan(RUN_SPEED + 4 - 0.4);
+  });
+
+  it('steers only the steady blow: the pure split along and across the walk', () => {
+    const out = { x: 0, z: 0 };
+    // Wind east 4, walk north: along 0, across 4 held to the grip.
+    steerDriftToWalk({ x: 4, z: 0 }, 0, 1, out);
+    expect(out.x).toBeCloseTo(4 * WIND_CROSS_GRIP, 9);
+    expect(out.z).toBeCloseTo(0, 9);
+    // Wind straight into the walk: whole.
+    steerDriftToWalk({ x: 0, z: -4 }, 0, 1, out);
+    expect(out.z).toBeCloseTo(-4, 9);
+    expect(out.x).toBeCloseTo(0, 9);
+    expect(windIsSteady({ auras: [wind(0, 3)] })).toBe(true);
+    expect(windIsSteady({ auras: [wind(0, 3), pull(0, 0, 3)] })).toBe(false);
+    expect(windIsSteady({ auras: [] })).toBe(false);
   });
 
   it('keeps a cast going while the wind carries the caster (the drift is no input)', () => {

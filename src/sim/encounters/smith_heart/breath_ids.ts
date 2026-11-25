@@ -775,6 +775,23 @@ export const BREATH_TUNING = {
 
 // ---- pure helpers ---------------------------------------------------------------------
 
+/** A blow's rise and fall (the owner's playtest of 2026-11-25: a blow at
+ *  its whole speed on its first tick jerked the raid, and online every edge
+ *  was one big correction): it rises over `in` seconds and falls over the
+ *  last `out`, in `steps` even steps each way, so the wind aura's value
+ *  changes only a few times a blow and each change is small. */
+export const WIND_RAMP = { in: 0.6, out: 0.4, steps: 3 } as const;
+
+/** The share of the blow's speed `elapsed` seconds into it with `remaining`
+ *  left (0 to 1, in WIND_RAMP steps). */
+export function windRamp(elapsed: number, remaining: number): number {
+  const R = WIND_RAMP;
+  const step = (k: number) => Math.min(1, Math.ceil(Math.max(0, k) * R.steps - 1e-9) / R.steps);
+  const rise = step((elapsed + 1e-9) / R.in);
+  const fall = step((remaining + 1e-9) / R.out);
+  return Math.max(1 / R.steps, Math.min(rise, fall));
+}
+
 /** The calm after a blow at `hpFrac` health (5 s at full, 3 s at half). */
 export function calmSeconds(hpFrac: number): number {
   const T = BREATH_TUNING;

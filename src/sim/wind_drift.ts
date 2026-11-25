@@ -124,6 +124,46 @@ export function windDrift(
   return true;
 }
 
+/** While a body walks on the ground, the steady wind's push ACROSS its walk
+ *  is held to this share (its push along the walk stays whole: a headwind
+ *  slows the walk, a tailwind speeds it). The owner's playtest of
+ *  2026-11-25: walking in the wind felt like sliding on ice, the body
+ *  crabbing sideways off the line the keys asked for; now the walk goes
+ *  where it is pointed and the wind reads as a steady push on it. A body
+ *  that stands is still carried whole. The pull and the blast are never
+ *  steered (their whole point is the body carried). */
+export const WIND_CROSS_GRIP = 0.35;
+
+/** Is the wind carrying `e` the steady blow (not a pull or a blast, which
+ *  outrank it in windDrift)? */
+export function windIsSteady(e: Pick<Entity, 'auras'>): boolean {
+  let steady = false;
+  for (const a of e.auras) {
+    if (a.id === WIND_PULL_AURA || a.id === WIND_BLAST_AURA) return false;
+    if (a.id === WIND_DRIFT_AURA) steady = true;
+  }
+  return steady;
+}
+
+/**
+ * Steer a steady drift `d` (yd/s) to a walk along the unit wish (wx, wz):
+ * its component along the walk kept whole, the one across it held to
+ * WIND_CROSS_GRIP. Written into `out` (may alias `d`). Pure arithmetic, the
+ * same on both hosts.
+ */
+export function steerDriftToWalk(
+  d: { x: number; z: number },
+  wx: number,
+  wz: number,
+  out: { x: number; z: number },
+): void {
+  const along = d.x * wx + d.z * wz;
+  const cx = d.x - along * wx;
+  const cz = d.z - along * wz;
+  out.x = along * wx + cx * WIND_CROSS_GRIP;
+  out.z = along * wz + cz * WIND_CROSS_GRIP;
+}
+
 /** The speed of the wind carrying `e` (yd/s), 0 when none: the server's
  *  step check allows a walk plus this (server/movement_override_epoch.ts). */
 export function windDriftSpeed(e: Pick<Entity, 'auras'>): number {

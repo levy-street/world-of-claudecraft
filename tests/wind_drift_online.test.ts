@@ -25,7 +25,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import type { Aura } from '../src/sim/types';
-import { WIND_DRIFT_AURA } from '../src/sim/wind_drift';
+import { WIND_CROSS_GRIP, WIND_DRIFT_AURA } from '../src/sim/wind_drift';
 import { createOnlineHarness, type FrameRecord } from './helpers/online_harness';
 
 // The online pin for an encounter's wind (src/sim/wind_drift.ts; the Guardian
@@ -130,8 +130,70 @@ describe.each([
       const dt = (last.tMs - first.tMs) / 1000;
       const north = (last.z - first.z) / dt;
       const east = (last.x - first.x) / dt;
+      // Across it the walk keeps its line: the wind's push across a walk is
+      // held to WIND_CROSS_GRIP of it (the owner's playtest of 2026-11-25).
       if (windHeading === Math.PI) expect(north).toBeLessThan(7 - WIND + 0.5);
-      else expect(east).toBeGreaterThan(WIND - 0.5);
+      else {
+        expect(east).toBeGreaterThan(WIND * WIND_CROSS_GRIP - 0.4);
+        expect(east).toBeLessThan(WIND * WIND_CROSS_GRIP + 0.4);
+        expect(north).toBeGreaterThan(7 - 0.5);
+      }
+    } finally {
+      harness.dispose();
+    }
+  });
+});
+
+// The blow's rise and fall in steps (breath_ids.ts WIND_RAMP, the owner's
+// playtest of 2026-11-25): the fight re-puts the aura at a third, two thirds
+// and the whole of its speed, so each change the client meets late is a
+// small one. The predictor never stands down and no frame jumps.
+describe('online wind drift: a ramped blow', () => {
+  it('keeps predicting through the steps of the rise and the fall', () => {
+    const harness = createOnlineHarness({
+      latency: {
+        toServer: { baseMs: 60, jitterMs: 10, seed: 1337 },
+        toClient: { baseMs: 60, jitterMs: 10, seed: 4242 },
+      },
+      movementWire: 2,
+    });
+    try {
+      const setSpeed = (k: number) => () => {
+        const e = harness.serverEntity;
+        e.auras = e.auras.filter((a) => a.id !== WIND_DRIFT_AURA);
+        if (k > 0) e.auras.push({ ...wind(Math.PI / 2), value2: WIND * k });
+      };
+      const steps = [1 / 3, 2 / 3, 1];
+      const actions = [
+        ...steps.map((k, i) => ({ atMs: BLOW_AT_MS + i * 200, run: setSpeed(k) })),
+        { atMs: BLOW_AT_MS + BLOW_MS - 400, run: setSpeed(2 / 3) },
+        { atMs: BLOW_AT_MS + BLOW_MS - 200, run: setSpeed(1 / 3) },
+        { atMs: BLOW_AT_MS + BLOW_MS, run: setSpeed(0) },
+      ];
+      let epochBefore = -1;
+      const run = harness.runScript({
+        durationMs: RUN_MS,
+        script: [{ atMs: 0, mi: { forward: true }, facing: 0 }],
+        actions: [
+          {
+            atMs: 200,
+            run: () => {
+              epochBefore = harness.session.movementOverrideEpoch;
+            },
+          },
+          ...actions,
+        ],
+      });
+      expect(harness.session.movementOverrideEpoch).toBe(epochBefore);
+      expect(run.frames.filter((f) => f.tMs > 200).every((f) => f.predictorActive)).toBe(true);
+      for (let i = 1; i < run.frames.length; i++) {
+        const a = run.frames[i - 1];
+        const b = run.frames[i];
+        const step = Math.hypot(b.x - a.x, b.z - a.z);
+        expect(step, `frame ${b.tMs} ms`).toBeLessThanOrEqual((7 + WIND) * b.frameDtSec + 0.12);
+      }
+      for (const f of run.frames.filter(inSteadyBlow))
+        expect(Math.hypot(f.x - f.mirrorX, f.z - f.mirrorZ)).toBeLessThan(2);
     } finally {
       harness.dispose();
     }

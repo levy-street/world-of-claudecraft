@@ -18,7 +18,12 @@ import {
   BREATH_TUNING as T,
 } from '../sim/encounters/smith_heart/breath_ids';
 import { ISLE_AURAS, ISLE_TIERS } from '../sim/encounters/smith_heart/breath_isle_ids';
-import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../sim/wind_drift';
+import {
+  WIND_BLAST_AURA,
+  WIND_CROSS_GRIP,
+  WIND_DRIFT_AURA,
+  WIND_PULL_AURA,
+} from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
 import { tierRange, tierValue } from './heart_tier_damage';
 
@@ -47,6 +52,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         key: `${KEY}.wind`,
         nums: {
           speed: a.value2 ?? BREATH_DIFFICULTY.normal.windSpeed,
+          cross: pct(WIND_CROSS_GRIP),
           pinMin: tierValue(T.pinMin, NM),
           pinMax: tierValue(T.pinMax, NM),
           ...tierRange('heroic', T.pinMin, T.pinMax, HM),

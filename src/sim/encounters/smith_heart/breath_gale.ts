@@ -52,6 +52,7 @@ import {
   breathWindTemplate,
   calmSeconds,
   BREATH_TUNING as T,
+  windRamp,
 } from './breath_ids';
 import { startRoar, stepRoar } from './breath_roar';
 import {
@@ -208,6 +209,8 @@ function syncWindAuras(s: BreathScope): void {
   const blowing = windBlowing(s.st);
   const pulling = w.phase === 'inhale';
   const heading = (w.bearing * Math.PI) / 180;
+  // The blow rises and falls in a few steps (windRamp), never all at once.
+  const speed = blowing ? s.rules.windSpeed * windRamp(w.total - w.remaining, w.remaining) : 0;
   const inFight = new Set(s.players.map((p) => p.id));
   for (const meta of s.ctx.players.values()) {
     const p = s.ctx.entities.get(meta.entityId);
@@ -225,7 +228,7 @@ function syncWindAuras(s: BreathScope): void {
     if (blowing)
       keepWind(s, p, WIND_DRIFT_AURA, BREATH_NAMES.wind, {
         value: heading,
-        value2: s.rules.windSpeed,
+        value2: speed,
       });
     else if (pulling)
       keepWind(s, p, WIND_PULL_AURA, BREATH_NAMES.pull, {

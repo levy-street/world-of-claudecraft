@@ -63,7 +63,7 @@ import {
   TURN_SPEED,
 } from './types';
 import { terrainWallStandoff } from './wall_standoff';
-import { windDrift } from './wind_drift';
+import { steerDriftToWalk, windDrift, windIsSteady } from './wind_drift';
 import {
   groundHeight,
   groundHeightAtBody,
@@ -562,6 +562,11 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     driftOut.x = 0;
     driftOut.z = 0;
   }
+  // A steady blow steers to a walk on the ground (wind_drift.ts
+  // WIND_CROSS_GRIP): the walk goes where it is pointed, the wind pushing on
+  // it, never crabbing it sideways like ice.
+  if (drifting && movingOnGround && grip === 0 && !steepSlide && windIsSteady(p))
+    steerDriftToWalk(driftOut, wishX, wishZ, driftOut);
   if (
     slide ||
     movingOnGround ||

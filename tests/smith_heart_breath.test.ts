@@ -38,6 +38,7 @@ import {
   BREATH_TUNING as T,
   THESSALY_POST,
 } from '../src/sim/encounters/smith_heart';
+import { WIND_RAMP, windRamp } from '../src/sim/encounters/smith_heart/breath_ids';
 import { authoredFieldCliffRuns } from '../src/sim/instances/authored_field';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../src/sim/wind_drift';
@@ -715,6 +716,29 @@ describe('Guardian of the Breath: heroic', () => {
     }
   });
 
+  it('a blow rises and falls in a few steps, never all at once', () => {
+    expect(windRamp(0, 10)).toBeCloseTo(1 / 3, 9);
+    expect(windRamp(0.25, 9.75)).toBeCloseTo(2 / 3, 9);
+    expect(windRamp(WIND_RAMP.in, 5)).toBe(1);
+    expect(windRamp(5, 0.3)).toBe(1);
+    expect(windRamp(5, 0.25)).toBeCloseTo(2 / 3, 9);
+    expect(windRamp(5, 0.05)).toBeCloseTo(1 / 3, 9);
+    // The fight: its aura's speed a third on the blow's first tick, whole
+    // once the rise is over.
+    const f = pulled(4);
+    const p = f.players[1];
+    f.put(p, -20, 205);
+    f.tick(2);
+    f.dev('/dev heart breath blow 90');
+    f.tick(1);
+    const speed = () => p.auras.find((a) => a.id === WIND_DRIFT_AURA)?.value2 ?? 0;
+    const whole = BREATH_DIFFICULTY.normal.windSpeed;
+    expect(speed()).toBeLessThan(whole * 0.5);
+    expect(speed()).toBeGreaterThan(0);
+    f.tick(Math.round(WIND_RAMP.in / DT) + 1);
+    expect(speed()).toBe(whole);
+  });
+
   it('heroic blows the idle harder, a walker still makes headway, and the exhale throws further', () => {
     const measure = (heroic: boolean) => {
       const f = pulled(4);
@@ -724,7 +748,8 @@ describe('Guardian of the Breath: heroic', () => {
       f.put(walker, -20, 188);
       f.tick(2);
       f.dev('/dev heart breath blow 90');
-      f.tick(2);
+      // Past the blow's rise (WIND_RAMP): its whole speed from here.
+      f.tick(Math.round(WIND_RAMP.in / DT) + 2);
       const i0 = f.local(idle);
       const w0 = f.local(walker);
       walker.facing = -Math.PI / 2;

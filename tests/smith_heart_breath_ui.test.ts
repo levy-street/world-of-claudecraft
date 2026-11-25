@@ -15,7 +15,7 @@ import {
 } from '../src/sim/encounters/smith_heart/breath_ids';
 import { BREATH_LINES, breathLineKey } from '../src/sim/encounters/smith_heart/breath_voice';
 import type { SimEvent } from '../src/sim/types';
-import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../src/sim/wind_drift';
+import { WIND_CROSS_GRIP, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { t } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
@@ -71,6 +71,8 @@ describe('Guardian of the Breath: tooltips and names', () => {
     });
     expect(wind?.key).toBe('hudChrome.auraEffect.breathGuardian.wind');
     expect(say(wind)).toContain(`${BREATH_DIFFICULTY.heroic.windSpeed} yd a second`);
+    // A walk across it is pushed only the grip's share (wind_drift.ts).
+    expect(say(wind)).toContain(`only ${Math.round(WIND_CROSS_GRIP * 100)}% as hard`);
     // Normal's resolved range (x1.15 since 2026-11-16).
     const nm = (v: number) => Math.round(v * BREATH_DIFFICULTY.normal.damageMult);
     expect(say(wind)).toContain(`${nm(T.pinMin)} to ${nm(T.pinMax)}`);
