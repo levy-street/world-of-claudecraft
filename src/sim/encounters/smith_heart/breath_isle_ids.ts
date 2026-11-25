@@ -156,6 +156,11 @@ export interface IsleTier {
   /** The Stillstone's shared channel: seconds one player alone takes (more
    *  fill it faster, stoneRate). */
   stoneSoloSeconds: number;
+  /** Isle Lightning (the team's playtest of 2026-11-25: the adds read as a
+   *  pinata): while an isle's adds stand, a volley every `boltEvery`
+   *  seconds, each strike a share of the struck one's whole health. */
+  boltEvery: number;
+  boltShare: number;
 }
 
 // The bot passes of 2026-11-18 (POOL 0.65, the human clock): with the first
@@ -189,6 +194,8 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     shoveSafe: true,
     mendShare: 0.2,
     stoneSoloSeconds: 15,
+    boltEvery: 8,
+    boltShare: 0.2,
   },
   heroic: {
     novaSeconds: 125,
@@ -207,6 +214,8 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     shoveSafe: false,
     mendShare: 0.3,
     stoneSoloSeconds: 18,
+    boltEvery: 6,
+    boltShare: 0.3,
   },
   // Heroic whole for now (the mythic ideas are in the design doc).
   mythic: {
@@ -226,10 +235,23 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     shoveSafe: false,
     mendShare: 0.3,
     stoneSoloSeconds: 18,
+    boltEvery: 6,
+    boltShare: 0.3,
   },
 };
 
 export const ISLE_TUNING = {
+  /** Isle Lightning: the first volley this long after an isle's first rider
+   *  lands, then the tier's `boltEvery`; each volley lays `boltMarks`
+   *  strikes under hashed players on the isle and `boltSpots` more on its
+   *  floor, each on a `boltWarn` warning, striking within `boltR`. Never
+   *  once the isle's adds are down (the Stillstone's calm), nor after its
+   *  Closing Storm has run out (Sky's Reckoning rains then). */
+  boltFirst: 5,
+  boltWarn: 2,
+  boltR: 3.5,
+  boltMarks: 1,
+  boltSpots: 1,
   /** The guardian's health the phase begins at (a share of its whole):
    *  nothing takes it under this until the phase is over. */
   at: 0.5,

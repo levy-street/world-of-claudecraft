@@ -137,6 +137,10 @@ export interface BreathIsleState {
   stilled: boolean;
   /** Its shared channel's progress (0 to 1; never decays). */
   stoneProgress: number;
+  /** Isle Lightning (breath_isle_bolts.ts): seconds to the next volley once
+   *  a rider has landed, and the volleys laid (the hash's salt). */
+  bolt?: number;
+  bolts?: number;
 }
 
 /** Sky's Reckoning's strike on an isle (instance-local spot). */
@@ -146,6 +150,11 @@ export interface BreathIsleStrike {
   x: number;
   z: number;
   remaining: number;
+  /** Its hit, a share of the struck one's whole health (Isle Lightning's;
+   *  none: the tier's Sky's Reckoning share), and its reach (none: the
+   *  Reckoning's). */
+  share?: number;
+  r?: number;
 }
 
 /** The Islands of the Wind, the 50 percent phase (breath_isles.ts). */

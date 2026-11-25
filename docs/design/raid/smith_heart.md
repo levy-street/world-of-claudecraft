@@ -2161,6 +2161,15 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   instant wipe on Normal. No strike is laid under a player channeling a Stillstone (a channel
   any hit breaks would be hopeless once the storm closed); the neighbours' strikes still
   reach them.
+- **Isle Lightning** (the team's playtest of 2026-11-25: the adds read as a pinata; kept light).
+  While an isle's adds stand and its Closing Storm still closes, a volley falls on it every
+  `boltEvery` (Normal 8 s, Heroic and Mythic 6 s; the first 5 s after its first landing): one
+  strike under a hashed player on it and one hashed on its floor, each on a 2 s warning, within
+  3.5 yd, a share of the struck one's health (Normal 20 percent, Heroic and Mythic 30), named Sky
+  Strike. Never under a Stillstone's channeler, never once the adds are down or the storm has
+  closed (Sky's Reckoning takes over). Every Breath strike now wears the shared avoid tell
+  (`render/floor_telegraph`, chevrons outward). `breath_isle_bolts.ts`,
+  `tests/smith_heart_breath_isle_bolts.test.ts`; `/dev heart breath bolt [i]`.
 - **The Stillstones.** The last isle of each side holds one, woken when that isle's adds are
   down (Heroic: two Squall Fragments rise to guard it, and it stays locked, caged in its wind,
   until they fall: `KIT_USE_LOCKED_AURA`). Every player on its isle may click it (or target it

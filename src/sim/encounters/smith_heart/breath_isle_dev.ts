@@ -9,12 +9,14 @@
 //   still [0|1]     the side's Stillstone (0 east, 1 west; both without one)
 //                   is stilled now (woken first if need be)
 //   nova            Skyrend Nova runs out now
+//   bolt [i]        Isle Lightning strikes isle i (or the caller's isle) now
 //
 // Pure dispatch over breath_isles.ts; no rng.
 
 import { BREATH_ISLES } from '../../content/smith_heart_layout';
 import type { Entity } from '../../types';
 import { livingIsleAdds } from './breath_isle_adds';
+import { startIsleBolts } from './breath_isle_bolts';
 import { isleAt } from './breath_isle_geometry';
 import { ISLE_TUNING } from './breath_isle_ids';
 import { islePlayers, startIsles, startRide } from './breath_isles';
@@ -36,6 +38,7 @@ export const ISLE_DEV_VERBS: ReadonlySet<string> = new Set([
   'killisle',
   'still',
   'nova',
+  'bolt',
 ]);
 
 /** One isle verb: the reply line, or null for an unknown verb. */
@@ -97,6 +100,13 @@ export function isleDevTrigger(
       else st.stilled = true;
     }
     return 'The Stillstone is stilled.';
+  }
+  if (verb === 'bolt') {
+    if (isl.stage !== 'nova') return 'No isles phase.';
+    const at = me ? local(s.ctx, s.inst, me) : null;
+    const i = arg === undefined ? (at ? isleAt(at.x, at.z) : -1) : Number(arg);
+    if (!Number.isInteger(i) || i < 0 || i >= n) return `bolt takes an isle, 0 to ${n - 1}.`;
+    return `${startIsleBolts(s, i)} strikes fall on isle ${i}.`;
   }
   if (verb === 'nova') {
     if (isl.stage !== 'nova') return 'No nova gathering.';

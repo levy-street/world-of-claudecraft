@@ -66,6 +66,7 @@ import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
+import { FloorTellPool } from '../floor_telegraph/floor_tell';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -546,6 +547,8 @@ export class BreathFightFx {
   private readonly vortexFans: FanSlot[] = [];
   private readonly galeFans: FanSlot[] = [];
   private readonly strikeFans: FanSlot[] = [];
+  /** The shared avoid tell over each strike slot (same index). */
+  private readonly strikeTells: FloorTellPool;
   private readonly chargedFans: FanSlot[] = [];
   private readonly cradleFans: FanSlot[] = [];
   private readonly barFans: FanSlot[] = [];
@@ -651,6 +654,7 @@ export class BreathFightFx {
     );
     this.glowTex = hasDom ? radialGlowTexture() : null;
     this.kit = new TelegraphKit(this.root, this.detail);
+    this.strikeTells = new FloorTellPool(this.root, P.strikes, this.geometries, this.materials);
     this.paints = new BreathTelegraphs(BREATH_TELEGRAPH_GLOW_STEP, this.materials);
     this.auraArrows = new CouncilRushArrow(
       this.root,
@@ -1483,6 +1487,7 @@ export class BreathFightFx {
         s.id = -1;
         s.fan.group.visible = false;
       }
+    for (let i = 0; i < this.strikeFans.length; i++) this.strikeTells.hide(i);
     for (const p of [this.anchorMarks, this.pinnedMarks, this.drawnMarks]) {
       p.begin();
       p.end();
@@ -1850,12 +1855,32 @@ export class BreathFightFx {
       }
     }
     // The strikes' spots, the charged ground, the cradle.
-    for (const s of this.strikeFans) {
+    for (let i = 0; i < this.strikeFans.length; i++) {
+      const s = this.strikeFans[i];
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
-      if (!e) continue;
+      if (!e) {
+        this.strikeTells.hide(i);
+        continue;
+      }
       const warn = timedOf(BREATH_OBJECTS.strikePrefix, e.templateId) ?? T.strikeWarn;
       const fill = strikeFill(this.clock - s.born, warn);
-      this.drape(s, e, e.scale > 0 ? e.scale : T.strikeR, fill);
+      const radius = e.scale > 0 ? e.scale : T.strikeR;
+      this.drape(s, e, radius, fill);
+      // The shared keep-out tell over every strike (floor_tell_core.ts:
+      // chevrons pointing out, rings racing to the rim), on every tier.
+      const tellAt = fxAnchor(e);
+      this.strikeTells.paint(i, {
+        kind: 'avoid',
+        x: tellAt.x,
+        y: this.groundY(tellAt.x, tellAt.z),
+        z: tellAt.z,
+        radius,
+        color: C.danger,
+        hot: C.accent,
+        fill,
+        clock: this.clock,
+        reduced: this.reducedMotion(),
+      });
       if (this.rand() < dt * 14 * this.density * (0.3 + fill)) {
         // The charge gathering in the cloud over it.
         this.particles.puff(e.pos.x, e.pos.y + 10 + this.rand() * 4, e.pos.z, 2, {

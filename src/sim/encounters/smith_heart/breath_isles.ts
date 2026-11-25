@@ -48,7 +48,13 @@ import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
 import { clearCastIf, dropEncounterBody, startBar } from '../sunken_bastion/claim';
 import { clearGales, clearWindAuras, setWind, thessalyOf } from './breath_gale';
-import { BREATH_AURAS, BREATH_CASTS, BREATH_OBJECTS, timedTemplate } from './breath_ids';
+import {
+  BREATH_AURAS,
+  BREATH_CASTS,
+  BREATH_NAMES,
+  BREATH_OBJECTS,
+  timedTemplate,
+} from './breath_ids';
 import {
   isleRoles,
   isleTier,
@@ -57,6 +63,7 @@ import {
   raiseIsleAdd,
   stepIsleAdds,
 } from './breath_isle_adds';
+import { stepIsleBolts } from './breath_isle_bolts';
 import { cornicePads, isleAt, isleSpots, rideArc } from './breath_isle_geometry';
 import { holdIsleAdds } from './breath_isle_hold';
 import {
@@ -518,9 +525,11 @@ function stepClosing(s: BreathScope): void {
 function stepStrikes(s: BreathScope): void {
   const isl = s.st.isles;
   if (isl.strikes.length === 0) return;
-  const share = isleTier(s).reckonShare;
+  const reckonShare = isleTier(s).reckonShare;
   const keep = [];
   for (const k of isl.strikes) {
+    const share = k.share ?? reckonShare;
+    const reach = k.r ?? T.reckonR;
     k.remaining -= DT;
     if (k.remaining > 1e-9) {
       keep.push(k);
@@ -529,14 +538,14 @@ function stepStrikes(s: BreathScope): void {
     dropBreathObject(s.ctx, s.inst, k.objectId);
     for (const p of playersOnIsle(s, k.isle)) {
       const at = local(s.ctx, s.inst, p);
-      if (Math.hypot(at.x - k.x, at.z - k.z) > T.reckonR) continue;
+      if (Math.hypot(at.x - k.x, at.z - k.z) > reach) continue;
       s.ctx.dealDamage(
         s.boss,
         p,
         Math.round(p.maxHp * share),
         false,
         'nature',
-        ISLE_NAMES.reckoning,
+        k.share === undefined ? ISLE_NAMES.reckoning : BREATH_NAMES.skyMark,
         'hit',
         true,
       );
@@ -796,6 +805,7 @@ export function stepIsles(s: BreathScope, startStorm: (s: BreathScope) => boolea
     stepStones(s);
     stepPads(s);
     stepClosing(s);
+    stepIsleBolts(s);
     if (isl.stage === 'nova' && isl.elapsed + 1e-9 >= whole) endNova(s, true);
   } else if (isl.stage === 'home') {
     isl.elapsed += DT;
