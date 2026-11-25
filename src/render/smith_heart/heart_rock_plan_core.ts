@@ -735,7 +735,9 @@ export function planHeartLips(): HeartKitPlacement[] {
         z: oz,
         rot: Math.atan2(nx, nz),
         stretch,
-        shear: Math.abs(shear) < 1e-6 ? 0 : shear,
+        // The piece shears along its own x, which the yaw lays on +u or -u
+        // (whichever way the outward flip went): rise with the walk either way.
+        shear: Math.abs(shear) < 1e-6 ? 0 : shear * (ux * nz - uz * nx),
         noShadow: true,
         cosmetic: false,
       });
