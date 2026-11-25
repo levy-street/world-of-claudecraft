@@ -175,6 +175,8 @@ export function landRockBar(s: CouncilScope, caster: Entity): void {
     duration: T.rockMarkSeconds,
     value: 0,
     value2: T.rockRadius,
+    // How many must share it (the client's soak tell counts them in).
+    value3: T.rockMinSoakers,
     sourceId: caster.id,
     school: 'physical',
     undispellable: true,

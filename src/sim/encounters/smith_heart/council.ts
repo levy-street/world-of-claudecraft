@@ -54,11 +54,13 @@ import { addThreat, clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { regrowHead } from '../drowned_temple/hydra_regrowth';
 import { claimBoss, dropAuraById } from '../sunken_bastion/claim';
+import { payCover } from './council_cover';
 import { carryWrathHold, startFloorMechanics } from './council_floor';
 import { beginFury, clearFury, stepFury } from './council_fury';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
+  COUNCIL_CUES,
   COUNCIL_DIFFICULTY,
   COUNCIL_ROLES,
   COUNCIL_TEMPLATES,
@@ -240,6 +242,9 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     soulsSpent: [],
     lastFloorAt: null,
     floorHeld: {},
+    coverOwed: false,
+    coverKicked: false,
+    coverHeld: 0,
   };
 }
 
@@ -301,6 +306,7 @@ function landBar(s: CouncilScope, role: CouncilRole, body: Entity): void {
       return;
     case COUNCIL_CASTS.wake:
       landWake(s, body);
+      payCover(s.st, false);
       return;
     case COUNCIL_CASTS.rock:
       landRockBar(s, body);
@@ -329,7 +335,11 @@ function stepBars(s: CouncilScope): void {
       // A kick, unless the bar went with an evade (the leash clears it).
       if (s.st.kickable === bar.castId) {
         s.st.kickable = null;
-        if (b.aiState !== 'evade') songKicked(s, b, bar.castId);
+        if (b.aiState !== 'evade') {
+          songKicked(s, b, bar.castId);
+          // A kicked Wake pays the next Wrath's cover: the raid's choice.
+          if (bar.castId === COUNCIL_CASTS.wake) payCover(s.st, true);
+        }
       }
       continue;
     }
@@ -493,6 +503,25 @@ function finishCouncil(
   }
 }
 
+/** The pull's war cry (the team's playtest of 2026-11-25: "the Hammers have
+ *  no entrance" on every pull after the first): each living member's cue,
+ *  the renderer's short beat (render/smith_heart_fx/council_pull_fx.ts). A
+ *  look only: nothing is held, the fight runs from this very tick. */
+function cryPull(ctx: SimContext, bodies: CouncilBodies): void {
+  for (const r of COUNCIL_ROLES) {
+    const b = bodies[r];
+    if (!living(b)) continue;
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: b.id,
+      targetId: b.id,
+      school: 'physical',
+      fx: 'nova',
+      ability: COUNCIL_CUES.pull,
+    });
+  }
+}
+
 /** The fight starts: one state for both, the energy empty. */
 function beginCouncil(
   ctx: SimContext,
@@ -523,10 +552,16 @@ function beginCouncil(
       fury.heals = false;
     }
   }
-  // Straight after the entrance a pull line it has just said would repeat.
+  // Straight after the entrance a pull line it has just said would repeat,
+  // and its war cry (the pull beat) would only repeat the scene's end.
+  let quiet = false;
   for (const r of COUNCIL_ROLES)
-    if (councilIntroJustSpoke(ctx, bodies, r)) st.said[`${r}_pull`] = 0;
+    if (councilIntroJustSpoke(ctx, bodies, r)) {
+      st.said[`${r}_pull`] = 0;
+      quiet = true;
+    }
   attach(bodies, st);
+  if (!quiet) cryPull(ctx, bodies);
   return st;
 }
 

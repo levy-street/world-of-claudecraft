@@ -26,8 +26,9 @@ export const COUNCIL_REACH = {
   riseGap: 6.5,
   riseClearOfBodies: 4.5,
   riseKnock: 3,
-  /** The Wrath and the Echo reach. */
-  wrath: 45,
+  /** The Wrath's reach (arena-wide since 2026-11-25: the whole floor from
+   *  any spot) and the Echo's. */
+  wrath: 110,
 };
 
 const PILLAR = 'sh_council_pillar_';

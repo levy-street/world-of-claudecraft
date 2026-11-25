@@ -268,6 +268,10 @@ export const COUNCIL_CUES = {
   /** Mythic: the Quarry's ceiling sheds a blow (spellfxAt 'burst' on each
    *  player). */
   quarryCollapse: 'heart_quarry_collapse',
+  /** The pull (council.ts beginCouncil, the team's playtest of 2026-11-25):
+   *  each member's war cry as the fight begins (spellfx 'nova' on it), the
+   *  renderer's short pull beat (presentation only: it holds nothing). */
+  pull: 'heart_council_pull',
 } as const;
 
 /** The damage names (combat log and floating text; re-localized by
@@ -523,7 +527,14 @@ export const COUNCIL_TUNING = {
   enrageAfterWraths: 5,
   enrageFillMult: 2.5,
   wrathCast: 4,
-  wrathRadius: 45,
+  /** ARENA-WIDE since the team's playtest of 2026-11-25 (design doc 7.1: a
+   *  pillar's shelter is the only escape): the Wrath strikes every player on
+   *  the council's floor (council_scope.ts COUNCIL_ARENA_R, 52 yd round the
+   *  Quarry's middle) wherever its caster stands, so this reach spans the
+   *  whole floor from any spot on it (it was 45 yd from the caster, and a
+   *  raider at the far rim stood outside it). The kit's declaration and the
+   *  bots read it. */
+  wrathRadius: 110,
   wrathMin: 440,
   wrathMax: 520,
   // Hammer's Weight.
@@ -656,6 +667,9 @@ export const COUNCIL_TUNING = {
    *  Wake the Stone, Mountain's Rush, Falling Rock): one due sooner waits
    *  (council_floor_gap.ts). */
   floorGap: 4,
+  /** The cover guard (council_cover.ts, the team's playtest of 2026-11-25):
+   *  the longest a full Wrath waits for the Wake that gives it cover. */
+  coverHoldMax: 20,
   // Mythic: Soul in the Stone (council_soul.ts).
   /** A soul pillar's pips. */
   soulPips: 3,

@@ -166,4 +166,10 @@ export interface CouncilFightState {
    *  waited on the gap since its own last start. */
   lastFloorAt: number | null;
   floorHeld: Partial<Record<FloorMechanic, number>>;
+  /** The cover guard (council_cover.ts): the next Wrath is owed a Wake (set
+   *  as a Wrath lands, paid as a Wake bar lands or is kicked), a Wake was
+   *  kicked since the last Wrath, and the seconds a full Wrath has waited. */
+  coverOwed: boolean;
+  coverKicked: boolean;
+  coverHeld: number;
 }

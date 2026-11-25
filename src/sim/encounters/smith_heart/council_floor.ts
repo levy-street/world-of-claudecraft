@@ -16,9 +16,14 @@
 // gap's own rule (council_floor_gap.ts) that two floor mechanics never land
 // at once. A rock that would land within the Wrath guard's pad of the bar
 // waits until the Wrath has landed (the live playtest of 2026-11-24: the
-// survivor's rock kept landing two seconds before its Wrath). Zero rng.
+// survivor's rock kept landing two seconds before its Wrath).
+//
+// The cover guard (every tier, council_cover.ts): a full Wrath after the
+// first waits for a Wake to land (or be kicked) and its pillars to rise, and
+// for one more when no shelter stands; that Wake is due at once. Zero rng.
 
 import { DT } from '../../types';
+import { noteCoverHold, wakeForcedByCover, wrathWaitsForCover } from './council_cover';
 import {
   type FloorCandidate,
   type FloorMechanic,
@@ -88,12 +93,19 @@ export const RUSH_FLOOR_SECONDS = T.rushCast + T.rushWindup + 2;
 export function startFloorMechanics(s: CouncilScope): FloorMechanic[] {
   const st = s.st;
   const wrathHolder = jobHolder(s, 'wrath');
+  const wrathFull = wrathHolder !== null && st.energy >= T.energyMax - 1e-6;
+  // The cover guard (council_cover.ts): a full Wrath waits for its Wake, and
+  // that Wake comes due at once, past its clock and the Wrath guard.
+  const waits = wrathFull && wrathWaitsForCover(s);
+  if (waits) noteCoverHold(st);
+  const forceWake = wakeForcedByCover(s, wrathFull);
   const candidates: FloorCandidate[] = [
     {
       key: 'wrath',
       due:
         wrathHolder !== null &&
-        st.energy >= T.energyMax - 1e-6 &&
+        wrathFull &&
+        !waits &&
         st.bars[wrathHolder.role] === undefined &&
         !(wrathHolder.role === 'guardian' && st.rush !== null),
       start: () => startWrath(s),
@@ -101,7 +113,7 @@ export function startFloorMechanics(s: CouncilScope): FloorMechanic[] {
     { key: 'echo', due: guardianSoulReady(s), start: () => startEcho(s) },
     {
       key: 'wake',
-      due: st.wakeTimer <= 0 && clearOfWrath(s, wakeSeconds(s)),
+      due: forceWake || (st.wakeTimer <= 0 && clearOfWrath(s, wakeSeconds(s))),
       start: () => startWake(s),
     },
     {

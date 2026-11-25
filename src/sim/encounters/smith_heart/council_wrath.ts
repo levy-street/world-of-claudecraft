@@ -30,6 +30,7 @@
 
 import { DT, type Entity } from '../../types';
 import { clearCastIf, dropAuraById, heavySwing } from '../sunken_bastion/claim';
+import { oweCover } from './council_cover';
 import { stampFloor } from './council_floor_gap';
 import {
   COUNCIL_AURAS,
@@ -133,6 +134,8 @@ export function landWrath(s: CouncilScope, caster: Entity): number {
   const { ctx, inst, st } = s;
   st.energy = 0;
   st.wraths++;
+  // The next Wrath waits for a Wake to give it cover (council_cover.ts).
+  oweCover(st);
   dropAuraById(caster, COUNCIL_AURAS.pillarLimit);
   ctx.emit({
     type: 'spellfx',
@@ -153,9 +156,11 @@ export function landWrath(s: CouncilScope, caster: Entity): number {
   const shields = new Map<number, Entity[]>();
   const sheltered: { p: Entity; at: number[] }[] = [];
   let struck = 0;
+  // Arena-wide (the team's playtest of 2026-11-25): every player on the
+  // council's floor (s.players, COUNCIL_ARENA_R round the Quarry's middle),
+  // wherever the caster stands; only a pillar's shelter escapes it.
   for (const p of s.players) {
     if (p.dead) continue;
-    if (Math.hypot(p.pos.x - caster.pos.x, p.pos.z - caster.pos.z) > T.wrathRadius) continue;
     const at: number[] = [];
     for (const pl of pillars) {
       if (!inCouncilShelter(pl.e.pos.x, pl.e.pos.z, pl.r, p.pos.x, p.pos.z)) continue;
