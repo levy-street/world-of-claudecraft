@@ -388,6 +388,28 @@ export interface BreathKnotRules {
   /** Phase 2: the balls of each round, each with its own pair of portals
    *  (two: A and B, then C and D). */
   stormBalls: 1 | 2;
+  /** The burst's falloff (the team's ask of 2026-11-25: the farther the
+   *  ball from the raid when it bursts, the less it hurts; `knotBurstShare`):
+   *  each player is struck by their OWN distance from the ball. Within
+   *  `burstCore` yards it kills whatever shields them; from there to
+   *  `burstFar` its hit falls in a straight line from their whole health to
+   *  `burstFloor` of it, and stays there farther out. */
+  burstCore: number;
+  burstFar: number;
+  burstFloor: number;
+}
+
+/** The Knotted Gale's burst on a player `d` yards from the ball: a share of
+ *  their whole health, or Infinity within the core (a death whatever
+ *  shields them). Pure, for the sim, the tooltip and the tests. */
+export function knotBurstShare(
+  rules: Pick<BreathKnotRules, 'burstCore' | 'burstFar' | 'burstFloor'>,
+  d: number,
+): number {
+  if (d <= rules.burstCore) return Number.POSITIVE_INFINITY;
+  if (d >= rules.burstFar) return rules.burstFloor;
+  const k = (d - rules.burstCore) / (rules.burstFar - rules.burstCore);
+  return 1 - (1 - rules.burstFloor) * k;
 }
 
 /** The Knotted Gale's numbers, one row per tier that has it (Normal has none).
@@ -395,10 +417,30 @@ export interface BreathKnotRules {
 export const BREATH_KNOT: Readonly<Record<'heroic' | 'mythic', BreathKnotRules>> = {
   // Softer than Mythic's (Jose's call of 2026-11-08): a longer fuse, a quicker
   // carrier, two balls in phase 1, one ball and one pair of portals in phase 2.
-  heroic: { fuse: 15, walkMult: 0.7, tailMult: 0.85, windRuns: 2, stormBalls: 1 },
+  // The burst (2026-11-25): lethal within 8 yd, 15 percent of health from 40.
+  heroic: {
+    fuse: 15,
+    walkMult: 0.7,
+    tailMult: 0.85,
+    windRuns: 2,
+    stormBalls: 1,
+    burstCore: 8,
+    burstFar: 40,
+    burstFloor: 0.15,
+  },
   // Jose's call of 2026-11-07: half a run and a 10 s fuse (a tenth of a run
   // read as standing still); three balls in phase 1, two at once in phase 2.
-  mythic: { fuse: 10, walkMult: 0.5, tailMult: 0.65, windRuns: 3, stormBalls: 2 },
+  // The burst: lethal within 10 yd, 30 percent of health from 45.
+  mythic: {
+    fuse: 10,
+    walkMult: 0.5,
+    tailMult: 0.65,
+    windRuns: 3,
+    stormBalls: 2,
+    burstCore: 10,
+    burstFar: 45,
+    burstFloor: 0.3,
+  },
 };
 
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {

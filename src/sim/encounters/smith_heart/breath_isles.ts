@@ -591,16 +591,7 @@ export function novaWipe(s: Pick<BreathScope, 'ctx' | 'inst' | 'boss'>): void {
   for (const p of corniceListeners(s.ctx, s.inst)) {
     if (p.dead || p.ghost) continue;
     if (p.gm || (p.profilerInvulnerable && s.ctx.devCommands)) continue;
-    s.ctx.dealDamage(
-      s.boss,
-      p,
-      p.hp + p.maxHp * 10,
-      false,
-      'nature',
-      ISLE_NAMES.nova,
-      'hit',
-      true,
-    );
+    s.ctx.dealDamage(s.boss, p, p.hp + p.maxHp * 10, false, 'nature', ISLE_NAMES.nova, 'hit', true);
     if (!p.dead) s.ctx.handleDeath(p, s.boss, ISLE_NAMES.nova);
   }
 }

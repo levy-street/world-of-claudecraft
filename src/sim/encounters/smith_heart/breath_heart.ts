@@ -6,7 +6,10 @@
 // (breath_ids.ts BreathKnotRules); Normal's is null, so it never starts:
 //
 //   The ball      a Knotted Gale drops far from the gaps; its fuse (Heroic 15 s,
-//                 Mythic 10 s), then it bursts and wipes the raid.
+//                 Mythic 10 s), then it bursts: lethal near it, and less the
+//                 farther each player stands from it (`knotBurstShare`, the
+//                 tier's burstCore, burstFar and burstFloor; the team's ask of
+//                 2026-11-25): carried far from the raid, it costs a share.
 //   The portals   two non-tanks are marked; after 5 s Portal A and Portal B open
 //                 exactly where each stands (a body that fell through a gap
 //                 opens it at the lip it left). No second chance. Mythic's
@@ -65,6 +68,7 @@ import {
   type BreathKnotRules,
   KNOT_HOP_TEXT,
   KNOT_NOT_AT_LIP_ERROR,
+  knotBurstShare,
   knotTemplate,
   BREATH_TUNING as T,
 } from './breath_ids';
@@ -473,23 +477,44 @@ function stepPickups(s: BreathScope, rules: BreathKnotRules, heart: BreathHeart)
   }
 }
 
-/** A ball out of time: lethal whatever shields them (the damage path caps
- *  a huge hit, so a death follows it), game masters excepted. */
-function burst(s: BreathScope): void {
+/** A ball out of time bursts. Each player on the Cornice is struck by their
+ *  own distance from the nearest ball that burst (`knotBurstShare`): inside
+ *  the core a death whatever shields them (the damage path caps a huge hit,
+ *  so a death follows it), farther out a share of their whole health falling
+ *  with the yards; game masters excepted. */
+function burst(s: BreathScope, rules: BreathKnotRules, out: readonly BreathKnot[]): void {
   const o = s.ctx.instanceOriginOf(s.inst);
   const heart = s.st.heart;
-  const k = heart?.knots[0];
-  s.ctx.emit({
-    type: 'spellfxAt',
-    x: o.x + (k?.x ?? BREATH.cornice.x),
-    z: o.z + (k?.z ?? BREATH.cornice.z),
-    school: 'nature',
-    fx: 'nova',
-    radius: BREATH.cornice.rx,
-    ability: BREATH_CUES.knotBurst,
-  });
+  const balls = out.length > 0 ? out : (heart?.knots.slice(0, 1) ?? []);
+  for (const k of balls)
+    s.ctx.emit({
+      type: 'spellfxAt',
+      x: o.x + k.x,
+      z: o.z + k.z,
+      school: 'nature',
+      fx: 'nova',
+      radius: rules.burstFar,
+      ability: BREATH_CUES.knotBurst,
+    });
   for (const p of cornicePlayers(s.ctx, s.inst)) {
     if (p.gm || (p.profilerInvulnerable && s.ctx.devCommands)) continue;
+    const at = local(s.ctx, s.inst, p);
+    let d = balls.length > 0 ? Number.POSITIVE_INFINITY : 0;
+    for (const k of balls) d = Math.min(d, Math.hypot(at.x - k.x, at.z - k.z));
+    const share = knotBurstShare(rules, d);
+    if (Number.isFinite(share)) {
+      s.ctx.dealDamage(
+        s.boss,
+        p,
+        Math.round(p.maxHp * share),
+        false,
+        'nature',
+        BREATH_NAMES.knot,
+        'hit',
+        true,
+      );
+      continue;
+    }
     s.ctx.dealDamage(
       s.boss,
       p,
@@ -520,10 +545,10 @@ function stepLive(s: BreathScope, rules: BreathKnotRules, heart: BreathHeart): v
   stepCarriers(s, rules, heart);
   stepThrows(s, heart);
   stepPickups(s, rules, heart);
-  let out = false;
+  const out: BreathKnot[] = [];
   for (const k of heart.knots) {
     k.fuse -= DT;
-    if (k.fuse <= 1e-9) out = true;
+    if (k.fuse <= 1e-9) out.push(k);
     // The fuse rides the template in half seconds (the wire's only change).
     const e = s.ctx.entities.get(k.objectId);
     const shown = knotTemplate(
@@ -533,8 +558,8 @@ function stepLive(s: BreathScope, rules: BreathKnotRules, heart: BreathHeart): v
     );
     if (e && e.templateId !== shown) e.templateId = shown;
   }
-  if (out) {
-    burst(s);
+  if (out.length > 0) {
+    burst(s, rules, out);
     return;
   }
   if (heart.knots.length === 0) clearHeart(s.ctx, s.inst, s.st);

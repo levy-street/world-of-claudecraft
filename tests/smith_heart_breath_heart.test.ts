@@ -32,6 +32,7 @@ import {
   BREATH_OBJECTS,
   KNOT_HOP_TEXT,
   KNOT_NOT_AT_LIP_ERROR,
+  knotBurstShare,
   knotOf,
   knotTemplate,
   BREATH_TUNING as T,
@@ -153,8 +154,27 @@ describe('Knotted Gale: the row', () => {
     expect(BREATH_DIFFICULTY.heroic.stormHeart).toBe(H);
     expect(BREATH_DIFFICULTY.mythic.stormHeart).toBe(M);
     // Jose's calls: Mythic of 2026-11-07, Heroic (softer) of 2026-11-08.
-    expect(M).toEqual({ fuse: 10, walkMult: 0.5, tailMult: 0.65, windRuns: 3, stormBalls: 2 });
-    expect(H).toEqual({ fuse: 15, walkMult: 0.7, tailMult: 0.85, windRuns: 2, stormBalls: 1 });
+    // The burst's falloff: the team's ask of 2026-11-25.
+    expect(M).toEqual({
+      fuse: 10,
+      walkMult: 0.5,
+      tailMult: 0.65,
+      windRuns: 3,
+      stormBalls: 2,
+      burstCore: 10,
+      burstFar: 45,
+      burstFloor: 0.3,
+    });
+    expect(H).toEqual({
+      fuse: 15,
+      walkMult: 0.7,
+      tailMult: 0.85,
+      windRuns: 2,
+      stormBalls: 1,
+      burstCore: 8,
+      burstFar: 40,
+      burstFloor: 0.15,
+    });
     expect(T.heartMark).toBe(5);
     const f = breathFight(4);
     f.dev('/dev heart breath pull');
@@ -218,24 +238,79 @@ describe('Knotted Gale: the round', () => {
     expect(obj.scale).toBe(T.heartPickR);
   });
 
-  it('out of time it kills the whole Cornice, shields or not, game masters aside', () => {
+  it('out of time its burst falls off with each player distance from the ball', () => {
     const f = mythic();
-    round(f);
+    const h = round(f);
     const gm = f.players[5];
     gm.gm = true;
     f.tick(ticks(M.fuse) - 2);
     expect(f.players.filter((p) => p.dead)).toHaveLength(0);
-    // The ball runs out with no keep-alive and a huge pool.
+    const k = h.knots[0];
+    // Pinned in place (nobody carries it): one beside it, one in the
+    // falloff, one past its far reach, the game master on the ball.
+    const [near, mid, far, ...rest] = f.players.filter((p) => p !== gm);
+    const spot = (p: Entity, d: number) => {
+      // Along the line toward the Cornice's middle from the ball, on its floor.
+      const dx = 0 - k.x;
+      const dz = 196 - k.z;
+      const len = Math.hypot(dx, dz) || 1;
+      f.put(p, k.x + (dx / len) * d, k.z + (dz / len) * d);
+    };
+    spot(near, M.burstCore - 2);
+    spot(mid, (M.burstCore + M.burstFar) / 2);
+    spot(gm, 0.5);
+    for (const p of rest) spot(p, M.burstCore - 1);
+    // Far: the farthest floor from the ball (the Cornice is 100 by 80 yd).
+    let best = { x: 0, z: 196, d: 0 };
+    for (let x = -46; x <= 46; x += 2)
+      for (let z = 160; z <= 232; z += 2) {
+        if (!inBreathArena(x, z)) continue;
+        const d = Math.hypot(x - k.x, z - k.z);
+        if (d > best.d) best = { x, z, d };
+      }
+    f.put(far, best.x, best.z);
+    expect(best.d).toBeGreaterThan(M.burstFar);
+    // A huge pool: the core kills whatever the pool, the rest is a share.
     for (const p of f.players) {
-      p.maxHp = 5000000;
-      p.hp = 5000000;
+      p.maxHp = 100000;
+      p.hp = 100000;
     }
     const evs = f.tick(4, false);
-    for (const p of f.players) expect(p.dead, p.name).toBe(p !== gm);
+    expect(near.dead).toBe(true);
+    for (const p of rest) expect(p.dead, p.name).toBe(true);
+    expect(gm.dead).toBe(false);
+    expect(mid.dead).toBe(false);
+    expect(far.dead).toBe(false);
+    const midShare = knotBurstShare(M, (M.burstCore + M.burstFar) / 2);
+    expect(midShare).toBeCloseTo(1 - (1 - M.burstFloor) / 2, 5);
+    // Each lost about its share (no resistances on a test body).
+    expect(100000 - mid.hp).toBeGreaterThan(100000 * midShare * 0.8);
+    expect(100000 - far.hp).toBeLessThanOrEqual(Math.ceil(100000 * M.burstFloor) + 1);
+    expect(100000 - far.hp).toBeGreaterThan(0);
+    expect(100000 - mid.hp).toBeGreaterThan(100000 - far.hp);
     expect(evs.some((e) => e.type === 'spellfxAt' && e.ability === BREATH_CUES.knotBurst)).toBe(
       true,
     );
     expect(f.state()?.heart ?? null).toBeNull();
+  });
+
+  it('the burst curve: lethal in the core, a straight fall to the floor, flat past it', () => {
+    for (const r of [H, M]) {
+      expect(knotBurstShare(r, 0)).toBe(Number.POSITIVE_INFINITY);
+      expect(knotBurstShare(r, r.burstCore)).toBe(Number.POSITIVE_INFINITY);
+      expect(knotBurstShare(r, r.burstCore + 1e-6)).toBeCloseTo(1, 4);
+      expect(knotBurstShare(r, r.burstFar)).toBe(r.burstFloor);
+      expect(knotBurstShare(r, r.burstFar + 30)).toBe(r.burstFloor);
+      let last = 2;
+      for (let d = r.burstCore + 1; d < r.burstFar; d += 3) {
+        const v = knotBurstShare(r, d);
+        expect(v).toBeLessThan(last);
+        last = v;
+      }
+    }
+    // Mythic hits harder than Heroic at every distance.
+    for (let d = 12; d < 60; d += 4)
+      expect(knotBurstShare(M, d)).toBeGreaterThanOrEqual(knotBurstShare(H, d));
   });
 
   it('opens each portal exactly where its player stands when the mark ends', () => {
@@ -671,6 +746,8 @@ describe('Knotted Gale: the round', () => {
     const h = round(f);
     const p = third(f);
     carry(f, p);
+    // The round still running when the fight marks (no burst meanwhile).
+    for (const k of h.knots) k.fuse = 999;
     f.dev('/dev heart breath phase2');
     f.tick(ticks(T.stormCast) + ticks(T.barrageSeconds) + 4);
     f.dev('/dev heart breath conductor');
@@ -745,7 +822,20 @@ describe('Knotted Gale: when', () => {
       value: load?.value ?? 0,
       value2: load?.value2,
     });
-    expect(t(d?.key as never, d?.nums as never)).toContain(`${H.walkMult * 100}%`);
+    const text = t(d?.key as never, d?.nums as never);
+    expect(text).toContain(`${H.walkMult * 100}%`);
+    // The burst's falloff, Heroic's own numbers (the wearer's tier by its walk).
+    expect(text).toContain(`within ${H.burstCore} yd`);
+    expect(text).toContain(`${H.burstFloor * 100}% of their maximum health at ${H.burstFar} yd`);
+    const dm = auraEffectDescriptor({
+      id: BREATH_AURAS.laden,
+      kind: 'internal_cd',
+      value: 0,
+      value2: M.walkMult,
+    });
+    const mText = t(dm?.key as never, dm?.nums as never);
+    expect(mText).toContain(`within ${M.burstCore} yd`);
+    expect(mText).toContain(`${M.burstFloor * 100}% of their maximum health at ${M.burstFar} yd`);
     // Its whole fuse: no burst at Mythic's 10 s, the burst at 15.
     for (const e of f.players) f.put(e, -10, 190);
     f.tick(ticks(M.fuse + 1));

@@ -97,10 +97,22 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return { key: `${KEY}.portalC` };
     case BREATH_AURAS.portalD:
       return { key: `${KEY}.portalD` };
-    case BREATH_AURAS.laden:
-      // The tier's walk rides the load's value2 (Heroic 70, Mythic 50); its
+    case BREATH_AURAS.laden: // The tier's walk rides the load's value2 (Heroic 70, Mythic 50); its
       // value is the pace of the moment, quicker with the wind at the back.
-      return { key: `${KEY}.laden`, nums: { walk: pct(a.value2 ?? KNOT_WALK) } };
+      {
+        // The wearer's tier by its walk (Mythic's is its own), for the burst's
+        // resolved falloff (breath_ids.ts knotBurstShare).
+        const row = (a.value2 ?? KNOT_WALK) === KNOT_WALK ? BREATH_KNOT.mythic : BREATH_KNOT.heroic;
+        return {
+          key: `${KEY}.laden`,
+          nums: {
+            walk: pct(a.value2 ?? KNOT_WALK),
+            core: row.burstCore,
+            far: row.burstFar,
+            floor: pct(row.burstFloor),
+          },
+        };
+      }
     case BREATH_AURAS.anchor:
       return { key: `${KEY}.anchor` };
     case BREATH_AURAS.spent:
