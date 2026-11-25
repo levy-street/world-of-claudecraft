@@ -162,6 +162,13 @@ const BEARDS: readonly WocHeadVariant[] = [
   v('beard', 'long'),
   v('beard', 'chops'),
   v('beard', 'chinstrap'),
+  // reshaped from the shipped beards: scripts/assets/woc_character/build_facial_hair.mjs
+  v('beard', 'forked'),
+  v('beard', 'sage'),
+  v('beard', 'wild'),
+  v('beard', 'walrus'),
+  v('beard', 'whiskers'),
+  v('beard', 'imperial'),
 ];
 
 export const WOC_HEAD_TYPES: Readonly<Record<WocHeadType, WocHeadTypeDef>> = {
@@ -182,6 +189,12 @@ export const WOC_HEAD_TYPES: Readonly<Record<WocHeadType, WocHeadTypeDef>> = {
         v('hair', 'ponytail'),
         v('hair', 'braid'),
         v('hair', 'waves'),
+        // the mohawk's top over a long tail, built by scripts/assets/woc_character/build_mullet_hair.mjs
+        v('hair', 'mullet'),
+        // the mohawk combed sleek with a raised front: build_pompadour_hair.mjs
+        v('hair', 'pompadour'),
+        // a tonsure, grown on the head's own skull: build_monk_hair.mjs
+        v('hair', 'monk'),
         v('hair', 'bald'),
       ],
       beard: BEARDS,
@@ -228,6 +241,12 @@ export const WOC_HEAD_TYPES: Readonly<Record<WocHeadType, WocHeadTypeDef>> = {
         v('hair', 'undercut'),
         v('hair', 'topknot'),
         v('hair', 'shoulder'),
+        // the mohawk's top over a long tail, built by scripts/assets/woc_character/build_mullet_hair.mjs
+        v('hair', 'mullet'),
+        // the mohawk combed sleek with a raised front: build_pompadour_hair.mjs
+        v('hair', 'pompadour'),
+        // a tonsure, grown on the head's own skull: build_monk_hair.mjs
+        v('hair', 'monk'),
         v('hair', 'bald'),
       ],
       beard: BEARDS,
@@ -280,7 +299,15 @@ const PACK_DIR = 'models/chars/players/woc';
 
 /** Beard ids that live in their own file (a texture of their own); every other
  *  beard shares the group file. */
-const BEARDS_WITH_OWN_FILE: ReadonlySet<string> = new Set(['handlebar']);
+const BEARDS_WITH_OWN_FILE: ReadonlySet<string> = new Set([
+  'handlebar',
+  'forked',
+  'sage',
+  'wild',
+  'walrus',
+  'whiskers',
+  'imperial',
+]);
 
 /** A type's core file: the base head, eyes, brows, noses, lips, ears, piercings. */
 export function wocHeadCoreUrl(type: WocHeadType): string {

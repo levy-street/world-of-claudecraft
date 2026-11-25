@@ -467,6 +467,18 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `tests/melee_contact_wiring.test.ts`). Nothing else waits: a form, a cast
   pose and the other aura-driven looks still end on the event, and nothing a
   player acts on is held.
+- Some WOC head pieces are built in the repo, not from the Face Studio head files: the
+  `mullet` hairstyle (`scripts/assets/woc_character/build_mullet_hair.mjs`, the shipped
+  mohawk's strands over a tail cut from a committed sculpt), the `pompadour`
+  (`build_pompadour_hair.mjs`, the mohawk combed to a sleek cap with a raised front), the
+  `monk` tonsure (`build_monk_hair.mjs`, a ring grown on each head's own skull), and six
+  facial-hair styles (`build_facial_hair.mjs`: `forked`, `sage`, `wild`, `walrus`, `whiskers`,
+  `imperial`, each a shipped beard reshaped in place, keeping its texture and chin morph).
+  They sample their source's texture and tint reference. Rebuild them with those scripts after
+  the mohawk, the undercut or a beard file changes; `tests/woc_mullet_hair.test.ts`,
+  `tests/woc_pompadour_hair.test.ts`, `tests/woc_monk_hair.test.ts` and
+  `tests/woc_facial_hair.test.ts` pin what the builds
+  decide.
 - WOC modular heads (the face builder's library, `woc_head_catalog.ts`): it
   ships SPLIT, one core file per head type (the base head and every small face
   piece), one file per hairstyle, the beard files (`wocHeadCoreUrl`,

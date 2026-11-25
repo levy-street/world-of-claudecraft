@@ -457,6 +457,9 @@ export const en = {
         crown: 'Braided Crown',
         twins: 'Twin Braids',
         curls: 'Curly Updo',
+        mullet: 'Mullet',
+        pompadour: 'Pompadour',
+        monk: 'Monk Tonsure',
       },
       beard: {
         none: 'Clean Shaven',
@@ -468,6 +471,13 @@ export const en = {
         long: 'Long Beard',
         chops: 'Mutton Chops',
         chinstrap: 'Chinstrap',
+        forked: 'Forked Beard',
+        // a coined name (web-verified 2026-11-11: no game, wiki or franchise uses it)
+        sage: 'The Fizwic',
+        wild: 'Wild Beard',
+        walrus: 'Walrus Moustache',
+        whiskers: 'Drooping Whiskers',
+        imperial: 'Imperial Moustache',
       },
       nose: {
         default: 'Classic',

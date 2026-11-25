@@ -13810,7 +13810,10 @@ export const ru_RU: EnTranslations = {
         "bob": "Каре",
         "crown": "Коса-корона",
         "twins": "Две косы",
-        "curls": "Собранные кудри"
+        "curls": "Собранные кудри",
+        "mullet": "Маллет",
+        "pompadour": "Помпадур",
+        "monk": "Монашеская тонзура"
       },
       "beard": {
         "none": "Без бороды",
@@ -13821,7 +13824,13 @@ export const ru_RU: EnTranslations = {
         "boxed": "Короткая борода",
         "long": "Длинная борода",
         "chops": "Бакенбарды",
-        "chinstrap": "Борода-ремешок"
+        "chinstrap": "Борода-ремешок",
+        "forked": "Раздвоенная борода",
+        "sage": "Физвик",
+        "wild": "Дикая борода",
+        "walrus": "Усы моржа",
+        "whiskers": "Висячие усы",
+        "imperial": "Имперские усы"
       },
       "nose": {
         "default": "Классический",

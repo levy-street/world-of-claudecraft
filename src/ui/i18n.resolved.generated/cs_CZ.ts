@@ -13810,7 +13810,10 @@ export const cs_CZ: EnTranslations = {
         "bob": "Mikádo",
         "crown": "Koruna z copů",
         "twins": "Dva copy",
-        "curls": "Vyčesané kudrny"
+        "curls": "Vyčesané kudrny",
+        "mullet": "Mullet",
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Hladce oholený",
@@ -13821,7 +13824,13 @@ export const cs_CZ: EnTranslations = {
         "boxed": "Zastřižený plnovous",
         "long": "Dlouhý plnovous",
         "chops": "Kotlety",
-        "chinstrap": "Proužek podél čelisti"
+        "chinstrap": "Proužek podél čelisti",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Klasické",

@@ -289,7 +289,7 @@ describe('categorySections', () => {
     expect(b).not.toContain('mohawk');
   });
 
-  it('offers Facial Hair on both body types: Clean Shaven first, then the eight styles', () => {
+  it('offers Facial Hair on both body types: Clean Shaven first, then the fourteen styles', () => {
     for (const gender of ['male', 'female'] as const) {
       const a = readFace({ gender });
       const [s, ...rest] = categorySections('facialHair', a);
@@ -307,6 +307,12 @@ describe('categorySections', () => {
         'long',
         'chops',
         'chinstrap',
+        'forked',
+        'sage',
+        'wild',
+        'walrus',
+        'whiskers',
+        'imperial',
       ]);
       expect(opts.options.filter((o) => o.selected).map((o) => o.id)).toEqual([a.headBeard]);
     }

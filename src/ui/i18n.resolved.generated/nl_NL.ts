@@ -13810,7 +13810,10 @@ export const nl_NL: EnTranslations = {
         "bob": "Bobkapsel",
         "crown": "Vlechtkroon",
         "twins": "Twee Vlechten",
-        "curls": "Opgestoken krullen"
+        "curls": "Opgestoken krullen",
+        "mullet": "Mullet",
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Gladgeschoren",
@@ -13821,7 +13824,13 @@ export const nl_NL: EnTranslations = {
         "boxed": "Vierkante baard",
         "long": "Lange baard",
         "chops": "Bakkebaarden",
-        "chinstrap": "Kaaklijnbaard"
+        "chinstrap": "Kaaklijnbaard",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Klassiek",

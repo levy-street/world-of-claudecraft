@@ -13810,7 +13810,10 @@ export const es_ES: EnTranslations = {
         "bob": "Corte bob",
         "crown": "Corona trenzada",
         "twins": "Dos trenzas",
-        "curls": "Recogido rizado"
+        "curls": "Recogido rizado",
+        "mullet": "Mullet",
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Afeitado",
@@ -13821,7 +13824,13 @@ export const es_ES: EnTranslations = {
         "boxed": "Barba cuadrada",
         "long": "Barba larga",
         "chops": "Patillas anchas",
-        "chinstrap": "Barba de mandíbula"
+        "chinstrap": "Barba de mandíbula",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Clásico",

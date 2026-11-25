@@ -13810,7 +13810,10 @@ export const vi_VN: EnTranslations = {
         "bob": "Tóc Bob",
         "crown": "Tóc Tết Vương Miện",
         "twins": "Tóc Tết Đôi",
-        "curls": "Tóc Xoăn Búi Cao"
+        "curls": "Tóc Xoăn Búi Cao",
+        "mullet": "Mullet",
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Cạo Nhẵn",
@@ -13821,7 +13824,13 @@ export const vi_VN: EnTranslations = {
         "boxed": "Râu Vuông",
         "long": "Râu Dài",
         "chops": "Râu Mai",
-        "chinstrap": "Râu Viền Hàm"
+        "chinstrap": "Râu Viền Hàm",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Cổ Điển",

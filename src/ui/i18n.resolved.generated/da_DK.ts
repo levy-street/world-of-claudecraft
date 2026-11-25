@@ -13810,7 +13810,10 @@ export const da_DK: EnTranslations = {
         "bob": "Page",
         "crown": "Flettet krone",
         "twins": "To fletninger",
-        "curls": "Krøllet opsætning"
+        "curls": "Krøllet opsætning",
+        "mullet": "Mullet",
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Glatbarberet",
@@ -13821,7 +13824,13 @@ export const da_DK: EnTranslations = {
         "boxed": "Tilrettet fuldskæg",
         "long": "Langt skæg",
         "chops": "Bakkenbarter",
-        "chinstrap": "Hagerem"
+        "chinstrap": "Hagerem",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Klassisk",

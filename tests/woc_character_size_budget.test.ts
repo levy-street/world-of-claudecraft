@@ -83,8 +83,11 @@ const WOC_SIZE_BUDGETS = {
   /** A head type's shared facial-hair file, seven beards cut from one texture.
    *  head_type_a_beards: 281,000. */
   beards: 296_000,
-  /** A beard that ships in a file of its own. head_type_a_beard_handlebar: 61,656. */
-  beard: 65_000,
+  /** A beard that ships in a file of its own. The largest are the styles reshaped from the
+   *  long beard (build_facial_hair.mjs), which carry its 1470 triangles and the group's
+   *  texture: head_type_a_beard_sage: 95,740. Raised from 65,000 (the handlebar's 61,656) when those
+   *  six styles were added. */
+  beard: 103_000,
   /** One armor set's low file (its colour atlas 1024 x 512 since the 2026-10-05 rebuild,
    *  PR 4360 review N3). female_druid_low: 214,100. */
   armorLow: 225_000,
@@ -243,12 +246,21 @@ const CEILINGS: Readonly<Record<string, number>> = {
   // smaller (scalp caps 53 to 63%), so the hair and beard files of each type halved: Type A
   // 2969584 to 1503420 bytes, Type B 2909304 to 1524836. Geometry and level of detail are byte
   // for byte what they were, and so are both cores. Each changed file takes the next KiB.
+  'head_type_a_beard_forked.glb': 95232,
   'head_type_a_beard_handlebar.glb': 62464,
+  'head_type_a_beard_imperial.glb': 64512,
+  'head_type_a_beard_sage.glb': 96256,
+  'head_type_a_beard_walrus.glb': 61440,
+  'head_type_a_beard_whiskers.glb': 64512,
+  'head_type_a_beard_wild.glb': 92160,
   'head_type_a_beards.glb': 281600,
   'head_type_a_core.glb': 894976,
   'head_type_a_hair_braid.glb': 116736,
   'head_type_a_hair_long.glb': 101376,
   'head_type_a_hair_mohawk.glb': 99328,
+  'head_type_a_hair_monk.glb': 73728,
+  'head_type_a_hair_mullet.glb': 111616,
+  'head_type_a_hair_pompadour.glb': 82944,
   'head_type_a_hair_ponytail.glb': 113664,
   'head_type_a_hair_quiff.glb': 116736,
   'head_type_a_hair_shoulder.glb': 112640,
@@ -256,13 +268,22 @@ const CEILINGS: Readonly<Record<string, number>> = {
   'head_type_a_hair_topknot.glb': 110592,
   'head_type_a_hair_undercut.glb': 141312,
   'head_type_a_hair_waves.glb': 156672,
+  'head_type_b_beard_forked.glb': 81920,
   'head_type_b_beard_handlebar.glb': 55296,
+  'head_type_b_beard_imperial.glb': 57344,
+  'head_type_b_beard_sage.glb': 87040,
+  'head_type_b_beard_walrus.glb': 52224,
+  'head_type_b_beard_whiskers.glb': 57344,
+  'head_type_b_beard_wild.glb': 86016,
   'head_type_b_beards.glb': 270336,
   'head_type_b_core.glb': 1478656,
   'head_type_b_hair_bob.glb': 122880,
   'head_type_b_hair_braid.glb': 116736,
   'head_type_b_hair_crown.glb': 109568,
   'head_type_b_hair_curls.glb': 118784,
+  'head_type_b_hair_monk.glb': 74752,
+  'head_type_b_hair_mullet.glb': 110592,
+  'head_type_b_hair_pompadour.glb': 82944,
   'head_type_b_hair_ponytail.glb': 116736,
   'head_type_b_hair_shoulder.glb': 107520,
   'head_type_b_hair_topknot.glb': 106496,
