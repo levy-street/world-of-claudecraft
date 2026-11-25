@@ -11,6 +11,8 @@ import {
   PaladinAscensionVisual,
   syncPaladinAscensionVisual,
 } from '../src/render/paladin_ascension_visual';
+import { PALADIN_BODY_FIT } from '../src/render/paladin_body_fit';
+import { syncRiderAnchor } from '../src/render/rider_anchor';
 
 const ACTIVE_PLAN = { active: true, charges: 5, lastCharge: false };
 const INACTIVE_PLAN = { active: false, charges: 0, lastCharge: false };
@@ -69,13 +71,13 @@ describe('PaladinAscensionVisual', () => {
     expect(wings.getObjectByName('paladin-avenging-wrath-left-wing')?.visible).toBe(true);
     expect(wings.getObjectByName('paladin-avenging-wrath-right-wing')?.visible).toBe(true);
     const shoulders = wings.position.y;
-    expect(shoulders).toBeCloseTo(1.8 * 0.62, 1);
+    expect(shoulders).toBeCloseTo(1.8 * PALADIN_BODY_FIT.wingRoot, 6);
     expect(open.value).toBeGreaterThan(0.9);
 
     // Avenging Wrath takes the shoulders: the extra pair is at once below,
     // unfurling from closed rather than sliding down.
     visual.update({ ...ACTIVE_PLAN, wrathWings: true }, 1 / 60, false);
-    expect(shoulders - wings.position.y).toBeGreaterThan(1.8 * 0.3 - 0.07);
+    expect(shoulders - wings.position.y).toBeCloseTo(1.8 * PALADIN_BODY_FIT.lowerWingDrop, 6);
     expect(open.value).toBeLessThan(0.1);
     const right = wings.getObjectByName('paladin-avenging-wrath-right-wing') as THREE.Object3D;
     expect(right.rotation.z).toBeLessThan(-0.6);
@@ -90,15 +92,15 @@ describe('PaladinAscensionVisual', () => {
     expect(pairs()).toHaveLength(2);
     const upper = pairs().find((pair) => pair !== wings);
     if (!upper) throw new Error('missing shoulder pair');
-    // Where they were.
-    expect(Math.abs(upper.position.y - shoulders)).toBeLessThan(0.07);
+    // Exactly where they were: nothing bobs them.
+    expect(upper.position.y).toBeCloseTo(shoulders, 6);
     const upperFeathers = upper.getObjectByName(
       'paladin-avenging-wrath-right-feathers',
     ) as THREE.Mesh;
     expect((upperFeathers.material as THREE.ShaderMaterial).uniforms.uOpen.value).toBeGreaterThan(
       0.9,
     );
-    expect(shoulders - wings.position.y).toBeGreaterThan(1.8 * 0.3 - 0.07);
+    expect(shoulders - wings.position.y).toBeCloseTo(1.8 * PALADIN_BODY_FIT.lowerWingDrop, 6);
     visual.update(ACTIVE_PLAN, 0.25, false);
     expect(open.value).toBeLessThan(0.7);
     visual.update(ACTIVE_PLAN, 0.4, false);
@@ -247,7 +249,7 @@ describe('PaladinAscensionVisual', () => {
     reducedMotion = true,
   ): PaladinAscensionVisual | null {
     root.position.set(0, placedY, 0);
-    anchor.position.copy(root.position);
+    syncRiderAnchor(anchor, root);
     const next = syncPaladinAscensionVisual(visual, view, anchor, 1.8, plan, 1, reducedMotion);
     expect(root.position.toArray()).toEqual([0, placedY, 0]);
     return next;
@@ -263,9 +265,9 @@ describe('PaladinAscensionVisual', () => {
       let visual = frame(null, r, 0, ACTIVE_PLAN, reducedMotion);
       for (let i = 0; i < 4; i++) visual = frame(visual, r, 0, ACTIVE_PLAN, reducedMotion);
       if (!visual) throw new Error('visual not built');
-      expect(haloWorldY(visual, r.view)).toBeCloseTo(1.8 * 0.9);
+      expect(haloWorldY(visual, r.view)).toBeCloseTo(1.8 * 0.9, 6);
       const wings = visual.crown.getObjectByName('paladin-avenging-wrath');
-      expect(wings?.position.y).toBeCloseTo(1.8 * 0.62, 1);
+      expect(wings?.position.y).toBeCloseTo(1.8 * PALADIN_BODY_FIT.wingRoot, 6);
       visual = frame(visual, r, 0, INACTIVE_PLAN, reducedMotion);
       visual?.dispose();
     }
@@ -322,11 +324,33 @@ describe('PaladinAscensionVisual', () => {
     expect(r.root.position.y).toBe(SEAT);
   });
 
-  it('takes no rig root to move: the renderer hands the visual only its two parents', () => {
-    const source = readFileSync('src/render/paladin_ascension_visual.ts', 'utf8');
+  it('takes no rig root to move: handed one the way the renderer once did, it stays put', () => {
+    // The hover used to arrive as a trailing defaulted rig-root argument, which
+    // Function.length cannot see, so this hands the root over the same way and
+    // checks the visual leaves it where the mount pass put it.
+    const sync = syncPaladinAscensionVisual as (
+      ...args: unknown[]
+    ) => PaladinAscensionVisual | null;
+    for (const reducedMotion of [true, false]) {
+      for (const placedY of [0, SEAT]) {
+        const { view, root, anchor } = rig();
+        let visual: PaladinAscensionVisual | null = null;
+        for (const plan of [ACTIVE_PLAN, ACTIVE_PLAN, ACTIVE_PLAN, INACTIVE_PLAN]) {
+          root.position.set(0, placedY, 0);
+          syncRiderAnchor(anchor, root);
+          visual = sync(visual, view, anchor, 1.8, plan, 0.5, reducedMotion, root);
+          expect(root.position.toArray()).toEqual([0, placedY, 0]);
+        }
+        visual?.dispose();
+      }
+    }
+    const source = readFileSync(
+      new URL('../src/render/paladin_ascension_visual.ts', import.meta.url),
+      'utf8',
+    );
     expect(source).not.toMatch(/hoverTarget/);
-    expect(syncPaladinAscensionVisual.length).toBe(7);
   });
+
   it('seats the halo, motes and wings on the rider anchor and the circle on the view group', () => {
     const group = new THREE.Group();
     group.position.set(2, 10, 3);
