@@ -2263,13 +2263,18 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   turning on its own, the stones needing two channellers at once, the nova pulsing damage
   that grows as it gathers.
 - **The wind's way, on every preset** (the owner's playtest of 2026-11-25: players moved the
-  wrong way, and the low and medium presets drew the dust and streaks faint). A grid of chevrons
-  marches over the Cornice's floor the way the wind blows (half bright while the gather
-  telegraphs the coming bearing, whole in the blow, pointing in to the maw while the guardian
-  draws breath; `render/smith_heart_fx/breath_wind_arrows.ts`), and a small badge at the top of
-  the screen turns an arrow to where the wind will carry you, up being ahead
-  (`ui/hud/dungeon/breath_wind_view.ts`, the heading compass's convention: the player's facing).
-  Neither thins on any preset nor hides behind the hints setting.
+  wrong way, and the low and medium presets drew the dust and streaks faint; the floor chevrons
+  tried first that night cluttered the Cornice and hid other telegraphs, so Jose approved the
+  redesign the same day). A STORM WALL of churning cloud stands on the upwind edge of the
+  Cornice, rising out of the void past the floor: the side the wind blows from (a storm at your
+  back pushes you forward), swinging round with each turn and fading in the calm. On each turn
+  ONE big arrow lies at the Cornice's middle for 2 s, then fades. A few big gust ribbons (eight)
+  race over the floor the way it blows, and the blow's sound is heard from upwind of the player
+  (`render/smith_heart_fx/breath_wind_cue.ts`, `breath_wind_streaks.ts`, the look in
+  `breath_fight_fx_core.ts` `WIND_CUE`). A small badge at the top of the screen turns an arrow
+  to where the wind will carry you, up being ahead (`ui/hud/dungeon/breath_wind_view.ts`, the
+  heading compass's convention: the player's facing). None of it thins on any preset or hides
+  behind the hints setting.
 - **What the raid reads.** No banner: the nova's bar and growing light, the pads and their
   routes, each isle's closing ring, the Herald's line, the ward's shield, the stone's glow and
   beam (`render/smith_heart_fx/breath_isles_fx.ts`), Thessaly's lines (`isles`, `updraft`,

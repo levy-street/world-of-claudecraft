@@ -192,41 +192,114 @@ export function inhaleSwirlAngle(angle0: number, reach: number, r: number): numb
   return angle0 + INHALE_SWIRL.twist * Math.log(Math.max(1, reach) / Math.max(1, r));
 }
 
-/** The streaks of wind in the air over the Cornice: how many on each tier
- *  (the low tier fewer, never none: the dust on the floor reads the
- *  direction alone, the streaks agree with it), how far one wraps (yards),
- *  how much faster than the dust it runs. */
-export const WIND_STREAKS = { detail: 150, low: 56, span: 120, rate: 1.6 } as const;
+/** The streaks of wind in the air over the Cornice (the wind-cue redesign of
+ *  2026-11-25, Jose's approval: few, big gust ribbons, not signage): the
+ *  SAME count on every tier (`count`, the wind's way is what a player acts
+ *  on: docs/design/graphics-settings-fairness.md), each `minLen` to `maxLen`
+ *  yards long and up to `width` wide, how far one wraps (yards) and how much
+ *  faster than the dust it runs. */
+export const WIND_STREAKS = {
+  count: 8,
+  minLen: 16,
+  maxLen: 30,
+  width: 0.55,
+  span: 120,
+  rate: 1.6,
+} as const;
 
-/** The wind's floor arrows (breath_wind_arrows.ts; the owner's playtest of
- *  2026-11-25: players moved the wrong way and the low and medium presets read
- *  the streaks faint): chevrons on a grid over the Cornice's floor, each
- *  marching along its cell the way the wind blows. The same count and look on
- *  EVERY tier (the wind's way is information a player acts on). `spacing` the
- *  grid's yards, `width` and `depth` a chevron's, `rate` its march in yards a
- *  second at full flow. */
-export const WIND_ARROWS = { spacing: 8, width: 3.6, depth: 2.2, rate: 5 } as const;
+/** The wind's direction cue (the redesign of 2026-11-25, in place of the
+ *  floor's chevron grid, which cluttered the Cornice and hid other
+ *  telegraphs): a STORM WALL of cloud on the upwind edge of the Cornice (the
+ *  side the wind blows from: a storm behind you pushes you forward), and on
+ *  each turn of the wind ONE big arrow at the Cornice's middle for
+ *  `arrowSeconds`. The same on every tier. `wallHeight` the wall's top over
+ *  the floor and `wallDrop` how far it hangs below the rim (yards), `wallOut`
+ *  how far past the rim it stands (a share of the radii), `wallTurn` how
+ *  fast it swings round to a new bearing (per second, eased), `arrowLength`
+ *  and `arrowWidth` the arrow's yards, `arrowIn` and `arrowOut` its fades. */
+export const WIND_CUE = {
+  wallHeight: 16,
+  wallDrop: 10,
+  wallOut: 1.04,
+  wallTurn: 1.6,
+  arrowSeconds: 2,
+  arrowIn: 0.2,
+  arrowOut: 0.6,
+  arrowLength: 20,
+  arrowWidth: 13,
+} as const;
 
-/** The floor arrows' strength for the wind's phase (0 hidden, 1 whole) and
- *  whether they point in to the guardian (its indrawn breath): bright while
- *  it blows, half while the gather telegraphs the coming bearing, gone in the
- *  calm. */
-export function windArrowLook(
-  phase: BreathWindPhase | null,
-  fill: number,
-): { strength: number; inward: boolean } {
+/** The storm wall's strength for the wind's phase (0 hidden, 1 whole): whole
+ *  while it blows, rising through the gather that telegraphs the coming
+ *  bearing, gone in the calm and the indrawn breath (the pull has its own
+ *  look), and in the storm half. */
+export function stormWallLook(phase: BreathWindPhase | null, fill: number): number {
   switch (phase) {
     case 'gather':
     case 'gustgather':
-      return { strength: 0.35 + 0.35 * smooth(clamp01(fill)), inward: false };
+      return 0.45 + 0.45 * smooth(clamp01(fill));
     case 'blow':
     case 'gust':
-      return { strength: 1, inward: false };
-    case 'inhale':
-      return { strength: 0.85, inward: true };
+      return 1;
     default:
-      return { strength: 0, inward: false };
+      return 0;
   }
+}
+
+/** Does the wind's phase show a bearing the turn arrow may announce? */
+export function windShowsBearing(phase: BreathWindPhase | null): boolean {
+  return phase === 'gather' || phase === 'gustgather' || phase === 'blow' || phase === 'gust';
+}
+
+/** The turn arrow's opacity `t` seconds after the wind turned (0 before and
+ *  after its window): a quick fade in, held, then faded out by
+ *  `arrowSeconds`. */
+export function turnArrowAlpha(t: number): number {
+  const A = WIND_CUE;
+  if (!(t >= 0) || t >= A.arrowSeconds) return 0;
+  if (t < A.arrowIn) return smooth(t / A.arrowIn);
+  const out = A.arrowSeconds - A.arrowOut;
+  return t <= out ? 1 : 1 - smooth((t - out) / A.arrowOut);
+}
+
+/** How much of the storm wall stands at a point of the rim whose outward
+ *  unit normal is (nx, nz), with the wind blowing along the unit (dx, dz):
+ *  whole on the side it blows FROM, gone on the side it blows toward. */
+export function stormWallWeight(nx: number, nz: number, dx: number, dz: number): number {
+  const up = -(nx * dx + nz * dz);
+  return smooth(clamp01((up - 0.2) / 0.7));
+}
+
+/** Turn `cur` (a unit x, z) toward the unit `target` by `k` (0..1) of the
+ *  angle between them, kept unit: it swings round (a reversal the same way
+ *  every time), never collapsing through zero. Mutates and returns `cur`. */
+export function easeDir(
+  cur: { x: number; z: number },
+  target: { x: number; z: number },
+  k: number,
+): { x: number; z: number } {
+  const a = Math.atan2(cur.x, cur.z);
+  let diff = Math.atan2(target.x, target.z) - a;
+  while (diff > Math.PI) diff -= Math.PI * 2;
+  while (diff <= -Math.PI) diff += Math.PI * 2;
+  const n = a + diff * clamp01(k);
+  cur.x = Math.sin(n);
+  cur.z = Math.cos(n);
+  return cur;
+}
+
+/** Where the wind's sound is heard from: `back` yards upwind of `at` (the
+ *  local player), along the unit wind `dir`. */
+export function upwindHeardAt(
+  at: { x: number; y: number; z: number },
+  dir: { x: number; z: number },
+  back = 24,
+  out: { x: number; y: number; z: number } = { x: 0, y: 0, z: 0 },
+): { x: number; y: number; z: number } {
+  out.x = at.x - dir.x * back;
+  out.y = at.y;
+  out.z = at.z - dir.z * back;
+  return out;
 }
 
 /** Streak `i`'s seed (deterministic): `across` -1..1 over the span, `lift`

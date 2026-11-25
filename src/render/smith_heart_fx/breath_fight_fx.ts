@@ -89,6 +89,7 @@ import {
   chargedFade,
   corniceOutline,
   cradleLook,
+  easeDir,
   FORK_BEAM_SECONDS,
   FORK_REACH,
   fxHash01,
@@ -101,12 +102,16 @@ import {
   PINNED_MARK,
   STRIKE_BOLT_SECONDS,
   STRIKE_SCORCH_SECONDS,
+  stormWallLook,
   strikeBoltPath,
   strikeFill,
+  turnArrowAlpha,
+  upwindHeardAt,
   VORTEX_FUNNEL,
+  WIND_CUE,
   type WindFieldLook,
-  windArrowLook,
   windFieldLook,
+  windShowsBearing,
 } from './breath_fight_fx_core';
 import { FUNNEL_FRAG, GALE_FOOT_DUST, GALE_GRIT, WIND_FUNNEL_VERT } from './breath_gale_glsl';
 import { BreathHeartFx } from './breath_heart_fx';
@@ -114,7 +119,7 @@ import { BreathInhaleStreams } from './breath_inhale_streams';
 import { BreathIslesFx } from './breath_isles_fx';
 import { BreathRoarFx } from './breath_roar_fx';
 import { BreathTossFx } from './breath_toss_fx';
-import { BreathWindArrows } from './breath_wind_arrows';
+import { BreathWindCue } from './breath_wind_cue';
 import { BreathWindStreaks } from './breath_wind_streaks';
 import { CouncilRushArrow } from './council_rush_arrow';
 import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
@@ -543,7 +548,14 @@ export class BreathFightFx {
     inward: false,
   };
   private readonly streaks: BreathWindStreaks;
-  private readonly arrows: BreathWindArrows;
+  private readonly cue: BreathWindCue;
+  /** The storm wall's way (eased round to the wind's), and the turn arrow's
+   *  bearing (NaN before the first) and when it turned (this.clock). */
+  private readonly cueDir = { x: 0, z: 1 };
+  private cueBearing = Number.NaN;
+  private cueTurnAt = -1e9;
+  /** Where the wind is heard from this frame (reused). */
+  private readonly heardAt = { x: 0, y: 0, z: 0 };
   private flowAt = 0;
   // The objects' footprints.
   private readonly calmFans: FanSlot[] = [];
@@ -724,10 +736,10 @@ export class BreathFightFx {
     this.field.frustumCulled = false;
     this.field.renderOrder = floorVfxRenderOrder('encounter', 2);
     this.local.add(this.field);
-    // The streaks of wind in the air over it (every tier, fewer on the low).
-    this.streaks = new BreathWindStreaks(this.local, this.uTime, this.detail, CORNICE_FLOOR_H);
-    // The wind's way on the floor: marching chevrons, the same on every tier.
-    this.arrows = new BreathWindArrows(this.local, CORNICE_FLOOR_H);
+    // The gusts of wind in the air over it (the same few on every tier).
+    this.streaks = new BreathWindStreaks(this.local, this.uTime, CORNICE_FLOOR_H);
+    // The wind's way: the storm wall upwind and the turn arrow, every tier.
+    this.cue = new BreathWindCue(this.local, CORNICE_FLOOR_H);
 
     // ---- the gaps' lethal lips (every tier) ----
     const lipUniforms = (floor: number) => ({
@@ -1301,7 +1313,10 @@ export class BreathFightFx {
     this.audio.nova(this.isles.novaHum, meE ?? null);
     this.audio.update(
       this.windPhase,
-      wind ? wind.pos : null,
+      // The wind heard from upwind of the player (the storm wall's side).
+      wind && meE && windShowsBearing(this.windPhase)
+        ? upwindHeardAt(meE.pos, this.windDir, 24, this.heardAt)
+        : (wind?.pos ?? null),
       guardian,
       gale,
       meE ?? null,
@@ -1509,6 +1524,8 @@ export class BreathFightFx {
     for (const s of [...this.seatPips, ...this.beaconGlows]) s.visible = false;
     this.crown.visible = false;
     this.windPhase = null;
+    this.cue.hide();
+    this.cueBearing = Number.NaN;
   }
 
   // ---- the wind ---------------------------------------------------------------------------
@@ -1547,8 +1564,7 @@ export class BreathFightFx {
     if (g && this.origin) u.uFocus.value.set(g.pos.x - this.origin.x, g.pos.z - this.origin.z);
     this.field.visible = u.uDust.value > 0.01 || u.uStrength.value > 0.01 || look.front >= 0;
     this.streaks.paint(u.uStrength.value, d, look.inward, u.uFocus.value, this.flowAt, look.front);
-    const arrow = windArrowLook(this.windPhase, this.windFill);
-    this.arrows.paint(arrow.strength, d, arrow.inward, u.uFocus.value, dt, this.reducedMotion());
+    this.paintCue(d, dt);
     // The gaps' lips flare when the wind blows their way.
     const th = this.lipMat.uniforms.uThreat.value as THREE.Vector4;
     const th2 = this.lipMat.uniforms.uThreat2.value as THREE.Vector4;
@@ -1560,6 +1576,31 @@ export class BreathFightFx {
     const stacks = this.swell;
     u.uStorm.value = Math.min(1, stacks / 20);
     this.windDressing(look, d, dt);
+  }
+
+  /** The wind's way: the storm wall swung round to it, the turn arrow on a
+   *  new bearing (breath_wind_cue.ts). */
+  private paintCue(d: { x: number; z: number }, dt: number): void {
+    const shows = windShowsBearing(this.windPhase);
+    if (shows && this.windBearing !== this.cueBearing) {
+      // The first bearing of a pull sets the wall at once; a turn swings it.
+      if (Number.isNaN(this.cueBearing)) {
+        this.cueDir.x = d.x;
+        this.cueDir.z = d.z;
+      }
+      this.cueBearing = this.windBearing;
+      this.cueTurnAt = this.clock;
+    }
+    if (shows) easeDir(this.cueDir, d, Math.min(1, dt * WIND_CUE.wallTurn));
+    const arrow = shows ? turnArrowAlpha(this.clock - this.cueTurnAt) : 0;
+    this.cue.paint(
+      stormWallLook(this.windPhase, this.windFill),
+      this.cueDir,
+      arrow,
+      d,
+      dt,
+      this.reducedMotion(),
+    );
   }
 
   /** One gap's lip's threat (0 for a lip the field has none of). */
@@ -2307,7 +2348,7 @@ export class BreathFightFx {
     this.particles.dispose();
     this.kit.dispose();
     this.streaks.dispose();
-    this.arrows.dispose();
+    this.cue.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
     this.glowTex?.dispose();

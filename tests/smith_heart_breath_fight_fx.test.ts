@@ -63,16 +63,20 @@ import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 describe('breath_fight_fx_core', () => {
-  it('keeps streaks of wind in the air on every tier, fewer on the low, seeded alike', () => {
-    expect(WIND_STREAKS.low).toBeGreaterThan(0);
-    expect(WIND_STREAKS.detail).toBeGreaterThan(WIND_STREAKS.low);
+  it('keeps a few big gusts in the air, the same on every tier, seeded alike', () => {
+    // The wind-cue redesign of 2026-11-25: six to eight long ribbons, never
+    // a swarm, and one count for every preset.
+    expect(WIND_STREAKS.count).toBeGreaterThanOrEqual(6);
+    expect(WIND_STREAKS.count).toBeLessThanOrEqual(8);
+    expect(WIND_STREAKS.minLen).toBeGreaterThanOrEqual(12);
+    expect(WIND_STREAKS.maxLen).toBeGreaterThan(WIND_STREAKS.minLen);
     // The span covers the whole Cornice, both ways.
     expect(WIND_STREAKS.span).toBeGreaterThanOrEqual(
       2 * Math.max(BREATH.cornice.rx, BREATH.cornice.rz),
     );
     const a = windStreakSeed(7);
     expect(windStreakSeed(7)).toEqual(a);
-    for (let i = 0; i < WIND_STREAKS.detail; i++) {
+    for (let i = 0; i < WIND_STREAKS.count; i++) {
       const s = windStreakSeed(i);
       expect(Math.abs(s.across)).toBeLessThanOrEqual(1);
       for (const k of [s.lift, s.phase, s.length]) {
@@ -376,7 +380,14 @@ describe('BreathFightFx', () => {
     const streaks = root?.getObjectByName('smithHeartBreathWindStreaks') as THREE.Mesh | undefined;
     expect(streaks?.visible).toBe(true);
     if (!streaks) throw new Error('no streaks');
-    expect((streaks.geometry as THREE.InstancedBufferGeometry).instanceCount).toBeGreaterThan(0);
+    expect((streaks.geometry as THREE.InstancedBufferGeometry).instanceCount).toBe(
+      WIND_STREAKS.count,
+    );
+    // The wind's way: the storm wall upwind, the turn arrow on its first
+    // bearing, and no floor chevrons (the redesign of 2026-11-25).
+    expect(root?.getObjectByName('smithHeartBreathStormWall')?.visible).toBe(true);
+    expect(root?.getObjectByName('smithHeartBreathTurnArrow')?.visible).toBe(true);
+    expect(root?.getObjectByName('smithHeartBreathWindArrows')).toBeUndefined();
     expect(root?.getObjectByName('smithHeartBreathGapLip')).toBeDefined();
     // Every footprint at its object's own radius (the fans' horizontal scale).
     const shownFans = (r: number) =>

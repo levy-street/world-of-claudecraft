@@ -1,15 +1,13 @@
-// The streaks of wind in the air over the Storm Cornice (a part of
-// BreathFightFx; FinalKitFx lays the same over the Anvil of the World for the
-// Masterless Strength's Bellows Wind, docs/design/raid/smith_heart.md section 7.2): long thin
-// ribbons racing downwind at every height from the floor to a few yards up,
-// white at their heads, slate at their tails, wavering as they run, over the
-// whole Cornice (never only round the player), behind the gather's rolling
-// front, drawn inward to the guardian while it draws breath. With the dust
-// streaming over the floor they are the wind's mood; its direction reads
-// first in the floor's chevrons (breath_wind_arrows.ts, the owner's playtest
-// of 2026-11-25 reversed the old "no arrows on the floor": players moved the
-// wrong way) and the HUD's wind badge. Every tier draws them; the low tier
-// fewer (WIND_STREAKS).
+// The gusts of wind in the air over the Storm Cornice (a part of
+// BreathFightFx, docs/design/raid/smith_heart.md section 7.2): since the
+// wind-cue redesign of 2026-11-25 a FEW big ribbons (WIND_STREAKS.count, the
+// same on every tier: the wind's way is what a player acts on), each long and
+// wispy, racing downwind low over the floor, white at their heads, slate at
+// their tails, wavering as they run, over the whole Cornice (never only round
+// the player), behind the gather's rolling front, drawn inward to the guardian
+// while it draws breath. With the dust over the floor and the storm wall on
+// the upwind edge (breath_wind_cue.ts) they read the wind's way; the HUD's
+// wind badge names it.
 //
 // One instanced draw, positions computed in the vertex shader from the
 // shared clock and the field's own flow (no per-frame allocation, no CPU
@@ -43,12 +41,14 @@ uniform vec2 uRadii;
 uniform float uInward;
 uniform float uSwirl;
 uniform float uFront;
+uniform vec2 uLen;
+uniform float uWidth;
 attribute vec4 aSeed;
 varying float vT;
 varying float vSide;
 varying float vFade;
 void main() {
-  float len = mix(4.0, 11.0, aSeed.w);
+  float len = mix(uLen.x, uLen.y, aSeed.w);
   float t = position.x;
   vec2 p;
   vec2 fwd;
@@ -81,14 +81,14 @@ void main() {
   }
   // Over the Cornice, and a little past its rim where the wind spills off.
   vFade *= 1.0 - smoothstep(0.92, 1.12, length((p - uCentre) / uRadii));
-  float y = mix(0.4, 6.5, aSeed.y * aSeed.y);
+  float y = mix(0.6, 4.5, aSeed.y * aSeed.y);
   y += sin(p.x * 0.21 + p.y * 0.17 + aSeed.z * 20.0 + uTime) * 0.3;
   vec4 wp = modelMatrix * vec4(p.x, y, p.y, 1.0);
   vec3 f3 = normalize((modelMatrix * vec4(fwd.x, 0.0, fwd.y, 0.0)).xyz);
   vec3 sideW = cross(f3, normalize(cameraPosition - wp.xyz));
   float sl = length(sideW);
   sideW = sl > 0.0001 ? sideW / sl : vec3(0.0, 1.0, 0.0);
-  float w = mix(0.015, 0.07, t) * (0.7 + 0.6 * aSeed.w);
+  float w = mix(0.12, 1.0, sin(t * 3.14159265)) * uWidth * (0.7 + 0.6 * aSeed.w);
   wp.xyz += sideW * position.y * w;
   vT = t;
   vSide = position.y;
@@ -103,9 +103,11 @@ varying float vT;
 varying float vSide;
 varying float vFade;
 void main() {
-  float edge = 1.0 - smoothstep(0.3, 1.0, abs(vSide));
-  float body = smoothstep(0.0, 0.85, vT) * (1.0 - smoothstep(0.94, 1.0, vT));
-  float a = uStrength * vFade * edge * body * 0.45;
+  // A soft wisp: feathered across, frayed along (a few thin strands).
+  float edge = 1.0 - smoothstep(0.0, 1.0, abs(vSide));
+  float strands = 0.6 + 0.4 * sin(vSide * 7.0 + vT * 5.0);
+  float body = smoothstep(0.0, 0.7, vT) * (1.0 - smoothstep(0.9, 1.0, vT));
+  float a = uStrength * vFade * edge * strands * body * 0.5;
   if (a < 0.004) discard;
   gl_FragColor = vec4(mix(uTail, uHead, smoothstep(0.4, 1.0, vT)), a);
   #include <colorspace_fragment>
@@ -123,12 +125,12 @@ export class BreathWindStreaks {
   constructor(
     parent: THREE.Object3D,
     uTime: { value: number },
-    detail: boolean,
     floorY: number,
     field: { x: number; z: number; rx: number; rz: number } = BREATH.cornice,
     name = 'smithHeartBreathWindStreaks',
   ) {
-    const count = detail ? WIND_STREAKS.detail : WIND_STREAKS.low;
+    // The same count on every tier (no preset thins the wind's way).
+    const count = WIND_STREAKS.count;
     const pos: number[] = [];
     const idx: number[] = [];
     for (let i = 0; i <= SEGMENTS; i++) {
@@ -164,6 +166,8 @@ export class BreathWindStreaks {
         uInward: { value: 0 },
         uSwirl: { value: INHALE_SWIRL.twist },
         uFront: { value: -1 },
+        uLen: { value: new THREE.Vector2(WIND_STREAKS.minLen, WIND_STREAKS.maxLen) },
+        uWidth: { value: WIND_STREAKS.width },
         uStrength: { value: 0 },
         uHead: { value: new THREE.Color(C.streak) },
         uTail: { value: new THREE.Color(C.streakTail) },
