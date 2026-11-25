@@ -40,6 +40,7 @@ import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 import { AURA_URGENCY_BUCKET_COUNT, auraUrgencyBucket } from './aura_strip_order_core';
+import { quenchColdBadge } from './hud/dungeon/quench_cold_view';
 
 // Re-export the shared set for the view contract and its exact-set regression test.
 // Classification itself stays in the sim leaf so HUD display surfaces cannot drift.
@@ -474,15 +475,22 @@ export function createAurasView(
         slot.toggle = toggle;
         slot.alwaysRender = NEVER_SHED_IDS.has(a.id);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
-        // badge shows a stack count, and only when it stacks past 1.
+        // badge shows a stack count, and only when it stacks past 1. The Quench's cold
+        // badges its bar's own value (quench_cold_view.ts), so its level reads
+        // without a hover.
+        const coldBadge = quenchColdBadge(a.id, a.value);
         slot.stacksText =
-          a.poolPct !== undefined
-            ? deps.formatStacks(a.poolPct)
-            : a.charges !== undefined
-              ? deps.formatStacks(a.charges)
-              : a.stacks !== undefined && (a.stacks > 1 || isPersistentEngineAura(a.id))
-                ? deps.formatStacks(a.stacks)
-                : '';
+          coldBadge !== null
+            ? coldBadge > 0
+              ? deps.formatStacks(coldBadge)
+              : ''
+            : a.poolPct !== undefined
+              ? deps.formatStacks(a.poolPct)
+              : a.charges !== undefined
+                ? deps.formatStacks(a.charges)
+                : a.stacks !== undefined && (a.stacks > 1 || isPersistentEngineAura(a.id))
+                  ? deps.formatStacks(a.stacks)
+                  : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
         slot.duration = a.duration;

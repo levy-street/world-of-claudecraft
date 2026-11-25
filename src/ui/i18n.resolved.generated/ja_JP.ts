@@ -1050,7 +1050,9 @@ export const ja_JP: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "魂の欠片",
       "ruinMeter": "破滅",
-      "ruinStatus": "破滅 {value}/{max}"
+      "ruinStatus": "破滅 {value}/{max}",
+      "quenchColdMeter": "焼き入れの冷気",
+      "quenchColdStatus": "霜の印 {value}/{max}"
     },
     "comboMeter": {
       "label": "CP"

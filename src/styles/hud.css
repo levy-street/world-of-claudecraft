@@ -15796,6 +15796,25 @@
   #proc-overlay.destruction.r5 {
     opacity: 1;
   }
+  /* The Guardian of the Quench's cold on the same five marks, in frost blue
+     (proc_overlay_route.ts): the bank's own colours remapped, so every mark,
+     ring and flare rule above paints it. */
+  #proc-overlay.destruction.quench {
+    --color-ruin-empty-border: var(--color-quench-mark-empty-border);
+    --color-ruin-empty-start: var(--color-quench-mark-empty-start);
+    --color-ruin-empty-end: var(--color-quench-mark-empty-end);
+    --color-ruin-lit-border: var(--color-quench-mark-lit-border);
+    --color-ruin-lit-core: var(--color-quench-mark-lit-core);
+    --color-ruin-lit-mid: var(--color-quench-mark-lit-mid);
+    --color-ruin-lit-edge: var(--color-quench-mark-lit-edge);
+    --color-ruin-glow: var(--color-quench-mark-glow);
+    --color-ruin-inner-shine: var(--color-quench-mark-inner-shine);
+    --color-ruin-ritual-shadow: var(--color-quench-mark-ritual-shadow);
+    --color-ruin-ritual-aura: var(--color-quench-mark-ritual-aura);
+    --color-ruin-ring-highlight: var(--color-quench-mark-ring-highlight);
+    --color-ruin-rune-dim: var(--color-quench-mark-rune-dim);
+    --color-ruin-full-flare: var(--color-quench-mark-full-flare);
+  }
   #proc-overlay.destruction .fire-bird,
   #proc-overlay.destruction .chrono-bird,
   #proc-overlay.destruction .frost-bird,

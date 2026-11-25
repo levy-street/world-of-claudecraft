@@ -1050,7 +1050,9 @@ export const vi_VN: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "Mảnh Linh Hồn",
       "ruinMeter": "Wrack",
-      "ruinStatus": "{value} trên {max} Wrack"
+      "ruinStatus": "{value} trên {max} Wrack",
+      "quenchColdMeter": "Quenching Cold",
+      "quenchColdStatus": "{value} of {max} frost marks"
     },
     "comboMeter": {
       "label": "LH"

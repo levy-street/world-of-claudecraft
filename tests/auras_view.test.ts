@@ -538,6 +538,13 @@ describe('createAurasView: derivation per mode', () => {
     expect(v.tick(entity([aura({ id: 'a', stacks: 4 })])).slots[0].stacksText).toBe('4');
   });
 
+  it('badges the Quench cold debuff with its bar value, and nothing on an empty bar', () => {
+    const v = createAurasView('all', deps());
+    const id = 'heart_quench_cold';
+    expect(v.tick(entity([aura({ id, value: 63.4 })])).slots[0].stacksText).toBe('63');
+    expect(v.tick(entity([aura({ id, value: 0 })])).slots[0].stacksText).toBe('');
+  });
+
   it('always badges Druid engine stages, including zero and one', () => {
     const v = createAurasView('all', deps());
     expect(v.tick(entity([aura({ id: 'moontide', stacks: 0 })])).slots[0].stacksText).toBe('0');

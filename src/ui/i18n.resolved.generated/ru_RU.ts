@@ -1050,7 +1050,9 @@ export const ru_RU: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "Осколки душ",
       "ruinMeter": "Погибель",
-      "ruinStatus": "Гибель: {value} из {max}"
+      "ruinStatus": "Гибель: {value} из {max}",
+      "quenchColdMeter": "Закаляющий холод",
+      "quenchColdStatus": "Метки инея: {value} из {max}"
     },
     "comboMeter": {
       "label": "ОС"

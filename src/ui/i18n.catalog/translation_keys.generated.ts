@@ -17402,6 +17402,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.priest.gloomtitheLabel'
   | 'hudChrome.priest.gloomtitheStatus'
   | 'hudChrome.priest.gloomtitheTooltip'
+  | 'hudChrome.procOverlay.quenchColdMeter'
+  | 'hudChrome.procOverlay.quenchColdStatus'
   | 'hudChrome.procOverlay.ruinMeter'
   | 'hudChrome.procOverlay.ruinStatus'
   | 'hudChrome.procOverlay.soulFragmentsMeter'

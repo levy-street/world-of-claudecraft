@@ -1050,7 +1050,9 @@ export const cs_CZ: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "Úlomky duše",
       "ruinMeter": "Zkáza",
-      "ruinStatus": "Zkáza {value} z {max}"
+      "ruinStatus": "Zkáza {value} z {max}",
+      "quenchColdMeter": "Quenching Cold",
+      "quenchColdStatus": "{value} of {max} frost marks"
     },
     "comboMeter": {
       "label": "CP"

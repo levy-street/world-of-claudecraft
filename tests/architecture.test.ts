@@ -763,6 +763,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/quench_alert_view.ts',
   // Its screen effects (the frost border, the water's tint).
   'src/ui/hud/dungeon/quench_screen_view.ts',
+  'src/ui/hud/dungeon/quench_cold_view.ts',
   'src/ui/hud/dungeon/knot_alert_view.ts',
   'src/ui/hud/dungeon/tank_swap_alert_view.ts',
   'src/ui/hud/dungeon/coal_alert_view.ts',

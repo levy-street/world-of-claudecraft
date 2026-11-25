@@ -1050,7 +1050,9 @@ export const de_DE: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "Seelenfragmente",
       "ruinMeter": "Verderben",
-      "ruinStatus": "{value} von {max} Verderben"
+      "ruinStatus": "{value} von {max} Verderben",
+      "quenchColdMeter": "Quenching Cold",
+      "quenchColdStatus": "{value} of {max} frost marks"
     },
     "comboMeter": {
       "label": "CP"

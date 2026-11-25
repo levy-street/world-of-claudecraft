@@ -20833,6 +20833,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.devotionValue': 'Преданность: {value} из {max}',
   'hudChrome.procOverlay.ruinMeter': 'Погибель',
   'hudChrome.procOverlay.ruinStatus': 'Гибель: {value} из {max}',
+  'hudChrome.procOverlay.quenchColdMeter': 'Закаляющий холод',
+  'hudChrome.procOverlay.quenchColdStatus': 'Метки инея: {value} из {max}',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Осколки душ',
   'hudChrome.statInfo.effects.manaRegenCombat': 'Около {value} ед. маны каждые 5 сек. в бою',
   'hudChrome.warlock.doomEmptyStatus': 'Осуждение: {value} из {max}.',
