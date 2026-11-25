@@ -10915,7 +10915,7 @@ export class Renderer {
       // mid-cast always animate every frame no matter how dense the crowd.
       let animate = true;
       if (!actionablePose) {
-        const cadence = animCadenceFrames(d2, lodBands);
+        const cadence = animCadenceFrames(d2, lodBands, keepsArticulatedRig(e.templateId));
         animate = cadence <= 1 || (this.frameIdx + e.id) % cadence === 0;
       }
       if (runCharacterPresentation) active.update(dt, st, animate, this.reducedMotion());

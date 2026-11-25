@@ -10,7 +10,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { CharacterLodBands } from '../src/render/crowd_lod';
-import { CHARACTER_LOD_RANGE } from '../src/render/crowd_lod';
+import { animCadenceFrames, CHARACTER_LOD_RANGE } from '../src/render/crowd_lod';
 import { latchFarLod } from '../src/render/far_lod_latch';
 import {
   awaitsScriptedPose,
@@ -85,8 +85,27 @@ describe("the Smith's Heart bosses keep their rig at every distance", () => {
   });
 
   it('the wake reach sits on the articulated band (why the swap and the wake landed together)', () => {
-    for (const reach of [BREATH_INTRO.reach, COUNCIL_INTRO.reach, HEAT_INTRO.reach])
+    for (const reach of [COUNCIL_INTRO.reach, HEAT_INTRO.reach])
       expect(reach).toBeLessThanOrEqual(CHARACTER_LOD_RANGE + 1);
+    // The Breath's wakes from across the chasm (its landing, 2026-11-25), past
+    // the band: its rig there neither swaps nor drops to the far cadence.
+    expect(BREATH_INTRO.reach).toBeGreaterThan(CHARACTER_LOD_RANGE + 1);
+  });
+
+  it('plays every entrance at no less than the mid cadence from its wake reach', () => {
+    const breath = SMITH_HEART_GUARDIANS.breath;
+    for (const reach of [BREATH_INTRO.reach, COUNCIL_INTRO.reach, HEAT_INTRO.reach, 150]) {
+      expect(everFar(breath, reach)).toBe(false);
+      expect(animCadenceFrames(yd(reach), BANDS, keepsArticulatedRig(breath))).toBe(
+        BANDS.midCadence,
+      );
+    }
+    // Any other body still slows past the band.
+    expect(animCadenceFrames(yd(BREATH_INTRO.reach), BANDS, false)).toBeGreaterThan(
+      BANDS.midCadence,
+    );
+    const src = readFileSync('src/render/renderer.ts', 'utf8');
+    expect(src).toContain('animCadenceFrames(d2, lodBands, keepsArticulatedRig(e.templateId));');
   });
 
   it('casts its own shadow too (the static-pose proxy shadow would stand it up)', () => {
