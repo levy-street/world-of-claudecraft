@@ -62,6 +62,7 @@ import { COUNCIL_ARENA_R } from '../src/sim/encounters/smith_heart/council_scope
 import { onAnvil } from '../src/sim/encounters/smith_heart/final_scope';
 import { SMITH_HEART_VEIN_BITS, smithHeartProgress } from '../src/sim/encounters/smith_heart/seal';
 import { burstSmithHeartSeal } from '../src/sim/encounters/smith_heart/seal_burst';
+import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { dungeonReentryPoint } from '../src/sim/instances/dungeon_checkpoints';
 import {
   clearDungeonGateStateForTest,
@@ -432,6 +433,10 @@ describe('each point stands at its door, clear of the fight', () => {
             const i = cell(nx, nz);
             if (seen[i] || isBlocked(7, o.x + nx, o.z + nz, 0.5)) continue;
             seen[i] = 1;
+            // A body that steps into the void falls (the open lips of the
+            // Cornice and, since 2026-11-25, its approach): no walk on from it.
+            if (authoredFieldHeight(SMITH_HEART_FIELD, nx, nz) <= SMITH_HEART_FIELD.voidHeight + 1)
+              continue;
             queue.push(nx, nz);
           }
         }

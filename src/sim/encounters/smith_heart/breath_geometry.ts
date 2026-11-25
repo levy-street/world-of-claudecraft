@@ -10,6 +10,7 @@ import {
   BREATH_ISLE_REACH,
   BREATH_ISLES,
   CORNICE_GAPS,
+  CORNICE_LANDING,
   CORNICE_OPEN_RIM,
   SMITH_HEART_FIELD,
 } from '../../content/smith_heart_layout';
@@ -19,31 +20,48 @@ import { BREATH_TUNING as T } from './breath_ids';
 const F = SMITH_HEART_FIELD;
 const C = BREATH.cornice;
 
-/** The Cornice's floor id, and its climb's (whose top lies inside the
- *  fight: the gate seals it a little west, `cornice_mouth`). */
+/** The Cornice's floor id, its climb's and its landing's (the climb's head,
+ *  a chasm short of the Cornice since 2026-11-25: the Gale Crossing carries
+ *  the raid over, breath_crossing.ts). */
 const CORNICE_FLOOR = 'storm_cornice';
 const CORNICE_CLIMB = 'cornice_climb';
-/** The climb counts as the arena east of this (inside the Cornice Mouth). */
-const CLIMB_ARENA_X = -66;
+const CORNICE_LANDING_FLOOR = 'cornice_landing';
 
-/** Captain Thessaly's post: at the head of the climb, inside the gate, just
- *  off the Cornice's floor (the wind never reaches an NPC). */
-export const THESSALY_POST = { x: -56, z: 194.4 } as const;
+/** Captain Thessaly's post: on the landing at the climb's head, by the Gale
+ *  Crossing's pad, facing the Cornice across the chasm (out of the fight:
+ *  the wind never reaches an NPC). */
+export const THESSALY_POST = { x: -60, z: 189.5 } as const;
 
-/** Is instance-local (x, z) on the Cornice's fighting floor (its plateau, or
- *  the climb's top inside the gate)? */
+/** Is instance-local (x, z) on the Cornice's fighting floor? Since the chasm
+ *  (2026-11-25) that is its plateau alone: no stretch of the climb or the
+ *  landing is the fight's. */
 export function inBreathArena(x: number, z: number): boolean {
-  const s = authoredFieldSurfaceAt(F, x, z);
-  if (!s) return false;
-  if (s.id === CORNICE_FLOOR) return true;
-  return s.id === CORNICE_CLIMB && x > CLIMB_ARENA_X;
+  return authoredFieldSurfaceAt(F, x, z)?.id === CORNICE_FLOOR;
 }
 
-/** Is (x, z) on the way up to the fight (the Cornice's floor, or anywhere on
- *  its climb): where a target the guardian may keep stands. */
+/** Is (x, z) on the way up to the fight (the Cornice's floor, its landing or
+ *  anywhere on its climb): where a target the guardian may keep stands. */
 export function onCorniceApproach(x: number, z: number): boolean {
-  if (inBreathArena(x, z)) return true;
-  return authoredFieldSurfaceAt(F, x, z)?.id === CORNICE_CLIMB;
+  const id = authoredFieldSurfaceAt(F, x, z)?.id;
+  return id === CORNICE_FLOOR || id === CORNICE_CLIMB || id === CORNICE_LANDING_FLOOR;
+}
+
+/** The approach's centre line (instance-local): up the climb to the
+ *  landing's middle. A body that fell off the approach is laid back on it. */
+const APPROACH_LINE: readonly [number, number][] = [
+  [-104, 179],
+  [CORNICE_LANDING.x, CORNICE_LANDING.z],
+];
+
+/** The nearest point of the approach's centre line to (x, z), and how far. */
+function nearestOnApproach(x: number, z: number): { x: number; z: number; d: number } {
+  const [[ax, az], [bx, bz]] = APPROACH_LINE;
+  const dx = bx - ax;
+  const dz = bz - az;
+  const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)));
+  const px = ax + dx * t;
+  const pz = az + dz * t;
+  return { x: px, z: pz, d: Math.hypot(x - px, z - pz) };
 }
 
 /** Half a claim's slot band in z (slots are 500 yd apart): a local z past
@@ -61,6 +79,11 @@ export function inClaimBand(z: number): boolean {
  *  Cornice's middle (so a corpse is never left in the void, where a
  *  resurrection would drop it straight back into it). */
 export function voidCorpseSpot(x: number, z: number, inset = 3): { x: number; z: number } {
+  // Off the approach (its open lips since 2026-11-25): laid back on its
+  // centre line, never carried over the chasm to the Cornice.
+  const near = nearestOnApproach(x, z);
+  const rim = (Math.hypot((x - C.x) / C.rx, (z - C.z) / C.rz) - 1) * Math.min(C.rx, C.rz);
+  if (near.d < Math.max(0, rim)) return { x: near.x, z: near.z };
   const dx = C.x - x;
   const dz = C.z - z;
   const d = Math.hypot(dx, dz);
@@ -115,7 +138,9 @@ export function pinnedAgainstRim(x: number, z: number, heading: number): boolean
   const px = x + Math.sin(heading) * T.pinReach;
   const pz = z + Math.cos(heading) * T.pinReach;
   if (authoredFieldSurfaceAt(F, px, pz)) return false;
-  // Since the open rim (2026-11-03) only the climb's head keeps a wall.
+  // Since the open rim (2026-11-03) only the climb's head kept a wall, and
+  // since the chasm (2026-11-25) none does: kept for a wall a layout may yet
+  // stand (nothing pins a body today).
   return !openLipAt(px, pz) && !openLipAt(x, z);
 }
 

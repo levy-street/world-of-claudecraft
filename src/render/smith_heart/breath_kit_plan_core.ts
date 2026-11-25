@@ -49,6 +49,7 @@ export const BREATH_WALK_SURFACES: ReadonlySet<string> = new Set([
   'wind_bridge',
   'breath_b3',
   'cornice_climb',
+  'cornice_landing',
   'storm_cornice',
 ]);
 

@@ -35,6 +35,7 @@ import {
 } from '../src/sim/content/smith_heart';
 import {
   BREATH,
+  CORNICE_CROSSING,
   CORNICE_GAPS,
   EAST_STAIR,
   GALLERY_LANDINGS,
@@ -83,6 +84,19 @@ function voidCell(x: number, z: number): boolean {
   return authoredFieldHeight(FIELD, x, z) <= FIELD.voidHeight + 1;
 }
 
+/** The wind's rides a body takes by stepping on a pad (the Gale Crossing
+ *  over the chasm to the Storm Cornice, 2026-11-25; its way home): a cell
+ *  within a pad's reach links to where the ride sets the body down. */
+const RIDES: readonly { from: { x: number; z: number }; to: { x: number; z: number } }[] = [
+  { from: CORNICE_CROSSING.out, to: CORNICE_CROSSING.arrive },
+  { from: CORNICE_CROSSING.home, to: CORNICE_CROSSING.back },
+];
+function rideFrom(x: number, z: number): { x: number; z: number } | null {
+  for (const r of RIDES)
+    if (Math.hypot(x - r.from.x, z - r.from.z) <= CORNICE_CROSSING.r) return r.to;
+  return null;
+}
+
 /** Every one-yard cell a body reaches from `start` with `open` gates (never
  *  stepping into the void: `intoVoid` lets it, to find where the rim is open). */
 function flood(
@@ -113,6 +127,11 @@ function flood(
       // A body that steps into the void falls: it walks on from nowhere.
       if (!intoVoid && voidCell(nx, nz)) continue;
       queue.push(nx, nz);
+      const to = rideFrom(nx, nz);
+      if (to && !seen[cell(to.x, to.z)]) {
+        seen[cell(to.x, to.z)] = 1;
+        queue.push(Math.round(to.x), Math.round(to.z));
+      }
     }
   }
   return seen;
@@ -148,6 +167,11 @@ function walkSteps(
       if (voidCell(nx, nz)) continue;
       steps[i] = here + 1;
       queue.push(nx, nz);
+      const to = rideFrom(nx, nz);
+      if (to && steps[cell(to.x, to.z)] < 0 && !cut(Math.round(to.x), Math.round(to.z))) {
+        steps[cell(to.x, to.z)] = here + 2;
+        queue.push(Math.round(to.x), Math.round(to.z));
+      }
     }
   }
   return steps;

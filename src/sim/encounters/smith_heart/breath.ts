@@ -63,6 +63,7 @@ import {
   stepBlow,
 } from './breath_blow';
 import { dischargeCradles, landCradle, startCradle } from './breath_cradle';
+import { stepCrossing } from './breath_crossing';
 import {
   clearGales,
   clearWindAuras,
@@ -397,6 +398,9 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   // The void is the void's whether the guardian fights or not.
   const fell = stepVoidDeaths(ctx, inst);
   const boss = breathGuardian(ctx, inst);
+  // The Gale Crossing over the chasm to the Cornice, fight or no fight (its
+  // way home only while the guardian is not fighting).
+  stepCrossing(ctx, inst, boss !== null && fighting(boss));
   if (!boss) return;
   const st0 = boss.smithHeartBreath ?? null;
   // A raider lost to the void mid-fight breaks the feat (feats.ts).

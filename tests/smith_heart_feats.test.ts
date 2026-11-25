@@ -364,14 +364,15 @@ describe("the Breath's feat: Keep Your Feet", () => {
     expect(f.state()?.isles.stage).toBe('nova');
     expect(f.state()?.feat?.broken ?? false).toBe(false);
     for (const p of f.players) p.hp = p.maxHp;
+    const st = f.state();
     f.dev('/dev heart breath nova');
-    f.tick(2);
-    expect(f.state()?.isles.burst).toBe(true);
-    expect(f.state()?.feat?.broken).toBe(true);
-    f.dev('/dev heart breath storm');
-    f.tick(2);
-    fell(f.sim, f.boss(), f.players[0]);
-    f.tick(3);
+    f.tick(1, false);
+    // Since 2026-11-25 the nova run out wipes the raid on every tier: the
+    // attempt is broken and the deed out of reach.
+    expect(st?.isles.burst).toBe(true);
+    expect(st?.feat?.broken).toBe(true);
+    expect(f.players.every((p) => p.dead)).toBe(true);
+    f.tick(3, false);
     expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.breath)).toEqual([false, false, false]);
   });
 

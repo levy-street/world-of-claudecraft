@@ -21,7 +21,7 @@ import type {
   CryptBossFightState,
   KnellwyrmKnellState,
 } from './encounters/hollow_crypt/boss_state';
-import type { BreathFightState } from './encounters/smith_heart/breath_state';
+import type { BreathCrossingRide, BreathFightState } from './encounters/smith_heart/breath_state';
 import type { CouncilFightState } from './encounters/smith_heart/council_state';
 import type { FinalFightState } from './encounters/smith_heart/final_state';
 import type { HeatFightState } from './encounters/smith_heart/heat_state';
@@ -8493,6 +8493,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  breath.ts), on the guardian. Sim authority only; the client reads the
    *  fight from the wind object, the bars, the auras and the fight's objects. */
   smithHeartBreath?: BreathFightState;
+  /** A Gale Crossing ride (encounters/smith_heart/breath_crossing.ts), on
+   *  its carrier object. Sim authority only; the client reads the ride from
+   *  the carried body and its riding aura. */
+  breathCrossing?: BreathCrossingRide;
   /** The Smith's Heart's Guardian of the Quench's fight state (on the
    *  guardian: encounters/smith_heart/quench.ts). Server-local sim state:
    *  the client reads the fight from auras, bars and the fight's objects. */

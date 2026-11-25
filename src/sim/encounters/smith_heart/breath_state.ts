@@ -94,6 +94,18 @@ export interface BreathRide {
   total: number;
 }
 
+/** A body riding the Gale Crossing (breath_crossing.ts), kept on its carrier
+ *  object (the crossing runs in and out of the fight, so never on the
+ *  fight's state). Instance-local ends, y the floor heights. */
+export interface BreathCrossingRide {
+  playerId: number;
+  dir: 'out' | 'home';
+  from: { x: number; y: number; z: number };
+  to: { x: number; y: number; z: number };
+  t: number;
+  total: number;
+}
+
 /** The roles of the isles' adds (breath_isle_ids.ts ISLE_MOBS). */
 export type BreathIsleRole =
   | 'sentinel'

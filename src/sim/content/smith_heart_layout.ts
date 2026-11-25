@@ -258,9 +258,9 @@ export const CORNICE_CHANNELS: readonly { deg: number; depth: number; halfDeg: n
  *  wall has fallen and the lip lies open to the void, on every difficulty
  *  (Jose's playtest asked for more unsafe edges than the first four). A body
  *  walked or blown into one falls (the field builds no wall there:
- *  `lipOpenings`); everywhere else the rim stays walled. The west, where the
- *  climb comes up past Captain Thessaly's post, keeps its wall: the corpse
- *  run and the walk to the guardian never pass a gap. */
+ *  `lipOpenings`). Since 2026-11-03 the whole rim lies open
+ *  (CORNICE_OPEN_RIM), and since 2026-11-25 the climb's head stands a chasm
+ *  away (CORNICE_LANDING): the Gale Crossing carries the raid over. */
 export const CORNICE_GAP_DEGREES: readonly number[] = [22, 78, 128, 182, 228, 332];
 /** A gap's reach round its throat (yards): the lip inside it is open. */
 export const CORNICE_GAP_R = 6;
@@ -272,20 +272,53 @@ export const CORNICE_GAPS: readonly { deg: number; x: number; z: number; r: numb
     return { deg, x, z, r: CORNICE_GAP_R };
   });
 
+/** The Storm Cornice's west side, carved back (the owner's playtest of
+ *  2026-11-25, "no safe zones"): the boss's isle stands a chasm forward of
+ *  the climb's head, so no stretch of its rim is walled or joined to the
+ *  climb. How far its rim is drawn in at compass `deg` (yards): `cut` at the
+ *  west, easing to nothing `span` degrees either side. */
+export const CORNICE_WEST_CUT = { deg: 270, span: 36, cut: 8 } as const;
+export function corniceRimCut(deg: number): number {
+  const W = CORNICE_WEST_CUT;
+  let off = Math.abs(((((deg - W.deg) % 360) + 540) % 360) - 180);
+  if (off >= W.span) return 0;
+  off = (off / W.span) * (Math.PI / 2);
+  return W.cut * Math.cos(off) ** 2;
+}
+
+/** The Breath's landing at the climb's head (the owner's playtest of
+ *  2026-11-25): where the raid gathers before the fight, Captain Thessaly at
+ *  its east edge, the Cornice a chasm away across the void; the Gale Crossing
+ *  (CORNICE_CROSSING) carries a body over. Its rim, like the climb's, lies
+ *  open (no wall along the approach). */
+export const CORNICE_LANDING = { x: -64.5, z: 193.5, r: 7.5, h: H.cornice } as const;
+
+/** The Gale Crossing (encounters/smith_heart/breath_crossing.ts): a current
+ *  of wind from the landing's pad to the Cornice's west, and home again out
+ *  of the fight. `out` the landing's pad, `arrive` where it sets a body down
+ *  on the Cornice; `home` the Cornice's pad (only while the guardian is not
+ *  fighting), `back` where it sets a body down on the landing (off the pad). */
+export const CORNICE_CROSSING = {
+  out: { x: -59.5, z: 194 },
+  arrive: { x: -35, z: 190.5 },
+  home: { x: -37.5, z: 201 },
+  back: { x: -66.5, z: 197 },
+  /** A pad's reach (yards). */
+  r: 2.2,
+} as const;
+
 /** The Storm Cornice's open rim (the Guardian of the Breath's rework of
- *  2026-11-03, the owner's call after the team's feedback): no wall, rail or
- *  pillar stands round the Cornice any more; the whole lip is open to the
- *  void, so a body blown or thrown off ANY edge falls. Only the climb's head
- *  in the west (between these bearings) keeps its wall, so the walk up and
- *  the corpse run never pass an open lip. Discs along the rim, each a break
- *  in the wall (the field's `lipOpenings`), spaced to overlap. */
-export const CORNICE_WALLED_BEARINGS = { from: 248, to: 292 } as const;
+ *  2026-11-03, the owner's call after the team's feedback; whole since
+ *  2026-11-25): no wall, rail or pillar stands round the Cornice; the whole
+ *  lip is open to the void, so a body blown or thrown off ANY edge falls.
+ *  Discs along the rim, each a break in the wall (the field's
+ *  `lipOpenings`), spaced to overlap. */
 export const CORNICE_OPEN_RIM: readonly { x: number; z: number; r: number }[] = (() => {
   const C = BREATH.cornice;
   const out: { x: number; z: number; r: number }[] = [];
   for (let deg = 0; deg < 360; deg += 5) {
-    if (deg >= CORNICE_WALLED_BEARINGS.from && deg <= CORNICE_WALLED_BEARINGS.to) continue;
-    const [x, z] = bearingPoint(C.x, C.z, deg, C.rx - 0.8, C.rz - 0.8);
+    const cut = corniceRimCut(deg);
+    const [x, z] = bearingPoint(C.x, C.z, deg, C.rx - 0.8 - cut, C.rz - 0.8 - cut);
     out.push({ x, z, r: 6 });
   }
   // The wind channels' notches: their V sides run deep into the plateau.
@@ -294,6 +327,41 @@ export const CORNICE_OPEN_RIM: readonly { x: number; z: number; r: number }[] = 
       const [x, z] = bearingPoint(C.x, C.z, ch.deg, C.rx - k, C.rz - k);
       out.push({ x, z, r: 7 });
     }
+  }
+  return out;
+})();
+
+/** The approach's open lips (the owner's playtest of 2026-11-25: no walls
+ *  along the path to the guardian): discs along both edges of the Cornice's
+ *  climb and round its landing, so neither stands walled. A fall off them is
+ *  the void's (breath_void.ts), the body laid back on the approach. */
+export const CORNICE_APPROACH_LIPS: readonly { x: number; z: number; r: number }[] = (() => {
+  const out: { x: number; z: number; r: number }[] = [];
+  const climb: [number, number][] = [
+    [-108, 176],
+    [-104, 179],
+    [-64, 193],
+  ];
+  const half = 7;
+  // From its foot's turn (the first leg lies inside the high landing, whose
+  // rim keeps its own edge), up to the landing.
+  for (let i = 1; i + 1 < climb.length; i++) {
+    const [ax, az] = climb[i];
+    const [bx, bz] = climb[i + 1];
+    const len = Math.hypot(bx - ax, bz - az);
+    const nx = -(bz - az) / len;
+    const nz = (bx - ax) / len;
+    for (let t = 6; t <= len; t += 3) {
+      const x = ax + ((bx - ax) * t) / len;
+      const z = az + ((bz - az) * t) / len;
+      for (const side of [1, -1])
+        out.push({ x: x + nx * side * half, z: z + nz * side * half, r: 3 });
+    }
+  }
+  const L = CORNICE_LANDING;
+  for (let deg = 0; deg < 360; deg += 10) {
+    const [x, z] = bearingPoint(L.x, L.z, deg, L.r, L.r);
+    out.push({ x, z, r: 3 });
   }
   return out;
 })();
@@ -601,8 +669,8 @@ export const LIGHT_RIVERS: Readonly<Record<SmithHeartVein, readonly { x: number;
     { x: 0, z: -9 },
   ],
   breath: [
-    { x: 0, z: 198 },
-    { x: -30, z: 194 },
+    // From the landing at the climb's head: since the chasm (2026-11-25) the
+    // Cornice stands across the void, and no river crosses a chasm.
     { x: -60, z: 193 },
     { x: -104, z: 179 },
     { x: -112, z: 170 },
@@ -721,7 +789,8 @@ function cornice(): FieldSurface {
       // A V cut: deepest on the channel's line, gone at its opening's edge.
       if (off < ch.halfDeg) bite = Math.max(bite, ch.depth * (1 - off / ch.halfDeg));
     }
-    points.push(bearingPoint(C.x, C.z, d, C.rx - bite, C.rz - bite));
+    const cut = corniceRimCut(d);
+    points.push(bearingPoint(C.x, C.z, d, C.rx - bite - cut, C.rz - bite - cut));
   }
   return { kind: 'poly', id: 'storm_cornice', points, h: C.h, edge: 'rock', ground: 'scoured' };
 }
@@ -971,10 +1040,11 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-108, 176, H.breathHigh],
       [-104, 179, H.breathHigh],
       [-64, 193, H.cornice],
-      [-42, 195, H.cornice],
     ],
     { stairs: true, ground: 'scoured' },
   ),
+  // The landing at the climb's head, a chasm short of the Cornice (2026-11-25).
+  disc('cornice_landing', CORNICE_LANDING, { edge: 'rock', ground: 'scoured' }),
   cornice(),
   ...BREATH_ISLES.flatMap(isleSurfaces),
   // --- The Quench (east): descends to the Quench Basin --------------------------------
@@ -1391,7 +1461,12 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   bounds: { minX: -258, maxX: 248, minZ: -246, maxZ: 238 },
   voidHeight: SMITH_HEART_VOID_HEIGHT,
   cliffStep: 1.1,
-  lipOpenings: [...CORNICE_GAPS, ...CORNICE_OPEN_RIM, ...BREATH_ISLE_LIPS].map(({ x, z, r }) => ({
+  lipOpenings: [
+    ...CORNICE_GAPS,
+    ...CORNICE_OPEN_RIM,
+    ...CORNICE_APPROACH_LIPS,
+    ...BREATH_ISLE_LIPS,
+  ].map(({ x, z, r }) => ({
     x,
     z,
     r,

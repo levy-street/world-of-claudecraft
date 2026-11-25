@@ -1361,27 +1361,30 @@ describe('Knotted Gale: the player text', () => {
 // the same place, the throw press never left the client (he walked into the void
 // instead), and the wind at a carrier's back did nothing for them.
 describe("Knotted Gale: Jose's playtest of 2026-11-02", () => {
-  it('no round drops a ball where the last one fell, and the drops reach past the climb', () => {
+  it('no round drops a ball where the last one fell, and the drops spread over the Cornice', () => {
     const f = mythic();
     const spots: { x: number; z: number }[] = [];
     let last: { x: number; z: number }[] = [];
     for (let r = 0; r < 6; r++) {
       const h = round(f, r % 2 === 0 ? '' : ' 2');
       const now = h.knots.map((k) => ({ x: k.x, z: k.z }));
+      // Since the chasm (2026-11-25) the climb's head is no longer floor, so
+      // knotSpot may relax a step or three (its own loop, at most 6 yd apart
+      // and 3 yd from the lips) on the smaller Cornice.
       for (const k of now) {
-        expect(gapDistance(k.x, k.z)).toBeGreaterThanOrEqual(T.heartFar);
+        expect(gapDistance(k.x, k.z)).toBeGreaterThanOrEqual(T.heartFar - 3);
         for (const o of last)
-          expect(Math.hypot(k.x - o.x, k.z - o.z)).toBeGreaterThanOrEqual(T.heartApart);
+          expect(Math.hypot(k.x - o.x, k.z - o.z)).toBeGreaterThanOrEqual(T.heartApart - 6);
       }
       if (now.length === 2)
         expect(Math.hypot(now[0].x - now[1].x, now[0].z - now[1].z)).toBeGreaterThanOrEqual(
-          T.heartApart,
+          T.heartApart - 6,
         );
       spots.push(...now);
       last = now;
     }
     // Not all at Thessaly's post (the old bar left only that patch).
-    expect(spots.some((k) => Math.hypot(k.x - -56, k.z - 194.4) > 25)).toBe(true);
+    expect(spots.some((k) => Math.hypot(k.x - -38, k.z - 194.4) > 25)).toBe(true);
   });
 
   it('a ball never drops on the live circle of calm', () => {

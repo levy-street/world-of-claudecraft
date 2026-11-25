@@ -13,8 +13,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   BREATH,
+  CORNICE_CROSSING,
   CORNICE_GAPS,
-  CORNICE_WALLED_BEARINGS,
+  CORNICE_LANDING,
   SMITH_HEART_FIELD,
 } from '../src/sim/content/smith_heart_layout';
 import {
@@ -39,7 +40,7 @@ import {
   THESSALY_POST,
 } from '../src/sim/encounters/smith_heart';
 import { WIND_RAMP, windRamp } from '../src/sim/encounters/smith_heart/breath_ids';
-import { authoredFieldCliffRuns } from '../src/sim/instances/authored_field';
+import { authoredFieldCliffRuns, authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../src/sim/wind_drift';
 import { type BreathFight, breathFight } from './helpers/breath_fight';
@@ -333,52 +334,47 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     }
   });
 
-  it('where the wall stands (the climb head only) the wind pins a body and hurts it each second; never in the calm', () => {
+  it('no wall stands anywhere round the Cornice: the wind pins nobody, it carries them off', () => {
+    // The owner's playtest of 2026-11-25 ("no safe zones"): the climb's
+    // head kept a wall a raid could stand against; the Cornice now stands a
+    // chasm forward of it. A body blown at the old head goes over the lip.
     const f = pulled(3);
     const p = f.players[1];
-    // Just south of the climb's head, where the west rim keeps its wall.
-    f.put(p, -44.5, 186.8);
+    f.put(p, -38, 187);
     f.dev('/dev heart breath blow 262');
-    // Carried onto the wall, then held against it for the rest of the blow.
-    until(f, () => has(p, BREATH_AURAS.pinned), 5);
-    expect(has(p, BREATH_AURAS.pinned)).toBe(true);
     const ev = f.tick(20 * 4);
-    const hits = hitsOf(ev, BREATH_NAMES.pinned, p.id);
-    expect(hits.length).toBeGreaterThanOrEqual(3);
-    expect(hits.length).toBeLessThanOrEqual(5);
-    for (const h of hits) expect(h).toBeGreaterThanOrEqual(T.pinMin);
-    expect(p.dead).toBe(false);
-    f.dev('/dev heart breath calm');
-    const calm = f.tick(20 * 2);
-    expect(hitsOf(calm, BREATH_NAMES.pinned, p.id)).toEqual([]);
     expect(has(p, BREATH_AURAS.pinned)).toBe(false);
+    expect(hitsOf(ev, BREATH_NAMES.pinned, p.id)).toEqual([]);
+    expect(p.dead || !inBreathArena(f.local(p).x, f.local(p).z)).toBe(true);
   });
 
-  it("the whole rim is open but the climb's head; the six channel throats stay where they were", () => {
-    // Six on every difficulty (Jose's playtest), the climb's side whole.
+  it('the whole rim is open, the west carved a chasm short of the climb; the six channel throats stay', () => {
+    // Six on every difficulty (Jose's playtest).
     expect(CORNICE_GAPS.map((g) => g.deg)).toEqual([22, 78, 128, 182, 228, 332]);
     for (const g of CORNICE_GAPS) {
-      // Clear of Thessaly's post and of the walk from it to the guardian.
-      expect(dist(g, THESSALY_POST)).toBeGreaterThan(25);
-      for (let x = THESSALY_POST.x; x <= 0; x += 2) {
-        const z =
-          THESSALY_POST.z + ((196 - THESSALY_POST.z) * (x - THESSALY_POST.x)) / -THESSALY_POST.x;
+      // Clear of the crossing's landing on the Cornice and of the walk from it.
+      expect(dist(g, CORNICE_CROSSING.arrive)).toBeGreaterThan(12);
+      for (let x = CORNICE_CROSSING.arrive.x; x <= 0; x += 2) {
+        const k = (x - CORNICE_CROSSING.arrive.x) / -CORNICE_CROSSING.arrive.x;
+        const z = CORNICE_CROSSING.arrive.z + (196 - CORNICE_CROSSING.arrive.z) * k;
         expect(dist(g, { x, z })).toBeGreaterThan(g.r + 6);
       }
     }
-    // Every run of the Cornice's rim over the void is open, but the climb's
-    // head in the west (CORNICE_WALLED_BEARINGS).
+    // Every run of the Cornice's rim over the void is open: not one walled.
     const runs = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter(
       (r) => r.surface === 'storm_cornice' && r.low <= SMITH_HEART_FIELD.voidHeight + 1,
     );
-    const open = runs.filter((r) => r.open);
-    expect(open.length).toBeGreaterThan(80);
-    for (const r of runs.filter((q) => !q.open)) {
-      const mid = { x: (r.ax + r.bx) / 2, z: (r.az + r.bz) / 2 };
-      const deg = ((Math.atan2(mid.x, mid.z - 196) * 180) / Math.PI + 360) % 360;
-      expect(deg).toBeGreaterThanOrEqual(CORNICE_WALLED_BEARINGS.from - 12);
-      expect(deg).toBeLessThanOrEqual(CORNICE_WALLED_BEARINGS.to + 12);
-    }
+    expect(runs.filter((r) => r.open).length).toBeGreaterThan(80);
+    expect(runs.filter((r) => !r.open)).toEqual([]);
+    // No floor joins the Cornice: from the landing's edge to its rim lies
+    // the void, wider than any jump (14 yd and more).
+    const L = CORNICE_LANDING;
+    for (let x = L.x + L.r + 0.5; x < L.x + L.r + 14; x += 0.5)
+      expect(authoredFieldHeight(SMITH_HEART_FIELD, x, L.z)).toBeLessThanOrEqual(
+        SMITH_HEART_FIELD.voidHeight + 1,
+      );
+    expect(inBreathArena(L.x, L.z)).toBe(false);
+    expect(inBreathArena(THESSALY_POST.x, THESSALY_POST.z)).toBe(false);
     // No rod, cheek stone or horn stands on the Cornice any more.
     for (const kind of ['sh_lightning_rod', 'sh_channel_jamb', 'sh_broken_bellows'])
       expect(SMITH_HEART_FIELD.props.some((q) => q.kind === kind)).toBe(false);

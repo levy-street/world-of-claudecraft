@@ -73,9 +73,8 @@ describe('Guardian of the Breath: tooltips and names', () => {
     expect(say(wind)).toContain(`${BREATH_DIFFICULTY.heroic.windSpeed} yd a second`);
     // A walk across it is pushed only the grip's share (wind_drift.ts).
     expect(say(wind)).toContain(`only ${Math.round(WIND_CROSS_GRIP * 100)}% as hard`);
-    // Normal's resolved range (x1.15 since 2026-11-16).
-    const nm = (v: number) => Math.round(v * BREATH_DIFFICULTY.normal.damageMult);
-    expect(say(wind)).toContain(`${nm(T.pinMin)} to ${nm(T.pinMax)}`);
+    // No wall stands anywhere since the chasm (2026-11-25): no pin to name.
+    expect(say(wind)).not.toContain('pressed against');
     const draw = auraEffectDescriptor({
       id: WIND_PULL_AURA,
       kind: 'internal_cd',

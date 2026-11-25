@@ -38,9 +38,9 @@ const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjec
 const FAR = { x: -112, z: 170 };
 /** On the climb's stairs, short of its top: wakes nothing. */
 const STAIR = { x: -70, z: 191 };
-/** The climb's flat top, a few strides short of the rim: wakes it, far
- *  outside its reach. */
-const EDGE = { x: -54, z: 195 };
+/** The landing's east edge at the climb's head, across the chasm from the
+ *  rim (2026-11-25): wakes it, far outside its reach. */
+const EDGE = { x: -59, z: 195 };
 /** At its side: inside its aggro reach. */
 const SIDE = { x: -6, z: 198 };
 
@@ -94,7 +94,7 @@ const pullLines = (ev: SimEvent[], pid?: number) =>
   );
 
 describe('the wake reach: climbing onto the Cornice', () => {
-  it('counts the climb flat top and the plateau, never the stairs below or the isles above', () => {
+  it('counts the landing and the plateau, never the stairs below or the isles above', () => {
     const h = BREATH.cornice.h;
     expect(inBreathIntroReach(EDGE.x, EDGE.z, h)).toBe(true);
     expect(inBreathIntroReach(STAIR.x, STAIR.z, h - 3)).toBe(false);
@@ -104,7 +104,7 @@ describe('the wake reach: climbing onto the Cornice', () => {
     // Far outside its own aggro reach: the scene plays before a pull.
     const at = SMITH_HEART_BOSS_SPOTS.breath;
     expect(Math.hypot(EDGE.x - at.x, EDGE.z - at.z)).toBeGreaterThan(45);
-    expect(BREATH_INTRO.reach).toBe(58);
+    expect(BREATH_INTRO.reach).toBe(66);
   });
 });
 

@@ -140,10 +140,21 @@ describe('breath_fight_fx_core', () => {
         (s) =>
           Math.hypot(s.ax - e.x, s.az - e.z) < 0.05 || Math.hypot(s.bx - e.x, s.bz - e.z) < 0.05,
       );
-    // The open rim runs unbroken round the Cornice but for the climb's head:
-    // two free ends, each on exactly one lip, facing out as it does.
-    expect(ends).toHaveLength(2);
+    // Since the chasm (2026-11-25) the open rim runs unbroken all round the
+    // Cornice: no free end on it. The approach's open lips (the climb and its
+    // landing, no wall along them) end where the high landing's wall begins.
+    const C = BREATH.cornice;
+    const onCornice = (e: { x: number; z: number }) =>
+      Math.hypot((e.x - C.x) / C.rx, (e.z - C.z) / C.rz) < 1.15;
+    expect(ends.filter(onCornice)).toEqual([]);
+    expect(ends.length).toBeGreaterThan(0);
     for (const e of ends) {
+      // The approach's ends stand far down the climb, never by the Cornice.
+      expect(Math.hypot(e.x - C.x, e.z - C.z)).toBeGreaterThan(C.rx + 10);
+      expect(Math.hypot(e.nx, e.nz)).toBeCloseTo(1);
+      expect(Math.hypot(e.ux, e.uz)).toBeCloseTo(1);
+    }
+    for (const e of ends.filter(onCornice)) {
       const owners = lips.filter((l) => onLip(l, e));
       expect(owners).toHaveLength(1);
       const seg = onLip(owners[0], e);

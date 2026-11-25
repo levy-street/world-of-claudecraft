@@ -165,8 +165,10 @@ describe('the Knotted Gale over the wire', () => {
     const C = at('portalC');
     const D = at('portalD');
     // Off every mouth first.
-    serverMe.pos.x = (C.pos.x + D.pos.x) / 2 + T.heartPortalR * 3;
-    serverMe.pos.z = (C.pos.z + D.pos.z) / 2;
+    // (Beside C on its far side from D: the midpoint can lie in D's own mouth.)
+    const away = Math.hypot(C.pos.x - D.pos.x, C.pos.z - D.pos.z) || 1;
+    serverMe.pos.x = C.pos.x + ((C.pos.x - D.pos.x) / away) * T.heartPortalR * 3;
+    serverMe.pos.z = C.pos.z + ((C.pos.z - D.pos.z) / away) * T.heartPortalR * 3;
     run(0.2);
     const epoch2 = a.session.movementOverrideEpoch;
     serverMe.pos.x = C.pos.x;

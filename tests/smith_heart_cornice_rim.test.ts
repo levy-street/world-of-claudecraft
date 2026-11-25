@@ -25,11 +25,7 @@ import {
 } from '../src/render/smith_heart/heart_rock_hang_core';
 import { HEART_ROCK_LIP } from '../src/render/smith_heart/heart_rock_plan_core';
 import { gapLips } from '../src/render/smith_heart_fx/breath_fight_fx_core';
-import {
-  BREATH,
-  CORNICE_WALLED_BEARINGS,
-  SMITH_HEART_FIELD,
-} from '../src/sim/content/smith_heart_layout';
+import { BREATH, CORNICE_LANDING, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
 import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 
 const C = BREATH.cornice;
@@ -56,10 +52,9 @@ describe("the Cornice's rim", () => {
         const y = data.positions[i + 1];
         const z = data.positions[i + 2];
         if (ell(x, z) > 1.25 || y > C.h - 0.5 || y < C.h - CORNICE_SHEER) continue;
-        // The climb's head in the west keeps its wall and its own stair's
-        // faces (never an open lip).
-        const deg = ((Math.atan2(x - C.x, z - C.z) * 180) / Math.PI + 360) % 360;
-        if (deg >= CORNICE_WALLED_BEARINGS.from - 15 && deg <= CORNICE_WALLED_BEARINGS.to + 15)
+        // The landing at the climb's head (a chasm west of the rim since
+        // 2026-11-25) keeps its own faces.
+        if (Math.hypot(x - CORNICE_LANDING.x, z - CORNICE_LANDING.z) < CORNICE_LANDING.r + 6)
           continue;
         // Past the lip: the floor there is the void (no ground under it).
         if (authoredFieldHeight(SMITH_HEART_FIELD, x, z) > SMITH_HEART_FIELD.voidHeight + 1)

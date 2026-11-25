@@ -39,7 +39,6 @@ import {
   BREATH_ISLE_REACH,
   BREATH_ISLES,
   SMITH_HEART_FIELD,
-  SMITH_HEART_HEIGHTS,
 } from '../../content/smith_heart_layout';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -64,8 +63,6 @@ import { breathSay } from './breath_voice';
 /** How far under the Cornice's floor a body counts as off it (yards): the
  *  floor is flat, so anything lower has left it (a fall, the void). */
 const OFF_FLOOR_DROP = 3;
-/** The climb's foot (its lowest walk, the Breath's high landing). */
-const HIGH_CLIMB = SMITH_HEART_HEIGHTS.breathHigh;
 
 /** A body over an open lip is said once each (the fight's warning). */
 export function stepOverLip(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
@@ -169,10 +166,13 @@ function onCornice(x: number, z: number, y: number): boolean {
   return y > BREATH.cornice.h - OFF_FLOOR_DROP && inBreathArena(x, z);
 }
 
-/** May the guardian keep a target at (x, z, y): on its floor or its climb
- *  (the way up: a pull from the climb is a pull), never fallen below them? */
+/** May the guardian keep a target at (x, z, y): on its Cornice's floor,
+ *  never fallen below it. Since the chasm (2026-11-25) the climb and its
+ *  landing are no part of the fight: a target there leaves the threat
+ *  table (the guardian never stands at the rim for a body it cannot reach,
+ *  and a raid that all left the Cornice has wiped). */
 function keepable(x: number, z: number, y: number): boolean {
-  return y > HIGH_CLIMB - OFF_FLOOR_DROP && onCorniceApproach(x, z);
+  return y > BREATH.cornice.h - OFF_FLOOR_DROP && inBreathArena(x, z);
 }
 
 /** Is `e` in the Islands of the Wind's part of the fight: riding a gale

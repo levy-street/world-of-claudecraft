@@ -183,12 +183,14 @@ describe('the void under the east isles over a real Sim', () => {
 });
 
 describe('the tether over a real Sim', () => {
-  it('keeps a target on the climb, drops one in the void, puts a stray step back', () => {
+  it('drops a target on the climb (the chasm, 2026-11-25) and one in the void, puts a stray step back', () => {
     const f = breathFight(3, 23);
     f.dev('/dev heart breath pull');
     f.tick(2);
     const boss = f.boss();
-    const [, onClimb, fallen] = f.players;
+    const [tank, onClimb, fallen] = f.players;
+    // The tank on the Cornice keeps the fight going.
+    boss.threat.set(tank.id, 50);
     const c = lowClimb();
     f.put(onClimb, c.x, c.z);
     boss.threat.set(onClimb.id, 5);
@@ -200,7 +202,9 @@ describe('the tether over a real Sim', () => {
     fallen.pos.y = SMITH_HEART_FIELD.voidHeight;
     boss.threat.set(fallen.id, 5);
     f.tick(1, false);
-    expect(boss.threat.has(onClimb.id)).toBe(true);
+    // Since the chasm the climb is no part of the fight: the guardian could
+    // never reach a body there, so it lets it go.
+    expect(boss.threat.has(onClimb.id)).toBe(false);
     expect(boss.threat.has(fallen.id)).toBe(false);
     // A step off the floor (the mob AI chasing over a gap) is undone, and
     // drawn as the jump back it is (prevPos with it).

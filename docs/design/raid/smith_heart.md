@@ -2097,6 +2097,31 @@ Stone, Echo of Wrath and Endless Song returned no game use (CLEAR; the nearest w
 
 ### 7.2 Guardian of the Breath
 
+**The chasm and the Gale Crossing (the owner's playtest of 2026-11-25, "no safe zones").**
+Where it and anything below disagree, this block wins.
+
+- **No safe zone.** A raid could stand against the climb's head, the one walled stretch of the
+  Cornice's rim, and never be blown off. The Cornice's west side is now carved back
+  (`smith_heart_layout.ts` `CORNICE_WEST_CUT`, 8 yd at the west, easing out over 36 degrees
+  either side) and the climb ends on its own landing (`CORNICE_LANDING`, Captain Thessaly at its
+  east edge, `breath_geometry.ts` `THESSALY_POST`), a chasm of 14 yd and more short of the rim:
+  the WHOLE rim of the Cornice is an open lip (`CORNICE_OPEN_RIM`, no walled bearings; Pressed
+  to the Rim never fires), and the fight's floor is the Cornice alone (`inBreathArena`; a target
+  on the climb or the landing leaves the threat table, `breath_void.ts` `keepable`).
+- **No walls along the approach.** The climb and the landing stand open too
+  (`CORNICE_APPROACH_LIPS`): a step off them is the void's, the body laid back on the approach's
+  centre line, never over the chasm (`voidCorpseSpot`). The checkpoint stays on the landing.
+- **The Gale Crossing** (`breath_crossing.ts`, `breath_crossing_ids.ts`): an Updraft on the
+  landing's east edge carries whoever steps on (alive, or a spirit on its corpse run; never a
+  body not yet released) on a FIXED arc over the chasm to the Cornice's west (2.6 s, 5 yd over
+  the floors, `rideArc`), carried and stunned under the shipped Riding the Gale aura, never a
+  fall. A second Updraft on the Cornice carries home to the landing, up only while the guardian
+  is not fighting, so the crossing is never a way out of the fight. Both run in the fight and out
+  of it; the pads, the ride and its cues are the isles' own look. The entrance wakes from the
+  landing (`BREATH_INTRO.reach` 66 yd): the raid watches the storm gather across the void.
+  Tests: `tests/smith_heart_breath_crossing.test.ts`.
+
+
 **The Islands of the Wind, the 50 percent phase (the team's design of 2026-11-17, built
 2026-11-18).** Where it and anything below disagree (the Gale Bulwark rounds, the Gale Paths,
 the Homeward Gales, Windworn, the storm breaking on the mark), this block wins: those are gone.

@@ -53,9 +53,6 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         nums: {
           speed: a.value2 ?? BREATH_DIFFICULTY.normal.windSpeed,
           cross: pct(WIND_CROSS_GRIP),
-          pinMin: tierValue(T.pinMin, NM),
-          pinMax: tierValue(T.pinMax, NM),
-          ...tierRange('heroic', T.pinMin, T.pinMax, HM),
         },
       };
     case WIND_BLAST_AURA:

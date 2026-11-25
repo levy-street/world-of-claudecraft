@@ -13,11 +13,12 @@
 export const BREATH_INTRO = {
   /** Yards from the guardian's spot (content/smith_heart_layout.ts
    *  SMITH_HEART_BOSS_SPOTS.breath, the Cornice's middle) a living player
-   *  wakes it: the climb's last flat strides before the rim (the climb tops
-   *  out some 64 yd west of it), so the raid steps up onto the plateau with
-   *  the whole storm before it. Far past its aggro reach: a raider who runs
-   *  straight in pulls nothing until the scene ends. */
-  reach: 58,
+   *  wakes it: since the chasm (2026-11-25) the landing at the climb's head,
+   *  its east half (its middle some 65 yd west of it), so the raid watches
+   *  the storm gather across the void before the Gale Crossing carries it
+   *  over; the stairs below it wake nothing. Far past its aggro reach: a
+   *  raider who runs straight in pulls nothing until the scene ends. */
+  reach: 66,
   /** How far over or under the Cornice's floor a waker may stand (yards):
    *  the climb's top counts, its stairs below and the floating isles (26 yd
    *  and more above) do not. */
