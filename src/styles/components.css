@@ -19854,26 +19854,12 @@
     width: 0;
     transition: width 80ms linear;
   }
-  #heart-quench-alert.is-warm {
-    border-color: var(--color-gold);
-  }
-  #heart-quench-alert.is-warm .fa-title,
-  #heart-quench-alert.is-warm .fa-fill {
-    color: var(--color-gold);
-    --bar-color: var(--color-gold);
-  }
-  #heart-quench-alert.is-freezing,
-  #heart-quench-alert.is-frozen,
   #heart-quench-alert.is-marked,
   #heart-quench-alert.is-rime {
     border-color: var(--color-hostile);
   }
-  #heart-quench-alert.is-freezing .fa-title,
-  #heart-quench-alert.is-frozen .fa-title,
   #heart-quench-alert.is-marked .fa-title,
   #heart-quench-alert.is-rime .fa-title,
-  #heart-quench-alert.is-freezing .fa-fill,
-  #heart-quench-alert.is-frozen .fa-fill,
   #heart-quench-alert.is-marked .fa-fill {
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
@@ -19885,17 +19871,8 @@
     color: var(--color-debuff-frost);
     --bar-color: var(--color-debuff-frost);
   }
-  #heart-quench-alert.is-freezing,
   #heart-quench-alert.is-rime {
     animation: bce-throb 0.9s ease-in-out infinite alternate;
-  }
-  #heart-quench-alert.is-water {
-    border-color: var(--color-mana);
-  }
-  #heart-quench-alert.is-water .fa-title,
-  #heart-quench-alert.is-water .fa-fill {
-    color: var(--color-mana);
-    --bar-color: var(--color-mana);
   }
   body.mobile-touch #heart-quench-alert {
     min-width: min(340px, calc(100vw - 32px));

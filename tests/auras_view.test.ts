@@ -543,6 +543,12 @@ describe('createAurasView: derivation per mode', () => {
     const id = 'heart_quench_cold';
     expect(v.tick(entity([aura({ id, value: 63.4 })])).slots[0].stacksText).toBe('63');
     expect(v.tick(entity([aura({ id, value: 0 })])).slots[0].stacksText).toBe('');
+    expect(v.tick(entity([aura({ id, value: 100 })])).slots[0].stacksText).toBe('99');
+    // Frozen solid: the freeze's own debuff replaces the cold's icon.
+    const frozen = v.tick(entity([aura({ id, value: 0 }), aura({ id: 'heart_quench_frozen' })]));
+    expect(frozen.slots.slice(0, frozen.count).map((sl) => sl.key)).toEqual([
+      'heart_quench_frozen',
+    ]);
   });
 
   it('always badges Druid engine stages, including zero and one', () => {

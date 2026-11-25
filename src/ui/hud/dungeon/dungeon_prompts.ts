@@ -12,10 +12,10 @@
 // readouts, the Rite's candles and the Bound Souls), the Drowned Temple's
 // (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
 // melody, its answer and her broken voice), the Smith's Heart's Guardian of
-// the Quench's cold bar (quench_alert_view.ts:
+// the Quench's bar (quench_alert_view.ts: a slash's mark and Living Rime,
 // the player's own gauge, never advisory) and its screen effects
 // (quench_screen_view.ts and quench_screen_painter.ts: the frost border
-// creeping in as the bar fills, the blue tint in the water; never advisory
+// creeping in as the cold fills, the blue tint in the water; never advisory
 // either), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns

@@ -8,9 +8,12 @@ import { describe, expect, it } from 'vitest';
 import { QUENCH_AURAS } from '../src/sim/encounters/smith_heart/quench_ids';
 import type { Aura } from '../src/sim/types';
 import {
+  QUENCH_COLD_BADGE_MAX,
   QUENCH_COLD_MARKS,
   quenchColdBadge,
+  quenchColdIconHidden,
   quenchColdMarks,
+  quenchFrozenSolid,
 } from '../src/ui/hud/dungeon/quench_cold_view';
 import type { ProcOverlayPainter } from '../src/ui/proc_overlay_painter';
 import { paintProcOverlayRoute } from '../src/ui/proc_overlay_route';
@@ -21,13 +24,27 @@ describe('quenchColdBadge', () => {
   it('badges the cold bar value, rounded and clamped', () => {
     expect(quenchColdBadge(QUENCH_AURAS.cold, 37.6)).toBe(38);
     expect(quenchColdBadge(QUENCH_AURAS.cold, 0)).toBe(0);
-    expect(quenchColdBadge(QUENCH_AURAS.cold, 140)).toBe(100);
+    // Tops out at 99: a full bar is the freeze, which wears its own debuff.
+    expect(quenchColdBadge(QUENCH_AURAS.cold, 99.4)).toBe(99);
+    expect(quenchColdBadge(QUENCH_AURAS.cold, 100)).toBe(QUENCH_COLD_BADGE_MAX);
+    expect(quenchColdBadge(QUENCH_AURAS.cold, 140)).toBe(99);
     expect(quenchColdBadge(QUENCH_AURAS.cold, undefined)).toBe(0);
   });
 
   it('leaves every other aura to the usual stack rule', () => {
     expect(quenchColdBadge(QUENCH_AURAS.frozen, 50)).toBeNull();
     expect(quenchColdBadge('battle_stance', 50)).toBeNull();
+  });
+});
+
+describe('the cold icon gives way to the freeze', () => {
+  it('hides only the cold, and only while frozen solid', () => {
+    const frozen = quenchFrozenSolid([cold(0), { id: QUENCH_AURAS.frozen }]);
+    expect(frozen).toBe(true);
+    expect(quenchFrozenSolid([cold(80)])).toBe(false);
+    expect(quenchColdIconHidden(QUENCH_AURAS.cold, true)).toBe(true);
+    expect(quenchColdIconHidden(QUENCH_AURAS.cold, false)).toBe(false);
+    expect(quenchColdIconHidden(QUENCH_AURAS.frozen, true)).toBe(false);
   });
 });
 
