@@ -1404,11 +1404,9 @@ const PROPS: FieldProp[] = [
   // The Seal Dais: the ring crystal at its centre is the renderer's (its footprint is the
   // sim's `SEAL_CRYSTAL` wall); the seal's own placeholder prop stands at the middle.
   { kind: 'sh_heart_seal', x: HEART_SEAL.x, z: HEART_SEAL.z, rot: 0 },
-  // The Breath: wind shelters on the bridge's windward edge (phase 2 gusts
-  // push the raid against them, never off the arch). The Cornice itself is
-  // bare (the rework of 2026-11-03: no rods, horns or cheek stones on it).
-  { kind: 'sh_wind_shelter', x: -80, z: 140, rot: -0.75, hw: 2.4, hd: 0.7, h: 2 },
-  { kind: 'sh_wind_shelter', x: -91, z: 152, rot: -0.75, hw: 2.4, hd: 0.7, h: 2 },
+  // The Breath: no wind shelters on the bridge since Jose's playtest of
+  // 2026-11-25 (the two low slabs read as walls in the middle of the way
+  // up); the Cornice itself is bare (the rework of 2026-11-03).
   ...STORM_STONES,
   // The Quench: the basin's braziers, vents, sunk blades and ice shelves.
   ...LAKE_BRAZIERS,

@@ -215,7 +215,6 @@ describe('the rooms: landmarks and line features from their layout records', () 
       'derrick',
       'standingStone',
       'cairn',
-      'shelter',
       'blade',
       'iceShelf',
       'brazier',
@@ -228,6 +227,9 @@ describe('the rooms: landmarks and line features from their layout records', () 
     // Jose's playtest of 2026-11-25 (the shore runs all the way round), so the
     // map draws no anvil there any more.
     expect(kinds.has('anvil')).toBe(false);
+    // The Wind Bridge's two shelters went with Jose's playtest of 2026-11-25
+    // (they read as walls on the way up).
+    expect(kinds.has('shelter')).toBe(false);
     const pool = veins.glyphs.find((g) => g.kind === 'firePool');
     expect(pool).toMatchObject({ x: HEARTH_WELL.x, z: HEARTH_WELL.z, r: HEARTH_WELL.r });
   });

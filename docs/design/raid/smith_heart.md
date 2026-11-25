@@ -1808,8 +1808,9 @@ room rule, `docs/design/boss-rooms/README.md`).
 
 ### 6.2 Breath: the wind bridge
 
-- Where: `wind_bridge` (13 yd wide, +24 to +36), shelters `sh_wind_shelter` on the
-  windward edge.
+- Where: `wind_bridge` (13 yd wide, +24 to +36). Its two `sh_wind_shelter` slabs were
+  removed on 2026-11-25 (Jose's playtest: two walls in the middle of the way up); the kind
+  stays in the kit for any later use.
 - Behaviour: gusts arrive in a steady rhythm across the arch. A gust pushes players
   toward the windward shelters, never off the arch; a player behind a shelter is
   not pushed. Cross between gusts. Balustrade edges plus field cliffs mean nobody

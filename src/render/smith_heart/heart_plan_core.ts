@@ -221,11 +221,6 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'stone', 'hammer', [2.6, 8.6, 2.2], [0, 4.3, 0]),
     part('gem', 'glow', 'hammer', [0.9, 1.4, 0.9], [0, 9.2, 0]),
   ],
-  // The Breath: the bridge's wind shelters (the Cornice stands bare).
-  sh_wind_shelter: [
-    part('box', 'stone', 'breath', [4.8, 2, 1.4], [0, 1, 0]),
-    part('box', 'glow', 'breath', [4.2, 0.2, 0.2], [0, 1.6, 0.72]),
-  ],
   // A landing's standing stone (phase 2G stand-in until the Breath kit lands).
   sh_storm_stone: [
     part('box', 'stone', 'breath', [2.6, 7.5, 1.8], [0, 3.75, 0]),

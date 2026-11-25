@@ -166,7 +166,8 @@ describe('the Breath painted kit as shipped', () => {
         ...breathEnvSwap(planBreathKit()).swap,
       ].map((p) => p.piece),
     );
-    expect(placed.size).toBeGreaterThanOrEqual(9);
+    // Eight since the bridge's wind shelters went (2026-11-25).
+    expect(placed.size).toBeGreaterThanOrEqual(8);
     for (const piece of placed) expect(shapes.has(piece), piece).toBe(true);
     for (const [piece, m] of Object.entries(BREATH_ENV_ROCK)) {
       const s = shape(piece);

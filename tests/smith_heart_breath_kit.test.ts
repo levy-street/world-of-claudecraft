@@ -472,10 +472,11 @@ describe('Smith Heart Breath kit: the plan', () => {
     // or cheek stone.
     for (const piece of ['Kit_StormRod', 'Kit_StrikeScar', 'Kit_WindHorn', 'Kit_ChannelJamb'])
       expect(of(piece), piece).toBe(0);
-    expect(of('Kit_WindShelter')).toBe(2);
+    // The bridge's two wind shelters went with Jose's playtest of 2026-11-25.
+    expect(of('Kit_WindShelter')).toBe(0);
     expect(of('Kit_StormStone')).toBe(6);
     expect(of('Kit_WindBridge')).toBe(1);
-    expect(props.length).toBe(2 + 6);
+    expect(props.length).toBe(6);
     // The standing stones stand on their colliders, on Breath floors.
     for (const p of F.props) {
       if (p.kind !== 'sh_storm_stone') continue;
