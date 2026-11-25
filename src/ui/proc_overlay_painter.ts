@@ -31,7 +31,6 @@ export class ProcOverlayPainter {
 
   private clearDestruction(): void {
     this.writers.toggleClass(this.root, 'destruction', false);
-    this.writers.toggleClass(this.root, 'quench', false);
     this.writers.toggleClass(this.root, 'r1', false);
     this.writers.toggleClass(this.root, 'r2', false);
     this.writers.toggleClass(this.root, 'r3', false);
@@ -167,10 +166,8 @@ export class ProcOverlayPainter {
   }
 
   // Destruction variant: five forged marks stay visible as an empty ritual
-  // bank, then ignite one at a time as the caster gathers Ruin. `quench` paints
-  // the same bank in frost blue for the Guardian of the Quench's cold
-  // (proc_overlay_route.ts; the marks are hud/dungeon/quench_cold_view.ts).
-  paintDestructionMarks(n: number, label: string, status: string, quench = false): void {
+  // bank, then ignite one at a time as the caster gathers Ruin.
+  paintDestructionMarks(n: number, label: string, status: string): void {
     this.writers.setAttr(this.root, 'aria-hidden', 'false');
     // -1: see paintNecromancyCharges above.
     this.writers.setAttr(this.root, 'tabindex', '-1');
@@ -199,7 +196,6 @@ export class ProcOverlayPainter {
     this.writers.toggleClass(this.root, 'n4', false);
     this.writers.toggleClass(this.root, 'n5', false);
     this.writers.toggleClass(this.root, 'destruction', true);
-    this.writers.toggleClass(this.root, 'quench', quench);
     this.writers.toggleClass(this.root, 'r1', n >= 1);
     this.writers.toggleClass(this.root, 'r2', n >= 2);
     this.writers.toggleClass(this.root, 'r3', n >= 3);

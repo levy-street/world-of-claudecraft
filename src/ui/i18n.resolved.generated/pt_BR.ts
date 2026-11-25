@@ -1050,9 +1050,7 @@ export const pt_BR: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "Fragmentos de Alma",
       "ruinMeter": "Ruína",
-      "ruinStatus": "Ruína {value} de {max}",
-      "quenchColdMeter": "Quenching Cold",
-      "quenchColdStatus": "{value} of {max} frost marks"
+      "ruinStatus": "Ruína {value} de {max}"
     },
     "comboMeter": {
       "label": "PC"

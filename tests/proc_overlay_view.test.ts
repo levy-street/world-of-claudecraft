@@ -432,11 +432,7 @@ describe('Destruction Ruin visual progression', () => {
       'utf8',
     );
     const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
-    // The per-spec paint choice lives in proc_overlay_route.ts (out of hud.ts).
-    const hudSource = readFileSync(
-      new URL('../src/ui/proc_overlay_route.ts', import.meta.url),
-      'utf8',
-    );
+    const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
     expect(domSource).toContain('class="ruin-ritual"');
     expect(domSource.match(/class="ruin-mark ruin-mark-[1-5]"/g)).toHaveLength(5);

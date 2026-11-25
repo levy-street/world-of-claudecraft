@@ -1050,9 +1050,7 @@ export const tr_TR: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "Ruh Parçaları",
       "ruinMeter": "Harabiyet",
-      "ruinStatus": "{value} / {max} Harabiyet",
-      "quenchColdMeter": "Quenching Cold",
-      "quenchColdStatus": "{value} of {max} frost marks"
+      "ruinStatus": "{value} / {max} Harabiyet"
     },
     "comboMeter": {
       "label": "KP"

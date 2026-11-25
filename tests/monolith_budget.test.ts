@@ -562,9 +562,7 @@ const MONOLITHS: MonolithRow[] = [
     // party / target-of-target frame wiring.
     // LOWERED 17709 -> 17704 by the party pings: four dead imports went, paying
     // for the hud/pings/ field, its import and its fast-band tick.
-    // LOWERED 17704 -> 17675: the proc overlay's per-spec paint choice moved to
-    // proc_overlay_route.ts (with the Quench's frost marks ahead of it).
-    ceiling: 17675,
+    ceiling: 17704,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -19500,8 +19500,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.devotionValue': '虔誠值 {value}/{max}',
   'hudChrome.procOverlay.ruinMeter': '毀滅',
   'hudChrome.procOverlay.ruinStatus': '毀滅 {value}/{max}',
-  'hudChrome.procOverlay.quenchColdMeter': '淬火寒冷',
-  'hudChrome.procOverlay.quenchColdStatus': '霜痕 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '靈魂碎片',
   'hudChrome.statInfo.effects.manaRegenCombat': '戰鬥中每 5 秒約恢復 {value} 點法力',
   'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 譴罪。',

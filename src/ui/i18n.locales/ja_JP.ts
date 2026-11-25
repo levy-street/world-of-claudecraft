@@ -18752,8 +18752,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.devotionValue': '献身 {value} / {max}',
   'hudChrome.procOverlay.ruinMeter': '破滅',
   'hudChrome.procOverlay.ruinStatus': '破滅 {value}/{max}',
-  'hudChrome.procOverlay.quenchColdMeter': '焼き入れの冷気',
-  'hudChrome.procOverlay.quenchColdStatus': '霜の印 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '魂の欠片',
   'hudChrome.statInfo.effects.manaRegenCombat': '戦闘中、5秒ごとにマナが約{value}回復',
   'hudChrome.warlock.doomEmptyStatus': '断罪 {value}/{max}。',

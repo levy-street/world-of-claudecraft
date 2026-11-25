@@ -399,8 +399,6 @@ export const hudChromeStrings = {
     soulFragmentsMeter: 'Soul Fragments',
     ruinMeter: 'Wrack',
     ruinStatus: '{value} of {max} Wrack',
-    quenchColdMeter: 'Quenching Cold',
-    quenchColdStatus: '{value} of {max} frost marks',
   },
   // Combo Points meter (#combo-row): the 0-5 pip row next to the player frame
   // for the energy-resource classes. Kept NON-WORDY (no run of four-plus

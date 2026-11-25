@@ -1050,9 +1050,7 @@ export const id_ID: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "Serpihan Jiwa",
       "ruinMeter": "Wrack",
-      "ruinStatus": "{value} dari {max} Wrack",
-      "quenchColdMeter": "Quenching Cold",
-      "quenchColdStatus": "{value} of {max} frost marks"
+      "ruinStatus": "{value} dari {max} Wrack"
     },
     "comboMeter": {
       "label": "PK"

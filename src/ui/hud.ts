@@ -659,7 +659,7 @@ import {
   renderWarfareVendorWindow,
   warfarePurchaseConfirmBody,
 } from './hud/vendor/warfare_vendor_window';
-import { afflictionFateThreadCount } from './hud/warlock';
+import { afflictionFateThreadCount, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
 import { createHudWorldMarkers, type HudWorldMarkers } from './hud/world_markers';
 import { HudFrameGroups, refreshHudFrameGroupLabels } from './hud_frame_groups';
@@ -847,7 +847,13 @@ import { applyPreviewSubject, type PreviewSubject, wocPreviewKey } from './previ
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
 import { ProcOverlayPainter } from './proc_overlay_painter';
-import { paintProcOverlayRoute } from './proc_overlay_route';
+import {
+  chronoOverlayCharges,
+  combustionOverlayActive,
+  frostOverlayCharges,
+  necromancyOverlayCharges,
+  procOverlayState,
+} from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
 import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
@@ -8973,8 +8979,31 @@ export class Hud {
       this.procChipSpec = this.sim.talentSpec;
       if (this.interfaceUnlock.isUnlocked) this.interfaceUnlock.relocalize();
     }
-    // Which art the overlay paints (the Quench's frost marks, else the spec's): proc_overlay_route.
-    paintProcOverlayRoute(this.procOverlayPainter, this.sim.talentSpec, p.auras);
+    // Chronomancy (arcane spec) drives the same bird from its Aether Surge
+    // charges (one quarter per charge); every other spec/class keeps the fire
+    // Heating Up / Hot Streak rule. Both routes clear the other's classes, so a
+    // spec swap never strands a half-lit bird.
+    if (this.sim.talentSpec === 'demonology') {
+      const soulFragments = necromancyOverlayCharges(p.auras);
+      this.procOverlayPainter.paintNecromancyCharges(
+        soulFragments,
+        t('hudChrome.procOverlay.soulFragmentsMeter'),
+        t('hudChrome.auraEffect.resourceCount', { value: soulFragments, max: 5 }),
+      );
+    } else if (this.sim.talentSpec === 'destruction') {
+      const ruinPips = destructionRuinPips(this.sim.talentSpec, p.auras);
+      this.procOverlayPainter.paintDestructionMarks(
+        ruinPips,
+        t('hudChrome.procOverlay.ruinMeter'),
+        t('hudChrome.procOverlay.ruinStatus', { value: ruinPips, max: 5 }),
+      );
+    } else if (this.sim.talentSpec === 'arcane') {
+      this.procOverlayPainter.paintChronoCharges(chronoOverlayCharges(p.auras));
+    } else if (this.sim.talentSpec === 'frost') {
+      this.procOverlayPainter.paintFrostCharges(frostOverlayCharges(p.auras));
+    } else {
+      this.procOverlayPainter.paint(procOverlayState(p.auras), combustionOverlayActive(p.auras));
+    }
     this.auraOverlayController.paint(
       p.auras,
       this.sim.reactiveAbilityWindowRemaining('mongoose_bite'),

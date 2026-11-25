@@ -1050,9 +1050,7 @@ export const da_DK: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "Sjælesplinter",
       "ruinMeter": "Wrack",
-      "ruinStatus": "{value} af {max} Wrack",
-      "quenchColdMeter": "Quenching Cold",
-      "quenchColdStatus": "{value} of {max} frost marks"
+      "ruinStatus": "{value} af {max} Wrack"
     },
     "comboMeter": {
       "label": "KP"

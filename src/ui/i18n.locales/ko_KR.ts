@@ -18700,8 +18700,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.devotionValue': '헌신 {value} / {max}',
   'hudChrome.procOverlay.ruinMeter': '파멸',
   'hudChrome.procOverlay.ruinStatus': '파멸 {value}/{max}',
-  'hudChrome.procOverlay.quenchColdMeter': '담금질 냉기',
-  'hudChrome.procOverlay.quenchColdStatus': '서리 표식 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '영혼 조각',
   'hudChrome.statInfo.effects.manaRegenCombat': '전투 중 5초마다 약 {value} 마나 회복',
   'hudChrome.warlock.doomEmptyStatus': '단죄 {value}/{max}.',

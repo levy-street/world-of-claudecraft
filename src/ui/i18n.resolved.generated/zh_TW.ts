@@ -1050,9 +1050,7 @@ export const zh_TW: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "靈魂碎片",
       "ruinMeter": "毀滅",
-      "ruinStatus": "毀滅 {value}/{max}",
-      "quenchColdMeter": "淬火寒冷",
-      "quenchColdStatus": "霜痕 {value}/{max}"
+      "ruinStatus": "毀滅 {value}/{max}"
     },
     "comboMeter": {
       "label": "連擊點"

@@ -1050,9 +1050,7 @@ export const en_XA: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "[Šóúļ Ƒŕáĝɱéñţš]",
       "ruinMeter": "[Ŵŕáçķ]",
-      "ruinStatus": "[{value} óƒ {max} Ŵŕáçķ]",
-      "quenchColdMeter": "[Ɋúéñçĥíñĝ Çóļð]",
-      "quenchColdStatus": "[{value} óƒ {max} ƒŕóšţ ɱáŕķš]"
+      "ruinStatus": "[{value} óƒ {max} Ŵŕáçķ]"
     },
     "comboMeter": {
       "label": "[ÇÞ]"

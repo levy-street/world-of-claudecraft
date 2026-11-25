@@ -1050,9 +1050,7 @@ export const ko_KR: EnTranslations = {
     "procOverlay": {
       "soulFragmentsMeter": "영혼 조각",
       "ruinMeter": "파멸",
-      "ruinStatus": "파멸 {value}/{max}",
-      "quenchColdMeter": "담금질 냉기",
-      "quenchColdStatus": "서리 표식 {value}/{max}"
+      "ruinStatus": "파멸 {value}/{max}"
     },
     "comboMeter": {
       "label": "연계"
