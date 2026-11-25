@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import type { AnimState } from '../src/render/characters/anim_state';
+import {
+  CHARACTER_EFFECT_TREADING_WATER,
+  characterEffectFlags,
+  hasCharacterEffect,
+} from '../src/render/character_effects_core';
+import { type AnimState, desiredBaseState } from '../src/render/characters/anim_state';
 import {
   type AnimOverrideFacts,
   applyEntityAnimOverrides,
 } from '../src/render/characters/anim_state_entity_core';
+import { QUENCH_AURAS } from '../src/sim/encounters/smith_heart/quench_ids';
 
 // The renderer's per-entity sync loop derives an AnimState from DISPLAYED motion;
 // these overrides then apply facts about the entity itself. Extracted out of the
@@ -115,5 +121,39 @@ describe('applyEntityAnimOverrides: ice-slide suppression', () => {
     applyEntityAnimOverrides(st, { aggroTargetId: null }, false);
     expect(st.moving).toBe(true);
     expect(st.combat).toBe(false);
+  });
+});
+
+describe('applyEntityAnimOverrides: held in the Quench water', () => {
+  it('a body trapped in a hole treads water in place, upright', () => {
+    const flags = characterEffectFlags([{ id: QUENCH_AURAS.trapped, kind: 'root' }]);
+    expect(hasCharacterEffect(flags, CHARACTER_EFFECT_TREADING_WATER)).toBe(true);
+    const st = state({ moving: true, running: true, airborne: true, wading: true });
+    applyEntityAnimOverrides(st, facts({ aggroTargetId: 7 }), false, flags);
+    expect(st.swimming).toBe(true);
+    expect(st.submerged).toBe(false);
+    expect(st.moving).toBe(false);
+    expect(st.running).toBe(false);
+    expect(st.airborne).toBe(false);
+    expect(st.wading).toBe(false);
+    expect(st.combat).toBe(false);
+    // Standing still in the water resolves to the tread clip.
+    expect(desiredBaseState(st, true)).toBe('swimIdle');
+  });
+
+  it('leaves a dead body and an untrapped body alone', () => {
+    const flags = characterEffectFlags([{ id: QUENCH_AURAS.trapped, kind: 'root' }]);
+    const dead = state({ dead: true });
+    applyEntityAnimOverrides(dead, facts(), true, flags);
+    expect(dead.swimming).toBe(false);
+    const dry = state({ moving: true });
+    applyEntityAnimOverrides(
+      dry,
+      facts(),
+      false,
+      characterEffectFlags([{ id: QUENCH_AURAS.cold, kind: 'debuff' }]),
+    );
+    expect(dry.swimming).toBe(false);
+    expect(dry.moving).toBe(true);
   });
 });

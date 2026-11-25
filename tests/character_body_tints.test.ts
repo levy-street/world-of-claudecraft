@@ -3,7 +3,7 @@
 // rune lean and the Quench's frost glaze painted on the body's own material.
 import { expect, it } from 'vitest';
 import { applyCharacterBodyTints } from '../src/render/character_effects';
-import { easeSink, treadsWater } from '../src/render/characters/water_sink_core';
+import { easeSink } from '../src/render/characters/water_sink_core';
 import type { QuenchGlaze } from '../src/render/smith_heart_fx/quench_glaze_core';
 import { QUENCH_TRAPPED_SINK } from '../src/render/smith_heart_fx/quench_glaze_core';
 import { QUENCH_AURAS } from '../src/sim/encounters/smith_heart/quench_ids';
@@ -43,19 +43,17 @@ it('a cold body wears the glaze climbing with its bar; leaving the cold releases
   expect(c).toBeNull();
 });
 
-it('a body fallen through the ice is drawn treading the water chest deep, and climbs back out', () => {
+it('a body fallen through the ice is drawn sunk in the water, and climbs back out', () => {
   const r = rig();
   applyCharacterBodyTints(r, body([{ id: QUENCH_AURAS.cold, value: 40 }]), 0);
   applyCharacterBodyTints(r, body([{ id: QUENCH_AURAS.trapped, kind: 'root' }]), 0);
   applyCharacterBodyTints(r, body([]), 0);
   expect(r.seen.sink).toEqual([0, QUENCH_TRAPPED_SINK, 0]);
-  // A deep-water swimmer's depth (feet 0.75 under the line), the body
-  // treading it (the tread's own sink on top: chest deep), never a body
-  // left standing sunk to the hips (the team's playtest of 2026-11-25).
-  expect(QUENCH_TRAPPED_SINK).toBeGreaterThan(0.6);
+  // The body also treads water (the rig's tread pose sinks it about another
+  // third of a yard): together they put the waterline at the shoulders on a
+  // 2.6 yd rig, so the hole reads as water and the head stays clear.
+  expect(QUENCH_TRAPPED_SINK).toBeGreaterThan(0.5);
   expect(QUENCH_TRAPPED_SINK).toBeLessThan(1);
-  expect(treadsWater(QUENCH_TRAPPED_SINK)).toBe(true);
-  expect(treadsWater(0)).toBe(false);
   // The drawn sink eases in quickly, out more slowly, and settles exactly.
   let d = 0;
   for (let i = 0; i < 6; i++) d = easeSink(d, QUENCH_TRAPPED_SINK, 1 / 20);

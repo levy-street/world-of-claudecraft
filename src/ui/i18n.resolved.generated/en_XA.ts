@@ -7528,11 +7528,6 @@ export const en_XA: EnTranslations = {
       "blowing": "[Ŵíñð]",
       "turning": "[Ŵíñð ţúŕñíñĝ]"
     },
-    "quenchIce": {
-      "onIce": "[Óñ ţĥé íçé]",
-      "breaking": "[Íçé ƀŕéáķíñĝ!]",
-      "water": "[Íñ ţĥé ŵáţéŕ!]"
-    },
     "finalOverload": {
       "kneeling": "[Íţ ķñééļš]",
       "rising": "[Ţĥé Ĥéáŕţ ƀéáţš]",

@@ -7528,11 +7528,6 @@ export const zh_TW: EnTranslations = {
       "blowing": "Wind",
       "turning": "風向轉變"
     },
-    "quenchIce": {
-      "onIce": "冰面上",
-      "breaking": "冰面破裂！",
-      "water": "落入水中！"
-    },
     "finalOverload": {
       "kneeling": "它跪下了",
       "rising": "心臟搏動",

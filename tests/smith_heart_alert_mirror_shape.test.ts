@@ -42,7 +42,7 @@ const sparse = (id: string) => ({ id, remaining: 2.5 });
 
 describe("the Smith's Heart alerts read a mirror-shaped aura like a Sim one", () => {
   it('the Quench', () => {
-    for (const id of [QUENCH_AURAS.frozen, QUENCH_AURAS.trapped, QUENCH_AURAS.marked]) {
+    for (const id of [QUENCH_AURAS.marked, QUENCH_AURAS.rime]) {
       const a = buildQuenchAlertView({
         auras: [full(id, { value: 2, value2: 3 })],
       }) as unknown as View;

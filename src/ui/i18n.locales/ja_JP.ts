@@ -26347,9 +26347,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.devilThrown':
     'ダストデビルに投げ飛ばされた：つむじ風から{yards}ヤード外へ運ばれる。地面に降ろされるまで移動できない。',
   'hudChrome.breathWind.turning': '風向きが変わる',
-  'hudChrome.quenchIce.onIce': '氷の上',
-  'hudChrome.quenchIce.breaking': '氷が割れる！',
-  'hudChrome.quenchIce.water': '水中！',
   'hudChrome.auraEffect.breathGuardian.gust':
     'サミットロアの突風が、投げ飛ばされた方向へあなたを数秒間押し流す（毎秒{speed}ヤード）。ガーディアンの方へまっすぐ歩いて踏みとどまるか、セサリーの錨に立つこと。さもなければコーニスの縁へ運ばれる。',
 };

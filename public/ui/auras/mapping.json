@@ -12,7 +12,8 @@
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-fear-aura-art.json",
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json",
     "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json",
-    "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json"
+    "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+    "docs/achievements/quench-cold-icon-2026-11-25/accepted-aura-art.json"
   ],
   "externalAssets": [
     {
@@ -4767,33 +4768,29 @@
     },
     {
       "auraId": "heart_quench_cold",
-      "sourcePack": "smith-heart-aura-art-2026-11-19",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_cold.png",
-      "sourceBytes": 2931630,
+      "sourcePack": "quench-cold-icon-2026-11-25",
+      "sourceFile": "docs/design/raid/kit/quench_cold_icon_src/heart_quench_cold.svg",
+      "sourceBytes": 1954,
       "output": "heart_quench_cold.webp",
-      "source": "OpenAI built-in image generation",
+      "source": "Hand-authored SVG, rasterized with sharp",
       "owner": "World of ClaudeCraft",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "Frost creeping up the fingers of an armoured gauntlet, ice crystals forming, a deep blue cold glow.",
+      "intendedVisualSubject": "A white snowflake on a blue background, readable at a glance as the cold.",
       "references": [
         {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
           "path": "src/sim/encounters/smith_heart/quench_cold.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_cold."
+          "role": "The live mechanic the icon stands for: where the raid applies heart_quench_cold."
         },
         {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+          "path": "docs/design/raid/kit/quench_cold_icon_src/heart_quench_cold.svg",
+          "role": "The vector source, rasterized to the shipped 128px opaque WebP with sharp (resize 128, flatten, webp quality 88)."
         }
       ],
-      "sourceSha256": "e1cc30a881c9af382ac1f024ea24209d327a8372a5515cddc8f97471509a109f",
-      "acceptedSha256": "3fe092e99dcf4d4053d130791cb899090d59d232c8e731ed67f5872e23c9856d",
-      "acceptedBytes": 4718,
-      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+      "sourceSha256": "9bb20296338e9e4a12ae4ad249148de75cf679a0f706a344cae3dde522ebd8bc",
+      "acceptedSha256": "09bb58a793dfbde890f3d0be30c1d9b66bdc8454fd24a6408140b7d2bfb27ca7",
+      "acceptedBytes": 3984,
+      "acceptedArtManifest": "docs/achievements/quench-cold-icon-2026-11-25/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/quench-cold-icon-2026-11-25/accepted-aura-art.json"
     },
     {
       "auraId": "heart_quench_warmth",

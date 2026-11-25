@@ -24,6 +24,13 @@ describe('exact runtime aura paintings', () => {
     'docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json';
   const smithHeartManifest =
     'docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json';
+  // The one hand-authored replacement: Quenching Cold's gauntlet read as a hand
+  // icon in playtest, so a snowflake (an SVG rasterized with sharp) supersedes
+  // that single painting. The 2026-11-19 record stays as it was accepted.
+  const quenchColdManifest = 'docs/achievements/quench-cold-icon-2026-11-25/accepted-aura-art.json';
+  const quenchColdManifestSha256 =
+    'd9b3cdc0fb0e067ef402e7ca7ed58475cd7d0c9e721e9703e66fb0a847851751';
+  const HAND_AUTHORED = 'Hand-authored SVG, rasterized with sharp';
   const secondPassManifestSha256 =
     'bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe';
   const externalAuraArt = new Map([
@@ -175,6 +182,20 @@ describe('exact runtime aura paintings', () => {
         acceptedBytes: number;
         references: Array<{ path: string; role: string }>;
         prompt: string;
+      }>;
+    };
+    const quenchColdBytes = readFileSync(path.join(process.cwd(), quenchColdManifest));
+    const quenchCold = JSON.parse(quenchColdBytes.toString('utf8')) as {
+      batch: { id: string; rasterGenerator: string; supersedes: string };
+      assets: Array<{
+        auraId: string;
+        sourceProvenance: string;
+        sourceFile: string;
+        sourceBytes: number;
+        sourceSha256: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+        references: Array<{ path: string; role: string }>;
       }>;
     };
     const smithHeartBytes = readFileSync(path.join(process.cwd(), smithHeartManifest));
@@ -330,7 +351,42 @@ describe('exact runtime aura paintings', () => {
             },
           ] as const,
       ),
+      // Last, so its entry supersedes the painting it replaces.
+      ...quenchCold.assets.map(
+        (asset) =>
+          [
+            asset.auraId,
+            {
+              auraId: asset.auraId,
+              sourceFile: asset.sourceFile,
+              sourceBytes: asset.sourceBytes,
+              sourceSha256: asset.sourceSha256,
+              acceptedSha256: asset.acceptedSha256,
+              acceptedBytes: asset.acceptedBytes,
+              acceptedArtManifest: quenchColdManifest,
+              references: asset.references.map(({ path: referencePath }) => referencePath),
+              sourceProvenance: asset.sourceProvenance,
+            },
+          ] as const,
+      ),
     ]);
+    expect(createHash('sha256').update(quenchColdBytes).digest('hex')).toBe(
+      quenchColdManifestSha256,
+    );
+    expect(quenchCold.batch).toMatchObject({
+      id: 'quench-cold-icon-2026-11-25',
+      rasterGenerator: HAND_AUTHORED,
+      supersedes: smithHeartManifest,
+    });
+    expect(quenchCold.assets.map(({ auraId }) => auraId)).toEqual(['heart_quench_cold']);
+    for (const asset of quenchCold.assets) {
+      expect(existsSync(path.join(process.cwd(), asset.sourceFile)), asset.auraId).toBe(true);
+      const sourceBytes = readFileSync(path.join(process.cwd(), asset.sourceFile));
+      expect(sourceBytes.length, asset.auraId).toBe(asset.sourceBytes);
+      expect(createHash('sha256').update(sourceBytes).digest('hex'), asset.auraId).toBe(
+        asset.sourceSha256,
+      );
+    }
 
     expect(committed.filter((name) => name !== 'mapping.json' && !name.endsWith('.webp'))).toEqual(
       [],
@@ -486,6 +542,7 @@ describe('exact runtime aura paintings', () => {
         mobManifest,
         masterwroughtManifest,
         smithHeartManifest,
+        quenchColdManifest,
       ]),
     );
     expect(mapping.externalAssets.map(({ auraId, runtimeUrl }) => [auraId, runtimeUrl])).toEqual([
@@ -508,7 +565,11 @@ describe('exact runtime aura paintings', () => {
     const hashes = new Set<string>();
     for (const entry of mappedEntries) {
       expect(entry.output, entry.auraId).toBe(`${entry.auraId}.webp`);
-      expect(entry.source, entry.auraId).toBe('OpenAI built-in image generation');
+      expect(entry.source, entry.auraId).toBe(
+        entry.acceptedArtManifest === quenchColdManifest
+          ? HAND_AUTHORED
+          : 'OpenAI built-in image generation',
+      );
       expect(entry.owner, entry.auraId).toBe('World of ClaudeCraft');
       expect(entry.license, entry.auraId).toContain('project asset');
       expect(entry.sourceSha256, entry.auraId).toMatch(/^[0-9a-f]{64}$/);

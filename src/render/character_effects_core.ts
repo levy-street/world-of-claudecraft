@@ -1,4 +1,5 @@
 import { GOURDLIGHT_TRICKS } from '../sim/content/gourdlight_eve';
+import { QUENCH_AURAS } from '../sim/encounters/smith_heart/quench_ids';
 import { NYTHRAXIS_IMPALED_AURA_ID } from '../sim/nythraxis_bone_spike';
 
 export const CHARACTER_EFFECT_SOUL_REND = 1 << 0;
@@ -17,6 +18,11 @@ export const CHARACTER_EFFECT_SPORE_HOT = 1 << 5;
 export const CHARACTER_EFFECT_FEIGN_DEATH = 1 << 6;
 /** A Gourdlight Eve trick (seasonal/): wreathed in green fumes for a few seconds. */
 export const CHARACTER_EFFECT_SEASONAL_FUMES = 1 << 7;
+/** Held in the Guardian of the Quench's water (fallen through a hole in the
+ *  ice): the living body treads water, upright, in its swim tread clip, for
+ *  every viewer, until the aura clears. Presentation only: the sim keeps the
+ *  body rooted on the ice. */
+export const CHARACTER_EFFECT_TREADING_WATER = 1 << 8;
 const SEASONAL_FUMES_AURA_ID: string = GOURDLIGHT_TRICKS[2].id;
 
 export interface CharacterEffectAura {
@@ -33,6 +39,7 @@ export function addCharacterEffectAura(flags: number, aura: CharacterEffectAura)
   if (aura.kind === 'buff_reckless') next |= CHARACTER_EFFECT_RECKLESSNESS;
   if (aura.kind === 'form_sporemender') next |= CHARACTER_EFFECT_SPORE_FORM;
   if (aura.id === 'rejuvenation' && aura.kind === 'hot') next |= CHARACTER_EFFECT_SPORE_HOT;
+  if (aura.id === QUENCH_AURAS.trapped) next |= CHARACTER_EFFECT_TREADING_WATER;
   if (aura.kind === 'seasonal_cosmetic' && aura.id === SEASONAL_FUMES_AURA_ID)
     next |= CHARACTER_EFFECT_SEASONAL_FUMES;
   return next;

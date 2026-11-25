@@ -16,7 +16,7 @@ import {
 import { QUENCH_LINES, quenchLineKey } from '../src/sim/encounters/smith_heart/quench_voice';
 import type { SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
-import { buildQuenchAlertView, QUENCH_FREEZING_AT } from '../src/ui/hud/dungeon/quench_alert_view';
+import { buildQuenchAlertView } from '../src/ui/hud/dungeon/quench_alert_view';
 import { t } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { quenchFight } from './helpers/quench_fight';
@@ -139,10 +139,19 @@ describe('Guardian of the Quench: tooltips and names', () => {
   });
 });
 
-describe('Guardian of the Quench: the cold bar over the action bar', () => {
-  it('shows the bar, warns past three quarters, glows warm in a huddle, and counts the freeze and the water', () => {
+describe('Guardian of the Quench: the bar over the action bar', () => {
+  it('shows only the slash mark and Living Rime; the cold, the freeze and the water stand it down', () => {
     expect(buildQuenchAlertView({ auras: [] }).visible).toBe(false);
-    // A slash's mark takes the bar's place: its number and the time, under the freeze.
+    // The cold is no longer this bar's (playtest 2026-11-25): its debuff
+    // badges the value and the frost marks fill (quench_cold_view.ts).
+    for (const value2 of [1, -1]) {
+      for (const value of [0, 40, 90]) {
+        expect(
+          buildQuenchAlertView({ auras: [{ id: QUENCH_AURAS.cold, value, value2 }] }).visible,
+        ).toBe(false);
+      }
+    }
+    // A slash's mark: its number and the time.
     const mark = { id: QUENCH_AURAS.marked, remaining: 2, duration: 4, value: 2, value2: 3 };
     const marked = buildQuenchAlertView({
       auras: [{ id: QUENCH_AURAS.cold, value: 40, value2: 1 }, mark],
@@ -151,51 +160,12 @@ describe('Guardian of the Quench: the cold bar over the action bar', () => {
     expect(marked.kind).toBe('marked');
     expect(marked.title).toContain('2 of 3');
     expect(marked.progress).toBeCloseTo(0.5);
-    const held = buildQuenchAlertView({
-      auras: [mark, { id: QUENCH_AURAS.frozen, remaining: 2, duration: 4 }],
-    });
-    expect(held.visible && held.kind).toBe('frozen');
-    const rising = buildQuenchAlertView({
-      auras: [{ id: QUENCH_AURAS.cold, value: 40, value2: 1 }],
-    });
-    if (!rising.visible) throw new Error('hidden');
-    expect(rising.kind).toBe('cold');
-    expect(rising.progress).toBeCloseTo(0.4);
-    expect(rising.barLabel).toBe(`Cold 40 / ${T.coldMax}`);
-    // A short title over the bar and its number: no sentence under it.
-    expect(rising.title).toBe('Cold');
-    expect(rising.line).toBe('');
-    const freezing = buildQuenchAlertView({
-      auras: [{ id: QUENCH_AURAS.cold, value: QUENCH_FREEZING_AT, value2: 1 }],
-    });
-    expect(freezing.visible && freezing.kind).toBe('freezing');
-    const warm = buildQuenchAlertView({
-      auras: [{ id: QUENCH_AURAS.cold, value: 90, value2: -1 }],
-    });
-    expect(warm.visible && warm.kind).toBe('warm');
-    const frozen = buildQuenchAlertView({
-      auras: [
-        { id: QUENCH_AURAS.cold, value: 0, value2: 0 },
-        { id: QUENCH_AURAS.frozen, remaining: 2.2, duration: T.freezeSeconds },
-      ],
-    });
-    if (!frozen.visible) throw new Error('hidden');
-    expect(frozen.kind).toBe('frozen');
-    expect(frozen.line).toBe('');
-    expect(frozen.barLabel).toBe('3s');
-    expect(frozen.progress).toBeCloseTo(2.2 / T.freezeSeconds);
-    const water = buildQuenchAlertView({
-      auras: [
-        { id: QUENCH_AURAS.cold, value: 50, value2: 1 },
-        { id: QUENCH_AURAS.trapped, remaining: 3, duration: T.trapSeconds + 1 },
-      ],
-    });
-    if (!water.visible) throw new Error('hidden');
-    expect(water.kind).toBe('water');
-    expect(water.line).toBe('');
-    expect(water.barLabel).toBe('2s');
-    expect(
-      buildQuenchAlertView({ auras: [{ id: QUENCH_AURAS.cold, value: 9 }], dead: true }).visible,
-    ).toBe(false);
+    expect(marked.line).toBe('');
+    // Frozen solid or under the ice: the debuffs' own timers carry it.
+    const frozen = { id: QUENCH_AURAS.frozen, remaining: 2.2, duration: T.freezeSeconds };
+    const water = { id: QUENCH_AURAS.trapped, remaining: 3, duration: T.trapSeconds + 1 };
+    expect(buildQuenchAlertView({ auras: [mark, frozen] }).visible).toBe(false);
+    expect(buildQuenchAlertView({ auras: [mark, water] }).visible).toBe(false);
+    expect(buildQuenchAlertView({ auras: [mark], dead: true }).visible).toBe(false);
   });
 });

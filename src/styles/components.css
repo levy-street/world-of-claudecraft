@@ -19854,26 +19854,12 @@
     width: 0;
     transition: width 80ms linear;
   }
-  #heart-quench-alert.is-warm {
-    border-color: var(--color-gold);
-  }
-  #heart-quench-alert.is-warm .fa-title,
-  #heart-quench-alert.is-warm .fa-fill {
-    color: var(--color-gold);
-    --bar-color: var(--color-gold);
-  }
-  #heart-quench-alert.is-freezing,
-  #heart-quench-alert.is-frozen,
   #heart-quench-alert.is-marked,
   #heart-quench-alert.is-rime {
     border-color: var(--color-hostile);
   }
-  #heart-quench-alert.is-freezing .fa-title,
-  #heart-quench-alert.is-frozen .fa-title,
   #heart-quench-alert.is-marked .fa-title,
   #heart-quench-alert.is-rime .fa-title,
-  #heart-quench-alert.is-freezing .fa-fill,
-  #heart-quench-alert.is-frozen .fa-fill,
   #heart-quench-alert.is-marked .fa-fill {
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
@@ -19885,17 +19871,8 @@
     color: var(--color-debuff-frost);
     --bar-color: var(--color-debuff-frost);
   }
-  #heart-quench-alert.is-freezing,
   #heart-quench-alert.is-rime {
     animation: bce-throb 0.9s ease-in-out infinite alternate;
-  }
-  #heart-quench-alert.is-water {
-    border-color: var(--color-mana);
-  }
-  #heart-quench-alert.is-water .fa-title,
-  #heart-quench-alert.is-water .fa-fill {
-    color: var(--color-mana);
-    --bar-color: var(--color-mana);
   }
   body.mobile-touch #heart-quench-alert {
     min-width: min(340px, calc(100vw - 32px));
@@ -20515,133 +20492,6 @@
   @media (prefers-reduced-motion: reduce) {
     #heart-breath-wind.is-turning .hbw-dial {
       animation: none;
-    }
-  }
-
-  /* The Guardian of the Quench's ice badge: self-mounted by src/ui/hud/dungeon/quench_ice_painter.ts
-     (view: quench_ice_view.ts). Top centre while the player fights on the lake:
-     on the ice (calm), ice breaking under them (red, pulsing), in the water
-     (blue, the seconds to the climb out). Every graphics preset: the ice
-     breaking under you is what you act on. It never takes the pointer. */
-  #heart-quench-ice {
-    position: absolute;
-    left: 50%;
-    top: 8px;
-    transform: translateX(-50%);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    z-index: 31;
-    padding: 5px 10px 4px;
-    pointer-events: none;
-    user-select: none;
-    color: var(--color-text-light);
-    border: 1px solid var(--color-gold-700);
-  }
-  #heart-quench-ice .hqi-dial {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 2px solid var(--color-quench-ice-ring);
-    background: radial-gradient(
-      circle,
-      var(--color-quench-ice-dial) 55%,
-      var(--color-quench-ice-dial-edge)
-    );
-    box-shadow: 0 0 8px var(--color-quench-ice-glow);
-  }
-  #heart-quench-ice .hqi-glyph {
-    display: none;
-    fill: none;
-    stroke: var(--color-quench-ice-glyph);
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  #heart-quench-ice.is-ice .hqi-glyph-ice,
-  #heart-quench-ice.is-breaking .hqi-glyph-breaking,
-  #heart-quench-ice.is-water .hqi-glyph-water {
-    display: inline;
-  }
-  #heart-quench-ice .hqi-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: var(--color-text-light);
-  }
-  #heart-quench-ice .hqi-seconds {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--color-quench-ice-water);
-  }
-  #heart-quench-ice.is-breaking {
-    border-color: var(--color-quench-ice-break);
-  }
-  #heart-quench-ice.is-breaking .hqi-dial {
-    border-color: var(--color-quench-ice-break);
-    animation: hqi-breaking 0.35s ease-in-out infinite alternate;
-  }
-  #heart-quench-ice.is-breaking .hqi-glyph {
-    stroke: var(--color-quench-ice-break);
-  }
-  #heart-quench-ice.is-breaking .hqi-label {
-    color: var(--color-quench-ice-break);
-    font-size: 13px;
-  }
-  #heart-quench-ice.is-water .hqi-dial {
-    border-color: var(--color-quench-ice-water);
-    box-shadow: 0 0 12px var(--color-quench-ice-water-glow);
-  }
-  #heart-quench-ice.is-water .hqi-glyph {
-    stroke: var(--color-quench-ice-water);
-  }
-  @keyframes hqi-breaking {
-    from {
-      box-shadow: 0 0 4px var(--color-quench-ice-break-glow-soft);
-    }
-    to {
-      box-shadow: 0 0 16px var(--color-quench-ice-break-glow);
-    }
-  }
-  body.mobile-touch #heart-quench-ice {
-    top: 4px;
-    padding: 3px 6px 3px;
-  }
-  body.mobile-touch #heart-quench-ice .hqi-dial {
-    width: 36px;
-    height: 36px;
-  }
-  /* In the water: a frosted blue edge round the screen and a light blue tint
-     over it (the team's playtest of 2026-11-25). Light: it never hides the
-     middle of the screen. */
-  #heart-quench-veil {
-    position: fixed;
-    inset: 0;
-    z-index: 30;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.35s ease-out;
-    background:
-      radial-gradient(
-        ellipse at center,
-        transparent 52%,
-        var(--color-quench-veil-frost-mid) 82%,
-        var(--color-quench-veil-frost) 100%
-      ),
-      var(--color-quench-veil-tint);
-    box-shadow: inset 0 0 60px 18px var(--color-quench-veil-frost);
-  }
-  #heart-quench-veil.is-on {
-    opacity: 1;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    #heart-quench-ice.is-breaking .hqi-dial {
-      animation: none;
-      box-shadow: 0 0 14px var(--color-quench-ice-break-glow);
-    }
-    #heart-quench-veil {
-      transition: none;
     }
   }
 

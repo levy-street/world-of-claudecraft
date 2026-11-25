@@ -24999,9 +24999,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.devilThrown':
     '被尘卷风抛出：被卷出旋风 {yards} 码。在它把你放下之前你无法移动。',
   'hudChrome.breathWind.turning': '风向转变',
-  'hudChrome.quenchIce.onIce': '冰面上',
-  'hudChrome.quenchIce.breaking': '冰面破裂！',
-  'hudChrome.quenchIce.water': '落入水中！',
   'hudChrome.auraEffect.breathGuardian.gust':
     '巅峰咆哮的狂风沿你被抛出的方向继续推你数秒，每秒{speed}码。径直走向守护者以稳住脚步，或站进塞萨莉的锚点，否则会被吹向飞檐边缘。',
 };

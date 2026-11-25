@@ -558,11 +558,11 @@ describe('Living Rime on the client', () => {
     expect(v.progress).toBeCloseTo(0.7, 9);
     // The burst's seconds and reach are the debuff's timer and tooltip.
     expect(v.line).toBe('');
-    // The freeze still comes first.
+    // Frozen solid, the bar stands down (the freeze reads on its debuff).
     const frozen = buildQuenchAlertView({
       auras: [crust, { id: QUENCH_AURAS.frozen, remaining: 3, duration: 6 }],
     });
-    expect(frozen.visible && frozen.kind).toBe('frozen');
+    expect(frozen.visible).toBe(false);
   });
 
   it("the raid frame badges the healing left as a share of the carrier's health", () => {

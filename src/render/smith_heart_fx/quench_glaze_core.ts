@@ -71,15 +71,12 @@ export function quenchGlazeOf(
   return out;
 }
 
-/** How deep a body fallen through the ice is drawn in the water (yards): the
- *  feet a deep-water swimmer's 0.75 under the line (sim/player_motion.ts
- *  swimsAt), the body TREADING it (render/characters/water_sink_core.ts
- *  treadsWater: the tread pose's own sink on top), so the waterline lands at
- *  the chest as it does in a lake. It was 1.05 on a body left standing, which
- *  read as sunk into the ground to the hips (the team's playtest of
- *  2026-11-25); the hole still reads as water, never a plate under the feet
- *  (audit point 14). */
-export const QUENCH_TRAPPED_SINK = 0.75;
+/** How deep a body fallen through the ice is drawn in the water (yards), on
+ *  top of the swim tread pose's own sink (the body treads water while held:
+ *  anim_state_entity_core.ts, CHARACTER_EFFECT_TREADING_WATER). Together they
+ *  put the waterline at the shoulders, so the hole reads as water and never
+ *  as a plate under its feet (audit point 14). */
+export const QUENCH_TRAPPED_SINK = 0.7;
 
 /** How far below its feet a body carrying `auras` is drawn: a body the sim
  *  holds in a hole (`QUENCH_AURAS.trapped`) stands sunk in the water; 0 for

@@ -7528,11 +7528,6 @@ export const ja_JP: EnTranslations = {
       "blowing": "Wind",
       "turning": "風向きが変わる"
     },
-    "quenchIce": {
-      "onIce": "氷の上",
-      "breaking": "氷が割れる！",
-      "water": "水中！"
-    },
     "finalOverload": {
       "kneeling": "膝をついた",
       "rising": "心臓が脈打つ",

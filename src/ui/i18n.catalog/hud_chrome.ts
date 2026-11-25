@@ -10467,6 +10467,10 @@ export const hudChromeStrings = {
   // the overlays.
   quenchAlert: {
     markedTitle: 'A blade hunts you! ({order} of {count})',
+    // The cold, the freeze and the water: RETIRED 2026-11-25 (the cold reads
+    // on its debuff's badge and the frost marks, quench_cold_view.ts; the
+    // freeze and the water on their debuffs' timers); kept for the overlays'
+    // reviewed rows.
     coldTitle: 'Cold',
     freezingTitle: 'Freezing!',
     warmTitle: 'Huddled warmth',
@@ -10587,14 +10591,6 @@ export const hudChromeStrings = {
   breathWind: {
     blowing: 'Wind',
     turning: 'Wind turning',
-  },
-  // The Guardian of the Quench's ice-state badge (src/ui/hud/dungeon/
-  // quench_ice_view.ts): on the lake's ice, on ice breaking under you, in the
-  // freezing water (its seconds are quenchAlert.secondsBar). Wordy (M16).
-  quenchIce: {
-    onIce: 'On the ice',
-    breaking: 'Ice breaking!',
-    water: 'In the water!',
   },
   finalOverload: {
     kneeling: 'It kneels',

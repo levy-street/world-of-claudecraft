@@ -12,8 +12,11 @@
 // readouts, the Rite's candles and the Bound Souls), the Drowned Temple's
 // (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
 // melody, its answer and her broken voice), the Smith's Heart's Guardian of
-// the Quench's cold bar (quench_alert_view.ts:
-// the player's own gauge, never advisory), plus the trash engine's
+// the Quench's bar (quench_alert_view.ts: a slash's mark and Living Rime,
+// the player's own gauge, never advisory) and its screen effects
+// (quench_screen_view.ts and quench_screen_painter.ts: the frost border
+// creeping in as the cold fills, the blue tint in the water; never advisory
+// either), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
@@ -94,13 +97,8 @@ import {
 } from './kit_use_prompt_view';
 import { buildKnotAlertView, KNOT_ALERT_KINDS } from './knot_alert_view';
 import { buildQuenchAlertView, QUENCH_ALERT_KINDS } from './quench_alert_view';
-import { QuenchIceBadge } from './quench_ice_painter';
-import {
-  buildQuenchIceView,
-  makeQuenchIceView,
-  type QuenchIceBody,
-  QuenchIceScan,
-} from './quench_ice_view';
+import { QuenchScreenOverlay } from './quench_screen_painter';
+import { buildQuenchScreenView, makeQuenchScreenView } from './quench_screen_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 import {
@@ -162,8 +160,7 @@ export interface DungeonPromptsFrame {
         KitUseBody &
         FinalPhaseBoss &
         TankSwapBody &
-        BreathWindBody &
-        QuenchIceBody
+        BreathWindBody
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -188,6 +185,8 @@ export class DungeonPrompts {
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
   private readonly quench: EncounterAlert;
+  private readonly quenchScreen: QuenchScreenOverlay;
+  private readonly quenchScreenView = makeQuenchScreenView();
   private readonly knot: EncounterAlert;
   private readonly tankSwap: EncounterAlert;
   private readonly tankBuster: EncounterAlert;
@@ -198,9 +197,6 @@ export class DungeonPrompts {
   private readonly breathWind: BreathWindBadge;
   private readonly breathWindView = makeBreathWindView();
   private readonly breathWindScan = new BreathWindScan();
-  private readonly quenchIce: QuenchIceBadge;
-  private readonly quenchIceView = makeQuenchIceView();
-  private readonly quenchIceScan = new QuenchIceScan();
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly temple: EncounterAlert;
   private readonly templeScene = new TempleAlertSceneScan();
@@ -260,6 +256,12 @@ export class DungeonPrompts {
         kinds: QUENCH_ALERT_KINDS,
       },
     );
+    // The frost border and the water's tint: over the world, under the
+    // nameplates and every HUD frame (mounted before the nameplates layer).
+    this.quenchScreen = new QuenchScreenOverlay({
+      ...deps,
+      before: () => quenchScreenAnchor(deps.layer()),
+    });
     this.knot = new EncounterAlert(deps, {
       id: 'heart-knot-alert',
       className: 'ui-panel-strong encounter-alert heart-knot-alert',
@@ -283,7 +285,6 @@ export class DungeonPrompts {
     });
     this.finalPhase = new HeartFinalPhasePanel(deps);
     this.breathWind = new BreathWindBadge(deps);
-    this.quenchIce = new QuenchIceBadge(deps);
     this.temple = new EncounterAlert(deps, {
       id: 'temple-alert',
       className: 'ui-panel-strong encounter-alert temple-alert',
@@ -376,6 +377,11 @@ export class DungeonPrompts {
       ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
       : HINT_HIDDEN;
     this.quench.paint(quench);
+    // The frost and the water on the screen: the player's own state, every
+    // tier and whatever the hints setting.
+    this.quenchScreen.paint(
+      buildQuenchScreenView({ auras: p.auras, dead: p.dead }, this.quenchScreenView),
+    );
     // The Knotted Gale's part in the fight (the panel is the throw's button).
     const knot = dungeonPromptEnabled('knot', hints)
       ? buildKnotAlertView({
@@ -415,12 +421,6 @@ export class DungeonPrompts {
     // (the wind's way is what the player acts on).
     this.breathWind.paint(
       buildBreathWindView(this.breathWindScan.frame(f.world), p, this.breathWindView),
-    );
-    // The Quench's ice-state badge and the water's frost veil: every preset,
-    // never behind the hints setting (the ice breaking under you is what
-    // you act on).
-    this.quenchIce.paint(
-      buildQuenchIceView(f.world, this.quenchIceScan.frame(f.world), p, this.quenchIceView),
     );
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
@@ -470,13 +470,13 @@ export class DungeonPrompts {
     this.sanctum.dispose();
     this.crypt.dispose();
     this.quench.dispose();
+    this.quenchScreen.dispose();
     this.knot.dispose();
     this.tankSwap.dispose();
     this.tankBuster.dispose();
     this.liveCoal.dispose();
     this.finalPhase.dispose();
     this.breathWind.dispose();
-    this.quenchIce.dispose();
     this.temple.dispose();
     this.kitUse.dispose();
   }
@@ -486,4 +486,10 @@ export class DungeonPrompts {
  *  else the HUD layer itself. */
 export function quenchDock(layer: HTMLElement | null): HTMLElement | null {
   return layer?.ownerDocument.getElementById('player-frame') ?? layer;
+}
+
+/** Where the Quench screen effects mount: just before the nameplates layer
+ *  (outside the HUD root), so they sit under the nameplates and the HUD. */
+export function quenchScreenAnchor(layer: HTMLElement | null): HTMLElement | null {
+  return layer?.ownerDocument.getElementById('nameplates') ?? null;
 }

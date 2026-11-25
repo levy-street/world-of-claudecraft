@@ -7528,11 +7528,6 @@ export const ru_RU: EnTranslations = {
       "blowing": "Wind",
       "turning": "Ветер меняется"
     },
-    "quenchIce": {
-      "onIce": "На льду",
-      "breaking": "Лёд трескается!",
-      "water": "В воде!"
-    },
     "finalOverload": {
       "kneeling": "Преклонил колени",
       "rising": "Сердце бьётся",

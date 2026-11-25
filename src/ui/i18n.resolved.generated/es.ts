@@ -7528,11 +7528,6 @@ export const es: EnTranslations = {
       "blowing": "Wind",
       "turning": "Wind turning"
     },
-    "quenchIce": {
-      "onIce": "On the ice",
-      "breaking": "Ice breaking!",
-      "water": "In the water!"
-    },
     "finalOverload": {
       "kneeling": "It kneels",
       "rising": "The Heart beats",

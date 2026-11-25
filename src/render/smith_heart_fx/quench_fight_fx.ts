@@ -16,7 +16,7 @@
 //  - the ice: a crack's footprint at its hole's exact radius (the shared
 //    floor telegraph) under a web of cracks racing out, light in them; the
 //    hole of freezing water (dark deep water, a churn, a rim of broken white
-//    ice); a trapped player held to the waist in churning water; the
+//    ice); a trapped player treading water to the shoulders in a churn; the
 //    plunge's and the climb's splashes;
 //  - a slash: its line from the blade through the marked player (the shared floor
 //    telegraph, following them until it locks), the flight's wake;
@@ -215,7 +215,7 @@ void main() {
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
-/** The churning freezing water round a trapped player's waist. */
+/** The churning freezing water round a trapped player treading it. */
 const COLLAR_FRAG = /* glsl */ `
 uniform float uTime;
 uniform vec3 uDeep;
@@ -1268,7 +1268,7 @@ export class QuenchFightFx {
       bi++;
     }
     for (let i = bi; i < P.frozen; i++) this.splashFans[i].fan.group.visible = false;
-    // The water: a churning collar round each trapped body's waist.
+    // The water: a churning collar round each trapped body.
     let wa = 0;
     for (const id of this.plunged) if (!this.trappedIds.includes(id)) this.plunged.delete(id);
     for (const id of this.trappedIds) {

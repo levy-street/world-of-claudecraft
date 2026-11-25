@@ -7528,11 +7528,6 @@ export const ko_KR: EnTranslations = {
       "blowing": "Wind",
       "turning": "바람 방향 전환"
     },
-    "quenchIce": {
-      "onIce": "얼음 위",
-      "breaking": "얼음이 깨진다!",
-      "water": "물속!"
-    },
     "finalOverload": {
       "kneeling": "무릎을 꿇었다",
       "rising": "심장이 고동친다",

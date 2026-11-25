@@ -601,6 +601,21 @@
     --color-field-map-vignette: rgba(0, 0, 0, 0.55);
     --color-field-map-vignette-clear: rgba(0, 0, 0, 0);
 
+    /* The Guardian of the Quench's screen effects (hud.css "Quench frost and
+       water screen effects", painted by src/ui/hud/dungeon/quench_screen_painter.ts):
+       the frost border's haze, rim and frozen glint, the mask's solid stop, the
+       water's tint, and the frost's tiled rime texture (fractal noise keyed to
+       an icy white; no colour literal of its own). */
+    --color-quench-frost-clear: rgba(190, 228, 255, 0.12);
+    --color-quench-frost-haze: rgba(132, 198, 250, 0.8);
+    --color-quench-frost-rim: rgba(228, 244, 255, 1);
+    --color-quench-frost-glint: rgba(244, 252, 255, 1);
+    --color-quench-frost-glint-core: rgba(255, 255, 255, 1);
+    --color-quench-mask: rgba(0, 0, 0, 1);
+    --color-quench-water-centre: rgba(30, 108, 186, 0.4);
+    --color-quench-water-edge: rgba(10, 48, 120, 0.7);
+    --quench-frost-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='f' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.03' numOctaves='5' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.9 0 0 0 0 0.97 0 0 0 0 1 -2.3 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+
     /* overworld world-map window (resolved by map_window_painter.ts via
        getComputedStyle: a 2D canvas context cannot read a CSS var directly).
        Exact pre-existing values from the inline updateMapWindow/drawMapDetail. */
@@ -877,25 +892,6 @@
     --color-breath-wind-turning: #fff1b8;
     --color-breath-wind-turning-glow-soft: rgb(255 220 120 / 0.35);
     --color-breath-wind-turning-glow: rgb(255 220 120 / 0.9);
-
-    /* The Guardian of the Quench's ice badge and water veil (components.css
-       #heart-quench-ice / #heart-quench-veil, src/ui/hud/dungeon/
-       quench_ice_painter.ts): a glacier dial, a white glyph on the ice, red
-       on breaking ice, bright blue in the water; the veil's frosted edge and
-       its light blue tint. */
-    --color-quench-ice-dial: rgb(14 38 62 / 0.88);
-    --color-quench-ice-dial-edge: rgb(6 18 32 / 0.92);
-    --color-quench-ice-ring: #8fd6ff;
-    --color-quench-ice-glyph: #eaf8ff;
-    --color-quench-ice-glow: rgb(140 210 255 / 0.45);
-    --color-quench-ice-break: #ff4a3a;
-    --color-quench-ice-break-glow: rgb(255 80 60 / 0.95);
-    --color-quench-ice-break-glow-soft: rgb(255 80 60 / 0.3);
-    --color-quench-ice-water: #5fc4ff;
-    --color-quench-ice-water-glow: rgb(80 190 255 / 0.85);
-    --color-quench-veil-tint: rgb(120 196 255 / 0.13);
-    --color-quench-veil-frost: rgb(214 240 255 / 0.85);
-    --color-quench-veil-frost-mid: rgb(130 200 255 / 0.4);
 
     /* Performance Overlay gilded-ornament shape defaults. perf_ornament_svg.ts
        overwrites these with the real generated mask-image/gradient values once at
