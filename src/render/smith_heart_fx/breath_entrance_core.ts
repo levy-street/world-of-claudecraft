@@ -81,7 +81,9 @@ export const BREATH_ENTRANCE = {
   burstAt: 8.5,
   burstFor: 0.75,
   ringFrom: 5,
-  ringTo: 66,
+  // Past the wake reach: since the chasm (2026-11-25) the raid watches from
+  // the landing across the void, and the gust sweeps over it.
+  ringTo: 74,
   ringFor: 1.7,
   /** The great bolt onto the guardian, the thunderclap. */
   finalAt: 10.85,

@@ -68,23 +68,24 @@ varying float vFade;
 void main() {
   float x = abs(vUv.x - 0.5) * 2.0;
   // The chevron's two arms: a band whose back edge follows the V.
-  float front = 1.0 - x * 0.62;
-  float back = front - 0.42;
+  float front = 1.0 - x * 0.55;
+  float back = front - 0.5;
   float aa = fwidth(vUv.y) * 1.5 + 0.01;
   float inside = smoothstep(back - aa, back + aa, vUv.y) * (1.0 - smoothstep(front - aa, front + aa, vUv.y));
   // A dark rim round the bright core, so it reads on pale granite and dark.
-  float core = smoothstep(back + 0.07 - aa, back + 0.07 + aa, vUv.y)
-    * (1.0 - smoothstep(front - 0.07 - aa, front - 0.07 + aa, vUv.y));
+  float core = smoothstep(back + 0.05 - aa, back + 0.05 + aa, vUv.y)
+    * (1.0 - smoothstep(front - 0.05 - aa, front - 0.05 + aa, vUv.y));
   float a = inside * uStrength * vFade;
   if (a < 0.01) discard;
   vec3 col = mix(uEdge, uColor, core);
-  gl_FragColor = vec4(col, a * mix(0.75, 0.95, core));
+  gl_FragColor = vec4(col * mix(1.0, 2.0, core), min(1.0, a * mix(0.9, 1.0, core)));
   #include <colorspace_fragment>
 }
 `;
 
-/** The arrows' colours: a pale wind white, a storm-slate rim. */
-const ARROW_RGB = { core: 0xe8f6ff, edge: 0x1d3446 } as const;
+/** The arrows' colours: the wind's bright cyan (the Updrafts' own), a
+ *  storm-slate rim, so they read on the pale granite and in its shade. */
+const ARROW_RGB = { core: 0x9ff2ff, edge: 0x0d2a3a } as const;
 
 export class BreathWindArrows {
   readonly mesh: THREE.Mesh;
@@ -138,6 +139,7 @@ export class BreathWindArrows {
       fragmentShader: ARROW_FRAG,
       transparent: true,
       depthWrite: false,
+      toneMapped: false,
       side: THREE.DoubleSide,
       polygonOffset: true,
       polygonOffsetFactor: -2,
@@ -145,7 +147,8 @@ export class BreathWindArrows {
     });
     this.mesh = new THREE.Mesh(this.geo, this.mat);
     this.mesh.name = 'smithHeartBreathWindArrows';
-    this.mesh.position.y = floorY + 0.06;
+    // Over the painted granite (its kit stands a hand over the field floor).
+    this.mesh.position.y = floorY + 0.3;
     this.mesh.renderOrder = floorVfxRenderOrder('encounter', 12);
     this.mesh.frustumCulled = false;
     this.mesh.visible = false;

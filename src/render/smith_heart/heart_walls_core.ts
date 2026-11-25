@@ -29,6 +29,8 @@ import {
   BREATH,
   BREATH_ISLE_REACH,
   BREATH_ISLES,
+  CORNICE_LANDING,
+  CORNICE_WEST_CUT,
   GREAT_HEARTH,
   HEART_ROOM,
   HEART_ROOM_CHASM_R,
@@ -343,6 +345,16 @@ export function heartIsleRockCap(x: number, z: number): number {
   return cap;
 }
 
+/** The chasm the Gale Crossing spans (smith_heart_layout.ts CORNICE_LANDING,
+ *  CORNICE_WEST_CUT): from the landing's east edge to the Cornice's carved
+ *  west rim, a little wider than the crossing's road. */
+export function inBreathChasm(x: number, z: number): boolean {
+  const L = CORNICE_LANDING;
+  const C = BREATH.cornice;
+  if (Math.abs(z - L.z) > 15) return false;
+  return x > L.x + L.r - 1 && x < C.x - C.rx + CORNICE_WEST_CUT.cut + 2;
+}
+
 /** The summit's open shoulders (the Breath's third pass, 2026-11-03): round
  *  the Storm Cornice and its floating isles the mountain FALLS away under the
  *  floor instead of climbing round it, so the Cornice stands as the summit
@@ -359,6 +371,9 @@ export const HEART_SUMMIT_CROWN = { from: 62, to: 128, blend: 14 } as const;
 export function heartSummitOpen(x: number, z: number, floor: number): number {
   const C = BREATH.cornice;
   if (floor < C.h - 0.5) return 0;
+  // The chasm between the climb's landing and the Cornice (2026-11-25): open
+  // sky down to the cloud, never the head's rock (a body falls there).
+  if (inBreathChasm(x, z)) return 1;
   const deg = ((Math.atan2(x - C.x, z - C.z) * 180) / Math.PI + 360) % 360;
   let open = 1;
   for (const S of [HEART_SUMMIT_HEAD, HEART_SUMMIT_CROWN]) {

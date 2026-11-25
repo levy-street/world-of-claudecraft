@@ -205,7 +205,7 @@ export const WIND_STREAKS = { detail: 150, low: 56, span: 120, rate: 1.6 } as co
  *  EVERY tier (the wind's way is information a player acts on). `spacing` the
  *  grid's yards, `width` and `depth` a chevron's, `rate` its march in yards a
  *  second at full flow. */
-export const WIND_ARROWS = { spacing: 8, width: 2.6, depth: 1.5, rate: 5 } as const;
+export const WIND_ARROWS = { spacing: 8, width: 3.6, depth: 2.2, rate: 5 } as const;
 
 /** The floor arrows' strength for the wind's phase (0 hidden, 1 whole) and
  *  whether they point in to the guardian (its indrawn breath): bright while
