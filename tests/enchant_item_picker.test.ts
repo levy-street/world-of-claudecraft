@@ -180,7 +180,7 @@ describe('Shift + right-click on the character sheet', () => {
 
   it('the worn tooltip names the shortcut only on enchantable gear', () => {
     expect(sheet).toMatch(
-      /hasEnchantsForItemSlot\(item\.slot\)\s*\?\s*`<div class="tt-sub">\$\{esc\(t\('hudChrome\.paperdoll\.enchantHint'\)\)\}<\/div>`/,
+      /hasEnchantsForItemSlot\(item\.slot\)[^?]*\?\s*`<div class="tt-sub">\$\{esc\(t\('hudChrome\.paperdoll\.enchantHint'\)\)\}<\/div>`/,
     );
   });
 
@@ -189,5 +189,44 @@ describe('Shift + right-click on the character sheet', () => {
     expect(painter).toMatch(/openWornEnchant\(slot: EquipSlot, x: number, y: number\): void/);
     expect(painter).toMatch(/world\.applyEnchant\(itemId, enchantId, wornSlot\)/);
     expect(painter).toMatch(/this\.confirmReplace\(itemId, enchantId, worn\.replace, wornSlot\)/);
+  });
+});
+
+describe('review fixes', () => {
+  const infusion = Object.values(ENCHANTS).find((enchant) => enchant.requiresPerfected);
+
+  it('answers the Perfected gate for the clicked copy, not any copy', () => {
+    expect(infusion).toBeDefined();
+    if (!infusion) return;
+    const slot = infusion.itemSlot;
+    const perfected = enchantsForItemSlot([], slot, SYNCED, {
+      instance: { perfected: true } as never,
+    }).find((row) => row.enchantId === infusion.id);
+    const plain = enchantsForItemSlot([], slot, SYNCED, { instance: {} as never }).find(
+      (row) => row.enchantId === infusion.id,
+    );
+    // An empty bag holds no candidate, yet a Perfected clicked copy qualifies.
+    expect(perfected?.perfectedMet).toBe(true);
+    expect(plain?.perfectedMet).toBe(false);
+    // Without a copy the any-candidate answer is unchanged (empty bags: false).
+    expect(
+      enchantsForItemSlot([], slot, SYNCED).find((row) => row.enchantId === infusion.id)
+        ?.perfectedMet,
+    ).toBe(false);
+  });
+
+  it('never sends a blind apply when no target row matches the clicked copy', () => {
+    const painter = read('../src/ui/bag_item_action_menu.ts');
+    const body = painter.match(/private applyToItem\([\s\S]*?\n {2}\}\n/)?.[0] ?? '';
+    expect(body).toMatch(/if \(!worn\) \{\s*this\.paintNoTarget\(x, y\);\s*return;/);
+    expect(body).toMatch(/if \(!row\) \{\s*this\.paintNoTarget\(x, y\);\s*return;/);
+    // The bagged confirm names the sim's pinned victim, not the clicked payload.
+    expect(body).toMatch(/world\.inventory\[row\.copy\.slotIndex\]\?\.instance/);
+  });
+
+  it('the Shift hint is not advertised on the touch HUD', () => {
+    expect(read('../src/ui/char_window.ts')).toMatch(
+      /hasEnchantsForItemSlot\(item\.slot\) && !document\.body\.classList\.contains\('mobile-touch'\)/,
+    );
   });
 });

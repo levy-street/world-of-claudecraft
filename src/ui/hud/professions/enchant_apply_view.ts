@@ -215,13 +215,25 @@ export function enchantsForReagent(
  *  the sim's wrong_slot gate makes against ItemDef.slot), in ENCHANTS
  *  declaration order, each with the exact row facts enchantsForReagent
  *  carries. The item-first picker's step: the player right-clicked a piece of
- *  gear, so only its slot's enchants are offered. */
+ *  gear, so only its slot's enchants are offered.
+ *
+ *  `copy`, when given, is the ONE copy the player clicked: the Perfected gate
+ *  then answers for that copy (copyMeetsPerfectedGate) instead of asking
+ *  whether any matching copy exists, so a worn Perfected piece is not gated
+ *  off and an ordinary clicked piece is not offered the capstone. */
 export function enchantsForItemSlot(
   inventory: readonly InvSlot[],
   itemSlot: string,
   viewer: EnchantViewerInput = GATED_VIEWER,
+  copy?: { instance?: ItemInstancePayload },
 ): EnchantPickRow[] {
-  return enchantPickRows(inventory, (enchant) => enchant.itemSlot === itemSlot, viewer);
+  const rows = enchantPickRows(inventory, (enchant) => enchant.itemSlot === itemSlot, viewer);
+  if (copy === undefined) return rows;
+  for (const row of rows) {
+    const enchant = ENCHANTS[row.enchantId];
+    if (enchant) row.perfectedMet = copyMeetsPerfectedGate(enchant, copy.instance);
+  }
+  return rows;
 }
 
 /** Whether any enchant targets `itemSlot`, so the bag menu offers Enchant only
@@ -481,8 +493,9 @@ export function enchantSectionsForItemSlot(
   inventory: readonly InvSlot[],
   itemSlot: string,
   viewer: EnchantViewerInput = GATED_VIEWER,
+  copy?: { instance?: ItemInstancePayload },
 ): EnchantPickSection[] {
-  return sectionsByTier(enchantsForItemSlot(inventory, itemSlot, viewer));
+  return sectionsByTier(enchantsForItemSlot(inventory, itemSlot, viewer, copy));
 }
 
 function sectionsByTier(picks: readonly EnchantPickRow[]): EnchantPickSection[] {

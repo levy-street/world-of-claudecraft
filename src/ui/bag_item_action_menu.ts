@@ -582,7 +582,11 @@ export class BagItemActionMenu {
   ): void {
     const world = this.deps.world();
     const viewer = this.enchantViewer();
-    const sections = def.slot ? enchantSectionsForItemSlot(world.inventory, def.slot, viewer) : [];
+    // The clicked copy rides along, so the Perfected gate is answered for THIS
+    // copy rather than for any matching copy in the bags.
+    const sections = def.slot
+      ? enchantSectionsForItemSlot(world.inventory, def.slot, viewer, { instance })
+      : [];
     const title = esc(
       t('hudChrome.enchanting.itemPickerTitle', { item: wornItemCellParts(def, instance).name }),
     );
@@ -619,7 +623,8 @@ export class BagItemActionMenu {
       rows,
       x,
       y,
-      (act) => this.applyToItem(itemId, act.slice('item-enchant:'.length), instance, wornSlot),
+      (act) =>
+        this.applyToItem(itemId, act.slice('item-enchant:'.length), x, y, instance, wornSlot),
       title,
       true,
       true,
@@ -634,6 +639,8 @@ export class BagItemActionMenu {
   private applyToItem(
     itemId: string,
     enchantId: string,
+    x: number,
+    y: number,
     instance?: ItemInstancePayload,
     wornSlot?: EquipSlot,
   ): void {
@@ -647,7 +654,13 @@ export class BagItemActionMenu {
         enchantId,
         this.enchantViewer(),
       ).find((row) => row.slot === wornSlot && row.itemId === itemId);
-      if (worn?.replace) {
+      // No row means the sim would refuse this copy (it moved, or a gate the
+      // picker could not see): say so in place, never send the apply blind.
+      if (!worn) {
+        this.paintNoTarget(x, y);
+        return;
+      }
+      if (worn.replace) {
         this.confirmReplace(itemId, enchantId, worn.replace, wornSlot);
         return;
       }
@@ -659,12 +672,34 @@ export class BagItemActionMenu {
     const row = enchantTargets(world.inventory, enchantId, [], this.enchantViewer()).find(
       (target) => target.itemId === itemId && (target.replace !== undefined) === enchanted,
     );
-    if (row?.replace) {
-      this.confirmReplace(itemId, enchantId, row.replace, undefined, instance);
+    // Same rule for the bagged arm: without a matching row the itemId-keyed
+    // apply could land on a different copy than the one clicked.
+    if (!row) {
+      this.paintNoTarget(x, y);
+      return;
+    }
+    if (row.replace) {
+      // The confirm names the copy the sim will actually replace (the row's
+      // pinned victim), so its title and its "old enchant" text describe the
+      // same copy even when several enchanted copies of this item are held.
+      const victim = world.inventory[row.copy.slotIndex]?.instance;
+      this.confirmReplace(itemId, enchantId, row.replace, undefined, victim);
       return;
     }
     world.applyEnchant(itemId, enchantId);
     this.deps.afterAction();
+  }
+
+  private paintNoTarget(x: number, y: number): void {
+    this.paint(
+      [{ html: esc(t('hudChrome.enchanting.noTargets')), disabled: true }],
+      x,
+      y,
+      () => {},
+      undefined,
+      true,
+      true,
+    );
   }
 
   // One enchant row's HTML, shared by both pickers: the localized name, what
@@ -692,7 +727,9 @@ export class BagItemActionMenu {
             }),
           )}</span>`,
       )
-      .join(' ');
+      // A real comma between materials: it reads as a pause to a screen reader
+      // and separates the chips on screen.
+      .join(', ');
     // The effect line reuses the item tooltip's own stat-line key and stat
     // names, so "+4 Stamina" reads identically here and on the enchanted
     // copy's tooltip; no new i18n for the effect itself.

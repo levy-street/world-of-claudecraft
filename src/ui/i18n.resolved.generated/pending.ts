@@ -46,42 +46,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemMenu.enchant",
     "hudChrome.paperdoll.enchantHint"
   ],
-  "zh_CN": [
-    "hudChrome.enchanting.currentEnchantTag",
-    "hudChrome.enchanting.itemPickerTitle",
-    "hudChrome.itemMenu.enchant",
-    "hudChrome.paperdoll.enchantHint"
-  ],
-  "zh_TW": [
-    "hudChrome.enchanting.currentEnchantTag",
-    "hudChrome.enchanting.itemPickerTitle",
-    "hudChrome.itemMenu.enchant",
-    "hudChrome.paperdoll.enchantHint"
-  ],
-  "ko_KR": [
-    "hudChrome.enchanting.currentEnchantTag",
-    "hudChrome.enchanting.itemPickerTitle",
-    "hudChrome.itemMenu.enchant",
-    "hudChrome.paperdoll.enchantHint"
-  ],
-  "ja_JP": [
-    "hudChrome.enchanting.currentEnchantTag",
-    "hudChrome.enchanting.itemPickerTitle",
-    "hudChrome.itemMenu.enchant",
-    "hudChrome.paperdoll.enchantHint"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.enchanting.currentEnchantTag",
     "hudChrome.enchanting.itemPickerTitle",
     "hudChrome.itemMenu.enchant",
     "hudChrome.paperdoll.enchantHint"
   ],
-  "ru_RU": [
-    "hudChrome.enchanting.currentEnchantTag",
-    "hudChrome.enchanting.itemPickerTitle",
-    "hudChrome.itemMenu.enchant",
-    "hudChrome.paperdoll.enchantHint"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.enchanting.currentEnchantTag",
     "hudChrome.enchanting.itemPickerTitle",

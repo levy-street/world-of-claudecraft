@@ -693,7 +693,10 @@ export class CharWindow {
             )}</div>`
           : '';
         return `${this.deps.wornItemTooltip(item, instance)}${mwLine}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>${
-          hasEnchantsForItemSlot(item.slot)
+          // The shortcut is mouse + keyboard only, so the touch HUD (no Shift,
+          // no right-click) never advertises it; there the bag menu's Enchant
+          // row is the path.
+          hasEnchantsForItemSlot(item.slot) && !document.body.classList.contains('mobile-touch')
             ? `<div class="tt-sub">${esc(t('hudChrome.paperdoll.enchantHint'))}</div>`
             : ''
         }`;
