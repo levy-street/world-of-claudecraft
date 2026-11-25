@@ -457,7 +457,7 @@ export const BREATH_KNOT: Readonly<Record<'heroic' | 'mythic', BreathKnotRules>>
 
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {
   normal: {
-    windSpeed: 5.8,
+    windSpeed: 6.2,
     pullSpeed: 6.2,
     gustThrow: 16,
     roarSafe: true,
@@ -826,9 +826,13 @@ export function calmSeconds(hpFrac: number): number {
 }
 
 /** The bearings the blows aim at, in the order they turn (compass degrees,
- *  clockwise from north: where the wind blows TOWARD). Each pair a wide turn
- *  apart; four point at a gap's throat, two at a walled stretch. */
-export const BLOW_BEARINGS: readonly number[] = [182, 22, 300, 128, 332, 75];
+ *  clockwise from north: where the wind blows TOWARD). Jose's playtest of
+ *  2026-11-25: the old order swung each blow nearly opposite the last, so a
+ *  body left standing was carried out and then back to the middle, blow
+ *  after blow. Now the wind wheels round the compass a step at a time
+ *  (never more than about 60 degrees from the last), so the next blow keeps
+ *  carrying a stander outward; most point at a channel's throat. */
+export const BLOW_BEARINGS: readonly number[] = [22, 78, 128, 182, 228, 280, 332];
 
 /** The `k`-th blow's bearing of a pull that began on `start`. Pure. */
 export function blowBearing(start: number, k: number): number {

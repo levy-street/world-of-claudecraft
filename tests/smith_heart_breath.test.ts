@@ -303,6 +303,19 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
           // nobody alive by hand.
           const st = f.state();
           if (st) st.blowTimer = 999;
+          // The one who stays holds Thessaly's calm through the run (the
+          // wind of 2026-11-25 carries a stander off in a blow or two).
+          if (n === 2)
+            f.players[1].auras.push({
+              id: BREATH_AURAS.anchor,
+              name: 'Anchored in Calm',
+              kind: 'internal_cd',
+              remaining: 60,
+              duration: 60,
+              value: 0,
+              sourceId: f.boss().id,
+              school: 'holy',
+            });
           const a = (gap.deg * Math.PI) / 180;
           f.put(walker, gap.x - Math.sin(a) * 4, gap.z - Math.cos(a) * 4);
           walker.facing = a;
@@ -696,7 +709,9 @@ describe('Guardian of the Breath: heroic', () => {
     // The team's review of 2026-11-17: MUCH stronger (a blow left standing
     // carries a body some forty yards, off the Cornice from its middle), with a
     // longer warning and a longer calm; a run into it still gains ground.
-    expect(BREATH_DIFFICULTY.normal.windSpeed).toBe(5.8);
+    // Jose's playtest of 2026-11-25: Normal harder (5.8 left a stander on
+    // the Cornice for blow after blow), still under a run.
+    expect(BREATH_DIFFICULTY.normal.windSpeed).toBe(6.2);
     expect(T.gatherSeconds).toBe(5);
     expect(T.blowSeconds).toBe(7);
     expect(BREATH_DIFFICULTY.normal.windSpeed * T.blowSeconds).toBeGreaterThan(38);
@@ -776,10 +791,12 @@ describe('Guardian of the Breath: heroic', () => {
     const heroic = measure(true);
     expect(normal.drift).toBeCloseTo(BREATH_DIFFICULTY.normal.windSpeed, 0);
     expect(heroic.drift).toBeCloseTo(BREATH_DIFFICULTY.heroic.windSpeed, 0);
-    expect(heroic.drift).toBeGreaterThan(normal.drift + 0.8);
+    // Normal's blow rose to 6.2 with Jose's playtest of 2026-11-25 (Heroic
+    // kept where it was): Heroic still the harder.
+    expect(heroic.drift).toBeGreaterThan(normal.drift + 0.3);
     // Against it a run still gains ground, barely.
     expect(heroic.headway).toBeGreaterThan(0.1);
-    expect(heroic.headway).toBeLessThan(normal.headway - 0.5);
+    expect(heroic.headway).toBeLessThan(normal.headway - 0.2);
     expect(heroic.thrown).toBeGreaterThan(normal.thrown + 2);
   });
 
