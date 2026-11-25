@@ -554,7 +554,9 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // Player encyclopedia: the ability and aura tooltip builders moved to
+    // src/ui/ability_tooltip_view.ts (shared with the wiki hover cards). wc -l.
+    ceiling: 17626,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

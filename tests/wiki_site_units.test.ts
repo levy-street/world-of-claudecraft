@@ -81,6 +81,44 @@ describe('encyclopedia addresses', () => {
     expect(fileForPath('/wiki/item/iron-sword')).toBe('wiki/item/iron-sword/index.html');
   });
 
+  it('drops a unique qualifier and numbers the same way whatever the page order', () => {
+    const titles = [
+      page('Ember (Deed)', ['Book of Deeds']),
+      page('Lantern', ['Items']),
+      page('Lantern!', ['Items']),
+    ];
+    const forward = assignPaths(new Map(titles.map((p) => [p.title, p]))).paths;
+    const reverse = assignPaths(new Map([...titles].reverse().map((p) => [p.title, p]))).paths;
+    expect(forward.get('Ember (Deed)')).toBe('/wiki/deed/ember');
+    // "Lantern" and "Lantern!" slug alike: the sorted first keeps the plain slug.
+    expect(forward.get('Lantern')).toBe('/wiki/item/lantern');
+    expect(forward.get('Lantern!')).toBe('/wiki/item/lantern-2');
+    expect([...reverse].sort()).toEqual([...forward].sort());
+  });
+
+  it('gives a new page its qualified slug when the short one is already published', () => {
+    const pages = new Map(
+      [page('Wolf', ['Mobs']), page('Wolf (Mob, level 9)', ['Mobs'])].map((p) => [p.title, p]),
+    );
+    const { paths } = assignPaths(pages, {
+      pages: { Wolf: '/wiki/creature/wolf' },
+      redirects: {},
+    });
+    expect(paths.get('Wolf (Mob, level 9)')).toBe('/wiki/creature/wolf-mob-level-9');
+  });
+
+  it('lets a page that comes back reclaim its gone address, never a redirect source', () => {
+    const pages = new Map(
+      [page('Returning Blade', ['Items']), page('Old Sword', ['Items'])].map((p) => [p.title, p]),
+    );
+    const { paths } = assignPaths(pages, {
+      pages: {},
+      redirects: { '/wiki/item/returning-blade': null, '/wiki/item/old-sword': 'Iron Sword' },
+    });
+    expect(paths.get('Returning Blade')).toBe('/wiki/item/returning-blade');
+    expect(paths.get('Old Sword')).toBe('/wiki/item/old-sword-2');
+  });
+
   it('reports pages that are new or gone against the registry', () => {
     const paths = new Map([['A', '/wiki/topic/a']]);
     expect(registryDrift(paths, { pages: { B: '/wiki/topic/b' }, redirects: {} })).toEqual({
@@ -134,6 +172,11 @@ describe('page head', () => {
     const clipped = clipDescription(long);
     expect(clipped.length).toBeLessThanOrEqual(155);
     expect(clipped.endsWith('...')).toBe(true);
+    // Cut at a word boundary: the text before the ellipsis is whole words only.
+    expect(clipped).toMatch(/^(word )*word\.\.\.$/);
+    expect(clipDescription('alpha beta '.repeat(20), 40)).toMatch(
+      /^(alpha beta )*(alpha|alpha beta)\.\.\.$/,
+    );
     expect(
       describePage({ title: 'X', lead: 'A long enough opening line about this sword.' }),
     ).toContain('X: reference page');

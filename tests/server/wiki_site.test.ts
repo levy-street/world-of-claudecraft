@@ -63,7 +63,20 @@ describe('resolveWikiRequest', () => {
   let dir = '';
   beforeEach(() => {
     resetWikiRedirectCache();
-    dir = mkdtempSync(join(tmpdir(), 'woc-wiki-site-'));
+    // The static dir sits inside a parent, so a traversal that escapes it has a real
+    // file to find: without the guards these cases would resolve, not miss.
+    const base = mkdtempSync(join(tmpdir(), 'woc-wiki-site-'));
+    dir = join(base, 'root');
+    for (const decoy of [
+      join(base, 'secret'),
+      join(dir, 'secret'),
+      join(dir, 'etc'),
+      join(dir, 'wiki/secret'),
+      join(dir, 'wiki/item/sword.png'),
+    ]) {
+      mkdirSync(decoy, { recursive: true });
+      writeFileSync(join(decoy, 'index.html'), 'decoy');
+    }
     mkdirSync(join(dir, 'wiki/item/sword'), { recursive: true });
     writeFileSync(join(dir, 'wiki/item/sword/index.html'), 'page');
     mkdirSync(join(dir, 'encyclopedia-data'));
@@ -106,6 +119,7 @@ describe('resolveWikiRequest', () => {
       '/wiki/../etc',
       '/wiki/item/../../secret',
       '/wiki/%2e%2e/%2e%2e/secret',
+      '/wiki/%2e%2e/%2e%2e/%2e%2e/secret',
       '/wiki/item/%5c..%5csecret',
       '/wiki//item/sword',
     ])
@@ -120,9 +134,14 @@ describe('resolveWikiRequest', () => {
   it('ignores a redirect target that is not a site path', () => {
     writeFileSync(
       join(dir, 'encyclopedia-data/redirects.json'),
-      JSON.stringify({ '/wiki/item/evil': '//evil.example/x' }),
+      JSON.stringify({
+        '/wiki/item/evil': '//evil.example/x',
+        '/wiki/item/tab': '/\t/evil.example/x',
+        '/wiki/item/off': '/somewhere-else',
+      }),
     );
-    expect(resolveWikiRequest(dir, '/wiki/item/evil')).toEqual({ kind: 'gone' });
+    for (const from of ['/wiki/item/evil', '/wiki/item/tab', '/wiki/item/off'])
+      expect(resolveWikiRequest(dir, from), from).toEqual({ kind: 'gone' });
   });
 });
 
@@ -169,7 +188,7 @@ describe('serveStatic encyclopedia pages (routeHttpRequest)', () => {
 
   function fetchPath(
     urlPath: string,
-  ): Promise<{ status: number; type: string; location: string; body: string }> {
+  ): Promise<{ status: number; type: string; location: string; cache: string; body: string }> {
     return new Promise((resolve, reject) => {
       const req = http.request(
         {
@@ -191,6 +210,7 @@ describe('serveStatic encyclopedia pages (routeHttpRequest)', () => {
               status: res.statusCode ?? 0,
               type: String(res.headers['content-type'] ?? ''),
               location: String(res.headers.location ?? ''),
+              cache: String(res.headers['cache-control'] ?? ''),
               body,
             }),
           );
@@ -218,7 +238,15 @@ describe('serveStatic encyclopedia pages (routeHttpRequest)', () => {
     const moved = await fetchPath('/wiki/item/old-sword');
     expect(moved.status).toBe(301);
     expect(moved.location).toBe('/wiki/item/test-sword');
-    expect((await fetchPath('/wiki/item/retired-sword')).status).toBe(410);
+    expect(moved.cache).toBe('no-cache');
+    const gone = await fetchPath('/wiki/item/retired-sword');
+    expect(gone.status).toBe(410);
+    expect(gone.location).toBe('');
+    expect(gone.cache).toBe('no-cache');
+    // A redirect keeps the query string on the way to the new address.
+    expect((await fetchPath('/wiki/item/old-sword?q=blade')).location).toBe(
+      '/wiki/item/test-sword?q=blade',
+    );
   });
 
   it('404s an unknown article address on the guide shell', async () => {

@@ -69,6 +69,14 @@ descriptive and resolve (to an encyclopedia page or a Guide route), alt text on 
 picture, valid JSON-LD with a breadcrumb trail, and a sitemap that lists exactly the
 built pages.
 
+The audit builds from the committed seed. At PR tier that seed may lag the game data
+(`tests/mediawiki_seed_freshness.test.ts` checks only its envelope there), so run
+`npm run wiki:paths` in any content change. The release-tier CI job
+(`MEDIAWIKI_SEED_RELEASE_TIER=1`) requires the committed seed to match a fresh build, so
+the audit checks current data before a release ships. The deploy build itself never
+ships a dead link: a link to a missing page renders as plain text, and it prints a
+warning for each one and for any address not yet pinned.
+
 To run real Lighthouse against a production build:
 
 ```powershell

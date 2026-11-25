@@ -9,6 +9,7 @@ import { join, relative, sep } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { buildSite, readRegistry } from '../scripts/wiki_site/build.mjs';
 import { HOME_PATH, registryDrift } from '../scripts/wiki_site/paths.mjs';
+import { cacheControlFor } from '../server/static_cache';
 import { matchRoute } from '../src/guide/routes';
 
 // Lighthouse's link-text audit rejects these as non-descriptive (English list).
@@ -58,9 +59,10 @@ beforeAll(async () => {
   }
 }, 300_000);
 
+// Removing about 5,500 page folders is slow on a busy Windows machine.
 afterAll(() => {
   if (outDir) rmSync(outDir, { recursive: true, force: true });
-});
+}, 300_000);
 
 const text = (html: string) =>
   html
@@ -155,6 +157,25 @@ describe('static encyclopedia', () => {
       if (art && /\salt=""/.test(art)) problems.push(`${path}: page picture without alt`);
     }
     expect(problems.slice(0, 20)).toEqual([]);
+  });
+
+  it('writes the data files the server caches and the redirect table it reads', () => {
+    // The server caches only names that match its hashed pattern (server/static_cache.ts).
+    for (const url of [built.searchUrl, built.cardsUrl]) {
+      expect(url).toMatch(/^\/encyclopedia-data\/(search|cards)\.[a-f0-9]{10}\.json$/);
+      expect(cacheControlFor(url)).toContain('immutable');
+      expect(JSON.parse(readFileSync(join(outDir, url), 'utf8'))).toBeTruthy();
+    }
+    const search = JSON.parse(readFileSync(join(outDir, built.searchUrl), 'utf8'));
+    expect(search.length).toBe(pages.size - 1);
+    for (const [, path] of search) expect(pages.has(path), path).toBe(true);
+    const redirects = JSON.parse(
+      readFileSync(join(outDir, 'encyclopedia-data/redirects.json'), 'utf8'),
+    );
+    const registry = readRegistry();
+    expect(Object.keys(redirects).sort()).toEqual(Object.keys(registry.redirects).sort());
+    for (const target of Object.values(redirects))
+      if (target !== null) expect(pages.has(target as string), String(target)).toBe(true);
   });
 
   it('lists exactly the built pages in sitemap-wiki.xml', () => {

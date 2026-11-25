@@ -1,10 +1,13 @@
-// Exercise the actual article reader, including nested overflow on narrow screens.
+// Exercise the hash-routed article reader (the offline export from
+// scripts/mediawiki/export_reader.mjs), including nested overflow on narrow screens.
+// The public static pages are audited by tests/wiki_site_audit.test.ts instead.
 import assert from 'node:assert/strict';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from '../browser_path.mjs';
 
 const url = process.argv[2];
-if (!url) throw Error('Pass the running encyclopedia URL or the file URL of a portable export.');
+if (!url)
+  throw Error('Pass the file URL of an offline export (scripts/mediawiki/export_reader.mjs).');
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: true,

@@ -126,11 +126,22 @@ export async function buildSite({
   const { paths } = assignPaths(pages, registry);
   const pathOf = (title) => paths.get(title);
 
+  // The heading drops an index page's qualifier (Druid (Abilities index) reads Druid);
+  // where that would give two pages one name, the title keeps it.
+  const named = new Map();
+  for (const title of pages.keys()) {
+    const name = displayTitle(title);
+    named.set(name, (named.get(name) ?? 0) + 1);
+  }
+  const pageName = (title) => {
+    const name = displayTitle(title);
+    return named.get(name) > 1 && name !== title ? title : name;
+  };
   // Data files the pages fetch on demand, content-hashed so they cache forever.
   const searchRows = site.all
     .filter((page) => page.title !== 'Main Page')
     .map((page) => [
-      displayTitle(page.title),
+      pageName(page.title),
       pathOf(page.title),
       page.art || '',
       page.categories[0] || '',
@@ -153,17 +164,6 @@ export async function buildSite({
   const navHtml = navEl.innerHTML;
   const body = `data-wiki-page data-search-index="${searchUrl}" data-cards="${cardsUrl}"`;
 
-  // The heading drops an index page's qualifier (Druid (Abilities index) reads Druid);
-  // where that would give two pages one name, the title keeps it.
-  const named = new Map();
-  for (const title of pages.keys()) {
-    const name = displayTitle(title);
-    named.set(name, (named.get(name) ?? 0) + 1);
-  }
-  const pageName = (title) => {
-    const name = displayTitle(title);
-    return named.get(name) > 1 && name !== title ? title : name;
-  };
   const broken = new Map();
   let written = 0;
   for (const page of site.all) {
@@ -249,6 +249,8 @@ async function main() {
   if (args.includes('--update-registry')) {
     const redirects = { ...registry.redirects };
     for (const title of drift.missing) redirects[registry.pages[title]] = null;
+    // An address a page holds again is no longer a redirect.
+    for (const path of paths.values()) delete redirects[path];
     const pages = Object.fromEntries([...paths].sort(([a], [b]) => (a < b ? -1 : 1)));
     writeFileSync(REGISTRY_FILE, JSON.stringify({ pages, redirects }, null, 2) + '\n');
     console.log(

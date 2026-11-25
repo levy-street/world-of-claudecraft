@@ -1,6 +1,6 @@
 // The single-page reader: loads the whole seed and routes articles by #hash. The offline
 // export (scripts/mediawiki/export_reader.mjs) runs on it. The public site is the static
-// build instead (scripts/wiki/build_wiki_site.mjs plus wiki_page.js); both render pages
+// build instead (scripts/wiki_site/build.mjs plus wiki_page.js); both render pages
 // through page_render.js.
 import { sectionRoute } from './article_layout.js';
 import { displayTitle } from './browse.js';

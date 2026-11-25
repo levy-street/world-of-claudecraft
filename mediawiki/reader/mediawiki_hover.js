@@ -1,7 +1,8 @@
 import { mountWikiTooltips } from './hover_tooltip.js';
 import { tooltipLookup } from './tooltip_content.js';
 
-// The standalone reader uses hash links; Vector exposes the page title in same-wiki article URLs.
+// Hover cards inside the MediaWiki container: Vector puts the page title in same-wiki
+// article URLs (the offline reader uses #hash links and the static site uses paths).
 function titleForLink(link) {
   const url = new URL(link.href);
   if (url.origin !== location.origin) return null;

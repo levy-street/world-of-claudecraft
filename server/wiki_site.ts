@@ -78,9 +78,10 @@ export function resolveWikiRequest(
     const target = redirects[slashless];
     if (
       typeof target === 'string' &&
-      target.startsWith('/') &&
-      !target.startsWith('//') &&
-      !target.includes('\\')
+      // Only an in-wiki path: browsers drop tabs and newlines from a URL, so a control
+      // character could otherwise turn "/<tab>/host" into an off-site "//host".
+      target.startsWith('/wiki/') &&
+      ![...target].some((ch) => ch === '\\' || ch <= ' ' || ch === '\u007f')
     )
       return { kind: 'redirect', location: target + search };
     return { kind: 'gone' };

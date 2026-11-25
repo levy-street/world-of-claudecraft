@@ -74,7 +74,13 @@ export function sectionFor(page) {
  */
 export function assignPaths(pages, registry = { pages: {}, redirects: {} }) {
   const paths = new Map();
-  const taken = new Set([...Object.keys(registry.redirects ?? {})]);
+  // A redirect to another page reserves its address; a gone address (null) may be
+  // reclaimed by a page that comes back under the same slug.
+  const taken = new Set(
+    Object.entries(registry.redirects ?? {})
+      .filter(([, target]) => target !== null)
+      .map(([from]) => from),
+  );
   const pinned = registry.pages ?? {};
   for (const title of pages.keys()) {
     if (Object.hasOwn(pinned, title)) {
@@ -97,7 +103,11 @@ export function assignPaths(pages, registry = { pages: {}, redirects: {} }) {
     const page = pages.get(title);
     const section = sectionFor(page);
     const short = slugify(stripQualifier(title));
-    const slug = shortCount.get(section + '/' + short) === 1 ? short : slugify(title);
+    // A short slug already published (or reserved by a redirect) is not free either:
+    // the qualified slug is the next choice, before any number.
+    const shortFree =
+      shortCount.get(section + '/' + short) === 1 && !taken.has(`${WIKI_BASE}/${section}/${short}`);
+    const slug = shortFree ? short : slugify(title);
     const base = section === 'encyclopedia' ? HOME_PATH : `${WIKI_BASE}/${section}/${slug}`;
     let path = base;
     for (let n = 2; taken.has(path); n++) path = `${base}-${n}`;

@@ -24,7 +24,7 @@ export const guideStrings = {
   // Top navigation + sidebar controls.
   nav: {
     overview: 'Overview',
-    // The static player encyclopedia at /wiki/encyclopedia (English only).
+    // The static player encyclopedia at /wiki/encyclopedia (its pages are English-only).
     encyclopedia: 'Encyclopedia',
     howToPlay: 'How to Play',
     classes: 'Classes',

@@ -3,7 +3,8 @@ import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from '../browser_path.mjs';
 
 const [base] = process.argv.slice(2);
-if (!base) throw Error('Pass an encyclopedia URL or an offline export file URL.');
+if (!base)
+  throw Error('Pass the file URL of an offline export (scripts/mediawiki/export_reader.mjs).');
 const browser = await puppeteer.launch({
   headless: true,
   executablePath: BROWSER_PATH,

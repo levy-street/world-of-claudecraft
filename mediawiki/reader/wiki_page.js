@@ -31,11 +31,13 @@ export function resultsMarkup(query, found, limit = RESULT_LIMIT) {
     (found.length === 1 ? ' result' : ' results') +
     '</p><ul class="results">' +
     found
+      // The index is a same-origin build file; still, only wiki paths become links.
+      .filter(([, path]) => typeof path === 'string' && path.startsWith('/wiki/'))
       .slice(0, limit)
       .map(
         ([title, path, art, category]) =>
           '<li class="result">' +
-          (art
+          (typeof art === 'string' && /^\/(?!\/)/.test(art)
             ? '<img class="result-icon" src="' +
               escapeHtml(art) +
               '" alt="" width="32" height="32" loading="lazy" decoding="async">'
@@ -56,7 +58,12 @@ export function resultsMarkup(query, found, limit = RESULT_LIMIT) {
 
 // Opens the closed disclosures around the element a #fragment points at.
 function revealTarget() {
-  const id = decodeURIComponent(location.hash.slice(1));
+  let id = '';
+  try {
+    id = decodeURIComponent(location.hash.slice(1));
+  } catch {
+    return; // A malformed fragment names nothing on the page.
+  }
   const target = id && document.getElementById(id);
   if (!target) return;
   for (let node = target.parentElement; node; node = node.parentElement)
@@ -69,6 +76,8 @@ function mountSearch(view, input, enhance) {
   const articleClass = view.className;
   let rows = null;
   let timer;
+  // Each search bumps this; a slow index fetch for an older query must not land.
+  let latest = 0;
   const load = () => {
     rows ??= fetch(document.body.dataset.searchIndex)
       .then((response) => (response.ok ? response.json() : []))
@@ -76,6 +85,7 @@ function mountSearch(view, input, enhance) {
     return rows;
   };
   async function show(query, limit = RESULT_LIMIT) {
+    const ticket = ++latest;
     const url = new URL(location.href);
     if (!query.trim()) {
       url.searchParams.delete('q');
@@ -87,7 +97,9 @@ function mountSearch(view, input, enhance) {
     }
     url.searchParams.set('q', query);
     history.replaceState(null, '', url);
-    const found = searchRows(await load(), query);
+    const all = await load();
+    if (ticket !== latest) return;
+    const found = searchRows(all, query);
     view.className = '';
     view.innerHTML = resultsMarkup(query, found, limit);
     view.querySelector('#more')?.addEventListener('click', () => show(query, limit + 100));
