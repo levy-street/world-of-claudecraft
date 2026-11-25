@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { petOf, summonPet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
 import { fiestaDownEntity } from '../src/sim/social/fiesta';
 import { channelTickBonus, directHealBonus } from '../src/sim/spell_scaling';
@@ -43,6 +44,42 @@ function protectionFrom(casterId: number) {
 }
 
 describe('Aegis of the First Dawn', () => {
+  it('shows real protection for nonparty allies but not blocked allies, opponents or pets', () => {
+    const { sim } = setup();
+    const friendId = sim.addPlayer('hunter', 'Nonparty recipient');
+    sim.setPlayerLevel(20, friendId);
+    const friend = sim.entities.get(friendId)!;
+    friend.pos = { ...sim.player.pos };
+    const foeId = sim.addPlayer('rogue', 'Jailed opponent');
+    const foe = sim.entities.get(foeId)!;
+    foe.pos = { ...sim.player.pos };
+    foe.jailed = true;
+    sim.player.jailed = true;
+    summonPet(sim.ctx, friend, 'forest_wolf');
+    const pet = petOf(sim.ctx, friendId)!;
+    pet.pos = { ...sim.player.pos };
+    const protectedNow = (entity: Entity) =>
+      entity.auras.some((a) => a.id.startsWith('aegis_first_dawn_dr:'));
+    const los = vi.spyOn(sim.ctx, 'hasLineOfSight');
+    sim.castAbility('aegis_first_dawn');
+    // The nonparty ally in the dome is protected; the opponent and the pet are not.
+    expect(protectedNow(friend)).toBe(true);
+    expect(protectedNow(foe)).toBe(false);
+    expect(pet.auras.some((a) => a.id.startsWith('aegis_first_dawn_dr:'))).toBe(false);
+    // Line of sight blocked for that tick: the ally loses it...
+    los.mockImplementation((source, target) => target.id !== friendId);
+    sim.tick();
+    expect(protectedNow(friend)).toBe(false);
+    expect(protectedNow(foe)).toBe(false);
+    // ...and regains it once the dome can see them again.
+    los.mockReturnValue(true);
+    sim.tick();
+    expect(protectedNow(friend)).toBe(true);
+    expect(protectedNow(foe)).toBe(false);
+    expect(protectedNow(pet)).toBe(false);
+    los.mockRestore();
+  });
+
   it('authors a Holy-only self-centered 5-second support channel', () => {
     expect(ABILITIES.aegis_first_dawn).toMatchObject({
       name: 'Aegis of the First Dawn',
@@ -93,7 +130,10 @@ describe('Aegis of the First Dawn', () => {
     const { sim, ally } = setup();
     sim.castAbility('aegis_first_dawn');
 
-    expect(sim.player).toMatchObject({ castingAbility: 'aegis_first_dawn', channeling: true });
+    expect(sim.player).toMatchObject({
+      castingAbility: 'aegis_first_dawn',
+      channeling: true,
+    });
     expect(ally.auras).toContainEqual(protectionFrom(sim.player.id));
 
     const attacker = hostileNear(sim);
@@ -164,6 +204,20 @@ describe('Aegis of the First Dawn', () => {
       (135 + directHealBonus(sim.player.spellPower, 0, true)) * healMultiplier,
     );
     expect(allyHeals).toEqual([tickHeal, tickHeal, tickHeal, tickHeal, tickHeal, finalHeal]);
+    const cues = events.filter(
+      (event) => event.type === 'spellfxAt' && event.ability === 'aegis_first_dawn',
+    );
+    expect(cues.map((event) => event.type === 'spellfxAt' && event.fx)).toEqual([
+      'tick',
+      'tick',
+      'tick',
+      'tick',
+      'tick',
+      'burst',
+    ]);
+    expect(
+      cues.every((event) => event.type === 'spellfxAt' && event.sourceId === sim.player.id),
+    ).toBe(true);
     expect(ally.auras).toContainEqual(
       expect.objectContaining({
         id: 'aegis_first_dawn_speed',
@@ -220,6 +274,14 @@ describe('Aegis of the First Dawn', () => {
     expect(ally.auras).not.toContainEqual(protectionFrom(sim.player.id));
     expect(ally.auras.some((aura) => aura.id === 'aegis_first_dawn_speed')).toBe(false);
     expect(ally.hp).toBe(earnedHealing);
+    expect(
+      postCancelEvents.some(
+        (event) =>
+          event.type === 'spellfxAt' &&
+          event.ability === 'aegis_first_dawn' &&
+          event.fx === 'burst',
+      ),
+    ).toBe(false);
     for (let i = 0; i < 100; i++) postCancelEvents.push(...sim.tick());
     expect(
       postCancelEvents.some(

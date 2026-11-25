@@ -308,6 +308,21 @@ export class SignatureCrests {
     if (!units.length) return units;
     return [{ id: 'crest-bind-kit', synchronous: true, run: () => this.bindKit() }, ...units];
   }
+  /** The Paladin recipe's crests (Valkyr's Calling's leap_rupture slabs): the
+   *  same preparation units, so a kind the Warrior recipe prepared is offered
+   *  to neither again, behind a bind of the one map those kinds sample, the
+   *  rock (the Paladin loads no other crest map). */
+  borrowedUnits(host: CrestPrewarmHost, kinds: readonly CrestKind[]): PrewarmResumeUnit[] {
+    const units = this.preparation.units(host, kinds);
+    if (!units.length) return units;
+    return [{ id: 'crest-bind-rock', synchronous: true, run: () => this.bindRock() }, ...units];
+  }
+  private bindRock(): void {
+    if (this.disposed) return;
+    const rock = warriorRockTexture();
+    if (!rock) throw new Error('Warrior rock texture has not been prepared');
+    for (const s of this.slots) s.mesh.material.uniforms.uRockMap.value = rock;
+  }
   private bindKit(): void {
     if (this.disposed) return;
     const pressure = warriorPressureTexture(),
@@ -336,10 +351,15 @@ export class SignatureCrests {
     angle = 0,
     duration = 1.15,
     pitch = 0,
+    /** A Paladin landing's borrowed slab: drawn on its kind's own preparation
+     *  (and the rock map bound), never asking the Warrior kit's cast family
+     *  gate, which no Paladin cast asks for. */
+    borrowed = false,
   ): boolean {
     if (
       this.disposed ||
-      !this.spawnGate.allows(CAST_VFX_KIT) ||
+      (!borrowed && !this.spawnGate.allows(CAST_VFX_KIT)) ||
+      (borrowed && !this.slots[0].mesh.material.uniforms.uRockMap.value) ||
       ![x, y, z, radius, height, angle, pitch].every(Number.isFinite) ||
       radius <= 0 ||
       height <= 0

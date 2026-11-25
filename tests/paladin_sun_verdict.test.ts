@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { sunGodVerdictAreaRadius } from '../src/sim/combat/paladin_sun_verdict';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
@@ -124,6 +125,33 @@ describe('Verdict of the Sun God', () => {
     expect(verdictAura(replacementTarget, sim.player.id)).toBeDefined();
   });
 
+  it('sizes the area sentence to contain the whole pronouncing Dawnfall', () => {
+    const { sim, marked } = setup();
+    const effect = resolve(sim, 'sun_gods_verdict').effects[0];
+    if (effect.type !== 'sunGodVerdict') throw new Error('missing verdict effect');
+    // Twice the Dawnfall radius, so any enemy Dawnfall reaches is inside the
+    // circle centred on the marked enemy; the authored radius is the floor.
+    expect(sunGodVerdictAreaRadius(effect, 6)).toBe(12);
+    expect(sunGodVerdictAreaRadius(effect, 10)).toBe(20);
+    expect(sunGodVerdictAreaRadius(effect, 2)).toBe(effect.areaRadius);
+    expect(sunGodVerdictAreaRadius(effect, undefined)).toBe(effect.areaRadius);
+
+    // An enemy at the far edge of Dawnfall, opposite the marked one, is sentenced.
+    const farSide = addHostile(sim, 9703, -5.9);
+    run(sim, marked, 'final_edict');
+    run(sim, marked, 'final_edict');
+    sim.drainEvents();
+    run(sim, null, 'dawnfall');
+    const events = sim.drainEvents();
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'damage',
+        targetId: farSide.id,
+        ability: 'Verdict of the Sun God',
+      }),
+    );
+  });
+
   it('lets only the third hit choose the area verdict', () => {
     const { sim, marked, nearby } = setup();
     sim.drainEvents();
@@ -137,6 +165,27 @@ describe('Verdict of the Sun God', () => {
 
     expect(verdictAura(marked, sim.player.id)).toMatchObject({ value: 3, stacks: 3 });
     const events = sim.drainEvents();
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        ability: 'sun_gods_verdict',
+        fx: 'paladinAscensionImpact',
+        sourceId: sim.player.id,
+        targetId: marked.id,
+        range: 12,
+      }),
+    );
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfxAt',
+        ability: 'sun_gods_verdict',
+        fx: 'nova',
+        sourceId: sim.player.id,
+        x: marked.pos.x,
+        z: marked.pos.z,
+        radius: 12,
+      }),
+    );
     expect(events).toContainEqual(
       expect.objectContaining({
         type: 'damage',
@@ -170,9 +219,18 @@ describe('Verdict of the Sun God', () => {
 
     run(sim, marked, 'final_edict');
 
-    const verdictDamage = sim
-      .drainEvents()
-      .filter((event) => event.type === 'damage' && event.ability === 'Verdict of the Sun God');
+    const events = sim.drainEvents();
+    const sentence = events.find(
+      (event) =>
+        event.type === 'spellfx' &&
+        event.ability === 'sun_gods_verdict' &&
+        event.fx === 'paladinAscensionImpact',
+    );
+    expect(sentence).toMatchObject({ targetId: marked.id, sourceId: sim.player.id });
+    expect(sentence).not.toHaveProperty('range');
+    const verdictDamage = events.filter(
+      (event) => event.type === 'damage' && event.ability === 'Verdict of the Sun God',
+    );
     expect(verdictDamage).toHaveLength(1);
     expect(verdictDamage[0]).toMatchObject({ targetId: marked.id });
     expect(nearby.auras.some((aura) => aura.kind === 'stun')).toBe(false);

@@ -123,11 +123,12 @@ describe('winning Warrior attack animation routing', () => {
     expect(attackAbilityId('mortal_strike')).toBe('mortal_strike');
     expect(attackAbilityId('missing ability')).toBeUndefined();
     expect(isSpinAttackAbility('whirlwind')).toBe(true);
-    expect(isSpinAttackAbility('dawnfall')).toBe(true);
+    expect(isSpinAttackAbility('dawnfall')).toBe(false);
     expect(isSpinAttackAbility('mortal_strike')).toBe(false);
   });
 
-  it.each(['cleave', 'whirlwind', 'bladestorm', 'dawnfall'])(
+  // Dawnfall left the spin family in the Paladin rework (its own visual plays it).
+  it.each(['cleave', 'whirlwind', 'bladestorm'])(
     'forwards %s identity to the live spin selector',
     (abilityId) => {
       const visual = { playWhirl: vi.fn(), playAttack: vi.fn() };

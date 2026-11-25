@@ -85,10 +85,13 @@ export class SolidImpactFragments {
     this.standIn.frustumCulled = false;
     scene.add(this.standIn);
   }
-  units(host: CrestPrewarmHost): PrewarmResumeUnit[] {
+  /** Every kind's build and preparation, or only `kinds` (the Paladin recipe
+   *  borrows the stone chips alone). A prepared kind offers nothing, so a kind
+   *  the other kit already prepared is never paid twice. */
+  units(host: CrestPrewarmHost, kinds: readonly FragmentKind[] = KINDS): PrewarmResumeUnit[] {
     if (this.disposed) return [];
     const units: PrewarmResumeUnit[] = [];
-    for (const kind of KINDS) {
+    for (const kind of kinds) {
       if (this.batches.get(kind)?.preparation.ready()) continue;
       units.push({ id: `fragment-build:${kind}`, synchronous: true, run: () => this.build(kind) });
       for (const step of PREPARATION_STEPS)
@@ -164,10 +167,14 @@ export class SolidImpactFragments {
     ground: (x: number, z: number) => number,
     lifetime?: number,
     fractured = false,
+    /** A Paladin landing's borrowed chips: drawn on the kind's own
+     *  preparation alone, never asking the Warrior kit's cast family gate. */
+    borrowed = false,
   ): number {
     if (this.disposed || ![x, y, z, count, power, dx, dz].every(Number.isFinite)) return 0;
     const batch = this.batches.get(kind);
-    if (!batch?.preparation.ready() || !this.spawnGate.allows(CAST_VFX_KIT)) return 0;
+    if (!batch?.preparation.ready() || (!borrowed && !this.spawnGate.allows(CAST_VFX_KIT)))
+      return 0;
     const g = batch.mesh.geometry;
     const origin = g.getAttribute('aOrigin') as THREE.InstancedBufferAttribute,
       velocity = g.getAttribute('aVelocity') as THREE.InstancedBufferAttribute,

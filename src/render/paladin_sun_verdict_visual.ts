@@ -1,137 +1,170 @@
 import * as THREE from 'three';
+import { paladinVfxDetailNow } from './ability_vfx/paladin_vfx_detail';
+import { type PaladinVfxDetail, paladinDetailScale } from './ability_vfx/paladin_vfx_detail_core';
 import type { PaladinSunVerdictVisualPlan } from './paladin_sun_verdict_core';
 
-const TEXTURE_SIZE = 96;
-const SEGMENT_COUNT = 3;
-const TAU = Math.PI * 2;
-const SUN_GOLD = 0xffd45c;
-const SUN_WHITE = 0xffffdf;
-const SUN_DARK = 0x8b5318;
+// Detail: core = the spear and the two charge wings (they say how many charges
+// the mark holds, so they draw on every tier); secondary = none; accents = the
+// sentence flash (the white star of the third charge, a render-only flash after
+// the sentence has landed) and the brand's flicker and breathing. The detail is
+// read as the mark appears and held while it stays.
 
-function setPixel(data: Uint8Array, x: number, y: number, color: number, alpha: number): void {
-  const offset = (y * TEXTURE_SIZE + x) * 4;
-  data[offset] = (color >> 16) & 0xff;
-  data[offset + 1] = (color >> 8) & 0xff;
-  data[offset + 2] = color & 0xff;
-  data[offset + 3] = alpha;
+// Solar Lance brand, drawn as glowing light: a slim diamond-tipped spear for the
+// mark, a small pair of curved flame wings for the first charge and a larger
+// outer pair for the second. Shapes are in sprite space, x right and y up.
+const SIZE = 256;
+const GOLD: [number, number, number] = [0.91, 0.62, 0.27];
+const IVORY: [number, number, number] = [1, 0.95, 0.82];
+const SPEAR = [
+  0, 0.95, 0.085, 0.5, 0.028, 0.36, 0.028, -0.42, 0.065, -0.6, 0, -0.82, -0.065, -0.6, -0.028,
+  -0.42, -0.028, 0.36, -0.085, 0.5,
+];
+/** Right-hand wings; the left is the mirror image. */
+const INNER_WING = [
+  0.04, -0.3, 0.14, -0.2, 0.24, -0.02, 0.3, 0.22, 0.29, 0.5, 0.2, 0.26, 0.12, 0.08, 0.05, -0.08,
+];
+const OUTER_WING = [
+  0.06, -0.45, 0.22, -0.34, 0.38, -0.12, 0.47, 0.16, 0.46, 0.62, 0.33, 0.3, 0.2, 0.06, 0.07, -0.2,
+];
+function segment(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
+  const ex = bx - ax,
+    ey = by - ay;
+  const t = Math.max(0, Math.min(1, ((px - ax) * ex + (py - ay) * ey) / (ex * ex + ey * ey)));
+  return Math.hypot(px - ax - ex * t, py - ay - ey * t);
 }
-
-function sunTexture(segment: number | null): THREE.DataTexture {
-  const data = new Uint8Array(TEXTURE_SIZE * TEXTURE_SIZE * 4);
-  const center = TEXTURE_SIZE / 2;
-  for (let y = 0; y < TEXTURE_SIZE; y++) {
-    for (let x = 0; x < TEXTURE_SIZE; x++) {
-      const dx = x + 0.5 - center;
-      const dy = center - (y + 0.5);
-      const radius = Math.hypot(dx, dy);
-      let angle = Math.atan2(dy, dx) + Math.PI / 2;
-      if (angle < 0) angle += TAU;
-      const wedge = Math.floor((angle / TAU) * SEGMENT_COUNT) % SEGMENT_COUNT;
-
-      if (segment !== null) {
-        if (radius >= 8 && radius <= 27 && wedge === segment) {
-          setPixel(data, x, y, SUN_GOLD, radius < 23 ? 235 : 185);
-        }
-        continue;
-      }
-
-      const outerRing = Math.abs(radius - 28) < 1.8;
-      const innerRing = Math.abs(radius - 8) < 1.4;
-      const rayBand = radius >= 32 && radius <= 41;
-      const rayAngle = ((angle + Math.PI / 12) / TAU) * 12;
-      const ray = rayBand && Math.abs(rayAngle - Math.round(rayAngle)) < 0.09;
-      const separatorAngle = (angle / TAU) * SEGMENT_COUNT;
-      const separator =
-        radius >= 8 &&
-        radius <= 27 &&
-        Math.abs(separatorAngle - Math.round(separatorAngle)) < 0.025;
-      const dimSegment = radius >= 8 && radius <= 27;
-      const core = radius < 6;
-      if (outerRing || innerRing || ray || separator || core) {
-        setPixel(data, x, y, core ? SUN_WHITE : SUN_GOLD, core ? 245 : 220);
-      } else if (dimSegment) {
-        setPixel(data, x, y, SUN_DARK, 95);
-      }
-    }
+/** Signed distance to a polygon: negative inside. */
+function polygonDistance(x: number, y: number, polygon: number[]): number {
+  let hit = false;
+  let d = Infinity;
+  for (let i = 0, j = polygon.length - 2; i < polygon.length; j = i, i += 2) {
+    const ax = polygon[i],
+      ay = polygon[i + 1],
+      bx = polygon[j],
+      by = polygon[j + 1];
+    if (ay > y !== by > y && x < ((bx - ax) * (y - ay)) / (by - ay) + ax) hit = !hit;
+    d = Math.min(d, segment(x, y, ax, ay, bx, by));
   }
-  const texture = new THREE.DataTexture(data, TEXTURE_SIZE, TEXTURE_SIZE, THREE.RGBAFormat);
-  texture.needsUpdate = true;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = false;
-  return texture;
+  return hit ? -d : d;
 }
-
-const SUN_BASE_TEXTURE = sunTexture(null);
-const SUN_SEGMENT_TEXTURES = Array.from({ length: SEGMENT_COUNT }, (_, index) => sunTexture(index));
-
-function sprite(
-  texture: THREE.Texture,
-  opacity: number,
-  renderOrder: number,
-  blending: THREE.Blending = THREE.NormalBlending,
-): THREE.Sprite {
-  const result = new THREE.Sprite(
+/** Artwork scale inside the sprite, leaving room for the glow at the spear
+ * tip and wing tips so the sprite edge never clips it. */
+export const SUN_VERDICT_ART_SCALE = 0.84;
+function shapeDistance(part: number, x: number, y: number): number {
+  const k = SUN_VERDICT_ART_SCALE;
+  if (part === 0) return polygonDistance(x / k, y / k, SPEAR) * k;
+  const wing = part === 1 ? INNER_WING : OUTER_WING;
+  return Math.min(polygonDistance(x / k, y / k, wing), polygonDistance(-x / k, y / k, wing)) * k;
+}
+function texture(part: number): THREE.DataTexture {
+  const data = new Uint8Array(SIZE * SIZE * 4);
+  const pixel = 2 / SIZE;
+  for (let row = 0; row < SIZE; row++)
+    for (let col = 0; col < SIZE; col++) {
+      const x = ((col + 0.5) / SIZE) * 2 - 1;
+      // Rows are uploaded flipped, so row 0 is the top of the sprite.
+      const y = 1 - ((row + 0.5) / SIZE) * 2;
+      let intensity: number;
+      let heat: number;
+      if (part === 3) {
+        // Sentence flash: a white star at the spear's heart.
+        const r = Math.hypot(x, y - 0.2 * SUN_VERDICT_ART_SCALE);
+        const spokes =
+          Math.exp(-Math.abs(x) * 40) * Math.exp(-Math.abs(y - 0.17) * 3) +
+          Math.exp(-Math.abs(y - 0.17) * 40) * Math.exp(-Math.abs(x) * 3);
+        intensity = Math.min(1, Math.exp(-r * r * 30) * 1.4 + spokes * 0.8);
+        heat = Math.exp(-r * r * 60);
+      } else {
+        const d = shapeDistance(part, x, y);
+        const body = 1 - Math.min(1, Math.max(0, (d + pixel) / (2 * pixel)));
+        const glow = Math.exp(-Math.max(0, d) * 30) * 0.45;
+        intensity = Math.min(1, Math.max(body, glow));
+        // Hot along the centre of each blade, gold toward its edges and glow.
+        heat = body * Math.min(1, Math.max(0, -d / 0.025));
+      }
+      if (intensity < 0.004) continue;
+      const offset = (row * SIZE + col) * 4;
+      data[offset] = Math.round((GOLD[0] + (IVORY[0] - GOLD[0]) * heat) * 255);
+      data[offset + 1] = Math.round((GOLD[1] + (IVORY[1] - GOLD[1]) * heat) * 255);
+      data[offset + 2] = Math.round((GOLD[2] + (IVORY[2] - GOLD[2]) * heat) * 255);
+      data[offset + 3] = Math.round(intensity * 255);
+    }
+  const t = new THREE.DataTexture(data, SIZE, SIZE, THREE.RGBAFormat);
+  t.flipY = true;
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.minFilter = THREE.LinearFilter;
+  t.magFilter = THREE.LinearFilter;
+  t.generateMipmaps = false;
+  t.needsUpdate = true;
+  return t;
+}
+const TEXTURES = [texture(0), texture(1), texture(2), texture(3)];
+export function sunVerdictMarkTextures(): readonly THREE.DataTexture[] {
+  return TEXTURES;
+}
+function sprite(map: THREE.Texture): THREE.Sprite {
+  const s = new THREE.Sprite(
     new THREE.SpriteMaterial({
-      map: texture,
+      map,
       color: 0xffffff,
       transparent: true,
-      opacity,
+      opacity: 0.95,
+      blending: THREE.AdditiveBlending,
       depthTest: true,
       depthWrite: false,
-      blending,
     }),
   );
-  result.renderOrder = renderOrder;
-  result.scale.setScalar(1.85);
-  return result;
+  // Same on-screen brand as before; the sprite grows to hold the glow margin.
+  s.scale.set(1.9 / SUN_VERDICT_ART_SCALE, 1.9 / SUN_VERDICT_ART_SCALE, 1);
+  s.renderOrder = 20;
+  s.userData.renderCategory = 'vfx';
+  return s;
 }
-
 export class PaladinSunVerdictVisual {
   readonly group = new THREE.Group();
-  private readonly base = sprite(SUN_BASE_TEXTURE, 0.8, 20);
-  private readonly segments = SUN_SEGMENT_TEXTURES.map((texture, index) =>
-    sprite(texture, 1, 21 + index, THREE.AdditiveBlending),
-  );
+  private readonly base = sprite(TEXTURES[0]);
+  private readonly segments = TEXTURES.slice(1).map(sprite);
   private elapsed = 0;
-
+  private wasActive = false;
+  /** The detail this mark draws at: read as it appears, kept while it stays. */
+  private detail: PaladinVfxDetail = 'full';
   constructor(characterHeight: number) {
     this.group.name = 'paladin-sun-verdict-visual';
-    this.group.position.y = characterHeight + 1.8;
+    this.group.position.y = characterHeight + 1.1;
     this.group.visible = false;
     this.base.name = 'paladin-sun-verdict-base';
     this.group.add(this.base);
-    for (let index = 0; index < this.segments.length; index++) {
-      this.segments[index].name = `paladin-sun-verdict-segment-${index + 1}`;
-      this.group.add(this.segments[index]);
+    for (let i = 0; i < this.segments.length; i++) {
+      this.segments[i].name = `paladin-sun-verdict-segment-${i + 1}`;
+      this.group.add(this.segments[i]);
     }
   }
-
   update(plan: PaladinSunVerdictVisualPlan, dt: number, reducedMotion: boolean): void {
     this.group.visible = plan.active;
     this.group.userData.charges = plan.charges;
+    if (plan.active && !this.wasActive) this.detail = paladinVfxDetailNow();
+    this.wasActive = plan.active;
     if (!plan.active) return;
-
+    const accents = paladinDetailScale(this.detail).accents;
+    // A lighter mark holds still: its breathing and flicker are accents.
+    const steady = reducedMotion || !accents;
     if (!reducedMotion) this.elapsed += Math.max(0, dt);
-    const rotation = reducedMotion ? 0 : this.elapsed * (plan.imminent ? 1.15 : 0.38);
-    const pulse = reducedMotion ? 1 : 1 + Math.sin(this.elapsed * (plan.imminent ? 7.5 : 3)) * 0.07;
+    const pulse = steady ? 1 : 1 + Math.sin(this.elapsed * 3) * 0.025;
     this.group.scale.setScalar(pulse);
-    this.base.material.rotation = rotation;
-    this.base.material.opacity = plan.imminent ? 0.98 : 0.8;
-    for (let index = 0; index < this.segments.length; index++) {
-      const segment = this.segments[index];
-      segment.visible = index < plan.charges;
-      segment.material.rotation = rotation;
-      segment.material.opacity = plan.imminent ? 1 : 0.92;
+    // The brand burns brighter as the sentence nears.
+    const shimmer = steady ? 1 : 0.9 + 0.1 * Math.sin(this.elapsed * 5.3);
+    this.base.material.opacity = (plan.imminent ? 1 : 0.85) * shimmer;
+    for (let i = 0; i < this.segments.length; i++) {
+      // The last segment is the sentence flash: an accent.
+      this.segments[i].visible = i < plan.charges && (accents || i < this.segments.length - 1);
+      this.segments[i].material.opacity = 0.95 * shimmer;
     }
   }
-
   dispose(): void {
     this.base.material.dispose();
-    for (const segment of this.segments) segment.material.dispose();
+    for (const s of this.segments) s.material.dispose();
+    // Shared textures belong to the boot prewarm, not an individual wearer.
   }
 }
-
 export function syncPaladinSunVerdictVisual(
   visual: PaladinSunVerdictVisual | null,
   parent: THREE.Group,

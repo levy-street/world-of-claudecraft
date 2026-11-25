@@ -4,6 +4,10 @@ export interface WeaponAnchorSampler {
   (out: THREE.Vector3): boolean;
   /** Unit equipment axes at its exposed face, without multiplying grip scale. */
   frame?: (out: THREE.Matrix4) => boolean;
+  /** Half the exposed face's width (local x), in world units (a shield's face). */
+  faceHalf?: () => number;
+  /** The equipment's depth behind its exposed face (local z), in world units. */
+  faceDepth?: () => number;
 }
 
 const handCache = new WeakMap<THREE.Object3D, (THREE.Object3D | null)[]>();
@@ -45,6 +49,8 @@ export function weaponTrailAnchor(root: THREE.Object3D, hand: 0 | 1): WeaponAnch
   if (!holder) return null;
   let mesh: THREE.Mesh | null = null;
   let longest = 0;
+  let faceHalf = 0;
+  let faceDepth = 0;
   const tip = new THREE.Vector3();
   const face = new THREE.Vector3();
   (holder as THREE.Object3D).traverse((node) => {
@@ -59,6 +65,8 @@ export function weaponTrailAnchor(root: THREE.Object3D, hand: 0 | 1): WeaponAnch
     const length = Math.max(dx, dy, dz);
     if (length <= longest) return;
     longest = length;
+    faceHalf = dx / 2;
+    faceDepth = dz;
     mesh = candidate;
     box.getCenter(tip);
     face.copy(tip);
@@ -104,5 +112,7 @@ export function weaponTrailAnchor(root: THREE.Object3D, hand: 0 | 1): WeaponAnch
     out.makeBasis(x, y, z).setPosition(center);
     return true;
   };
+  sample.faceHalf = () => faceHalf * weapon.matrixWorld.getMaxScaleOnAxis();
+  sample.faceDepth = () => faceDepth * weapon.matrixWorld.getMaxScaleOnAxis();
   return sample;
 }

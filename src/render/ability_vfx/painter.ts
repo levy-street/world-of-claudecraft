@@ -10,6 +10,7 @@ import {
 } from '../../game/fury_audio_core';
 import { WARRIOR_CONTROL_AUDIO } from '../../game/warrior_control_audio_core';
 import { DT, type SimEvent } from '../../sim/types';
+import { FinalEdictContacts, finalEdictOutcome } from '../final_edict_core';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { warriorFuryStateKind } from '../warrior_fury_state_core';
 import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
@@ -62,13 +63,23 @@ import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { CAST_VFX_ENGINE } from '../cast_vfx_family';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
+import { isDebtReturn } from '../debt_of_light_core';
+import { isGuardianCovenantAura } from '../guardian_covenant_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
 import { spellEffectsMuted, spellEffectsMutedBy } from '../spell_effects_switch';
+import { isTollingHammer } from '../tolling_hammer_core';
 import { trinketCueReadsAsSelfCast } from '../trinket_vfx_specs';
 import { CastAdmission } from './cast_admission_core';
 import { castVfxRequirement, WARRIOR_KIT_REQUIREMENT } from './cast_requirements';
+import { isDevotionKind } from './devotion_rings';
 import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
+import { PALADIN_SPEC_SIGNATURES } from './paladin_spec_emblems';
+import {
+  enterPaladinCast,
+  exitPaladinCast,
+  setPaladinCastTierResolver,
+} from './paladin_vfx_detail';
 
 interface VfxPoint {
   x: number;
@@ -123,6 +134,7 @@ export interface AbilityVfxDeps {
   anchor: (id: number, heightFrac: number) => VfxPoint | null;
   spawnAoeRing: (x: number, z: number, radius: number, school: string, colorHex?: number) => void;
   triggerAttack: (entityId: number, abilityId?: string) => void;
+  receiveHit?: (entityId: number) => void;
   // The renderer's pooled talent-moment point light (pulseAt); optional so
   // tests can omit it.
   lightPulse?: (
@@ -221,12 +233,23 @@ export interface TrinketRelicsHook {
 
 // Structural slices of the SimEvent members this painter consumes.
 export interface AbilityVfxSpellfxEvent {
+  range?: number;
   sourceId: number;
   targetId: number;
   school: string;
   fx: string;
   ability?: string;
   attackAnimation?: 'ranged-shot';
+  /** Paladin cues: which side of the fight a cue lands on, a bounce's level
+   * and count, and a sweep's arc and facing. */
+  impact?: string;
+  level?: number;
+  count?: number;
+  angle?: number;
+  facing?: number;
+  /** A taunt's cue at a target it cannot turn (Sacred Goad fizzles), or an
+   * Oath Chain's at an enemy it cannot move (the chain snaps). */
+  immune?: boolean;
 }
 
 // Structural slice of the point-anchored SimEvent member ('spellfxAt').
@@ -486,6 +509,13 @@ const PULSE_BURST_BY_PALETTE: Record<string, ParticleBurstKind> = {
 // authoring a signature clip cannot silently miss this list.
 export const PET_SIGNATURE_ATTACK_IDS = new Set(['emberkin_felbolt', 'gloomshade_abyssal_chain']);
 
+/** The area ring of a Paladin point cue with no gallery spec (the Valkyr's
+ *  Calling landing marks): the kit's gold. */
+const PALADIN_AREA_GOLD = 0xe8bb76;
+
+/** Requital Aura's reflected spark: the aura's own gold. */
+const REQUITAL_SPARK = 0xffc06a;
+
 export class AbilityVfx {
   private quality = 1;
   private budget = new AbilityVfxBudget();
@@ -534,6 +564,7 @@ export class AbilityVfx {
     ready: (mask) => (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.(mask) ?? true,
   });
   private readonly harvestDetonations = new HarvestDetonations();
+  private readonly edictContacts = new FinalEdictContacts();
 
   /** A preview take can replace its world while keeping warmed primitives. */
   resetPresentation(): void {
@@ -547,6 +578,7 @@ export class AbilityVfx {
     this.semanticFrame = 0;
     this.harvestDetonations.clear();
     this.admission.clear();
+    this.edictContacts.clear();
     this.spawned = 0;
   }
 
@@ -590,6 +622,11 @@ export class AbilityVfx {
             deps.abilityAudio?.(kind, palette, power, x, y, z, opts)
         : undefined,
     );
+    // The Paladin kit's big flashes dim for other casters (paladin_flash.ts).
+    deps.fx.setLocalPlayer?.(deps.localPlayerId ?? null);
+    // A Paladin spawn inside a cue bracket asks this painter's spam budget for
+    // its caster's tier (paladin_vfx_detail.ts); the last painter built wins.
+    setPaladinCastTierResolver((casterId) => this.paladinCastTier(casterId));
   }
 
   /** The reads a player acts on that this painter draws past a closed gate
@@ -634,6 +671,51 @@ export class AbilityVfx {
       tier = this.budget.admit(casterId, nowSec);
     }
     return this.biasFor(casterId, tier);
+  }
+
+  /** The spam budget's tier for a Paladin cue, read WITHOUT charging: the
+   *  kit's cues pick their detail before the painter knows they are claimed
+   *  (paladin_vfx_detail.ts); a claimed cast is charged after the dispatch. */
+  private paladinCastTier(casterId: number | undefined): 0 | 1 | 2 {
+    if (casterId === undefined) return 0;
+    return this.biasFor(casterId, this.budget.peek(casterId, this.now()));
+  }
+
+  // Each Paladin dispatch runs inside a cast bracket: a Paladin spawn inside it
+  // reads the caster's budget tier, resolved only if one asks
+  // (paladin_vfx_detail.ts). No closure and no budget read for an event no
+  // Paladin effect claims, though every class's events pass through here.
+  private paladinSpellfxCue(ev: AbilityVfxSpellfxEvent): boolean {
+    enterPaladinCast(ev.sourceId);
+    try {
+      return this.paladinSpellfx(ev);
+    } finally {
+      exitPaladinCast();
+    }
+  }
+
+  private paladinSpellfxAtCue(ev: AbilityVfxSpellfxAtEvent): boolean {
+    enterPaladinCast(ev.sourceId);
+    try {
+      return this.paladinSpellfxAt(ev);
+    } finally {
+      exitPaladinCast();
+    }
+  }
+
+  private paladinDamageCue(ev: AbilityVfxDamageEvent): boolean {
+    enterPaladinCast(ev.sourceId);
+    try {
+      return this.paladinDamage(ev);
+    } finally {
+      exitPaladinCast();
+    }
+  }
+
+  /** Charge a claimed Paladin cast once per (caster, ability) window, like
+   *  every other class's cast, so a crowd of Paladins degrades the kit. */
+  private chargePaladinCast(casterId: number | undefined, abilityId: string | undefined): void {
+    if (casterId !== undefined && abilityId) this.castTier(casterId, abilityId);
   }
 
   private biasFor(casterId: number, tier: 0 | 1 | 2): 0 | 1 | 2 {
@@ -730,8 +812,344 @@ export class AbilityVfx {
     return this.deps.fx.warriorRecovery(ev, maxHp);
   }
 
+  // The Paladin kit's spellfx cues (paladin_kit.ts and its sibling modules):
+  // true when the cue is the kit's, which then owns its whole presentation.
+  private paladinSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
+    if (ev.ability === 'sun_gods_verdict') {
+      if (ev.fx === 'selfCast') this.releaseGesture(ev.sourceId, 'sun_gods_verdict');
+      if (ev.fx === 'paladinAscensionImpact') {
+        // A Dawnfall-pronounced area sentence plays the larger Dawnfall at the
+        // target alone: the caster's own Dawnfall from the same batch is
+        // withdrawn. A Final Edict-pronounced sentence drops the Solar Sword.
+        if (ev.range !== undefined && ev.range > 0) {
+          this.deps.fx.dawnfallSentenced?.(ev.sourceId);
+          this.deps.fx.dawnfallCast(ev.targetId, ev.range);
+        } else {
+          this.deps.fx.sunVerdictLanceAt(ev.targetId);
+        }
+      }
+      return true;
+    }
+    // A spent Ascension charge has one cue, whichever ability spends it: the
+    // Paladin's own halo orb bursts and a pulse runs round their circle
+    // (paladin_ascension_visual). The generic burst would add a second,
+    // different one, and twice for Valkyr's Calling. Claimed here, before any
+    // ability's own branch, so each can still show its Ascension change.
+    if (ev.fx === 'paladinAscensionImpact') {
+      // Final Edict's explosion has landed its hits.
+      if (ev.ability === 'final_edict') this.edictContacts.area(ev.sourceId, false);
+      // Abilities whose Ascension change is only more power are gilded: their
+      // own visual, brighter, with a second wave of gold.
+      else if (ev.ability === 'dawns_embrace')
+        this.deps.fx.paladinKit.dawnsEmbrace.gild(ev.sourceId);
+      else if (ev.ability === 'hammer_of_wrath') this.deps.fx.gildTollingHammer?.(ev.sourceId);
+      else if (ev.ability === 'valkyrs_calling') this.deps.fx.gildValkyrsCalling?.(ev.sourceId);
+      else if (ev.ability === 'holy_shield') this.deps.fx.paladinKit.hallowedWall.gild(ev.sourceId);
+      else if (ev.ability === 'consecration')
+        this.deps.fx.notePaladinConsecrationAscended?.(ev.sourceId);
+      return true;
+    }
+    // Valkyr's Calling is posed by the body itself (weapon raised, wings open)
+    // and drawn by its own flight visual; the generic release gesture would
+    // fight the brandish.
+    if (ev.ability === 'valkyrs_calling' && ev.fx === 'selfCast') return true;
+    // Mending Light and Last Rite: authored hands of healing (paladin_mending.ts).
+    if (ev.ability === 'holy_light' || ev.ability === 'lay_on_hands') {
+      if (ev.fx === 'selfCast') {
+        // Both raise the off-hand sigil, like the Covenants and the Devotions.
+        this.releaseGesture(ev.sourceId, ev.ability);
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+        if (ev.ability === 'holy_light') this.deps.fx.mendingLight(ev.sourceId, ev.targetId);
+        else this.deps.fx.lastRite(ev.sourceId, ev.targetId);
+      }
+      return true;
+    }
+    // Holy Ground draws its own opening and ticks from the live zone
+    // (paladin_consecration_visual.ts); the generic nova would stack a dome on it.
+    if (ev.ability === 'consecration') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'consecration');
+        this.deps.fx.notePaladinConsecration?.(ev.sourceId);
+      }
+      return true;
+    }
+    // Requital Aura and the Devotions cast with the off-hand sigil; each party
+    // member's rune ring comes from their aura application (onWarriorControlAura).
+    if (isDevotionKind(ev.ability)) {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, ev.ability);
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+      }
+      return true;
+    }
+    // Hammer of Grace: the mace is hurled on release; the hit comes from damage.
+    if (ev.ability === 'hammer_of_grace') {
+      if (ev.fx === 'projectile') {
+        this.releaseGesture(ev.sourceId, 'hammer_of_grace');
+        this.deps.fx.graceHammerThrow(ev.sourceId, ev.targetId);
+      }
+      return true;
+    }
+    // Hushbrand stamps its own sigil; the lockout aura carries the silence.
+    // Sundering Gavel: the gavel of light swings down on the target from the
+    // cast (so it lands on an immune target too); the stun's shackles follow
+    // the aura (fx.sunderingGavelHold).
+    if (ev.ability === 'hammer_of_justice') {
+      if (ev.fx === 'projectile' && ev.targetId !== undefined) {
+        this.releaseGesture(ev.sourceId, ev.ability);
+        this.deps.fx.sunderingGavel(ev.sourceId, ev.targetId);
+      }
+      return true;
+    }
+    // Ward of Faith: the off-hand sigil raises the ward's shield plates; the
+    // aura holds them (fx.wardOfFaithHold) until it breaks or runs out.
+    if (ev.ability === 'divine_protection') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, ev.ability);
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+        this.deps.fx.wardOfFaithRaise(ev.sourceId);
+      }
+      return true;
+    }
+    // Sunward Disc: the disc's every leg and every strike, bounce by bounce.
+    if (ev.fx === 'paladinSunwardDisc') {
+      if ((ev.level ?? 0) === 0) this.deps.triggerAttack(ev.sourceId, 'sunward_disc');
+      this.deps.fx.paladinKit.sunwardDisc.hurl(ev.sourceId, ev.targetId);
+      return true;
+    }
+    if (ev.fx === 'paladinSunwardDiscImpact') {
+      this.deps.fx.paladinKit.sunwardDisc.strike(
+        ev.sourceId,
+        ev.targetId,
+        ev.level ?? 0,
+        ev.count ?? 0,
+      );
+      return true;
+    }
+    // Bastion Sweep: the swing is the authored clip (with its shield-hand
+    // light); the fan of light and the hits are the kit's.
+    if (ev.fx === 'paladinBastionSweep') {
+      this.deps.triggerAttack(ev.sourceId, 'bastion_sweep');
+      this.deps.fx.paladinKit.bastionSweep.sweep(
+        ev.sourceId,
+        ev.range ?? 6,
+        ev.angle ?? 180,
+        ev.facing,
+      );
+      return true;
+    }
+    if (ev.fx === 'paladinBastionSweepImpact') {
+      this.deps.fx.paladinKit.bastionSweep.strike(ev.targetId);
+      return true;
+    }
+    // Veilbound March: the veil is held from the march's aura and bursts as it
+    // ends (fx.paladinKit.presence); the cast is the gesture.
+    if (ev.ability === 'veilbound_march') {
+      if (ev.fx === 'selfCast') this.releaseGesture(ev.sourceId, 'veilbound_march');
+      return true;
+    }
+    // Oath Chain: the cast lashes a whip of light at the enemy; the chain, the
+    // shackle and the binding runes follow the pull and slow auras.
+    if (ev.ability === 'oath_chain') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'oath_chain');
+        const chain = this.deps.fx.paladinKit.oathChain;
+        chain.lash(ev.sourceId, ev.targetId);
+        // The sim will not move this enemy (a boss or a dummy): the chain
+        // pulls taut and snaps instead of catching.
+        if (ev.immune === true) chain.refuse(ev.sourceId, ev.targetId);
+      }
+      return true;
+    }
+    // Sacred Goad: a goad of light and a challenge blazing over the enemy, or
+    // cracking and fizzling on one that cannot be taunted.
+    if (ev.ability === 'sacred_challenge') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'sacred_challenge');
+        this.deps.fx.paladinKit.sacredGoad.goad(ev.sourceId, ev.targetId, ev.immune === true);
+      }
+      return true;
+    }
+    // Hallowed Wall and Bastion Rite raise the off-hand sigil; their walls and
+    // shields are held from the auras (fx.paladinKit.presence).
+    if (ev.ability === 'holy_shield' || ev.ability === 'bastion_rite') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, ev.ability);
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+        // A recast over a standing wall runs its threat ring out again.
+        if (ev.ability === 'holy_shield') this.deps.fx.paladinKit.hallowedWallCast(ev.sourceId);
+      }
+      return true;
+    }
+    // Life Covenant: a twisting bond of light carries the covenant to the ally;
+    // the wings it raises are the wing rig's, the ring at their feet the kit's.
+    if (ev.ability === 'life_covenant') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'life_covenant');
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+        this.deps.fx.paladinKit.lifeCovenant.bind(ev.sourceId, ev.targetId);
+      }
+      return true;
+    }
+    // Solar Invocation: a sun kindles over the target and its light comes
+    // down, on an ally or an enemy; the cast's own completion only times it.
+    if (ev.fx === 'paladinHolyShock') {
+      this.releaseGesture(ev.sourceId, 'solar_invocation');
+      this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+      this.deps.fx.paladinKit.solarInvocation.invoke(
+        ev.sourceId,
+        ev.targetId,
+        ev.impact === 'healing',
+      );
+      return true;
+    }
+    if (ev.ability === 'solar_invocation') {
+      // Ascension's splash around the ally healed or the enemy struck, drawn
+      // at its true reach.
+      if (ev.fx === 'nova' && ev.range !== undefined && ev.range > 0)
+        this.deps.fx.paladinKit.solarInvocation.splash(ev.sourceId, ev.targetId, ev.range);
+      return true;
+    }
+    // Sacred Form: light rises through the Paladin as the stance is taken; the
+    // sign at their feet is held from the aura (fx.paladinKit.presence).
+    if (ev.ability === 'sacred_form') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'sacred_form');
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+        this.deps.fx.paladinKit.sacredForm.enter(ev.sourceId);
+      }
+      return true;
+    }
+    // Beacon of Light: light comes down on the ally and the beacon kindles; the
+    // beacon itself is held from the aura (fx.paladinKit.presence).
+    if (ev.ability === 'beacon_of_light') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'beacon_of_light');
+        this.deps.fx.paladinKit.beaconOfLight.kindle(ev.targetId);
+      }
+      return true;
+    }
+    // Radiant Chorus: the hymn bursts about the Paladin; each ally's ribbon of
+    // light comes from their heal (fx.paladinKit.healed).
+    if (ev.ability === 'radiant_chorus') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'radiant_chorus');
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+        this.deps.fx.paladinKit.radiantChorus.release(ev.sourceId);
+      }
+      // The heal's true reach (30 m, 40 m under Ascension) sizes the wave.
+      if (ev.fx === 'nova' && ev.range !== undefined && ev.range > 0)
+        this.deps.fx.paladinKit.radiantChorus.span(ev.sourceId, ev.range);
+      return true;
+    }
+    // Dawn's Embrace: wings of dawn fold about the healed ally.
+    if (ev.ability === 'dawns_embrace') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'dawns_embrace');
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+        this.deps.fx.paladinKit.dawnsEmbrace.embrace(ev.sourceId, ev.targetId);
+      }
+      return true;
+    }
+    if (ev.ability === 'hushbrand') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'hushbrand');
+        this.deps.fx.hushbrandStrike(ev.sourceId, ev.targetId);
+      }
+      return true;
+    }
+    // Solar Step lights its own sprint from the aura; the cast ignites it.
+    if (ev.ability === 'solar_step') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'solar_step');
+        this.deps.fx.solarStepIgnite(ev.sourceId);
+      }
+      return true;
+    }
+    // Recall the Fallen draws its own rite; the completion names the body.
+    if (ev.ability === 'recall_the_fallen') {
+      if (ev.fx === 'selfCast') this.releaseGesture(ev.sourceId, 'recall_the_fallen');
+      if (ev.fx === 'temporalGlyph') this.deps.fx.recallTheFallenRelease(ev.sourceId, ev.targetId);
+      return true;
+    }
+    // The Seraphic wings own Avenging Wrath's whole presentation (they unfurl
+    // from the aura); the generic buff's wing ribs would double them.
+    if (ev.ability === 'avenging_wrath') {
+      if (ev.fx === 'selfCast') this.releaseGesture(ev.sourceId, 'avenging_wrath');
+      return true;
+    }
+    if (ev.ability === 'guardian_covenant') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'guardian_covenant');
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+      }
+      return true;
+    }
+    if (ev.ability === 'hammer_of_wrath') {
+      if (ev.fx === 'projectile') {
+        this.releaseGesture(ev.sourceId, 'hammer_of_wrath');
+        this.deps.fx.tollingHammerThrow(ev.sourceId, ev.targetId);
+      }
+      return true;
+    }
+    // Aura snapshots own the armed state; cast companions must not make a hit.
+    if (ev.ability === 'faithforged_guard') {
+      if (ev.fx === 'selfCast') {
+        this.releaseGesture(ev.sourceId, 'faithforged_guard');
+        this.deps.fx.castPaladinShieldSigil(ev.sourceId);
+      }
+      return true;
+    }
+    if (ev.fx === 'paladinDawnfall') {
+      this.deps.triggerAttack(ev.sourceId, 'dawnfall');
+      this.deps.fx.dawnfallCast(ev.sourceId, ev.range ?? 6);
+      return true;
+    }
+    if (ev.fx === 'paladinDawnfallImpact') return true;
+    if (ev.fx === 'paladinFinalEdict') {
+      const contact = this.edictContacts.take(ev.sourceId, ev.targetId);
+      if (contact) {
+        // The victim flinches as the overhead blow visibly lands, not as it is raised.
+        const target = ev.targetId;
+        const flinch =
+          contact.outcome === 'damage' ? () => this.deps.receiveHit?.(target) : undefined;
+        this.deps.fx.finalEdictContact(
+          ev.sourceId,
+          target,
+          contact.outcome,
+          contact.critical,
+          flinch,
+        );
+      }
+      return true;
+    }
+    // Ascension's Holy explosion: the nova opens it, its true radius riding the
+    // cue (the charge's impact cue closes it, above).
+    if (ev.ability === 'final_edict' && ev.fx === 'nova') {
+      this.edictContacts.area(ev.sourceId, true);
+      this.deps.fx.finalEdictVerdict(ev.sourceId, ev.range ?? 6);
+      return true;
+    }
+    return false;
+  }
+
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
     if (this.deps.shardpikeThrow?.handleEvent(ev)) return true;
+    // A Paladin's cast sigil and Ward of Faith bear their spec's icon: the
+    // local player's own spec, or one seen from a spec signature cast.
+    const paladinSpec =
+      this.deps.warriorSpecOf?.(ev.sourceId) ??
+      (ev.ability ? PALADIN_SPEC_SIGNATURES[ev.ability] : undefined);
+    if (paladinSpec) this.deps.fx.learnPaladinSpec?.(ev.sourceId, paladinSpec);
+    // The Paladin kit's own cues. A caster the Spell Effects option mutes
+    // takes the release's ordinary path below (spell_effects_switch.ts).
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfxCue(ev)) {
+      // A claimed cast charges the shared spam budget like every other
+      // class's cast; a tick (Consecration's pulse, an aura's beat) does not.
+      if (ev.fx !== 'tick') this.chargePaladinCast(ev.sourceId, ev.ability);
+      this.deps.fx.wakePaladinKit?.();
+      return true;
+    }
     // Physical Warrior ticks are wounds. The wire's tick companion has no
     // ability label, so preserve its recipient cue without an ivory magic puff.
     if (ev.fx === 'tick' && ev.school === 'physical' && this.deps.isWarrior?.(ev.sourceId)) {
@@ -1246,6 +1664,50 @@ export class AbilityVfx {
     return true;
   }
 
+  // The Paladin kit's spellfx-at cues: true when the cue is the kit's. Final
+  // Edict's area nova only opens the explosion's contact window and falls
+  // through to the ordinary area read.
+  private paladinSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean {
+    if (ev.ability === 'sun_gods_verdict') return true;
+    // Veilbound March's final wave: the kit's veil bursts there, in the same
+    // tick as its hits (each struck mark snaps shut from its own hit).
+    if (ev.ability === 'veilbound_march') {
+      if (ev.fx === 'nova')
+        this.deps.fx.paladinKit.veilboundMarch.burst(ev.sourceId ?? -1, ev.x, ev.z);
+      return true;
+    }
+    if (ev.ability === 'consecration') {
+      // The zone draws each tick's wave itself; keep only the pulse's sound.
+      const gy = this.deps.fx.groundYAt(ev.x, ev.z);
+      this.deps.abilityAudio?.('pulse', 'gold', 1, ev.x, gy, ev.z, { abilityId: 'consecration' });
+      return true;
+    }
+    if (ev.ability === 'recall_the_fallen') {
+      // The group rite reports each recalled body at its point.
+      if (ev.sourceId !== undefined) this.deps.fx.recallTheFallenReleaseAt(ev.sourceId, ev.x, ev.z);
+      return true;
+    }
+    if (ev.ability === 'valkyrs_calling_mark') {
+      if (ev.sourceId !== undefined)
+        this.deps.fx.valkyrsCallingLaunch(ev.sourceId, ev.x, ev.z, ev.radius ?? 8);
+      return true;
+    }
+    if (ev.ability === 'valkyrs_calling_impact') {
+      if (ev.sourceId !== undefined) {
+        this.deps.fx.valkyrsCallingLand(ev.sourceId, ev.x, ev.z, ev.radius ?? 8);
+        const gy = this.deps.fx.groundYAt(ev.x, ev.z);
+        this.deps.abilityAudio?.('impact', 'holy', 1.6, ev.x, gy, ev.z, {
+          abilityId: 'valkyrs_calling_impact',
+        });
+      }
+      this.recordStat('valkyrs_calling_impact', true);
+      return true;
+    }
+    if (ev.ability === 'final_edict' && ev.fx === 'nova' && ev.sourceId !== undefined)
+      this.edictContacts.area(ev.sourceId, true);
+    return false;
+  }
+
   // Point-anchored claims: an aimed ground cast's landing ('nova'/'burst' at
   // the aim point) runs the full archetype sequence anchored at the WORLD
   // POINT - windup ceremony and release flash on the caster, motifs, decal,
@@ -1256,6 +1718,19 @@ export class AbilityVfx {
   // landing, snowfall over the zone's whole life, a persistent inscription,
   // the roaming orb) that a one-shot sequence would read worse than.
   handleSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean {
+    // The Paladin kit's point cues; a caster the Spell Effects option mutes
+    // takes the release's ordinary path below (its area ring included).
+    // Point cues are a cast's follow-through (an impact, a placed zone, a
+    // tick): they read the caster's budget tier but never charge it.
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfxAtCue(ev)) {
+      this.deps.fx.wakePaladinKit?.();
+      // The kit's own figures are additions to the area read, never its
+      // substitute: a radius-carrying cue draws the draped ring on every tier,
+      // cold or refused, as the Warrior kit's do (ability_vfx/CLAUDE.md).
+      // Recall the Fallen's points mark a returning body, not an area.
+      if (ev.ability !== 'recall_the_fallen') this.spawned += this.paladinAreaTelegraph(ev);
+      return true;
+    }
     if (!ev.ability) return false;
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
     const spec = abilityVfxSpecFor(ev.ability);
@@ -1457,6 +1932,14 @@ export class AbilityVfx {
     ev: Extract<SimEvent, { type: 'aura' }>,
     auras?: readonly { id: string; kind: string; remaining?: number }[],
   ): boolean {
+    // Every aura event passes here first, so the Paladin's party auras claim
+    // theirs too: each member the aura reaches gets a rune ring at their feet
+    // instead of the generic buff swirl.
+    if (isDevotionKind(ev.abilityId)) {
+      if (ev.gained && !spellEffectsMuted(ev.sourceId))
+        this.deps.fx.devotionRing(ev.abilityId, ev.targetId, ev.sourceId);
+      return true;
+    }
     const cast = warriorControlAuraCast(ev.abilityId);
     if (cast && !this.followAdmitted(ev.sourceId, cast, WARRIOR_KIT_REQUIREMENT)) return true;
     return drawWarriorControlAura(
@@ -1467,7 +1950,138 @@ export class AbilityVfx {
     );
   }
 
+  // The Paladin kit's damage contacts: true when the hit is the kit's, which
+  // then plays its own victim response (receiveHit) in place of the generic
+  // flinch. Veilbound March's strike marks the hit and lets it run on.
+  private paladinDamage(ev: AbilityVfxDamageEvent): boolean {
+    // Veilbound March's final wave: the veil snaps shut on each enemy as its
+    // hit lands (the rest of the hit's read runs on unchanged).
+    if (ev.abilityId === 'veilbound_march' && ev.sourceId !== ev.targetId) {
+      this.deps.fx.wakePaladinKit?.();
+      this.deps.fx.paladinKit.veilboundMarch.strike(ev.sourceId, ev.targetId);
+    }
+    // Requital Aura's reflected blow (only its display name rides the hit): a
+    // small spark of holy light on the attacker it strikes, never the aura's
+    // whole cast again on the defender.
+    if (!ev.abilityId && attackAbilityId(ev.ability) === 'retribution_aura') {
+      if (finalEdictOutcome(ev.kind, ev.amount, ev.absorbed) === 'none') return true;
+      const at = this.deps.anchor(ev.targetId, 0.55);
+      if (at) this.deps.vfx.burst(at, 'holy', 5, 0.35, REQUITAL_SPARK, 0.25);
+      return true;
+    }
+    // Solar Invocation's Ascension splash: the target already stands in the
+    // shaft and every other enemy it strikes glints as the light reaches them.
+    if (
+      ev.abilityId === 'solar_invocation' &&
+      this.deps.fx.paladinKit.solarInvocation.striking(ev.sourceId)
+    ) {
+      this.deps.fx.paladinKit.solarInvocation.reach(ev.sourceId, ev.targetId);
+      if (finalEdictOutcome(ev.kind, ev.amount, ev.absorbed) === 'damage')
+        this.deps.receiveHit?.(ev.targetId);
+      return true;
+    }
+    if (ev.abilityId === 'sun_gods_verdict') {
+      const outcome = finalEdictOutcome(ev.kind, ev.amount, ev.absorbed);
+      // The Solar Sword waits over the condemned for this confirmed outcome.
+      this.deps.fx.sunVerdictLanceContact(ev.targetId, outcome);
+      if (outcome === 'damage') this.deps.receiveHit?.(ev.targetId);
+      return true;
+    }
+    // Sunward Disc: a throw that did nothing (resisted, missed, immune)
+    // glances off the enemy instead of striking home.
+    if (
+      ev.abilityId === 'sunward_disc' &&
+      finalEdictOutcome(ev.kind, ev.amount, ev.absorbed) === 'none'
+    ) {
+      this.deps.fx.paladinKit.sunwardDisc.glance(ev.targetId);
+      return true;
+    }
+    // Oath Chain deals no damage: its only damage event is a resist, and a
+    // resisted chain pulls nothing, so it snaps instead of catching.
+    if (ev.abilityId === 'oath_chain' && ev.kind === 'resist') {
+      this.deps.fx.paladinKit.oathChain.refuse(ev.sourceId, ev.targetId);
+      return true;
+    }
+    // Vowkeeper Strike: a crescent of light and the vow stamped on the enemy.
+    if (ev.abilityId === 'vowkeeper_strike') {
+      const outcome = finalEdictOutcome(ev.kind, ev.amount, ev.absorbed);
+      this.deps.fx.paladinKit.vowkeeperStrike.strike(ev.sourceId, ev.targetId, outcome);
+      if (outcome === 'damage') this.deps.receiveHit?.(ev.targetId);
+      return true;
+    }
+    // Mercy Lance: the lance formed through the cast is hurled through the target.
+    if (ev.abilityId === 'mercy_lance') {
+      const outcome = finalEdictOutcome(ev.kind, ev.amount, ev.absorbed);
+      this.releaseGesture(ev.sourceId, 'mercy_lance');
+      this.deps.fx.paladinKit.mercyLance.strike(ev.sourceId, ev.targetId, outcome, ev.crit);
+      if (outcome === 'damage') this.deps.receiveHit?.(ev.targetId);
+      return true;
+    }
+    if (ev.abilityId === 'hammer_of_grace') {
+      const outcome = finalEdictOutcome(ev.kind, ev.amount, ev.absorbed);
+      this.deps.fx.graceHammerContact(ev.sourceId, ev.targetId, outcome);
+      if (outcome === 'damage') this.deps.receiveHit?.(ev.targetId);
+      return true;
+    }
+    if (isTollingHammer(ev.abilityId, ev.ability)) {
+      const outcome = finalEdictOutcome(ev.kind, ev.amount, ev.absorbed);
+      // Dawn Echo reuses the display label without the primary's stable id.
+      if (ev.abilityId === 'hammer_of_wrath' || outcome === 'none') {
+        this.deps.fx.tollingHammerContact(ev.sourceId, ev.targetId, outcome);
+        if (outcome === 'damage') this.deps.receiveHit?.(ev.targetId);
+      }
+      return true;
+    }
+    if (isDebtReturn(ev.abilityId, ev.ability)) {
+      const outcome = finalEdictOutcome(ev.kind, ev.amount, ev.absorbed);
+      if (outcome !== 'none' && ev.sourceId !== ev.targetId) {
+        this.deps.fx.debtOfLightReturn(ev.sourceId, ev.targetId, outcome === 'absorb');
+        if (outcome === 'damage') this.deps.receiveHit?.(ev.targetId);
+      }
+      return true;
+    }
+    if ((ev.abilityId ?? attackAbilityId(ev.ability)) === 'dawnfall') {
+      if (ev.abilityId === 'dawnfall') {
+        const outcome = finalEdictOutcome(ev.kind, ev.amount, ev.absorbed);
+        if (outcome !== 'none') this.deps.fx.dawnfallContact(ev.targetId, outcome);
+        if (outcome === 'damage') this.deps.receiveHit?.(ev.targetId);
+      }
+      return true;
+    }
+    // Holy Ground's ticks: the zone's own wave carries each pulse
+    // (paladin_consecration_visual.ts); the struck enemy only flinches.
+    if ((ev.abilityId ?? attackAbilityId(ev.ability)) === 'consecration') {
+      if (finalEdictOutcome(ev.kind, ev.amount, ev.absorbed) === 'damage')
+        this.deps.receiveHit?.(ev.targetId);
+      return true;
+    }
+    if ((ev.abilityId ?? attackAbilityId(ev.ability)) === 'final_edict') {
+      const outcome = finalEdictOutcome(ev.kind, ev.amount, ev.absorbed);
+      // Inside Ascension's explosion every hit is an enemy it struck: each
+      // has the edict's seal stamped beneath it as the shockwave arrives.
+      if (ev.abilityId === 'final_edict' && this.edictContacts.inArea(ev.sourceId)) {
+        this.deps.fx.finalEdictAreaHit(ev.sourceId, ev.targetId, outcome);
+        return true;
+      }
+      // Untagged secondary weapon echoes reuse the display label. Only the
+      // primary carries the stable id; untagged avoidance may clear a record.
+      if (ev.abilityId === 'final_edict' || outcome === 'none')
+        this.edictContacts.record(ev.sourceId, ev.targetId, outcome, ev.crit);
+      return true;
+    }
+    return false;
+  }
+
   onDamage(ev: AbilityVfxDamageEvent): boolean | void {
+    const paladinSpec = ev.abilityId ? PALADIN_SPEC_SIGNATURES[ev.abilityId] : undefined;
+    if (paladinSpec) this.deps.fx.learnPaladinSpec?.(ev.sourceId, paladinSpec);
+    // The Paladin kit's contacts. Like its cues they wait on no cast family
+    // (each pool keeps its own preparation and falls back when cold), while a
+    // caster the Spell Effects option mutes takes the release's path below.
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinDamageCue(ev)) {
+      this.deps.fx.wakePaladinKit?.();
+      return true;
+    }
     // Latched on the event's own id, asked for every family its draws below
     // can reach. They resolve the id off the display name whatever the
     // caster's class (a mob's Reaping Arc draws the kit's cleave contact), so
@@ -1840,6 +2454,7 @@ export class AbilityVfx {
   onAuraGained(ev: AbilityVfxAuraEvent, abilityIdGuess?: string): void {
     if (!ev.gained) return;
     const abilityId = ev.ability ?? abilityIdGuess;
+    if (abilityId === 'faithforged_guard') return;
     if (!abilityId) return;
     const spec = abilityVfxSpecFor(abilityId);
     if (!spec) return;
@@ -1876,7 +2491,16 @@ export class AbilityVfx {
       this.kitsRequested.add('warrior');
       this.deps.requestClassKit?.('warrior');
     }
-    if (isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) fx.cancelWarriorHammer?.(e.id);
+    // A remote Paladin's kit is prepared on first sight, like the Warrior's
+    // (a local Paladin's is prepared by the renderer's own entry).
+    if (e.kind === 'player' && e.templateId === 'paladin' && !this.kitsRequested.has('paladin')) {
+      this.kitsRequested.add('paladin');
+      this.deps.requestClassKit?.('paladin');
+    }
+    if (isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) {
+      fx.cancelWarriorHammer?.(e.id);
+      fx.cancelTollingHammerEntity?.(e.id);
+    }
     let held = this.heldSemantic.get(e.id);
     if (!held) {
       held = {
@@ -2030,6 +2654,16 @@ export class AbilityVfx {
       // Caused by a muted caster (a player's buff on themselves, a player's
       // DoT on a mob). An aura that names no caster falls to its wearer.
       if (spellEffectsMutedBy(aura.sourceId ?? e.id)) continue;
+      if (isGuardianCovenantAura(aura)) {
+        if (!e.dead && (e.hp ?? 1) > 0 && (aura.remaining ?? 1) > 0)
+          fx.holdGuardianCovenant?.(e.id, aura.value ?? 0.2);
+        continue;
+      }
+      if (aura.kind === 'paladin_debt_of_light') {
+        if (!e.dead && (e.hp ?? 1) > 0 && (aura.remaining ?? 1) > 0)
+          fx.holdDebtOfLight?.(e.id, (aura.value ?? 140) / 140);
+        continue;
+      }
       const auraWasHeld = held.auraStamps.has(aura.id);
       const readiness = this.deps.isLivingWarrior?.(e.id) ? warriorReadinessBit(aura) : 0;
       if (readiness) {
@@ -2088,6 +2722,12 @@ export class AbilityVfx {
           fx.holdBladeCharges?.(e.id, aura.stacks ?? 1);
         continue;
       }
+      // Ward of Faith draws its own shield plates (ward_of_faith.ts, fed by
+      // paladin_presence.ts): no generic held shell or ground band.
+      if (aura.id === 'divine_protection') continue;
+      // Sundering Gavel's stun wears its own shackles (sundering_gavel.ts)
+      // under the hard-CC band, which stays the actionable read.
+      if (aura.id === 'hammer_of_justice_stun') continue;
       let auraId = auraSpecId(aura.id);
       // Victim-worn resolution: a hostile suffix (_slow/_root), or the fixed
       // fear id armed by Lingering Dread. A wornDebuff aura reads ONLY through
@@ -2286,6 +2926,12 @@ export class AbilityVfx {
 
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).
   update(dt: number, reducedMotion = false): void {
+    this.edictContacts.clear();
+    // The local player's spec is known up front (and follows a respec), so
+    // their sigil bears the right icon from the very first cast.
+    const local = this.deps.localPlayerId?.();
+    const localSpec = local === undefined ? null : this.deps.warriorSpecOf?.(local);
+    if (local !== undefined && localSpec) this.deps.fx.learnPaladinSpec?.(local, localSpec);
     this.harvestDetonations.advance(this.deps.fx, dt);
     this.deps.fx.update(dt, reducedMotion);
     this.deps.trinketRelics?.update(dt, reducedMotion);
@@ -2456,6 +3102,12 @@ export class AbilityVfx {
    *  comes off the plan (tier-independent by construction), so the same cast
    *  never reads one colour on a held gate and another on an open one.
    *  Returns the primitive count for the dev probe. */
+  private paladinAreaTelegraph(ev: AbilityVfxSpellfxAtEvent): number {
+    const spec = ev.ability ? abilityVfxSpecFor(ev.ability) : undefined;
+    const color = spec ? planCast(spec, this.quality, REFUSED_CAST_TIER).color : PALADIN_AREA_GOLD;
+    return this.areaTelegraph(ev, color);
+  }
+
   private areaTelegraph(ev: AbilityVfxSpellfxAtEvent, colorHex: number): number {
     if (!ev.radius) return 0;
     this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, colorHex);

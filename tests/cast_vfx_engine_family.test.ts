@@ -92,6 +92,31 @@ const GATE_TOTAL = 21;
 /** Pools that build no drawable of their own at construction (the spirit
  *  holders are material-less; each puppet runs its own compile gate). */
 const NO_DRAWABLE = ['spirits'] as const;
+/** The Paladin kit's pools (AbilityVfxFx fields). They sit in neither family
+ *  and out of the boot link walk: no cast waits on them, since each keeps its
+ *  own preparation (the active kit recipe, `authoredPrewarmUnits(host, [],
+ *  'paladin')`, which links them) and draws its cold fallback until that has
+ *  run. */
+const PALADIN = [
+  'finalEdict',
+  'dawnfall',
+  'sunVerdictLance',
+  'valkyrsCalling',
+  'recallTheFallen',
+  'solarStep',
+  'hushbrand',
+  'paladinKit',
+  'graceHammer',
+  'devotionRings',
+  'paladinMending',
+  'wardOfFaith',
+  'gavel',
+  'debtOfLight',
+  'tollingHammer',
+  'guardianCovenant',
+  'paladinCastSigil',
+  'paladinStandIns',
+] as const;
 
 type Draw = { object: THREE.Object3D; material: THREE.Material };
 
@@ -193,7 +218,7 @@ for (const fragments of [false, true]) {
 
     it('attributes every drawable the engine builds to one named pool', () => {
       expect(h.built.length).toBeGreaterThan(0);
-      const named = new Set<string>([...ENGINE_POOLS, ...KIT_POOLS, ...NO_DRAWABLE]);
+      const named = new Set<string>([...ENGINE_POOLS, ...KIT_POOLS, ...NO_DRAWABLE, ...PALADIN]);
       for (const draw of h.built) {
         const owners = h.owners.get(draw.object) ?? [];
         expect(owners, `${draw.object.name || draw.object.type} has one owner`).toHaveLength(1);
@@ -203,6 +228,16 @@ for (const fragments of [false, true]) {
       for (const pool of ENGINE_POOLS) expect(drawing.has(pool), pool).toBe(true);
       for (const pool of KIT_POOLS) expect(drawing.has(pool), pool).toBe(true);
       for (const pool of NO_DRAWABLE) expect(drawing.has(pool), pool).toBe(false);
+      for (const pool of PALADIN) expect(drawing.has(pool), pool).toBe(true);
+      // None of the Paladin kit's drawables joins a gate family, nor the boot
+      // link walk: each pool refuses to draw until the kit's own recipe ran,
+      // which links it (active_kit_prewarm.ts), so no other class pays for it.
+      const bootTargets = new Set(collectAbilityVfxCompileTargets(h.scene).map((t) => t.object));
+      for (const draw of h.drawsOf(PALADIN)) {
+        const pool = h.owners.get(draw.object)?.[0];
+        expect(inGate(draw.object), `${pool} stays outside`).toBe(false);
+        expect(bootTargets.has(draw.object), `${pool} skips the boot walk`).toBe(false);
+      }
     });
 
     it('joins every engine and kit drawable and the cloud', () => {

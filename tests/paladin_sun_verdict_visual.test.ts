@@ -1,11 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
 import {
   PaladinSunVerdictVisual,
   syncPaladinSunVerdictVisual,
 } from '../src/render/paladin_sun_verdict_visual';
+
+// Node tests run at the Medium preset; the tests below pin the authored
+// composition (full detail) unless a test names another tier.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('PaladinSunVerdictVisual', () => {
   it('syncs before the character-rig guard so ordinary enemy mobs can display it', () => {
@@ -37,8 +43,10 @@ describe('PaladinSunVerdictVisual', () => {
     visual.update({ active: true, charges: 3, imminent: true }, 0.1, false);
     expect(segments.map((segment) => segment.visible)).toEqual([true, true, true]);
     expect(visual.group.userData.charges).toBe(3);
-    const sprites = visual.group.children as THREE.Sprite[];
-    expect(sprites.every((sprite) => sprite.material.depthTest)).toBe(true);
+    visual.group.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material && !Array.isArray(material)) expect(material.depthTest).toBe(true);
+    });
     visual.update({ active: false, charges: 0, imminent: false }, 0.1, false);
     expect(visual.group.visible).toBe(false);
     visual.dispose();
@@ -79,5 +87,61 @@ describe('PaladinSunVerdictVisual', () => {
     expect((base.material as THREE.SpriteMaterial).rotation).toBe(rotation);
     expect(parent.children).toEqual([visual?.group]);
     visual?.dispose();
+  });
+
+  it('keeps the spear and both charge wings on every tier and drops the sentence flash below full', () => {
+    const drawn = (detail: 'full' | 'light' | 'minimal') => {
+      setPaladinVfxDetailForTest(detail);
+      const visual = new PaladinSunVerdictVisual(1.8);
+      const segments = [1, 2, 3].map(
+        (index) =>
+          visual.group.getObjectByName(`paladin-sun-verdict-segment-${index}`) as THREE.Object3D,
+      );
+      const base = visual.group.getObjectByName('paladin-sun-verdict-base') as THREE.Sprite;
+      visual.update({ active: true, charges: 2, imminent: true }, 0.1, false);
+      const charged = segments.map((segment) => segment.visible);
+      visual.update({ active: true, charges: 3, imminent: true }, 0.1, false);
+      const out = {
+        base: base.visible,
+        charged,
+        sentence: segments.map((segment) => segment.visible),
+        steady: base.material.opacity === 1 && visual.group.scale.x === 1,
+      };
+      visual.dispose();
+      return out;
+    };
+    expect(drawn('full')).toEqual({
+      base: true,
+      charged: [true, true, false],
+      sentence: [true, true, true],
+      steady: false,
+    });
+    for (const detail of ['light', 'minimal'] as const) {
+      // The charges a player reads stay; the render-only flash after the
+      // sentence and the brand's flicker are accents.
+      expect(drawn(detail)).toEqual({
+        base: true,
+        charged: [true, true, false],
+        sentence: [true, true, false],
+        steady: true,
+      });
+    }
+  });
+
+  it('reads the detail as the mark appears and keeps it while the mark stays', () => {
+    setPaladinVfxDetailForTest('minimal');
+    const visual = new PaladinSunVerdictVisual(1.8);
+    const sentence = visual.group.getObjectByName(
+      'paladin-sun-verdict-segment-3',
+    ) as THREE.Object3D;
+    visual.update({ active: true, charges: 1, imminent: false }, 0.1, false);
+    setPaladinVfxDetailForTest('full');
+    visual.update({ active: true, charges: 3, imminent: true }, 0.1, false);
+    expect(sentence.visible).toBe(false);
+    // A new mark reads afresh.
+    visual.update({ active: false, charges: 0, imminent: false }, 0.1, false);
+    visual.update({ active: true, charges: 3, imminent: true }, 0.1, false);
+    expect(sentence.visible).toBe(true);
+    visual.dispose();
   });
 });

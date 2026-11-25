@@ -6,6 +6,7 @@ import {
   VALKYRS_CALLING_ASCENT_DURATION,
   VALKYRS_CALLING_DESCENT_DURATION,
   VALKYRS_CALLING_FLIGHT_DURATION,
+  VALKYRS_CALLING_TAKEOFF,
 } from '../src/sim/combat/paladin_valkyrs_calling';
 import { VALKYRS_CALLING_FLIGHT_AURA_ID } from '../src/sim/combat/paladin_valkyrs_calling_state';
 import { ABILITIES, MOBS } from '../src/sim/data';
@@ -121,7 +122,7 @@ describe("Paladin Retribution: Valkyr's Calling", () => {
       VALKYRS_CALLING_ASCENT_DURATION,
       VALKYRS_CALLING_APPROACH_DURATION,
       VALKYRS_CALLING_DESCENT_DURATION,
-    ]).toEqual([0.5, 1, 0.5]);
+    ]).toEqual([0.8, 0.7, 0.5]);
     expect(VALKYRS_CALLING_FLIGHT_DURATION).toBe(2);
 
     sim.castAbility('valkyrs_calling');
@@ -156,10 +157,11 @@ describe("Paladin Retribution: Valkyr's Calling", () => {
       sim.player.pos.y - start.y,
       sim.player.pos.z - start.z,
     );
-    expect(firstStep).toBeGreaterThan(0);
+    // Braced on the spot first: no jump at the cast.
     expect(firstStep).toBeLessThan(1);
 
-    advance(Math.floor((VALKYRS_CALLING_ASCENT_DURATION * 20) / 2) - 1);
+    // Past the brace, into the climb.
+    advance(Math.round(VALKYRS_CALLING_TAKEOFF * 20) + 1);
     expect(sim.player.pos.x).toBeCloseTo(start.x, 5);
     expect(sim.player.pos.z).toBeCloseTo(start.z, 5);
     expect(sim.player.pos.y).toBeGreaterThan(start.y);
@@ -363,5 +365,52 @@ describe("Paladin Retribution: Valkyr's Calling", () => {
     expect(ascended.chargesAfterLanding).toBe(4);
     expect(ascended.ascensionImpacts).toBe(1);
     expect(Math.abs(ascended.damage - normal.damage * 1.5)).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("Valkyr's Calling presentation cues", () => {
+  it('marks the landing at launch and hovers before the launch, then slams down accelerating', () => {
+    const sim = makeRet();
+    targetAt(sim, 18);
+    const start = { ...sim.player.pos };
+    sim.castAbility('valkyrs_calling');
+    const flight = sim.player.valkyrsCalling;
+    if (!flight) throw new Error('Valkyr flight did not start');
+    const mark = sim.events.find(
+      (event) => event.type === 'spellfxAt' && event.ability === 'valkyrs_calling_mark',
+    );
+    expect(mark).toMatchObject({
+      x: flight.to.x,
+      z: flight.to.z,
+      sourceId: sim.player.id,
+      radius: 8,
+      duration: VALKYRS_CALLING_FLIGHT_DURATION,
+    });
+
+    // The brace: crouched on the spot while the wings open.
+    tick(sim, Math.round(VALKYRS_CALLING_TAKEOFF * 20));
+    expect(sim.player.pos.y).toBeCloseTo(start.y, 6);
+
+    // The launch bursts off the ground: the first tick climbs furthest.
+    const climbs: number[] = [];
+    let height = sim.player.pos.y;
+    for (let i = 0; i < 4; i++) {
+      sim.tick();
+      climbs.push(sim.player.pos.y - height);
+      height = sim.player.pos.y;
+    }
+    expect(climbs[0]).toBeGreaterThan(1);
+    for (let i = 1; i < climbs.length; i++) expect(climbs[i]).toBeLessThan(climbs[i - 1]);
+
+    // The dive: every tick falls further than the one before.
+    tick(sim, Math.round((VALKYRS_CALLING_FLIGHT_DURATION - VALKYRS_CALLING_TAKEOFF) * 20) - 14);
+    const drops: number[] = [];
+    let y = sim.player.pos.y;
+    for (let i = 0; i < 9; i++) {
+      sim.tick();
+      drops.push(y - sim.player.pos.y);
+      y = sim.player.pos.y;
+    }
+    for (let i = 1; i < drops.length; i++) expect(drops[i]).toBeGreaterThan(drops[i - 1]);
   });
 });

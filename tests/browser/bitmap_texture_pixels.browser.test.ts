@@ -42,7 +42,10 @@ import {
   warriorRockTexture,
   warriorSteelTexture,
 } from '../../src/render/ability_vfx/production_assets';
-import { bitmapSheetReleased } from '../../src/render/assets/bitmap_sheet_release';
+import {
+  bitmapSheetReleased,
+  restoreBitmapSheet,
+} from '../../src/render/assets/bitmap_sheet_release';
 
 type Sheets = Map<string, THREE.Texture>;
 
@@ -153,11 +156,16 @@ describe('the Warrior kit sheets decoded off the main thread', () => {
       expect(bitmapSheetReleased(texture), `${name} released`).toBe(true);
       expect((first.get(name) as ImageBitmap).width, `${name} bitmap closed`).toBe(0);
     }
-    // The graphics rebuild: a new renderer, whose kit asks for the assets
-    // again before its recipe uploads a sheet.
+    // The graphics rebuild: a new renderer, whose kit recipe decodes each
+    // released sheet in the unit that uploads it (active_kit_prewarm.ts
+    // sheetUnit, through restoreBitmapSheet); the demand load itself decodes
+    // nothing, so no sheet is left dirty with no upload after it.
     renderer.dispose();
     renderer = new THREE.WebGLRenderer({ canvas: document.createElement('canvas') });
     await expect(ensureWarriorKitAssets(false)).resolves.toBe(true);
+    for (const [name, texture] of bitmap)
+      expect(bitmapSheetReleased(texture), `${name} still released`).toBe(true);
+    await Promise.all([...bitmap.values()].map((texture) => restoreBitmapSheet(texture)));
     for (const [name, reference] of image) {
       const decoded = bitmap.get(name) as THREE.Texture;
       expect(decoded.image instanceof ImageBitmap, `${name} decoded again`).toBe(true);

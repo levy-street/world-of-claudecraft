@@ -22,6 +22,7 @@ export const CONTEXT_RESTORE_RESET_IDS = [
   'occluder-fade-gate',
   'guard-prewarm',
   'crest-prewarm',
+  'paladin-stand-ins',
   'active-kit',
   'vfx-cloud',
   'overlay-sprites',

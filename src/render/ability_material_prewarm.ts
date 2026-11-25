@@ -25,12 +25,24 @@
 // The group is staged into the scene HIDDEN and never disposed: disposing a
 // material releases the program this entry exists to keep, and every material
 // here is the one the live cast will draw with.
+//
+// The Paladin rows are ALSO linked, much earlier, by the Paladin kit recipe,
+// on stand-ins of its own (ability_vfx/paladin_stand_in_prewarm.ts): this
+// group is linked by the last background unit, minutes after the curtain on a
+// slow boot, while the kit runs seconds after entry or a Paladin's first
+// sighting. They stay here because not every draw of them follows a sighting:
+// a Holy Ground in interest range is drawn whether or not its caster has a
+// view, and a renderer that never sights a Paladin still holds them by here.
 
 import * as THREE from 'three';
 import { balgathRangedMaterials, buildBalgathRangedStandIn } from './balgath_ranged_fx';
 import { balgathStarwakeMaterials, buildBalgathStarwakeStandIn } from './balgath_starwake_fx';
 import { buildEffigyRigStandIn, effigyRigMaterials } from './characters/effigy_rig';
 import { buildMoonwingStandIn, moonwingMaterials } from './characters/moonwing_adornment';
+import {
+  buildPaladinShieldGlowStandIn,
+  paladinShieldGlowStandInMaterials,
+} from './characters/paladin_shield_glow_fx';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
@@ -38,10 +50,19 @@ import { buildFrozenOrbStandIn, frozenOrbStandInMaterials } from './frozen_orb_f
 import { IceBlockVisual, iceMaterials } from './ice_block_visual';
 import { buildGroundFireAoeStandIn, groundFireAoeMaterials } from './ignivar_fire_vfx';
 import { buildMeteorRockStandIn, meteorRockStandInMaterials } from './mage_ground_fx';
+import { buildPaladinAegisStandIn, paladinAegisStandInMaterials } from './paladin_aegis_visual';
 import {
   buildPaladinAscensionStandIn,
   paladinAscensionStandInMaterials,
 } from './paladin_ascension_visual';
+import {
+  buildPaladinAvengingWrathStandIn,
+  paladinAvengingWrathStandInMaterials,
+} from './paladin_avenging_wrath_visual';
+import {
+  buildPaladinConsecrationStandIn,
+  paladinConsecrationStandInMaterials,
+} from './paladin_consecration_visual';
 import { buildRingOfFrostStandIn, ringOfFrostStandInMaterials } from './ring_of_frost_visual';
 import { TemporalHourglassVisual, temporalHourglassMaterials } from './temporal_hourglass_visual';
 import { buildFelRockStandIn, felRockStandInMaterials } from './warlock_meteor_fx';
@@ -175,6 +196,40 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'paladin_ascension_visual.ts',
     materials: () => [...paladinAscensionStandInMaterials()],
     build: () => buildPaladinAscensionStandIn().root,
+  },
+  {
+    // Aegis of the First Dawn's dome, ground runes, sign, planted blade and the
+    // plus and sparkle sprites, built per caster view when the channel first
+    // shows; staging them also uploads the plus and sparkle textures.
+    id: 'paladin-aegis',
+    module: 'paladin_aegis_visual.ts',
+    materials: () => [...paladinAegisStandInMaterials()],
+    build: () => buildPaladinAegisStandIn().root,
+  },
+  {
+    // Holy Ground (Consecration): every zone mints its own materials (per-zone
+    // uniforms) and disposes them when it ends, so without an anchor holding
+    // its programs each next cast relinked them.
+    id: 'paladin-consecration',
+    module: 'paladin_consecration_visual.ts',
+    materials: () => [...paladinConsecrationStandInMaterials()],
+    build: () => buildPaladinConsecrationStandIn().root,
+  },
+  {
+    // Avenging Wrath's wings and rune band: every live pair mints and disposes
+    // its own two materials, so nothing held their programs between casts.
+    id: 'paladin-avenging-wrath',
+    module: 'paladin_avenging_wrath_visual.ts',
+    materials: () => [...paladinAvengingWrathStandInMaterials()],
+    build: () => buildPaladinAvengingWrathStandIn().root,
+  },
+  {
+    // The shield and weapon glow layered over a Paladin's held gear
+    // (characters/paladin_shield_glow_fx.ts): one program for every layer.
+    id: 'paladin-shield-glow',
+    module: 'paladin_shield_glow_fx.ts',
+    materials: () => [...paladinShieldGlowStandInMaterials()],
+    build: () => buildPaladinShieldGlowStandIn().root,
   },
   {
     // The Frostglobe: per-instance pooled materials like the Ring of Frost,

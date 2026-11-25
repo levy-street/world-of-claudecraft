@@ -3,6 +3,7 @@ import { grantDawnsWrath } from '../src/sim/combat/paladin_dawns_wrath';
 import {
   advanceSunGodVerdict,
   applySunGodVerdict,
+  sunGodVerdictAreaRadius,
   sunVerdictMarkForHit,
 } from '../src/sim/combat/paladin_sun_verdict';
 import { MOBS } from '../src/sim/data';
@@ -144,6 +145,22 @@ describe('Dawnreaver resolved damage tooltip accuracy', () => {
       );
     }
   }
+
+  it("states the Dawnfall-triggered Verdict area at combat's resolved radius", () => {
+    const { sim } = setup(70, false);
+    const res = resolve(sim, 'sun_gods_verdict');
+    const effect = required(res.effects.find((item) => item.type === 'sunGodVerdict'));
+    if (effect.type !== 'sunGodVerdict') throw new Error('Missing Verdict effect');
+    const dawnfall = resolve(sim, 'dawnfall').effects.find((item) => item.type === 'aoeDamage');
+    if (dawnfall?.type !== 'aoeDamage') throw new Error('Missing Dawnfall area');
+    // The sentence covers Dawnfall's whole circle: twice its radius, never under
+    // the authored floor.
+    const radius = sunGodVerdictAreaRadius(effect, dawnfall.radius);
+    expect(radius).toBe(Math.max(effect.areaRadius, dawnfall.radius * 2));
+    expect(radius).toBeGreaterThan(effect.areaRadius);
+    expect(required(dawnreaverTooltipValues(res).verdict).radius).toBe(radius);
+    expect(text(res, sim)).toContain(`within ${formatAbilityNumber(radius)} m`);
+  });
 
   it('preserves the existing tooltip presentation when primaryDamage is absent', () => {
     const { sim } = setup(70, false);

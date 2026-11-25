@@ -15,6 +15,11 @@ import { CONTACT_SHEETS, type ContactSheet } from '../src/render/ability_vfx/con
 import { CrestPrewarm } from '../src/render/ability_vfx/crest_prewarm';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
+import {
+  bindPaladinSpecIcons,
+  paladinSpecIconUniforms,
+  setPaladinSpecIconsForTest,
+} from '../src/render/ability_vfx/paladin_spec_icons';
 import * as assets from '../src/render/ability_vfx/production_assets';
 import { BAKED_URLS, type BakedKind } from '../src/render/ability_vfx/production_assets';
 import { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
@@ -24,7 +29,11 @@ import { WarriorGuardPlates } from '../src/render/ability_vfx/warrior_guard_plat
 import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
 import { WarriorSpiritHammers } from '../src/render/ability_vfx/warrior_spirit_hammers';
 import { setArrivalCover } from '../src/render/arrival_cover';
-import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import {
+  type BackgroundGpuQueue,
+  createBackgroundGpuQueue,
+  GPU_WORK_PRIORITY,
+} from '../src/render/background_gpu_queue';
 import { runContextRestoreResets } from '../src/render/context_restore_registry';
 import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
 import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
@@ -827,5 +836,244 @@ it('drops a pending retry when the renderer retires the preparation', async () =
   } finally {
     f.close();
     vi.useRealTimers();
+  }
+});
+
+// The Paladin kit's recipe: its pools, then its spec-icon atlas, demand-loaded
+// only when a Paladin kit is requested and uploaded by its own paced unit.
+function paladinFixture(localClass: string) {
+  const scene = new THREE.Scene();
+  const atlas = new THREE.Texture();
+  const ran: string[] = [];
+  const geometryCalls: string[] = [];
+  const unit = (id: string): PrewarmResumeUnit => ({ id, run: () => void ran.push(id) });
+  const queue = {
+    run: vi.fn(async (work: PrewarmResumeUnit['run'], _priority?: number, _id?: string) => {
+      await work();
+    }),
+  };
+  const uploads: THREE.Texture[] = [];
+  // The Warrior recipe's sheets, for a Warrior renderer that also sights a Paladin.
+  const sheet = new THREE.Texture();
+  vi.spyOn(contact, 'contactTexture').mockReturnValue(sheet);
+  vi.spyOn(assets, 'bakedTexture').mockReturnValue(sheet);
+  vi.spyOn(assets, 'warriorBloodTexture').mockReturnValue(sheet);
+  vi.spyOn(assets, 'warriorSteelTexture').mockReturnValue(sheet);
+  vi.spyOn(assets, 'warriorPressureTexture').mockReturnValue(sheet);
+  vi.spyOn(assets, 'warriorRockTexture').mockReturnValue(sheet);
+  const paladinAssets = vi.fn(async () => {
+    setPaladinSpecIconsForTest(atlas, false);
+    return true;
+  });
+  const material = new THREE.ShaderMaterial({ uniforms: paladinSpecIconUniforms() });
+  const entry = activeKitPrewarmEntry(scene, localClass, {
+    queue: queue as unknown as Pick<BackgroundGpuQueue, 'run'>,
+    // The whole Warrior kit loads; the Warrior pieces the Paladin landings
+    // borrow answer declined, so these cases pin the Paladin pools and atlas
+    // alone (tests/paladin_borrowed_warrior_pieces.test.ts covers the pieces).
+    assets: vi.fn(async (pieces?: readonly string[]) => pieces === undefined),
+    paladinAssets,
+    geometry: (kinds, kit) => {
+      geometryCalls.push(kit ?? 'warrior');
+      if (kit === 'paladin') return [unit('paladin-pool:a'), unit('paladin-pool:b')];
+      return kinds.length ? [unit('warrior-crest:a')] : [];
+    },
+    texture: (texture) => void uploads.push(texture),
+  });
+  return {
+    scene,
+    atlas,
+    ran,
+    geometryCalls,
+    queue,
+    uploads,
+    paladinAssets,
+    material,
+    entry,
+    close: () => {
+      cancelActiveAbilityKit(scene);
+      setPaladinSpecIconsForTest(null);
+      material.dispose();
+      atlas.dispose();
+      sheet.dispose();
+      vi.restoreAllMocks();
+    },
+  };
+}
+
+it('fetches the Paladin spec-icon atlas only with the kit, and uploads it in its own unit', async () => {
+  // No boot fetch for every class: the atlas module registers no preload.
+  const source = readFileSync('src/render/ability_vfx/paladin_spec_icons.ts', 'utf8');
+  expect(source).not.toContain('registerDeferredPreload');
+  expect(source).not.toContain('registerPreload');
+  const f = paladinFixture('paladin');
+  try {
+    // Loaded but not yet uploaded on this renderer: the binder keeps its emblem.
+    setPaladinSpecIconsForTest(f.atlas, false);
+    expect(bindPaladinSpecIcons(f.material)).toBe(false);
+    expect(f.material.uniforms.uSpecIconsReady.value).toBe(0);
+    await ensureActiveAbilityKit(f.scene);
+    expect(f.paladinAssets).toHaveBeenCalledOnce();
+    const ids = (f.queue.run.mock.calls as unknown[][]).map((call) => call[2]);
+    expect(ids).toEqual(['paladin-pool:a', 'paladin-pool:b', 'upload-big:paladin-spec-icons']);
+    expect(f.uploads).toEqual([f.atlas]);
+    expect(bindPaladinSpecIcons(f.material)).toBe(true);
+    expect(f.material.uniforms.uSpecIcons.value).toBe(f.atlas);
+    expect(f.entry.progress()).toEqual({ done: 3, planned: 3, trimmed: false });
+  } finally {
+    f.close();
+  }
+});
+
+it('leaves the Paladin pools prepared and asks again when the atlas failed to load', async () => {
+  const f = paladinFixture('paladin');
+  try {
+    f.paladinAssets.mockImplementationOnce(async () => false);
+    setPaladinSpecIconsForTest(null);
+    await expect(ensureActiveAbilityKit(f.scene)).rejects.toThrow('spec icons texture');
+    expect(f.ran).toEqual(['paladin-pool:a', 'paladin-pool:b']);
+    expect(bindPaladinSpecIcons(f.material)).toBe(false);
+    // The next request pays only the atlas unit.
+    await ensureActiveAbilityKit(f.scene);
+    expect(f.ran).toEqual(['paladin-pool:a', 'paladin-pool:b']);
+    expect(f.uploads).toEqual([f.atlas]);
+    expect(bindPaladinSpecIcons(f.material)).toBe(true);
+  } finally {
+    f.close();
+  }
+});
+
+it('a context restore prepares every requested kit again, and unbinds the atlas until it is re-uploaded', async () => {
+  const f = paladinFixture('warrior');
+  try {
+    await ensureActiveAbilityKit(f.scene);
+    // A remote Paladin sighting on the Warrior's renderer.
+    await ensureActiveAbilityKit(f.scene, 'paladin');
+    expect(bindPaladinSpecIcons(f.material)).toBe(true);
+    // The entry still reports the local Warrior's kit, not the last sighting.
+    const before = f.entry.progress();
+    expect(before.trimmed).toBe(false);
+    let hold!: () => void;
+    const held = new Promise<void>((resolve) => {
+      hold = resolve;
+    });
+    f.queue.run.mockImplementation(async (work: PrewarmResumeUnit['run']) => {
+      await held;
+      await work();
+    });
+    f.ran.length = 0;
+    f.uploads.length = 0;
+    runContextRestoreResets();
+    // The restored context holds no atlas: the binder falls back at once.
+    expect(bindPaladinSpecIcons(f.material)).toBe(false);
+    expect(f.material.uniforms.uSpecIcons.value).toBe(null);
+    hold();
+    await vi.waitFor(() => expect(f.uploads).toContain(f.atlas));
+    expect(f.ran).toEqual(
+      expect.arrayContaining(['warrior-crest:a', 'paladin-pool:a', 'paladin-pool:b']),
+    );
+    expect(bindPaladinSpecIcons(f.material)).toBe(true);
+    expect(f.entry.progress().planned).toBe(before.planned);
+  } finally {
+    f.close();
+  }
+});
+
+// Reuben's review of #4796: one class's pending retry must never swallow the
+// other class's first sighting (the painter asks once per class per renderer).
+function failFirst(f: ReturnType<typeof paladinFixture>, prefix: string): void {
+  let failures = 1;
+  f.queue.run.mockImplementation(
+    async (work: PrewarmResumeUnit['run'], _priority?: number, id?: string) => {
+      if (String(id).startsWith(prefix) && failures-- > 0) throw new Error('driver link failed');
+      await work();
+    },
+  );
+}
+
+it.each([
+  ['warrior', 'paladin', 'warrior-crest:a', 'paladin-pool:a'],
+  ['paladin', 'warrior', 'paladin-pool:a', 'warrior-crest:a'],
+] as const)(
+  'a %s kit in backoff never swallows the first %s sighting, and both kits end prepared',
+  async (failing, sighted, failingUnit, sightedUnit) => {
+    vi.useFakeTimers();
+    // A Mage's renderer: both kits arrive only as remote sightings.
+    const f = paladinFixture('mage');
+    try {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      failFirst(f, failingUnit.split(':')[0]);
+      resumeActiveAbilityKit(f.scene, undefined, failing);
+      await settle();
+      expect(f.ran).not.toContain(failingUnit);
+      expect(vi.getTimerCount()).toBe(1);
+      // The other class's first sighting lands inside the five-second backoff.
+      resumeActiveAbilityKit(f.scene, undefined, sighted);
+      await settle();
+      expect(f.ran).toContain(sightedUnit);
+      if (sighted === 'paladin') expect(f.uploads).toContain(f.atlas);
+      // The failed kit's own retry still runs once its backoff ends.
+      await vi.advanceTimersByTimeAsync(ACTIVE_KIT_RETRY_DELAYS_MS[0]);
+      await settle();
+      expect(f.ran).toContain(failingUnit);
+      expect(f.uploads).toContain(f.atlas);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      f.close();
+      vi.useRealTimers();
+    }
+  },
+);
+
+it('keeps each kit on its own backoff: one kit failing does not spend the other kit retries', async () => {
+  vi.useFakeTimers();
+  const f = paladinFixture('mage');
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // The Warrior kit fails every attempt until it gives up.
+    f.queue.run.mockImplementation(
+      async (work: PrewarmResumeUnit['run'], _priority?: number, id?: string) => {
+        if (String(id).startsWith('warrior')) throw new Error('driver link failed');
+        await work();
+      },
+    );
+    resumeActiveAbilityKit(f.scene, undefined, 'warrior');
+    await settle();
+    for (const delay of ACTIVE_KIT_RETRY_DELAYS_MS) {
+      await vi.advanceTimersByTimeAsync(delay);
+      await settle();
+    }
+    expect(vi.getTimerCount()).toBe(0);
+    // A Paladin failing once afterwards still gets its first retry.
+    let paladinFailures = 1;
+    f.queue.run.mockImplementation(
+      async (work: PrewarmResumeUnit['run'], _priority?: number, id?: string) => {
+        if (String(id).startsWith('paladin') && paladinFailures-- > 0)
+          throw new Error('driver link failed');
+        await work();
+      },
+    );
+    resumeActiveAbilityKit(f.scene, undefined, 'paladin');
+    await settle();
+    expect(vi.getTimerCount()).toBe(1);
+    await vi.advanceTimersByTimeAsync(ACTIVE_KIT_RETRY_DELAYS_MS[0]);
+    await settle();
+    expect(f.ran).toEqual(expect.arrayContaining(['paladin-pool:a', 'paladin-pool:b']));
+    expect(f.uploads).toContain(f.atlas);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('answers a progress poll without rebuilding the recipe', () => {
+  const f = paladinFixture('paladin');
+  try {
+    f.entry.progress();
+    const built = f.geometryCalls.length;
+    for (let i = 0; i < 10; i++) f.entry.progress();
+    expect(f.geometryCalls.length).toBe(built);
+  } finally {
+    f.close();
   }
 });

@@ -300,6 +300,32 @@ describe('Paladin Protection abilities', () => {
     },
   );
 
+  it('marks the Oath Chain cue immune only at an enemy the pull will not move', () => {
+    const cueFor = (templateId: string) => {
+      const sim = makeProtection();
+      stageInField(sim);
+      const target = createMob(sim.nextId++, MOBS[templateId], 20, {
+        x: sim.player.pos.x,
+        y: sim.player.pos.y,
+        z: sim.player.pos.z + 18,
+      });
+      target.hostile = true;
+      target.aiState = 'idle';
+      sim.addEntity(target);
+      sim.targetEntity(target.id);
+      sim.drainEvents();
+      sim.castAbility('oath_chain');
+      return sim
+        .drainEvents()
+        .find((ev) => ev.type === 'spellfx' && ev.fx === 'selfCast' && ev.ability === 'oath_chain');
+    };
+    expect(cueFor(IGNIVAR_BOSS_ID)).toMatchObject({ immune: true });
+    expect(cueFor('training_dummy')).toMatchObject({ immune: true });
+    const wolf = cueFor('forest_wolf');
+    expect(wolf).toBeDefined();
+    expect(wolf).not.toHaveProperty('immune');
+  });
+
   it('reindexes an Oath Chain target while it travels instead of teleporting for an immediate sweep', () => {
     const sim = makeProtection();
     stageInField(sim);

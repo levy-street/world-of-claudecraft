@@ -138,14 +138,14 @@ describe('character visual effects', () => {
     ).toBe(false);
   });
 
-  it('shows the same golden wings on any living ally protected by either Paladin covenant', () => {
+  it('raises no wings for either covenant: each holds a shield instead', () => {
     const guardian = aura('guardian_covenant', 'buff_dr', 1, 8);
     const covenant = aura('life_covenant', 'buff_dr', 1, 6);
     expect(characterPaladinWingsActive(entity({ templateId: 'warrior', auras: [guardian] }))).toBe(
-      true,
+      false,
     );
     expect(characterPaladinWingsActive(entity({ templateId: 'priest', auras: [covenant] }))).toBe(
-      true,
+      false,
     );
     expect(
       characterPaladinWingsActive(entity({ templateId: 'warrior', dead: true, auras: [covenant] })),

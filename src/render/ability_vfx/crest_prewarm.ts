@@ -19,21 +19,18 @@ export interface CrestPrewarmHost {
 
 /** Hidden carriers borrow the actual pool buffers and material. Compilation
  * alone never uploads geometry; each carrier also receives a bounded draw. */
-export class CrestPrewarm {
+export class CrestPrewarm<Kind extends string = CrestKind> {
   readonly group = new THREE.Group();
-  private readonly carriers = new Map<
-    CrestKind,
-    THREE.Mesh<THREE.BufferGeometry, THREE.Material>
-  >();
-  private readonly compiled = new Map<CrestKind, LinkedProgramLike[]>();
-  private readonly compiling = new Map<CrestKind, Promise<void>>();
+  private readonly carriers = new Map<Kind, THREE.Mesh<THREE.BufferGeometry, THREE.Material>>();
+  private readonly compiled = new Map<Kind, LinkedProgramLike[]>();
+  private readonly compiling = new Map<Kind, Promise<void>>();
   private readonly touched = new Set<LinkedProgramLike>();
-  private readonly uploaded = new Set<CrestKind>();
+  private readonly uploaded = new Set<Kind>();
   private disposed = false;
 
   constructor(
     scene: THREE.Scene,
-    shapes: ReadonlyMap<CrestKind, THREE.BufferGeometry>,
+    shapes: ReadonlyMap<Kind, THREE.BufferGeometry>,
     material: THREE.Material,
   ) {
     this.group.name = 'signature-crest-prewarm';
@@ -51,7 +48,7 @@ export class CrestPrewarm {
     registerContextRestoreReset('crest-prewarm', this, (owner) => owner.forgetContext());
   }
 
-  ready(kind: CrestKind): boolean {
+  ready(kind: Kind): boolean {
     return !this.disposed && this.uploaded.has(kind);
   }
 
@@ -63,7 +60,7 @@ export class CrestPrewarm {
     this.uploaded.clear();
   }
 
-  units(host: CrestPrewarmHost, kinds?: readonly CrestKind[]): PrewarmResumeUnit[] {
+  units(host: CrestPrewarmHost, kinds?: readonly Kind[]): PrewarmResumeUnit[] {
     if (this.disposed) return [];
     const units: PrewarmResumeUnit[] = [];
     for (const [kind, carrier] of this.carriers) {

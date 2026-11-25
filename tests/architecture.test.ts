@@ -1102,7 +1102,14 @@ const RENDER_PURE_CORES = [
   'src/render/seat_pick_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
+  // the Paladin rework's pure cores
+  'src/render/final_edict_core.ts',
+  'src/render/dawnfall_core.ts',
+  'src/render/debt_of_light_core.ts',
+  'src/render/tolling_hammer_core.ts',
+  'src/render/guardian_covenant_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
+  'src/render/ability_vfx/paladin_vfx_detail_core.ts',
   'src/render/ability_vfx/signature_core.ts',
   'src/render/ability_vfx/warrior_attention_core.ts',
   'src/render/ability_vfx/warrior_insult_core.ts',
@@ -1445,6 +1452,8 @@ const RENDER_PURE_CORES = [
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
+  'src/render/paladin_valkyrs_calling_core.ts',
+  'src/render/paladin_aura_vfx_core.ts',
   'src/render/prewarm_compile_submission_core.ts',
   'src/render/prewarm_submit_stop_core.ts',
   // Bare-named, so the on-disk *_core sweep cannot find them: registered

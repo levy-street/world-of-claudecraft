@@ -23,6 +23,13 @@ import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
 import type { MountRideSpec } from '../mount_visuals';
+import {
+  heldShieldFlash,
+  shieldBlockLeft,
+  shieldSigilSpec,
+  vowkeeperWeaponGlow,
+} from '../paladin_shield_buffs';
+import { valkyrBrandish, valkyrSlam } from '../paladin_valkyrs_calling_core';
 import { buildSeasonalHeadPiece, fitSeasonalHead } from '../seasonal_head_cosmetic';
 import type { SeatAnimInfo } from '../seated_pose_core';
 import {
@@ -141,12 +148,10 @@ import { noteLookAttached } from './look_pieces';
 import type { ClipMap, EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
 import { clampWocBodyScale, type ModularAppearance, type ModularLook } from './modular';
-import {
-  PALADIN_BASTION_SWEEP_CLIP,
-  PALADIN_BASTION_SWEEP_DURATION,
-} from './paladin_bastion_sweep_clip';
-import { PaladinBastionSweepFx } from './paladin_bastion_sweep_fx';
+import { PALADIN_BASTION_SWEEP_CLIP } from './paladin_bastion_sweep_clip';
+import { PaladinShieldGlowFx } from './paladin_shield_glow_fx';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { type ValkyrArmTargets, valkyrArmTargetsFor } from './paladin_valkyr_pose';
 import { applyRideGrip, newRideGripState, type RideArms, resolveRideArms } from './ride_grip_ik';
 import { aimBone, reinArmDirections, rideLegDirections } from './ride_pose';
 import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
@@ -379,6 +384,19 @@ const CLIMB_BODY_PITCH = 0.3;
 const CLIMB_BODY_DUCK = -0.18;
 /** Blend in/out rate for the whole climb pose (1/s). */
 const CLIMB_BLEND_RATE = 14;
+
+// Valkyr's Calling: the weapon arm is thrust straight overhead with the head
+// of the weapon to the sky and the chin lifts; on landing the weapon comes
+// down hard in front, head into the ground, as the chest folds over it. The
+// arm is an OVERRIDE toward absolute shoulder rotations (the base under it is
+// the jump loop in the air and the idle on landing, and an additive offset
+// lands somewhere different on each). The targets come per rig from
+// paladin_valkyr_pose.ts (the WOC body's own raise and chop keys).
+const valkyrArm = new THREE.Quaternion();
+const VALKYR_HEAD_LIFT_RAD = -0.35;
+const VALKYR_CHEST_FOLD_RAD = 0.35;
+/** A flight seen this close to its end touched down (not cancelled). */
+const VALKYR_LANDING_WINDOW = 0.3;
 
 /** Ride (straddle) pose bones. The foot chain is only needed here, so it is not
  *  folded into the climb's arrays. Names are the three.js-sanitized KayKit
@@ -1272,7 +1290,10 @@ export class CharacterVisual {
   private weaponAuraSanguine = false;
   private readonly sanguineSheath = new SanguineWeaponSheath();
   private weaponAuraMode: WeaponAuraMode = 'none';
-  private bastionSweepFx: PaladinBastionSweepFx | null = null;
+  /** Bastion Sweep's bash lights the shield the Paladin holds. */
+  private shieldGlowFx: PaladinShieldGlowFx | null = null;
+  /** Vowkeeper Strike's blow lights the weapon the Paladin holds. */
+  private weaponGlowFx: PaladinShieldGlowFx | null = null;
   private bastionSweepAction: THREE.AnimationAction | null = null;
   private templarsVerdictFx: PaladinTemplarsVerdictFx | null = null;
   private templarsVerdictAction: THREE.AnimationAction | null = null;
@@ -1473,6 +1494,20 @@ export class CharacterVisual {
   private rideArmBones: (THREE.Object3D | null)[] | undefined;
   private rideFootBones: (THREE.Object3D | null)[] | undefined;
   private rideHipBone: THREE.Object3D | null | undefined;
+  // Valkyr's Calling pose: seconds into the flight (null grounded) and time
+  // since touchdown for the slam (negative when none is playing).
+  private valkyrElapsed: number | null = null;
+  private valkyrLastElapsed = 0;
+  private valkyrSlamSince = -1;
+  private valkyrBones: (THREE.Object3D | null)[] | undefined;
+  private valkyrArmTargets: ValkyrArmTargets | null = null;
+  /** Last head/chest tilt added and the value it left, per bone: the jump
+   * loop keys neither, so the mixer never resets them and a plain `+=` would
+   * spin the head round a full turn every few frames. */
+  private readonly valkyrNudges = [
+    { add: 0, written: Number.NaN },
+    { add: 0, written: Number.NaN },
+  ];
   private spinAngle = 0;
   private spinOnceTimer = 0;
 
@@ -1550,6 +1585,7 @@ export class CharacterVisual {
     this.offhandItemId = offhandItemId;
     this.bareWhenUnarmed = opts?.bareWhenUnarmed ?? false;
     this.baseHeight = prep.def.height;
+    if (key === 'player_paladin') this.valkyrArmTargets = valkyrArmTargetsFor(prep.clips);
 
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
@@ -1782,8 +1818,13 @@ export class CharacterVisual {
       }
       this.mixer.addEventListener('finished', (ev) => this.onFinished(ev.action));
       recordBuildSpan('view-part:mixer', performance.now() - mixerStarted, mixerStarted);
-      if (key === 'player_paladin' && !prep.def.wocCharacter) {
-        this.bastionSweepFx = new PaladinBastionSweepFx(this.model);
+      if (key === 'player_paladin') {
+        // Their layers are built now, hidden, so the view's compile gate takes
+        // them with the rig and a first glow mounts nothing.
+        this.shieldGlowFx = new PaladinShieldGlowFx(this.model);
+        this.weaponGlowFx = new PaladinShieldGlowFx(this.model, 'right');
+        this.shieldGlowFx.prepare();
+        this.weaponGlowFx.prepare();
       }
       this.rebuildTemplarsVerdictFx();
 
@@ -2349,22 +2390,38 @@ export class CharacterVisual {
       this.applyClimbPose();
       // ...and for the straddle a mount asks its rider to hold.
       this.applyRidePose(dt);
+      this.applyValkyrPose(dt);
       const verdictTime =
         this.templarsVerdictAction &&
         this.current === this.templarsVerdictAction &&
         this.currentIsOneShot
           ? this.templarsVerdictAction.time
           : null;
-      const bastionTime =
-        this.bastionSweepAction && this.current === this.bastionSweepAction && this.currentIsOneShot
-          ? Math.min(PALADIN_BASTION_SWEEP_DURATION, this.bastionSweepAction.time)
-          : null;
-      this.bastionSweepFx?.update(bastionTime, animationDt);
       this.templarsVerdictFx?.update(
         verdictTime,
         animationDt,
         this.templarsVerdictAction?.getClip().duration,
       );
+      if (this.shieldGlowFx) {
+        const bash =
+          this.bastionSweepAction &&
+          this.current === this.bastionSweepAction &&
+          this.currentIsOneShot
+            ? this.bastionSweepAction
+            : null;
+        this.shieldGlowFx.update(
+          bash?.time ?? null,
+          bash?.getClip().duration ?? 0,
+          animationDt,
+          shieldBlockLeft(this.clickProxy.userData.entityId),
+          heldShieldFlash(this.clickProxy.userData.entityId),
+          shieldSigilSpec(this.clickProxy.userData.entityId),
+        );
+      }
+      if (this.weaponGlowFx) {
+        const swing = vowkeeperWeaponGlow(this.clickProxy.userData.entityId);
+        this.weaponGlowFx.drive(swing?.glow ?? 0, swing?.flash ?? 0, animationDt);
+      }
       // Morph influences, not bone writes, so mixer order is irrelevant, but
       // it rides the animated branch: a throttled far rig has no business
       // integrating a hair spring.
@@ -2849,6 +2906,65 @@ export class CharacterVisual {
       aimBone(rideQuat.copy(fore.quaternion), rideSwing, rideDirB);
       fore.quaternion.slerp(rideQuat, k);
     }
+  }
+
+  /** Seconds into a Valkyr's Calling flight, or null when not flying. A flight
+   * that ends near its full length touched down and plays the slam. */
+  setValkyrFlight(elapsed: number | null, landAt: number): void {
+    // The arm is posed over whatever clip plays (applyValkyrPose).
+    if (elapsed === null && this.valkyrElapsed !== null) {
+      if (this.valkyrLastElapsed >= landAt - VALKYR_LANDING_WINDOW) this.valkyrSlamSince = 0;
+    }
+    if (elapsed !== null) {
+      this.valkyrLastElapsed = elapsed;
+      this.valkyrSlamSince = -1;
+    }
+    this.valkyrElapsed = elapsed;
+  }
+
+  /** After the mixer, only on frames the mixer ran (like the climb). */
+  private applyValkyrPose(dt: number): void {
+    let weight = valkyrBrandish(this.valkyrElapsed);
+    let strike = 0;
+    if (this.valkyrSlamSince >= 0) {
+      this.valkyrSlamSince += dt;
+      const [s, w] = valkyrSlam(this.valkyrSlamSince);
+      if (w <= 0) this.valkyrSlamSince = -1;
+      weight = w;
+      strike = s;
+    }
+    if (weight <= 1e-3) weight = 0;
+    const nudged = this.valkyrNudges[0].add !== 0 || this.valkyrNudges[1].add !== 0;
+    if (weight === 0 && !nudged) return;
+    if (this.valkyrBones === undefined) {
+      this.valkyrBones = ['upperarmr', 'chest', 'head'].map(
+        (n) => this.model.getObjectByName(n) ?? null,
+      );
+    }
+    const [arm, chest, head] = this.valkyrBones;
+    if (arm && weight > 0) {
+      this.valkyrArmTargets ??= valkyrArmTargetsFor(new Map());
+      valkyrArm.copy(this.valkyrArmTargets.overhead).slerp(this.valkyrArmTargets.strike, strike);
+      arm.quaternion.slerp(valkyrArm, weight);
+    }
+    const lift = weight * (1 - strike),
+      fold = weight * strike;
+    if (chest) this.valkyrNudge(chest, VALKYR_CHEST_FOLD_RAD * fold, this.valkyrNudges[0]);
+    if (head)
+      this.valkyrNudge(head, VALKYR_HEAD_LIFT_RAD * lift + 0.25 * fold, this.valkyrNudges[1]);
+  }
+
+  /** Tilt a bone about X by `add`, first taking back last frame's tilt when no
+   * clip has rewritten the bone since (it still holds exactly what we left). */
+  private valkyrNudge(
+    bone: THREE.Object3D,
+    add: number,
+    last: { add: number; written: number },
+  ): void {
+    if (bone.rotation.x === last.written) bone.rotation.x -= last.add;
+    bone.rotation.x += add;
+    last.add = add;
+    last.written = bone.rotation.x;
   }
 
   /** Ease the extra arm raise in toward the swap moment and back out after it;
@@ -4735,6 +4851,9 @@ export class CharacterVisual {
     this.syncSpiritVeil();
     this.rebuildWeaponAura();
     this.rebuildTemplarsVerdictFx();
+    // The held gear changed: lay the glow layers over it now, not on its first glow.
+    this.shieldGlowFx?.prepare();
+    this.weaponGlowFx?.prepare();
   }
 
   private rebuildTemplarsVerdictFx(): void {
@@ -5289,11 +5408,13 @@ export class CharacterVisual {
     this.eyeWardMarker = null;
     this.effigyRig?.dispose();
     this.effigyRig = null;
-    this.bastionSweepFx?.dispose();
-    this.bastionSweepFx = null;
-    this.bastionSweepAction = null;
     this.templarsVerdictFx?.dispose();
     this.templarsVerdictFx = null;
+    this.shieldGlowFx?.dispose();
+    this.shieldGlowFx = null;
+    this.weaponGlowFx?.dispose();
+    this.weaponGlowFx = null;
+    this.bastionSweepAction = null;
     this.templarsVerdictAction = null;
     this.formAdornments?.dispose();
     // shared geometry and glow materials (seasonal_decor_assets.ts): only detach
@@ -6090,7 +6211,7 @@ export class CharacterVisual {
     // Final Edict and an ordinary two-hand attack share WOC's authored chop.
     // Every new one-shot clears ownership; playAttack reclaims it by ability.
     this.stopTemplarsVerdictFx();
-    if (name !== PALADIN_BASTION_SWEEP_CLIP) this.stopBastionSweepFx();
+    if (name !== PALADIN_BASTION_SWEEP_CLIP) this.stopShieldGlow();
     // A one-shot replaced in the frame it began (the second swing of a same-tick
     // dual pair) never drove a pose: blend from what IT was blending from.
     const replacedThisFrame = this.currentIsOneShot && this.oneShotAt === this.mixer.time;
@@ -6153,7 +6274,7 @@ export class CharacterVisual {
 
   private onFinished(a: THREE.AnimationAction): void {
     if (a === this.templarsVerdictAction) this.stopTemplarsVerdictFx();
-    if (a === this.bastionSweepAction) this.stopBastionSweepFx();
+    if (a === this.bastionSweepAction) this.stopShieldGlow();
     if (this.deadLock) return; // death clip clamps on its last frame
     if (this.baseState === 'sit' && a === this.seatAction('down')) {
       this.fadeTo(this.seatAction('idle') ?? a, 0.25, false);
@@ -6213,7 +6334,7 @@ export class CharacterVisual {
   private enterDeath(): void {
     this.braceUntil = Number.NEGATIVE_INFINITY;
     this.stopTemplarsVerdictFx();
-    this.stopBastionSweepFx();
+    this.stopShieldGlow();
     this.deadLock = true;
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
@@ -6264,9 +6385,18 @@ export class CharacterVisual {
     this.templarsVerdictFx?.update(null, 0);
   }
 
-  private stopBastionSweepFx(): void {
+  private stopShieldGlow(): void {
     this.bastionSweepAction = null;
-    this.bastionSweepFx?.update(null, 0);
+    // Ends the bash's light only: Bastion Rite's carries on.
+    const id = this.clickProxy.userData.entityId;
+    this.shieldGlowFx?.update(
+      null,
+      0,
+      0,
+      shieldBlockLeft(id),
+      heldShieldFlash(id),
+      shieldSigilSpec(id),
+    );
   }
 
   private revive(): void {

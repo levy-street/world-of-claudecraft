@@ -232,6 +232,20 @@ export function groundTickAbilityCue(ability: string | undefined): SfxId | null 
   return (ability && GROUND_TICK_ABILITY_CUES[ability]) || null;
 }
 
+// Ground cues that keep the nova voice although their fx is not 'nova': each
+// heal pulse of Aegis of the First Dawn (fx:'tick') and its closing burst
+// (fx:'burst') were world novas until the Paladin rework split them for the
+// dome's pulse and completion (paladin_aegis_visual.ts routePaladinAegisCue),
+// and they still sound as the nova did (the shared burst with the holy layer,
+// novaAbilityCue's default). hud.ts's spellfxAt arm voices the fx this returns.
+const NOVA_VOICED_ZONE_CUES: Partial<Record<string, readonly string[]>> = {
+  aegis_first_dawn: ['tick', 'burst'],
+};
+
+export function spellfxAtVoicedFx(fx: string, ability: string | undefined): string {
+  return ability && NOVA_VOICED_ZONE_CUES[ability]?.includes(fx) ? 'nova' : fx;
+}
+
 // A damage-landing archetype (bolt/burst/strike/nova/beam/dot) always
 // resolves the shared impact_<school> cue (impactCueForDamage below). A few
 // abilities get their own distinct impact instead, keyed off

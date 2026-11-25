@@ -11,6 +11,22 @@ const DETONATION_FLASH_DURATION = 0.2;
 export type SunGodVerdictEffect = Extract<AbilityEffect, { type: 'sunGodVerdict' }>;
 export type SunGodVerdictDetonation = 'singleTarget' | 'area';
 
+/** The area sentence covers every enemy the pronouncing Dawnfall could reach.
+ * Dawnfall hits by centre distance within `triggerRadius` of the Paladin, so the
+ * marked enemy is at most that far away; a sentence of twice that radius,
+ * centred on the marked enemy, therefore contains Dawnfall's whole circle.
+ * The authored `areaRadius` stays the floor. */
+export function sunGodVerdictAreaRadius(
+  effect: SunGodVerdictEffect,
+  triggerRadius: number | undefined,
+): number {
+  const reach =
+    triggerRadius !== undefined && Number.isFinite(triggerRadius) && triggerRadius > 0
+      ? triggerRadius * 2
+      : 0;
+  return Math.max(effect.areaRadius, reach);
+}
+
 export function sunVerdictAbilityGlowActive(
   auras: readonly { kind: Aura['kind']; sourceId?: number }[] | undefined,
   sourceId: number | undefined,
@@ -65,6 +81,7 @@ export function applySunGodVerdict(
     targetId: target.id,
     school: 'holy',
     fx: 'wardBloom',
+    ability: PALADIN_SUN_GOD_VERDICT_ID,
   });
   ctx.enterCombat(caster, target);
 }
@@ -111,6 +128,7 @@ function detonateArea(
   effect: SunGodVerdictEffect,
   abilityName: string,
   damageMult: number,
+  radius: number,
 ): void {
   ctx.emit({
     type: 'spellfx',
@@ -120,6 +138,7 @@ function detonateArea(
     fx: 'paladinAscensionImpact',
     ability: PALADIN_SUN_GOD_VERDICT_ID,
     impact: 'offensive',
+    range: radius,
   });
   ctx.emit({
     type: 'spellfxAt',
@@ -127,11 +146,13 @@ function detonateArea(
     z: target.pos.z,
     school: 'holy',
     fx: 'nova',
-    radius: effect.areaRadius,
+    ability: PALADIN_SUN_GOD_VERDICT_ID,
+    sourceId: caster.id,
+    radius,
   });
 
   const victims = ctx
-    .hostilesInRadius(caster, target.pos, effect.areaRadius)
+    .hostilesInRadius(caster, target.pos, radius)
     .filter((victim) => ctx.hasLineOfSight(caster, victim));
   const capScale = victims.length > effect.areaSoftCap ? effect.areaSoftCap / victims.length : 1;
   for (const victim of victims) {
@@ -183,6 +204,8 @@ export function advanceSunGodVerdict(
   mark: Aura,
   effect: SunGodVerdictEffect,
   abilityName: string,
+  /** Radius of the Dawnfall that landed this charge; sizes the area sentence. */
+  triggerRadius?: number,
 ): SunGodVerdictDetonation | null {
   if (
     (triggeringAbilityId !== FINAL_EDICT_ID && triggeringAbilityId !== DAWNFALL_ID) ||
@@ -227,7 +250,15 @@ export function advanceSunGodVerdict(
     detonateSingleTarget(ctx, caster, target, effect, abilityName, damageMult);
     return 'singleTarget';
   }
-  detonateArea(ctx, caster, target, effect, abilityName, damageMult);
+  detonateArea(
+    ctx,
+    caster,
+    target,
+    effect,
+    abilityName,
+    damageMult,
+    sunGodVerdictAreaRadius(effect, triggerRadius),
+  );
   return 'area';
 }
 

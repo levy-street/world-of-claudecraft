@@ -1438,7 +1438,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  '4f474fa63f385a9500a579234fa54bb0347928db42b34bce32c8b908ea32f6db';
+  // Re-minted for the Paladin VFX rework (renderer.ts presentation wiring). No capture was retaken.
+  // Re-minted for the Paladin kit borrowing the Warrior debris pieces (renderer.ts assets line). No capture was retaken.
+  // Re-minted for Divine Ascension no longer lifting the rider (renderer.ts sync call). No capture was retaken.
+  '44b4ca6093f3bdd59880d13c31f60885b743ee3ba301f0d9e93693451ebb7cf8';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1496,7 +1499,10 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Paladin VFX rework (renderer.ts presentation wiring). No capture was retaken.
+  // Re-minted for the Paladin kit borrowing the Warrior debris pieces (renderer.ts assets line). No capture was retaken.
+  // Re-minted for Divine Ascension no longer lifting the rider (renderer.ts sync call). No capture was retaken.
+  'bae081c4f77692b39e292e4da45b7471ce4188f83fcc0fba6cb7816332e40e7e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2905,7 +2911,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
       // v0.45.4 graphics and dungeon loading optimizations in renderer.ts:
       // recomputed from the swept evidence. No capture was retaken.
-    ).toBe('cac822feca2db6382e3569357b7b23fab2f038db18acfc98cc07412512475032');
+    ).toBe('1402461590113ad4b053147260a5bd3b5368d78bc096b515815caf42168ca690');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

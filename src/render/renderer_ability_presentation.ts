@@ -47,7 +47,13 @@ interface PresentationHost {
   castGate: Pick<CastVfxReadiness, 'admit' | 'ready' | 'spawnAllowed'>;
   painter: Pick<
     AbilityVfxDeps,
-    'spawnAoeRing' | 'triggerAttack' | 'lightPulse' | 'addShake' | 'screenFlash' | 'screenImpact'
+    | 'spawnAoeRing'
+    | 'triggerAttack'
+    | 'receiveHit'
+    | 'lightPulse'
+    | 'addShake'
+    | 'screenFlash'
+    | 'screenImpact'
   >;
 }
 
@@ -84,6 +90,11 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
       const entity = h.world().entities.get(id);
       const itemId = hand === 0 ? entity?.mainhandItemId : entity?.offhandItemId;
       return !!itemId && ITEMS[itemId]?.kind === 'weapon';
+    },
+    // The Paladin's shield-borne effects anchor to a held shield (off hand).
+    (id) => {
+      const item = ITEMS[h.world().entities.get(id)?.offhandItemId ?? ''];
+      return item?.kind === 'armor' && 'shield' in item && item.shield === true;
     },
   );
   fx.setViewportScale(h.height() * h.pixelRatio(), 60, h.height());

@@ -56,6 +56,8 @@ const INVENTORY: Record<string, Answer> = {
   'src/render/ability_vfx/crest_prewarm.ts:compiled': { reset: 'crest-prewarm' },
   'src/render/ability_vfx/crest_prewarm.ts:touched': { reset: 'crest-prewarm' },
   'src/render/ability_vfx/crest_prewarm.ts:uploaded': { reset: 'crest-prewarm' },
+  'src/render/ability_vfx/paladin_stand_in_prewarm.ts:compiled': { reset: 'paladin-stand-ins' },
+  'src/render/ability_vfx/paladin_stand_in_prewarm.ts:touched': { reset: 'paladin-stand-ins' },
   'src/render/ability_vfx/painter.ts:warmedSpiritClasses': {
     exempt: 'CPU: the spirit GLB loads a first sighting starts, not a GPU proof',
   },

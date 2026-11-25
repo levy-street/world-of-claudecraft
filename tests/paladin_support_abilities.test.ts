@@ -107,8 +107,9 @@ describe('Paladin support abilities', () => {
     });
     expect(ally.auras).toContainEqual(covenantAura);
     expect(sim.player.auras).toContainEqual(covenantAura);
-    expect(characterPaladinWingsActive(ally)).toBe(true);
-    expect(characterPaladinWingsActive(sim.player)).toBe(true);
+    // The Covenants draw their own visuals now; they no longer raise the wings.
+    expect(characterPaladinWingsActive(ally)).toBe(false);
+    expect(characterPaladinWingsActive(sim.player)).toBe(false);
   });
 
   it('self-casts Guardian Covenant when no friendly target is selected', () => {

@@ -3045,6 +3045,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "vfx/magic_04.png": "/media/vfx/magic_04.db52cb9014be.png",
   "vfx/orbital-lightning/impact.glb": "/media/vfx/orbital-lightning/impact.4314bdf401a7.glb",
   "vfx/orbital-lightning/orb.glb": "/media/vfx/orbital-lightning/orb.585974a028dc.glb",
+  "vfx/paladin_spec_icons.webp": "/media/vfx/paladin_spec_icons.f1b18bc028d9.webp",
   "vfx/pulsars/orb.glb": "/media/vfx/pulsars/orb.0a45beb708ed.glb",
   "vfx/slash_02.png": "/media/vfx/slash_02.4c226fe5bcc4.png",
   "vfx/smoke_05.png": "/media/vfx/smoke_05.d45c9fb99de9.png",

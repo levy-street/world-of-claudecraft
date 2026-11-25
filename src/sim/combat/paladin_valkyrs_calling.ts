@@ -9,8 +9,8 @@ import { sweptLanding } from './heroic_leap';
 import { VALKYRS_CALLING_FLIGHT_AURA_ID } from './paladin_valkyrs_calling_state';
 import { wearsSetBonus } from './set_bonus_wearer';
 
-export const VALKYRS_CALLING_ASCENT_DURATION = 0.5;
-export const VALKYRS_CALLING_APPROACH_DURATION = 1;
+export const VALKYRS_CALLING_ASCENT_DURATION = 0.8;
+export const VALKYRS_CALLING_APPROACH_DURATION = 0.7;
 export const VALKYRS_CALLING_DESCENT_DURATION = 0.5;
 export const VALKYRS_CALLING_FLIGHT_DURATION =
   VALKYRS_CALLING_ASCENT_DURATION +
@@ -18,6 +18,10 @@ export const VALKYRS_CALLING_FLIGHT_DURATION =
   VALKYRS_CALLING_DESCENT_DURATION;
 
 const VALKYRS_CALLING_ALTITUDE = 7;
+/** The first part of the ascent is the charge: the Paladin crouches on the spot
+ * gathering light while the wings open, then the launch bursts up through the
+ * rest of the climb. */
+export const VALKYRS_CALLING_TAKEOFF = 0.55;
 const EXTERNAL_RELOCATION_EPSILON = 0.05;
 const VALKYRS_CALLING_DEVOTION_GAIN = 1;
 
@@ -34,7 +38,15 @@ function pointOnFlight(entity: Entity, elapsed: number): Vec3 {
 
   const cruiseY = Math.max(flight.from.y, flight.to.y) + VALKYRS_CALLING_ALTITUDE;
   if (elapsed <= VALKYRS_CALLING_ASCENT_DURATION) {
-    const progress = smoothstep(elapsed / VALKYRS_CALLING_ASCENT_DURATION);
+    // Braced on the ground, then launched: fastest off the ground, easing
+    // into the top of the climb.
+    if (elapsed <= VALKYRS_CALLING_TAKEOFF) return { ...flight.from };
+    const climb = Math.min(
+      1,
+      (elapsed - VALKYRS_CALLING_TAKEOFF) /
+        (VALKYRS_CALLING_ASCENT_DURATION - VALKYRS_CALLING_TAKEOFF),
+    );
+    const progress = 1 - (1 - climb) ** 2;
     return {
       x: flight.from.x,
       y: flight.from.y + (cruiseY - flight.from.y) * progress,
@@ -54,7 +66,8 @@ function pointOnFlight(entity: Entity, elapsed: number): Vec3 {
 
   const descentElapsed =
     elapsed - VALKYRS_CALLING_ASCENT_DURATION - VALKYRS_CALLING_APPROACH_DURATION;
-  const progress = smoothstep(descentElapsed / VALKYRS_CALLING_DESCENT_DURATION);
+  // The slam: a hang at the top, then accelerating all the way down.
+  const progress = Math.max(0, Math.min(1, descentElapsed / VALKYRS_CALLING_DESCENT_DURATION)) ** 3;
   return {
     x: flight.to.x,
     y: cruiseY + (flight.to.y - cruiseY) * progress,
@@ -119,12 +132,25 @@ export function armValkyrsCalling(
     school: ability.school,
   });
   ctx.emit({
-    type: 'spellfxAt',
-    x: entity.pos.x,
-    z: entity.pos.z,
+    type: 'spellfx',
+    sourceId: entity.id,
+    targetId: entity.id,
     school: ability.school,
+    fx: 'selfCast',
+    ability: 'valkyrs_calling',
+  });
+  // Cosmetic: where the flight will come down, so the renderer can mark the
+  // landing while the Paladin is out of sight.
+  ctx.emit({
+    type: 'spellfxAt',
+    x: landing.x,
+    z: landing.z,
+    school: ability.school,
+    sourceId: entity.id,
+    ability: 'valkyrs_calling_mark',
     fx: 'nova',
-    radius: 3,
+    radius: effect.radius,
+    duration: VALKYRS_CALLING_FLIGHT_DURATION,
   });
 }
 
@@ -170,6 +196,8 @@ export function advanceValkyrsCalling(ctx: SimContext, entity: Entity): boolean 
     x: entity.pos.x,
     z: entity.pos.z,
     school: flight.school,
+    sourceId: entity.id,
+    ability: 'valkyrs_calling_impact',
     fx: 'nova',
     radius: flight.landingAoe.radius,
   });

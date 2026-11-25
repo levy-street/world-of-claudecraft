@@ -740,7 +740,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Paladin VFX rework (renderer.ts presentation wiring). No capture was retaken.
+  // Re-minted for the Paladin kit borrowing the Warrior debris pieces (renderer.ts assets line). No capture was retaken.
+  // Re-minted for Divine Ascension no longer lifting the rider (renderer.ts sync call). No capture was retaken.
+  'bae081c4f77692b39e292e4da45b7471ce4188f83fcc0fba6cb7816332e40e7e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

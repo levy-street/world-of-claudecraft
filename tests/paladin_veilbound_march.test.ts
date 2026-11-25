@@ -253,6 +253,27 @@ describe('Veilbound March', () => {
     expect(sim.player.stats.armor).toBe(Math.round(baseArmor));
   });
 
+  it("cues the final wave's burst in the same tick as its hits, after them, naming the Paladin", () => {
+    const sim = makeProtection();
+    const marked = targetAt(sim, 0, -39.4);
+    sim.castAbility('veilbound_march');
+    walkInto(sim, [marked]);
+    sim.drainEvents();
+    let wave: ReturnType<typeof sim.tick> = [];
+    for (let tick = 0; tick < 4 * 20 && !wave.length; tick++) {
+      const events = sim.tick();
+      if (events.some((e) => e.type === 'spellfxAt' && e.ability === 'veilbound_march'))
+        wave = events;
+    }
+    const hit = wave.findIndex(
+      (e) => e.type === 'damage' && e.abilityId === 'veilbound_march' && e.targetId === marked.id,
+    );
+    const burst = wave.findIndex((e) => e.type === 'spellfxAt' && e.ability === 'veilbound_march');
+    expect(hit).toBeGreaterThanOrEqual(0);
+    expect(burst).toBeGreaterThan(hit);
+    expect(wave[burst]).toMatchObject({ fx: 'nova', sourceId: sim.playerId });
+  });
+
   it('uses one Ascension charge to empower the final wave by 50% and pull marked enemies 2 m', () => {
     const sim = makeProtection();
     const marked = targetAt(sim, 0, -39.4);
