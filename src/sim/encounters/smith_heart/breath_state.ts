@@ -240,6 +240,21 @@ export interface BreathRoar {
   slides: BreathShove[];
 }
 
+/** A body riding the Wind Bridge's current (breath_bridge.ts), kept on its
+ *  carrier object (the current runs out of the fight, so never on the
+ *  fight's state). `s` its place on the curve (0 the landing's mouth, 1 the
+ *  Cornice's) and `dir` its way (1 out, -1 home); `atLanding` and
+ *  `atCornice` the instance-local spots its ends blend to; `floorY` the
+ *  floors' height (world). */
+export interface BreathBridgeRide {
+  playerId: number;
+  s: number;
+  dir: 1 | -1;
+  atLanding: { x: number; z: number };
+  atCornice: { x: number; z: number };
+  floorY: number;
+}
+
 export interface BreathFightState {
   kind: 'breath';
   difficulty: BreathDifficulty;
@@ -292,10 +307,6 @@ export interface BreathFightState {
   roar: BreathRoar | null;
   /** The Roar's follow-through gusts still blowing (breath_roar_gust.ts). */
   roarGusts: RoarGust[];
-  /** The Wind Bridge (breath_bridge.ts): seconds since it began to dissolve
-   *  (the pull), and the bodies it is carrying off to an end meanwhile. */
-  bridgeGone: number;
-  bridgeShoves: BreathShove[];
   /** The storm breaking: the barrage's clock (seconds left, next volley). */
   barrage: { remaining: number; next: number; volleys: number } | null;
   spots: BreathSpot[];

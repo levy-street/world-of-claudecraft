@@ -13,7 +13,7 @@ import {
   type MovementOverrideSessionState,
   updateMovementOverrideEpochs,
 } from '../server/movement_override_epoch';
-import { BREATH } from '../src/sim/content/smith_heart_layout';
+import { BREATH, CORNICE_BRIDGE, CORNICE_LANDING } from '../src/sim/content/smith_heart_layout';
 import {
   BREATH_AURAS,
   BREATH_CUES,
@@ -21,6 +21,7 @@ import {
   ISLE_TUNING as IT,
   BREATH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
+import { BRIDGE_TUNING } from '../src/sim/encounters/smith_heart/breath_bridge_ids';
 import { DT } from '../src/sim/types';
 import { WIND_BLAST_AURA, WIND_GUST_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -86,6 +87,26 @@ describe('the Breath moves bodies the online client can draw', () => {
       expect(s.movementOverrideActive).toBe(true);
     }
     // Airborne for the whole arc without one more epoch bump.
+    expect(s.movementOverrideEpoch).toBe(startEpoch);
+  });
+
+  it('the Wind Bridge current holds the override the whole ride: one epoch edge, never one a tick', () => {
+    const f = breathFight(1, 23);
+    const p = f.players[0];
+    f.put(p, CORNICE_LANDING.x, CORNICE_LANDING.z + 2);
+    expect(f.dev('/dev heart breath reset')).toBe(true);
+    f.tick(4);
+    const s = sessionOf(f, p.id);
+    const w = watch(f, s);
+    w.tick();
+    f.put(p, CORNICE_BRIDGE.landing.x, CORNICE_BRIDGE.landing.z);
+    w.tick();
+    expect(p.carriedBy).toBeDefined();
+    const startEpoch = s.movementOverrideEpoch;
+    for (let k = 0; k < ticks(BRIDGE_TUNING.rideSeconds) - 2; k++) {
+      w.tick();
+      expect(s.movementOverrideActive).toBe(true);
+    }
     expect(s.movementOverrideEpoch).toBe(startEpoch);
   });
 

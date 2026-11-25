@@ -35,6 +35,7 @@ import {
 } from '../src/sim/content/smith_heart';
 import {
   BREATH,
+  CORNICE_BRIDGE,
   CORNICE_GAPS,
   EAST_STAIR,
   GALLERY_LANDINGS,
@@ -83,6 +84,18 @@ function voidCell(x: number, z: number): boolean {
   return authoredFieldHeight(FIELD, x, z) <= FIELD.voidHeight + 1;
 }
 
+/** The Wind Bridge's current: a cell in either mouth links to where the ride
+ *  sets the body down on the far side (breath_bridge.ts, 2026-11-25). */
+const RIDES: readonly { from: { x: number; z: number }; to: { x: number; z: number } }[] = [
+  { from: CORNICE_BRIDGE.landing, to: CORNICE_BRIDGE.corniceDrop },
+  { from: CORNICE_BRIDGE.cornice, to: CORNICE_BRIDGE.landingDrop },
+];
+function rideFrom(x: number, z: number): { x: number; z: number } | null {
+  for (const r of RIDES)
+    if (Math.hypot(x - r.from.x, z - r.from.z) <= CORNICE_BRIDGE.mouthR) return r.to;
+  return null;
+}
+
 /** Every one-yard cell a body reaches from `start` with `open` gates (never
  *  stepping into the void: `intoVoid` lets it, to find where the rim is open). */
 function flood(
@@ -113,6 +126,11 @@ function flood(
       // A body that steps into the void falls: it walks on from nowhere.
       if (!intoVoid && voidCell(nx, nz)) continue;
       queue.push(nx, nz);
+      const to = rideFrom(nx, nz);
+      if (to && !seen[cell(to.x, to.z)]) {
+        seen[cell(to.x, to.z)] = 1;
+        queue.push(Math.round(to.x), Math.round(to.z));
+      }
     }
   }
   return seen;
@@ -148,6 +166,11 @@ function walkSteps(
       if (voidCell(nx, nz)) continue;
       steps[i] = here + 1;
       queue.push(nx, nz);
+      const to = rideFrom(nx, nz);
+      if (to && steps[cell(to.x, to.z)] < 0 && !cut(Math.round(to.x), Math.round(to.z))) {
+        steps[cell(to.x, to.z)] = here + 2;
+        queue.push(Math.round(to.x), Math.round(to.z));
+      }
     }
   }
   return steps;
@@ -326,7 +349,7 @@ describe("the Smith's Heart route", () => {
       'q3',
       'f3',
       // No gate on the Cornice's climb since 2026-11-25 (its standing stones
-      // read as walls on the ramp): the Wind Bridge over the chasm is its door.
+      // read as walls on the ramp): the Wind Bridge's current is its door.
       'cornice',
     ] as const) {
       expect(reaches(seen, SPOTS[k]), k).toBe(true);

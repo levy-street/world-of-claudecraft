@@ -1,149 +1,196 @@
-// The Wind Bridge over the chasm (encounters/smith_heart/breath_bridge.ts;
-// Jose's call of 2026-11-25, in place of the Gale Crossing's pads): walked
-// both ways out of the fight, gone the moment the guardian fights (a body on
-// it carried off to an end, never killed by it going), the void's while the
-// fight runs, back after a wipe or the kill. Deterministic.
+// The Wind Bridge's curved current over the chasm (encounters/smith_heart/
+// breath_bridge.ts, its curve breath_bridge_path.ts; Jose's call of
+// 2026-11-25): step into either mouth and the wind lifts you and carries you
+// along the curve to the far side in a few seconds, both ways, a flowing
+// carry (never a blink), set down softly. Gone on the pull (a rider mid-way
+// set down at the nearer end, never dropped), back after a wipe or the
+// kill. Deterministic. Its look: render/smith_heart_fx/breath_bridge_fx_core.ts.
 
 import { describe, expect, it } from 'vitest';
 import {
   BRIDGE_LOOK,
-  bridgeDeck,
-  bridgeLayer,
+  bridgeArc,
   bridgeShown,
+  bridgeStrand,
+  bridgeStreamPath,
   stepBridgeForm,
 } from '../src/render/smith_heart_fx/breath_bridge_fx_core';
 import { CORNICE_BRIDGE, CORNICE_LANDING } from '../src/sim/content/smith_heart_layout';
 import {
-  BRIDGE_ENDS,
   BRIDGE_OBJECT,
+  BRIDGE_RIDE_OBJECT,
   BRIDGE_TUNING,
-  bridgeCarryEnd,
-  onBridgeStrip,
+  bridgeMouthAt,
 } from '../src/sim/encounters/smith_heart/breath_bridge';
+import { bridgeCurve } from '../src/sim/encounters/smith_heart/breath_bridge_path';
 import { inBreathArena } from '../src/sim/encounters/smith_heart/breath_geometry';
+import { ISLE_AURAS } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import type { Entity } from '../src/sim/types';
 import { type BreathFight, breathFight } from './helpers/breath_fight';
 
 const ticks = (s: number) => Math.round(s * 20);
 const B = CORNICE_BRIDGE;
-const MID = { x: (B.from.x + B.to.x) / 2, z: B.from.z };
 
-/** Walk `p` toward instance-local (x, z) for `seconds`. */
-function walk(f: BreathFight, p: Entity, to: { x: number; z: number }, seconds: number): void {
-  const meta = f.sim.players.get(p.id);
-  if (!meta) throw new Error('meta');
-  for (let i = 0; i < ticks(seconds); i++) {
-    const at = f.local(p);
-    p.facing = Math.atan2(to.x - at.x, to.z - at.z);
-    meta.moveInput.forward = Math.hypot(to.x - at.x, to.z - at.z) > 0.6;
-    f.tick(1);
-  }
-  meta.moveInput.forward = false;
+const bridgeObjects = (f: BreathFight) =>
+  f.objects(BRIDGE_OBJECT).filter((e) => e.templateId === BRIDGE_OBJECT).length;
+
+/** A claim at rest: the raid on the landing, the guardian reset (the helper
+ *  sets the raid on the Cornice, which wakes it). */
+function atRest(n: number): BreathFight {
+  const f = breathFight(n, 23);
+  for (const p of f.players) f.put(p, CORNICE_LANDING.x, CORNICE_LANDING.z + 2);
+  expect(f.dev('/dev heart breath reset')).toBe(true);
+  f.tick(4);
+  return f;
+}
+const riding = (p: Entity) => p.auras.some((a) => a.id === ISLE_AURAS.riding);
+
+interface Ride {
+  /** Seconds from the step in until set down (-1 never). */
+  seconds: number;
+  /** The most one tick moved the body (yards), and its highest rise. */
+  maxStep: number;
+  rise: number;
+  end: { x: number; z: number };
+  dead: boolean;
+  carriedAll: boolean;
 }
 
-const bridgeObjects = (f: BreathFight) => f.objects(BRIDGE_OBJECT).length;
+/** Step `p` into the mouth at `mouth` and follow its ride for `seconds`. */
+function ride(f: BreathFight, p: Entity, mouth: { x: number; z: number }, seconds: number): Ride {
+  f.put(p, mouth.x, mouth.z);
+  const y0 = p.pos.y;
+  const out: Ride = {
+    seconds: -1,
+    maxStep: 0,
+    rise: 0,
+    end: f.local(p),
+    dead: false,
+    carriedAll: true,
+  };
+  let last = { ...p.pos };
+  let began = -1;
+  for (let i = 0; i < ticks(seconds); i++) {
+    f.tick(1);
+    const step = Math.hypot(p.pos.x - last.x, p.pos.y - last.y, p.pos.z - last.z);
+    last = { ...p.pos };
+    if (p.carriedBy !== undefined && began < 0) began = i;
+    if (began >= 0 && out.seconds < 0) {
+      out.maxStep = Math.max(out.maxStep, step);
+      out.rise = Math.max(out.rise, p.pos.y - y0);
+      if (p.carriedBy === undefined) out.seconds = (i - began) / 20;
+      else if (!riding(p)) out.carriedAll = false;
+    }
+  }
+  out.end = f.local(p);
+  out.dead = p.dead;
+  return out;
+}
 
-describe('the Wind Bridge', () => {
-  it('its object is no other Breath object (never read as the wind, a calm or a pad)', () => {
-    for (const prefix of [
-      'sh_breath_wind_',
-      'sh_breath_calm_',
-      'sh_breath_strike_',
-      'sh_breath_charged_',
-      'sh_breath_cradle_',
-      'sh_breath_knot_',
-      'sh_breath_updraft_',
-      'sh_breath_gale_ride_',
-      'sh_breath_closing_',
-    ])
-      expect(BRIDGE_OBJECT.startsWith(prefix), prefix).toBe(false);
+describe('the Wind Bridge current', () => {
+  it('its objects are no other Breath object (never read as the wind, a calm or a pad)', () => {
+    for (const id of [BRIDGE_OBJECT, BRIDGE_RIDE_OBJECT])
+      for (const prefix of [
+        'sh_breath_wind_',
+        'sh_breath_calm_',
+        'sh_breath_strike_',
+        'sh_breath_charged_',
+        'sh_breath_cradle_',
+        'sh_breath_knot_',
+        'sh_breath_updraft_',
+        'sh_breath_gale_ride_',
+        'sh_breath_closing_',
+      ])
+        expect(id.startsWith(prefix), `${id} ${prefix}`).toBe(false);
   });
 
-  it('spans the chasm: its strip is floor between the landing and the Cornice', () => {
-    expect(onBridgeStrip(MID.x, MID.z)).toBe(true);
-    expect(onBridgeStrip(CORNICE_LANDING.x, CORNICE_LANDING.z)).toBe(false);
-    expect(onBridgeStrip(0, 196)).toBe(false);
-    expect(inBreathArena(BRIDGE_ENDS.cornice.x, BRIDGE_ENDS.cornice.z)).toBe(true);
-    expect(BRIDGE_TUNING.dissolve).toBeCloseTo(1.5, 6);
-    expect(BRIDGE_TUNING.form).toBeCloseTo(1.5, 6);
+  it('curves: up over the chasm and down, swept sideways, mouth to mouth', () => {
+    const a = bridgeCurve(0, 60);
+    const b = bridgeCurve(1, 60);
+    expect(a.x).toBeCloseTo(B.landing.x, 6);
+    expect(b.x).toBeCloseTo(B.cornice.x, 6);
+    let rise = 0;
+    let sweep = 0;
+    let last = a;
+    for (let i = 1; i <= 100; i++) {
+      const p = bridgeCurve(i / 100, 60);
+      rise = Math.max(rise, p.y - 60);
+      sweep = Math.max(sweep, Math.abs(p.z - B.landing.z));
+      // Smooth: no step jumps.
+      expect(Math.hypot(p.x - last.x, p.y - last.y, p.z - last.z)).toBeLessThan(1.2);
+      last = p;
+    }
+    expect(rise).toBeGreaterThan(B.apex * 0.8);
+    expect(sweep).toBeGreaterThan(B.bend * 0.8);
+    expect(bridgeMouthAt(B.landing.x, B.landing.z)).toBe('landing');
+    expect(bridgeMouthAt(B.cornice.x, B.cornice.z)).toBe('cornice');
+    expect(bridgeMouthAt(B.landingDrop.x, B.landingDrop.z)).toBeNull();
+    expect(bridgeMouthAt(B.corniceDrop.x, B.corniceDrop.z)).toBeNull();
+    expect(inBreathArena(B.corniceDrop.x, B.corniceDrop.z)).toBe(true);
+    expect(inBreathArena(B.cornice.x, B.cornice.z)).toBe(true);
   });
 
-  it('is walked both ways out of the fight, its object up', () => {
-    const f = breathFight(1, 23);
+  it('carries a body out to the Cornice: lifted, held, flowing, set down clear of the mouth', () => {
+    const f = atRest(1);
     const p = f.players[0];
     expect(bridgeObjects(f)).toBe(1);
-    f.put(p, CORNICE_LANDING.x, CORNICE_LANDING.z);
-    walk(f, p, { x: BRIDGE_ENDS.cornice.x + 4, z: B.to.z }, 6);
-    let at = f.local(p);
-    expect(p.dead).toBe(false);
-    expect(inBreathArena(at.x, at.z)).toBe(true);
-    walk(f, p, { x: CORNICE_LANDING.x, z: CORNICE_LANDING.z }, 6);
-    at = f.local(p);
-    expect(p.dead).toBe(false);
-    expect(Math.hypot(at.x - CORNICE_LANDING.x, at.z - CORNICE_LANDING.z)).toBeLessThan(
+    const r = ride(f, p, B.landing, BRIDGE_TUNING.rideSeconds + 2);
+    expect(r.dead).toBe(false);
+    expect(r.carriedAll).toBe(true);
+    expect(r.seconds).toBeGreaterThan(BRIDGE_TUNING.rideSeconds - 0.15);
+    expect(r.seconds).toBeLessThan(BRIDGE_TUNING.rideSeconds + 0.15);
+    expect(r.rise).toBeGreaterThan(B.apex * 0.8);
+    // Never a blink: no tick near a third of the way.
+    expect(r.maxStep).toBeLessThan(1.5);
+    expect(Math.hypot(r.end.x - B.corniceDrop.x, r.end.z - B.corniceDrop.z)).toBeLessThan(0.6);
+    expect(riding(p)).toBe(false);
+    expect(p.onGround).toBe(true);
+  });
+
+  it('carries a body home to the landing the same way', () => {
+    const f = atRest(1);
+    const p = f.players[0];
+    const r = ride(f, p, B.cornice, BRIDGE_TUNING.rideSeconds + 2);
+    expect(r.dead).toBe(false);
+    expect(r.seconds).toBeGreaterThan(BRIDGE_TUNING.rideSeconds - 0.15);
+    expect(Math.hypot(r.end.x - B.landingDrop.x, r.end.z - B.landingDrop.z)).toBeLessThan(0.6);
+    expect(Math.hypot(r.end.x - CORNICE_LANDING.x, r.end.z - CORNICE_LANDING.z)).toBeLessThan(
       CORNICE_LANDING.r,
     );
   });
 
-  it('picks the end a body is carried to: the way it heads, else the nearer', () => {
-    expect(bridgeCarryEnd(MID.x, Math.PI / 2)).toBe('cornice');
-    expect(bridgeCarryEnd(MID.x, -Math.PI / 2)).toBe('landing');
-    expect(bridgeCarryEnd(B.to.x - 3, 0)).toBe('cornice');
-    expect(bridgeCarryEnd(B.from.x + 3, 0)).toBe('landing');
-  });
-
-  it('goes on the pull: a body on it is carried off to an end, alive, never left on it', () => {
-    for (const [facing, end] of [
-      [Math.PI / 2, 'cornice'],
-      [-Math.PI / 2, 'landing'],
+  it('goes on the pull: no mouth takes anyone, a rider mid-way is set down at the nearer end', () => {
+    for (const [start, nearer] of [
+      [B.landing, B.landingDrop],
+      [B.cornice, B.corniceDrop],
     ] as const) {
-      const f = breathFight(2, 23);
+      const f = atRest(2);
       const p = f.players[1];
-      f.put(p, MID.x, MID.z);
-      p.facing = facing;
-      f.tick(1);
+      f.put(p, start.x, start.z);
+      // A third of the way over, then the raid on the Cornice pulls.
+      f.tick(ticks(BRIDGE_TUNING.rideSeconds / 3));
+      expect(p.carriedBy).toBeDefined();
+      f.put(f.players[0], 0, 192);
       expect(f.dev('/dev heart breath pull')).toBe(true);
-      f.tick(4);
+      f.tick(ticks(BRIDGE_TUNING.rideSeconds));
       expect(bridgeObjects(f)).toBe(0);
-      let maxStep = 0;
-      let last = f.local(p);
-      for (let i = 0; i < ticks(BRIDGE_TUNING.dissolve + 3); i++) {
-        f.tick(1);
-        const at = f.local(p);
-        maxStep = Math.max(maxStep, Math.hypot(at.x - last.x, at.z - last.z));
-        last = at;
-      }
+      expect(p.dead).toBe(false);
+      expect(p.carriedBy).toBeUndefined();
       const at = f.local(p);
-      expect(p.dead, end).toBe(false);
-      expect(onBridgeStrip(at.x, at.z), end).toBe(false);
-      const want = BRIDGE_ENDS[end];
-      expect(Math.abs(at.x - want.x), end).toBeLessThan(2);
-      // Gently: a slide, never a blink.
-      expect(maxStep).toBeLessThan(1);
+      expect(Math.hypot(at.x - nearer.x, at.z - nearer.z)).toBeLessThan(0.6);
+      // In the fight a mouth takes nobody.
+      f.put(p, B.landing.x, B.landing.z);
+      f.tick(4);
+      expect(p.carriedBy).toBeUndefined();
     }
-  });
-
-  it('is the void in the fight: a body that steps onto its strip falls', () => {
-    const f = breathFight(2, 23);
-    expect(f.dev('/dev heart breath pull')).toBe(true);
-    f.tick(ticks(BRIDGE_TUNING.dissolve) + 4);
-    const p = f.players[1];
-    p.maxHp = 50000;
-    p.hp = 50000;
-    f.put(p, BRIDGE_ENDS.cornice.x, BRIDGE_ENDS.cornice.z);
-    walk(f, p, { x: MID.x, z: MID.z }, 3);
-    expect(p.dead).toBe(true);
-    // Its body laid back on the floor at the strip's end, never in the void.
-    const at = f.local(p);
-    expect(onBridgeStrip(at.x, at.z)).toBe(false);
   });
 
   it('comes back after a wipe and after the kill', () => {
     const f = breathFight(1, 23);
+    f.tick(4);
     expect(f.dev('/dev heart breath pull')).toBe(true);
     f.tick(4);
     expect(bridgeObjects(f)).toBe(0);
-    // A wipe: the raid off the Cornice (on the landing), the fight reset.
     f.put(f.players[0], CORNICE_LANDING.x, CORNICE_LANDING.z);
     expect(f.dev('/dev heart breath reset')).toBe(true);
     f.tick(4);
@@ -159,42 +206,44 @@ describe('the Wind Bridge', () => {
 
   it('is deterministic', () => {
     const run = () => {
-      const f = breathFight(2, 23);
-      const p = f.players[1];
-      f.put(p, MID.x - 2, MID.z + 1);
-      p.facing = 0;
-      f.tick(1);
-      f.dev('/dev heart breath pull');
-      f.tick(ticks(BRIDGE_TUNING.dissolve + 2));
-      return { at: f.local(p), dead: p.dead };
+      const f = atRest(1);
+      const p = f.players[0];
+      const trail: number[] = [];
+      f.put(p, B.landing.x + 1, B.landing.z - 1);
+      for (let i = 0; i < ticks(BRIDGE_TUNING.rideSeconds + 1); i++) {
+        f.tick(1);
+        trail.push(p.pos.x, p.pos.y, p.pos.z);
+      }
+      return trail;
     };
     expect(run()).toEqual(run());
   });
 });
 
 describe('the Wind Bridge look (pure core)', () => {
-  it('lies over the chasm alone, a little onto each rim', () => {
-    const D = bridgeDeck();
-    const west = D.x - D.length / 2;
-    const east = D.x + D.length / 2;
-    expect(west).toBeGreaterThan(CORNICE_LANDING.x + CORNICE_LANDING.r - 3);
-    expect(onBridgeStrip(west + 2, D.z)).toBe(true);
-    expect(onBridgeStrip(east - 2, D.z)).toBe(true);
-    expect(D.width).toBe(B.halfWidth * 2);
+  it('lays the stream on the ride curve at a body middle, strands round it', () => {
+    const path = bridgeStreamPath(60);
+    expect(path).toHaveLength(BRIDGE_LOOK.samples + 1);
+    expect(path[0].y).toBeCloseTo(60 + BRIDGE_LOOK.lift, 6);
+    const mid = BRIDGE_LOOK.samples >> 1;
+    const s = bridgeStrand(path, 0);
+    const d = Math.hypot(s[mid].x - path[mid].x, s[mid].y - path[mid].y, s[mid].z - path[mid].z);
+    expect(d).toBeGreaterThan(BRIDGE_LOOK.radius * 0.5);
+    expect(d).toBeLessThan(BRIDGE_LOOK.radius);
   });
 
-  it('reads as a volume: stacked sheets, each lower one narrower and thinner, wisps past the edge', () => {
-    expect(BRIDGE_LOOK.layers).toBeGreaterThanOrEqual(3);
-    const top = bridgeLayer(0);
-    expect(top.reach).toBeGreaterThan(1);
-    expect(top.alpha).toBe(1);
-    for (let k = 1; k < BRIDGE_LOOK.layers; k++) {
-      const a = bridgeLayer(k);
-      const b = bridgeLayer(k - 1);
-      expect(a.reach).toBeLessThan(b.reach);
-      expect(a.alpha).toBeLessThan(b.alpha);
-      expect(a.alpha).toBeGreaterThan(0);
-    }
+  it('jumps short jagged arcs along the stream (a cosmetic source, no rng)', () => {
+    const path = bridgeStreamPath(60);
+    let seed = 7;
+    const rand = () => {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    };
+    const arc = bridgeArc(path, 20, 1, rand);
+    expect(arc).toHaveLength(BRIDGE_LOOK.arcSegments + 1);
+    const a = arc[0];
+    const b = arc[arc.length - 1];
+    expect(Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z)).toBeLessThan(BRIDGE_LOOK.arcReach * 2.5);
   });
 
   it('forms over its seconds while up and is gone (nothing drawn) over its dissolve', () => {

@@ -2155,21 +2155,24 @@ Where it and anything below disagree, this block wins.
 - **No walls along the approach.** The climb and the landing stand open too
   (`CORNICE_APPROACH_LIPS`): a step off them is the void's, the body laid back on the approach's
   centre line, never over the chasm (`voidCorpseSpot`). The checkpoint stays on the landing.
-- **The Wind Bridge** (`breath_bridge.ts`, `breath_bridge_ids.ts`; Jose's call of the same day,
-  in place of the first Gale Crossing's pads and stun-carried rides): a walkable strip of packed
-  air 12 yd wide spans the chasm from the landing to the Cornice (`CORNICE_BRIDGE`, the field's
-  hidden `cornice_bridge` floor, its sides open lips), walked both ways on foot or mounted, by
-  the living and by spirits on a corpse run. It stands while the guardian is not fighting (its
-  object `sh_breath_airbridge`; the look forms over 1.5 s, `render/smith_heart_fx/
-  breath_bridge_fx.ts`). On the pull it dissolves over 1.5 s: any body on it is carried off,
-  gently, to the Cornice when it was heading there or stood nearer it, else to the landing, under
-  the shipped Riding the Gale hold, never killed by the bridge going. Once dissolved its strip is
-  the void's while the fight runs (a living body that steps or is blown onto it falls,
-  `breath_void.ts` `fallIntoVoid`; a spirit is set back on the landing to wait). It forms again
-  after a wipe's reset or the kill. Nothing of it is drawn during the fight. The entrance wakes
-  from the landing (`BREATH_INTRO.reach` 66 yd): the raid watches the storm gather across the
-  void. The raid bots teleport onto the Cornice (`/dev heart tp cornice`), so they need no walk.
-  Tests: `tests/smith_heart_breath_bridge.test.ts`.
+- **The Wind Bridge** (`breath_bridge.ts`, `breath_bridge_path.ts`, `breath_bridge_ids.ts`;
+  Jose's call of the same day, after a walkable strip read flat): a CURVED current of wind
+  spans the chasm (`CORNICE_BRIDGE`), up over the void and down, swept sideways at its middle,
+  with a swirling mouth on the landing's east edge and one on the Cornice's west rim. Step into
+  either mouth (alive, or a spirit on a corpse run) and the wind lifts you and carries you along
+  the curve to the far side in 2.7 s, set down softly clear of the far mouth: carried and held
+  under the shipped Riding the Gale aura (its wind wrap and sound), so nobody falls mid-ride and
+  the online client draws the server's motion (one override edge per ride). It stands while the
+  guardian is not fighting; on the pull its look dissolves over 1.5 s, no mouth takes anyone and
+  a rider mid-way turns for the nearer end; the chasm is the void's again (a step off the
+  landing is a fall). It returns after a wipe's reset or the kill. Its look
+  (`render/smith_heart_fx/breath_bridge_fx.ts`): a tunnel of fast-flowing wind streaks along the
+  same curve (brighter at its silhouette, so it reads round from any side), gust pulses racing
+  along it, a bright core and strands of wind wound round it, small cyan-white lightning arcs
+  jumping along and around it, a crackle as it takes a body; the same on every tier, nothing of
+  it in the fight. The entrance wakes from the landing (`BREATH_INTRO.reach` 66 yd). The raid
+  bots teleport onto the Cornice (`/dev heart tp cornice`). Tests:
+  `tests/smith_heart_breath_bridge.test.ts`.
 
 
 **The Islands of the Wind, the 50 percent phase (the team's design of 2026-11-17, built

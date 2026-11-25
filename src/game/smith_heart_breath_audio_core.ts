@@ -28,6 +28,7 @@
 // A WARNING (a fuse, a portal opening, the gather) swells with no hit; an
 // IMPACT (a strike, the burst, the roar's wave) is a hard transient.
 
+import { BRIDGE_CUES } from '../sim/encounters/smith_heart/breath_bridge_ids';
 import {
   BREATH_AURAS,
   BREATH_CASTS,
@@ -122,6 +123,12 @@ export const BREATH_CUE_SOUNDS: Readonly<Record<string, readonly BreathSound[]>>
   ],
   [ISLE_CUES.mended]: [S('calm_land', 0.45, 'target', 1.2, 0.6)],
   [ISLE_CUES.rideUp]: [S('ride_up', 1, 'point', 1, 0.3)],
+  // The Wind Bridge's current takes a body: the lift and a crackle of its
+  // lightning (breath_bridge.ts; the landing is the shared rideDown).
+  [BRIDGE_CUES.ride]: [
+    S('ride_up', 1, 'point', 1.05, 0.3),
+    S('discharge', 0.5, 'point', 1.35, 0.3),
+  ],
   [ISLE_CUES.rideDown]: [S('ride_down', 0.9, 'point', 1, 0.3)],
   [ISLE_CUES.isleWake]: [S('isle_wake', 0.9, 'point', 1, 0.3)],
 };

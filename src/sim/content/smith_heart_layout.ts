@@ -260,7 +260,7 @@ export const CORNICE_CHANNELS: readonly { deg: number; depth: number; halfDeg: n
  *  walked or blown into one falls (the field builds no wall there:
  *  `lipOpenings`). Since 2026-11-03 the whole rim lies open
  *  (CORNICE_OPEN_RIM), and since 2026-11-25 the climb's head stands a chasm
- *  away (CORNICE_LANDING): the Wind Bridge (CORNICE_BRIDGE) spans it. */
+ *  away (CORNICE_LANDING): the Wind Bridge's current (CORNICE_BRIDGE) spans it. */
 export const CORNICE_GAP_DEGREES: readonly number[] = [22, 78, 128, 182, 228, 332];
 /** A gap's reach round its throat (yards): the lip inside it is open. */
 export const CORNICE_GAP_R = 6;
@@ -288,37 +288,30 @@ export function corniceRimCut(deg: number): number {
 
 /** The Breath's landing at the climb's head (the owner's playtest of
  *  2026-11-25): where the raid gathers before the fight, Captain Thessaly at
- *  its east edge, the Cornice a chasm away across the void; the Wind Bridge
- *  over the chasm (CORNICE_BRIDGE) is the walk across. Its rim, like the
- *  climb's, lies open (no wall along the approach). */
+ *  its east edge, the Cornice a chasm away across the void; the Wind Bridge's
+ *  current (CORNICE_BRIDGE) carries a body over. Its rim, like the climb's,
+ *  lies open (no wall along the approach). */
 export const CORNICE_LANDING = { x: -64.5, z: 193.5, r: 7.5, h: H.cornice } as const;
 
-/** The Wind Bridge over the chasm (Jose's call of 2026-11-25, in place of
- *  the Gale Crossing's pads and rides): a walkable strip of packed air from
- *  the landing's east edge to the Cornice's carved west rim, walked both ways
- *  (a spirit too). It stands only while the guardian is not fighting
- *  (encounters/smith_heart/breath_bridge.ts): on the pull it dissolves, any
- *  body still on it carried off to an end, and while the fight runs its strip
- *  is the void's; it forms again after a wipe or the kill. Its field surface
- *  (`cornice_bridge`) is hidden from the generic terrain (its look is the
- *  fight's own, render/smith_heart_fx/breath_bridge_fx.ts) and laid UNDER the
- *  landing and the Cornice, so it owns only the chasm between them. `from`
- *  and `to` its ends inside the landing and the Cornice, `halfWidth` yards. */
+/** The Wind Bridge over the chasm (Jose's call of 2026-11-25): a CURVED
+ *  current of wind from a swirling mouth on the landing's east edge to one on
+ *  the Cornice's carved west rim; a body that steps into either mouth is
+ *  lifted and carried along the current to the far side
+ *  (encounters/smith_heart/breath_bridge.ts), both ways, while the guardian
+ *  is not fighting. `landing` and `cornice` the mouths, `landingDrop` and
+ *  `corniceDrop` where a ride sets a body down (clear of the mouth it lands
+ *  by), `mouthR` a mouth's reach (yards), `apex` the current's rise over the
+ *  floors and `bend` its sideways sweep at the middle (yards, to the north:
+ *  never a straight line). */
 export const CORNICE_BRIDGE = {
-  from: { x: -62, z: 194 },
-  to: { x: -37, z: 194 },
-  halfWidth: 6,
+  landing: { x: -59.5, z: 194 },
+  cornice: { x: -37.5, z: 194 },
+  landingDrop: { x: -65.5, z: 194 },
+  corniceDrop: { x: -32, z: 194 },
+  mouthR: 2.4,
+  apex: 6,
+  bend: 4.5,
 } as const;
-
-/** The bridge's sides: open lips over the void (a step off either side is a
- *  fall, as everywhere on the summit). */
-export const CORNICE_BRIDGE_LIPS: readonly { x: number; z: number; r: number }[] = (() => {
-  const B = CORNICE_BRIDGE;
-  const out: { x: number; z: number; r: number }[] = [];
-  for (let x = B.from.x; x <= B.to.x + 1e-9; x += 2)
-    for (const side of [1, -1]) out.push({ x, z: B.from.z + side * B.halfWidth, r: 2 });
-  return out;
-})();
 
 /** The Storm Cornice's open rim (the Guardian of the Breath's rework of
  *  2026-11-03, the owner's call after the team's feedback; whole since
@@ -1056,23 +1049,6 @@ const AUTHORED_SURFACES: FieldSurface[] = [
     ],
     { stairs: true, ground: 'scoured' },
   ),
-  // The Wind Bridge over the chasm (2026-11-25): walkable while it stands,
-  // drawn by the fight's own look; a flat strip laid before the landing and
-  // the Cornice so they own its ends (a path would be laid after them all).
-  {
-    kind: 'poly',
-    id: 'cornice_bridge',
-    hidden: true,
-    points: [
-      [CORNICE_BRIDGE.from.x, CORNICE_BRIDGE.from.z - CORNICE_BRIDGE.halfWidth],
-      [CORNICE_BRIDGE.to.x, CORNICE_BRIDGE.to.z - CORNICE_BRIDGE.halfWidth],
-      [CORNICE_BRIDGE.to.x, CORNICE_BRIDGE.to.z + CORNICE_BRIDGE.halfWidth],
-      [CORNICE_BRIDGE.from.x, CORNICE_BRIDGE.from.z + CORNICE_BRIDGE.halfWidth],
-    ],
-    h: H.cornice,
-    edge: 'rock',
-    ground: 'scoured',
-  },
   // The landing at the climb's head, a chasm short of the Cornice (2026-11-25).
   disc('cornice_landing', CORNICE_LANDING, { edge: 'rock', ground: 'scoured' }),
   cornice(),
@@ -1493,7 +1469,6 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
     ...CORNICE_GAPS,
     ...CORNICE_OPEN_RIM,
     ...CORNICE_APPROACH_LIPS,
-    ...CORNICE_BRIDGE_LIPS,
     ...BREATH_ISLE_LIPS,
   ].map(({ x, z, r }) => ({
     x,
