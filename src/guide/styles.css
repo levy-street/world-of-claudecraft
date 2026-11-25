@@ -593,6 +593,11 @@ img {
   align-items: center;
   gap: var(--g-md);
 }
+/* The header Play button keeps one line; the search box gives up width instead. */
+.guide-nav-actions .guide-cta {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
 /* Language picker. */
 .guide-lang {
@@ -3367,6 +3372,13 @@ span.guide-prof-mat + span.guide-prof-mat {
 /* Header search: let the field breathe with the viewport instead of a fixed 180px. */
 .guide-search-input {
   width: clamp(150px, 16vw, 230px);
+}
+/* Just above the 1024px menu breakpoint the top bar (with its Encyclopedia link) is
+   tight: the search box narrows so the bar never overflows the window. */
+@media (min-width: 1025px) and (max-width: 1240px) {
+  .guide-search-input {
+    width: clamp(110px, 11vw, 150px);
+  }
 }
 /* The slash keycap hint sits at the end of the search box and disappears once the
    reader is typing (the wrapper gets is-typing from chrome.ts). */
