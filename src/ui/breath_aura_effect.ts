@@ -153,7 +153,6 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return {
         key: `${KEY}.cocoon`,
         nums: {
-          share: pct(ISLE_TIERS.normal.novaShare),
           stilled: Math.max(0, Math.round(a.value ?? 0)),
         },
       };

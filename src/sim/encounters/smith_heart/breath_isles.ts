@@ -8,8 +8,10 @@
 //                 play is thrown or bursts first: the ball and the phase never
 //                 meet), then it closes its Gale Cocoon and channels Skyrend
 //                 Nova (the tier's `novaSeconds`): if the bar ends, the nova
-//                 strikes every player for `novaShare` of their whole health
-//                 (Normal: nine tenths; Heroic: a wipe).
+//                 kills every player of the claim on every tier, whatever
+//                 shields them (the team's ask of 2026-11-25: a failed DPS
+//                 check is a wipe, never a survivable hit; game masters
+//                 excepted, as the shared wipe spares them).
 //   The isles     Captain Thessaly raises two Updrafts on the Cornice, east
 //                 and west: step in and the wind carries you to the first
 //                 isle of that side; the raid splits in two. Three isles a
@@ -568,20 +570,7 @@ function endNova(s: BreathScope, burst: boolean): void {
   });
   if (burst) {
     breakFeat(s.st);
-    const share = isleTier(s).novaShare;
-    for (const p of corniceListeners(s.ctx, s.inst)) {
-      if (p.dead || p.ghost) continue;
-      s.ctx.dealDamage(
-        b,
-        p,
-        Math.round(p.maxHp * share),
-        false,
-        'nature',
-        ISLE_NAMES.nova,
-        'hit',
-        true,
-      );
-    }
+    novaWipe(s);
   } else breathSay(s, b, 'guardian', 'bulwark');
   // The adds and the pads go; everyone out on the isles rides home.
   for (const a of isl.adds) dropEncounterBody(s.ctx, s.inst, b, a.id);
@@ -591,6 +580,29 @@ function endNova(s: BreathScope, burst: boolean): void {
   for (let i = 0; i < isl.isles.length; i++) endClosing(s, i);
   clearShoves(s, isl.shoves);
   for (const { p, isle } of islePlayers(s.ctx, s.inst)) startRide(s, p, isle, 'home');
+}
+
+/** Skyrend Nova run out: every living player of the claim dies, on every
+ *  tier, whatever shields them (an absorb, an immunity, a cheat-death: the
+ *  damage path caps a huge hit, so a death of its own follows it). A real
+ *  game master (or the profiler's invulnerable stand-in) is spared, as the
+ *  shared wipe spares them. */
+export function novaWipe(s: Pick<BreathScope, 'ctx' | 'inst' | 'boss'>): void {
+  for (const p of corniceListeners(s.ctx, s.inst)) {
+    if (p.dead || p.ghost) continue;
+    if (p.gm || (p.profilerInvulnerable && s.ctx.devCommands)) continue;
+    s.ctx.dealDamage(
+      s.boss,
+      p,
+      p.hp + p.maxHp * 10,
+      false,
+      'nature',
+      ISLE_NAMES.nova,
+      'hit',
+      true,
+    );
+    if (!p.dead) s.ctx.handleDeath(p, s.boss, ISLE_NAMES.nova);
+  }
 }
 
 /** The way home over: the storm breaks (phase 2). */

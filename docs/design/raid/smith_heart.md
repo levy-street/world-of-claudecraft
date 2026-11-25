@@ -2109,9 +2109,9 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   **Gale Cocoon** (an aura: the Stillstones stilled, of 2) and channels **Skyrend Nova**, a
   long bar that is the phase's clock (Normal 150 s, Heroic and Mythic 125 s). The wind falls
   still, Thessaly's circle, the gales, the sky strikes and the tank swap stop (the fight's
-  `half` is `isles`). If the bar ends, the nova strikes everyone for 90 percent of their health
-  on Normal and kills on Heroic and Mythic, the feat breaks, and the fight goes on (the raid is
-  carried home, the storm breaks).
+  `half` is `isles`). If the bar ends, the nova kills every player of the claim on every tier,
+  whatever shields them (the team's ask of 2026-11-25: a failed DPS check is a wipe; before, Normal
+  took 90 percent and survived), and the fight resets (`breath_isles.ts` `novaWipe`).
 - **The split.** Captain Thessaly raises two **Updrafts** on the Cornice (east and west): step
   in and the wind carries you on the fixed ride (3.2 s, stunned, `rideArc`) to the first isle
   of that side. Six floating isles (`BREATH_ISLES`), three a side, each a stride higher than

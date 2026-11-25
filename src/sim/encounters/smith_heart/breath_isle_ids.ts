@@ -131,9 +131,6 @@ export const ISLE_NAMES = {
 export interface IsleTier {
   /** Skyrend Nova's channel (seconds): the whole phase's clock. */
   novaSeconds: number;
-  /** The nova's blow, a share of each player's whole health (over 1: a
-   *  wipe, whatever shields them). */
-  novaShare: number;
   /** An isle's Closing Storm (seconds from the first rider's landing). */
   closingSeconds: number;
   /** Sky's Reckoning: a strike under each player on the isle every
@@ -177,7 +174,6 @@ export interface IsleTier {
 export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTier>> = {
   normal: {
     novaSeconds: 150,
-    novaShare: 0.9,
     closingSeconds: 50,
     reckonEvery: 2.5,
     reckonShare: 0.16,
@@ -196,7 +192,6 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
   },
   heroic: {
     novaSeconds: 125,
-    novaShare: 3,
     closingSeconds: 38,
     reckonEvery: 2,
     reckonShare: 0.3,
@@ -216,7 +211,6 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
   // Heroic whole for now (the mythic ideas are in the design doc).
   mythic: {
     novaSeconds: 125,
-    novaShare: 3,
     closingSeconds: 38,
     reckonEvery: 2,
     reckonShare: 0.3,

@@ -60,7 +60,7 @@ function stillAir(f: BreathFight): void {
   }
 }
 
-function pulled(n = 6, tier: '' | 'heroic' = '', seed = 23): BreathFight {
+function pulled(n = 6, tier: '' | 'heroic' | 'mythic' = '', seed = 23): BreathFight {
   const f = breathFight(n, seed);
   expect(f.dev('/dev heart breath pull')).toBe(true);
   if (tier) f.dev(`/dev heart breath ${tier}`);
@@ -446,22 +446,17 @@ describe('the Islands of the Wind: the stones and the end', () => {
     expect(b.damageImmune).toBe(false);
   });
 
-  it('the nova run out: normal leaves the raid at a tenth of its health; heroic kills', () => {
-    for (const tier of ['', 'heroic'] as const) {
+  it('the nova run out wipes the raid on every tier, shields and immunities too', () => {
+    for (const tier of ['', 'heroic', 'mythic'] as const) {
       const f = pulled(4, tier);
       toIsles(f);
       for (const p of f.players) p.hp = p.maxHp;
+      // An absorb and an immunity do not save anyone: the nova is the check.
+      f.players[0].damageImmune = true;
       f.dev('/dev heart breath nova');
       f.tick(1, false);
-      const share = ISLE_TIERS[tier || 'normal'].novaShare;
-      if (share >= 1) expect(f.players.every((p) => p.dead)).toBe(true);
-      else
-        for (const p of f.players) {
-          expect(p.dead).toBe(false);
-          expect(p.hp).toBeLessThanOrEqual(Math.ceil(p.maxHp * (1 - share)) + 1);
-        }
-      expect(f.state()?.isles.stage).toBe('home');
-      expect(f.state()?.isles.burst).toBe(true);
+      expect(f.players.every((p) => p.dead)).toBe(true);
+      expect(f.state()?.isles.burst ?? true).toBe(true);
     }
   });
 
