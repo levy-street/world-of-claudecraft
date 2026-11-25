@@ -7,6 +7,7 @@
 // telegraph drapes over it), opaque like the pool and on the pool's own rung
 // of the Heat's floor ladder (the two never overlap: the terrace starts past
 // the lip), under every mark of the fight; its outer edge dithers out.
+// It writes no depth (a mark on it always draws over it; it never hides one).
 // It starts under the lip wall's stumps and reaches past the melee's whole
 // band (the guardian's body radius plus the player's BODY_EDGE_MELEE_REACH)
 // with a margin: the melee's pedestal, grown with the wall on 2026-11-24. Every tier draws it (cheap: one ring,
@@ -111,6 +112,14 @@ export class HeatWellShore {
       vertexShader: VERT,
       fragmentShader: FRAG,
       toneMapped: false,
+      // Drawn over the hall's floor (its offset wins the floor's depth) but
+      // writing no depth of its own (Jose's playtest of 2026-11-25): it stood
+      // a few hundredths over the floor with its offset pulling it closer
+      // still, so a mark laid on the ring (a Hearthseed's crater, a fist's
+      // spot, a Wakefire band) lost the depth test to it and hid under it.
+      // Opaque, it draws before every mark, so each now paints over it as
+      // over the bare floor.
+      depthWrite: false,
       polygonOffset: true,
       polygonOffsetFactor: -2,
       polygonOffsetUnits: -2,

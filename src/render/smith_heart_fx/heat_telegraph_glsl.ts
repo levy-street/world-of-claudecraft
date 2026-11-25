@@ -68,6 +68,7 @@ uniform float uCells;
 uniform float uCrack;
 uniform float uRimK;
 uniform float uSpent;
+uniform float uFinal;
 varying vec2 vLocal;
 varying vec2 vP;
 ${HEAT_NOISE_GLSL}
@@ -109,7 +110,7 @@ void main() {
   // The basalt's joints, in yards (the same size on every mark of a kind).
   float joint = 1.0 - smoothstep(0.0, 0.075, cellEdge(vP * uCells + 11.3));
 #ifdef HEAT_CHAR
-  float c = uChar * (0.45 + 0.4 * swept + 0.15 * uWarn);
+  float c = uChar * (0.45 + 0.4 * swept + 0.15 * uWarn + 0.2 * uFinal);
   c *= mix(1.0, 0.35, landed) * heatW;
   c *= 0.82 + 0.18 * vn(vP * 0.6) + 0.25 * joint;
   // Soft just inside the edge: the glow's hot line carries the exact edge.
@@ -149,6 +150,10 @@ void main() {
   col += molten(0.8) * seam * 0.5 * flick + molten(0.5) * lick * 0.3 * flick;
   // The bar's last stretch: the swept part flares with the warning.
   col += (uColor * 0.35 + hot * 0.12) * uWarn * swept * heatW;
+  // Its last half second (heatTelegraphFinal): the rim blazes white-hot and
+  // the whole mark flares, peaking the instant it strikes.
+  col += hot * uFinal * (rimCore * 1.8 + rimSoft * 0.6) * uRimK;
+  col += (uColor * 0.55 + hot * 0.3) * uFinal * swept * heatW;
   // Embers glinting over it (cosmetic).
   if (uDetail > 0.0) {
     vec2 g = vP * 1.1 + vec2(0.0, -uTime * 0.7);

@@ -8,9 +8,10 @@
 //  - the heat summed over every burst (`(1 - d / reach)^2` each, the sim's
 //    falloff): the basalt chars deepest and the cracks burn brightest on each
 //    seed and where bursts stack, fading to the outer edge;
-//  - each seed's fill sweeping its core to the burst (its reach to half
-//    way), the union of the swept parts with one ragged front of fire, the
-//    bar's last stretch flaring.
+//  - each seed's fill sweeping its core and its whole reach to the burst
+//    (both full at its instant), the union of the swept parts with one
+//    ragged front of fire, the bar's last stretch flaring, and its last half
+//    second blazing (`uFinal`, heat_telegraph_core.ts heatTelegraphFinal).
 // The same molten paint as every Heat warning (heat_telegraph_glsl.ts: the
 // char a multiply, the glow additive, on the fight's telegraph rungs where
 // they commute with every other warning), with the looks of `seedReach` and
@@ -73,6 +74,7 @@ uniform float uCrackC;
 uniform float uRimR;
 uniform float uRimC;
 uniform float uBodyC;
+uniform float uFinal;
 varying vec2 vP;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
@@ -93,7 +95,7 @@ void main() {
     float d = length(vP - s.xy);
     re = min(re, d - s.z);
     ce = min(ce, d - uCoreR);
-    rf = min(rf, d - 0.5 * s.w * s.z);
+    rf = min(rf, d - s.w * s.z);
     cf = min(cf, d - s.w * uCoreR);
     float k = max(0.0, 1.0 - d / max(s.z, 1e-3));
     heat += k * k;
@@ -118,7 +120,7 @@ void main() {
 #ifdef HEAT_CHAR
   float cR = uCharR * (0.45 + 0.4 * sweptR) * uFadeR;
   float cC = uCharC * (0.45 + 0.4 * sweptC + 0.15 * uWarn) * inCore;
-  float c = max(cR, cC) * hw;
+  float c = max(cR, cC) * hw * (1.0 + 0.25 * uFinal);
   c *= 0.82 + 0.18 * vn(vP * 0.6) + 0.25 * joint;
   // Soft just inside the outer edge: the glow's hot line carries it.
   c *= smoothstep(-0.02, 0.35, edgeR);
@@ -159,6 +161,11 @@ void main() {
   col += molten(0.8) * max(seamR, seamC) * 0.5 * flick + molten(0.5) * max(lickR, lickC) * 0.3 * flick;
   // The bar's last stretch: the cores flare with the warning.
   col += (uColor * 0.35 + hot * 0.12) * uWarn * sweptC * hw;
+  // Its last half second (heatTelegraphFinal): the outer edge and the cores'
+  // edges blaze white-hot and the whole field flares, peaking at the burst.
+  col += hot * uFinal * (rimCoreR * 1.8 * uRimR + rimSoftR * 0.5 + rimCoreC * 1.4);
+  // (A wide field: its wash stays under the edges', never a white sheet.)
+  col += (uColor * 0.3 + hot * 0.1) * uFinal * swept * hw;
   // Embers glinting over it (cosmetic).
   if (uDetail > 0.0) {
     vec2 g = vP * 1.1 + vec2(0.0, -uTime * 0.7);
@@ -230,6 +237,7 @@ export class HeatSeedField {
       uRimR: { value: R.rim },
       uRimC: { value: K.rim },
       uBodyC: { value: K.body },
+      uFinal: { value: 0 },
       uLipClip: heatLipClipUniform,
     };
     const common = {
@@ -295,9 +303,10 @@ export class HeatSeedField {
     this.mesh.visible = true;
   }
 
-  /** One frame: each laid seed's fill (in `layout`'s order) and the timing
-   *  looks off the kit's own clock (the cores' warning, the fronts). */
-  paint(seeds: readonly SeedMark[], n: number, clock: number): void {
+  /** One frame: each laid seed's fill (in `layout`'s order), the timing
+   *  looks off the kit's own clock (the cores' warning, the fronts) and the
+   *  last moment before the first burst (`final`, heatTelegraphFinal). */
+  paint(seeds: readonly SeedMark[], n: number, clock: number, final = 0): void {
     if (!this.mesh.visible) return;
     const count = Math.min(n, this.uniforms.uCount.value as number);
     let fill = 0;
@@ -310,9 +319,11 @@ export class HeatSeedField {
     this.uniforms.uWarn.value = core.warn;
     this.uniforms.uFrontC.value = core.front;
     this.uniforms.uRim.value = core.rim;
-    // The reach sweeps to half way, faint at first and brighter to the burst.
-    this.uniforms.uFrontR.value = fill > 0 ? 0.75 : 0;
+    // The reach sweeps out with the core, faint at first and brighter to the
+    // burst; its front goes once it is full.
+    this.uniforms.uFrontR.value = fill > 0 && fill < 1 ? 0.75 : 0;
     this.uniforms.uFadeR.value = 0.35 + 0.45 * fill;
+    this.uniforms.uFinal.value = final;
   }
 
   hide(): void {

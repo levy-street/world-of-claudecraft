@@ -159,6 +159,7 @@ try {
           st.seedTimer = 999;
           st.zoneTimer = 999;
           st.cinderTimer = 999;
+          st.wheelTimer = 999;
         }
     });
   const pull = async (heroic = false) => {
@@ -276,6 +277,54 @@ try {
       await chat('/dev heart heat seeds', 300);
       await place([BOSS.x + 19, BOSS.z - 12], [BOSS.x + 1, BOSS.z + 1], 0.12, 0.42, 14);
       await sleep(5200);
+    },
+    // Jose's playtest of 2026-11-25: the shore all the way round (no
+    // altar-stone behind the well), the raid behind the guardian too, the
+    // Wheel's four quarters reaching round behind it. Seen from behind it.
+    async '08_detras'() {
+      // The first scene of a run: let the raid's loading screen clear.
+      await page
+        .waitForFunction(() => !document.querySelector('#loading:not(.hidden)'), {
+          timeout: 60000,
+        })
+        .catch(() => {});
+      await sleep(6000);
+      await pull();
+      for (let i = 1; i < 8; i++) {
+        const a = (i / 7) * Math.PI * 2;
+        await raider(i, BOSS.x + Math.sin(a) * 15, BOSS.z + Math.cos(a) * 15);
+      }
+      await chat('/dev heart heat wheel', 2600);
+      await place([BOSS.x - 34, BOSS.z + 9], [BOSS.x, BOSS.z], 0.05, 0.62, 16);
+      await sleep(900);
+    },
+    // The same playtest: Hearthseeds thrown onto the melee's ring round the
+    // lip (the shore terrace) draw over it, never under it; their fill sweeps
+    // the whole reach.
+    async '09_anillo'() {
+      await pull();
+      await chat('/dev heart heat phase 2', 400);
+      await holdAll();
+      for (let i = 1; i < 8; i++) {
+        const a = 0.9 + (i / 7) * 2.4;
+        await raider(i, BOSS.x + Math.sin(a) * 15.5, BOSS.z + Math.cos(a) * 15.5);
+      }
+      await chat('/dev heart heat seeds', 300);
+      await place([BOSS.x + 30, BOSS.z + 4], [BOSS.x + 6, BOSS.z], 0.08, 0.72, 15);
+      await sleep(5400);
+    },
+    // The seeds' last half second: full to the edge, the rim blazing.
+    async '10_estallido'() {
+      await pull();
+      await chat('/dev heart heat phase 2', 400);
+      await holdAll();
+      for (let i = 1; i < 8; i++) {
+        const a = 0.9 + (i / 7) * 2.4;
+        await raider(i, BOSS.x + Math.sin(a) * 15.5, BOSS.z + Math.cos(a) * 15.5);
+      }
+      await place([BOSS.x + 30, BOSS.z + 4], [BOSS.x + 6, BOSS.z], 0.08, 0.72, 15);
+      await chat('/dev heart heat seeds', 0);
+      await sleep(Number(process.env.SHOT_BURST_MS ?? 9780));
     },
   };
 

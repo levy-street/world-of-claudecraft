@@ -30,6 +30,8 @@ import {
 import { coalLook, type HeatCoalLook } from './heat_coal_fx_core';
 import { HEAT_FIGHT_COLORS as C } from './heat_fight_fx_core';
 import type { HeatFxHost } from './heat_fx_host';
+import { setTelegraphFinal } from './heat_telegraph';
+import { heatTelegraphFinal } from './heat_telegraph_core';
 
 /** Bearers drawn at once: two coals a set, room for a stray. */
 export const COAL_SLOTS = 4;
@@ -258,6 +260,7 @@ export class HeatCoalFx {
       PAINT.front = undefined;
       PAINT.fade = undefined;
       this.host.kit.paintFan(s.burst, PAINT);
+      setTelegraphFinal(s.burst, heatTelegraphFinal(coal.remaining));
       s.burst.group.visible = true;
     } else {
       s.burst.group.visible = false;

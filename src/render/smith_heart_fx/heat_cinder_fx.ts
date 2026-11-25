@@ -43,6 +43,8 @@ import { HEAT_FIGHT_COLORS as C, fallLook, HEAT_FIGHT_POOLS as P } from './heat_
 import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { setTelegraphFinal } from './heat_telegraph';
+import { heatTelegraphFinal } from './heat_telegraph_core';
 
 /** The ball's radius (yards): about a player and a half across. */
 const BALL_R = 2.2;
@@ -393,6 +395,7 @@ export class HeatCinderFx {
       PAINT.front = undefined;
       PAINT.fade = undefined;
       this.host.kit.paintFan(s.fan, PAINT);
+      setTelegraphFinal(s.fan, heatTelegraphFinal(s.seconds - (clock - s.born)));
       const y = this.host.groundY(eAt.x, eAt.z);
       s.ball.position.set(eAt.x, y + look.height + BALL_R, eAt.z);
       s.ball.scale.set(BALL_R * 5, BALL_R * 5, 1);

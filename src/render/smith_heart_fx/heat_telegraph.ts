@@ -33,6 +33,13 @@ export function setLaneSpent(lane: TelegraphLane, yards: number): void {
   if (u) u.value = yards;
 }
 
+/** A dressed fan's or lane's last moment before it goes off (0 to 1,
+ *  heat_telegraph_core.ts heatTelegraphFinal): both its passes read it. */
+export function setTelegraphFinal(mark: TelegraphFan | TelegraphLane, k: number): void {
+  const u = (mark.floor.material as THREE.ShaderMaterial).uniforms?.uFinal;
+  if (u) u.value = k;
+}
+
 /** An owner's three telegraph rungs (encounter steps). */
 export interface HeatTelegraphSteps {
   char: number;
@@ -79,6 +86,7 @@ export class HeatTelegraphs {
       uCrack: { value: L.crack },
       uRimK: { value: L.rim },
       uSpent: { value: 0 },
+      uFinal: { value: 0 },
       uLipClip: heatLipClipUniform,
     };
     const common = {

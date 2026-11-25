@@ -233,9 +233,14 @@ describe('heat_seed_field_core: a cluster of seeds reads as one shape', () => {
     expect(seedFieldHeatWeight(2)).toBeCloseTo(1.3, 9);
   });
 
-  it("sweeps each seed's core to the burst and its reach to half way, one front", () => {
+  it("sweeps each seed's core and its whole reach to the burst together, one front", () => {
+    // Jose's playtest of 2026-11-25: the reach swept only half way, so the
+    // circle burst before it read as full. At the burst both are swept to the edge.
     const s = [{ x: 0, z: 0, reach: R, fill: 1 }];
     expect(seedFieldAt(SEED_CORE_R - 0.01, 0, s, 1, SEED_CORE_R).coreFront).toBeLessThan(0);
+    expect(seedFieldAt(R - 0.01, 0, s, 1, SEED_CORE_R).reachFront).toBeLessThan(0);
+    // Half its life spent: half its reach swept, and no further.
+    s[0].fill = 0.5;
     expect(seedFieldAt(R / 2 - 0.01, 0, s, 1, SEED_CORE_R).reachFront).toBeLessThan(0);
     expect(seedFieldAt(R / 2 + 0.5, 0, s, 1, SEED_CORE_R).reachFront).toBeGreaterThan(0);
     s[0].fill = 0;

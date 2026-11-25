@@ -100,6 +100,7 @@ import { HeatSeedField } from './heat_seed_field';
 import type { SeedMark } from './heat_seed_field_core';
 import { floorRingGeometry } from './heat_shapes';
 import { HeatTelegraphs } from './heat_telegraph';
+import { heatTelegraphFinal } from './heat_telegraph_core';
 import { HeatWellFx } from './heat_well_fx';
 import { HeatWheelFx } from './heat_wheel_fx';
 
@@ -767,7 +768,13 @@ export class HeatFightFx implements HeatFxHost {
     this.clock += dt;
     this.uTime.value = this.clock;
     this.scanTimer -= dt;
-    if (this.scanTimer <= 0) {
+    // A new or gone object scans at once: a mark's fill runs from the frame
+    // it arrives, never up to a scan late, so it is full the instant the sim
+    // strikes (Jose's playtest of 2026-11-25).
+    if (
+      this.scanTimer <= 0 ||
+      (this.origin !== null && world.entityRosterVersion !== this.rosterSeen)
+    ) {
       this.scanTimer = SCAN_SEC;
       this.scan(world);
     }
@@ -970,11 +977,13 @@ export class HeatFightFx implements HeatFxHost {
 
   private paintSeeds(world: IWorld, dt: number): void {
     let n = 0;
+    let left = Number.POSITIVE_INFINITY;
     for (const s of this.seeds) {
       if (s.id < 0) continue;
       const e = world.entities.get(s.id);
       if (!e) continue;
       const eAt = fxAnchor(e);
+      left = Math.min(left, s.life - (this.clock - s.born));
       const look = seedLook(this.clock - s.born, s.life, _seed);
       if (s.laid >= 0) this.seedMarks[s.laid].fill = look.fill;
       // Still in the air (its meteor): the footprint shows, the orb waits.
@@ -1000,7 +1009,7 @@ export class HeatFightFx implements HeatFxHost {
     }
     this.seedOrbs.instanceMatrix.needsUpdate = true;
     this.seedOrbs.visible = n > 0;
-    this.seedField.paint(this.seedMarks, this.laidSeeds, this.clock);
+    this.seedField.paint(this.seedMarks, this.laidSeeds, this.clock, heatTelegraphFinal(left));
   }
 
   /** Lay every live seed into the field, in slot order (once per change of

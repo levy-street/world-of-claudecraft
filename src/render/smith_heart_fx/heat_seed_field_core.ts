@@ -16,9 +16,11 @@
 //    distance (`seedFalloff`), so the field's heat at a point is the sum of
 //    every seed's `(1 - d / reach)^2`: hottest on each seed, hotter still
 //    where reaches overlap (struck twice), cold at the outer edge;
-//  - the TIMING: each seed's own fill (its life spent) sweeps its core out
-//    to the burst, and its reach to half way (the kit's old split), the
-//    union of the swept parts with one front.
+//  - the TIMING: each seed's own fill (its life spent) sweeps its core and
+//    its whole reach out together, both full at the very instant it bursts
+//    (Jose's playtest of 2026-11-25: the reach swept only half way, so the
+//    circle burst before it had visibly filled), the union of the swept
+//    parts with one front.
 // The shader (heat_seed_field.ts) runs the same arithmetic; these functions
 // are its testable twin and the mesh's layout.
 //
@@ -70,7 +72,7 @@ export function seedFieldAt(
     const d = Math.hypot(px - s.x, pz - s.z);
     re = Math.min(re, d - s.reach);
     ce = Math.min(ce, d - coreR);
-    rf = Math.min(rf, d - 0.5 * s.fill * s.reach);
+    rf = Math.min(rf, d - s.fill * s.reach);
     cf = Math.min(cf, d - s.fill * coreR);
     const k = Math.max(0, 1 - d / Math.max(s.reach, 1e-3));
     heat += k * k;

@@ -85,7 +85,8 @@ import { HEAT_LIP_FRAG_GLSL, HEAT_LIP_VERT_GLSL, heatLipClipUniform } from './he
 import { moltenDecal } from './heat_molten_decal';
 import { basaltColumn, basaltRepaint, crystalPrism } from './heat_shapes';
 import { HeatSwells } from './heat_swell_fx';
-import { HeatTelegraphs, setLaneSpent } from './heat_telegraph';
+import { HeatTelegraphs, setLaneSpent, setTelegraphFinal } from './heat_telegraph';
+import { heatTelegraphFinal } from './heat_telegraph_core';
 
 /** The fist trail's heat on the pyre ramp (its orange). */
 const FIST_TRAIL_HEAT = [0.55, 0, 0] as const;
@@ -619,7 +620,9 @@ export class HeatFx {
     this.clock += dt;
     this.uTime.value = this.clock;
     this.scanTimer -= dt;
-    if (this.scanTimer <= 0) {
+    // A new or gone object scans at once: the fist's fill runs from the frame
+    // its spot arrives, full the instant it lands (Jose's playtest of 2026-11-25).
+    if (this.scanTimer <= 0 || (this.active && world.entityRosterVersion !== this.rosterSeen)) {
       this.scanTimer = SCAN_SEC;
       this.scan(world);
     }
@@ -803,6 +806,7 @@ export class HeatFx {
       PAINT.front = undefined;
       PAINT.fade = undefined;
       this.kit.paintFan(s.fan, PAINT);
+      setTelegraphFinal(s.fan, heatTelegraphFinal(s.seconds - (this.clock - s.born)));
       const y = this.groundY(s.x, s.z);
       s.fist.visible = look.shown;
       if (!look.shown) continue;

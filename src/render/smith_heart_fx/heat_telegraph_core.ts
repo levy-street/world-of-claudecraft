@@ -100,3 +100,30 @@ export function heatTelegraphChar(
   const base = HEAT_TELEGRAPH_LOOKS[kind].char * (0.45 + 0.4 * s + 0.15 * warn);
   return landed ? base * 0.35 : base;
 }
+
+/** How long before a mark goes off its last moment blazes (seconds). */
+export const HEAT_TELEGRAPH_FINAL_SECONDS = 0.5;
+
+/**
+ * A filling mark's last moment (Jose's playtest of 2026-11-25: a circle went
+ * off before its fill read as done, so nobody could tell when it struck):
+ * 0 until `left` seconds before it goes off falls under
+ * HEAT_TELEGRAPH_FINAL_SECONDS, then rising to 1 at the instant it strikes.
+ * Its rim blazes white-hot and the swept mark flares over it (the shaders'
+ * `uFinal`), on every tier. Eased in, so the blaze peaks at the strike.
+ */
+export function heatTelegraphFinal(left: number): number {
+  if (!(left < HEAT_TELEGRAPH_FINAL_SECONDS)) return 0;
+  const k = 1 - Math.max(0, left) / HEAT_TELEGRAPH_FINAL_SECONDS;
+  return k * k;
+}
+
+/**
+ * A timed mark's fill at `age` seconds of its `seconds` (both on the
+ * painter's clock, from the frame it first saw the sim's object): exactly 1
+ * at `seconds`, the instant the sim strikes and drops it, never earlier.
+ */
+export function heatTelegraphFill(age: number, seconds: number): number {
+  const f = age / Math.max(0.1, seconds);
+  return f <= 0 ? 0 : f >= 1 ? 1 : f;
+}
