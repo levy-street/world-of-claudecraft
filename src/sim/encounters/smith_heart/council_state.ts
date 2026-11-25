@@ -7,6 +7,7 @@
 import type { FloorMechanic } from './council_floor_gap';
 import type { CouncilDifficulty, CouncilRole } from './council_ids';
 import type { SmithHeartFeatAttempt } from './feat_attempt';
+import type { HardEnrageState } from './hard_enrage';
 import type { TierSwingBase } from './tier_swing';
 import type { SlainWatch } from './voice_slain';
 
@@ -105,6 +106,9 @@ export interface CouncilFightState {
   firstFallAt?: number;
   /** Seconds since the pull. */
   clock: number;
+  /** Forge-Fury, the hard enrage (hard_enrage.ts; Heroic and Mythic), created
+   *  on its first tick at the pull. */
+  enrage?: HardEnrageState;
   /** The Wrath holder's energy, 0 to 100. */
   energy: number;
   /** Wraths landed this pull (the soft enrage reads it; the first one

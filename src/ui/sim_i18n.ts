@@ -1580,6 +1580,9 @@ const baseEnTable = {
     'A white-gold light runs out of the Hearth toward the heart seal.',
   'log.smithHeartClosed':
     'The cleft is choked with fallen rock. It is not open yet.',
+  // Forge-Fury, the hard enrage (hard_enrage_ids.ts HARD_ENRAGE_LOGS).
+  'log.smithHeartForgeFuryWarn': 'Forge-Fury gathers. In 30 seconds it will burn the raid away.',
+  'log.smithHeartForgeFury': 'Forge-Fury is unleashed!',
   // The "encounter in progress" door rule (src/sim/instances/encounter_lock.ts):
   // a released spirit held outside while a boss fight of its claim runs.
   'error.encounterInProgress': 'An encounter is in progress. You cannot enter until it ends.',
@@ -1740,6 +1743,9 @@ const baseEnTable = {
   'aura.heartSearingBurn': 'Searing Burn',
   'aura.heartBitingFrost': 'Biting Frost',
   'aura.heartCrackedArmor': 'Cracked Armor',
+  // Forge-Fury, the raid's hard enrage (hard_enrage_ids.ts HARD_ENRAGE_NAMES).
+  'aura.heartForgeFuryGathering': 'Gathering Forge-Fury',
+  'mechanic.heartForgeFury': 'Forge-Fury',
   'aura.heartFrozenSolid': 'Frozen Solid',
   'aura.heartHardeningFrost': 'Hardening Frost',
   'aura.heartElementalFusion': 'Elemental Fusion',
@@ -27310,6 +27316,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Searing Burn': 'aura.heartSearingBurn',
   'Biting Frost': 'aura.heartBitingFrost',
   'Cracked Armor': 'aura.heartCrackedArmor',
+  'Gathering Forge-Fury': 'aura.heartForgeFuryGathering',
+  'Forge-Fury': 'mechanic.heartForgeFury',
   'Frozen Solid': 'aura.heartFrozenSolid',
   'Hardening Frost': 'aura.heartHardeningFrost',
   'Elemental Fusion': 'aura.heartElementalFusion',

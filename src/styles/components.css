@@ -20193,6 +20193,99 @@
     top: 34%;
   }
 
+  /* The tank swap's sibling, the tank buster alert. Self-mounted by the shared encounter alert painter from
+     src/ui/hud/dungeon/tank_swap_alert_view.ts (the tank swap's family): a
+     boss's heavy hit on the local tank (the team's feedback of 2026-11-25).
+     Only the tank it is aimed at ever sees it, for the second or two the hit
+     takes to come. In the screen's middle, above the character and clear of
+     the floor's telegraphs: the hit's name large in the hostile tone, "On
+     you" under it, a bar running down to the hit and its countdown in
+     steady-width digits. It lands with one firm pulse and leaves; nothing
+     flashes while it stays. Every tier, never hidden by the hints setting; it
+     never takes the pointer. */
+  #heart-tank-buster {
+    position: absolute;
+    left: 50%;
+    top: 24%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    z-index: 8;
+    min-width: 200px;
+    max-width: min(360px, calc(100vw - 32px));
+    padding: 8px 20px 7px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-hostile);
+    box-shadow: var(--shadow-raid-warning-glow);
+  }
+  #heart-tank-buster .fa-title {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    color: var(--color-hostile);
+    text-shadow: var(--art-shadow-lg);
+  }
+  #heart-tank-buster .fa-line {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gold-300);
+  }
+  #heart-tank-buster .fa-hint {
+    display: none;
+  }
+  #heart-tank-buster .fa-bar {
+    --bar-h: 6px;
+    --bar-color: var(--color-hostile);
+    width: 100%;
+    margin-top: 3px;
+  }
+  #heart-tank-buster .fa-fill {
+    width: 0;
+    transition: width 60ms linear;
+  }
+  #heart-tank-buster .fa-bar-label {
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    #heart-tank-buster {
+      animation: heart-tank-buster-in 0.35s ease-out 1;
+    }
+  }
+  @keyframes heart-tank-buster-in {
+    0% {
+      scale: 1.25;
+      opacity: 0;
+    }
+    50% {
+      scale: 0.97;
+      opacity: 1;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  /* Touch: a little higher and narrower, clear of the action ring. */
+  body.mobile-touch #heart-tank-buster {
+    top: 18%;
+    min-width: 160px;
+    padding: 6px 14px 6px;
+  }
+  body.mobile-touch #heart-tank-buster .fa-title {
+    font-size: 20px;
+  }
+
   /* ---------- The Smith's Heart's Live Coal chip ---------- */
   /* Self-mounted by the shared encounter alert painter from
      src/ui/hud/dungeon/coal_alert_view.ts: the Guardian of the Heat's Live

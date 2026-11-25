@@ -36,6 +36,7 @@ import {
 } from '../sim/aura_classify';
 import { isCancelableAura } from '../sim/combat/aura_cancel';
 import { isColdsightInternalMarkerAuraId } from '../sim/combat/hunter_coldsight_read';
+import { TANK_BUSTER_AURA } from '../sim/encounters/smith_heart/tank_buster_ids';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
@@ -454,6 +455,9 @@ export function createAurasView(
         // OTHER internal_cd marker (Heating Up, Stormsurge Ready, ...) and the
         // real armed Coldsight Read opportunity (10s) still render normally.
         if (a.kind === 'internal_cd' && isColdsightInternalMarkerAuraId(a.id)) return;
+        // The Smith's Heart's tank buster marker is the tank buster alert's
+        // source (tank_swap_alert_view.ts), never an icon of its own.
+        if (a.id === TANK_BUSTER_AURA) return;
         const debuff = isAuraDebuff(a);
         if (mode === 'debuffs' && !debuff) return;
         if (mode === 'buffs' && debuff) return;

@@ -77,6 +77,7 @@ import {
   spawnFightObject,
 } from './final_scope';
 import type { FinalAdd } from './final_state';
+import { warnTankBuster } from './tank_buster';
 import { tierPoolMult } from './tier_health';
 
 type School = 'fire' | 'frost' | 'nature' | 'physical' | 'arcane';
@@ -316,6 +317,8 @@ export function startShear(s: FinalScope, a: FinalAdd, e: Entity): boolean {
     facingTo(local(s.ctx, s.inst, e), local(s.ctx, s.inst, t)),
     t.id,
   );
+  // The Splinter's tank's own warning, for as long as the bar runs.
+  warnTankBuster(t, e, 'shear', e.castRemaining);
   return true;
 }
 

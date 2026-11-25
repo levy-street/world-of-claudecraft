@@ -60,6 +60,8 @@ import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
 import { settleSmithHeartFeat } from './feats';
+import { clearHardEnrage, hardEnrageOf, stepHardEnrage } from './hard_enrage';
+import { hardEnrageSeconds } from './hard_enrage_ids';
 import { landBreath, startBreath } from './quench_attacks';
 import {
   bladesAtHome,
@@ -320,6 +322,7 @@ function clearFight(
   boss.damageImmune = false;
   clearBladeMarks(boss);
   dropAura(boss, QUENCH_AURAS.deepening);
+  clearHardEnrage(boss);
 }
 
 /** The fight ended without the kill: the lake as it was. */
@@ -416,6 +419,11 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
   watchQuenchSlain(s);
   startBars(s);
   watchStrikeWindup(s);
+  stepHardEnrage(
+    { ctx, inst, bodies: [boss], players: s.players },
+    hardEnrageOf(st),
+    hardEnrageSeconds('quench', st.difficulty),
+  );
 }
 
 // ---- dev ----------------------------------------------------------------------------------

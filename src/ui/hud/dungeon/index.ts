@@ -94,13 +94,20 @@ export type {
 } from './sanctum_alert_view';
 export { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 export type {
+  TankBusterAlertKind,
+  TankBusterAlertView,
   TankSwapAlertInput,
   TankSwapAlertKind,
   TankSwapAlertView,
   TankSwapAura,
   TankSwapBody,
 } from './tank_swap_alert_view';
-export { buildTankSwapAlertView, TANK_SWAP_ALERT_KINDS } from './tank_swap_alert_view';
+export {
+  buildTankBusterAlertView,
+  buildTankSwapAlertView,
+  TANK_BUSTER_ALERT_KINDS,
+  TANK_SWAP_ALERT_KINDS,
+} from './tank_swap_alert_view';
 export type { TempleSceneEntity, TempleSceneWorld } from './temple_alert_scene_core';
 export { TempleAlertSceneScan } from './temple_alert_scene_core';
 export type {

@@ -4811,6 +4811,10 @@ export const zh_CN: EnTranslations = {
         "rimeSlow": "被活体霜壳减速：在霜壳被治疗击碎或爆发前，你的移动速度降低{slow}%，寒意上升速度变为{normalMult}倍（英雄和史诗难度为{heroicMult}倍）。",
         "tempered": "淬火打击已淬炼你{stacks}次：你的寒意不会低于{floor}，你受到的冰霜伤害提高{pct}%。每次命中你的淬火打击都会叠加一层（每层{cold}点寒意和{per}%冰霜伤害），并将持续时间重置为{seconds}秒。达到{swap}层时换坦。英雄和史诗难度下，{heroicMax}层会将你的寒意维持在{max}，你会被冻结；普通难度最多{normalMax}层（{normalFloor}点寒意）。"
       },
+      "forgeFury": {
+        "gathering": "熔炉之怒在开战{minutes}分钟后到来。此效果结束时，它每{every}秒灼烧战斗中的所有人：先是最大生命值的{share}%，然后是{share2}%，第三次灼烧无论有何护盾都会杀死他们。先击败首领。仅限英雄和史诗难度；首领无法受到伤害时它绝不会降临。",
+        "fury": "战斗已超过{minutes}分钟。熔炉之怒每{every}秒灼烧战斗中的所有人：先是最大生命值的{share}%，然后是{share2}%，第三次灼烧无论有何护盾都会杀死他们。它持续到战斗结束。"
+      },
       "heatGuardian": {
         "statePhase1": "半身沉在涌泉之中，从不移动。炉心之轮把岸边切成四块：三块发红并在{warn}秒后爆发（英雄难度{heroicWarn}秒），一块保持黑暗、安全；每一轮爆发时，下一轮的安全区会出现在别处。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。",
         "statePhase2": "半身沉在涌泉之中，从不移动。炉心之轮与玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。",
@@ -7453,6 +7457,17 @@ export const zh_CN: EnTranslations = {
     "tankSwap": {
       "swapTitle": "换坦 x{stacks}",
       "timeAria": "减益效果剩余{seconds}秒"
+    },
+    "tankBuster": {
+      "weight": "重锤之压",
+      "blow": "风箱重击",
+      "thunder": "雷霆鞭笞",
+      "tempering": "淬火打击",
+      "strike": "元素打击",
+      "shear": "劈裂重击",
+      "onYou": "目标是你",
+      "seconds": "{seconds}秒",
+      "timeAria": "{name}将在{seconds}秒后击中你"
     },
     "liveCoal": {
       "title": "炽炭",

@@ -1,8 +1,8 @@
 // The Smith's Heart's painted aura art (src/ui/smith_heart_aura_art.ts): every id it
 // covers is a live aura the raid applies, the HUD's aura resolver answers each with its
 // painting (its own, or the one it shares), every painting ships as a small opaque
-// 128px WebP, and the census leaves no raid aura on a generic glyph except the two
-// documented ones.
+// 128px WebP, and the census leaves no raid aura on a generic glyph except the three
+// documented ones (the tank buster marker among them).
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -13,8 +13,10 @@ import { ISLE_AURAS } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import { COUNCIL_AURAS } from '../src/sim/encounters/smith_heart/council_ids';
 import { FINAL_AURAS, overloadAuraId } from '../src/sim/encounters/smith_heart/final_ids';
 import { FINAL_PHASE_AURAS, pouredAuraId } from '../src/sim/encounters/smith_heart/final_phase_ids';
+import { HARD_ENRAGE_AURAS } from '../src/sim/encounters/smith_heart/hard_enrage_ids';
 import { HEAT_AURAS } from '../src/sim/encounters/smith_heart/heat_ids';
 import { QUENCH_AURAS } from '../src/sim/encounters/smith_heart/quench_ids';
+import { TANK_BUSTER_AURA } from '../src/sim/encounters/smith_heart/tank_buster_ids';
 import { DORMANT_AURA_ID } from '../src/sim/mob/dormant_state';
 import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../src/sim/wind_drift';
 import { resolveHudAuraIconId } from '../src/ui/aura_icon_runtime';
@@ -25,7 +27,8 @@ import {
 } from '../src/ui/smith_heart_aura_art';
 
 /** Every aura id the raid's sim applies: the five fights' maps, the final boss's
- *  per-vein bars, the Breath's wind kernel and the warders' dormant ward. */
+ *  per-vein bars, the Breath's wind kernel, the warders' dormant ward, the hard
+ *  enrage and the tank buster marker. */
 const LIVE_RAID_AURA_IDS = new Set<string>([
   ...Object.values(COUNCIL_AURAS),
   ...Object.values(BREATH_AURAS),
@@ -36,6 +39,8 @@ const LIVE_RAID_AURA_IDS = new Set<string>([
   ...Object.values(FINAL_PHASE_AURAS),
   ...SMITH_HEART_VEINS.map(overloadAuraId),
   ...SMITH_HEART_VEINS.map(pouredAuraId),
+  ...Object.values(HARD_ENRAGE_AURAS),
+  TANK_BUSTER_AURA,
   WIND_DRIFT_AURA,
   WIND_PULL_AURA,
   WIND_BLAST_AURA,
@@ -46,6 +51,7 @@ const LIVE_RAID_AURA_IDS = new Set<string>([
 const UNPAINTED: Readonly<Record<string, string>> = {
   heart_endless_song: 'rides a pillar object; no unit frame ever shows it',
   stackpoison_heart_heat_guardian: 'already wears the mob_stack_poison painting',
+  heart_tank_buster: 'the tank buster alert reads it; the aura strips never show it',
 };
 
 /** The owner's size budget for these icons (the existing aura art averages under 5 KB). */
@@ -55,19 +61,19 @@ const painted = new Set(SMITH_HEART_AURA_IMAGE_IDS);
 const aliases = new Map(SMITH_HEART_AURA_ICON_SOURCES);
 
 describe("Smith's Heart aura art", () => {
-  it('keeps 67 paintings and 24 shared aliases, sorted and disjoint', () => {
+  it('keeps 67 paintings and 26 shared aliases, sorted and disjoint', () => {
     expect(SMITH_HEART_AURA_IMAGE_IDS).toHaveLength(67);
     expect(painted.size).toBe(67);
     expect([...SMITH_HEART_AURA_IMAGE_IDS]).toEqual([...SMITH_HEART_AURA_IMAGE_IDS].sort());
-    expect(SMITH_HEART_AURA_ICON_SOURCES).toHaveLength(24);
-    expect(aliases.size).toBe(24);
+    expect(SMITH_HEART_AURA_ICON_SOURCES).toHaveLength(26);
+    expect(aliases.size).toBe(26);
     for (const [alias, source] of aliases) {
       expect(painted.has(alias), `${alias} is an alias, not a painting`).toBe(false);
       expect(painted.has(source), `${alias} shares a real painting (${source})`).toBe(true);
     }
   });
 
-  it('covers only live raid aura ids, and every one of them but the documented two', () => {
+  it('covers only live raid aura ids, and every one of them but the documented three', () => {
     const covered = [...painted, ...aliases.keys()];
     for (const id of covered) {
       expect(LIVE_RAID_AURA_IDS.has(id), `${id} is a live raid aura id`).toBe(true);

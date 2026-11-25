@@ -51,6 +51,7 @@ import {
   roll,
 } from './breath_scope';
 import { type BreathShove, beginShove, clearShoves, stepShoves } from './breath_shove';
+import { warnTankBuster } from './tank_buster';
 
 /** A body's stacks of `aura` (0 without it). */
 export function stacksOf(p: Pick<Entity, 'auras'>, aura: string): number {
@@ -121,11 +122,14 @@ export function startBlow(s: BreathScope): boolean {
   if (!t) return false;
   if (s.st.half === 'storm') {
     beginBar(s, BREATH_CASTS.thunder, T.thunderCast, t.id);
+    warnTankBuster(t, s.boss, 'thunder', s.boss.castRemaining);
     s.st.thunderTimer = T.thunderEvery;
     return true;
   }
   const stacks = stacksOf(t, BREATH_AURAS.battered);
   beginBar(s, BREATH_CASTS.blow, T.blowCast, t.id);
+  // The tank's own warning, for as long as the bar runs (tank_buster.ts).
+  warnTankBuster(t, s.boss, 'blow', s.boss.castRemaining);
   s.st.blowTimer = T.blowEvery;
   // The telegraph's length: the throw, held short of the lip on a safe tier
   // as the landing will hold it (from where the tank stands now).

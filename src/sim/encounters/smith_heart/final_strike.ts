@@ -60,6 +60,8 @@ import {
   roll,
   spawnFightObject,
 } from './final_scope';
+import { endTankBuster, warnTankBuster } from './tank_buster';
+import { TANK_BUSTER_AURA } from './tank_buster_ids';
 
 const VEINS: readonly SmithHeartVein[] = ['heat', 'quench', 'breath', 'hammer'];
 
@@ -294,7 +296,15 @@ export function stepStatic(s: FinalScope): Entity[] {
 export function stepStrike(s: FinalScope): number {
   const el = s.st.elements;
   el.strikeClock -= DT;
-  if (el.strikeClock > 1e-9) return 0;
+  if (el.strikeClock > 1e-9) {
+    // Its tank is told the strike is coming (the HUD's tank buster alert).
+    if (el.strikeClock <= E.strikeLead + 1e-9 && el.strikeClock > DT) {
+      const tank = bossTank(s);
+      if (tank && !tank.auras.some((a) => a.id === TANK_BUSTER_AURA))
+        warnTankBuster(tank, s.boss, 'strike', el.strikeClock);
+    }
+    return 0;
+  }
   const tank = bossTank(s);
   if (!tank || s.st.bar || s.ctx.isStunned(s.boss)) {
     el.strikeClock = 0;
@@ -307,6 +317,7 @@ export function stepStrike(s: FinalScope): number {
     return 0;
   }
   el.strikeClock = E.strikeEvery;
+  endTankBuster(tank, 'strike');
   return elementalStrike(s, tank);
 }
 

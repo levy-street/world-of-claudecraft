@@ -127,6 +127,8 @@ import { breathSay, THESSALY_PULL_DELAY, watchBreathSlain } from './breath_voice
 import { stepOverLip, stepVoidDeaths, tetherGuardian } from './breath_void';
 import { breakFeat } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
+import { clearHardEnrage, hardEnrageOf, stepHardEnrage } from './hard_enrage';
+import { hardEnrageSeconds } from './hard_enrage_ids';
 import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
@@ -351,6 +353,7 @@ function clearFight(
   );
   dropAura(boss, BREATH_AURAS.stormForm);
   dropAura(boss, BREATH_AURAS.swell);
+  clearHardEnrage(boss);
   stillWind(ctx, inst);
 }
 
@@ -452,6 +455,11 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   startWindBars(s);
   startStormBars(s);
   startBlowBars(s);
+  stepHardEnrage(
+    { ctx, inst, bodies: [boss], players: s.players },
+    hardEnrageOf(st),
+    hardEnrageSeconds('breath', st.difficulty),
+  );
 }
 
 // ---- dev ----------------------------------------------------------------------------------

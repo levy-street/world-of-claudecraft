@@ -7,6 +7,7 @@
 import type { BreathDifficulty, BreathWindPhase } from './breath_ids';
 import type { BreathShove } from './breath_shove';
 import type { SmithHeartFeatAttempt } from './feat_attempt';
+import type { HardEnrageState } from './hard_enrage';
 import type { TierSwingBase } from './tier_swing';
 import type { SlainWatch } from './voice_slain';
 
@@ -263,6 +264,9 @@ export interface BreathFightState {
   feat?: SmithHeartFeatAttempt;
   /** Seconds since the pull. */
   clock: number;
+  /** Forge-Fury, the hard enrage (hard_enrage.ts; Heroic and Mythic), created
+   *  on its first tick at the pull. */
+  enrage?: HardEnrageState;
   /** The fight's half: the Wind, the Islands of the Wind (the 50 percent
    *  phase), the storm breaking, the Storm. */
   half: 'wind' | 'isles' | 'break' | 'storm';

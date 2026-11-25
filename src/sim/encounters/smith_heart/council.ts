@@ -135,6 +135,8 @@ import {
 } from './council_wrath';
 import { breakFeat, COUNCIL_FEAT_FALL_WINDOW, countFeat } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
+import { clearHardEnrage, hardEnrageOf, stepHardEnrage } from './hard_enrage';
+import { hardEnrageSeconds } from './hard_enrage_ids';
 import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
@@ -463,6 +465,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     // The Rush's reel (its stun, the extra damage) never outlives the fight.
     dropAuraById(b, COUNCIL_AURAS.rushStunned);
     dropAuraById(b, COUNCIL_AURAS.rushExposed);
+    clearHardEnrage(b);
     if (b.dead && anyAlive) regrowHead(ctx, b, 1);
     restoreTierHealth(b, st?.basePools?.[r]);
     restoreTierSwing(b, st?.baseSwings?.[r]);
@@ -500,6 +503,7 @@ function finishCouncil(
   for (const r of COUNCIL_ROLES) {
     const b = bodies[r];
     if (b) b.resource = 0;
+    clearHardEnrage(b);
   }
 }
 
@@ -638,6 +642,11 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
     }
   }
   startBars(s);
+  stepHardEnrage(
+    { ctx, inst, bodies: COUNCIL_ROLES.map((r) => bodies[r]), players: s.players },
+    hardEnrageOf(st),
+    hardEnrageSeconds('council', st.difficulty),
+  );
 }
 
 // ---- dev ------------------------------------------------------------------------------------

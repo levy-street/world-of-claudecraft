@@ -52,6 +52,8 @@ import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
 import { settleSmithHeartFeat } from './feats';
 import { dropFightObject } from './fight_kit';
+import { clearHardEnrage, hardEnrageOf, stepHardEnrage } from './hard_enrage';
+import { hardEnrageSeconds } from './hard_enrage_ids';
 import {
   callCinder,
   clearCinders,
@@ -533,6 +535,7 @@ function clearFight(
   boss.hostile = true;
   boss.damageImmune = false;
   boss.damageFloorHp = undefined;
+  clearHardEnrage(boss);
   setWell(ctx, inst, 'calm');
 }
 
@@ -623,6 +626,11 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
   startMechanics(s);
   holdStance(s);
   showState(s);
+  stepHardEnrage(
+    { ctx, inst, bodies: [boss], players: s.players },
+    hardEnrageOf(st),
+    hardEnrageSeconds('heat', st.difficulty),
+  );
 }
 
 // ---- dev ----------------------------------------------------------------------------------

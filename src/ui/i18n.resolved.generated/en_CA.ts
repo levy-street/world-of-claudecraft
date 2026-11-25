@@ -4811,6 +4811,10 @@ export const en_CA: EnTranslations = {
         "rimeSlow": "Slowed by Living Rime: you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic) until the crust is healed through or bursts.",
         "tempered": "Tempering Strike tempered you {stacks} times: your cold cannot fall below {floor}, and you take {pct}% more Frost damage. Each Tempering Strike on you adds a stack ({cold} cold and {per}% Frost damage each) and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, stack {heroicMax} fills your cold to {max} and you freeze solid; Normal stops at {normalMax} stacks ({normalFloor} cold)."
       },
+      "forgeFury": {
+        "gathering": "Forge-Fury comes {minutes} min after the pull. When this runs out, every {every} sec it burns everyone in the fight: {share}% of their maximum health, then {share2}%, and the third burn kills them whatever shields them. Defeat the boss first. Heroic and Mythic only; it never lands while the boss cannot be harmed.",
+        "fury": "The fight ran past {minutes} min. Every {every} sec Forge-Fury burns everyone in the fight: {share}% of their maximum health, then {share2}%, and the third burn kills them whatever shields them. It lasts until the fight ends."
+      },
       "heatGuardian": {
         "statePhase1": "Half sunk in its wellspring: it never moves. The Wheel of the Hearth cuts the shore into four slices: three glow red and erupt after {warn} sec ({heroicWarn} sec on Heroic), one stays dark and safe, and as one round erupts the next round shows its safe slice somewhere else. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
         "statePhase2": "Half sunk in its wellspring: it never moves. The Wheel of the Hearth and Basalt Fist go on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.",
@@ -7453,6 +7457,17 @@ export const en_CA: EnTranslations = {
     "tankSwap": {
       "swapTitle": "Swap x{stacks}",
       "timeAria": "{seconds} seconds left on the debuff"
+    },
+    "tankBuster": {
+      "weight": "Hammer's Weight",
+      "blow": "Bellows Blow",
+      "thunder": "Thunder Lash",
+      "tempering": "Tempering Strike",
+      "strike": "Elemental Strike",
+      "shear": "Shearing Blow",
+      "onYou": "On you",
+      "seconds": "{seconds} sec",
+      "timeAria": "{name} hits you in {seconds} seconds"
     },
     "liveCoal": {
       "title": "Live Coal",

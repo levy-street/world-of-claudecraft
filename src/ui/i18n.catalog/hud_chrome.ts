@@ -6039,6 +6039,13 @@ export const hudChromeStrings = {
         'Tempering Strike tempered you {stacks} times: your cold cannot fall below {floor}, and you take {pct}% more Frost damage. Each Tempering Strike on you adds a stack ({cold} cold and {per}% Frost damage each) and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, stack {heroicMax} fills your cold to {max} and you freeze solid; Normal stops at {normalMax} stacks ({normalFloor} cold).',
     },
     // The Smith's Heart's Guardian of the Heat (src/ui/heat_aura_effect.ts).
+    // Forge-Fury, the Smith's Heart's hard enrage on Heroic and Mythic
+    // (src/ui/hard_enrage_aura_effect.ts). Wordy (M16): non-Latin fills.
+    forgeFury: {
+      gathering:
+        'Forge-Fury comes {minutes} min after the pull. When this runs out, every {every} sec it burns everyone in the fight: {share}% of their maximum health, then {share2}%, and the third burn kills them whatever shields them. Defeat the boss first. Heroic and Mythic only; it never lands while the boss cannot be harmed.',
+      fury: 'The fight ran past {minutes} min. Every {every} sec Forge-Fury burns everyone in the fight: {share}% of their maximum health, then {share2}%, and the third burn kills them whatever shields them. It lasts until the fight ends.',
+    },
     heatGuardian: {
       statePhase1:
         'Half sunk in its wellspring: it never moves. The Wheel of the Hearth cuts the shore into four slices: three glow red and erupt after {warn} sec ({heroicWarn} sec on Heroic), one stays dark and safe, and as one round erupts the next round shows its safe slice somewhere else. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.',
@@ -10485,6 +10492,21 @@ export const hudChromeStrings = {
   tankSwap: {
     swapTitle: 'Swap x{stacks}',
     timeAria: '{seconds} seconds left on the debuff',
+  },
+  // The Smith's Heart's tank buster alert (tank_swap_alert_view.ts, the swap's
+  // family): a boss's heavy hit on the tank it is aimed at, its name, two words
+  // under it and its countdown (the team's feedback of 2026-11-25). Wordy
+  // (M16): non-Latin fills in the overlays.
+  tankBuster: {
+    weight: "Hammer's Weight",
+    blow: 'Bellows Blow',
+    thunder: 'Thunder Lash',
+    tempering: 'Tempering Strike',
+    strike: 'Elemental Strike',
+    shear: 'Shearing Blow',
+    onYou: 'On you',
+    seconds: '{seconds} sec',
+    timeAria: '{name} hits you in {seconds} seconds',
   },
   // The Smith's Heart's Live Coal chip (src/ui/hud/dungeon/coal_alert_view.ts):
   // the bearer's own small readout, a word and a number (Jose's rule of

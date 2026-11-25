@@ -52,6 +52,7 @@ import {
   punishRoll,
 } from './council_scope';
 import { councilSay } from './council_voice';
+import { warnTankBuster } from './tank_buster';
 
 /** Every member carries the energy bar's frame; only the Wrath's holder's
  *  fills (an empty bar on the others says the stone could take it up). */
@@ -223,6 +224,8 @@ export function startWeight(s: CouncilScope): boolean {
   if (!tank || tank.dead) return false;
   s.st.weightTimer = T.weightEvery;
   beginBar(s, holder.role, COUNCIL_CASTS.weight, T.weightCast, tank.id, holder.heir);
+  // The tank's own warning, for as long as the bar runs (tank_buster.ts).
+  warnTankBuster(tank, g, 'weight', g.castRemaining);
   return true;
 }
 

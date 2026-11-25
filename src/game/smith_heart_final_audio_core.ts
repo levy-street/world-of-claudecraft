@@ -48,7 +48,13 @@ import {
   FINAL_PHASE_CASTS,
   FINAL_PHASE_CUES,
 } from '../sim/encounters/smith_heart/final_phase_ids';
-import { HEART_MARK, type HeartMarkSound, markSound } from './smith_heart_mark_audio';
+import { TANK_BUSTER_AURA } from '../sim/encounters/smith_heart/tank_buster_ids';
+import {
+  HEART_MARK,
+  HEART_TANK_BUSTER_SOUND,
+  type HeartMarkSound,
+  markSound,
+} from './smith_heart_mark_audio';
 
 export interface FinalSound {
   key: string;
@@ -330,6 +336,8 @@ export function rebuildDue(from: number, to: number): boolean {
 /** The fight's marks in the marked player's own ear. */
 export const FINAL_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [FINAL_AURAS.ember]: HEART_MARK.fire,
+  // Elemental Strike and Shearing Blow on the tank (the tank buster alert's).
+  [TANK_BUSTER_AURA]: HEART_TANK_BUSTER_SOUND,
   [FINAL_AURAS.drawn]: HEART_MARK.storm,
   [FINAL_AURAS.skyMark]: markSound(HEART_MARK.storm, 1, 1.1),
   [FINAL_AURAS.bladeMark]: HEART_MARK.frost,

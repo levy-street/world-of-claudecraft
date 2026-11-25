@@ -37,7 +37,13 @@ import {
   type BreathWindPhase,
 } from '../sim/encounters/smith_heart/breath_ids';
 import { ISLE_AURAS, ISLE_CUES } from '../sim/encounters/smith_heart/breath_isle_ids';
-import { HEART_MARK, type HeartMarkSound, markSound } from './smith_heart_mark_audio';
+import { TANK_BUSTER_AURA } from '../sim/encounters/smith_heart/tank_buster_ids';
+import {
+  HEART_MARK,
+  HEART_TANK_BUSTER_SOUND,
+  type HeartMarkSound,
+  markSound,
+} from './smith_heart_mark_audio';
 
 export interface BreathSound {
   key: string;
@@ -224,6 +230,8 @@ export const BREATH_RIDING_AURA = ISLE_AURAS.riding;
 export const BREATH_MARK_ALARM: Readonly<Record<string, HeartMarkSound>> = {
   [BREATH_AURAS.skyMark]: { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 },
   [BREATH_AURAS.drawn]: { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 },
+  // Bellows Blow and Thunder Lash on the tank (the tank buster alert's sound).
+  [TANK_BUSTER_AURA]: HEART_TANK_BUSTER_SOUND,
 };
 
 /** The same horn when a bar aimed at one player (Storm Lance, Leaping Bolt)

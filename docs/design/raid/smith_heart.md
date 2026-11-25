@@ -1933,6 +1933,50 @@ fights here, 73 on the Quench (no pressure on its healers). So:
 - Every aura tooltip names the resolved Normal value too (`src/ui/*_aura_effect.ts`, Normal's
   factor no longer 1).
 
+
+**The hard enrage: Forge-Fury (owner-approved, 2026-11-25).** One berserk every boss of the raid
+shares on Heroic and Mythic (`encounters/smith_heart/hard_enrage.ts`, its rules and numbers
+`hard_enrage_ids.ts`; each coordinator calls `stepHardEnrage` once a tick of its fight, the state
+on its fight state, gone with a wipe's reset). Normal has NO hard enrage; every fight's own soft
+enrage (the Council's Wraths, the Breath's swelling storm, the Heat's late cinders, the final
+boss's) stays untouched on every tier.
+
+| Boss | Heroic | Mythic |
+|---|---|---|
+| Hammer Council | 8:00 | 9:00 |
+| Guardian of the Breath | 9:00 | 10:00 |
+| Guardian of the Heat | 8:00 | 9:00 |
+| Guardian of the Quench | 8:00 | 9:00 |
+| Masterless Strength | 10:00 | 11:00 |
+
+- The clock runs from the pull through every tick of the fight, its scripted downtime included
+  (the Heat's overflows, the Breath's isles, the final boss's intermissions and Mythic's hidden
+  phase are part of every kill's length, and the timers were set with them in).
+- 30 s before: Gathering Forge-Fury on the boss (both Council members), its countdown on the
+  boss frame, and one line to everyone in the fight ("Forge-Fury gathers. In 30 seconds it will
+  burn the raid away."). No banner (the owner's rule of few banners).
+- At the timer: Forge-Fury on the boss (held while the fight lasts) and the line "Forge-Fury is
+  unleashed!"; every second it burns everyone in the fight, 40 percent of their maximum health,
+  then 80, and the third burn kills them whatever shields them (a game master excepted). The
+  raid is down within about 3 s whatever its health.
+- Fair: the fury never lands while the boss itself cannot be harmed (`damageImmune`: the Heat
+  sunk in an overflow, the Breath's Gale Cocoon, the Quench's Flurry, the final boss's shield, its
+  kneel); a timer that runs out then waits for the first tick the raid can strike it again, and
+  the fury lands at once. Deterministic: no pick and no rng. Tooltips: `src/ui/hard_enrage_aura_effect.ts`.
+  Pinned by `tests/smith_heart_hard_enrage.test.ts`.
+
+**The tank buster alert (the team's feedback of 2026-11-25: "show tank busters on screen, not
+only as a debuff").** Each boss's heavy hit on its tank lays one quiet marker on that tank as it
+begins (`encounters/smith_heart/tank_buster.ts`, the table `tank_buster_ids.ts`): Hammer's
+Weight's bar, Bellows Blow's and Thunder Lash's bars, Tempering Strike told with the Quench's
+wind-up (`strikeWindup`, 1 s), Elemental Strike told 1.5 s out (`ELEMENT_TUNING.strikeLead`) and a
+Splinter's Shearing Blow bar. Only the tank carrying it sees, in the screen's middle, the hit's
+name, "On you", a bar and a countdown, on every graphics preset and whatever the hints setting
+(the tank swap alert's family, `src/ui/hud/dungeon/tank_swap_alert_view.ts`), with the anvil
+struck in their ear (`HEART_TANK_BUSTER_SOUND`); the aura strips never show the marker. The
+Guardian of the Heat has no single heavy hit (its tank's pressure is Cinder Grip on every swing,
+called by the tank swap alert), so it lays none. Pinned by `tests/smith_heart_tank_buster.test.ts`.
+
 ### 7.1 The Hammer Council (always first)
 
 The Quarry's first boss is two stone beings that share the Hammer's strength: the

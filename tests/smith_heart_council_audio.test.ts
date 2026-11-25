@@ -76,7 +76,10 @@ describe('Hammer Council sounds: the plan', () => {
           key === 'heart_mark_stone' ||
           // The rock's gather call: the raid's one share sound (2026-11-25).
           key === 'heart_final_anvil_warn' ||
-          key === 'ui_aura_blaring_horn',
+          key === 'ui_aura_blaring_horn' ||
+          // The raid's tank buster sting (smith_heart_mark_audio.ts
+          // HEART_TANK_BUSTER_SOUND, 2026-11-25).
+          key === 'ui_aura_anvil_strike',
         key,
       ).toBe(true);
       expect(Object.hasOwn(SFX_CLIPS, key), `${key} in the manifest`).toBe(true);
@@ -85,8 +88,9 @@ describe('Hammer Council sounds: the plan', () => {
     // takes, the Bond's pulse, Resonance, Narrow Shelter's strain and the
     // stone mark came with the AAA pass (the Rush no longer borrows the crush);
     // the Rush mark's alarm with the owner's playtest of 2026-11-12; the
-    // Wake's grind and the rock's gather call with the team's of 2026-11-25.
-    expect(COUNCIL_SFX_KEYS.length).toBe(25);
+    // Wake's grind and the rock's gather call with the team's of 2026-11-25;
+    // the tank buster's anvil the same night (Hammer's Weight on its tank).
+    expect(COUNCIL_SFX_KEYS.length).toBe(26);
     expect(councilSoundClaims('frost_nova')).toBe(false);
     expect(councilSoundClaims(undefined)).toBe(false);
   });

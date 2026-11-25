@@ -29,7 +29,13 @@ import {
   endlessSongMult,
   COUNCIL_TUNING as T,
 } from '../sim/encounters/smith_heart/council_ids';
-import { HEART_MARK, type HeartMarkSound, markSound } from './smith_heart_mark_audio';
+import { TANK_BUSTER_AURA } from '../sim/encounters/smith_heart/tank_buster_ids';
+import {
+  HEART_MARK,
+  HEART_TANK_BUSTER_SOUND,
+  type HeartMarkSound,
+  markSound,
+} from './smith_heart_mark_audio';
 
 export interface CouncilSound {
   key: string;
@@ -198,6 +204,8 @@ export const COUNCIL_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
  *  of 2026-11-12: the sting alone went unnoticed). */
 export const RUSH_MARK_ALARM: Readonly<Record<string, HeartMarkSound>> = {
   [COUNCIL_AURAS.rushMark]: { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 },
+  // Hammer's Weight on its tank (the tank buster alert's sound).
+  [TANK_BUSTER_AURA]: HEART_TANK_BUSTER_SOUND,
 };
 
 /** Every sample the council plays, for preloading once. */

@@ -11,11 +11,15 @@
 // once), so her raised fists come down as a plain swing instead of a slam
 // that hits nothing, and the next swing is cued again.
 //
+// The same moment lays the tank buster marker on her tank (tank_buster.ts:
+// the HUD's tank buster alert, until the swing; an avoided swing takes it off).
+//
 // Presentation only: it reads the count, the swing timer and the bar, and
 // changes nothing the fight resolves. Zero rng.
 
 import { QUENCH_CUES, QUENCH_TUNING as T } from './quench_ids';
 import type { QuenchScope } from './quench_scope';
+import { endTankBuster, warnTankBuster } from './tank_buster';
 
 /** Is the guardian's swing under way the cleaving one, `strikeWindup`
  *  seconds or less out, on a target in her reach, with no bar? */
@@ -54,6 +58,12 @@ export function strikeSpentDue(boss: {
   );
 }
 
+/** Her tank: the body her swing is on. */
+function tankOf(s: QuenchScope) {
+  const id = s.boss.aggroTargetId;
+  return id !== null ? s.ctx.entities.get(id) : undefined;
+}
+
 /** One tick: cue her wind-up once for the cleaving swing, and tell an
  *  avoided one. */
 export function watchStrikeWindup(s: QuenchScope): void {
@@ -69,6 +79,7 @@ export function watchStrikeWindup(s: QuenchScope): void {
       fx: 'windup',
       ability: QUENCH_CUES.strikeSpent,
     });
+    endTankBuster(tankOf(s), 'tempering');
   }
   // A new swing's wait (or a count that moved on) arms the cue again, and so
   // does a bar or a target out of her reach: the swing they hold is cued
@@ -83,6 +94,8 @@ export function watchStrikeWindup(s: QuenchScope): void {
     s.st.strikeWound = false;
   if (s.st.strikeWound || !strikeWindupDue(b)) return;
   s.st.strikeWound = true;
+  // Her tank is told the slam is coming, until her swing lands (tank_buster.ts).
+  warnTankBuster(tankOf(s), b, 'tempering', b.swingTimer);
   s.ctx.emit({
     type: 'spellfx',
     sourceId: b.id,

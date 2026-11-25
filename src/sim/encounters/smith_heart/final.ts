@@ -164,6 +164,8 @@ import {
 import type { FinalFightState, FinalKitClocks } from './final_state';
 import { freshElements } from './final_strike';
 import { finalSay, freshFinalVoice, stepFinalVoice } from './final_voice';
+import { clearHardEnrage, hardEnrageOf, stepHardEnrage } from './hard_enrage';
+import { hardEnrageSeconds } from './hard_enrage_ids';
 import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
 
@@ -430,6 +432,7 @@ function clearFight(
   clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil, ELEMENT_CASTS.fusion);
   clearRules(boss);
   clearPhaseAuras({ boss });
+  clearHardEnrage(boss);
 }
 
 /** The boss's authored home (world yards and facing): the middle of the
@@ -550,6 +553,11 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   stepFinalVoice(s);
   // The feat watch: any raider's death in the fight breaks it.
   watchFeatDeaths(st, heartListeners(ctx, inst), (id) => ctx.entities.get(id));
+  stepHardEnrage(
+    { ctx, inst, bodies: [boss], players: s.players },
+    hardEnrageOf(st),
+    hardEnrageSeconds('final', st.difficulty),
+  );
 }
 
 /** One tick of a stage that is not the quarter fight: the stride into the

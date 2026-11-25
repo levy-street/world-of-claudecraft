@@ -16,7 +16,23 @@
 //    tank), and while dead.
 // An ACTION prompt: the hints setting never hides it, every graphics tier
 // paints it. The painter is the shared encounter alert's.
+//
+// The family's second member, the tank buster alert (the team's feedback of
+// 2026-11-25: "show tank busters on screen, not only as a debuff"): a boss's
+// heavy hit on its tank (encounters/smith_heart/tank_buster_ids.ts) lays a
+// marker on that tank as it begins, and only the player carrying it is shown,
+// in the screen's middle, the hit's name and a short countdown to it.
+//  - Buster: the local player carries the marker. A bar buster (Hammer's
+//    Weight, Bellows Blow, Thunder Lash, Shearing Blow) shows while its boss
+//    still casts it; a told one (Tempering Strike, Elemental Strike) while its
+//    boss is still on them.
+//  - Hidden otherwise, and while dead.
 
+import {
+  type HeartBusterKey,
+  heartTankBusterByCode,
+  TANK_BUSTER_AURA,
+} from '../../../sim/encounters/smith_heart/tank_buster_ids';
 import {
   HEART_TANK_SWAPS,
   type HeartTankSwap,
@@ -37,6 +53,7 @@ const HIDDEN: EncounterAlertHidden = { visible: false };
 
 export interface TankSwapAura {
   id: string;
+  value?: number;
   remaining?: number;
   duration?: number;
   stacks?: number;
@@ -50,6 +67,8 @@ export interface TankSwapBody {
   auras: readonly TankSwapAura[];
   /** A mob's current target (its tank). */
   aggroTargetId?: number | null;
+  /** A body's bar under way (a bar buster shows while it runs). */
+  castingAbility?: string | null;
 }
 
 export interface TankSwapAlertInput {
@@ -123,4 +142,77 @@ export function buildTankSwapAlertView(input: TankSwapAlertInput): TankSwapAlert
     };
   }
   return HIDDEN;
+}
+
+// ---- the tank buster alert ------------------------------------------------------------------
+
+export type TankBusterAlertKind = 'buster';
+
+/** Every kind class the painter toggles (the CSS keys on them). */
+export const TANK_BUSTER_ALERT_KINDS: readonly TankBusterAlertKind[] = ['buster'];
+
+export type TankBusterAlertLive = Omit<EncounterAlertLive, 'kind'> & { kind: TankBusterAlertKind };
+export type TankBusterAlertView = TankBusterAlertLive | EncounterAlertHidden;
+
+/** Each buster's name in the catalog (a static key per buster). */
+function busterName(key: HeartBusterKey): string {
+  switch (key) {
+    case 'weight':
+      return t('hudChrome.tankBuster.weight');
+    case 'blow':
+      return t('hudChrome.tankBuster.blow');
+    case 'thunder':
+      return t('hudChrome.tankBuster.thunder');
+    case 'tempering':
+      return t('hudChrome.tankBuster.tempering');
+    case 'strike':
+      return t('hudChrome.tankBuster.strike');
+    case 'shear':
+      return t('hudChrome.tankBuster.shear');
+  }
+}
+
+const tenths = (v: number) =>
+  formatNumber(Math.max(0, Math.ceil(v * 10 - 1e-6) / 10), {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+
+export function buildTankBusterAlertView(input: TankSwapAlertInput): TankBusterAlertView {
+  const self = input.self;
+  if (self.dead) return HIDDEN;
+  let mark: TankSwapAura | null = null;
+  for (const a of self.auras)
+    if (a.id === TANK_BUSTER_AURA) {
+      mark = a;
+      break;
+    }
+  if (!mark) return HIDDEN;
+  const buster = heartTankBusterByCode(mark.value);
+  if (!buster) return HIDDEN;
+  const left = Math.max(0, mark.remaining ?? 0);
+  if (left <= 0) return HIDDEN;
+  // Its boss, when the mirror sees it: a bar buster ends with its bar, a told
+  // one once the boss has turned to another tank.
+  const boss = mark.sourceId !== undefined ? input.entity(mark.sourceId) : undefined;
+  if (boss && !boss.dead) {
+    if (buster.cast !== null && boss.castingAbility !== buster.cast) return HIDDEN;
+    if (buster.cast === null && !stillTanking(mark, self.id, input.entity)) return HIDDEN;
+  }
+  const total = Math.max(1e-6, mark.duration ?? left);
+  const title = busterName(buster.key);
+  const seconds = tenths(left);
+  return {
+    visible: true,
+    kind: 'buster',
+    title,
+    line: t('hudChrome.tankBuster.onYou'),
+    hint: '',
+    key: '',
+    progress: Math.max(0, Math.min(1, left / total)),
+    progressAria: t('hudChrome.tankBuster.timeAria', { name: title, seconds }),
+    barLabel: t('hudChrome.tankBuster.seconds', { seconds }),
+    pressable: false,
+    buttonAria: title,
+  };
 }

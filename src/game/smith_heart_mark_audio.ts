@@ -24,6 +24,12 @@ export const HEART_MARK = {
   fire: S('heart_mark_fire'),
 } as const;
 
+/** A boss's heavy hit on the local tank (encounters/smith_heart/
+ *  tank_buster_ids.ts): the forge's anvil struck in their ear as its marker
+ *  arrives, with the HUD's tank buster alert. Every fight but the Heat's
+ *  (it has no single heavy hit) lists it on its own ear. */
+export const HEART_TANK_BUSTER_SOUND: HeartMarkSound = S('ui_aura_anvil_strike', 0.9, 0.9);
+
 /** A sting of `element` at its own gain and rate (a second mark of one fight
  *  told apart by pitch). */
 export function markSound(base: HeartMarkSound, gain = 1, rate = 1): HeartMarkSound {

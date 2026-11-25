@@ -11,6 +11,7 @@ import type { FinalElementsState } from './final_elements_state';
 import type { FinalDifficulty, FinalPoolKind } from './final_ids';
 import type { FinalStage } from './final_phase_ids';
 import type { FinalVoiceWatch } from './final_voice';
+import type { HardEnrageState } from './hard_enrage';
 import type { TierSwingBase } from './tier_swing';
 
 /** A bar in flight on the boss. */
@@ -292,6 +293,9 @@ export interface FinalFightState {
    *  created on first touch. */
   feat?: SmithHeartFeatAttempt;
   clock: number;
+  /** Forge-Fury, the hard enrage (hard_enrage.ts; Heroic and Mythic), created
+   *  on its first tick at the pull. */
+  enrage?: HardEnrageState;
   /** The zone the boss stands in now. */
   zone: HeartQuarterZone;
   /** The quarter it was pulled in: its base form for the fight. */

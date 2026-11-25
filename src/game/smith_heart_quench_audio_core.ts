@@ -35,7 +35,8 @@ import {
   QUENCH_CUES,
   QUENCH_DEV_CUES,
 } from '../sim/encounters/smith_heart/quench_ids';
-import { HEART_MARK, type HeartMarkSound } from './smith_heart_mark_audio';
+import { TANK_BUSTER_AURA } from '../sim/encounters/smith_heart/tank_buster_ids';
+import { HEART_MARK, HEART_TANK_BUSTER_SOUND, type HeartMarkSound } from './smith_heart_mark_audio';
 
 export interface QuenchSound {
   key: string;
@@ -174,6 +175,8 @@ export const QUENCH_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
  *  (the owner's heroic run of 2026-11-17). */
 export const QUENCH_MARK_ALARM: Readonly<Record<string, HeartMarkSound>> = {
   [QUENCH_AURAS.marked]: { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 },
+  // Tempering Strike on her tank (the tank buster alert's sound).
+  [TANK_BUSTER_AURA]: HEART_TANK_BUSTER_SOUND,
 };
 
 /** Every sample the fight plays, for preloading once. */

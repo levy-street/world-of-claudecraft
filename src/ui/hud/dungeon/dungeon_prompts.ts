@@ -28,7 +28,9 @@
 // (tank_swap_alert_view.ts on the same family: Swap for the tank carrying a
 // swap debuff at its count, its stacks; nobody else), small beside the
 // target frame, on every tier and whatever the hints setting; it never holds
-// the slot. Its mirror on the action bar's other side is the Live Coal chip
+// the slot. Its sibling, the tank buster alert (the same view module: a boss's
+// heavy hit and its countdown for the tank it is aimed at), sits in the
+// screen's middle under the same rules. Its mirror on the action bar's other side is the Live Coal chip
 // (coal_alert_view.ts: its bearer's absorb left and fuse), the same rules.
 //
 // Beside the slot it paints the Masterless Strength's raid HUD, its phase
@@ -102,7 +104,9 @@ import {
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 import {
+  buildTankBusterAlertView,
   buildTankSwapAlertView,
+  TANK_BUSTER_ALERT_KINDS,
   TANK_SWAP_ALERT_KINDS,
   type TankSwapBody,
 } from './tank_swap_alert_view';
@@ -186,6 +190,7 @@ export class DungeonPrompts {
   private readonly quench: EncounterAlert;
   private readonly knot: EncounterAlert;
   private readonly tankSwap: EncounterAlert;
+  private readonly tankBuster: EncounterAlert;
   private readonly liveCoal: EncounterAlert;
   private readonly finalPhase: HeartFinalPhasePanel;
   private readonly finalPhaseView = makeFinalPhaseView();
@@ -264,6 +269,12 @@ export class DungeonPrompts {
       id: 'heart-tank-swap',
       className: 'ui-panel-strong encounter-alert heart-tank-swap',
       kinds: TANK_SWAP_ALERT_KINDS,
+    });
+    // The tank buster alert: the swap's family, in the screen's middle.
+    this.tankBuster = new EncounterAlert(deps, {
+      id: 'heart-tank-buster',
+      className: 'ui-panel-strong encounter-alert heart-tank-buster',
+      kinds: TANK_BUSTER_ALERT_KINDS,
     });
     this.liveCoal = new EncounterAlert(deps, {
       id: 'heart-live-coal',
@@ -383,6 +394,13 @@ export class DungeonPrompts {
         ? buildTankSwapAlertView({ self: p, entity })
         : HINT_HIDDEN,
     );
+    // A boss's heavy hit on the local tank (an action prompt, off the slot):
+    // only the tank it is aimed at carries its marker.
+    this.tankBuster.paint(
+      dungeonPromptEnabled('tankBuster', hints)
+        ? buildTankBusterAlertView({ self: p, entity })
+        : HINT_HIDDEN,
+    );
     // The Live Coal's bearer's own chip (an action readout, off the slot).
     this.liveCoal.paint(
       dungeonPromptEnabled('liveCoal', hints)
@@ -454,6 +472,7 @@ export class DungeonPrompts {
     this.quench.dispose();
     this.knot.dispose();
     this.tankSwap.dispose();
+    this.tankBuster.dispose();
     this.liveCoal.dispose();
     this.finalPhase.dispose();
     this.breathWind.dispose();

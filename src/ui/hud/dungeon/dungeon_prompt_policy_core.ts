@@ -43,6 +43,7 @@ export type DungeonPromptId =
   | 'quench'
   | 'knot'
   | 'tankSwap'
+  | 'tankBuster'
   | 'liveCoal'
   | 'temple'
   | 'kitUse';
@@ -59,6 +60,7 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   quench: false,
   knot: false,
   tankSwap: false,
+  tankBuster: false,
   liveCoal: false,
   temple: true,
   kitUse: false,

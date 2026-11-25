@@ -5,6 +5,7 @@
 // fight's objects (quench_ids.ts says which).
 
 import type { SmithHeartFeatAttempt } from './feat_attempt';
+import type { HardEnrageState } from './hard_enrage';
 import type { QuenchDifficulty } from './quench_ids';
 import type { TierSwingBase } from './tier_swing';
 import type { SlainWatch } from './voice_slain';
@@ -127,6 +128,9 @@ export interface QuenchFightState {
   feat?: SmithHeartFeatAttempt;
   /** Seconds since the pull. */
   clock: number;
+  /** Forge-Fury, the hard enrage (hard_enrage.ts; Heroic and Mythic), created
+   *  on its first tick at the pull. */
+  enrage?: HardEnrageState;
   /** The fight's half: two blades awake, the others waking, all four. */
   half: 'lake' | 'wake' | 'awake';
   bar: QuenchBar | null;

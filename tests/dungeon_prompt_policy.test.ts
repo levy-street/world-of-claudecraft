@@ -58,6 +58,7 @@ const ALL_IDS: DungeonPromptId[] = [
   'quench',
   'knot',
   'tankSwap',
+  'tankBuster',
   'liveCoal',
   'temple',
   'kitUse',
@@ -78,6 +79,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       quench: false,
       knot: false,
       tankSwap: false,
+      tankBuster: false,
       liveCoal: false,
       temple: true,
       kitUse: false,
@@ -187,6 +189,9 @@ function rig() {
   const entities = new Map<number, Entity>();
   let version = 1;
   const add = (e: Entity) => {
+    // Every real body carries a template id (the roster scans read it); a
+    // fixture that leaves it out gets the empty one.
+    e.templateId ??= '';
     entities.set(e.id, e);
     version++;
   };

@@ -429,6 +429,9 @@ export const ELEMENT_TUNING = {
    *  tier the same. */
   strikeEvery: 8,
   strikeFirst: 8,
+  /** Its tank is told this long before a strike (tank_buster.ts; a
+   *  warning only, the strike's own clock unchanged). */
+  strikeLead: 1.5,
   /** Its tank must stand this near (yards, past the body's reach). */
   strikeReach: 12,
   /** A stack lasts this long (each strike refreshes it). */

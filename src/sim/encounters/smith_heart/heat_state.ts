@@ -5,6 +5,7 @@
 // objects (heat_ids.ts says which).
 
 import type { SmithHeartFeatAttempt } from './feat_attempt';
+import type { HardEnrageState } from './hard_enrage';
 import type { HeatDifficulty, HeatPhase, HeatStage, HeatZoneState } from './heat_ids';
 import type { TierSwingBase } from './tier_swing';
 import type { SlainWatch } from './voice_slain';
@@ -201,6 +202,9 @@ export interface HeatFightState {
   feat?: SmithHeartFeatAttempt;
   /** Seconds since the pull. */
   clock: number;
+  /** Forge-Fury, the hard enrage (hard_enrage.ts; Heroic and Mythic), created
+   *  on its first tick at the pull. */
+  enrage?: HardEnrageState;
   phase: HeatPhase;
   /** The fight clock when this phase began (the cinders' soft enrage reads
    *  how long phase 3 has run, heat_cinders.ts). */
