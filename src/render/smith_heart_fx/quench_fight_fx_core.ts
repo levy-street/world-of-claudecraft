@@ -482,14 +482,19 @@ export const LANE_TRACK_TOLERANCE = 0.1;
  *  it has not locked), it is drawn at that player's DRAWN pose instead, so
  *  the line rides the body on screen every frame rather than the 20 Hz
  *  snapshot a step behind (the owner's online run of 2026-11-17: the line
- *  trailed the marked, the local player most). Locked (no mark on its sim
- *  yaw), the sim's own yaw. Pure. */
+ *  trailed the marked, the local player most). Locked (`locked`, read off
+ *  the line's own template clock, or no mark on its sim yaw), the sim's own
+ *  yaw and nothing else: Jose's video of 2026-11-25 showed a locked line
+ *  swinging off on its own, riding a marked body that still stood near its
+ *  bearing as it stepped away. Pure. */
 export function laneDrawnYaw(
   laneX: number,
   laneZ: number,
   simYaw: number,
   marks: readonly { simX: number; simZ: number; drawnX: number; drawnZ: number }[],
+  locked = false,
 ): number {
+  if (locked) return simYaw;
   let best = -1;
   let bestDiff = LANE_TRACK_TOLERANCE;
   for (let i = 0; i < marks.length; i++) {
@@ -510,6 +515,15 @@ export function laneDrawnYaw(
   const dz = m.drawnZ - laneZ;
   if (dx * dx + dz * dz < 1e-4) return simYaw;
   return Math.atan2(dx, dz);
+}
+
+/** Has a slash line locked `elapsed` seconds after it was first drawn, its
+ *  warning `seconds` long with its last `lock` locked (laneOf)? A hair
+ *  early (`LANE_LOCK_LEAD`): the client sees the line a snapshot late, and a
+ *  locked line must never move. Pure. */
+export const LANE_LOCK_LEAD = 0.1;
+export function laneLocked(elapsed: number, seconds: number, lock: number): boolean {
+  return elapsed >= seconds - lock - LANE_LOCK_LEAD;
 }
 
 /** Which of `marks` a slash line at (laneX, laneZ) with sim yaw `simYaw` is

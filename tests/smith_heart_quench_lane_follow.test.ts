@@ -6,9 +6,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  LANE_LOCK_LEAD,
   LANE_TRACK_TOLERANCE,
   laneDrawnYaw,
+  laneLocked,
 } from '../src/render/smith_heart_fx/quench_fight_fx_core';
+import { QUENCH_DIFFICULTY } from '../src/sim/encounters/smith_heart/quench_ids';
 
 describe('the slash line follows the drawn body', () => {
   it('while the sim line points at a marked player, aims at where that player is drawn', () => {
@@ -41,8 +44,8 @@ describe('the slash line follows the drawn body', () => {
 
   it('the fight draws its lines through it, from the marked players it scans', () => {
     const src = readFileSync('src/render/smith_heart_fx/quench_fight_fx.ts', 'utf8');
-    expect(src).toContain(
-      'laneDrawnYaw(lane.pos.x, lane.pos.z, lane.facing, this.markedAt(world))',
+    expect(src).toMatch(
+      /laneDrawnYaw\(\s*lane\.pos\.x,\s*lane\.pos\.z,\s*lane\.facing,\s*this\.markedAt\(world\),\s*lof\.state !== 'warn' \|\| laneLocked\(this\.clock - l\.born, lof\.seconds, lof\.lock\),\s*\)/,
     );
     expect(src).toMatch(/markedAt\(world: IWorld\)[\s\S]*fxAnchor\(e\)/);
   });
@@ -63,5 +66,42 @@ describe("the slash line's sound: the marked player's alone", () => {
   it('the fight passes `mine` from the local player being that target', () => {
     const src = readFileSync('src/render/smith_heart_fx/quench_fight_fx.ts', 'utf8');
     expect(src).toContain('marked[target].id === world.playerId');
+  });
+});
+
+// Jose's video of 2026-11-25 (Heroic, about 0:22): after the lock the line
+// swung off on its own. The sim freezes its yaw at the lock
+// (quench_slash.ts stepSlashes), but the client kept riding the marked body
+// while it still stood near the bearing; locked, the drawn line is the sim's
+// yaw and nothing else, whatever the marked do.
+describe('the locked slash line never moves', () => {
+  it('locked, holds the sim yaw even with the marked body right on its line and moving', () => {
+    const simYaw = Math.atan2(0, 20);
+    const drawn: number[] = [];
+    for (let k = 0; k <= 20; k++) {
+      // The marked runs off sideways from right on the line.
+      const x = k * 0.1;
+      drawn.push(
+        laneDrawnYaw(0, 0, simYaw, [{ simX: x * 0.5, simZ: 20, drawnX: x, drawnZ: 20 }], true),
+      );
+    }
+    for (const y of drawn) expect(y).toBe(simYaw);
+    // Unlocked, the same frames follow the body (the smooth track before the lock).
+    const free = laneDrawnYaw(0, 0, simYaw, [{ simX: 0.5, simZ: 20, drawnX: 1, drawnZ: 20 }]);
+    expect(free).toBeCloseTo(Math.atan2(1, 20), 9);
+  });
+
+  it("locks on the line's own clock, a hair before the sim does, on every tier", () => {
+    for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+      const { slashAim: warn, slashLock: lock } = QUENCH_DIFFICULTY[tier];
+      const at = warn - lock;
+      expect(laneLocked(at - LANE_LOCK_LEAD - 0.05, warn, lock), tier).toBe(false);
+      expect(laneLocked(at - LANE_LOCK_LEAD, warn, lock), tier).toBe(true);
+      expect(laneLocked(at, warn, lock), tier).toBe(true);
+      expect(laneLocked(warn, warn, lock), tier).toBe(true);
+    }
+    // An interphase line, locked its whole warning, never tracks.
+    expect(laneLocked(0, 3, 3)).toBe(true);
+    expect(LANE_LOCK_LEAD).toBeLessThanOrEqual(0.15);
   });
 });
