@@ -13,7 +13,7 @@
 //              that no longer exist to its redirects (as gone, until given a target).
 // --consume-template  delete the template afterwards (the built shell has no article, so
 //              it must not be served as a page of its own).
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -166,9 +166,11 @@ export async function buildSite({
 
   const broken = new Map();
   let written = 0;
+  let peakRss = process.memoryUsage().rss;
   for (const page of site.all) {
     // A long-lived DOM keeps every page it has built; a fresh one per batch bounds memory.
     if (written && written % 200 === 0) {
+      peakRss = Math.max(peakRss, process.memoryUsage().rss);
       await window.happyDOM.close();
       window = installDom();
     }
@@ -225,12 +227,30 @@ export async function buildSite({
   await window.happyDOM.close();
   log(
     `wiki site: ${written} pages in ${((Date.now() - started) / 1000).toFixed(1)}s, ` +
-      `${broken.size} unknown link targets`,
+      `${broken.size} unknown link targets, peak memory ${Math.round(peakRss / 2 ** 20)} MB`,
   );
   return { paths, broken, written, searchUrl, cardsUrl };
 }
 
+// Left to its default heap, V8 collects lazily and this build peaks near 2.6 GB of
+// memory; the production image builds on a 4 GB host beside the running game. A
+// 1280 MB heap holds it near 1 GB at the same speed, so the CLI relaunches itself
+// with that cap unless the caller already set one.
+const HEAP_CAP_MB = 1280;
+function relaunchWithHeapCap() {
+  const flag = /--max-old-space-size/;
+  if (process.execArgv.some((arg) => flag.test(arg))) return false;
+  if (flag.test(process.env.NODE_OPTIONS ?? '')) return false;
+  const child = spawnSync(
+    process.execPath,
+    [`--max-old-space-size=${HEAP_CAP_MB}`, ...process.execArgv, ...process.argv.slice(1)],
+    { stdio: 'inherit' },
+  );
+  process.exit(child.status ?? 1);
+}
+
 async function main() {
+  relaunchWithHeapCap();
   const args = process.argv.slice(2);
   const seedFile = args.includes('--generate')
     ? generateSeed()

@@ -29,7 +29,11 @@ so neither site can shadow the other.
 
 `npm run build` runs both steps from the current game data
 (`build.mjs --generate --template dist/encyclopedia.html --out dist`), so every deploy
-publishes an encyclopedia that matches the game it ships with. Native builds drop it
+publishes an encyclopedia that matches the game it ships with. The step adds about 1 to 2
+minutes and about 105 MB of HTML to `dist/`; the builder caps its own heap so it peaks
+near 1.2 GB of memory (the production image builds on a 4 GB host beside the game). The
+image copies `encyclopedia.html` and `mediawiki/` and allowlists the script trees it
+needs; `tests/dockerignore_context.test.ts` fails if a build:bundle input stops reaching it. Native builds drop it
 (`scripts/wiki_site/prune_native.mjs`, and the desktop `build.files` excludes).
 
 Serving: the game server answers `/wiki/<path>` from `dist/wiki/<path>/index.html`
