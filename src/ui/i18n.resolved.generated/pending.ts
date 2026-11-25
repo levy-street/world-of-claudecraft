@@ -34,30 +34,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.home.encyclopedia",
     "guide.nav.encyclopedia"
   ],
-  "zh_CN": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "zh_TW": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "ko_KR": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
-  "ja_JP": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "guide.home.encyclopedia",
     "guide.nav.encyclopedia"
   ],
-  "ru_RU": [
-    "guide.home.encyclopedia",
-    "guide.nav.encyclopedia"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "guide.home.encyclopedia",
     "guide.nav.encyclopedia"
