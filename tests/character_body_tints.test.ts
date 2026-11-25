@@ -43,15 +43,17 @@ it('a cold body wears the glaze climbing with its bar; leaving the cold releases
   expect(c).toBeNull();
 });
 
-it('a body fallen through the ice is drawn sunk waist deep, and climbs back out', () => {
+it('a body fallen through the ice is drawn sunk in the water, and climbs back out', () => {
   const r = rig();
   applyCharacterBodyTints(r, body([{ id: QUENCH_AURAS.cold, value: 40 }]), 0);
   applyCharacterBodyTints(r, body([{ id: QUENCH_AURAS.trapped, kind: 'root' }]), 0);
   applyCharacterBodyTints(r, body([]), 0);
   expect(r.seen.sink).toEqual([0, QUENCH_TRAPPED_SINK, 0]);
-  // Waist deep on a 2.6 yd rig: the hole reads as water, the head stays clear.
-  expect(QUENCH_TRAPPED_SINK).toBeGreaterThan(0.8);
-  expect(QUENCH_TRAPPED_SINK).toBeLessThan(1.4);
+  // The body also treads water (the rig's tread pose sinks it about another
+  // third of a yard): together they put the waterline at the shoulders on a
+  // 2.6 yd rig, so the hole reads as water and the head stays clear.
+  expect(QUENCH_TRAPPED_SINK).toBeGreaterThan(0.5);
+  expect(QUENCH_TRAPPED_SINK).toBeLessThan(1);
   // The drawn sink eases in quickly, out more slowly, and settles exactly.
   let d = 0;
   for (let i = 0; i < 6; i++) d = easeSink(d, QUENCH_TRAPPED_SINK, 1 / 20);
