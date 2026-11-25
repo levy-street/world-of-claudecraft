@@ -16940,8 +16940,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Sillage solaire',
   'entities.abilities.sunlance.description':
     'Consomme vos 3 Marée lunaire pour une frappe de {damage} points de dégâts de Nature plus une brûlure de {overTime} sur 9 s, et rend 35 points de mana : le choix du mana. Déferlante lunaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un.',
-  'guide.abilityHook.moonseed':
-    'Ajoute un cran de Marée lunaire et prolonge Tempête lunaire tant que vous êtes en Forme de sélénien.',
   'hudChrome.auraEffect.moontide':
     "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
   'hudChrome.auraEffect.oldBlood':

@@ -276,12 +276,13 @@ export const RUINCALLER_4PC_CHAOS_BOLT_DMG_PCT = 0.242;
 
 // Audited constants for the bespoke druid bends (read by the class-module
 // call sites AND pinned by tests, so the copy cannot drift from the code).
-/** Moonscorch 2pc: Moonseed's per-application Lunar Tempest extension cap
- *  (base extendDot maxBonus 6). The RESOLVED effect is rewritten in
- *  applyTalentMods, the ONE number the extendOwnedDot dispatch and the
- *  {duration} description splice both read: two 6-sec extensions fit per
- *  application, and the third press stays dead (the set doc's honesty note). */
-export const MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC = 12;
+/** Moonscorch 2pc: Lunar Tempest's ticks add Moontide at most once per this
+ *  many seconds (the Tidewheel base is TIDE_TICK_ICD, 8). The bonus used to
+ *  let Moonseed extend Lunar Tempest twice per application; Moonseed retired
+ *  when the Tidewheel payoffs got their own buttons, so the 2pc moved to the
+ *  Moontide bank it fed (recorded as a deviation from the set doc in the PR).
+ *  Read by druid_engines.ts druidEngineOnBleedTick; draws no rng. */
+export const MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC = 4;
 /** Moonscorch 4pc: the moonlash/sunlance dmgPct row. The printed number is 25
  *  percent DELIVERED: the accumulator is additive (talent_hit_mult.ts,
  *  1 + spellDmgPct + dmgPct) and a committed Moongrove at the raid's level
@@ -1076,15 +1077,13 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   moonscorch: [
     {
       pieces: 2,
-      // Moonseed may extend Lunar Tempest twice per application: the resolved
-      // extendDot cap goes 6 -> 12 (applyTalentMods rewrite), and the
-      // extendedBy bookkeeping already enforces the per-application budget
-      // (a fresh Lunar Tempest application replaces the aura object, so the
-      // budget resets exactly at the copy's "per application" boundary). The
-      // caster 2pc pushback rider rides the generic global knob. Draws no rng.
+      // Lunar Tempest's ticks add Moontide every 4 sec instead of every 8: a
+      // bespoke bend in druid_engines.ts druidEngineOnBleedTick, gated on the
+      // wearer flag. The caster 2pc pushback rider rides the generic global
+      // knob. Draws no rng.
       effect: {
         global: { castPushbackReduction: 1 },
-        tuning: { tempestExtendCapSec: MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC },
+        tuning: { moontideTickIcdSec: MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC },
       },
     },
     {

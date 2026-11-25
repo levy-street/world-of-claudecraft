@@ -197,8 +197,8 @@ export function runDruidLiveMobProbe(
         const open = (id: string) => player.auras.some((aura) => aura.id === id);
         if (!tempest) sim.castAbility('moonfire');
         else if (!swarm) sim.castAbility('insect_swarm');
-        else if (bank('suntide') >= 3) sim.castAbility('starfire');
-        else if (bank('moontide') >= 3) sim.castAbility('moonseed');
+        else if (bank('suntide') >= 3) sim.castAbility('sunlance');
+        else if (bank('moontide') >= 3) sim.castAbility('moonlash');
         else if (open('sunrise')) sim.castAbility('starfire');
         else if (open('moonrise')) sim.castAbility('wrath');
         else sim.castAbility(bank('suntide') <= bank('moontide') ? 'wrath' : 'starfire');

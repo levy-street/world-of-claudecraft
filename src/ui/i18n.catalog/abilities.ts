@@ -1229,7 +1229,7 @@ const classAbilityNamesEn = {
         'Hurls a bolt of nature energy for {damage} Nature damage.',
         {
           balance:
-            'In Moonwing Form, each completed cast adds 1 Suntide (max 3) and extends your Stinging Swarm by 2 sec, up to 6 sec per application. Deals 25% more damage during Moonrise. At 3 Suntide, Skyfall becomes Sunwake.',
+            'In Moonwing Form, each completed cast adds 1 Suntide (max 5) and extends your Stinging Swarm by 2 sec, up to 6 sec per application. Deals 25% more damage during Moonrise.',
         },
       ],
       [
@@ -1252,7 +1252,7 @@ const classAbilityNamesEn = {
         'Burns the enemy with moonfire for {damage} Arcane damage, then {overTime} Arcane damage over {duration} sec.',
         {
           balance:
-            'Keep it burning: Skyfall extends it by 2 sec and Moonseed by 6 sec. In Moonwing Form, its ticks add 1 Moontide, at most once every 8 sec. Moonsurge refreshes it, and it ticks 20% faster during Sunrise.',
+            'Keep it burning: Skyfall extends it by 2 sec, up to 12 sec per application. In Moonwing Form, its ticks add 1 Moontide, at most once every 8 sec. Moonsurge refreshes it, and it ticks 20% faster during Sunrise.',
         },
       ],
       [
@@ -1365,7 +1365,7 @@ const classAbilityNamesEn = {
         'Calls down a bolt of stellar fire, causing {damage} Arcane damage.',
         {
           balance:
-            'In Moonwing Form, each completed cast adds 1 Moontide (max 3) and extends your Lunar Tempest by 2 sec, up to 12 sec per application together with Moonseed. Casts 20% faster during Sunrise. At 3 Suntide, this button becomes Sunwake.',
+            'In Moonwing Form, each completed cast adds 1 Moontide (max 5) and extends your Lunar Tempest by 2 sec, up to 12 sec per application. Casts 20% faster during Sunrise.',
         },
       ],
       [
@@ -1683,12 +1683,12 @@ const classAbilityNamesEn = {
       [
         'moonlash',
         'Moonsurge',
-        'Spends your 3 Moontide for a heavy strike of {damage} Arcane damage, refreshes your Lunar Tempest to full duration, and opens Moonrise for 10 sec: Wildbolt deals 25% more damage and Stinging Swarm ticks 20% faster. Opening Moonrise closes Sunrise.',
+        'Moonwing Form only, usable at 3 or more Moontide. Spends all your Moontide for a heavy strike of {damage} Arcane damage, 20% more for each Moontide past 3 (up to 5), refreshes your Lunar Tempest to full duration, and opens Moonrise for 10 sec: Wildbolt deals 25% more damage and Stinging Swarm ticks 20% faster. Opening Moonrise closes Sunrise. Tidecross: cast during Sunrise, the strike deals 30% more damage.',
       ],
       [
         'sunlance',
         'Sunwake',
-        'Spends your 3 Suntide for a strike of {damage} Nature damage plus {overTime} Nature damage over 9 sec, restores 35 mana, refreshes your Stinging Swarm to full duration, and opens Sunrise for 10 sec: Skyfall casts 20% faster and Lunar Tempest ticks 20% faster. Opening Sunrise closes Moonrise.',
+        'Moonwing Form only, usable at 3 or more Suntide. Spends all your Suntide for a strike of {damage} Nature damage (20% more for each Suntide past 3, up to 5) plus {overTime} Nature damage over 9 sec, restores 35 mana, refreshes your Stinging Swarm to full duration, and opens Sunrise for 10 sec: Skyfall casts 20% faster and Lunar Tempest ticks 20% faster. Opening Sunrise closes Moonrise. Tidecross: cast during Moonrise, the strike deals 30% more damage.',
       ],
       [
         'redharvest',
@@ -1720,7 +1720,8 @@ const classAbilityNamesEn = {
         'Spore Burst',
         'Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.',
         {
-          balance: 'At 3 Moontide it is 25% stronger and spends your Moontide.',
+          balance:
+            'At 3 or more Moontide it is 25% stronger, plus 20% for each Moontide past 3, and spends your Moontide.',
           restoration:
             'Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance.',
         },

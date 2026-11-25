@@ -16136,8 +16136,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Zonnespoor',
   'entities.abilities.sunlance.description':
     'Verbruikt je 3 Maanvloed voor een slag van {damage} Natuur-schade plus een brandwond van {overTime} over 9 sec, en herstelt 35 mana: de manakeuze. Maangolf verbruikt dezelfde 3 Maanvloed, dus kies er een.',
-  'guide.abilityHook.moonseed':
-    'Voegt een Maanvloed-stadium toe en verlengt Maanstorm zolang je in Maanuilvorm bent.',
   'hudChrome.auraEffect.moontide':
     'Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit',
   'hudChrome.auraEffect.oldBlood':

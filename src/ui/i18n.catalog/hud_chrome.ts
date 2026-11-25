@@ -388,13 +388,13 @@ export const hudChromeStrings = {
     moontideLabel: 'Moontide',
     suntideStatus: '{value} of {max} Suntide',
     moontideStatus: '{value} of {max} Moontide',
-    sunriseOpen: 'Sunrise is open',
-    moonriseOpen: 'Moonrise is open',
+    sunriseOpen: 'Sunrise is open: cast Skyfall, and Moonsurge strikes harder',
+    moonriseOpen: 'Moonrise is open: cast Wildbolt, and Sunwake strikes harder',
     noWindow: 'No Tidewheel window open',
     suntideTooltip:
-      'Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.',
+      'Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 5. From 3, Sunwake is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Stinging Swarm and opens Sunrise.',
     moontideTooltip:
-      'Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise.',
+      'Moontide: Skyfall casts and Lunar Tempest ticks fill it, up to 5. From 3, Moonsurge is ready: it spends the bank, hitting 20% harder for each point past 3, refreshes Lunar Tempest and opens Moonrise.',
   },
   priest: {
     gloomtitheLabel: 'Gloomtithe',
@@ -3215,6 +3215,7 @@ export const hudChromeStrings = {
     // Interface > Combat opt-out of the vivid floating combat text (school colours,
     // fan-out, crit and big-hit emphasis) back to the classic white and gold.
     classicCombatText: 'Classic Combat Text',
+    tidewheelEdgeGlow: 'Moonwing Tidewheel Screen Glow',
     // Graphics-panel opt-in (default off) for the interactive wake/ripple
     // simulation on water surfaces; bubbles and splash particles do not key
     // off it. It sits in the Display card beside Weather because it costs
@@ -6093,11 +6094,13 @@ export const hudChromeStrings = {
       'Your next Long Draw deals {longDrawPct}% more damage, or your next Fell Shot deals {fellShotPct}% more',
     duskEconomy: 'Abilities cost {pct}% less energy',
     moontide:
-      'Moontide {stacks}/{max}. In Moonwing Form, Skyfall and Moonseed casts each add 1, and Lunar Tempest ticks add 1 at most once every 8 sec. At {max}, Moonseed becomes Moonsurge, which spends all 3',
+      'Moontide {stacks}/{max}. In Moonwing Form, Skyfall casts each add 1, and Lunar Tempest ticks add 1 at most once every 8 sec. From 3, Moonsurge is ready and spends them all, 20% stronger for each point past 3',
     suntide:
-      'Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3',
-    sunrise: 'Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster',
-    moonrise: 'Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster',
+      'Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. From 3, Sunwake is ready and spends them all, 20% stronger for each point past 3',
+    sunrise:
+      'Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster. Moonsurge cast now deals {crossPct}% more damage',
+    moonrise:
+      'Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster. Sunwake cast now deals {crossPct}% more damage',
     oldBlood:
       'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:

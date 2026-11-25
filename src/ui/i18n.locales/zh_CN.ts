@@ -18525,7 +18525,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lay_on_hands': '在盟友濒临倒下时为其恢复大量生命值。',
   'guide.abilityHook.lifespring_weapon': '为武器灌注复苏之水，强化持续的治疗节奏。',
   'guide.abilityHook.measured_shot': '一记从容瞄准的远程射击，为你的强力攻击恢复集中值。',
-  'guide.abilityHook.moonseed': '在月翼形态下，推进一层月潮并延长月光风暴。',
   'guide.abilityHook.oath_chain': '将远处的敌人拉入队伍并减缓其逃离速度。',
   'guide.abilityHook.pack_command': '命令你的伙伴发动攻击，并积攒凶性以释放野兽。',
   'guide.abilityHook.primal_exaltation': '短暂释放与你专精相符的元素力量。',

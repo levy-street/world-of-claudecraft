@@ -17664,8 +17664,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '무기에 치유의 물을 불어넣어 이어지는 회복 흐름을 강화합니다.',
   'guide.abilityHook.measured_shot':
     '신중하게 조준한 원거리 사격으로, 강력한 공격에 쓸 집중을 회복합니다.',
-  'guide.abilityHook.moonseed':
-    '달날개 형상일 때 달물결을 1단계 진행시키고 달빛 폭풍 지속시간을 연장합니다.',
   'guide.abilityHook.oath_chain': '멀리 있는 적을 무리 안으로 끌어당기고 도주를 늦춥니다.',
   'guide.abilityHook.pack_command':
     '동료에게 공격을 명령하고, 야수 해방에 필요한 흉포함을 쌓습니다.',

@@ -15305,8 +15305,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Sonnenspur',
   'entities.abilities.sunlance.description':
     'Verbraucht 3 Mondflut für einen Schlag mit {damage} Naturschaden plus einem Brand von {overTime} über 9 Sek. und stellt 35 Mana wieder her: die Manawahl. Mondwoge verbraucht dieselben 3 Mondflut, also wählt eine.',
-  'guide.abilityHook.moonseed':
-    'Fügt eine Mondflut-Stufe hinzu und verlängert Mondsturm, solange Ihr in Mondkingestalt seid.',
   'hudChrome.auraEffect.moontide':
     'Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr',
   'hudChrome.auraEffect.oldBlood':

@@ -922,7 +922,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
         effect: {},
         // The caster 2pc carries the pushback rider (full immunity, the raid
         // tier's upgrade over the leveling lineage's 50 percent).
-        text: 'Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.',
+        text: 'Lunar Tempest ticks add Moontide at most once every 4 sec, instead of every 8 sec. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,

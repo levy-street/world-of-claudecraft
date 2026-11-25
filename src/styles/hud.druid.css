@@ -1,7 +1,17 @@
-/* The Moonwing Tidewheel strip: three Suntide orbs, the window gem, three Moontide
-   orbs, on the warlock resource strip's footprint. A filled orb glows in its school's
-   color, a full bank breathes, and the gem's ring drains with the open window.
-   Counts and the window survive every quality tier; only the glow scales. */
+/* The Moonwing Tidewheel in the Eclipse layout: the window gem on a 108 by 100
+   plate with the two banks' five orbs each around it, always horizontal. The bank
+   being charged (the favored spell's school; with no window open, the one charged
+   last) sits in an arc of full-size orbs above the gem, the other in a row of small
+   orbs below it (tidePlace in tide_orbs_view.ts). Swapping banks glides the orbs
+   between the two arcs. A filled orb glows in its school's color, a bank at 3 or
+   more (payoff ready) breathes, and the gem shows the spell the open window favors
+   (Skyfall in moon blue during Sunrise, Wildbolt in sun gold during Moonrise) with a
+   ring that drains with the window. The composition sits a little below the plate's
+   center (--tide-cy) so the arcs fill it evenly. The screen-edge overlay carries a
+   faint attunement tint while a window is open, a faint flash when a bank reaches 3
+   and a strong one at 5; it shows only under the tidewheel-edge-glow body class
+   (Options). Counts and the window survive every quality tier; only the glow
+   scales. */
 @layer components {
   .druid-tide-frame {
     --tide-glow: calc(12px * var(--fx-shadow, 1));
@@ -11,25 +21,32 @@
     top: 72%;
     translate: -50% -50%;
     z-index: 24;
+    --tide-orb: 20px;
+    --tide-gem: 32px;
+    --tide-r: 44px;
+    --tide-cy: 9px;
+    --tide-plate-tint: var(--color-tide-rim);
     display: none;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    width: 300px;
-    height: 48px;
+    width: 108px;
+    height: 100px;
     box-sizing: border-box;
     border: 1px solid var(--color-tide-rim);
-    border-radius: var(--radius-md);
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-tide-sun-deep) 14%, var(--color-tide-strip)),
-      var(--color-tide-strip) 42%,
-      var(--color-tide-strip) 58%,
-      color-mix(in srgb, var(--color-tide-moon-deep) 18%, var(--color-tide-strip))
+    border-radius: 20px;
+    background: radial-gradient(
+      circle at 50% calc(50% + var(--tide-cy)),
+      var(--color-tide-strip) 0 52%,
+      color-mix(in srgb, var(--tide-plate-tint) 22%, var(--color-tide-strip)) 100%
     );
     box-shadow: 0 2px 6px var(--color-ink-deep);
     isolation: isolate;
     pointer-events: none;
+  }
+  /* The plate's rim takes the color of the bank being charged. */
+  .druid-tide-frame.charging-sun {
+    --tide-plate-tint: var(--color-tide-sun-deep);
+  }
+  .druid-tide-frame.charging-moon {
+    --tide-plate-tint: var(--color-tide-moon-deep);
   }
   .druid-tide-frame.hud-frame-detached {
     translate: none;
@@ -37,35 +54,68 @@
   #ui > .druid-tide-frame:not(.tf-unlocked) {
     pointer-events: none;
   }
+  /* Each bank is a zero-size anchor at the composition's center; its orbs are
+     placed around it by angle (--tide-a) and radius (--tide-r scaled by
+     --tide-rr). */
   .druid-tide-bank {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px;
-    border-radius: 999px;
+    --tide-rr: 1;
+    --tide-s: 1;
+    --tide-o: 1;
+    position: absolute;
+    left: 50%;
+    top: calc(50% + var(--tide-cy));
+    width: 0;
+    height: 0;
     pointer-events: auto;
-    transition: background calc(180ms * var(--motion-scale));
   }
-  /* A full bank also lights its own well behind the orbs. */
-  .druid-tide-bank.sun.full {
-    background: radial-gradient(
-      closest-side,
-      color-mix(in srgb, var(--color-tide-sun) 30%, transparent),
-      transparent
-    );
+  /* The bank being charged: five full-size orbs in an arc above the gem,
+     29 deg apart (20px orbs clear each other at 44px), filling left to right. */
+  .druid-tide-bank.place-top .druid-tide-orb:nth-child(1) {
+    --tide-a: 212deg;
   }
-  .druid-tide-bank.moon.full {
-    background: radial-gradient(
-      closest-side,
-      color-mix(in srgb, var(--color-tide-moon) 30%, transparent),
-      transparent
-    );
+  .druid-tide-bank.place-top .druid-tide-orb:nth-child(2) {
+    --tide-a: 241deg;
+  }
+  .druid-tide-bank.place-top .druid-tide-orb:nth-child(3) {
+    --tide-a: 270deg;
+  }
+  .druid-tide-bank.place-top .druid-tide-orb:nth-child(4) {
+    --tide-a: 299deg;
+  }
+  .druid-tide-bank.place-top .druid-tide-orb:nth-child(5) {
+    --tide-a: 328deg;
+  }
+  /* The other bank: five small orbs in a tighter arc below the gem, filling
+     left to right. They still light per point and breathe from 3. */
+  .druid-tide-bank.place-below {
+    --tide-rr: 0.68;
+    --tide-s: 0.55;
+  }
+  .druid-tide-bank.place-below .druid-tide-orb:nth-child(1) {
+    --tide-a: 148deg;
+  }
+  .druid-tide-bank.place-below .druid-tide-orb:nth-child(2) {
+    --tide-a: 119deg;
+  }
+  .druid-tide-bank.place-below .druid-tide-orb:nth-child(3) {
+    --tide-a: 90deg;
+  }
+  .druid-tide-bank.place-below .druid-tide-orb:nth-child(4) {
+    --tide-a: 61deg;
+  }
+  .druid-tide-bank.place-below .druid-tide-orb:nth-child(5) {
+    --tide-a: 32deg;
   }
   .druid-tide-orb {
-    position: relative;
-    width: 24px;
-    height: 24px;
-    flex: 0 0 24px;
+    position: absolute;
+    left: calc(var(--tide-orb) / -2);
+    top: calc(var(--tide-orb) / -2);
+    width: var(--tide-orb);
+    height: var(--tide-orb);
+    translate: calc(cos(var(--tide-a, 270deg)) * var(--tide-r) * var(--tide-rr))
+      calc(sin(var(--tide-a, 270deg)) * var(--tide-r) * var(--tide-rr));
+    scale: var(--tide-s);
+    opacity: var(--tide-o);
     box-sizing: border-box;
     border: 1.5px solid var(--color-tide-rim);
     border-radius: 50%;
@@ -76,6 +126,9 @@
     );
     box-shadow: inset 0 2px 3px var(--color-ink-deep);
     transition:
+      translate calc(450ms * var(--motion-scale)) cubic-bezier(0.3, 0.7, 0.2, 1),
+      scale calc(450ms * var(--motion-scale)) cubic-bezier(0.3, 0.7, 0.2, 1),
+      opacity calc(450ms * var(--motion-scale)),
       background calc(180ms * var(--motion-scale)),
       box-shadow calc(180ms * var(--motion-scale)),
       border-color calc(180ms * var(--motion-scale));
@@ -104,21 +157,27 @@
       0 0 var(--tide-glow) color-mix(in srgb, var(--color-tide-moon) 80%, transparent),
       inset 0 -2px 3px color-mix(in srgb, var(--color-tide-moon-deep) 70%, transparent);
   }
-  /* A full bank is a spend cue: the three orbs breathe together. */
-  .druid-tide-bank.sun.full .druid-tide-orb.on {
+  /* A bank at 3 or more is a spend cue: its lit orbs breathe together. */
+  .druid-tide-bank.sun.ready .druid-tide-orb.on {
     --tide-breathe-color: var(--color-tide-sun);
     animation: druid-tide-breathe calc(1.4s * var(--motion-scale)) ease-in-out infinite alternate;
   }
-  .druid-tide-bank.moon.full .druid-tide-orb.on {
+  .druid-tide-bank.moon.ready .druid-tide-orb.on {
     --tide-breathe-color: var(--color-tide-moon);
     animation: druid-tide-breathe calc(1.4s * var(--motion-scale)) ease-in-out infinite alternate;
   }
+  /* The gem sits at the composition's center, over the orbs gliding past it
+     when the banks swap (it is the frame's last child). */
   .druid-tide-gem {
     --tide-gem-color: var(--color-tide-rim);
-    position: relative;
-    width: 32px;
-    height: 32px;
-    flex: 0 0 32px;
+    position: absolute;
+    left: calc(50% - var(--tide-gem) / 2);
+    top: calc(50% + var(--tide-cy) - var(--tide-gem) / 2);
+    z-index: 1;
+    width: var(--tide-gem);
+    height: var(--tide-gem);
+    border-radius: 50%;
+    background: var(--color-tide-strip);
   }
   .druid-tide-gem.sun {
     --tide-gem-color: var(--color-tide-sun);
@@ -162,16 +221,139 @@
       background calc(180ms * var(--motion-scale)),
       box-shadow calc(180ms * var(--motion-scale));
   }
+  /* While a window is open the diamond gives way to the favored spell's icon. */
   .druid-tide-gem.sun::after,
   .druid-tide-gem.moon::after {
-    border-color: var(--tide-gem-deep);
-    background: linear-gradient(
-      135deg,
-      var(--tide-gem-hi),
-      var(--tide-gem-color) 45%,
-      var(--tide-gem-deep)
+    opacity: 0;
+  }
+  .druid-tide-gem-icon {
+    position: absolute;
+    inset: 4px;
+    z-index: 1;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity calc(180ms * var(--motion-scale));
+  }
+  .druid-tide-gem.sun .druid-tide-gem-icon,
+  .druid-tide-gem.moon .druid-tide-gem-icon {
+    opacity: 1;
+    box-shadow:
+      0 0 var(--tide-glow-full) color-mix(in srgb, var(--tide-gem-color) 85%, transparent),
+      inset 0 0 0 1.5px var(--tide-gem-deep);
+  }
+  .druid-tide-gem.sun .druid-tide-gem-icon {
+    background-image: var(--tide-icon-sun);
+  }
+  .druid-tide-gem.moon .druid-tide-gem-icon {
+    background-image: var(--tide-icon-moon);
+  }
+
+  /* The screen-edge glow: a click-through overlay under the HUD frames (the
+     low-health vignette's layer). ::before is the attunement tint while a
+     window is open, ::after the faint flash when a bank reaches 3, and the
+     .druid-tide-edge-max child the strong flash when it reaches 5. Values
+     tuned by the owner in a live preview (2026-11-25). */
+  .druid-tide-edge {
+    --tide-edge-strength: 0;
+    --tide-edge-color: transparent;
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    display: none;
+    pointer-events: none;
+  }
+  body.tidewheel-edge-glow .druid-tide-edge.on {
+    display: block;
+  }
+  .druid-tide-edge.sun {
+    --tide-edge-color: var(--color-tide-sun);
+  }
+  .druid-tide-edge.moon {
+    --tide-edge-color: var(--color-tide-moon);
+  }
+  .druid-tide-edge::before,
+  .druid-tide-edge::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  /* Attunement: a steady faint tint (40%), clear inside 57%, fading out with
+     the window's last 2 sec. */
+  .druid-tide-edge::before {
+    opacity: calc(0.4 * var(--tide-edge-strength));
+    background: radial-gradient(
+      ellipse at center,
+      transparent 57%,
+      color-mix(in srgb, var(--tide-edge-color) 45%, transparent) 83%,
+      var(--tide-edge-color) 100%
     );
-    box-shadow: 0 0 var(--tide-glow-full) color-mix(in srgb, var(--tide-gem-color) 85%, transparent);
+    transition: opacity calc(250ms * var(--motion-scale));
+  }
+  /* Ready at 3: a faint flash (peak 45%, clear inside 45%, 0.9 sec). */
+  .druid-tide-edge::after {
+    opacity: 0;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 45%,
+      color-mix(in srgb, var(--tide-pulse-color, transparent) 40%, transparent) 78%,
+      color-mix(in srgb, var(--tide-pulse-color, transparent) 90%, transparent) 100%
+    );
+  }
+  .druid-tide-edge.ready-sun::after {
+    --tide-pulse-color: var(--color-tide-sun);
+    animation: druid-tide-edge-ready 900ms ease-out 1;
+  }
+  .druid-tide-edge.ready-moon::after {
+    --tide-pulse-color: var(--color-tide-moon);
+    animation: druid-tide-edge-ready 900ms ease-out 1;
+  }
+  /* Full at 5: a strong flash (peak 100%, clear inside 36%, 1.5 sec). */
+  .druid-tide-edge-max {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 36%,
+      color-mix(in srgb, var(--tide-max-color, transparent) 45%, transparent) 74%,
+      var(--tide-max-color, transparent) 100%
+    );
+  }
+  .druid-tide-edge.max-sun .druid-tide-edge-max {
+    --tide-max-color: var(--color-tide-sun);
+    animation: druid-tide-edge-max 1500ms ease-out 1;
+  }
+  .druid-tide-edge.max-moon .druid-tide-edge-max {
+    --tide-max-color: var(--color-tide-moon);
+    animation: druid-tide-edge-max 1500ms ease-out 1;
+  }
+  @keyframes druid-tide-edge-ready {
+    0% {
+      opacity: 0;
+    }
+    20% {
+      opacity: 0.45;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes druid-tide-edge-max {
+    0% {
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  body.reduce-motion .druid-tide-edge::after,
+  body.reduce-motion .druid-tide-edge-max {
+    animation: none;
   }
   .druid-tide-bank:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -202,8 +384,15 @@
       animation: none !important;
       transition: none;
     }
+    .druid-tide-edge::after,
+    .druid-tide-edge-max {
+      animation: none;
+    }
   }
   @media (forced-colors: active) {
+    .druid-tide-edge {
+      display: none !important;
+    }
     .druid-tide-orb,
     .druid-tide-gem::after {
       border-color: CanvasText;
@@ -217,32 +406,22 @@
   }
 }
 @layer hud-mobile {
-  /* Touch HUD: a smaller strip above the player frame, draggable like the
+  /* Touch HUD: a smaller plate above the player frame, draggable like the
      other class-resource seats (touch_frame_drag_core.ts druidTide row). */
   body.mobile-touch .druid-tide-frame {
-    top: 70%;
-    width: min(220px, 56vw);
-    height: 38px;
-    gap: 8px;
+    --tide-orb: 16px;
+    --tide-gem: 26px;
+    --tide-r: 35px;
+    --tide-cy: 7px;
+    top: 66%;
+    width: 86px;
+    height: 80px;
+    border-radius: 16px;
     pointer-events: auto;
     touch-action: none;
     cursor: var(--cursor-move, move);
     -webkit-touch-callout: none;
     user-select: none;
-  }
-  body.mobile-touch .druid-tide-bank {
-    gap: 5px;
-    padding: 2px;
-  }
-  body.mobile-touch .druid-tide-orb {
-    width: 18px;
-    height: 18px;
-    flex-basis: 18px;
-  }
-  body.mobile-touch .druid-tide-gem {
-    width: 26px;
-    height: 26px;
-    flex-basis: 26px;
   }
   body.mobile-touch .druid-tide-gem::after {
     left: 6px;

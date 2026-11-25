@@ -17709,7 +17709,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lay_on_hands': '味方が倒れかけたとき、その体力を大幅に回復する。',
   'guide.abilityHook.lifespring_weapon': '武器に癒やしの水を宿し、継続する回復の流れを強めます。',
   'guide.abilityHook.measured_shot': '慎重に狙う遠距離射撃で、強力な攻撃に使う集中値を回復します。',
-  'guide.abilityHook.moonseed': '月翼形態中、月潮を1段階進め、月の嵐の効果時間を延長します。',
   'guide.abilityHook.oath_chain': '遠くの敵を集団へ引き寄せ、逃走を遅らせる。',
   'guide.abilityHook.pack_command': '相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。',
   'guide.abilityHook.primal_exaltation': '専門分野に応じた元素の力を短時間解き放ちます。',

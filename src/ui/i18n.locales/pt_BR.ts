@@ -16509,8 +16509,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Esteira Solar',
   'entities.abilities.sunlance.description':
     'Consome seus 3 de Maré Lunar para um golpe de {damage} de dano de Natureza mais uma queimadura de {overTime} ao longo de 9 s, e restaura 35 de mana: a escolha de mana. Onda Lunar consome os mesmos 3 de Maré Lunar, então escolha um.',
-  'guide.abilityHook.moonseed':
-    'Adiciona um estágio de Maré Lunar e estende Tempestade Lunar enquanto você está na Forma de Luniscante.',
   'hudChrome.auraEffect.moontide':
     'Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta',
   'hudChrome.auraEffect.oldBlood':

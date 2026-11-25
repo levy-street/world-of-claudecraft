@@ -16367,8 +16367,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunlance.name': 'Słoneczny ślad',
   'entities.abilities.sunlance.description':
     'Zużywa twoje 3 Księżycowego przypływu na cios zadający {damage} obrażeń natury oraz podpalenie zadające {overTime} w ciągu 9 s i przywraca 35 many: wybór many. Księżycowy przybór zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
-  'guide.abilityHook.moonseed':
-    'Dodaje stopień Księżycowego przypływu i przedłuża Księżycową nawałnicę, gdy jesteś w Postaci księżycowej sowy.',
   'hudChrome.auraEffect.moontide':
     'Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają',
   'hudChrome.auraEffect.oldBlood':

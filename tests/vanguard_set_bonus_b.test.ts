@@ -662,9 +662,10 @@ describe('Starwarden Raiment (balance)', () => {
   it('4pc: the first Skyfall into your own Gripping Roots is instant and 20 percent stronger', () => {
     const { sim, mob, p } = rooted(4);
     expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(true);
-    // Wildbolt is covered too (to open a Suntide cycle instead); Moonseed is not.
+    // Wildbolt is covered too (to open a Suntide cycle instead); the Moonsurge
+    // payoff is not.
     expect(starfallSnarePending(sim.ctx, p, 'wrath', mob)).toBe(true);
-    expect(starfallSnarePending(sim.ctx, p, 'moonseed', mob)).toBe(false);
+    expect(starfallSnarePending(sim.ctx, p, 'moonlash', mob)).toBe(false);
     expect(skyfallHasCastBar(sim, mob)).toBe(false);
     // Spent for the rest of this root: the next Skyfall is an ordinary cast.
     expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(false);

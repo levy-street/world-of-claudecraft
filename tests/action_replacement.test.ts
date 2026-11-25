@@ -9,8 +9,9 @@ import type { AuraKind, Entity } from '../src/sim/types';
 
 // Direct pins for the action-slot replacement leaf (src/sim/combat/action_replacement.ts),
 // previously covered only through whole-sim scenarios. Anchored on real content rules:
-// Fleetmend -> Overbloom (shared 8 sec clock), Eviscerate's two spec-gated rules, and
-// Skyfall's Moonwing-gated Sunwake transform.
+// Fleetmend -> Overbloom (shared 8 sec clock) and Eviscerate's two spec-gated rules. The
+// actorAuraKind clause lost its content user when Sunwake became its own button, so it is
+// pinned on a synthetic copy of the old Skyfall rule.
 
 function resolved(id: string): ResolvedAbility {
   const def = ABILITIES[id];
@@ -83,8 +84,29 @@ describe('resolveActionReplacement', () => {
     expect(out.def.id).toBe('knockout_blow');
   });
 
-  it('gates a rule behind actorAuraKind: Skyfall becomes Sunwake only in Moonwing Form', () => {
+  it('Skyfall no longer turns into Sunwake: the Tidewheel payoffs are their own buttons', () => {
+    expect(ABILITIES.starfire.actionReplacement).toBeUndefined();
     const base = resolved('starfire');
+    const full = resolveActionReplacement(
+      base,
+      actorWith({ kind: 'form_moonkin' }, { kind: 'suntide', stacks: 3 }),
+    );
+    expect(full).toBe(base);
+  });
+
+  it('gates a rule behind actorAuraKind', () => {
+    // No content rule carries actorAuraKind since the Tidewheel payoffs left
+    // Skyfall, so the clause is pinned on a synthetic copy of that old rule.
+    const def = {
+      ...ABILITIES.starfire,
+      actionReplacement: {
+        abilityId: 'sunlance',
+        auraKind: 'suntide',
+        minStacks: 3,
+        actorAuraKind: 'form_moonkin',
+      },
+    } as typeof ABILITIES.starfire;
+    const base = { ...resolved('starfire'), def };
     const outOfForm = resolveActionReplacement(base, actorWith({ kind: 'suntide', stacks: 3 }));
     expect(outOfForm).toBe(base);
     const inForm = resolveActionReplacement(
@@ -92,12 +114,12 @@ describe('resolveActionReplacement', () => {
       actorWith({ kind: 'form_moonkin' }, { kind: 'suntide', stacks: 3 }),
     );
     expect(inForm.def.id).toBe('sunlance');
-    // Tidewheel: Sunwake reads Suntide, so a full Moontide alone leaves Skyfall.
-    const moontideOnly = resolveActionReplacement(
+    // The driving aura still has to hold: the actor gate alone never matches.
+    const otherBank = resolveActionReplacement(
       base,
       actorWith({ kind: 'form_moonkin' }, { kind: 'moontide', stacks: 3 }),
     );
-    expect(moontideOnly).toBe(base);
+    expect(otherBank).toBe(base);
   });
   it('resolves an ABSENCE rule: Slinkstrike is Lunge out of stealth, on its own clock', () => {
     const base = resolved('pounce');

@@ -20,6 +20,7 @@ describe('interface body classes', () => {
       hideUnusedActionSlots: 'hide-unused-action-slots',
       colorblindMode: 'colorblind-mode',
       classicCombatText: 'classic-combat-text',
+      tidewheelEdgeGlow: 'tidewheel-edge-glow',
     });
   });
 

@@ -149,6 +149,7 @@ import {
 } from './druid_form_entry';
 import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
 import { starfallSnareCastTime } from './druid_starfall_snare';
+import { tidewheelPayoffBlocked } from './druid_tidewheel';
 import { resolveDualPurposeTarget } from './dual_purpose_target';
 import {
   consumeFreeCostFor,
@@ -1386,6 +1387,13 @@ export function castAbility(
   // client matcher is needed. requiresAuraStacks (Rimeneedle's full 5-stack
   // Icicles) additionally gates on the stack count.
   if (!hasRequiredAura(p, ability)) {
+    ctx.error(p.id, 'That ability is not ready yet.');
+    return;
+  }
+  // Sunwake and Moonsurge gate on their Tidewheel bank (above), and a bank
+  // outlives Moonwing Form: outside the form the press is not ready either
+  // (the same literal the form-gated Moonseed always answered with).
+  if (tidewheelPayoffBlocked(p, ability.id)) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;
   }

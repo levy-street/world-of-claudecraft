@@ -372,8 +372,8 @@ export function auraBuffDisplayValue(a: { kind: string; value: number }): number
 export function abilityDurationValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
     // An extendDot's timed magnitude is its per-application extension cap in
-    // seconds (Moonseed is the only extendDot user): $t prints the RESOLVED
-    // maxBonus, so the Moonscorch 2pc's 12 shows live for wearers (base 6).
+    // seconds (the retired Moonseed is the only extendDot user): $t prints
+    // the RESOLVED maxBonus.
     if (eff.type === 'extendDot') return eff.maxBonus;
     // Spore Burst's $t is the mushroom's fuse, placement to burst.
     if (eff.type === 'sporeBurst') return eff.fuse;

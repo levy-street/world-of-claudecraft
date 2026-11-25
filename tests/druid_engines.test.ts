@@ -15,7 +15,11 @@ import {
   verdanceWildmendCastTime,
   WILDMEND_ID,
 } from '../src/sim/combat/druid_engines';
-import { SUNTIDE_ID, SUNTIDE_STAGES } from '../src/sim/combat/druid_tidewheel';
+import {
+  SUNTIDE_ID,
+  SUNTIDE_STAGES,
+  tidewheelPayoffBlocked,
+} from '../src/sim/combat/druid_tidewheel';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { spellHasteMult } from '../src/sim/combat/spell_combat';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
@@ -76,7 +80,10 @@ function targetMob(sim: Sim): Entity {
 }
 
 describe('Moongrove engine', () => {
-  it('keeps Moonseed and its engine effects inside Moonwing', () => {
+  it('retires Moonseed: unlearned, uncastable, and no longer a Moontide builder', () => {
+    // Moonsurge took Moonseed's place in the kit when the Tidewheel payoffs
+    // got their own buttons. The def stays (hidden) so a saved bar naming it
+    // resolves, but nothing teaches it and the engine no longer banks it.
     const { sim, player } = rig('balance');
     const mob = targetMob(sim);
     mob.level = 1;
@@ -93,27 +100,28 @@ describe('Moongrove engine', () => {
       school: 'arcane',
       extendedBy: 0,
     });
-    const hpBefore = mob.hp;
-
-    sim.castAbility('moonseed');
-
-    expect(mob.hp).toBe(hpBefore);
-    expect(mob.auras.find((aura) => aura.id === 'moonfire')?.remaining).toBe(6);
-    expect(stacks(player, MOONTIDE_ID)).toBe(0);
-    expect(player.cooldowns.has('moonseed')).toBe(false);
-
     player.auras.push(formAura(player, 'form_moonkin'));
-    player.resource = player.maxResource;
+    expect(sim.resolvedAbility('moonseed')).toBeNull();
+    const hpBefore = mob.hp;
+    sim.drainEvents();
+
     sim.castAbility('moonseed');
     for (let tick = 0; tick < 20; tick++) sim.tick();
 
-    expect(player.cooldowns.has('moonseed')).toBe(true);
-    expect(mob.auras.find((aura) => aura.id === 'moonfire')?.remaining).toBeGreaterThan(6);
-    expect(mob.auras.find((aura) => aura.id === 'moonfire')?.extendedBy).toBe(6);
-    expect(stacks(player, MOONTIDE_ID)).toBe(1);
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'error' && e.text === 'You do not know that ability.'),
+    ).toBe(true);
+    expect(mob.hp).toBe(hpBefore);
+    expect(mob.auras.find((aura) => aura.id === 'moonfire')?.extendedBy).toBe(0);
+    expect(player.cooldowns.has('moonseed')).toBe(false);
+    // Even a completed-cast hook for the retired id banks nothing.
+    completed(sim, 'moonseed', mob);
+    expect(stacks(player, MOONTIDE_ID)).toBe(0);
   });
 
-  it('fills each Tidewheel bank from its own casts and each payoff spends only its own', () => {
+  it('fills each Tidewheel bank to 5 from its own casts and each payoff spends all of its own', () => {
     const { sim, player } = rig('balance');
 
     completed(sim, 'wrath');
@@ -122,35 +130,31 @@ describe('Moongrove engine', () => {
     expect(stacks(player, MOONTIDE_ID)).toBe(0);
 
     player.auras.push(formAura(player, 'form_moonkin'));
-    // Wildbolt fills Suntide; Skyfall and Moonseed fill Moontide.
-    completed(sim, 'wrath');
-    completed(sim, 'wrath');
-    completed(sim, 'wrath');
+    // Wildbolt fills Suntide; Skyfall fills Moontide. The payoffs are their
+    // own buttons, so no cast button turns into another along the way. Each
+    // bank holds 5 points; an extra cast at the cap banks nothing.
+    expect(SUNTIDE_STAGES).toBe(5);
+    expect(MOONTIDE_STAGES).toBe(5);
+    for (let cast = 0; cast <= SUNTIDE_STAGES; cast++) completed(sim, 'wrath');
     expect(stacks(player, SUNTIDE_ID)).toBe(SUNTIDE_STAGES);
     expect(stacks(player, MOONTIDE_ID)).toBe(0);
-    expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
+    expect(sim.resolvedAbility('starfire')?.def.id).toBe('starfire');
 
-    completed(sim, 'moonseed');
-    completed(sim, 'moonseed');
-    completed(sim, 'moonseed');
+    for (let cast = 0; cast <= MOONTIDE_STAGES; cast++) completed(sim, 'starfire');
     expect(stacks(player, MOONTIDE_ID)).toBe(MOONTIDE_STAGES);
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonlash');
-    expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
+    expect(stacks(player, SUNTIDE_ID)).toBe(SUNTIDE_STAGES);
+    expect(sim.resolvedAbility('starfire')?.def.id).toBe('starfire');
     expect(sim.resolvedAbility('wrath')?.def.id).toBe('wrath');
 
-    // Moonsurge spends Moontide only: Sunwake stays armed.
+    // Moonsurge spends all 5 Moontide and only Moontide: Sunwake stays armed.
     completed(sim, 'moonlash');
     expect(stacks(player, MOONTIDE_ID)).toBe(0);
     expect(stacks(player, SUNTIDE_ID)).toBe(SUNTIDE_STAGES);
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
-    expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
 
-    // Sunwake spends Suntide only.
+    // Sunwake spends all 5 Suntide and only Suntide.
     completed(sim, 'sunlance');
     expect(stacks(player, SUNTIDE_ID)).toBe(0);
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
-    expect(sim.resolvedAbility('starfire')?.def.id).toBe('starfire');
+    expect(stacks(player, MOONTIDE_ID)).toBe(0);
   });
 
   it('freezes both banks outside Moonwing and disarms both payoffs', () => {
@@ -160,17 +164,37 @@ describe('Moongrove engine', () => {
     completed(sim, 'wrath');
     completed(sim, 'wrath');
     completed(sim, 'wrath');
-    completed(sim, 'moonseed');
-    completed(sim, 'moonseed');
-    completed(sim, 'moonseed');
-    expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonlash');
+    completed(sim, 'starfire');
+    completed(sim, 'starfire');
+    completed(sim, 'starfire');
+    expect(stacks(player, SUNTIDE_ID)).toBe(3);
+    expect(stacks(player, MOONTIDE_ID)).toBe(3);
+    expect(tidewheelPayoffBlocked(player, 'moonlash')).toBe(false);
+    expect(tidewheelPayoffBlocked(player, 'sunlance')).toBe(false);
 
+    // The banks outlive the form, but the payoffs do not fire outside it.
     player.auras = player.auras.filter((aura) => aura.kind !== 'form_moonkin');
     expect(stacks(player, SUNTIDE_ID)).toBe(3);
     expect(stacks(player, MOONTIDE_ID)).toBe(3);
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
-    expect(sim.resolvedAbility('starfire')?.def.id).toBe('starfire');
+    expect(tidewheelPayoffBlocked(player, 'moonlash')).toBe(true);
+    expect(tidewheelPayoffBlocked(player, 'sunlance')).toBe(true);
+    sim.drainEvents();
+    for (const payoff of ['moonlash', 'sunlance']) {
+      player.resource = player.maxResource;
+      player.gcdRemaining = 0;
+      sim.castAbility(payoff);
+      expect(
+        sim
+          .drainEvents()
+          .some((e) => e.type === 'error' && e.text === 'That ability is not ready yet.'),
+        payoff,
+      ).toBe(true);
+      // Refused before commit: nothing billed, nothing in flight.
+      expect(player.resource, payoff).toBe(player.maxResource);
+      expect(ctx(sim).pendingProjectiles, payoff).toHaveLength(0);
+    }
+    expect(stacks(player, SUNTIDE_ID)).toBe(3);
+    expect(stacks(player, MOONTIDE_ID)).toBe(3);
 
     // A base Skyfall hard-cast out of form is a plain nuke: it must not
     // touch either frozen bank.
@@ -183,30 +207,39 @@ describe('Moongrove engine', () => {
     expect(stacks(player, MOONTIDE_ID)).toBe(3);
 
     player.auras.push(formAura(player, 'form_moonkin'));
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonlash');
-    expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
+    expect(tidewheelPayoffBlocked(player, 'moonlash')).toBe(false);
+    expect(tidewheelPayoffBlocked(player, 'sunlance')).toBe(false);
   });
 
-  it('fires Moonsurge through the Moonseed cooldown and spends the bank once', () => {
+  it('fires Moonsurge from its own button at 3 Moontide and spends the bank once', () => {
     const { sim, player } = rig('balance');
     const mob = targetMob(sim);
     player.auras.push(formAura(player, 'form_moonkin'));
     completed(sim, 'starfire');
     completed(sim, 'starfire');
     completed(sim, 'starfire');
-    player.cooldowns.set('moonseed', 5);
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonlash');
+    expect(sim.resolvedAbility('moonlash')?.def.id).toBe('moonlash');
 
     player.resource = player.maxResource;
     player.gcdRemaining = 0;
-    sim.castAbility('moonseed');
+    sim.castAbility('moonlash');
     for (let tick = 0; tick < 5; tick++) sim.tick();
 
     expect(mob.hp).toBeLessThan(mob.maxHp);
     expect(stacks(player, MOONTIDE_ID)).toBe(0);
-    expect(player.cooldowns.get('moonseed')).toBeGreaterThan(0);
-    // With the bank spent, the button is Moonseed again and still recharging.
-    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
+    // No cooldown of its own: the empty bank is what holds the next press.
+    expect(player.cooldowns.has('moonlash')).toBe(false);
+    player.resource = player.maxResource;
+    player.gcdRemaining = 0;
+    sim.drainEvents();
+    sim.castAbility('moonlash');
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'error' && e.text === 'That ability is not ready yet.'),
+    ).toBe(true);
+    expect(player.resource).toBe(player.maxResource);
+    expect(ctx(sim).pendingProjectiles).toHaveLength(0);
   });
 
   it('amplifies the full Sunwake burn through Wild Apex', () => {
@@ -223,9 +256,8 @@ describe('Moongrove engine', () => {
       completed(sim, 'wrath');
       completed(sim, 'wrath');
       completed(sim, 'wrath');
-      expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
       const direct = sim
-        .resolvedAbility('starfire')
+        .resolvedAbility('sunlance')
         ?.effects.find((effect) => effect.type === 'directDamage');
       expect(direct).toMatchObject({ type: 'directDamage' });
       if (direct?.type !== 'directDamage') throw new Error('missing Sunlance damage');
@@ -239,7 +271,7 @@ describe('Moongrove engine', () => {
       expect(direct.max).toBeGreaterThan(authored.max);
       player.resource = player.maxResource;
       player.gcdRemaining = 0;
-      sim.castAbility('starfire');
+      sim.castAbility('sunlance');
       for (let tick = 0; tick < 20; tick++) sim.tick();
       expect(target.auras.some((aura) => aura.id === 'sunlance')).toBe(true);
     }

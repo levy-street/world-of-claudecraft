@@ -510,6 +510,13 @@ export const BOOL_SETTINGS = {
   // rising straight up. Purely presentational: both show every number; mirrored
   // onto a body class (interface_body_classes.ts) the FCT painter reads.
   classicCombatText: { def: false },
+  // on by default: the Moonwing Tidewheel screen-edge glow (src/ui/hud/druid/):
+  // a faint edge tint in the color of the spell the open Sunrise or Moonrise
+  // favors, fading over the window's last 2 sec, and one pulse when a payoff's
+  // bank fills. Shows only for a Moongrove druid in Moonwing Form. Purely
+  // presentational: mirrored onto a body class (interface_body_classes.ts) the
+  // glow's CSS reads, so off hides it without touching the orbs.
+  tidewheelEdgeGlow: { def: true },
   // off by default: an opt-in frosted-glass blur behind HUD panels & windows.
   // Off keeps the classic crisp look (and zero GPU cost); on softens the world
   // showing through translucent frames.

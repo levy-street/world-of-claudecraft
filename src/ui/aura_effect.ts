@@ -42,6 +42,7 @@ import {
   SUNRISE_ID,
   SUNRISE_SKYFALL_CAST_MULT,
   SUNTIDE_STAGES,
+  TIDECROSS_PAYOFF_DMG_MULT,
   TIDEWHEEL_TICK_RATE,
 } from '../sim/combat/druid_tidewheel';
 import {
@@ -501,6 +502,7 @@ export function auraEffectDescriptor(
       nums: {
         castPct: pctFromFrac(1 - SUNRISE_SKYFALL_CAST_MULT),
         tickPct: pctFromFrac(TIDEWHEEL_TICK_RATE - 1),
+        crossPct: pctFromFrac(TIDECROSS_PAYOFF_DMG_MULT - 1),
       },
     };
   }
@@ -510,6 +512,7 @@ export function auraEffectDescriptor(
       nums: {
         dmgPct: pctFromFrac(MOONRISE_WILDBOLT_DMG_MULT - 1),
         tickPct: pctFromFrac(TIDEWHEEL_TICK_RATE - 1),
+        crossPct: pctFromFrac(TIDECROSS_PAYOFF_DMG_MULT - 1),
       },
     };
   }

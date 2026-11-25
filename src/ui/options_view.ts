@@ -1194,6 +1194,9 @@ export function buildInterfaceControls(
       // Opt back into the shipped white / gold combat text (the vivid school-coloured
       // look is the default); directly under the size slider for the same numbers.
       boolToggle(s, 'classicCombatText', 'hudChrome.options.classicCombatText'),
+      // The Moonwing Tidewheel's screen-edge glow (druid HUD), with the class
+      // resource cues rather than the comfort toggles.
+      boolToggle(s, 'tidewheelEdgeGlow', 'hudChrome.options.tidewheelEdgeGlow'),
       // The secondary/third bar toggles deliberately have NO menu rows: the
       // plus/minus buttons on the primary action bar are the one control for
       // adding and removing the optional rows (the settings and the central

@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -24,11 +25,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "es_ES": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -41,11 +44,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "fr_FR": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -58,11 +63,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "fr_CA": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -75,12 +82,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -93,11 +102,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "de_DE": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -110,11 +121,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "zh_CN": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -127,11 +140,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "zh_TW": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -144,11 +159,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "ko_KR": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -161,11 +178,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "ja_JP": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -178,11 +197,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "pt_BR": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -195,11 +216,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "ru_RU": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -212,11 +235,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "cs_CZ": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -229,11 +254,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "nl_NL": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -246,11 +273,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "pl_PL": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -263,11 +292,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "id_ID": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -280,11 +311,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "tr_TR": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -297,11 +330,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "sv_SE": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -314,11 +349,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "vi_VN": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -331,11 +368,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ],
   "da_DK": [
     "entities.abilities.entangling_roots.descriptionWithDot",
     "entities.abilities.insect_swarm.specNote_balance",
+    "guide.abilityHook.moonlash",
     "guide.interfacePage.framesGovernedDruid",
     "hudChrome.auraEffect.moonrise",
     "hudChrome.auraEffect.sunrise",
@@ -348,6 +387,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.druid.sunriseOpen",
     "hudChrome.druid.suntideLabel",
     "hudChrome.druid.suntideStatus",
-    "hudChrome.druid.suntideTooltip"
+    "hudChrome.druid.suntideTooltip",
+    "hudChrome.options.tidewheelEdgeGlow"
   ]
 };

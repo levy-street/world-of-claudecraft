@@ -133,13 +133,9 @@ import {
   resolveDruidOverbloom,
 } from './druid_engines';
 import { resolveWeaponSweep } from './druid_scratch';
-import {
-  plantSporeBurst,
-  SPORE_BURST_FULL_BANK_POWER,
-  sporeBurstFullBank,
-} from './druid_spore_burst';
+import { plantSporeBurst, sporeBurstBankPower } from './druid_spore_burst';
 import { starfallSnareDamageMult } from './druid_starfall_snare';
-import { tidewheelDirectMult } from './druid_tidewheel';
+import { tidewheelDirectMult, tidewheelPayoffMult } from './druid_tidewheel';
 import { consumeNextAttackCrit } from './empower_next';
 import { rollFeralStrikeEnchant, runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -679,10 +675,10 @@ export function runEffects(
         // the cast was aimed. Both riders take the area coefficient, like
         // aoeDamage and aoeHeal, and everything is snapshotted here so the
         // burst five seconds later only rolls.
-        // A full Verdance or Moontide bank adds its 25% on top of any armed
+        // A full Verdance or 3+ Moontide bank adds its 25% (more past 3) on top of any armed
         // Nature's Boon window; the bank itself is spent at cast completion
         // (druid_engines.ts druidEngineOnCast), after this snapshot.
-        const bankPower = sporeBurstFullBank(p.auras, p.id) ? SPORE_BURST_FULL_BANK_POWER : 1;
+        const bankPower = sporeBurstBankPower(p.auras, p.id);
         const boonPower = (res.naturesBoonPower ?? 1) * bankPower;
         plantSporeBurst(ctx, p, p.castAim ?? p.pos, eff, ability.name, {
           spBonus: directHitBonus(
@@ -982,6 +978,9 @@ export function runEffects(
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
         dmg *= tidewheelDirectMult(p, ability.id);
+        // Tidecross (Moonsurge in Sunrise, Sunwake in Moonrise) times the
+        // bank surplus (+20% per point past 3).
+        dmg *= tidewheelPayoffMult(p, ability.id, target);
         // Starwarden 4pc: the first Skyfall or Wildbolt into the wearer's own
         // Gripping Roots.
         dmg *= starfallSnareDamageMult(ctx, p, ability.id, target);

@@ -1602,7 +1602,8 @@ export const guideStrings = {
     healing_touch: 'A big single-target heal with a long cast, for topping someone off.',
     mark_of_the_wild: 'A lasting blessing you put on yourself or an ally before a fight.',
     moonfire: 'Hits instantly and leaves the target burning, good while moving.',
-    moonseed: 'Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.',
+    moonlash:
+      'Spends 3 or more Moontide on a heavy arcane strike while you are in Moonwing Form; each point past 3 makes it hit harder.',
     rejuvenation: 'Casts instantly and heals an ally over time, so you can keep acting.',
     thorns: 'Wards an ally so melee attackers hurt themselves for striking.',
   },

@@ -174,8 +174,14 @@ const LIVE_MOB_MEASURED = {
   // double-swing/rage cadence. Authored-world wander also changes shared RNG.
   // Re-measured at 42420 with the unchanged 8% bands and exact payoff counts.
   // Moonwing Tidewheel: the probe now plays the two-bank rotation (both
-  // effects up, each full bank on its own payoff), re-measured at 42420.
-  moongrove: { damage: 7781, incomingDamage: 270, threat: 7782, payoffs: 14 },
+  // effects up, each bank spent on its own payoff from 3), re-measured at 42420.
+  // RE-MEASURED 2026-11-24 at 42420 for the Tidewheel follow-up (the payoffs
+  // are their own buttons, Moonseed retired, Tidecross, retuned Wildbolt and
+  // Skyfall rows): damage and threat rose, incoming and payoffs held.
+  // RE-MEASURED 2026-11-25 at 42420 for 5-point banks (payoffs usable from 3,
+  // +20% per point past 3): damage 8105 to 8259, threat 8106 to 8260,
+  // incoming and payoffs held.
+  moongrove: { damage: 8259, incomingDamage: 270, threat: 8260, payoffs: 14 },
   wildfang: { damage: 6389, incomingDamage: 213, threat: 7486.7135, payoffs: 10 },
   bruin: { damage: 3254, incomingDamage: 159, threat: 12206.51375, payoffs: 6 },
 } as const;
@@ -228,8 +234,10 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     // Nythraxis anchor; on this proxy it reads ~160. Wildfang (agility melee) is
     // not under-geared here, so the arms are not directly comparable on the proxy
     // (real BiS parity is the montecarlo's job). These bands guard the proxy only.
-    // Moonwing Tidewheel: the probe plays the two-bank rotation, ~193 on this
-    // proxy (the live kit's best Skyfall rotation reads ~183 here).
+    // Moonwing Tidewheel: the probe plays the two-bank rotation, ~202 on this
+    // proxy since the 2026-11-25 follow-up (separate payoff buttons, Tidecross,
+    // retuned Wildbolt and Skyfall rows, 5-point banks; ~193 before). The live kit's best
+    // Skyfall rotation reads ~183 here.
     expect(moongrove?.value).toBeGreaterThanOrEqual(160);
     expect(moongrove?.value).toBeLessThanOrEqual(210);
     expect(wildfang?.value).toBeGreaterThanOrEqual(165);

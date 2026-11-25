@@ -9,6 +9,7 @@ import { DRUID_CHOICE_ROWS } from '../content/choice_rows_classic';
 import {
   CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE,
   GROVESPRING_4PC_VERDANCE_BANK,
+  MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC,
 } from '../content/ignivar_set_bonuses';
 import { scalePrimaryHealing } from '../primary_healing';
 import type { PlayerMeta } from '../sim';
@@ -42,7 +43,9 @@ import {
   SUNTIDE_NAME,
   SUNTIDE_STAGES,
   SUNTIDE_TICK_ICD_KEY,
+  TIDE_PAYOFF_MIN_STACKS,
   TIDE_TICK_ICD,
+  tidewheelArmTidecross,
   tidewheelExtendOnCast,
   tidewheelReplantDot,
   tidewheelTickBank,
@@ -54,7 +57,9 @@ export const MOONTIDE_ID = 'moontide';
 export const OLD_BLOOD_ID = 'old_blood';
 export const VERDANCE_ID = 'verdance';
 
-export const MOONTIDE_STAGES = 3;
+/** Moontide holds up to 5 points, like Suntide (druid_tidewheel.ts
+ *  SUNTIDE_STAGES); Moonsurge and Spore Burst use it from 3. */
+export const MOONTIDE_STAGES = 5;
 export const OLD_BLOOD_STAGES = 3;
 export const VERDANCE_STAGES = 3;
 const ENGINE_BACKING_DURATION = 3600;
@@ -169,7 +174,9 @@ const FORM_ABILITY_IDS = new Set([
   'moonkin_form',
   'sporemender_form',
 ]);
-const MOONTIDE_BUILDER_IDS = new Set(['starfire', 'moonseed']);
+// Moonseed retired with the Tidewheel's separate payoff buttons (Moonsurge took
+// its slot): Skyfall is the one cast that fills Moontide.
+const MOONTIDE_BUILDER_IDS = new Set(['starfire']);
 // Every landed feral strike that banks one Old Blood. Slinkstrike ('pounce')
 // and Lunge joined the list in the v0.43 feral pass: the stealth opener banks
 // on the tick its stun lands (the stun arm of effect_dispatch.ts reports here
@@ -432,12 +439,12 @@ export function druidEngineOnCast(
   if (abilityId === LUNGE_ID) startLunge(ctx, player, target);
 
   const spec = specOf(ctx, player);
-  // Spore Burst (combat/druid_spore_burst.ts) is a payoff when the bank is
-  // full: the cast arm already took the 25%, and here the whole bank is
-  // spent, in any form, exactly as Overbloom or Moonsurge spend it.
+  // Spore Burst (combat/druid_spore_burst.ts) is a payoff at full Verdance
+  // or 3+ Moontide: the cast arm already took its power, and here the whole
+  // bank is spent, in any form, exactly as Overbloom or Moonsurge spend it.
   if (abilityId === 'spore_burst') {
     const bankId = spec === 'restoration' ? VERDANCE_ID : spec === 'balance' ? MOONTIDE_ID : null;
-    const cap = spec === 'restoration' ? VERDANCE_STAGES : MOONTIDE_STAGES;
+    const cap = spec === 'restoration' ? VERDANCE_STAGES : TIDE_PAYOFF_MIN_STACKS;
     if (bankId && (ownedAura(player, bankId)?.stacks ?? 0) >= cap) {
       removeOwnedAura(ctx, player, bankId);
       if (bankId === VERDANCE_ID) {
@@ -451,9 +458,9 @@ export function druidEngineOnCast(
   if (spec === 'balance') {
     if (!inMoonwing(player)) return;
     // Tidewheel (combat/druid_tidewheel.ts): two banks. Wildbolt fills
-    // Suntide and extends Stinging Swarm; Skyfall and Moonseed fill Moontide
-    // (Skyfall also extends Lunar Tempest). At 3 Suntide, Skyfall becomes
-    // Sunwake; at 3 Moontide, Moonseed becomes Moonsurge.
+    // Suntide and extends Stinging Swarm; Skyfall fills Moontide and extends
+    // Lunar Tempest. Sunwake and Moonsurge are their own buttons, usable from 3
+    // points (their requiresAuraKind gate) and spending them all.
     if (abilityId === WILDBOLT_ID) {
       addStage(ctx, player, SUNTIDE_ID, SUNTIDE_NAME, 'suntide', SUNTIDE_STAGES);
       tidewheelExtendOnCast(player, abilityId, target);
@@ -466,7 +473,10 @@ export function druidEngineOnCast(
     }
     if (abilityId === 'sunlance' || abilityId === 'moonlash') {
       // Each payoff spends its own bank, refreshes its school's effect, and
-      // opens the window that favours the other school.
+      // opens the window that favours the other school. Tidecross reads the
+      // window BEFORE it swaps: a payoff cast inside the other window arms
+      // its in-flight strike first.
+      tidewheelArmTidecross(player, abilityId, target);
       const sun = abilityId === 'sunlance';
       if (sun) {
         removeOwnedAura(ctx, player, SUNTIDE_ID);
@@ -556,13 +566,18 @@ export function druidEngineOnLandedStrike(
 
 export function druidEngineOnBleedTick(ctx: SimContext, source: Entity | null, aura: Aura): void {
   // Tidewheel: a Stinging Swarm tick feeds Suntide and a Lunar Tempest tick
-  // feeds Moontide, each at most once per TIDE_TICK_ICD. Draws no rng.
+  // feeds Moontide, each at most once per TIDE_TICK_ICD (Moontide every
+  // MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC for a Moonscorch 2pc wearer). Draws
+  // no rng.
   const tideBank = tidewheelTickBank(aura);
   if (tideBank && source && !source.dead && isTidewheelDruid(ctx, source)) {
     if (!source.procState) source.procState = { counters: {}, icds: {} };
     const key = tideBank === 'suntide' ? SUNTIDE_TICK_ICD_KEY : MOONTIDE_TICK_ICD_KEY;
     if (source.procState.icds[key] === undefined) {
-      source.procState.icds[key] = TIDE_TICK_ICD;
+      source.procState.icds[key] =
+        tideBank === 'moontide' && wearsSetBonus(ctx, source, 'moonscorch', 2)
+          ? MOONSCORCH_2PC_MOONTIDE_TICK_ICD_SEC
+          : TIDE_TICK_ICD;
       if (tideBank === 'suntide') {
         addStage(ctx, source, SUNTIDE_ID, SUNTIDE_NAME, 'suntide', SUNTIDE_STAGES);
       } else {

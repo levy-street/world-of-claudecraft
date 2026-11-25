@@ -98,11 +98,10 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   rupture: [2, 6, 5, 16],
   expose_armor: [2, 5, 30],
   rip: [5],
-  // Druid spec-engine interaction lines: the cited numbers are engine
-  // constants in combat/druid_engines.ts (the Moonseed extension seconds on
-  // the Lunar Tempest line, the Verdance stage cap on the Sporemending line),
-  // not per-rank effect fields.
-  moonfire: [6],
+  // Druid spec-engine interaction line: the cited number is an engine constant
+  // in combat/druid_engines.ts (the Verdance stage cap on the Sporemending
+  // line), not a per-rank effect field. Lunar Tempest's entry (the Moonseed
+  // extension seconds) left with the retired Moonseed.
   rejuvenation: [5],
   // Rogue spec-engine interaction lines: the cited numbers are engine
   // constants in combat/rogue_engines.ts (ritual stages, stage refund, the

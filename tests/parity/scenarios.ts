@@ -5496,36 +5496,42 @@ function druidEngines(): Scenario {
       moon.resource = moon.maxResource;
       sim.castAbility('moonkin_form', moonId);
       rec.tick(35);
-      // Tidewheel: three Skyfalls fill Moontide (Moonseed becomes Moonsurge)
-      // but not Suntide, so the Skyfall button stays Skyfall.
+      // Tidewheel: Sunwake and Moonsurge are their own buttons, armed (usable)
+      // from 3 points of their own 5-point bank, so "armed" reads the bank
+      // itself. Both payoffs below spend exactly 3, so neither carries the
+      // bank surplus (+20% per point past 3).
+      const bankFull = (kind: 'suntide' | 'moontide') =>
+        moon.auras.some(
+          (aura) => aura.kind === kind && aura.sourceId === moonId && (aura.stacks ?? 0) >= 3,
+        );
+      // Three Skyfalls fill Moontide (Moonsurge is ready) but not Suntide.
       for (let cast = 0; cast < 3; cast++) {
         moon.resource = moon.maxResource;
         moon.gcdRemaining = 0;
         sim.castAbility('starfire', moonId);
         rec.tick(70);
       }
-      rec.notes.moonlashArmed = sim.resolvedAbility('moonseed', moonId)?.def.id === 'moonlash';
-      rec.notes.sunlanceArmedBySkyfall =
-        sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
-      // Three Wildbolts fill Suntide: the Skyfall button becomes Sunwake.
+      rec.notes.moonlashArmed = bankFull('moontide');
+      rec.notes.sunlanceArmedBySkyfall = bankFull('suntide');
+      // Three Wildbolts fill Suntide: Sunwake is ready.
       for (let cast = 0; cast < 3; cast++) {
         moon.resource = moon.maxResource;
         moon.gcdRemaining = 0;
         sim.castAbility('wrath', moonId);
         rec.tick(50);
       }
-      rec.notes.sunlanceArmed = sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
-      // The Moonseed button fires Moonsurge and spends Moontide only.
+      rec.notes.sunlanceArmed = bankFull('suntide');
+      // Moonsurge fires from its own button and spends Moontide only.
       moon.resource = moon.maxResource;
       moon.gcdRemaining = 0;
-      sim.castAbility('moonseed', moonId);
+      sim.castAbility('moonlash', moonId);
       rec.tick(20);
-      rec.notes.sunlanceArmedAfterMoonsurge =
-        sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
-      // The Skyfall button fires Sunwake and spends Suntide.
+      rec.notes.sunlanceArmedAfterMoonsurge = bankFull('suntide');
+      // Sunwake fires from its own button and spends Suntide (inside the
+      // Moonrise that Moonsurge opened, so it lands as a Tidecross strike).
       moon.resource = moon.maxResource;
       moon.gcdRemaining = 0;
-      sim.castAbility('starfire', moonId);
+      sim.castAbility('sunlance', moonId);
       rec.tick(20);
       rec.snapshot('moongrove-choice');
 

@@ -736,8 +736,8 @@ function castMoongrove(state: RunState): void {
   const player = state.sim.player;
   const bank = (id: string) => player.auras.find((aura) => aura.id === id)?.stacks ?? 0;
   const open = (id: string) => player.auras.some((aura) => aura.id === id);
-  if (bank('suntide') >= 3 && tryCast(state, 'starfire')) return;
-  if (bank('moontide') >= 3 && tryCast(state, 'moonseed')) return;
+  if (bank('suntide') >= 3 && tryCast(state, 'sunlance')) return;
+  if (bank('moontide') >= 3 && tryCast(state, 'moonlash')) return;
   if (open('sunrise') && tryCast(state, 'starfire')) return;
   if (open('moonrise') && tryCast(state, 'wrath')) return;
   tryCast(state, bank('suntide') <= bank('moontide') ? 'wrath' : 'starfire');

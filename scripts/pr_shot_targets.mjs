@@ -13545,14 +13545,15 @@ export const TARGETS = [
         beforeLoad: lowGraphicsSeed,
       })),
       // Moonwing Tidewheel: the two-bank Moongrove copy on the builders, the
-      // dots and Moonseed, plus Gripping Roots' rank 2 damage and diminishing
-      // returns line, as a level 20 Moongrove druid.
+      // dots and the two payoff buttons, plus Gripping Roots' rank 2 damage and
+      // diminishing returns line, as a level 20 Moongrove druid.
       ...[
         ['wildbolt', 'wrath'],
         ['skyfall', 'starfire'],
         ['lunar-tempest', 'moonfire'],
         ['stinging-swarm', 'insect_swarm'],
-        ['moonseed', 'moonseed'],
+        ['moonsurge', 'moonlash'],
+        ['sunwake', 'sunlance'],
         ['gripping-roots', 'entangling_roots'],
       ].map(([key, abilityId]) => ({
         key: `moongrove-${key}`,

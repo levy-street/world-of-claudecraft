@@ -403,7 +403,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     elementId: 'druid-tide-frame',
     storageKey: 'woc_hud_frame_druid_tide',
     labelKey: 'hudChrome.druid.moontideLabel',
-    fallbackSize: { w: 300, h: 48 },
+    fallbackSize: { w: 108, h: 100 },
     detachToUiRoot: false,
   },
   // The doom meter docks beside the player frame inside the transformed
