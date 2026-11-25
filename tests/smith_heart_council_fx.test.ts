@@ -36,6 +36,7 @@ import {
   SOUL_COLORS,
 } from '../src/render/smith_heart_fx/council_fx_core';
 import { RUSH_ARROW } from '../src/render/smith_heart_fx/council_mechanic_look_core';
+import { COUNCIL_PULL_BEAT } from '../src/render/smith_heart_fx/council_pull_fx_core';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   COUNCIL_AURAS,
@@ -291,12 +292,29 @@ describe('CouncilFx over a fake world', () => {
     expect(soakPaint).toBeDefined();
     expect(soakPaint?.uniforms.uShadow.value).toBeLessThan(1);
     expect(soakPaint?.uniforms.uHeat.value).toBeGreaterThan(0);
-    // The Wrath's real shadow behind both pillars, with its light curtains.
+    // The shared soak / avoid tell (the team's playtest of 2026-11-25): the
+    // rock's chevrons in with a pip per soaker it needs (one inside: its own
+    // player), Resonance's chevrons out.
+    expect(shown('floorTell')).toBe(2);
+    const tells: THREE.ShaderMaterial[] = [];
+    root?.traverse((c) => {
+      if (c.name === 'floorTell' && c.visible)
+        tells.push((c as THREE.Mesh).material as THREE.ShaderMaterial);
+    });
+    const share = tells.find((m) => m.uniforms.uDir.value === -1);
+    const avoid = tells.find((m) => m.uniforms.uDir.value === 1);
+    expect(share?.uniforms.uNeed.value).toBe(T.rockMinSoakers);
+    expect(share?.uniforms.uLit.value).toBe(1);
+    expect(avoid?.uniforms.uNeed.value).toBe(0);
+    // The Wrath's real shadow behind both pillars, with its light curtains,
+    // over its own arena-wide floor.
     expect(shown('smithHeartShelter:wrath')).toBe(2);
     expect(shown('smithHeartShelterCurtain:wrath')).toBe(2);
+    expect(shown('smithHeartWrathField')).toBe(1);
     guardian.castingAbility = null;
     fx.update(1 / 30);
     expect(shown('smithHeartShelter:wrath')).toBe(0);
+    expect(shown('smithHeartWrathField')).toBe(0);
     expect(shaken).toBeGreaterThan(0);
     // The rock's impact and a fall are claimed and drawn.
     const impact = {
@@ -493,6 +511,48 @@ describe('CouncilFx over a fake world', () => {
     me.auras.length = 0;
     for (let i = 0; i < 6; i++) fx.update(1 / 30);
     expect(arrows().length).toBe(0);
+    fx.dispose();
+  });
+  it("plays each member's pull beat on its cue: the gesture, then the blow", () => {
+    const entities = new Map<number, Entity>();
+    const me = entity(1, 'player', 'warrior', 8, -160);
+    const guardian = entity(20, 'mob', 'heart_hammer_guardian', 10, -170);
+    const singer = entity(21, 'mob', 'heart_seam_singer', -4, -172);
+    for (const e of [me, guardian, singer]) entities.set(e.id, e);
+    const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
+    const gestures: string[] = [];
+    let shaken = 0;
+    const fx = new CouncilFx(
+      new THREE.Scene(),
+      () => 0,
+      world,
+      undefined,
+      () => false,
+      (a) => {
+        shaken += a;
+      },
+      (_id, g) => gestures.push(g),
+    );
+    const cue = (id: number) =>
+      ({
+        type: 'spellfx',
+        sourceId: id,
+        targetId: id,
+        school: 'physical',
+        fx: 'nova',
+        ability: COUNCIL_CUES.pull,
+      }) as SimEvent;
+    expect(fx.handleEvent(cue(guardian.id))).toBe(true);
+    expect(fx.handleEvent(cue(singer.id))).toBe(true);
+    expect(gestures).toEqual([
+      COUNCIL_PULL_BEAT.guardian.gesture,
+      COUNCIL_PULL_BEAT.singer.gesture,
+    ]);
+    // Nothing shakes before the Guardian's fists land; the blow does.
+    fx.update(0.3);
+    expect(shaken).toBe(0);
+    for (let i = 0; i < 30; i++) fx.update(1 / 30);
+    expect(shaken).toBeGreaterThan(0);
     fx.dispose();
   });
 });

@@ -262,6 +262,8 @@ function councilWrath(
     min,
     max,
     encounterDriven: true,
+    // Arena-wide: the council draws its own floor (council_wrath_field.ts).
+    ownFloor: true,
   };
 }
 
@@ -417,8 +419,8 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // factor (x2.3) on Normal and x2.0 on Heroic (tier_health.ts), for a 4 to
   // 5 minute human Normal kill (design doc 7, "Pools per tier"; 54,000 and
   // 46,000 with Heroic's x1.85 until the parse-calibrated pass of 2026-11-16). Each carries the Wrath's declaration (`nova`,
-  // encounter-driven: the council casts it, never the trash engine), so the
-  // sight field draws for whichever of them holds the Wrath.
+  // encounter-driven: the council casts it, never the trash engine); its
+  // floor is the council's own (arena-wide, `ownFloor`), never the sight field.
   // The Guardian of the Hammer: a stone titan half-fused with the floor, the
   // melee tank boss (energy, Mountain's Wrath, Hammer's Weight, Mountain's
   // Rush). Hammerfall, its

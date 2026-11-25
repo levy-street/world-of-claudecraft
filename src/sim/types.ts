@@ -4987,6 +4987,11 @@ export interface TrashKitCast {
    *  record stays the cast's declaration, which the renderer reads for its
    *  look (the nova's sight field) and its numbers. */
   encounterDriven?: boolean;
+  /** The encounter's own renderer draws this cast's floor warning, so the
+   *  trash engine's generic one stays off (the Hammer Council's arena-wide
+   *  Mountain's Wrath: the sight field's ring and line-of-sight wedges are
+   *  not its rule). Presentation only. */
+  ownFloor?: boolean;
 }
 
 /**

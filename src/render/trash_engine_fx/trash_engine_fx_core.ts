@@ -96,7 +96,9 @@ export function buildEngineCatalog(
         put(empowerAuras, e.auraId, w);
       if (w.intercept.groupShield) put(empowerAuras, w.intercept.groupShield.auraId, w);
     }
-    if (kit.nova) {
+    // A nova whose encounter draws its own floor (`ownFloor`) never gets
+    // the generic sight field or wave.
+    if (kit.nova && !kit.nova.ownFloor) {
       put(novas, kit.nova.castId, kit.nova);
       if (kit.nova.unstoppableCastId) put(novas, kit.nova.unstoppableCastId, kit.nova);
     }
@@ -341,7 +343,7 @@ export function novaCastLook(
   castId: string | null,
 ): NovaCastLook | null {
   const def = kit?.nova;
-  if (!def || !castId) return null;
+  if (!def || !castId || def.ownFloor) return null;
   const kickable = castId === def.castId;
   if (!kickable && castId !== def.unstoppableCastId) return null;
   return {

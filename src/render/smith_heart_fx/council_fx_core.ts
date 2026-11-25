@@ -32,6 +32,7 @@ import {
 } from '../../sim/encounters/smith_heart/council_ids';
 import { rushReach } from '../../sim/encounters/smith_heart/council_rush_reach';
 import { FINAL_DIFFICULTY } from '../../sim/encounters/smith_heart/final_ids';
+import type { FloorTellKind } from '../floor_telegraph/floor_tell_core';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { fxHash } from './hammer_fx_core';
 
@@ -219,6 +220,10 @@ export interface CouncilMarkSpec {
   accent: number;
   /** The motes stream in (gather here) or out (keep clear). */
   gather: boolean;
+  /** The shared soak / avoid tell over it (floor_telegraph/floor_tell_core.ts,
+   *  the team's playtest of 2026-11-25), or none (the Rush's mark: its lane
+   *  and its arrow say it). */
+  tell?: FloorTellKind;
 }
 
 export const COUNCIL_MARK_SPECS: Readonly<Record<string, CouncilMarkSpec>> = {
@@ -229,6 +234,7 @@ export const COUNCIL_MARK_SPECS: Readonly<Record<string, CouncilMarkSpec>> = {
     color: COUNCIL_FX_COLORS.danger,
     accent: COUNCIL_FX_COLORS.resonance,
     gather: false,
+    tell: 'avoid',
   },
   // Mountain's Rush: the charge's half width round the marked player.
   [COUNCIL_AURAS.rushMark]: {
@@ -237,17 +243,22 @@ export const COUNCIL_MARK_SPECS: Readonly<Record<string, CouncilMarkSpec>> = {
     accent: COUNCIL_FX_COLORS.ochre,
     gather: false,
   },
+  // Wake the Stone: the marked player stands where the cover must rise and
+  // everyone else keeps out of the knockback (avoid: chevrons out).
   [COUNCIL_AURAS.wakeMark]: {
     radius: T.riseKnockRadius,
     color: COUNCIL_FX_COLORS.wake,
     accent: COUNCIL_FX_COLORS.ochre,
     gather: false,
+    tell: 'avoid',
   },
+  // Falling Rock: share it (chevrons in, a pip per soaker it needs).
   [COUNCIL_AURAS.rockMark]: {
     radius: T.rockRadius,
     color: COUNCIL_FX_COLORS.soak,
     accent: 0xfff0c0,
     gather: true,
+    tell: 'share',
   },
 };
 
@@ -460,6 +471,7 @@ export function councilClaims(ability: string | undefined): boolean {
   if (!ability) return false;
   return (
     ability === COUNCIL_CUES.rise ||
+    ability === COUNCIL_CUES.pull ||
     ability === COUNCIL_CUES.crack ||
     ability === COUNCIL_CUES.collapse ||
     ability === COUNCIL_CUES.rockImpact ||

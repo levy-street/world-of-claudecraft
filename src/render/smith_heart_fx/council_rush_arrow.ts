@@ -103,8 +103,8 @@ void main() {
   col = mix(col, uRim, rim * 0.85);
   // The glow outside it, breathing with the pulse.
   float glow = exp(-max(d, 0.0) * 5.5) * (1.0 - fill) * (0.45 + 0.55 * uGlow);
-  vec3 rgb = col * (0.85 + 0.35 * uGlow) * fill + uColor * 1.5 * glow;
-  float a = clamp(fill + glow * 0.9, 0.0, 1.0);
+  vec3 rgb = col * (0.85 + 0.35 * uGlow) * fill * ${f(RUSH_ARROW.opacity)} + uColor * 1.5 * glow * ${f(RUSH_ARROW.halo)};
+  float a = clamp(fill * ${f(RUSH_ARROW.opacity)} + glow * ${f(RUSH_ARROW.halo)}, 0.0, 1.0);
   if (a < 0.003) discard;
   gl_FragColor = vec4(rgb / max(a, 0.001), a);
   #include <colorspace_fragment>

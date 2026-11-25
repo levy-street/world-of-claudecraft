@@ -53,6 +53,8 @@ import type { Aura, Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor, needsRedrape } from '../attached_fx_anchor';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
+import { FloorTellPool } from '../floor_telegraph/floor_tell';
+import { countInside } from '../floor_telegraph/floor_tell_core';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -104,12 +106,14 @@ import {
 } from './council_fx_core';
 import { CouncilLimitFx } from './council_limit_fx';
 import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
+import { CouncilPullFx } from './council_pull_fx';
 import { CouncilRushArrow } from './council_rush_arrow';
 import { CouncilRushFx } from './council_rush_fx';
 import { CouncilShelters } from './council_shelter_fx';
 import { CouncilSoakFx } from './council_soak_fx';
 import { CouncilSoulFx } from './council_soul_fx';
 import { CouncilStrikeFx } from './council_strike_fx';
+import { CouncilWrathField } from './council_wrath_field';
 import { chunkGeometry, Rubble } from './hammer_fx';
 import type { CouncilTelegraphKind } from './painted_telegraph_core';
 import {
@@ -415,6 +419,18 @@ export class CouncilFx {
    *  for them alone (each marked player sees their own). */
   private readonly wakeArrow: CouncilRushArrow;
   private readonly limitFx: CouncilLimitFx;
+  /** The shared soak / avoid tell over each mark's footprint (the team's
+   *  playtest of 2026-11-25: floor_tell_core.ts), one per mark slot. */
+  private readonly tells: FloorTellPool;
+  /** The pull's war cry (council_pull_fx.ts). */
+  private readonly pull: CouncilPullFx;
+  /** Mountain's Wrath's arena-wide floor (council_wrath_field.ts). */
+  private readonly wrathField: CouncilWrathField;
+  /** The raid's living players (refilled at the scan's pace) and their
+   *  drawn spots this frame (the soak's count). */
+  private readonly raidIds: number[] = [];
+  private readonly raidAt: { x: number; z: number }[] = [];
+  private raidCount = 0;
   /** The players the Wrath's runes count (refilled at their pace). */
   private readonly limitPlayers: Entity[] = [];
   /** When the Wrath's shelters were last laid (the host clock), or -1. */
@@ -538,6 +554,9 @@ export class CouncilFx {
       this.shakeSink,
     );
     this.limitFx = new CouncilLimitFx(host, this.pillarsFx);
+    this.tells = new FloorTellPool(this.root, POOLS.marks, this.geometries, this.materials);
+    this.pull = new CouncilPullFx(host, sfx, playGesture);
+    this.wrathField = new CouncilWrathField(host);
     this.soulFx = new CouncilSoulFx(host, this.pillarsFx, this.shelters);
     const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
     const ringGeo = new THREE.RingGeometry(0.93, 1, 96, 1).rotateX(-Math.PI / 2);
@@ -859,11 +878,13 @@ export class CouncilFx {
     // field still draw it, so the cue stays unclaimed).
     if (ev.type === 'spellfx' && ev.ability === COUNCIL_CASTS.wrath) {
       this.strike.wrathLand(ev.sourceId);
+      this.wrathField.blow();
       return false;
     }
     if (ev.type !== 'spellfx' || !councilClaims(ev.ability)) return false;
     const ability = ev.ability;
-    if (ability === COUNCIL_CUES.rise || ability === COUNCIL_CUES.cursedRise)
+    if (ability === COUNCIL_CUES.pull) this.pull.cue(ev.sourceId);
+    else if (ability === COUNCIL_CUES.rise || ability === COUNCIL_CUES.cursedRise)
       this.pillarsFx.rise(ev.sourceId);
     else if (ability === COUNCIL_CUES.cursedPulse) this.pillarsFx.cursedPulse(ev.sourceId);
     else if (ability === COUNCIL_CUES.resonancePulse) this.resonancePulse(ev.sourceId);
@@ -916,6 +937,10 @@ export class CouncilFx {
     this.updateStreams(world, dt);
     this.updateEnergy(world, dt);
     this.updateWrathShelters(world);
+    this.pull.update();
+    // The fury's floor dims under any council warning (H7 of the team's
+    // playtest of 2026-11-25: its glow had hidden the marks).
+    this.fury.setTelegraphs(this.anyWarning());
     this.fury.update(dt);
     this.rush.update(dt);
     this.strike.update(dt);
@@ -928,6 +953,33 @@ export class CouncilFx {
     );
     this.debris.update(dt);
     this.particles.update(this.clock);
+  }
+
+  /** Does any council warning lie on the floor this frame (a mark, a rise
+   *  spot, the Wrath's bar)? */
+  private anyWarning(): boolean {
+    if (this.wrathLaidAt >= 0) return true;
+    for (const m of this.marks) if (m.playerId >= 0) return true;
+    for (const sp of this.spots) if (sp.id >= 0) return true;
+    return false;
+  }
+
+  /** The raid's drawn spots this frame (only while a soak needs counting). */
+  private refreshRaidAt(world: IWorld): void {
+    this.raidCount = 0;
+    for (const id of this.raidIds) {
+      const p = world.entities.get(id);
+      if (!p || p.dead) continue;
+      const at = fxAnchor(p);
+      let slot = this.raidAt[this.raidCount];
+      if (!slot) {
+        slot = { x: 0, z: 0 };
+        this.raidAt.push(slot);
+      }
+      slot.x = at.x;
+      slot.z = at.z;
+      this.raidCount++;
+    }
   }
 
   /** In the Smith's Heart at all (one cheap read of the local player). */
@@ -955,6 +1007,7 @@ export class CouncilFx {
     // The Wrath holder (the member whose energy is not empty), found here at
     // the scan's pace, never by a walk a frame.
     let holder = -1;
+    this.raidIds.length = 0;
     if (here) {
       for (const e of world.entities.values()) {
         if (e.kind === 'mob') {
@@ -991,7 +1044,9 @@ export class CouncilFx {
           else if (councilRiseSpotSeconds(e.templateId) !== null) this.seeSpot(e);
           continue;
         }
-        if (e.kind !== 'player' || e.dead || e.auras.length === 0) continue;
+        if (e.kind !== 'player' || e.dead) continue;
+        this.raidIds.push(e.id);
+        if (e.auras.length === 0) continue;
         for (const a of e.auras) {
           if (COUNCIL_MARK_SPECS[a.id]) this.seeMark(e, a.id);
           if (a.id === COUNCIL_AURAS.rockMark) {
@@ -1076,6 +1131,7 @@ export class CouncilFx {
   }
 
   private freeMark(m: MarkSlot): void {
+    this.tells.hide(this.marks.indexOf(m));
     m.key = '';
     m.drapedX = Number.NaN;
     m.drapedZ = Number.NaN;
@@ -1085,11 +1141,16 @@ export class CouncilFx {
   }
 
   private updateMarks(world: IWorld): void {
-    for (const m of this.marks) {
+    let counted = false;
+    for (let i = 0; i < this.marks.length; i++) {
+      const m = this.marks[i];
       if (m.playerId < 0) continue;
       const p = world.entities.get(m.playerId);
       const a = auraById(p, m.auraId);
-      if (!p || !a) continue;
+      if (!p || !a) {
+        this.tells.hide(i);
+        continue;
+      }
       const spec = COUNCIL_MARK_SPECS[m.auraId];
       const radius = markRadius(spec, a.value2);
       const fill = markFill(a.remaining, a.duration);
@@ -1103,6 +1164,33 @@ export class CouncilFx {
         m.drapedZ = at.z;
       } else this.kit.placeFan(m.fan, at.x, y, at.z);
       this.kit.paintFan(m.fan, paint(fill, this.clock, radius));
+      // The shared soak / avoid tell (floor_tell_core.ts): a soak's chevrons
+      // in and its soakers' pips, a keep-out circle's chevrons out.
+      if (spec.tell) {
+        let have = 0;
+        if (spec.tell === 'share') {
+          if (!counted) {
+            this.refreshRaidAt(world);
+            counted = true;
+          }
+          have = countInside(at.x, at.z, radius, this.raidAt, this.raidCount);
+        }
+        this.tells.paint(i, {
+          kind: spec.tell,
+          x: at.x,
+          y,
+          z: at.z,
+          radius,
+          color: spec.color,
+          hot: spec.accent,
+          fill,
+          clock: this.clock,
+          reduced: this.reducedMotion(),
+          need: spec.tell === 'share' ? (a.value3 ?? T.rockMinSoakers) : 0,
+          have,
+          rim: spec.tell !== 'share',
+        });
+      } else this.tells.hide(i);
       // The stone's live dressing: the rock's shadow under the soak and the
       // floor heating as it drops; the pillar's split heating as it comes.
       if (m.auraId === COUNCIL_AURAS.rockMark) {
@@ -1781,6 +1869,7 @@ export class CouncilFx {
     const e = this.haloHolder >= 0 ? world.entities.get(this.haloHolder) : undefined;
     const casting = !!e && !e.dead && e.castingAbility === COUNCIL_CASTS.wrath && e.castTotal > 0;
     if (!casting || !e) {
+      this.wrathField.hide();
       if (this.wrathLaidAt >= 0) {
         this.shelters.hide('wrath');
         this.limitFx.hide();
@@ -1795,7 +1884,12 @@ export class CouncilFx {
       this.layLimit(world, e);
     }
     const fill = Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal));
-    this.shelters.paint('wrath', Math.min(0.92, 0.45 + fill * 2));
+    // The safe rings stand out from the bar's very start (the team's playtest
+    // of 2026-11-25: the safe area was not always seen), over the arena-wide
+    // field that lies under them.
+    this.shelters.paint('wrath', Math.min(0.96, 0.72 + fill * 1.2));
+    const me = world.entities.get(world.playerId);
+    if (me) this.wrathField.show(me, fill);
   }
 
   dispose(): void {

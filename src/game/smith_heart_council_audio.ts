@@ -18,7 +18,9 @@ import {
   COUNCIL_SFX_KEYS,
   type CouncilSound,
   ROCK_FALL_SOUND,
+  ROCK_MARK_SOUND,
   RUSH_MARK_ALARM,
+  rockMarkRate,
   SHELTER_STRAIN_SOUND,
   shelterStrainDue,
   songPulseSound,
@@ -56,6 +58,8 @@ interface Watch {
   barTotal: number;
   /** The rock's fall already played for this mark. */
   fell: boolean;
+  /** The rock's gather call already played (or the mark was seen late). */
+  warned: boolean;
 }
 
 /** Two members, two soul pillars, and the rock's few marked players. */
@@ -87,6 +91,7 @@ export class CouncilAudio {
         bar: '',
         barTotal: 0,
         fell: false,
+        warned: false,
       });
   }
 
@@ -179,6 +184,8 @@ export class CouncilAudio {
     free.barTotal = e.castTotal;
     const rock = kind === 'rock' ? auraOf(e, COUNCIL_AURAS.rockMark) : null;
     free.fell = rock !== null && rock.remaining <= ROCK_FALL_SOUND.lead;
+    // A mark already well under way when first seen never sounds its call.
+    free.warned = rock !== null && rock.duration - rock.remaining > ROCK_MARK_SOUND.fresh;
     this.preload();
   }
 
@@ -208,8 +215,22 @@ export class CouncilAudio {
       }
       if (w.kind === 'rock') {
         const mark = auraOf(e, COUNCIL_AURAS.rockMark);
-        if (!mark) w.fell = false;
-        else if (!w.fell && mark.remaining <= ROCK_FALL_SOUND.lead) {
+        if (!mark) {
+          w.fell = false;
+          w.warned = false;
+          continue;
+        }
+        if (!w.warned) {
+          w.warned = true;
+          this.sink.playAt(ROCK_MARK_SOUND.key, e.pos.x, e.pos.y + 2, e.pos.z, {
+            gain: ROCK_MARK_SOUND.gain,
+            rate: rockMarkRate(mark.duration),
+            cooldown: 0.5,
+            jitter: false,
+            priority: true,
+          });
+        }
+        if (!w.fell && mark.remaining <= ROCK_FALL_SOUND.lead) {
           w.fell = true;
           this.sink.playAt(ROCK_FALL_SOUND.key, e.pos.x, e.pos.y + 6, e.pos.z, {
             gain: ROCK_FALL_SOUND.gain,

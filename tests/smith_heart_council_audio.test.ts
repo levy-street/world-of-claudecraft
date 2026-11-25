@@ -74,6 +74,8 @@ describe('Hammer Council sounds: the plan', () => {
       expect(
         key.startsWith('heart_council_') ||
           key === 'heart_mark_stone' ||
+          // The rock's gather call: the raid's one share sound (2026-11-25).
+          key === 'heart_final_anvil_warn' ||
           key === 'ui_aura_blaring_horn',
         key,
       ).toBe(true);
@@ -82,8 +84,9 @@ describe('Hammer Council sounds: the plan', () => {
     // The Walking Slab's grind loop left with the Slabwright; the Rush's two
     // takes, the Bond's pulse, Resonance, Narrow Shelter's strain and the
     // stone mark came with the AAA pass (the Rush no longer borrows the crush);
-    // the Rush mark's alarm with the owner's playtest of 2026-11-12.
-    expect(COUNCIL_SFX_KEYS.length).toBe(23);
+    // the Rush mark's alarm with the owner's playtest of 2026-11-12; the
+    // Wake's grind and the rock's gather call with the team's of 2026-11-25.
+    expect(COUNCIL_SFX_KEYS.length).toBe(25);
     expect(councilSoundClaims('frost_nova')).toBe(false);
     expect(councilSoundClaims(undefined)).toBe(false);
   });

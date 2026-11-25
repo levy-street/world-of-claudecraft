@@ -101,10 +101,14 @@ export const RUSH_TRACE_SECONDS = RUSH_SCAR.hold + RUSH_SCAR.fade;
  *  glow), bobbing `bob` at `bobHz`; it pulses from `pulseHz` at the mark to `pulseHzEnd`
  *  as the bar lands. Every tier: the mark is actionable (who to stay clear of, who must
  *  reach a pillar); reduced motion holds the bob and the pulse. */
+/** Toned down on the team's playtest of 2026-11-25 ("the giant arrow is too
+ *  much"): about two thirds of its old length and width (3.2 by 2.6), a
+ *  softer halo and a body a little see-through, still on every tier and over
+ *  the world, so the mark reads without covering the fight round it. */
 export const RUSH_ARROW = {
-  tip: 3.8,
-  length: 3.2,
-  width: 2.6,
+  tip: 3.6,
+  length: 2.2,
+  width: 1.75,
   /** Past this many yards from the camera the card grows with the distance, so a far
    *  arrow keeps its size on screen (a nameplate's rule); nearer it is its true size. */
   holdFrom: 22,
@@ -114,9 +118,12 @@ export const RUSH_ARROW = {
   pulseHz: 1.6,
   pulseHzEnd: 5,
   /** The glow never falls below this (always readable), up to 1 on the pulse. */
-  glowFloor: 0.7,
+  glowFloor: 0.6,
   /** The extra size on the pulse's crest, growing to its whole as the bar runs out. */
-  swell: 0.14,
+  swell: 0.08,
+  /** The body's opacity and the halo's strength round it (was 1 and 0.9). */
+  opacity: 0.8,
+  halo: 0.45,
 } as const;
 
 /** One frame of the arrow, written into `out` (no allocation). */
@@ -162,6 +169,26 @@ export function rushArrowLook(
 }
 
 // ---- Grieving Fury (encounters/smith_heart/council_fury.ts) ----------------------------------
+
+/** The fury's floor under the survivor (its burn and its cracked sigil),
+ *  pulled in on the team's playtest of 2026-11-25 ("in phase 2 the ground
+ *  glow hides mechanics"): its reach a share of the body's ring (2.3 before,
+ *  about 12 yd round the Guardian), its glow, the burn's darkness per soul
+ *  (the Singer's storm on him, the Guardian's fire on her), and how far it
+ *  all dims while a council warning lies on the floor, so every telegraph
+ *  reads on top of it. Every tier the same. */
+export const FURY_FLOOR = {
+  reach: 1.5,
+  sigilGlow: 0.45,
+  scorch: { storm: 0.5, fire: 0.26 },
+  underTelegraph: 0.4,
+} as const;
+
+/** The fury floor's strength: 1, or FURY_FLOOR.underTelegraph while any
+ *  council warning lies on the floor. */
+export function furyFloorDim(telegraphs: boolean): number {
+  return telegraphs ? FURY_FLOOR.underTelegraph : 1;
+}
 
 /** The fury's look on the survivor: how long the waking flash and the swell
  *  take (seconds), the swell's overshoot, and the heartbeat's period. */

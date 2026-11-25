@@ -34,7 +34,13 @@ import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { radialGlowTexture } from '../textures';
 import { COUNCIL_AURAS, SOUL_COLORS } from './council_fx_core';
-import { type FuryLook, furyLook, MEMBER_BODY } from './council_mechanic_look_core';
+import {
+  FURY_FLOOR,
+  type FuryLook,
+  furyFloorDim,
+  furyLook,
+  MEMBER_BODY,
+} from './council_mechanic_look_core';
 import type { CouncilFxHost } from './council_pillars_fx';
 
 /** The stone shards torn loose round the survivor (the low tier draws fewer). */
@@ -518,6 +524,13 @@ export class CouncilFuryFx {
     this.scanId = -1;
   }
 
+  /** The floor's strength this frame: dimmed while a council warning lies
+   *  on the floor (CouncilFx says so each frame). */
+  private floorDim = 1;
+  setTelegraphs(any: boolean): void {
+    this.floorDim = furyFloorDim(any);
+  }
+
   /** A living council member the host's scan found. */
   see(e: Entity): void {
     if (this.scanId >= 0) return;
@@ -621,15 +634,18 @@ export class CouncilFuryFx {
       this.columnMat.uniforms.uBeat.value = look.beat;
       this.column.visible = true;
     }
-    const sr = r * 2.3 * (1 + 0.05 * look.beat + 0.25 * look.flash);
+    // The floor stays close and soft, dimmer still under a warning
+    // (FURY_FLOOR: the team's playtest of 2026-11-25).
+    const sr = r * FURY_FLOOR.reach * (1 + 0.05 * look.beat + 0.25 * look.flash);
     this.scorch.position.set(at.x, y + 0.1, at.z);
     this.scorch.scale.set(sr * 1.08, sr * 1.08, 1);
-    this.scorchMat.uniforms.uAlpha.value = storm ? 0.85 : 0.4;
+    this.scorchMat.uniforms.uAlpha.value =
+      (storm ? FURY_FLOOR.scorch.storm : FURY_FLOOR.scorch.fire) * this.floorDim;
     this.sigilMat.uniforms.uCrack.value = storm ? 1 : 0;
     this.scorch.visible = true;
     this.sigil.position.set(at.x, y + 0.13, at.z);
     this.sigil.scale.set(sr, sr, 1);
-    this.sigilMat.uniforms.uGlow.value = 0.8 * look.glow;
+    this.sigilMat.uniforms.uGlow.value = FURY_FLOOR.sigilGlow * look.glow * this.floorDim;
     this.sigilMat.uniforms.uBeat.value = look.beat;
     this.sigil.visible = true;
     this.placeShards(at.x, y + height * body.chest, at.z, r, look);

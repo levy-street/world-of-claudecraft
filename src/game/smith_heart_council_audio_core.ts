@@ -10,13 +10,15 @@
 //                  striking, the Wrath landing, a Seam Bolt, Hammer's Weight)
 //   a bar          its charge, sized to the bar (Mountain's Wrath, the Echo of
 //                  Wrath, the Song of the Seam)
-//   the rock       its fall, as the boulder comes into view over its soak
+//   the rock       its gather call as its mark goes on (the raid's one share
+//                  sound), its fall as the boulder comes into view
+//   the Wake       its bar's stone grinding up (never the rock's sound)
 //   the song       each Endless Song pulse louder and deeper as the song grows
 //   the shelter    a crowded pillar groaning under the Wrath (Narrow Shelter)
 //   the marks      a mark landing on the local player, in their own ear
 //
 // Every sample is the council's own (`heart_council_*`, scripts/sfx/
-// sfx_prompts.mjs). Readable, punchy, never tiring: a cue repeated every two
+// sfx_prompts.mjs) but the rock's gather call, the raid's shared one. Readable, punchy, never tiring: a cue repeated every two
 // seconds (the heroic pulse) is kept low and cooled down.
 
 import {
@@ -87,6 +89,10 @@ export const COUNCIL_CUE_SOUNDS: Readonly<Record<string, CouncilSound>> = {
   // The Wrath landing (its nova on the caster), a Seam Bolt on its mark,
   // Hammer's Weight's slab on the tank.
   [COUNCIL_CASTS.wrath]: S('wrath_blast', 1, 'source'),
+  // The pull's war cry: the stone grinding as each member gathers itself;
+  // its blow's crush plays on the blow (render/smith_heart_fx/
+  // council_pull_fx_core.ts COUNCIL_PULL_BEAT).
+  [COUNCIL_CUES.pull]: S('slab_grind', 0.55, 'source', 1.3, 0.2),
   [COUNCIL_CASTS.bolt]: S('seam_bolt', 0.85, 'target', 1, 0.15),
   [COUNCIL_CASTS.weight]: S('rock_impact', 0.7, 'target', 1.25),
 };
@@ -125,6 +131,10 @@ export const COUNCIL_BAR_SOUNDS: Readonly<Record<string, CouncilBarSound>> = {
   [COUNCIL_CASTS.wrath]: { key: 'heart_council_wrath_charge', seconds: 4, gain: 0.95 },
   [COUNCIL_CASTS.echo]: { key: 'heart_council_echo_charge', seconds: 3, gain: 0.95 },
   [COUNCIL_CASTS.song]: { key: 'heart_council_song_cast', seconds: 3, gain: 0.8 },
+  // Wake the Stone (the pillars coming): stone grinding up out of the floor,
+  // its own sound since the team's playtest of 2026-11-25 (the Wake and the
+  // rock had sounded the same: both only the stone sting).
+  [COUNCIL_CASTS.wake]: { key: 'heart_council_slab_grind', seconds: 2.5, gain: 0.75 },
 };
 
 /** A bar's charge sized to its bar: the rate that fits the sample to the
@@ -132,6 +142,26 @@ export const COUNCIL_BAR_SOUNDS: Readonly<Record<string, CouncilBarSound>> = {
 export function barSoundRate(sound: CouncilBarSound, barSeconds: number): number {
   if (!(barSeconds > 0)) return 1;
   return Math.max(0.85, Math.min(1.2, sound.seconds / barSeconds));
+}
+
+/** The rock's mark, heard by the whole raid round its player as it goes on
+ *  (the team's playtest of 2026-11-25: the soak must read the first time, and
+ *  apart from Wake the Stone): the raid's GATHER call, the very warning of the
+ *  Masterless Strength's Weight of the Anvil (the fight's other group share),
+ *  a heavy weight hanging overhead, rising for the mark's 5 s. One sound for
+ *  every share in the raid. Played only as a mark goes on (never late). */
+export const ROCK_MARK_SOUND = {
+  key: 'heart_final_anvil_warn',
+  seconds: 5,
+  gain: 0.85,
+  /** A mark first seen with more than this much of it gone plays nothing. */
+  fresh: 0.6,
+} as const;
+
+/** The rock's mark's sound fitted to its mark (the sample's own 5 s). */
+export function rockMarkRate(markSeconds: number): number {
+  if (!(markSeconds > 0)) return 1;
+  return Math.max(0.85, Math.min(1.2, ROCK_MARK_SOUND.seconds / markSeconds));
 }
 
 /** The rock's fall plays as the boulder comes into view over its soak (the
@@ -157,7 +187,8 @@ export function shelterStrainDue(from: number, to: number): boolean {
 export const COUNCIL_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [COUNCIL_AURAS.rushMark]: HEART_MARK.stone,
   [COUNCIL_AURAS.wakeMark]: markSound(HEART_MARK.stone, 0.8, 1.15),
-  [COUNCIL_AURAS.rockMark]: markSound(HEART_MARK.stone, 0.9, 0.85),
+  // The rock's mark is no stone sting: the whole raid hears its gather call
+  // (ROCK_MARK_SOUND), its marked player too.
   [COUNCIL_AURAS.resonance]: markSound(HEART_MARK.stone, 0.75, 1.3),
 };
 
@@ -177,6 +208,7 @@ export const COUNCIL_SFX_KEYS: readonly string[] = [
     ...Object.values(COUNCIL_MARK_SOUNDS).map((s) => s.key),
     ...Object.values(RUSH_MARK_ALARM).map((s) => s.key),
     ROCK_FALL_SOUND.key,
+    ROCK_MARK_SOUND.key,
     SHELTER_STRAIN_SOUND.key,
   ]),
 ].sort();

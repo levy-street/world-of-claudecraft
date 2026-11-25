@@ -1250,6 +1250,10 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/council_bodies_core.ts',
   // The members' bodies and Mountain's Rush's wind-up, run and scar.
   'src/render/smith_heart_fx/council_mechanic_look_core.ts',
+  // The council's pull beat (each member's war cry as a pull begins).
+  'src/render/smith_heart_fx/council_pull_fx_core.ts',
+  // Mountain's Wrath's arena-wide floor.
+  'src/render/smith_heart_fx/council_wrath_field_core.ts',
   // Mountain's Wrath's and Mountain's Rush's gather and release.
   'src/render/smith_heart_fx/council_strike_core.ts',
   // Stone Thrum's ripple off each risen pillar.
@@ -1345,6 +1349,8 @@ const RENDER_PURE_CORES = [
   'src/render/drowned_temple/temple_score_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
+  // The shared soak / avoid tell (chevrons in or out, the soakers' pips).
+  'src/render/floor_telegraph/floor_tell_core.ts',
   // where a body sitting on a seat is drawn, and which seat a screen ray points at
   'src/render/seated_pose_core.ts',
   'src/render/seat_pick_core.ts',
