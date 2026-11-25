@@ -11797,7 +11797,10 @@
   }
   #heart-quench-screen.is-frozen .hqs-frost {
     opacity: 1;
-    box-shadow: inset 0 0 110px 36px var(--color-quench-frost-glint);
+    box-shadow:
+      inset 0 0 28px 14px var(--color-quench-frost-glint-core),
+      inset 0 0 180px 64px var(--color-quench-frost-glint);
+    filter: brightness(1.18);
   }
   /* Motion-calming: the fades snap, on all three axes. */
   @media (prefers-reduced-motion: reduce) {

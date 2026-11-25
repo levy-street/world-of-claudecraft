@@ -609,7 +609,8 @@
     --color-quench-frost-clear: rgba(190, 228, 255, 0.12);
     --color-quench-frost-haze: rgba(132, 198, 250, 0.8);
     --color-quench-frost-rim: rgba(228, 244, 255, 1);
-    --color-quench-frost-glint: rgba(244, 252, 255, 0.95);
+    --color-quench-frost-glint: rgba(244, 252, 255, 1);
+    --color-quench-frost-glint-core: rgba(255, 255, 255, 1);
     --color-quench-mask: rgba(0, 0, 0, 1);
     --color-quench-water-centre: rgba(30, 108, 186, 0.4);
     --color-quench-water-edge: rgba(10, 48, 120, 0.7);
