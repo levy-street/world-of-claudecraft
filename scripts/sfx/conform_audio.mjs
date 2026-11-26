@@ -145,6 +145,17 @@ function filterNumber(value) {
   return Object.is(rounded, -0) ? 0 : rounded;
 }
 
+/** Whether the loudest peak-safe attempt may still ship once the attempts run
+ *  out. On the LUFS branch only with a shortfall `sfx:check` excuses (the
+ *  shared isPeakConstrainedShortfall rule), so the conform never writes a file
+ *  the check would then reject; otherwise it throws with its attempt log. The
+ *  peak branch keeps its historical fallback. */
+export function exhaustedConformFallbackAllowed(normBranch, best) {
+  if (!best) return false;
+  if (normBranch !== 'lufs') return true;
+  return isPeakConstrainedShortfall(best.measuredPeakDb, best.measuredOutput);
+}
+
 export function buildSfxConformArgs({ inputFile, outputFile, duration, gainDb, channels = null }) {
   const normBranch = duration < DURATION_THRESHOLD ? 'peak' : 'lufs';
   if (!Number.isFinite(gainDb)) throw new Error('SFX conformance requires a finite gain');
@@ -331,7 +342,7 @@ export function conformSfxAudio({
       // across the tolerance window while still converging quickly.
       gainDb = Math.min(gainDb + error * 0.5, maxGainDb);
     }
-    if (bestPeakSafeAttempt) {
+    if (exhaustedConformFallbackAllowed(normBranch, bestPeakSafeAttempt)) {
       const plan = buildSfxConformArgs({
         inputFile,
         outputFile: temporary,

@@ -251,6 +251,27 @@ describe('shared conform command', () => {
     },
   );
 
+  it('ships an exhausted LUFS conform only with a shortfall the check excuses', () => {
+    const allowed = conformAudioModule.exhaustedConformFallbackAllowed;
+    // A transient pinned at the peak ceiling, 3 dB under target: the check's
+    // peak-constrained shortfall, so the loudest safe attempt may ship.
+    const excused = { measuredOutput: TARGET_LUFS - 3, measuredPeakDb: TARGET_PEAK_DBFS };
+    expect(allowed('lufs', excused)).toBe(true);
+    // The same shortfall with 6 dB of peak headroom left is one sfx:check
+    // rejects, so the conform throws instead of writing that file.
+    const unexcused = { measuredOutput: TARGET_LUFS - 3, measuredPeakDb: TARGET_PEAK_DBFS - 6 };
+    expect(allowed('lufs', unexcused)).toBe(false);
+    // Over target is never a peak-constrained shortfall either.
+    expect(
+      allowed('lufs', { measuredOutput: TARGET_LUFS + 2, measuredPeakDb: TARGET_PEAK_DBFS }),
+    ).toBe(false);
+    // No peak-safe attempt at all: nothing to fall back to, on either branch.
+    expect(allowed('lufs', null)).toBe(false);
+    expect(allowed('peak', null)).toBe(false);
+    // The short-clip peak branch keeps its fallback unchanged.
+    expect(allowed('peak', unexcused)).toBe(true);
+  });
+
   it('builds the fixed peak branch for clips below one second', () => {
     const plan = buildSfxConformArgs({
       inputFile: '/tmp/source.wav',
