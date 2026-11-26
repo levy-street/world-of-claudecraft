@@ -1242,12 +1242,10 @@ export class FinalKitFx {
           const under = anvilUnder(pts, ax, az, r);
           this.anvilFx.hang(id, ax, ay, az, fill, under, r);
           this.anvilTell.paint(0, {
-            kind: 'share',
             x: ax,
             y: ay,
             z: az,
             radius: r,
-            color: C.soak,
             element: 'earth',
             fill,
             clock: this.clock,

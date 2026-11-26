@@ -3,12 +3,9 @@
 export { type FloorTellPaint, FloorTellPool } from './floor_tell';
 export {
   countInside,
-  FLOOR_TELL,
   FLOOR_TELL_PIPS,
   type FloorTellKind,
-  floorTellLook,
   soakPips,
-  tellBand,
 } from './floor_tell_core';
 export {
   type TelegraphFan,

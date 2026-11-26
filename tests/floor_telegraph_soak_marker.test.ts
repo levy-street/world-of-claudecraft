@@ -230,16 +230,16 @@ describe('the soak marker shape (gather in, yard-true, tier-fair)', () => {
     expect(m.shown).toBe(false);
   });
 
-  it('the tell pool lays a share as the marker and an avoid as its chevron disc', () => {
+  it('the tell pool is the soak marker alone (no keep-out disc)', () => {
     const root = new THREE.Group();
-    const pool = new FloorTellPool(root, 1, [], []);
+    const mats: THREE.Material[] = [];
+    const pool = new FloorTellPool(root, 1, [], mats);
+    expect(mats.map((m) => m.name)).toEqual(['soakMarkerDisc', 'soakMarkerWisps']);
     pool.paint(0, {
-      kind: 'share',
       x: 0,
       y: 0,
       z: 0,
       radius: 5,
-      color: 0,
       element: 'fire',
       fill: 0,
       clock: 1,
@@ -248,23 +248,7 @@ describe('the soak marker shape (gather in, yard-true, tier-fair)', () => {
       have: 1,
     });
     expect(pool.uniformsOf(0)?.uNeed.value).toBe(2);
-    expect(pool.uniformsOf(0)?.uDir).toBeUndefined();
-    pool.paint(0, {
-      kind: 'avoid',
-      x: 0,
-      y: 0,
-      z: 0,
-      radius: 5,
-      color: 0xff0000,
-      fill: 0,
-      clock: 1.1,
-      reduced: false,
-    });
-    expect(pool.uniformsOf(0)?.uDir.value).toBe(1);
-    // An avoid-only pool builds no marker.
-    const mats: THREE.Material[] = [];
-    new FloorTellPool(new THREE.Group(), 2, [], mats, 26, false);
-    expect(mats.length).toBe(2);
+    expect(pool.uniformsOf(0)?.uLit.value).toBe(1);
   });
 });
 

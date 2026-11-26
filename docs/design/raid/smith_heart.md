@@ -2259,8 +2259,8 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   strike under a hashed player on it and one hashed on its floor, each on a 2 s warning, within
   3.5 yd, a share of the struck one's health (Normal 20 percent, Heroic and Mythic 30), named Sky
   Strike. Never under a Stillstone's channeler, never once the adds are down or the storm has
-  closed (Sky's Reckoning takes over). Every Breath strike now wears the shared avoid tell
-  (`render/floor_telegraph`, chevrons outward). `breath_isle_bolts.ts`,
+  closed (Sky's Reckoning takes over). Every Breath strike draws its own painted footprint at its
+  radius (the 2026-11-25 avoid overlay was removed on 2026-11-26). `breath_isle_bolts.ts`,
   `tests/smith_heart_breath_isle_bolts.test.ts`; `/dev heart breath bolt [i]`.
 - **The Stillstones.** The last isle of each side holds one, woken when that isle's adds are
   down (Heroic: two Squall Fragments rise to guard it, and it stays locked, caged in its wind,

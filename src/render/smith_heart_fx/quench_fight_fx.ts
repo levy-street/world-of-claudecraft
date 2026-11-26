@@ -50,7 +50,6 @@ import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit, type TelegraphLane } from '../floor_telegraph';
-import { FloorTellPool } from '../floor_telegraph/floor_tell';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -297,10 +296,6 @@ export class QuenchFightFx {
   readonly rime: QuenchRimeFx;
   // The footprints (every tier).
   private readonly crackFans: FanSlot[] = [];
-  /** The shared AVOID tell over each crack's footprint (chevrons pointing
-   *  out, its rim throbbing outward: floor_telegraph/floor_tell.ts), every
-   *  tier (the team's playtest of 2026-11-25: the breaking ice must read). */
-  private readonly crackTells: FloorTellPool;
   private readonly splashFans: FanSlot[] = [];
   private readonly lanes: {
     lane: TelegraphLane;
@@ -435,14 +430,6 @@ export class QuenchFightFx {
       },
       this.particles,
       (x, z) => this.groundY(x, z),
-    );
-    this.crackTells = new FloorTellPool(
-      this.root,
-      P.cracks,
-      this.geometries,
-      this.materials,
-      26,
-      false,
     );
     for (let i = 0; i < P.lanes; i++) {
       const lane = this.kit.lane(QUENCH_FLOOR.telegraphChar.step);
@@ -927,7 +914,6 @@ export class QuenchFightFx {
       s.id = -1;
       s.fan.group.visible = false;
     }
-    for (let i = 0; i < this.crackFans.length; i++) this.crackTells.hide(i);
     for (const l of this.lanes) {
       l.id = -1;
       l.lane.group.visible = false;
@@ -959,16 +945,13 @@ export class QuenchFightFx {
   // ---- the fight's objects --------------------------------------------------------------
 
   private paintObjects(world: IWorld, dt: number): void {
-    // The cracks: the hole's footprint filling, its web racing out, the
-    // avoid tell over it and the strain snapping higher to the break.
+    // The cracks: the hole's footprint filling, its web racing out and the
+    // strain snapping higher to the break.
     let n = 0;
     for (let ci = 0; ci < this.crackFans.length; ci++) {
       const s = this.crackFans[ci];
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
-      if (!e) {
-        this.crackTells.hide(ci);
-        continue;
-      }
+      if (!e) continue;
       const warn = crackOf(e.templateId) ?? T.crackWarn;
       const elapsed = this.clock - s.born;
       const look = crackLook(elapsed, warn);
@@ -976,19 +959,6 @@ export class QuenchFightFx {
       const y = this.groundY(e.pos.x, e.pos.z);
       this.kit.drapeFan(s.fan, this.groundY, e.pos.x, y, e.pos.z, 0, r);
       this.kit.paintFan(s.fan, { fill: look.fill, clock: this.clock, range: r });
-      this.crackTells.paint(ci, {
-        kind: 'avoid',
-        x: e.pos.x,
-        y,
-        z: e.pos.z,
-        radius: r,
-        color: C.danger,
-        hot: look.flash > 0.5 ? 0xffffff : C.accent,
-        fill: look.fill,
-        clock: this.clock,
-        reduced: this.reducedMotion(),
-        rim: true,
-      });
       this.audio.crackStrain(ci, e.id, e.pos.x, y, e.pos.z, elapsed, warn);
       _v.set(e.pos.x, y + 0.06, e.pos.z);
       _s.set(r * 1.15, 1, r * 1.15);

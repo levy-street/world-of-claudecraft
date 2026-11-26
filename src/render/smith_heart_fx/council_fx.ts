@@ -419,8 +419,8 @@ export class CouncilFx {
    *  for them alone (each marked player sees their own). */
   private readonly wakeArrow: CouncilRushArrow;
   private readonly limitFx: CouncilLimitFx;
-  /** The shared soak / avoid tell over each mark's footprint (the team's
-   *  playtest of 2026-11-25: floor_tell_core.ts), one per mark slot. */
+  /** The shared soak marker over each share mark (floor_tell.ts), one per
+   *  mark slot; the keep-out marks keep their own painted footprints. */
   private readonly tells: FloorTellPool;
   /** The pull's war cry (council_pull_fx.ts). */
   private readonly pull: CouncilPullFx;
@@ -1127,7 +1127,9 @@ export class CouncilFx {
               ? 'rush'
               : 'wake',
       );
-      m.fan.group.visible = true;
+      // A share mark is the shared soak marker alone: its own painted fan
+      // stays hidden under it (never two areas at once).
+      m.fan.group.visible = !spec.tell;
       m.ghost.visible = auraId === COUNCIL_AURAS.wakeMark;
     }
     m.seen = true;
@@ -1167,31 +1169,24 @@ export class CouncilFx {
         m.drapedZ = at.z;
       } else this.kit.placeFan(m.fan, at.x, y, at.z);
       this.kit.paintFan(m.fan, paint(fill, this.clock, radius));
-      // The shared soak / avoid tell (floor_tell_core.ts): a soak's chevrons
-      // in and its soakers' pips, a keep-out circle's chevrons out.
-      if (spec.tell) {
-        let have = 0;
-        if (spec.tell === 'share') {
-          if (!counted) {
-            this.refreshRaidAt(world);
-            counted = true;
-          }
-          have = countInside(at.x, at.z, radius, this.raidAt, this.raidCount);
+      // The shared soak marker over a share mark (its soakers' pips); a
+      // keep-out mark keeps its own painted footprint alone.
+      if (spec.tell === 'share') {
+        if (!counted) {
+          this.refreshRaidAt(world);
+          counted = true;
         }
         this.tells.paint(i, {
-          kind: spec.tell,
           x: at.x,
           y,
           z: at.z,
           radius,
-          color: spec.color,
-          hot: spec.accent,
           fill,
           clock: this.clock,
           reduced: this.reducedMotion(),
-          need: spec.tell === 'share' ? (a.value3 ?? T.rockMinSoakers) : 0,
-          have,
-          rim: spec.tell !== 'share',
+          need: a.value3 ?? T.rockMinSoakers,
+          have: countInside(at.x, at.z, radius, this.raidAt, this.raidCount),
+          rim: false,
           element: 'earth',
           detail: this.density,
         });

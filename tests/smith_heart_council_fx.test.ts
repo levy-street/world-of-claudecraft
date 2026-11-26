@@ -278,40 +278,31 @@ describe('CouncilFx over a fake world', () => {
     expect(shown('smithHeartPillarPips')).toBe(2);
     // Resonance: the shimmer on its carrier (its ring is a kit mark).
     expect(shown('smithHeartResonanceBand')).toBe(1);
-    // The soak reads from afar: its countdown rim, its beacon, and the rock's
-    // shadow drawn by the stone paint under the marked player (its char pass,
-    // so the fissures burn through it), heating as the rock comes.
+    // The soak reads from afar: its countdown rim and its beacon, over the
+    // shared soak marker (earth) with a pip per soaker it needs (one inside:
+    // its own player). The rock's own painted fan stays hidden under the
+    // marker (the owner's call of 2026-11-26: never two areas at once), and
+    // the keep-out marks (Resonance here) keep their painted footprint with
+    // no overlay of their own.
     expect(shown('smithHeartSoakRim')).toBe(1);
     expect(shown('smithHeartSoakBeacon')).toBe(1);
-    let soakPaint: THREE.ShaderMaterial | undefined;
+    expect(shown('floorTellSoakDisc')).toBe(1);
+    expect(shown('floorTell')).toBe(0);
+    let rockPaint = false;
     root?.traverse((c) => {
       const m = (c as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
-      if (c.name === 'smithHeartCouncilTelegraph' && c.visible && m?.uniforms?.uShadow?.value > 0)
-        soakPaint = m;
+      if (c.name !== 'smithHeartCouncilTelegraph' || !(m?.uniforms?.uShadow?.value > 0)) return;
+      for (let o: THREE.Object3D | null = c; o; o = o.parent) if (!o.visible) return;
+      rockPaint = true;
     });
-    expect(soakPaint).toBeDefined();
-    expect(soakPaint?.uniforms.uShadow.value).toBeLessThan(1);
-    expect(soakPaint?.uniforms.uHeat.value).toBeGreaterThan(0);
-    // The shared soak / avoid tell (the team's playtest of 2026-11-25): the
-    // rock wears the shared soak marker (earth) with a pip per soaker it
-    // needs (one inside: its own player), Resonance its chevrons out.
-    expect(shown('floorTell')).toBe(1);
-    expect(shown('floorTellSoakDisc')).toBe(1);
-    const tells: THREE.ShaderMaterial[] = [];
+    expect(rockPaint).toBe(false);
+    let share: THREE.ShaderMaterial | undefined;
     root?.traverse((c) => {
-      if (
-        (c.name === 'floorTell' || c.name === 'floorTellSoakDisc') &&
-        c.visible &&
-        c.parent?.visible
-      )
-        tells.push((c as THREE.Mesh).material as THREE.ShaderMaterial);
+      if (c.name === 'floorTellSoakDisc' && c.visible && c.parent?.visible)
+        share = (c as THREE.Mesh).material as THREE.ShaderMaterial;
     });
-    const share = tells.find((m) => m.name === 'soakMarkerDisc');
-    const avoid = tells.find((m) => m.name === 'floorTell');
     expect(share?.uniforms.uNeed.value).toBe(T.rockMinSoakers);
     expect(share?.uniforms.uLit.value).toBe(1);
-    expect(avoid?.uniforms.uDir.value).toBe(1);
-    expect(avoid?.uniforms.uNeed.value).toBe(0);
     // The Wrath's real shadow behind both pillars, with its light curtains,
     // over its own arena-wide floor.
     expect(shown('smithHeartShelter:wrath')).toBe(2);

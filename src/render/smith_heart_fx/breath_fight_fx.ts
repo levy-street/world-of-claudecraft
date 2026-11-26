@@ -564,8 +564,6 @@ export class BreathFightFx {
   private readonly vortexFans: FanSlot[] = [];
   private readonly galeFans: FanSlot[] = [];
   private readonly strikeFans: FanSlot[] = [];
-  /** The shared avoid tell over each strike slot (same index). */
-  private readonly strikeTells: FloorTellPool;
   /** The Thunder's Cradle's gather circles wear the shared soak marker
    *  (floor_telegraph/soak_marker.ts, lightning): its pips count the
    *  players under each against the tier's want. */
@@ -681,14 +679,6 @@ export class BreathFightFx {
     );
     this.glowTex = hasDom ? radialGlowTexture() : null;
     this.kit = new TelegraphKit(this.root, this.detail);
-    this.strikeTells = new FloorTellPool(
-      this.root,
-      P.strikes,
-      this.geometries,
-      this.materials,
-      26,
-      false,
-    );
     this.cradleTells = new FloorTellPool(this.root, P.cradles, this.geometries, this.materials);
     this.paints = new BreathTelegraphs(BREATH_TELEGRAPH_GLOW_STEP, this.materials);
     this.auraArrows = new CouncilRushArrow(
@@ -1544,7 +1534,6 @@ export class BreathFightFx {
         s.id = -1;
         s.fan.group.visible = false;
       }
-    for (let i = 0; i < this.strikeFans.length; i++) this.strikeTells.hide(i);
     this.cradleTells.hideAll();
     for (const p of [this.anchorMarks, this.pinnedMarks, this.drawnMarks]) {
       p.begin();
@@ -1956,29 +1945,11 @@ export class BreathFightFx {
     for (let i = 0; i < this.strikeFans.length; i++) {
       const s = this.strikeFans[i];
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
-      if (!e) {
-        this.strikeTells.hide(i);
-        continue;
-      }
+      if (!e) continue;
       const warn = timedOf(BREATH_OBJECTS.strikePrefix, e.templateId) ?? T.strikeWarn;
       const fill = strikeFill(this.clock - s.born, warn);
       const radius = e.scale > 0 ? e.scale : T.strikeR;
       this.drape(s, e, radius, fill);
-      // The shared keep-out tell over every strike (floor_tell_core.ts:
-      // chevrons pointing out, rings racing to the rim), on every tier.
-      const tellAt = fxAnchor(e);
-      this.strikeTells.paint(i, {
-        kind: 'avoid',
-        x: tellAt.x,
-        y: this.groundY(tellAt.x, tellAt.z),
-        z: tellAt.z,
-        radius,
-        color: C.danger,
-        hot: C.accent,
-        fill,
-        clock: this.clock,
-        reduced: this.reducedMotion(),
-      });
       if (this.rand() < dt * 14 * this.density * (0.3 + fill)) {
         // The charge gathering in the cloud over it.
         this.particles.puff(e.pos.x, e.pos.y + 10 + this.rand() * 4, e.pos.z, 2, {
@@ -2062,12 +2033,10 @@ export class BreathFightFx {
       // countdown arc the channel's hold (the kit's fill before it).
       const spot = this.cradleSpots[i];
       this.cradleTells.paint(i, {
-        kind: 'share',
         x: spot.x,
         y: this.groundY(spot.x, spot.z),
         z: spot.z,
         radius,
-        color: C.soak,
         element: 'lightning',
         fill: look.fill,
         clock: this.clock,

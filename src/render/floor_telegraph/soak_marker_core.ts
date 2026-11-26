@@ -17,9 +17,9 @@
 // Reduced motion holds every motion still (the shape still points in).
 //
 // Colour: the ELEMENT drives the palette (fire, earth, lightning, shadow, and
-// frost and water ready for later); the share-versus-avoid meaning lives in
-// the shape and the motion (the avoid tell, floor_tell.ts, is the outward
-// chevron disc with rings racing to its rim), never in the hue.
+// frost and water ready for later); the share meaning lives in the shape and
+// the motion (pulled in, never pushed out), never in the hue; a keep-out mark
+// keeps its own plain painted footprint.
 //
 // Clips: Birth (the vortex spins up and blooms out from the middle), Hold
 // (the loop), Decay (it is drawn back into the middle and fades).

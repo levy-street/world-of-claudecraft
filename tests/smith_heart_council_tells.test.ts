@@ -14,13 +14,7 @@ import {
   rockMarkRate,
 } from '../src/game/smith_heart_council_audio_core';
 import { FloorTellPool } from '../src/render/floor_telegraph/floor_tell';
-import {
-  countInside,
-  FLOOR_TELL,
-  floorTellLook,
-  soakPips,
-  tellBand,
-} from '../src/render/floor_telegraph/floor_tell_core';
+import { countInside, soakPips } from '../src/render/floor_telegraph/floor_tell_core';
 import { COUNCIL_AWAKEN_CLIP } from '../src/render/smith_heart_fx/council_entrance_core';
 import { COUNCIL_MARK_SPECS } from '../src/render/smith_heart_fx/council_fx_core';
 import {
@@ -48,42 +42,7 @@ import {
 } from '../src/sim/encounters/smith_heart/council_ids';
 import type { Entity } from '../src/sim/types';
 
-describe('the shared soak / avoid tell', () => {
-  it('a share tell runs inward, an avoid tell outward (the motion)', () => {
-    const r = 0.6;
-    const dp = 0.1;
-    // The same band value sits a band-step nearer the middle (share) or the
-    // rim (avoid) once the phase has moved on.
-    const step = dp / FLOOR_TELL.share.bands;
-    expect(tellBand('share', r - step, 0, dp)).toBeCloseTo(tellBand('share', r, 0, 0), 9);
-    expect(tellBand('avoid', r + step, 0, dp)).toBeCloseTo(tellBand('avoid', r, 0, 0), 9);
-  });
-
-  it('a chevron points in for a share and out for an avoid (the shape)', () => {
-    const u = 0.4;
-    const tipR = 0.5;
-    for (const kind of ['share', 'avoid'] as const) {
-      const off = u * FLOOR_TELL[kind].slope;
-      // The stroke through the tip (u = 0) at tipR runs out along the arm
-      // (|u| = 0.4) to tipR + off (share: the tip is the point nearest the
-      // middle) or in to tipR - off (avoid: the tip is nearest the rim).
-      const armR = kind === 'share' ? tipR + off : tipR - off;
-      expect(tellBand(kind, armR, u, 0.2)).toBeCloseTo(tellBand(kind, tipR, 0, 0.2), 9);
-    }
-    expect(FLOOR_TELL.share.dir).toBe(-1);
-    expect(FLOOR_TELL.avoid.dir).toBe(1);
-  });
-
-  it('reduced motion holds the pattern still; the mark burns brighter to the end', () => {
-    const a = floorTellLook('share', 3, 0, true, { phase: 0, rim: 0, alpha: 0 });
-    const b = floorTellLook('share', 9, 0, true, { phase: 0, rim: 0, alpha: 0 });
-    expect(a.phase).toBe(b.phase);
-    const early = floorTellLook('avoid', 1, 0, false, { phase: 0, rim: 0, alpha: 0 }).alpha;
-    const late = floorTellLook('avoid', 1, 1, false, { phase: 0, rim: 0, alpha: 0 }).alpha;
-    expect(late).toBeGreaterThan(early);
-    expect(early).toBeGreaterThan(0.4);
-  });
-
+describe('the shared soak tell', () => {
   it('counts the soakers inside and lights a pip for each, never past the need', () => {
     const pts = [
       { x: 0, z: 0 },
@@ -99,21 +58,21 @@ describe('the shared soak / avoid tell', () => {
     expect(soakPips(0, 4)).toEqual({ need: 0, lit: 0 });
   });
 
-  it('the pool draws whole with no tier knob: the count, the way it points', () => {
+  it('the pool draws the soak marker whole with no tier knob: the count', () => {
     const root = new THREE.Group();
     const geos: THREE.BufferGeometry[] = [];
     const mats: THREE.Material[] = [];
     const pool = new FloorTellPool(root, 2, geos, mats);
     expect(pool.size).toBe(2);
-    // Per slot: the avoid disc, and the share marker's disc and wisps.
-    expect(mats.length).toBe(6);
+    // Per slot: the marker's disc and its wisps, nothing else (the avoid
+    // disc of 2026-11-25 is gone).
+    expect(mats.length).toBe(4);
+    expect(mats.every((m) => m.name.startsWith('soakMarker'))).toBe(true);
     pool.paint(0, {
-      kind: 'share',
       x: 1,
       y: 0,
       z: 2,
       radius: 6,
-      color: 0xffc94a,
       fill: 0.5,
       clock: 1,
       reduced: false,
@@ -121,42 +80,25 @@ describe('the shared soak / avoid tell', () => {
       have: 2,
       rim: false,
     });
-    pool.paint(1, {
-      kind: 'avoid',
-      x: 0,
-      y: 0,
-      z: 0,
-      radius: 3,
-      color: 0xb67bff,
-      fill: 0.2,
-      clock: 1,
-      reduced: false,
-    });
     const a = pool.uniformsOf(0);
-    const b = pool.uniformsOf(1);
-    // The share is the shared soak marker (soak_marker.ts): its pips.
     expect(a?.uNeed.value).toBe(3);
     expect(a?.uLit.value).toBe(2);
     expect(a?.uRimOn.value).toBe(0);
-    expect(b?.uDir.value).toBe(1);
-    expect(b?.uNeed.value).toBe(0);
-    expect(b?.uRimOn.value).toBe(1);
-    expect(pool.shown(0) && pool.shown(1)).toBe(true);
-    // A share decays back into the middle before it hides.
+    expect(pool.shown(0)).toBe(true);
+    expect(pool.shown(1)).toBe(false);
+    // It decays back into the middle before it hides.
     pool.hide(0);
     expect(pool.shown(0)).toBe(true);
     pool.settle(5);
     expect(pool.shown(0)).toBe(false);
-    pool.hide(1);
-    expect(pool.shown(1)).toBe(false);
   });
 });
 
 describe('the council adopts the tell', () => {
-  it('Falling Rock shares; Wake the Stone and Resonance keep out; the Rush has its lane', () => {
+  it('only Falling Rock wears the soak marker; the keep-out marks keep their painted look', () => {
     expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.rockMark]?.tell).toBe('share');
-    expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.wakeMark]?.tell).toBe('avoid');
-    expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.resonance]?.tell).toBe('avoid');
+    expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.wakeMark]?.tell).toBeUndefined();
+    expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.resonance]?.tell).toBeUndefined();
     expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.rushMark]?.tell).toBeUndefined();
     // The rock and the Wake never wear one colour.
     expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.rockMark]?.color).not.toBe(
