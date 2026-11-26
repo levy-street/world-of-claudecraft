@@ -1,17 +1,14 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
+import { BURDEN_SOAK_STYLE } from '../src/render/balgath_ranged_fx';
+import { SOAK_MARKER, SOAK_PALETTES } from '../src/render/floor_telegraph/soak_marker_core';
+import { floorVfxLayerOf } from '../src/render/floor_vfx_layer';
 import {
   buildIgnivarSoakTelegraph,
-  IGNIVAR_SOAK_ARROWS_NAME,
-  IGNIVAR_SOAK_BEACON_CROWN_NAME,
-  IGNIVAR_SOAK_BEACON_NAME,
-  IGNIVAR_SOAK_FLAME_NAME,
-  IGNIVAR_SOAK_OCCUPANCY_NAME,
-  IGNIVAR_SOAK_READY_NAME,
-  IGNIVAR_SOAK_SWIRL_NAME,
-  IGNIVAR_SOAK_TIMER_NAME,
+  IGNIVAR_SOAK_DISC_NAME,
   IGNIVAR_SOAK_VISUAL_NAME,
+  IGNIVAR_SOAK_WISPS_NAME,
+  soakMarkerOf,
   syncIgnivarSoakTelegraph,
 } from '../src/render/ignivar_soak_telegraph';
 import {
@@ -19,134 +16,97 @@ import {
   VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
 } from '../src/sim/varkhul_shared_pyre';
 
-function expectGeometryInsideRadius(object: THREE.Object3D, radius: number): void {
-  object.traverse((child) => {
-    const geometry = (child as THREE.Mesh).geometry;
-    if (!geometry) return;
-    const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
-    for (let index = 0; index < positions.count; index++) {
-      expect(Math.hypot(positions.getX(index), positions.getZ(index))).toBeLessThanOrEqual(
-        radius + 1e-6,
-      );
-    }
-  });
+function discOf(soak: THREE.Object3D): THREE.Mesh {
+  return soak.getObjectByName(IGNIVAR_SOAK_DISC_NAME) as THREE.Mesh;
 }
 
-describe('Varkhul Shared Pyre soak telegraph', () => {
-  it('combines the WoW soak flame, inward arrows, swirl, and four occupancy runes', () => {
-    const soak = buildIgnivarSoakTelegraph();
+function uniformsOf(soak: THREE.Object3D): Record<string, THREE.IUniform> {
+  return (discOf(soak).material as THREE.ShaderMaterial).uniforms;
+}
 
+/** The disc's widest drawn point in the root's space (its geometry is the
+ *  unit circle, scaled to the sim's radius). */
+function drawnRadius(soak: THREE.Object3D): number {
+  soak.updateMatrixWorld(true);
+  const disc = discOf(soak);
+  const pos = disc.geometry.getAttribute('position') as THREE.BufferAttribute;
+  const v = new THREE.Vector3();
+  let most = 0;
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i).applyMatrix4(disc.matrixWorld);
+    most = Math.max(most, Math.hypot(v.x, v.z));
+  }
+  return most;
+}
+
+describe('the soak telegraph on a marked player (the shared soak marker)', () => {
+  it('builds the Shared Pyre as the fire marker: a floor disc and its wisps, yard-true', () => {
+    const soak = buildIgnivarSoakTelegraph();
     expect(soak.name).toBe(IGNIVAR_SOAK_VISUAL_NAME);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_SWIRL_NAME)).toBeInstanceOf(THREE.Mesh);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_ARROWS_NAME)).toBeInstanceOf(THREE.Mesh);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_OCCUPANCY_NAME)).toBeInstanceOf(THREE.Mesh);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_TIMER_NAME)).toBeInstanceOf(THREE.Mesh);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_FLAME_NAME)).toBeInstanceOf(THREE.InstancedMesh);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_BEACON_NAME)).toBeInstanceOf(THREE.Group);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_READY_NAME)).toBeInstanceOf(THREE.Mesh);
+    expect(soak.visible).toBe(false);
+    expect(discOf(soak)).toBeInstanceOf(THREE.Mesh);
+    expect(soak.getObjectByName(IGNIVAR_SOAK_WISPS_NAME)).toBeInstanceOf(THREE.Mesh);
     expect(soak.userData.requiredPlayers).toBe(VARKHUL_SHARED_PYRE_REQUIRED_NORMAL);
-    expectGeometryInsideRadius(soak, VARKHUL_SHARED_PYRE_RADIUS);
+    // The rim is the sim's own radius: never drawn past it, never short of it.
+    expect(drawnRadius(soak)).toBeCloseTo(VARKHUL_SHARED_PYRE_RADIUS, 4);
+    const fire = new THREE.Color(SOAK_PALETTES.fire.body);
+    expect((uniformsOf(soak).uBody.value as THREE.Color).equals(fire)).toBe(true);
+    expect(floorVfxLayerOf(discOf(soak).renderOrder)).toBe('encounter');
   });
 
-  it('fills four runes with occupancy and replaces the call-in flame when the soak is ready', () => {
+  it('dresses the Barrow Burden in shadow at its own radius', () => {
+    const soak = buildIgnivarSoakTelegraph(4, BURDEN_SOAK_STYLE);
+    expect(BURDEN_SOAK_STYLE.element).toBe('shadow');
+    expect(drawnRadius(soak)).toBeCloseTo(BURDEN_SOAK_STYLE.radius, 4);
+    const shadow = new THREE.Color(SOAK_PALETTES.shadow.body);
+    expect((uniformsOf(soak).uBody.value as THREE.Color).equals(shadow)).toBe(true);
+  });
+
+  it('lights a pip per player inside, never past the need, and runs the countdown arc', () => {
     const soak = buildIgnivarSoakTelegraph();
-    const occupancy = soak.getObjectByName(IGNIVAR_SOAK_OCCUPANCY_NAME) as THREE.Mesh;
-    const flame = soak.getObjectByName(IGNIVAR_SOAK_FLAME_NAME) as THREE.InstancedMesh;
-    const beacon = soak.getObjectByName(IGNIVAR_SOAK_BEACON_NAME) as THREE.Group;
-    const ready = soak.getObjectByName(IGNIVAR_SOAK_READY_NAME) as THREE.Mesh;
-    const timer = soak.getObjectByName(IGNIVAR_SOAK_TIMER_NAME) as THREE.Mesh;
-
-    syncIgnivarSoakTelegraph(soak, true, 1, 4, 0.25, 1, 0);
+    syncIgnivarSoakTelegraph(soak, true, 1, 4, 0.25, 1, 0.1);
+    const u = uniformsOf(soak);
     expect(soak.visible).toBe(true);
-    expect(soak.userData.playersInside).toBe(1);
     expect(soak.userData.ready).toBe(false);
-    expect(flame.visible).toBe(true);
-    expect(beacon.visible).toBe(true);
-    expect(ready.visible).toBe(false);
-    expect(timer.geometry.drawRange.count).toBe(48 * 6);
-    const colors = occupancy.geometry.getAttribute('color') as THREE.BufferAttribute;
-    const lit = new THREE.Color().fromBufferAttribute(colors, 0);
-    const unlit = new THREE.Color().fromBufferAttribute(colors, 4);
-    expect(lit.r).toBeGreaterThan(unlit.r);
-    expect(lit.g).toBeGreaterThan(unlit.g);
-
-    syncIgnivarSoakTelegraph(soak, true, 4, 4, 0.75, 1, 0);
+    expect(u.uNeed.value).toBe(4);
+    expect(u.uLit.value).toBe(1);
+    expect(u.uTimer.value).toBeCloseTo(0.75, 6);
+    expect(u.uFlare.value).toBe(0);
+    syncIgnivarSoakTelegraph(soak, true, 6, 4, 0.75, 1, 0.1);
     expect(soak.userData.ready).toBe(true);
-    expect(flame.visible).toBe(false);
-    expect(beacon.visible).toBe(false);
-    expect(ready.visible).toBe(true);
-    expect(timer.geometry.drawRange.count).toBe(16 * 6);
-    for (let slot = 0; slot < 4; slot++) {
-      const color = new THREE.Color().fromBufferAttribute(colors, slot * 4);
-      expect(color.r).toBeGreaterThan(0.8);
-      expect(color.g).toBeGreaterThan(0.5);
-    }
+    expect(u.uLit.value).toBe(4);
+    expect(u.uTimer.value).toBeCloseTo(0.25, 6);
+    expect(u.uFlare.value).toBe(1);
+  });
 
-    syncIgnivarSoakTelegraph(soak, false, 0, 4, 0, 1, 0);
+  it('blooms in, then decays back into the middle once the mark is gone', () => {
+    const soak = buildIgnivarSoakTelegraph();
+    const u = uniformsOf(soak);
+    syncIgnivarSoakTelegraph(soak, true, 1, 4, 0.1, 1, 0.05);
+    expect(u.uBloom.value as number).toBeLessThan(1);
+    syncIgnivarSoakTelegraph(soak, true, 1, 4, 0.2, 1, SOAK_MARKER.birth);
+    expect(u.uBloom.value).toBeCloseTo(1, 6);
+    // Released: still drawn (shrinking, fading), then gone.
+    syncIgnivarSoakTelegraph(soak, false, 0, 4, 0, 1, SOAK_MARKER.decay * 0.5);
+    expect(soak.visible).toBe(true);
+    expect(soakMarkerOf(soak)?.decaying).toBe(true);
+    expect(u.uBloom.value).toBeLessThan(1);
+    syncIgnivarSoakTelegraph(soak, false, 0, 4, 0, 1, SOAK_MARKER.decay);
     expect(soak.visible).toBe(false);
   });
 
-  it('marks the assigned player with a tall HDR-safe beacon and overhead crown', () => {
+  it('holds every motion still under reduced motion, the pips and countdown kept', () => {
     const soak = buildIgnivarSoakTelegraph();
-    const beacon = soak.getObjectByName(IGNIVAR_SOAK_BEACON_NAME) as THREE.Group;
-    const outer = beacon.userData.outer as THREE.Mesh;
-    const core = beacon.userData.core as THREE.Mesh;
-    const crown = soak.getObjectByName(IGNIVAR_SOAK_BEACON_CROWN_NAME) as THREE.Mesh;
-
-    expect((outer.geometry as THREE.ConeGeometry).parameters.height).toBe(7.2);
-    expect((core.geometry as THREE.ConeGeometry).parameters.height).toBe(6.2);
-    expect((crown.geometry as THREE.TorusGeometry).parameters.radius).toBe(1.08);
-    expect(outer.position.y).toBeGreaterThan(3);
-    expect(core.position.y).toBeGreaterThan(3);
-    expect(crown.position.y).toBeGreaterThan(6);
-    expect(beacon.renderOrder).toBe(0);
-    expect(outer.renderOrder).toBe(floorVfxRenderOrder('encounter', 8));
-    expect(core.renderOrder).toBe(floorVfxRenderOrder('encounter', 8));
-    expect(crown.renderOrder).toBe(floorVfxRenderOrder('encounter', 9));
-    expect((outer.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.35);
-    expect((core.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.75);
-    expect((crown.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.75);
-    expect((outer.material as THREE.MeshBasicMaterial).toneMapped).toBe(false);
-    expect((core.material as THREE.MeshBasicMaterial).toneMapped).toBe(false);
-    expect((crown.material as THREE.MeshBasicMaterial).toneMapped).toBe(false);
-
-    syncIgnivarSoakTelegraph(soak, true, 1, 4, 0.25, 1, 0.1);
-    expect(beacon.visible).toBe(true);
-    expect((outer.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.35);
-    expect((core.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.75);
-  });
-
-  it('keeps repeated state idempotent and advances rotation only with time', () => {
-    const soak = buildIgnivarSoakTelegraph();
-    const swirl = soak.getObjectByName(IGNIVAR_SOAK_SWIRL_NAME) as THREE.Mesh;
-    const arrows = soak.getObjectByName(IGNIVAR_SOAK_ARROWS_NAME) as THREE.Mesh;
-    syncIgnivarSoakTelegraph(soak, true, 2, 4, 0.4, 1, 0.1);
-    const first = {
-      elapsed: soak.userData.elapsed,
-      rotation: swirl.rotation.y,
-      arrowOpacity: (arrows.material as THREE.Material).opacity,
-    };
-    syncIgnivarSoakTelegraph(soak, true, 2, 4, 0.4, 1, 0);
-    expect({
-      elapsed: soak.userData.elapsed,
-      rotation: swirl.rotation.y,
-      arrowOpacity: (arrows.material as THREE.Material).opacity,
-    }).toEqual(first);
-    syncIgnivarSoakTelegraph(soak, true, 2, 4, 0.4, 1, 0.1);
-    expect(soak.userData.elapsed).toBeCloseTo(0.2);
-    expect(swirl.rotation.y).toBeLessThan(first.rotation);
-  });
-
-  it('freezes decoration under reduced motion without hiding occupancy or countdown', () => {
-    const soak = buildIgnivarSoakTelegraph();
-    const swirl = soak.getObjectByName(IGNIVAR_SOAK_SWIRL_NAME) as THREE.Mesh;
-    const timer = soak.getObjectByName(IGNIVAR_SOAK_TIMER_NAME) as THREE.Mesh;
-
     syncIgnivarSoakTelegraph(soak, true, 2, 4, 0.5, 1, 0.5, true);
+    const u = uniformsOf(soak);
+    const first = { spin: u.uSpin.value, time: u.uTime.value, bloom: u.uBloom.value };
     syncIgnivarSoakTelegraph(soak, true, 2, 4, 0.5, 1, 0.5, true);
-
-    expect(soak.visible).toBe(true);
-    expect(Math.abs(swirl.rotation.y)).toBe(0);
-    expect(timer.geometry.drawRange.count).toBe(32 * 6);
+    expect({ spin: u.uSpin.value, time: u.uTime.value, bloom: u.uBloom.value }).toEqual(first);
+    expect(first.bloom).toBe(1);
+    expect(u.uLit.value).toBe(2);
+    expect(u.uTimer.value).toBeCloseTo(0.5, 6);
+    // No decay under reduced motion: gone at once.
+    syncIgnivarSoakTelegraph(soak, false, 0, 4, 0, 1, 0.01, true);
+    expect(soak.visible).toBe(false);
   });
 });

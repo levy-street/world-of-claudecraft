@@ -332,6 +332,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The shared dungeon floor telegraph (the crypt's and the Bastion's cones,
   // rings, lanes and kick glyphs, and their edge curtains).
   { file: 'src/render/floor_telegraph/telegraph_kit.ts', layer: 'encounter', strict: true },
+  // The shared soak marker (the vortex disc and its wisps) every share soak wears.
+  { file: 'src/render/floor_telegraph/soak_marker.ts', layer: 'encounter', strict: true },
   // The Hollow Crypt trash mechanics pass's hero effects: the bone pile's glow,
   // the rupture crater and pool, the crush crack, the web net and the burning
   // embers (floor bodies under the telegraph rungs), their shockwaves, and the

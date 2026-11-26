@@ -24,6 +24,7 @@ import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import { inBreathArena, lipDistance } from '../../sim/encounters/smith_heart/breath_geometry';
 import {
   BREATH_CUES,
+  BREATH_DIFFICULTY,
   BREATH_OBJECTS,
   BREATH_TUNING,
   type BreathCalmState,
@@ -506,6 +507,14 @@ export function chargedFade(age: number, life: number): number {
 export function cradleLook(age: number, hold: number): { fill: number; charge: number } {
   const f = hold > 0 ? clamp01(age / hold) : 1;
   return { fill: f, charge: 0.3 + 0.7 * smooth(f) };
+}
+
+/** How many players a Thunder's Cradle circle wants under it, read off the
+ *  claim's difficulty (the run view) or, failing that, off the circles: only
+ *  Heroic and Mythic lift more than one (BREATH_DIFFICULTY cradleCount). */
+export function cradleNeedOf(difficulty: string | null | undefined, circles: number): number {
+  const tier = difficulty === 'heroic' || circles > 1 ? 'heroic' : 'normal';
+  return BREATH_DIFFICULTY[tier].cradleSoakers;
 }
 
 /** A strike's bolt from the cloud: a jagged path from `height` down to the

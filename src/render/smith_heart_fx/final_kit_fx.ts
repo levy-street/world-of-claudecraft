@@ -62,6 +62,7 @@ import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
 import { TelegraphKit, type TelegraphStyle, telegraphFillOf } from '../floor_telegraph';
+import { FloorTellPool } from '../floor_telegraph/floor_tell';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX, surfaceMat } from '../gfx';
@@ -172,6 +173,10 @@ interface OrbBody {
   crackle: { value: number };
 }
 
+/** The Anvil's soak pips sit inside its countdown runes' band (0.72 to the
+ *  rim, final_anvil_glsl.ts). */
+const ANVIL_TELL_PIPS_AT = 0.42;
+
 export class FinalKitFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -200,6 +205,11 @@ export class FinalKitFx {
   private readonly arcs: Arc[] = [];
   /** Weight of the Anvil's whole look past its mark (final_anvil_fx.ts). */
   private readonly anvilFx: FinalAnvilFx;
+  /** The Anvil's mark wears the shared soak marker (floor_telegraph/
+   *  soak_marker.ts, earth): its pips count the players under it against
+   *  the sim's minimum; its runes keep the rim. */
+  private readonly anvilTell: FloorTellPool;
+  private anvilTellSeen = false;
   /** The players' places this frame for the Anvil's count (pooled). */
   private readonly underPool: { x: number; z: number; dead: boolean }[] = [];
   private readonly underPts: { x: number; z: number; dead: boolean }[] = [];
@@ -491,6 +501,7 @@ export class FinalKitFx {
       this.uTime,
     );
     this.root.add(this.anvilFx.group);
+    this.anvilTell = new FloorTellPool(this.root, 1, this.geometries, this.materials);
     const veins = {
       uHeat: { value: new THREE.Color(C.heat) },
       uQuench: { value: new THREE.Color(C.quench) },
@@ -843,6 +854,7 @@ export class FinalKitFx {
     this.scan(world, dt);
     for (const el of ELEMENTS) for (const s of this.pools[el]) s.seen = false;
     this.anvilFx.begin(this.clock, dt);
+    this.anvilTellSeen = false;
     this.stars.begin(this.clock);
     this.elements.begin(this.clock, dt);
     this.poolFlames.begin();
@@ -850,6 +862,8 @@ export class FinalKitFx {
     this.paintElements(world);
     this.poolFlames.end();
     this.anvilFx.end();
+    if (!this.anvilTellSeen) this.anvilTell.hide(0);
+    this.anvilTell.settle(this.clock);
     this.paintMarks(world);
     this.stars.end();
     // The marked player's own arrow (final_arrow_core.ts).
@@ -1225,7 +1239,26 @@ export class FinalKitFx {
             slot.dead = p.dead;
             pts.push(slot);
           }
-          this.anvilFx.hang(id, ax, ay, az, fill, anvilUnder(pts, ax, az, r), r);
+          const under = anvilUnder(pts, ax, az, r);
+          this.anvilFx.hang(id, ax, ay, az, fill, under, r);
+          this.anvilTell.paint(0, {
+            kind: 'share',
+            x: ax,
+            y: ay,
+            z: az,
+            radius: r,
+            color: C.soak,
+            element: 'earth',
+            fill,
+            clock: this.clock,
+            reduced: this.reducedMotion(),
+            need: T.anvilMinSoakers,
+            have: under,
+            rim: false,
+            pipAt: ANVIL_TELL_PIPS_AT,
+            detail: this.density,
+          });
+          this.anvilTellSeen = true;
           break;
         }
         // ---- the woken stars ----
@@ -1544,6 +1577,7 @@ export class FinalKitFx {
     for (const m of [...this.ice, ...this.shells]) m.visible = false;
     this.shock.visible = false;
     this.anvilFx.hide();
+    this.anvilTell.hideAll();
     this.unboundRing.visible = false;
     this.arcsMesh.visible = false;
   }

@@ -68,6 +68,7 @@ import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { FloorTellPool } from '../floor_telegraph/floor_tell';
+import { countInside } from '../floor_telegraph/floor_tell_core';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -90,6 +91,7 @@ import {
   chargedFade,
   corniceOutline,
   cradleLook,
+  cradleNeedOf,
   easeDir,
   FORK_BEAM_SECONDS,
   FORK_REACH,
@@ -564,6 +566,13 @@ export class BreathFightFx {
   private readonly strikeFans: FanSlot[] = [];
   /** The shared avoid tell over each strike slot (same index). */
   private readonly strikeTells: FloorTellPool;
+  /** The Thunder's Cradle's gather circles wear the shared soak marker
+   *  (floor_telegraph/soak_marker.ts, lightning): its pips count the
+   *  players under each against the tier's want. */
+  private readonly cradleTells: FloorTellPool;
+  /** The players' drawn spots this frame for the cradles' count (pooled). */
+  private readonly cradleAt: { x: number; z: number }[] = [];
+  private cradleAtCount = 0;
   private readonly chargedFans: FanSlot[] = [];
   private readonly cradleFans: FanSlot[] = [];
   private readonly barFans: FanSlot[] = [];
@@ -669,7 +678,15 @@ export class BreathFightFx {
     );
     this.glowTex = hasDom ? radialGlowTexture() : null;
     this.kit = new TelegraphKit(this.root, this.detail);
-    this.strikeTells = new FloorTellPool(this.root, P.strikes, this.geometries, this.materials);
+    this.strikeTells = new FloorTellPool(
+      this.root,
+      P.strikes,
+      this.geometries,
+      this.materials,
+      26,
+      false,
+    );
+    this.cradleTells = new FloorTellPool(this.root, P.cradles, this.geometries, this.materials);
     this.paints = new BreathTelegraphs(BREATH_TELEGRAPH_GLOW_STEP, this.materials);
     this.auraArrows = new CouncilRushArrow(
       this.root,
@@ -1420,6 +1437,21 @@ export class BreathFightFx {
     this.assign(world);
   }
 
+  /** Every living player's drawn spot (the cradles' count), pooled. */
+  private refreshCradleAt(world: IWorld): void {
+    let n = 0;
+    for (const e of world.entities.values()) {
+      if (e.kind !== 'player' || e.dead) continue;
+      const at = fxAnchor(e);
+      const slot = this.cradleAt[n] ?? { x: 0, z: 0 };
+      this.cradleAt[n] = slot;
+      slot.x = at.x;
+      slot.z = at.z;
+      n++;
+    }
+    this.cradleAtCount = n;
+  }
+
   /** The roster walk: every entity the fight could draw (the claim's
    *  objects, its guardian, Thessaly, and every player, who may walk in). */
   private discover(world: IWorld, origin: { x: number; z: number }): void {
@@ -1476,7 +1508,8 @@ export class BreathFightFx {
         slot.id = id;
         slot.born = this.clock;
         slot.template = e.templateId;
-        slot.fan.group.visible = true;
+        // The cradle's circle is the shared soak marker alone (cradleTells).
+        slot.fan.group.visible = kind !== 'cradle';
       } else if (slot.template !== e.templateId) {
         // A new state (the circle landing, then holding): its clock restarts.
         slot.template = e.templateId;
@@ -1509,6 +1542,7 @@ export class BreathFightFx {
         s.fan.group.visible = false;
       }
     for (let i = 0; i < this.strikeFans.length; i++) this.strikeTells.hide(i);
+    this.cradleTells.hideAll();
     for (const p of [this.anchorMarks, this.pinnedMarks, this.drawnMarks]) {
       p.begin();
       p.end();
@@ -1980,13 +2014,42 @@ export class BreathFightFx {
         );
       }
     }
-    for (const s of this.cradleFans) {
+    let circles = 0;
+    for (const s of this.cradleFans) if (s.id >= 0 && world.entities.get(s.id)) circles++;
+    if (circles > 0) this.refreshCradleAt(world);
+    const need = cradleNeedOf(world.dungeonRun?.difficulty, circles);
+    for (let i = 0; i < this.cradleFans.length; i++) {
+      const s = this.cradleFans[i];
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
-      if (!e) continue;
+      if (!e) {
+        this.cradleTells.hide(i);
+        continue;
+      }
       const hold = timedOf(BREATH_OBJECTS.cradlePrefix, e.templateId) ?? T.cradleHold;
       const look = cradleLook(this.clock - s.born, hold);
-      this.drape(s, e, e.scale > 0 ? e.scale : T.cradleR, look.fill);
+      const radius = e.scale > 0 ? e.scale : T.cradleR;
+      // The shared soak marker IS the gather circle (every tier; only the
+      // wisps thin with the density): its pips the players under it, its
+      // countdown arc the channel's hold (the kit's fill before it).
+      const at = fxAnchor(e);
+      this.cradleTells.paint(i, {
+        kind: 'share',
+        x: at.x,
+        y: this.groundY(at.x, at.z),
+        z: at.z,
+        radius,
+        color: C.soak,
+        element: 'lightning',
+        fill: look.fill,
+        clock: this.clock,
+        reduced: this.reducedMotion(),
+        need,
+        have: countInside(at.x, at.z, radius, this.cradleAt, this.cradleAtCount),
+        detail: this.density,
+        timer: look.fill,
+      });
     }
+    this.cradleTells.settle(this.clock);
     // The lifted player's crown of storm.
     const lifted = this.cradledIds.length > 0 ? world.entities.get(this.cradledIds[0]) : undefined;
     this.crown.visible = lifted !== undefined;

@@ -105,7 +105,8 @@ describe('the shared soak / avoid tell', () => {
     const mats: THREE.Material[] = [];
     const pool = new FloorTellPool(root, 2, geos, mats);
     expect(pool.size).toBe(2);
-    expect(mats.length).toBe(2);
+    // Per slot: the avoid disc, and the share marker's disc and wisps.
+    expect(mats.length).toBe(6);
     pool.paint(0, {
       kind: 'share',
       x: 1,
@@ -133,7 +134,7 @@ describe('the shared soak / avoid tell', () => {
     });
     const a = pool.uniformsOf(0);
     const b = pool.uniformsOf(1);
-    expect(a?.uDir.value).toBe(-1);
+    // The share is the shared soak marker (soak_marker.ts): its pips.
     expect(a?.uNeed.value).toBe(3);
     expect(a?.uLit.value).toBe(2);
     expect(a?.uRimOn.value).toBe(0);
@@ -141,8 +142,13 @@ describe('the shared soak / avoid tell', () => {
     expect(b?.uNeed.value).toBe(0);
     expect(b?.uRimOn.value).toBe(1);
     expect(pool.shown(0) && pool.shown(1)).toBe(true);
+    // A share decays back into the middle before it hides.
     pool.hide(0);
+    expect(pool.shown(0)).toBe(true);
+    pool.settle(5);
     expect(pool.shown(0)).toBe(false);
+    pool.hide(1);
+    expect(pool.shown(1)).toBe(false);
   });
 });
 

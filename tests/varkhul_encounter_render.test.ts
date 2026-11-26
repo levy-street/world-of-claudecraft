@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { IGNIVAR_SOAK_OCCUPANCY_NAME } from '../src/render/ignivar_soak_telegraph';
+import { IGNIVAR_SOAK_DISC_NAME } from '../src/render/ignivar_soak_telegraph';
 import { syncRaidEncounterVisuals } from '../src/render/raid_encounter_visuals';
 import {
   buildVarkhulCinderOrbsTelegraph,
@@ -136,10 +136,17 @@ describe('Varkhul encounter rendering', () => {
       requiredPlayers: 4,
       ready: true,
     });
-    expect(visual.getObjectByName(IGNIVAR_SOAK_OCCUPANCY_NAME)).toBeDefined();
+    // The shared soak marker's disc carries the occupancy pips.
+    const disc = visual.getObjectByName(IGNIVAR_SOAK_DISC_NAME) as THREE.Mesh;
+    const u = (disc.material as THREE.ShaderMaterial).uniforms;
+    expect(u.uNeed.value).toBe(4);
+    expect(u.uLit.value).toBe(4);
     expect(varkhulEncounterBypassesCharacterCulling(marked)).toBe(true);
 
+    // The mark gone: the marker is drawn back into the middle, then hides.
     syncVarkhulEncounterVisuals(group, { ...marked, auras: [] }, 0.1, false, entities);
+    expect(visual.visible).toBe(true);
+    syncVarkhulEncounterVisuals(group, { ...marked, auras: [] }, 0.5, false, entities);
     expect(visual.visible).toBe(false);
   });
 
@@ -259,8 +266,8 @@ describe('Varkhul encounter rendering', () => {
     ]);
     group.add(buildVarkhulCinderOrbsTelegraph(), buildVarkhulMakersBrandTelegraph());
     syncVarkhulEncounterVisuals(group, marked);
-    const flame = group.getObjectByName('ignivarSoakCallInFlame') as THREE.InstancedMesh;
-    const dispose = vi.spyOn(flame, 'dispose');
+    const disc = group.getObjectByName(IGNIVAR_SOAK_DISC_NAME) as THREE.Mesh;
+    const dispose = vi.spyOn(disc.material as THREE.Material, 'dispose');
     disposeVarkhulEncounterVisuals(group);
     expect(group.getObjectByName(VARKHUL_CINDER_ORBS_VISUAL_NAME)).toBeUndefined();
     expect(group.getObjectByName(VARKHUL_BRAND_VISUAL_NAME)).toBeUndefined();

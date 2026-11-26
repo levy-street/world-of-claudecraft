@@ -436,7 +436,14 @@ export class QuenchFightFx {
       this.particles,
       (x, z) => this.groundY(x, z),
     );
-    this.crackTells = new FloorTellPool(this.root, P.cracks, this.geometries, this.materials);
+    this.crackTells = new FloorTellPool(
+      this.root,
+      P.cracks,
+      this.geometries,
+      this.materials,
+      26,
+      false,
+    );
     for (let i = 0; i < P.lanes; i++) {
       const lane = this.kit.lane(QUENCH_FLOOR.telegraphChar.step);
       lane.group.visible = false;

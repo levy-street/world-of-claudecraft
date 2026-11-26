@@ -371,7 +371,7 @@ try {
         frontalAimDot,
         soakPlayersInside: soak?.userData.playersInside ?? 0,
         soakReady: soak?.userData.ready ?? false,
-        soakBeaconVisible: soak?.getObjectByName('ignivarSoakCallInBeacon')?.visible ?? false,
+        soakWispsVisible: soak?.getObjectByName('ignivarSoakWisps')?.visible ?? false,
         meteorTelegraphVisible: meteorTelegraph?.visible ?? false,
         meteorTelegraphCount,
         meteorBodyVisible: meteor?.root?.getObjectByName('mage-meteor-body')?.visible ?? false,
@@ -534,7 +534,7 @@ try {
   if (
     expectRaidTuningVfx &&
     (!stageStates['well-active'].activeWellBeaconVisible ||
-      !stageStates['soak-call'].soakBeaconVisible ||
+      !stageStates['soak-call'].soakWispsVisible ||
       stageStates['soak-call'].soakReady)
   ) {
     throw new Error(`raid tuning VFX contract failed: ${JSON.stringify(stageStates)}`);

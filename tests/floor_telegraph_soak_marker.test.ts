@@ -1,0 +1,245 @@
+// The shared soak marker (src/render/floor_telegraph/soak_marker*.ts): one
+// raid-language look for every "stack on the marked player and share it"
+// circle, its palette driven by the element, its share meaning carried by the
+// shape and the motion (rings converging, chevrons in), never by the hue.
+
+import * as THREE from 'three';
+import { describe, expect, it } from 'vitest';
+import { FloorTellPool } from '../src/render/floor_telegraph/floor_tell';
+import { buildSoakMarkerGeometry, SoakMarker } from '../src/render/floor_telegraph/soak_marker';
+import {
+  newSoakMarkerLook,
+  SOAK_CHARACTER,
+  SOAK_ELEMENTS,
+  SOAK_MARKER,
+  SOAK_PALETTES,
+  SOAK_STILL_TIME,
+  soakMarkerLook,
+  soakMarkerStage,
+  soakRipple,
+  soakTimerLeft,
+  soakWispCount,
+  soakWispHeight,
+} from '../src/render/floor_telegraph/soak_marker_core';
+import { cradleNeedOf } from '../src/render/smith_heart_fx/breath_fight_fx_core';
+import { BREATH_DIFFICULTY } from '../src/sim/encounters/smith_heart/breath_ids';
+
+const lum = (hex: number) => {
+  const c = new THREE.Color(hex);
+  return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+};
+
+describe('the soak marker palette (the element drives it)', () => {
+  it('every element runs dark to hot, and no two elements share a body colour', () => {
+    expect(SOAK_ELEMENTS).toEqual(
+      expect.arrayContaining(['fire', 'earth', 'lightning', 'shadow', 'frost', 'water']),
+    );
+    const bodies = new Set<number>();
+    for (const el of SOAK_ELEMENTS) {
+      const p = SOAK_PALETTES[el];
+      expect(lum(p.deep)).toBeLessThan(lum(p.body));
+      expect(lum(p.body)).toBeLessThan(lum(p.bright));
+      expect(lum(p.bright)).toBeLessThan(lum(p.hot));
+      bodies.add(p.body);
+    }
+    expect(bodies.size).toBe(SOAK_ELEMENTS.length);
+  });
+
+  it('fire is red-orange, earth sandy, lightning blue, shadow violet', () => {
+    const c = (hex: number) => new THREE.Color(hex);
+    const fire = c(SOAK_PALETTES.fire.body);
+    expect(fire.r).toBeGreaterThan(fire.g * 2);
+    expect(fire.r).toBeGreaterThan(fire.b * 2);
+    const earth = c(SOAK_PALETTES.earth.bright);
+    expect(earth.r).toBeGreaterThan(earth.g);
+    expect(earth.g).toBeGreaterThan(earth.b);
+    const bolt = c(SOAK_PALETTES.lightning.body);
+    expect(bolt.b).toBeGreaterThan(bolt.r * 2);
+    const shadow = c(SOAK_PALETTES.shadow.bright);
+    expect(shadow.b).toBeGreaterThan(shadow.g);
+    expect(shadow.r).toBeGreaterThan(shadow.g);
+  });
+
+  it('each element has its own character, not a recolour only', () => {
+    expect(SOAK_CHARACTER.fire.tongues).toBeGreaterThan(0.5);
+    expect(SOAK_CHARACTER.earth.grain).toBeGreaterThan(0.5);
+    expect(SOAK_CHARACTER.lightning.crackle).toBeGreaterThan(0.5);
+    expect(SOAK_CHARACTER.shadow.smoke).toBeGreaterThan(0.5);
+    for (const el of SOAK_ELEMENTS) expect(SOAK_CHARACTER[el].speed).toBeGreaterThan(0);
+  });
+});
+
+describe('the soak marker clips (birth, hold, decay)', () => {
+  it('a mark is born, holds, and once released decays to done', () => {
+    expect(soakMarkerStage(0, null)).toBe('birth');
+    expect(soakMarkerStage(SOAK_MARKER.birth - 0.01, null)).toBe('birth');
+    expect(soakMarkerStage(SOAK_MARKER.birth, null)).toBe('hold');
+    expect(soakMarkerStage(99, null)).toBe('hold');
+    expect(soakMarkerStage(99, 0)).toBe('decay');
+    expect(soakMarkerStage(99, SOAK_MARKER.decay)).toBe('done');
+  });
+
+  it('the birth blooms out from the middle and the decay draws it back in', () => {
+    const look = newSoakMarkerLook();
+    soakMarkerLook(10, 0, null, 0, false, false, look);
+    expect(look.bloom).toBeCloseTo(SOAK_MARKER.bloomFrom, 6);
+    expect(look.wisp).toBe(0);
+    const born = soakMarkerLook(10, SOAK_MARKER.birth, null, 0, false, false, newSoakMarkerLook());
+    expect(born.bloom).toBeCloseTo(1, 6);
+    expect(born.alpha).toBeGreaterThan(look.alpha);
+    const dying = soakMarkerLook(
+      10,
+      5,
+      SOAK_MARKER.decay * 0.5,
+      0,
+      false,
+      false,
+      newSoakMarkerLook(),
+    );
+    expect(dying.bloom).toBeLessThan(1);
+    expect(dying.alpha).toBeLessThan(born.alpha);
+    const gone = soakMarkerLook(10, 5, SOAK_MARKER.decay, 0, false, false, newSoakMarkerLook());
+    expect(gone.alpha).toBeCloseTo(0, 6);
+    expect(gone.bloom).toBeCloseTo(SOAK_MARKER.bloomTo, 6);
+  });
+
+  it('the spin is continuous through the birth (no jump) and burns brighter to the end', () => {
+    const a = soakMarkerLook(5, 0.3, null, 0.2, false, false, newSoakMarkerLook());
+    const b = soakMarkerLook(5.001, 0.301, null, 0.2, false, false, newSoakMarkerLook());
+    expect(Math.abs(b.spin - a.spin)).toBeLessThan(0.05);
+    const early = soakMarkerLook(5, 3, null, 0, false, false, newSoakMarkerLook());
+    const late = soakMarkerLook(5, 3, null, 1, false, false, newSoakMarkerLook());
+    expect(late.alpha).toBeGreaterThan(early.alpha);
+  });
+
+  it('reduced motion holds everything still and skips the bloom', () => {
+    const a = soakMarkerLook(3, 0, null, 0.5, false, true, newSoakMarkerLook());
+    const b = soakMarkerLook(9, 0.2, null, 0.5, false, true, newSoakMarkerLook());
+    expect(a.spin).toBe(b.spin);
+    expect(a.time).toBe(SOAK_STILL_TIME);
+    expect(b.time).toBe(SOAK_STILL_TIME);
+    expect(a.bloom).toBe(1);
+    expect(a.wisp).toBe(1);
+  });
+
+  it('the ready flare lights once every soaker stands inside', () => {
+    expect(soakMarkerLook(1, 1, null, 0, true, false, newSoakMarkerLook()).flare).toBe(1);
+    expect(soakMarkerLook(1, 1, null, 0, false, false, newSoakMarkerLook()).flare).toBe(0);
+  });
+});
+
+describe('the soak marker shape (gather in, yard-true, tier-fair)', () => {
+  it('the rings converge: born at the rim, they close on the middle, never past the rim', () => {
+    const step = 0.05;
+    for (let k = 0; k < SOAK_MARKER.ripples; k++) {
+      for (let t = 0.02; t < 3; t += 0.37) {
+        const now = soakRipple(t, k);
+        const next = soakRipple(t + step, k);
+        expect(now.r).toBeLessThanOrEqual(1);
+        expect(now.r).toBeGreaterThanOrEqual(SOAK_MARKER.rippleTo - 1e-9);
+        // Unless it wrapped back to the rim, it moved inward.
+        if (next.r < now.r + 0.5) expect(next.r).toBeLessThan(now.r);
+      }
+    }
+    // A ring is strongest soon after it leaves the rim and fades as it closes.
+    const fresh = soakRipple(SOAK_MARKER.rippleEvery * SOAK_MARKER.ripples * 0.15, 0);
+    const old = soakRipple(SOAK_MARKER.rippleEvery * SOAK_MARKER.ripples * 0.9, 0);
+    expect(fresh.a).toBeGreaterThan(old.a);
+  });
+
+  it('only the wisps thin on the low tier, never to none', () => {
+    expect(soakWispCount(1)).toBe(SOAK_MARKER.wisps);
+    expect(soakWispCount(0)).toBe(SOAK_MARKER.wispsLow);
+    expect(soakWispCount(0)).toBeGreaterThan(0);
+    expect(soakWispHeight(1)).toBe(SOAK_MARKER.wispMin);
+    expect(soakWispHeight(100)).toBe(SOAK_MARKER.wispMax);
+    expect(soakTimerLeft(null)).toBe(-1);
+    expect(soakTimerLeft(0.25)).toBeCloseTo(0.75, 9);
+  });
+
+  it('the marker draws its disc at the sim radius, its pips and its arc', () => {
+    const mats: THREE.Material[] = [];
+    const m = new SoakMarker(buildSoakMarkerGeometry(), mats, 26);
+    expect(mats.length).toBe(2);
+    m.paint({
+      x: 3,
+      y: 1,
+      z: -2,
+      radius: 6,
+      element: 'lightning',
+      fill: 0.3,
+      clock: 4,
+      reduced: false,
+      need: 3,
+      have: 5,
+      timer: 0.3,
+      detail: 0,
+    });
+    expect(m.shown).toBe(true);
+    expect(m.disc.scale.x).toBe(6);
+    expect(m.group.position.toArray()).toEqual([3, 1, -2]);
+    const u = m.discMat.uniforms;
+    expect(u.uNeed.value).toBe(3);
+    expect(u.uLit.value).toBe(3);
+    expect(u.uTimer.value).toBeCloseTo(0.7, 9);
+    expect(
+      (u.uBody.value as THREE.Color).equals(new THREE.Color(SOAK_PALETTES.lightning.body)),
+    ).toBe(true);
+    // The low tier keeps a few wisps (the drawRange of the ribbon mesh).
+    const perWisp = m.wisps.geometry.index!.count / SOAK_MARKER.wisps;
+    expect(m.wisps.geometry.drawRange.count).toBe(SOAK_MARKER.wispsLow * perWisp);
+    // Released: it decays, then hides on its own clock.
+    m.release();
+    expect(m.decaying).toBe(true);
+    m.settle(4 + SOAK_MARKER.decay * 0.5);
+    expect(m.shown).toBe(true);
+    m.settle(4 + SOAK_MARKER.decay + 0.01);
+    expect(m.shown).toBe(false);
+  });
+
+  it('the tell pool lays a share as the marker and an avoid as its chevron disc', () => {
+    const root = new THREE.Group();
+    const pool = new FloorTellPool(root, 1, [], []);
+    pool.paint(0, {
+      kind: 'share',
+      x: 0,
+      y: 0,
+      z: 0,
+      radius: 5,
+      color: 0,
+      element: 'fire',
+      fill: 0,
+      clock: 1,
+      reduced: false,
+      need: 2,
+      have: 1,
+    });
+    expect(pool.uniformsOf(0)?.uNeed.value).toBe(2);
+    expect(pool.uniformsOf(0)?.uDir).toBeUndefined();
+    pool.paint(0, {
+      kind: 'avoid',
+      x: 0,
+      y: 0,
+      z: 0,
+      radius: 5,
+      color: 0xff0000,
+      fill: 0,
+      clock: 1.1,
+      reduced: false,
+    });
+    expect(pool.uniformsOf(0)?.uDir.value).toBe(1);
+    // An avoid-only pool builds no marker.
+    const mats: THREE.Material[] = [];
+    new FloorTellPool(new THREE.Group(), 2, [], mats, 26, false);
+    expect(mats.length).toBe(2);
+  });
+});
+
+describe("the Thunder's Cradle's want", () => {
+  it('reads the claim difficulty, or the circles when the run view is missing', () => {
+    expect(cradleNeedOf('normal', 1)).toBe(BREATH_DIFFICULTY.normal.cradleSoakers);
+    expect(cradleNeedOf('heroic', 1)).toBe(BREATH_DIFFICULTY.heroic.cradleSoakers);
+    expect(cradleNeedOf(null, 3)).toBe(BREATH_DIFFICULTY.heroic.cradleSoakers);
+    expect(cradleNeedOf(undefined, 1)).toBe(BREATH_DIFFICULTY.normal.cradleSoakers);
+  });
+});

@@ -929,6 +929,7 @@ export class CouncilFx {
     this.soulFx.update(dt, this.clock);
     this.pillarsFx.update(dt);
     this.updateMarks(world);
+    this.tells.settle(this.clock);
     this.updateSpots();
     this.updateRocks(world);
     this.updateCraters();
@@ -1191,6 +1192,8 @@ export class CouncilFx {
           need: spec.tell === 'share' ? (a.value3 ?? T.rockMinSoakers) : 0,
           have,
           rim: spec.tell !== 'share',
+          element: 'earth',
+          detail: this.density,
         });
       } else this.tells.hide(i);
       // The stone's live dressing: the rock's shadow under the soak and the

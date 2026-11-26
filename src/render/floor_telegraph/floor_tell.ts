@@ -1,9 +1,11 @@
 // The shared soak / avoid tell's painter (the plan: floor_tell_core.ts): a
-// fixed pool of flat discs, one draw each, laid over an owner's footprint.
-// A `share` disc draws chevrons pointing in and rings converging, plus a pip
-// round its rim for every player the soak needs (lit one per player inside);
-// an `avoid` disc draws chevrons pointing out, rings growing to the rim and a
-// throbbing rim. Built once by the OWNER in its constructor under its gated
+// fixed pool laid over an owner's footprints. A `share` slot draws the shared
+// soak marker (soak_marker.ts: the element's vortex, the crisp rim, rings
+// converging on the middle, inward chevrons, wisps rising, and a pip round
+// its rim for every player the soak needs, lit one per player inside; it
+// blooms in and is drawn back into the middle as it goes: owners call
+// `settle` every frame); an `avoid` disc draws chevrons pointing out, rings
+// growing to the rim and a throbbing rim. Built once by the OWNER in its constructor under its gated
 // root (no GPU work after boot), one program for the pool, no light, no
 // per-frame allocation. Every tier draws it whole (it is the mechanic's
 // information); reduced motion holds its motion still.
@@ -18,6 +20,8 @@ import {
   floorTellLook,
   soakPips,
 } from './floor_tell_core';
+import { buildSoakMarkerGeometry, SoakMarker } from './soak_marker';
+import type { SoakElement } from './soak_marker_core';
 
 const VERT = /* glsl */ `
 varying vec2 vXZ;
@@ -88,6 +92,8 @@ void main() {
 interface TellSlot {
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
+  /** The share look (null in an avoid-only pool). */
+  soak: SoakMarker | null;
 }
 
 export interface FloorTellPaint {
@@ -96,7 +102,8 @@ export interface FloorTellPaint {
   y: number;
   z: number;
   radius: number;
-  /** The threat colour (or the soak's gold) and its hot highlight. */
+  /** avoid: the threat colour and its hot highlight (a share takes its
+   *  palette from `element`). */
   color: number;
   hot?: number;
   /** The mark's fill (0 laid, 1 landing). */
@@ -109,6 +116,14 @@ export interface FloorTellPaint {
   /** Draw the tell's own rim line (off where the owner already draws one,
    *  the rock's countdown rim). Default on. */
   rim?: boolean;
+  /** share: the soak's element (its marker's palette). Default earth. */
+  element?: SoakElement;
+  /** share: the tier's detail (0 low .. 1 full): the wisps' count only. */
+  detail?: number;
+  /** share: a countdown arc, the bar's progress (0..1), or none. */
+  timer?: number | null;
+  /** share: where the pips sit (a share of the radius; default the rim's). */
+  pipAt?: number;
 }
 
 const _look: FloorTellLook = { phase: 0, rim: 0, alpha: 0 };
@@ -117,16 +132,19 @@ const _look: FloorTellLook = { phase: 0, rim: 0, alpha: 0 };
 export class FloorTellPool {
   private readonly slots: TellSlot[] = [];
 
-  /** `rung`: the owner's floor ladder rung (over its footprint's fill). */
+  /** `rung`: the owner's floor ladder rung (over its footprint's fill);
+   *  `share`: build the soak marker too (off for an avoid-only pool). */
   constructor(
     root: THREE.Object3D,
     size: number,
     geometries: THREE.BufferGeometry[],
     materials: THREE.Material[],
     rung = 26,
+    share = true,
   ) {
     const geo = new THREE.CircleGeometry(1, 72).rotateX(-Math.PI / 2);
     geometries.push(geo);
+    const soakGeo = share ? buildSoakMarkerGeometry(geometries) : null;
     for (let i = 0; i < size; i++) {
       const mat = new THREE.ShaderMaterial({
         name: 'floorTell',
@@ -164,7 +182,12 @@ export class FloorTellPool {
       mesh.frustumCulled = false;
       root.add(mesh);
       materials.push(mat);
-      this.slots.push({ mesh, mat });
+      let soak: SoakMarker | null = null;
+      if (soakGeo) {
+        soak = new SoakMarker(soakGeo, materials, rung, 'floorTellSoak');
+        root.add(soak.group);
+      }
+      this.slots.push({ mesh, mat, soak });
     }
   }
 
@@ -176,6 +199,27 @@ export class FloorTellPool {
   paint(i: number, p: FloorTellPaint): void {
     const s = this.slots[i];
     if (!s) return;
+    if (p.kind === 'share' && s.soak) {
+      if (s.mesh.visible) s.mesh.visible = false;
+      s.soak.paint({
+        x: p.x,
+        y: p.y,
+        z: p.z,
+        radius: p.radius,
+        element: p.element ?? 'earth',
+        fill: p.fill,
+        clock: p.clock,
+        reduced: p.reduced,
+        need: p.need,
+        have: p.have,
+        rim: p.rim,
+        detail: p.detail,
+        timer: p.timer,
+        pipAt: p.pipAt,
+      });
+      return;
+    }
+    s.soak?.hide();
     const spec = FLOOR_TELL[p.kind];
     floorTellLook(p.kind, p.clock, p.fill, p.reduced, _look);
     const u = s.mat.uniforms;
@@ -201,18 +245,39 @@ export class FloorTellPool {
     s.mesh.visible = true;
   }
 
+  /** Tell `i`'s mark is gone: an avoid disc goes at once, a share marker
+   *  plays its decay (advanced by `settle`). */
   hide(i: number): void {
     const s = this.slots[i];
-    if (s?.mesh.visible) s.mesh.visible = false;
+    if (!s) return;
+    if (s.mesh.visible) s.mesh.visible = false;
+    s.soak?.release();
   }
 
-  /** Is tell `i` showing (the tests read it)? */
+  /** Advance the share markers' decays (owners call it every frame). */
+  settle(clock: number): void {
+    for (const s of this.slots) s.soak?.settle(clock);
+  }
+
+  /** Hide every tell at once, no decay (a wipe, the fight's end). */
+  hideAll(): void {
+    for (const s of this.slots) {
+      if (s.mesh.visible) s.mesh.visible = false;
+      s.soak?.hide();
+    }
+  }
+
+  /** Is tell `i` showing (the tests read it)? A decaying marker still is. */
   shown(i: number): boolean {
-    return this.slots[i]?.mesh.visible ?? false;
+    const s = this.slots[i];
+    return (s?.mesh.visible ?? false) || (s?.soak?.shown ?? false);
   }
 
-  /** Its uniforms (the tests read the count and the way it points). */
+  /** Its uniforms (the tests read the count and the way it points): the
+   *  share marker's disc while it shows, else the avoid disc's. */
   uniformsOf(i: number): Record<string, THREE.IUniform> | null {
-    return this.slots[i]?.mat.uniforms ?? null;
+    const s = this.slots[i];
+    if (!s) return null;
+    return s.soak?.shown ? s.soak.discMat.uniforms : s.mat.uniforms;
   }
 }

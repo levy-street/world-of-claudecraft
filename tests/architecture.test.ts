@@ -1361,6 +1361,8 @@ const RENDER_PURE_CORES = [
   'src/render/floor_telegraph/telegraph_look_core.ts',
   // The shared soak / avoid tell (chevrons in or out, the soakers' pips).
   'src/render/floor_telegraph/floor_tell_core.ts',
+  // The shared soak marker's plan (the element palettes, the clips, the rings).
+  'src/render/floor_telegraph/soak_marker_core.ts',
   // where a body sitting on a seat is drawn, and which seat a screen ray points at
   'src/render/seated_pose_core.ts',
   'src/render/seat_pick_core.ts',
