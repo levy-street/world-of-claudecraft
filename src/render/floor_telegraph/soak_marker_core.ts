@@ -112,6 +112,10 @@ export const SOAK_MARKER = {
    *  fill), one leaving every `emitEvery` seconds; the birth sends a strong
    *  one. The rim itself (r = 1) is the sim's radius. */
   outer: 1.45,
+  /** The vortex's arms: coherent logarithmic spirals (how many, and how
+   *  tightly they wind per unit of log radius). */
+  arms: 4,
+  pitch: 1.05,
   emitEvery: 1.1,
   /** Wisps: on the full tier, at least on the low one. */
   wisps: 14,

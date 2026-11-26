@@ -55,6 +55,8 @@ uniform float uRipEvery;
 uniform float uRipTo;
 uniform float uOuter;
 uniform float uEmitEvery;
+uniform float uArms;
+uniform float uPitch;
 uniform vec4 uChar;
 uniform vec2 uChar2;
 uniform float uDetail;
@@ -117,46 +119,58 @@ void main() {
     float rb = r / max(uBloom, 0.05);
     float spread = 1.0 - smoothstep(0.9, 1.04, rb);
     float twist = 2.8 * (1.0 - r);
-    // Two counter-rotating layers: the inner turns faster (a vortex).
-    float angA = th + spin * (1.0 + 1.6 * (1.0 - r)) + twist;
-    float angB = th - spin * 0.6 - twist * 0.7 + 1.3;
-    vec2 ringA = vec2(cos(angA), sin(angA));
-    vec2 ringB = vec2(cos(angB), sin(angB));
     float drift = time * 0.5;
-    float stA = fbm(ringA * 2.0 + vec2(rb * 7.0 + drift, 0.0));
-    vec2 qA2 = ringA * 4.4 + vec2(rb * 19.0 + drift * 1.7, 4.1);
-    float stA2 = uDetail > 0.5 ? fbm(qA2) : vnoise(qA2) * 0.94;
-    float stB = fbm(ringB * 1.6 + vec2(rb * 5.0 + drift * 0.6, 7.3));
-    vec2 qT = ringB * 1.1 + vec2(rb * 2.6 - drift * 0.3, 9.7);
-    float turb = uDetail > 0.5 ? fbm(qT) : vnoise(qT) * 0.94;
-    float sA = smoothstep(0.46 + 0.08 * smoke, 0.8, stA);
-    // Thin bright filaments: spiral strands wound into the middle.
-    float lr = log(max(rb, 0.03));
-    float sp1 = t * 6.0 - lr * 1.6 + spin * (1.0 + 0.8 * (1.0 - r)) / 1.0472 + (stB - 0.5) * 1.8;
-    float sp2 = t * 4.0 + lr * 0.9 - spin * 0.35 / 1.5708 + (turb - 0.5) * 2.2;
-    float fil = pow(1.0 - abs(2.0 * fract(sp1) - 1.0), 10.0)
-      * smoothstep(0.35, 0.7, stA2 + 0.15) * smoothstep(0.2, 0.5, rb);
-    float filB = pow(1.0 - abs(2.0 * fract(sp2) - 1.0), 14.0)
-      * smoothstep(0.45, 0.75, stA) * smoothstep(0.15, 0.45, rb);
-    // The shape: a dark turbulent centre fading to clear, the body, a hot
-    // inner ring near 70 percent, the light swelling toward the rim.
+    float lr = log(max(rb, 0.02));
+    // One slow, large field bends the arms so they breathe (the low tier
+    // keeps one octave of it).
+    vec2 bendQ = vec2(cos(th - spin * 0.3), sin(th - spin * 0.3)) * 1.3
+      + vec2(rb * 2.2 - drift * 0.25, 9.7);
+    float turb = uDetail > 0.5 ? fbm(bendQ) : vnoise(bendQ);
+    // The arms: coherent logarithmic spirals wound in toward the eye, the
+    // inner turning faster. The arm coordinate a runs across it: 0 its bright leading
+    // edge, toward 1 its dark trailing side.
+    float spinR = spin * (1.0 + 0.9 * (1.0 - rb));
+    float ph = (spinR - th) / 6.2831853 * uArms - lr * uPitch + (turb - 0.5) * 0.18 * smoothstep(0.3, 0.75, rb);
+    float idx = mod(floor(ph), uArms);
+    float a = fract(ph);
+    float h = hash2(vec2(idx, 3.1));
+    // Each arm its own reach: it tapers to a tip short of the eye.
+    float tip = 0.24 + 0.2 * h;
+    float reach = smoothstep(tip, tip + 0.36, rb) * (1.0 - smoothstep(0.9, 1.0, rb));
+    // Narrower toward its tip: the trailing fade quickens inward.
+    float fall = mix(3.2, 9.0, 1.0 - smoothstep(0.2, 0.9, rb));
+    float lead = smoothstep(0.0, 0.03, a) * exp(-a * fall);
+    float edge = smoothstep(0.0, 0.015, a) * exp(-a * 40.0);
+    // The soft motion-blur trail behind each arm.
+    float trail = exp(-a * 1.6) * (1.0 - 0.4 * a);
+    // Fine streaks ALONG the arm (fast across it, slow along it); the low
+    // tier keeps the coarse set and drops the fine one.
+    float st1 = vnoise(vec2(ph * 9.0, lr * 1.6 - drift * 1.2));
+    float st2 = uDetail > 0.5 ? vnoise(vec2(ph * 27.0 + 3.0, lr * 3.5 - drift * 2.0)) : 0.5;
+    float streak = smoothstep(0.25, 0.85, 0.6 * st1 + 0.4 * st2);
+    float arm = lead * reach * (0.72 + 0.28 * h) * (0.45 + 0.75 * streak);
+    float armEdge = edge * reach * reach * (0.6 + 0.6 * streak);
+    float armTrail = trail * reach * (0.55 + 0.45 * st1);
+    // The eye: clean, deep, slowly turning (one faint inner ring).
+    float eye = 1.0 - smoothstep(0.06, 0.34, rb);
+    float eyeRing = exp(-pow((rb - 0.2) / 0.035, 2.0)) * (0.4 + 0.6 * vnoise(vec2((th + spin * 0.4) * 2.0, 1.0)));
     float band = smoothstep(0.3, 0.7, rb) * (1.0 - smoothstep(0.93, 1.0, rb));
-    float core = 1.0 - smoothstep(0.0, 0.5, rb);
-    float hotR = 0.7 + 0.04 * (turb - 0.5);
-    float hotRing = exp(-pow((rb - hotR) / 0.07, 2.0)) * (0.5 + 0.8 * sA);
-    float lit = clamp(sA * (0.08 + 0.5 * band) + 0.9 * fil * (0.2 + band) + 0.6 * filB * band, 0.0, 1.0);
-    vec3 body = mix(uDeep, uBody, clamp(0.25 + 0.9 * turb * (1.0 - 0.5 * core), 0.0, 1.0));
-    vec3 c = mix(body, uBright, lit * (1.0 - 0.45 * smoke));
-    float white = clamp(fil * sA * band * 1.5 + hotRing * fil * 1.4 + hotRing * 0.35, 0.0, 1.0);
-    c = mix(c, uHot, white * (1.0 - 0.45 * smoke));
-    // Emission: little in the dark centre, strong in the band and streaks.
-    float glow = (0.2 + 0.6 * turb * (1.0 - 0.7 * core) + 0.9 * lit + 0.8 * hotRing + 0.3 * band) * spread;
-    // The centre darkens the floor a little (its turbulence moving), the
-    // body barely covers it: the floor shows through.
-    float cov = (0.1 + 0.42 * core * (0.6 + 0.6 * turb) + 0.1 * band + 0.5 * smoke * band) * spread;
+    float hotRing = exp(-pow((rb - 0.7) / 0.08, 2.0)) * (0.35 + 0.9 * arm);
+    vec3 c = mix(uDeep, uBody, clamp(0.2 + 0.45 * turb + 0.45 * armTrail, 0.0, 1.0));
+    c = mix(c, uDeep * 0.6, eye * 0.85);
+    c = mix(c, uBright, clamp(arm * 1.25, 0.0, 1.0) * (1.0 - 0.4 * smoke));
+    c = mix(c, uHot, clamp(armEdge * 1.1 + hotRing * arm * 0.6, 0.0, 1.0) * (1.0 - 0.4 * smoke));
+    c = mix(c, uBright, eyeRing * 0.5);
+    // Emission: the arms and their hot edges carry the light; the trail a
+    // soft wash; the eye almost none.
+    float glow = (0.1 + 0.18 * turb * (1.0 - eye) + 0.38 * armTrail + 1.05 * arm + 0.7 * armEdge
+      + 0.4 * hotRing + 0.15 * band + 0.25 * eyeRing) * spread;
+    // The eye darkens the floor a little; the body barely covers it.
+    float cov = (0.08 + 0.5 * eye + 0.12 * armTrail + 0.08 * band + 0.5 * smoke * band) * spread;
     // Smoke (shadow): soft dark plumes curling in.
     if (smoke > 0.0) {
-      float plume = fbm(rot(vXZ, spin * 0.8 + twist * 1.4) * 3.0 + vec2(0.0, -drift * 0.8));
+      // In the arms' own coordinates: the smoke streams along them, curling in.
+      float plume = fbm(vec2(ph * 2.2, lr * 1.4 - drift * 0.9) + vec2(twist * 0.3, 0.0));
       float sm = smoothstep(0.42, 0.72, plume) * smoothstep(0.15, 0.6, rb) * smoke;
       c = mix(c, uDeep, sm * 0.7);
       glow *= 1.0 - 0.6 * sm;
@@ -286,7 +300,7 @@ void main() {
   if (uChar.z > 0.0 && r < 1.0) {
     vec2 rf = vec2(cos(th + spin * 0.3), sin(th + spin * 0.3));
     float n = fbm(rf * 3.2 + vec2(-time * 1.3, time * 0.4));
-    float edge = 0.97 - 0.42 * n * n;
+    float edge = 0.97 - 0.2 * n * n;
     float tongue = smoothstep(edge - 0.02, edge + 0.06, r) * (1.0 - smoothstep(0.96, 0.99, r));
     float tip = smoothstep(edge - 0.02, edge + 0.02, r) * (1.0 - smoothstep(edge + 0.02, edge + 0.1, r));
     tongue *= uChar.z * (1.0 - smoothstep(0.9, 1.04, r / max(uBloom, 0.05)));
@@ -389,14 +403,18 @@ void main() {
   vec4 w2 = modelMatrix * vec4(q, 1.0);
   vec3 tng = w2.xyz - w.xyz;
   tng = length(tng) > 1e-5 ? normalize(tng) : vec3(0.0, 1.0, 0.0);
-  vec3 side = cross(tng, normalize(cameraPosition - w.xyz));
+  vec3 toCam = normalize(cameraPosition - w.xyz);
+  vec3 side = cross(tng, toCam);
   side = length(side) > 1e-5 ? normalize(side) : vec3(1.0, 0.0, 0.0);
+  // Seen end-on (from overhead) a rising ribbon would lie flat over the
+  // vortex as a loop: it fades out as the view runs along it.
+  float endOn = 1.0 - smoothstep(0.55, 0.9, abs(dot(tng, toCam)));
   float taper = sin(3.14159265 * aV);
   w.xyz += side * aSide * uWidth * (0.35 + 0.65 * taper) * (1.0 - 0.5 * vv);
   vSide = aSide;
   vV = vv;
   vFade = taper * (1.0 - smoothstep(0.55, 1.0, vv)) * smoothstep(0.0, 0.08, vv)
-    * (1.0 - smoothstep(0.85, 1.0, life));
+    * (1.0 - smoothstep(0.85, 1.0, life)) * endOn;
   gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
@@ -524,6 +542,8 @@ export class SoakMarker {
         uBorn: { value: 1 },
         uOuter: { value: SOAK_MARKER.outer },
         uEmitEvery: { value: SOAK_MARKER.emitEvery },
+        uArms: { value: SOAK_MARKER.arms },
+        uPitch: { value: SOAK_MARKER.pitch },
         uAlpha: { value: 0 },
         uFlare: { value: 0 },
         uNeed: { value: 0 },
