@@ -14,7 +14,7 @@
 
 import { t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
-import { pingIconUrl } from '../../ping_icons';
+import { setPingIconImg } from '../../ping_icons';
 import {
   clampPingWheelCenter,
   PING_KIND_LABEL_KEYS,
@@ -233,7 +233,7 @@ export class PingWheelController {
       slot.style.transform = `translate(${at.x.toFixed(1)}px, ${at.y.toFixed(1)}px)`;
       const img = doc.createElement('img');
       img.className = 'ping-wheel-icon';
-      img.src = pingIconUrl(wedge.kind);
+      setPingIconImg(img, wedge.kind);
       img.alt = '';
       img.draggable = false;
       const label = doc.createElement('span');

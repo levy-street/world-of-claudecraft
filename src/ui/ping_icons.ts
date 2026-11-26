@@ -7,11 +7,15 @@
 // canvas with a glow in the kind's colour (render/party_pings_core.ts
 // PARTY_PING_COLORS) so it pops over a bright sky and a dark floor alike.
 //
-// The art loads on first use. Until it arrives (or if it never does) a canvas
-// carries the procedural glyph: our own eye, sword, warning triangle, arrow and
-// flag, white with a dark outline and no badge behind it. When a kind's art
-// loads, every cached canvas of that kind is repainted in place and
-// onPingIconArt listeners hear it, so a texture built from one can re-upload.
+// The art loads on first use, once per kind per session (a failed load is not
+// retried). Until it arrives (or if it never does) a canvas carries the
+// procedural glyph: our own eye, sword, warning triangle, arrow and flag, white
+// with a dark outline and no badge behind it. When a kind's art loads, every
+// cached canvas of that kind is repainted in place and onPingIconArt listeners
+// hear it, so a texture built from one can re-upload; pingIconArtSettled lets
+// the world icon's prewarm wait for the art so that upload happens behind the
+// loading curtain. An <img> set through setPingIconImg falls back to the glyph
+// if its file fails, so no surface ever shows a broken image where a ping is.
 //
 // One canvas per kind and size, built on first use and cached for the session.
 
@@ -40,8 +44,11 @@ const ART_DIR = '/ui/pings';
 const ART_FILL = 0.84;
 
 const art = new Map<number, HTMLImageElement>();
-const artLoading = new Set<number>();
+/** One load per kind per session: settles on load or on failure. */
+const artSettledByKind = new Map<number, Promise<void>>();
+const artFailed = new Set<number>();
 const artListeners = new Set<(kind: number) => void>();
+const glyphUrls = new Map<number, string>();
 
 /** Static URL of a kind's painted icon. */
 export function pingIconArtUrl(kind: number): string {
@@ -56,23 +63,33 @@ export function onPingIconArt(listener: (kind: number) => void): () => void {
   return () => artListeners.delete(listener);
 }
 
+/** Settles once every art load started so far has loaded or failed. */
+export function pingIconArtSettled(): Promise<void> {
+  return Promise.all(artSettledByKind.values()).then(() => undefined);
+}
+
 function loadArt(kind: number): void {
-  if (art.has(kind) || artLoading.has(kind) || typeof Image === 'undefined') return;
-  artLoading.add(kind);
-  const img = new Image();
-  img.decoding = 'async';
-  img.onload = () => {
-    artLoading.delete(kind);
-    art.set(kind, img);
-    for (const [key, canvas] of canvases) {
-      const [k, px] = key.split(':').map(Number);
-      if (k === kind) repaint(canvas, kind, px);
-    }
-    for (const listener of artListeners) listener(kind);
-  };
-  // A missing file keeps the procedural glyph.
-  img.onerror = () => artLoading.delete(kind);
-  img.src = pingIconArtUrl(kind);
+  if (artSettledByKind.has(kind) || typeof Image === 'undefined') return;
+  const settled = new Promise<void>((resolve) => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => {
+      art.set(kind, img);
+      for (const [key, canvas] of canvases) {
+        const [k, px] = key.split(':').map(Number);
+        if (k === kind) repaint(canvas, kind, px);
+      }
+      for (const listener of artListeners) listener(kind);
+      resolve();
+    };
+    // A missing file keeps the procedural glyph, for the rest of the session.
+    img.onerror = () => {
+      artFailed.add(kind);
+      resolve();
+    };
+    img.src = pingIconArtUrl(kind);
+  });
+  artSettledByKind.set(kind, settled);
 }
 
 const INK = 'rgba(12, 9, 6, 0.92)';
@@ -268,9 +285,29 @@ export function pingIconCanvas(kind: number, px = 128): HTMLCanvasElement {
   return canvas;
 }
 
-/** The painted icon's URL, an <img> source for the wheel, the chat line and
- *  the minimap (their CSS adds the glow). */
+/** The glyph as a data URL: what an <img> shows when the art cannot load. */
+function glyphUrl(kind: number): string {
+  let url = glyphUrls.get(kind);
+  if (url === undefined) {
+    url = pingIconCanvas(kind).toDataURL();
+    glyphUrls.set(kind, url);
+  }
+  return url;
+}
+
+/** An <img> source for the wheel, the chat line and the minimap (their CSS adds
+ *  the glow): the painted icon's file, or the glyph once that file has failed. */
 export function pingIconUrl(kind: number): string {
   loadArt(kind);
-  return pingIconArtUrl(kind);
+  return artFailed.has(kind) ? glyphUrl(kind) : pingIconArtUrl(kind);
+}
+
+/** Point `img` at a kind's icon, swapping to the glyph if the file fails to
+ *  load, so a ping never shows as a broken image. */
+export function setPingIconImg(img: HTMLImageElement, kind: number): void {
+  img.onerror = () => {
+    img.onerror = null;
+    img.src = glyphUrl(kind);
+  };
+  img.src = pingIconUrl(kind);
 }

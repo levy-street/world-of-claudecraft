@@ -17,10 +17,10 @@ party scope); the world icon is the renderer's (`src/render/party_pings.ts`).
   words, the unit name and its reaction) from two templates, `chatLine` and the
   kind's `callout*Unit`, so a locale keeps its own word order; the `.ping-kind-N`
   colour class; the unit reaction rule (hostile red, friendly green, neutral yellow).
-- `ping_chat_line.ts` (DOM): those parts as nodes: the kind's badge, the sender and a
+- `ping_chat_line.ts` (DOM): those parts as nodes: the kind's icon, the sender and a
   pinged player as clickable chat names (the Hud player menu), the tinted callout.
 - `ping_feed_controller.ts` (DOM): the fast-band tick: sound and chat line once per
-  new ping in view (the line lands on the party channel, solo too), the badges on
+  new ping in view (the line lands on the party channel, solo too), the icons on
   the minimap.
 - `hud_pings.ts`: the Hud factory (untyped Hud, members welded in
   `tests/party_pings_hud.test.ts`), built lazily. Hud holds one field and one

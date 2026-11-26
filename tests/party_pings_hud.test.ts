@@ -33,7 +33,9 @@ setLanguage('en');
 
 // happy-dom has no 2D canvas: the badge art is the icons module's own concern.
 vi.mock('../src/ui/ping_icons', () => ({
-  pingIconUrl: (kind: number) => `data:ping-${kind}`,
+  setPingIconImg: (img: HTMLImageElement, kind: number) => {
+    img.src = `data:ping-${kind}`;
+  },
   pingIconCanvas: () => document.createElement('canvas'),
   onPingIconArt: () => () => {},
 }));

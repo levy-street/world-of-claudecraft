@@ -12,9 +12,19 @@ import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const setting = { on: true };
+// The painted icon art's load signal (ui/ping_icons.ts), driven by the tests:
+// the listener the layer subscribed, and the settle the prewarm waits on.
+const art = {
+  listeners: new Set<(kind: number) => void>(),
+  settled: Promise.resolve() as Promise<void>,
+};
 vi.mock('../src/ui/ping_icons', () => ({
   pingIconCanvas: () => document.createElement('canvas'),
-  onPingIconArt: () => () => {},
+  onPingIconArt: (listener: (kind: number) => void) => {
+    art.listeners.add(listener);
+    return () => art.listeners.delete(listener);
+  },
+  pingIconArtSettled: () => art.settled,
 }));
 vi.mock('../src/game/party_pings_setting', () => ({
   partyPingsEnabled: () => setting.on,
@@ -30,7 +40,7 @@ import {
   type PartyPingMark,
 } from '../src/render/party_pings_core';
 import { prewarmResumeIsDebt } from '../src/render/prewarm_policy';
-import { PING_ATTACK, PING_LOOK } from '../src/sim/social/party_pings';
+import { PING_ATTACK, PING_KIND_COUNT, PING_LOOK } from '../src/sim/social/party_pings';
 
 const mark = (id: number, over: Partial<PartyPingMark> = {}): PartyPingMark => ({
   id,
@@ -59,6 +69,8 @@ const pieces = (scene: THREE.Scene, name: string) =>
 describe('party ping layer', () => {
   beforeEach(() => {
     setting.on = true;
+    art.listeners.clear();
+    art.settled = Promise.resolve();
   });
 
   it('builds every slot up front, hidden, and adds nothing later', () => {
@@ -147,6 +159,35 @@ describe('party ping layer', () => {
     const { l, camera } = layer(false);
     l.update([mark(1)], camera, 0, false);
     expect(l.shown).toBe(0);
+  });
+
+  it("re-uploads a kind's icon when its painted art arrives, and stops listening once disposed", () => {
+    const { l } = layer(false);
+    const icons = l.prewarmTextures().slice(0, PING_KIND_COUNT);
+    const before = icons.map((texture) => texture.version);
+    for (const listener of art.listeners) listener(2);
+    expect(icons.map((texture, kind) => texture.version - before[kind])).toEqual([0, 0, 1, 0, 0]);
+    l.dispose();
+    expect(art.listeners.size).toBe(0);
+  });
+
+  it('the prewarm entry waits for the painted art before it uploads the icons', async () => {
+    const { l } = layer(false);
+    let arrive = () => {};
+    art.settled = new Promise<void>((resolve) => {
+      arrive = resolve;
+    });
+    const textures: THREE.Texture[] = [];
+    const run = partyPingPrewarmEntry(l, {
+      prewarmTexture: (t) => textures.push(t),
+      compileColor: async () => {},
+    }).run();
+    await Promise.resolve();
+    expect(textures).toHaveLength(0);
+    arrive();
+    await run;
+    expect(textures).toHaveLength(6);
+    l.dispose();
   });
 
   it('the prewarm entry uploads the icons and glow and links a staged twin', async () => {

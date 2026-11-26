@@ -6,14 +6,14 @@
 // every piece, since a compile walks only visible objects), so the first
 // ping of a session links nothing and uploads nothing in a live frame.
 //
-// A ping reads as a callout, not a decoration: the ping's badge icon
+// A ping reads as a callout, not a decoration: the ping's painted icon
 // floating over its unit (following it) or over its ground point, held at a
 // readable screen size at any distance and drawn over the world so a wall
 // never hides it, popping in and fading at the end of its life. A GROUND ping
 // also lays one short ring ripple in its colour at its point (about a second,
-// fading out; a unit ping has none). The ring ignores depth, like the badge,
+// fading out; a unit ping has none). The ring ignores depth, like the icon,
 // so sloped terrain can never swallow part of it. Shed on the low preset,
-// cosmetic only: a soft glow behind the badge and a thin light stem from a
+// cosmetic only: a soft glow behind the icon and a thin light stem from a
 // ground ping's point up to it. The icon and the ring draw the same on every
 // preset: what a player reacts to never depends on the graphics preset.
 //
@@ -25,7 +25,7 @@
 import * as THREE from 'three';
 import { partyPingsEnabled } from '../game/party_pings_setting';
 import { PING_KIND_COUNT } from '../sim/social/party_pings';
-import { onPingIconArt, pingIconCanvas } from '../ui/ping_icons';
+import { onPingIconArt, pingIconArtSettled, pingIconCanvas } from '../ui/ping_icons';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   createPartyPingAnchor,
@@ -96,7 +96,7 @@ const STEM_VERTEX = `
   }
 `;
 
-// The light stem from the ground to the badge: brightest at the foot.
+// The light stem from the ground to the icon: brightest at the foot.
 const STEM_FRAGMENT = `
   uniform vec3 uColor;
   uniform float uAlpha;
@@ -113,7 +113,7 @@ const ICON_PX = 128;
 const GLOW_PX = 128;
 const STEM_RADIUS = 0.05;
 /** Draw order: the ring on the floor band, the stem and glow over it, the
- *  badge over everything (it ignores depth, so a wall never hides it). */
+ *  icon over everything (it ignores depth, so a wall never hides it). */
 const RING_ORDER = floorVfxRenderOrder('ground', 7);
 const ICON_ORDER = 9_000;
 
@@ -179,9 +179,10 @@ export class PartyPingLayer {
       texture.colorSpace = THREE.SRGBColorSpace;
       this.icons.push(texture);
     }
-    // The painted icon art loads after boot; when a kind's arrives its canvas
-    // is repainted in place, so its texture re-uploads once (five small
-    // 128 px textures, once per session).
+    // The painted icon art starts loading here; when a kind's arrives its
+    // canvas is repainted in place, so its texture re-uploads once (five small
+    // 128 px textures, once per session). The prewarm entry waits for the art
+    // first, so that upload normally happens behind the loading curtain.
     this.stopArt = onPingIconArt((kind) => {
       const texture = this.icons[kind];
       if (texture && !this.disposed) texture.needsUpdate = true;
@@ -421,10 +422,12 @@ export interface PartyPingPrewarmHost {
 }
 
 /**
- * The layer's world-entry prewarm manifest entry (`vfx.party-pings`): upload
- * the five icons and the glow, and link the ring, stem and sprite programs
- * through the staged twin, behind the loading curtain. A dropped entry
- * resumes its textures as cosmetic units and its programs as debt.
+ * The layer's world-entry prewarm manifest entry (`vfx.party-pings`): wait
+ * for the painted icon art to load or fail (ui/ping_icons.ts), then upload the
+ * five icons and the glow, and link the ring, stem and sprite programs through
+ * the staged twin, behind the loading curtain, so the art's repaint does not
+ * re-upload an icon in a live frame. A dropped entry resumes its textures as
+ * cosmetic units and its programs as debt.
  */
 export function partyPingPrewarmEntry(layer: PartyPingLayer, host: PartyPingPrewarmHost) {
   const link = async () => {
@@ -445,6 +448,7 @@ export function partyPingPrewarmEntry(layer: PartyPingLayer, host: PartyPingPrew
       })),
     resumeProgramUnits: () => [{ id: 'link:party-pings', run: link }],
     run: async () => {
+      await pingIconArtSettled();
       for (const texture of layer.prewarmTextures()) host.prewarmTexture(texture);
       await link();
     },
