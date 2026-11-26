@@ -9,12 +9,13 @@
 // fighting clips and their entrance's stances, gestures and dark (the ids and
 // beats in smith_heart_fx/council_entrance_core.ts).
 //
-// The Masterless Strength (the Quadrant Guardian): one rigged mesh, four
-// element bodies (Body_Hammer, Body_Breath, Body_Heat, Body_Quench plus the
-// Quench's icicles) the fight's quarter swaps through mesh toggles, the
-// cracks' flare a glow pulse, the false death a stance swap. The gestures
-// are sent by smith_heart_fx/final_body_fx.ts; their ids and the clip beats
-// live in smith_heart_fx/final_body_core.ts.
+// The Masterless Strength (the Quadrant Guardian; the four-element titan of
+// 2026-11-26): one rigged mesh and UV set in five paintings (Body_Four, the
+// base form, and Body_Hammer, Body_Breath, Body_Heat, Body_Quench: five mesh
+// nodes over the same vertex data) the fight's quarter swaps through mesh
+// toggles, the cracks' flare a glow pulse, the false death a stance swap. The
+// gestures are sent by smith_heart_fx/final_body_fx.ts; their ids and the
+// clip beats live in smith_heart_fx/final_body_core.ts.
 
 import { BREATH_CASTS, BREATH_TUNING } from '../../sim/encounters/smith_heart/breath_ids';
 import { ISLE_CASTS } from '../../sim/encounters/smith_heart/breath_isle_ids';
@@ -23,6 +24,7 @@ import {
   FINAL_DIFFICULTY,
   FINAL_TUNING,
 } from '../../sim/encounters/smith_heart/final_ids';
+import { FINAL_PHASE_CASTS } from '../../sim/encounters/smith_heart/final_phase_ids';
 import { HEAT_CASTS, HEAT_TUNING } from '../../sim/encounters/smith_heart/heat_ids';
 import { QUENCH_CASTS, QUENCH_TUNING } from '../../sim/encounters/smith_heart/quench_ids';
 import {
@@ -41,7 +43,7 @@ import {
 } from '../smith_heart_fx/council_entrance_core';
 import {
   FINAL_BODY_CLIP,
-  FINAL_BODY_ELEMENTS,
+  FINAL_BODY_FORMS,
   FINAL_BODY_GESTURES,
   FINAL_BODY_HEIGHT,
   FINAL_BODY_NODES,
@@ -73,11 +75,18 @@ const CREATURES = 'models/creatures';
 /** The shipped body (public/models/creatures). */
 export const MASTERLESS_STRENGTH_URL = `${CREATURES}/smith_heart_masterless_strength.glb`;
 
-/** Every clip the GLB carries. */
+/** Every clip the GLB carries (scripts/assets/specs/smith_heart_masterless_
+ *  strength.json). The arrival's two are authored on the rig itself now:
+ *  Dormant, the still knee it waits on, and Rise, the heavy push back to its
+ *  feet. Channel is the long call's own loop (Call of the Quarters): braced
+ *  wide, hauling the quarters' strength up and driving it back down. Its
+ *  swings alternate two blows: Attack, the right fist's overhead hammer, and
+ *  Attack2, the left fist's backhand swept low across the floor. */
 export const MASTERLESS_STRENGTH_CLIPS = [
   'Idle',
   'Walk',
   'Attack',
+  'Attack2',
   'Slam',
   'Wrath',
   'Pour',
@@ -86,13 +95,10 @@ export const MASTERLESS_STRENGTH_CLIPS = [
   'Kneel',
   'KneelIdle',
   'Death',
+  'Dormant',
+  'Rise',
+  'Channel',
 ] as const;
-
-/** The arrival's two authored clips (scripts/build_masterless_strength_
- *  arrival_anims.mjs, sampled from Kneel, KneelIdle and Idle): the still
- *  knee it waits dormant on and the heavy push back to its feet. */
-export const MASTERLESS_STRENGTH_ARRIVAL_URL = `${CREATURES}/smith_heart_masterless_strength_arrival_anims.glb`;
-export const MASTERLESS_STRENGTH_ARRIVAL_CLIPS = ['Dormant', 'Rise'] as const;
 
 /** The Guardian of the Quench's two entrance clips (scripts/build_quench_
  *  guardian_entrance_anims.mjs, sampled from Idle and Wake and laid down and
@@ -116,8 +122,14 @@ const BASE: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Walk',
-  attack: ['Attack'],
-  contacts: { Attack: [FINAL_BODY_CLIP.attack], Slam: [FINAL_BODY_CLIP.slam] },
+  // Two blows, taken in turn (never the same swing twice running): both land
+  // on the same beat, so the hit's number and sound fall where they did.
+  attack: ['Attack', 'Attack2'],
+  contacts: {
+    Attack: [FINAL_BODY_CLIP.attack],
+    Attack2: [FINAL_BODY_CLIP.attack],
+    Slam: [FINAL_BODY_CLIP.slam],
+  },
   attackByAbility: {
     // Forge Fist: the frontal's windup cue plays both fists into the floor.
     [FORGE_FIST_CUE]: 'Slam',
@@ -135,6 +147,10 @@ const BASE: ClipMap = {
     [FINAL_CASTS.fist]: 'Wrath',
     [FINAL_CASTS.anvil]: 'Wrath',
     [FINAL_CASTS.bolt]: 'Pour',
+    // Call of the Quarters: a 40 s channel under its shield. Its own loop (the
+    // generic Pour is a throw: looped through the call it hurled nothing over
+    // and over, the owner's playtest of 2026-11-26).
+    [FINAL_PHASE_CASTS.call]: 'Channel',
   },
   castTimeScaleByAbility: {
     // Normal's bar (Heroic's and Mythic's are a breath shorter: the slam lands a hair late).
@@ -164,10 +180,10 @@ const DORMANT: ClipMap = {
 
 const TOGGLES: readonly MeshToggleDef[] = [
   { nodes: ['*'], hideNow: FINAL_BODY_GESTURES.hide, showNow: FINAL_BODY_GESTURES.show },
-  ...FINAL_BODY_ELEMENTS.map((el) => ({
-    nodes: FINAL_BODY_NODES[el],
-    hideNow: FINAL_BODY_GESTURES.off[el],
-    showNow: FINAL_BODY_GESTURES.on[el],
+  ...FINAL_BODY_FORMS.map((form) => ({
+    nodes: FINAL_BODY_NODES[form],
+    hideNow: FINAL_BODY_GESTURES.off[form],
+    showNow: FINAL_BODY_GESTURES.on[form],
   })),
 ];
 
@@ -726,7 +742,6 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   },
   smith_heart_masterless_strength: {
     url: MASTERLESS_STRENGTH_URL,
-    animUrls: [MASTERLESS_STRENGTH_ARRIVAL_URL],
     height: FINAL_BODY_HEIGHT,
     clips: BASE,
     phaseClips: {
@@ -777,9 +792,10 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       deathFade: 3,
     },
     oneShotsHoldAttacks: ['Shift', 'Rise'],
-    // Its stride: 4.8 model yards a cycle over 1.6 s at the drawn height.
-    walkRef: 10,
-    runRef: 10,
+    // Its stride, measured on the planted foot (scripts/anim/measure_gait.mjs
+    // over the unquantized export at this height and the template's scale).
+    walkRef: 7.1,
+    runRef: 7.1,
     attackTimeScale: 1,
     deathTimeScale: 1,
     authoredAtlas: true,

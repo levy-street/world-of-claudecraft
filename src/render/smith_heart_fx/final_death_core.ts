@@ -40,6 +40,7 @@ import {
   arrivalStreamPath,
   arrivalStreamPointAt,
 } from './final_arrival_core';
+import { FINAL_BODY_CLIP } from './final_body_core';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const smooth = (v: number) => {
@@ -156,11 +157,13 @@ export function deathHusk(t: number, replay: boolean): boolean {
   return !replay || t < DEATH_END;
 }
 
-/** The kneel the anchors read (the heart's and the eyes' height): the body
- *  sinks onto its knee over the Kneel clip's drop. 0 standing, 1 kneeling. */
+/** The kneel the anchors read (the heart's and the eyes' places): the body
+ *  holds its feet, then drops onto its knee with its Kneel clip
+ *  (final_body_core.ts FINAL_BODY_CLIP). 0 standing, 1 kneeling. */
 export function deathKneel(t: number): number {
   if (t < 0) return 0;
-  return smooth(t / 0.9);
+  const { kneelDrop, kneelDown } = FINAL_BODY_CLIP;
+  return smooth((t - kneelDrop) / (kneelDown - kneelDrop));
 }
 
 // ---- the heart crystal --------------------------------------------------------------------

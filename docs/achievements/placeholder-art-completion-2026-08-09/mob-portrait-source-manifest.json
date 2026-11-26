@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "b7c322c1c734bbee3d6caec166983629959a406c99dda9a86049cea09476f215",
+  "rendererFingerprint": "ab30ffcc4a847d82cf237c7374d3ca22113174ff37ee7ebb5a38c4162b25ab40",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "win32",
-    "arch": "x64",
+    "platform": "darwin",
+    "arch": "arm64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "157",
-    "browserVersion": "Edg/157.0.4341.60",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "158",
+    "browserVersion": "Chrome/158.0.8127.88",
     "requestedBackend": "swiftshader",
-    "fingerprint": "93984b9f943895de3c4da131f720f05bcb47c89f02b336b88bda89953a63fc3a"
+    "fingerprint": "e46389c2323c05d4efa152d489480dd2bb016814cd6e54b51d3ed2d973787cd9"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6982697,
-      "sha256": "ff4bc151f54bd3940af0339b660a964e091556420242a8ff736bcb450aaf856b",
+      "bytes": 7001421,
+      "sha256": "e3326c2b941d27614df39b89821b6cde9dbe015a3f25a16de339d5aabe62fc2d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5745,11 +5745,11 @@
         "model": {
           "url": "models/creatures/smith_heart_masterless_strength.glb",
           "path": "public/models/creatures/smith_heart_masterless_strength.glb",
-          "bytes": 1459444,
-          "sha256": "fe2c92391de187acf916344a9b27f6ae9a25f2ad860c27d9681c249d1600e646"
+          "bytes": 1603724,
+          "sha256": "f10d4b8ca7b48247030600a04257477c8524560203fa32d19b9262b647c381d5"
         },
         "idle": "Idle",
-        "height": 5.6,
+        "height": 6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5763,11 +5763,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8047855b321a185578f3299619f4944cf490b846ae717242815714e95bda8748",
+      "sourceFingerprint": "f23230664b67e26572de5925f592ed6a8d87c1a70c2678f05bf16ac96f40afa0",
       "output": {
         "path": "public/ui/mobs/heart_masterless_strength.webp",
-        "bytes": 4870,
-        "sha256": "551013d2d17d7d48582229075055544919298b16f509dbfcfe5b06fbeb825825"
+        "bytes": 4614,
+        "sha256": "1a9ae8290d609944b7b17eb3433ba0370595f4511bba6c75707fa4cc7db7b268"
       }
     },
     {

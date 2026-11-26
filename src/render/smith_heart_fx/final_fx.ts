@@ -1,5 +1,5 @@
 // The Masterless Strength's effects round its own model (plan:
-// final_fx_core.ts; the model's clips, element bodies and auras are
+// final_fx_core.ts; the model's clips, forms and auras are
 // final_body_fx.ts's), hosted by ../rift_death_zone.ts beside the guardians'.
 // Presentation only, read from IWorld (the boss's position, facing, cast bar,
 // death, its events) and from the seal memory's arrival (`awakeSince`, the
@@ -83,7 +83,6 @@ import { entranceBudgetNow } from './entrance_budget';
 import { FinalArrivalBeam, type FinalArrivalFrame } from './final_arrival_beam';
 import {
   ARRIVAL_END,
-  ARRIVAL_KNEEL_HEIGHT,
   ARRIVAL_RISE_AT,
   ARRIVAL_SKIP_SECONDS,
   ARRIVAL_VEINS,
@@ -92,12 +91,13 @@ import {
   arrivalDark,
   arrivalForming,
   arrivalHeartLevel,
-  arrivalHeightShare,
+  arrivalKneel,
   arrivalSkyFlare,
   arrivalStance,
 } from './final_arrival_core';
-import { FINAL_BODY_HEIGHT, finalBodyPoint } from './final_body_core';
+import { FINAL_BODY_HEIGHT, type FinalBodySocketId, finalBodyKneelPoint } from './final_body_core';
 import { FinalBodyFx } from './final_body_fx';
+import { clearFinalBodySockets, finalSocketPoint } from './final_body_sockets';
 import {
   DEATH_END,
   DEATH_TEAR,
@@ -236,6 +236,7 @@ void main() {
 // ---- per-frame scratch (no allocation a frame) -----------------------------------------------
 
 const _e = new THREE.Euler();
+const _sock = new THREE.Vector3();
 /** The floor's rite marks rise in and fade out over these (seconds). */
 const RITE_RISE = 0.6;
 const RITE_FADE = 2.5;
@@ -901,14 +902,20 @@ export class FinalFx {
     const kneelRate = hv?.stage === 'rebirth' ? 0.2 : kneelTo === 1 ? 0.9 : 1.5;
     const kneelD = kneelTo - this.kneel;
     this.kneel += Math.sign(kneelD) * Math.min(Math.abs(kneelD), kneelRate * dt);
-    const share = arrivalHeightShare(t, dead) * (1 - this.kneel * (1 - ARRIVAL_KNEEL_HEIGHT));
+    // On its knee for the arrival or the death: the anchors slide to their
+    // kneeling places (the chest folds forward, further down than the head).
+    const knelt = 1 - (1 - arrivalKneel(t, dead)) * (1 - this.kneel);
     const at = fxAnchor(boss);
-    const height = FINAL_BODY_HEIGHT * (boss.scale > 0 ? boss.scale : 1) * share;
+    const height = FINAL_BODY_HEIGHT * (boss.scale > 0 ? boss.scale : 1);
     const lx = at.x - this.originX;
     const lz = at.z - this.originZ;
     const ly = this.groundY(at.x, at.z);
-    finalBodyPoint('heart', lx, ly, lz, boss.facing, height, this.heartAt);
-    finalBodyPoint('head', lx, ly, lz, boss.facing, height, this.eyeAt);
+    finalBodyKneelPoint('heart', knelt, lx, ly, lz, boss.facing, height, this.heartAt);
+    finalBodyKneelPoint('head', knelt, lx, ly, lz, boss.facing, height, this.eyeAt);
+    // Its view up, the rig's own chest and head say where they are (every
+    // clip: the Shift's fold, a strike's lunge); the anchors stand in till then.
+    this.liveSocket('heart', this.heartAt);
+    this.liveSocket('head', this.eyeAt);
     // Dying: the crystal tears from the chest it knelt with (held from the
     // tear, so the comets leave from where it hung).
     const held = dying && this.deathT >= DEATH_TEAR;
@@ -980,6 +987,15 @@ export class FinalFx {
     this.heartHalo.scale.set(halo, halo, 1);
     (this.heartHalo.material as THREE.SpriteMaterial).opacity =
       0.55 * Math.min(1, Math.max(0.1, heartLevel) + flare * 0.3);
+  }
+
+  /** A socket's live place, in the room's frame (untouched while no view is up). */
+  private liveSocket(id: FinalBodySocketId, out: { x: number; y: number; z: number }): void {
+    const p = finalSocketPoint(id, _sock);
+    if (!p) return;
+    out.x = p.x - this.originX;
+    out.y = p.y;
+    out.z = p.z - this.originZ;
   }
 
   private updateFlashes(): void {
@@ -1119,6 +1135,7 @@ export class FinalFx {
     this.disposed = true;
     if (this.slotKey) noteHeartArrivalLight(this.slotKey, null);
     this.root.removeFromParent();
+    clearFinalBodySockets();
     this.particles.dispose();
     this.bodyFx.dispose();
     this.arrival.dispose();

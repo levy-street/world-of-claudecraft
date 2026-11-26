@@ -946,8 +946,8 @@ markings), leaping the central ring's kerb and spiralling in to it; the four str
 of light, a white-hot core in a swirl of the four colours, shooting far up into the sky
 (`ARRIVAL_BEAM`, many times the room's width) (the floor's shockwave in the four colours, the camera's thud, the sky flaring round the
 beam, `heart_arrival_light_core.ts`); the beam falls back down into the boss, its cracks fill
-with light and its eyes ignite; it pushes up off its knee (its `Rise` clip,
-`scripts/build_masterless_strength_arrival_anims.mjs`) and roars (its `Shift` clip) with a
+with light and its eyes ignite; it pushes up off its knee (its `Rise` clip, authored on the
+rig) and roars (its `Shift` clip) with a
 four-colour shockwave out over the raid. The sim says the waking whisper as it opens and the
 roar's line on the roar (`final_voice.ts` `ARRIVAL_LINE_AT`, pinned to `ARRIVAL_VOICE`); the
 rising line is no longer said over it (the whisper alone fills most of the scene and a queued
@@ -956,7 +956,20 @@ a second, so the fight never waits on a show and the boss is never fought while 
 dormant. Every material is built under the effects' root before its gated attach.
 
 **The body.** (Replaced by its own rigged model in phase 2O, `final_body_fx.ts`; the rock
-pieces' body and their joints are gone since the 2026-11-09 arrival.) As first built: a
+pieces' body and their joints are gone since the 2026-11-09 arrival.) Rebuilt on 2026-11-26
+(the owner's ask: a last boss that reads as the master of all four elements) as the
+four-element titan: a towering stone titan-king quartered between the elements round a
+white-gold heart crystal, a crown of four crystal tines, a halo ring of stone with a crystal
+per element. ONE mesh and UV set in five paintings (`final_body_core.ts` `FINAL_BODY_FORMS`):
+the base form in the ring, at the arrival and on the pull, and one element over the whole body
+in each quarter; a form change swaps the painting and its glow map, never the model (the GLB
+lists the body as five mesh nodes over the same vertex data, pinned by
+`tests/smith_heart_final_body.test.ts`). Its clips keep the first model's names and beats; the
+arrival's `Dormant` and `Rise` are authored on the rig. Since the owner's playtest of 2026-11-26 its
+swings alternate two blows (`Attack`, the right fist's hammer; `Attack2`, the left fist's low
+backhand, on the same beat) and Call of the Quarters holds its own loop (`Channel`: braced wide,
+hauling strength up and driving it back down) in place of the generic cast's throw. Sources:
+`docs/design/raid/kit/final_boss_src/README.md`. As first built: a
 bodyless target with a colossus of the kit's rock pieces bound to the crystal heart, some
 twenty yards tall, hovering and breathing.
 

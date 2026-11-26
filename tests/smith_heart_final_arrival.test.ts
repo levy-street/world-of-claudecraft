@@ -40,7 +40,6 @@ import {
   ARRIVAL_CONVERGE,
   ARRIVAL_END,
   ARRIVAL_IGNITE,
-  ARRIVAL_KNEEL_HEIGHT,
   ARRIVAL_RISE_AT,
   ARRIVAL_ROAR_AT,
   ARRIVAL_SKIP_SECONDS,
@@ -52,7 +51,7 @@ import {
   arrivalBodyStage,
   arrivalDark,
   arrivalForming,
-  arrivalHeightShare,
+  arrivalKneel,
   arrivalSkyFlare,
   arrivalStance,
   arrivalStreamLevel,
@@ -64,11 +63,19 @@ import {
   arrivalVeinStart,
 } from '../src/render/smith_heart_fx/final_arrival_core';
 import {
+  FINAL_BODY_ANCHORS,
   FINAL_BODY_CLIP,
   FINAL_BODY_GESTURES,
+  FINAL_BODY_HEIGHT,
+  FINAL_BODY_KNEEL_ANCHORS,
+  FINAL_BODY_SOCKETS,
   FINAL_ELEMENT_LOOK,
 } from '../src/render/smith_heart_fx/final_body_core';
 import { FinalBodyFx, type FinalBodyHost } from '../src/render/smith_heart_fx/final_body_fx';
+import {
+  attachFinalBodySockets,
+  clearFinalBodySockets,
+} from '../src/render/smith_heart_fx/final_body_sockets';
 import * as finalFxCore from '../src/render/smith_heart_fx/final_fx_core';
 import { FINAL_BOSS } from '../src/render/smith_heart_fx/final_fx_core';
 import { EngineParticles } from '../src/render/trash_engine_fx/engine_particles';
@@ -231,8 +238,16 @@ describe('the body through the arrival', () => {
     expect(arrivalBodyStage(ARRIVAL_RISE_AT)).toBe('rising');
     expect(arrivalBodyStage(ARRIVAL_ROAR_AT)).toBe('roaring');
     expect(arrivalBodyStage(ARRIVAL_END)).toBe('awake');
-    expect(arrivalHeightShare(0, false)).toBe(ARRIVAL_KNEEL_HEIGHT);
-    expect(arrivalHeightShare(ARRIVAL_ROAR_AT, false)).toBe(1);
+    // Its anchors: on its knee until the Rise clip's push, on its feet as
+    // the clip stands (before the roar); a corpse is never held down by it.
+    expect(arrivalKneel(0, false)).toBe(1);
+    expect(arrivalKneel(ARRIVAL_RISE_AT + FINAL_BODY_CLIP.risePush, false)).toBe(1);
+    const mid = (FINAL_BODY_CLIP.risePush + FINAL_BODY_CLIP.riseStood) / 2;
+    expect(arrivalKneel(ARRIVAL_RISE_AT + mid, false)).toBeCloseTo(0.5, 6);
+    expect(arrivalKneel(ARRIVAL_RISE_AT + FINAL_BODY_CLIP.riseStood, false)).toBe(0);
+    expect(arrivalKneel(ARRIVAL_ROAR_AT, false)).toBe(0);
+    expect(arrivalKneel(0, true)).toBe(0);
+    expect(ARRIVAL.riseSeconds).toBe(FINAL_BODY_CLIP.riseLength);
   });
 
   it('a late arrival (first seen long awake) finds it standing, lit and whole', () => {
@@ -426,6 +441,72 @@ describe('FinalFx plays the arrival', () => {
     // And the floor's rite marks are gone with it (Jose's playtest of 2026-11-19).
     expect(heartArrivalRite(s.key)).toBe(0);
     s.fx.dispose();
+  });
+
+  it('holds the heart on the kneeling chest while it sleeps, and on its feet once it stands', () => {
+    const s = setup(true);
+    s.step(0.6);
+    const halo = s.scene.getObjectByName('smithHeartColossusHalo') as THREE.Object3D;
+    const H = FINAL_BODY_HEIGHT * s.boss.scale;
+    const place = ([f, l, u]: readonly [number, number, number]) => {
+      const sin = Math.sin(s.boss.facing);
+      const cos = Math.cos(s.boss.facing);
+      return {
+        x: s.boss.pos.x + (f * sin + l * cos) * H,
+        y: u * H,
+        z: s.boss.pos.z + (f * cos - l * sin) * H,
+      };
+    };
+    // Dormant: its kneeling place, well under where the standing heart is.
+    const down = place(FINAL_BODY_KNEEL_ANCHORS.heart);
+    expect(halo.position.x).toBeCloseTo(down.x, 3);
+    expect(halo.position.y).toBeCloseTo(down.y, 3);
+    expect(halo.position.z).toBeCloseTo(down.z, 3);
+    expect(down.y).toBeLessThan(FINAL_BODY_ANCHORS.heart[2] * H * 0.6);
+    // Standing after the roar: the standing anchor.
+    s.step(ARRIVAL_END + 1 - 0.6);
+    const up = place(FINAL_BODY_ANCHORS.heart);
+    expect(halo.position.x).toBeCloseTo(up.x, 3);
+    expect(halo.position.y).toBeCloseTo(up.y, 3);
+    expect(halo.position.z).toBeCloseTo(up.z, 3);
+    s.fx.dispose();
+  });
+
+  it("reads the heart off the live rig's chest once its view is up, through any pose", () => {
+    const s = setup(true);
+    // A view of the boss: a chest bone under its root, a skinned mesh beside it.
+    const rig = new THREE.Group();
+    rig.position.set(s.boss.pos.x, 0, s.boss.pos.z);
+    const chest = new THREE.Bone();
+    chest.name = 'Chest';
+    chest.position.set(0.5, 2.25, -0.75);
+    rig.add(
+      chest,
+      new THREE.SkinnedMesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial()),
+    );
+    s.scene.add(rig);
+    attachFinalBodySockets(rig);
+    try {
+      const heart = FINAL_BODY_SOCKETS.find((x) => x.id === 'heart');
+      if (!heart) throw new Error('no heart socket');
+      const halo = s.scene.getObjectByName('smithHeartColossusHalo') as THREE.Object3D;
+      s.step(0.6);
+      expect(halo.position.x).toBeCloseTo(s.boss.pos.x + 0.5 + heart.local[0], 3);
+      expect(halo.position.y).toBeCloseTo(2.25 + heart.local[1], 3);
+      expect(halo.position.z).toBeCloseTo(s.boss.pos.z - 0.75 + heart.local[2], 3);
+      // A clip folds the chest down and forward: the heart goes with it that frame.
+      chest.position.set(0.5, 1.1, 0.4);
+      s.step(0.05);
+      expect(halo.position.y).toBeCloseTo(1.1 + heart.local[1], 3);
+      expect(halo.position.z).toBeCloseTo(s.boss.pos.z + 0.4 + heart.local[2], 3);
+      // The view gone (retired to the pool): back on the anchor.
+      s.scene.remove(rig);
+      s.step(0.05);
+      expect(halo.position.y).toBeCloseTo(FINAL_BODY_KNEEL_ANCHORS.heart[2] * FINAL_BODY_HEIGHT, 3);
+    } finally {
+      clearFinalBodySockets();
+      s.fx.dispose();
+    }
   });
 
   it('a late arrival sees it standing: no veins, no beam, no push', () => {

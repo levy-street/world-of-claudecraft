@@ -42,7 +42,7 @@ wiki:content`.
 | `mount.ts` | main Guide | no, wiring + `hasWebGL`; dynamically `import('./scene')` |
 | `index.ts` | main Guide | no, barrel (the only import surface for pages) |
 | `scene.ts` | lazy chunk | yes, the `ModelViewer` turntable (scene/camera/loop/controls) |
-| `model.ts` | lazy chunk | yes, `buildModel` (GLB assembly via `loadGltf`) |
+| `model.ts` | lazy chunk | yes, `buildModel` (GLB assembly via `loadGltf`); `hideAlternateForms` hides every node a model file marks with the `wocHiddenForm` extra (a model carrying several bodies over one mesh for the game to swap between shows its default one alone here, pinned by `tests/guide_viewer_alternate_forms.test.ts`) |
 | `framing.ts` | lazy chunk | no, pure camera-framing math (`frameTurntable`, Node-testable); reached only via `scene.ts` |
 | `woc_head.ts` | lazy chunk | yes, a WOC body's default-look modular head (`guideWocHeadOf`, the head files' wait, hang + dress); reached only via `model.ts` |
 

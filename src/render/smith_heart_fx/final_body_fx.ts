@@ -3,9 +3,10 @@
 // shared particles and flashes are its). Presentation only, read from IWorld
 // through the host (the boss's drawn position, facing, scale, its state
 // aura's zone):
-//  - which of the rig's four element bodies shows (mesh toggles on the rig,
-//    sent through the renderer's gesture seam and re-sent so a rebuilt view
-//    shows the right body);
+//  - which of the one mesh's five paintings shows (the base form in the
+//    ring, its quarter's element elsewhere: mesh toggles on the rig, sent
+//    through the renderer's gesture seam and re-sent so a rebuilt view shows
+//    the right one);
 //  - the arrival's body (final_arrival_core.ts): dormant on its knee, its
 //    cracks held black, then the push to its feet (its Rise clip) and the
 //    roar that opens its first element;
@@ -37,7 +38,7 @@ import type { ArrivalStance } from './final_arrival_core';
 import {
   boltJoint,
   FINAL_AURA_RATES,
-  FINAL_BODY_ELEMENTS,
+  FINAL_BODY_FORMS,
   FINAL_BODY_GESTURES,
   FINAL_BODY_HEIGHT,
   FINAL_BODY_POOLS,
@@ -46,13 +47,16 @@ import {
   FINAL_SHIFT,
   type FinalBodyAnchor,
   type FinalBodyElement,
-  finalBodyElement,
+  type FinalBodyForm,
+  finalBodyForm,
   finalBodyPoint,
+  finalFormElement,
   finalRockOrbit,
   finalShiftAura,
   finalShiftStage,
   finalShiftStarts,
 } from './final_body_core';
+import { finalSocketPoint } from './final_body_sockets';
 import { colossusChunk, colossusRockMaterial } from './final_kit_shapes';
 
 /** What the host lends: its particles, flashes, camera thud and dice. */
@@ -95,6 +99,7 @@ const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
 const _v = new THREE.Vector3();
 const _s = new THREE.Vector3();
+const _sock = new THREE.Vector3();
 const _pos = new THREE.Vector3();
 const _c = new THREE.Color();
 const _p = { x: 0, y: 0, z: 0 };
@@ -124,8 +129,8 @@ export class FinalBodyFx {
   private readonly arcs: Arc[] = [];
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
-  /** The element the rig shows now (null: never sent). */
-  private shown: FinalBodyElement | null = null;
+  /** The form the rig shows now (null: never sent). */
+  private shown: FinalBodyForm | null = null;
   private bodyShown: boolean | null = null;
   private stanceSent: ArrivalStance | null = null;
   private darkIn = 0;
@@ -133,8 +138,8 @@ export class FinalBodyFx {
   private resendIn = 0;
   private bossId = -1;
   private shiftAt = -99;
-  private shiftFrom: FinalBodyElement = 'hammer';
-  private shiftTo: FinalBodyElement = 'hammer';
+  private shiftFrom: FinalBodyForm = 'four';
+  private shiftTo: FinalBodyForm = 'four';
   private shiftBurstDone = true;
   private auraDebt = 0;
   private arcDebt = 0;
@@ -239,7 +244,7 @@ export class FinalBodyFx {
     const resend = this.resendIn <= 0;
     if (resend) this.resendIn = RESEND_SEC;
     // A corpse keeps the body it died in (its state aura is gone with it).
-    const next = f.dead && this.shown ? this.shown : finalBodyElement(f.zone);
+    const next = f.dead && this.shown ? this.shown : finalBodyForm(f.zone);
     // The model always shows: dormant before and through the arrival.
     const showBody = true;
     // Formed: it roars awake (its Shift clip, the first element bursting).
@@ -264,11 +269,11 @@ export class FinalBodyFx {
     const age = f.clock - this.shiftAt;
     if (!this.shiftBurstDone && (age >= FINAL_SHIFT.burst || f.dead)) {
       this.shiftBurstDone = true;
-      if (!f.dead) this.burst(this.shiftTo);
+      if (!f.dead) this.burst(finalFormElement(this.shiftTo));
     }
-    // The element the rig should wear: the old one until the burst.
+    // The form the rig should wear: the old one until the burst.
     const wear = this.shiftBurstDone ? next : this.shiftFrom;
-    if (wear !== this.shown || resend) this.sendElement(wear);
+    if (wear !== this.shown || resend) this.sendForm(wear);
     if (showBody !== this.bodyShown || resend) {
       this.send(showBody ? FINAL_BODY_GESTURES.show : FINAL_BODY_GESTURES.hide);
       this.bodyShown = showBody;
@@ -315,9 +320,13 @@ export class FinalBodyFx {
     else if (age < FINAL_SHIFT.crownEnd) this.crown(age, f.dt);
     // The auras: the old one dying through the charge, the new one hot after.
     const [oldK, newK] = finalShiftAura(age);
-    if (!this.shiftBurstDone) this.aura(this.shiftFrom, oldK, f.dt);
-    else this.aura(next, newK, f.dt);
-    const rocksOn = FINAL_ELEMENT_LOOK[wear].rocks ? (this.shiftBurstDone ? 1 : oldK) : 0;
+    if (!this.shiftBurstDone) this.aura(finalFormElement(this.shiftFrom), oldK, f.dt);
+    else this.aura(finalFormElement(next), newK, f.dt);
+    const rocksOn = FINAL_ELEMENT_LOOK[finalFormElement(wear)].rocks
+      ? this.shiftBurstDone
+        ? 1
+        : oldK
+      : 0;
     this.rockScale += (rocksOn - this.rockScale) * Math.min(1, f.dt * 3);
     this.paintRocks(f.clock, this.rockScale);
     this.paintBolts(f.clock);
@@ -332,13 +341,24 @@ export class FinalBodyFx {
     if (this.bossId >= 0) this.playGesture?.(this.bossId, gesture);
   }
 
-  private sendElement(el: FinalBodyElement): void {
-    for (const e of FINAL_BODY_ELEMENTS) if (e !== el) this.send(FINAL_BODY_GESTURES.off[e]);
-    this.send(FINAL_BODY_GESTURES.on[el]);
-    this.shown = el;
+  private sendForm(form: FinalBodyForm): void {
+    for (const f of FINAL_BODY_FORMS) if (f !== form) this.send(FINAL_BODY_GESTURES.off[f]);
+    this.send(FINAL_BODY_GESTURES.on[form]);
+    this.shown = form;
   }
 
   private point(a: FinalBodyAnchor, out: { x: number; y: number; z: number }) {
+    // The heart and the eyes ride the rig's own bones while its view is up
+    // (the charge streams into the chest it folds over, not where it stood).
+    if (a === 'heart' || a === 'head') {
+      const live = finalSocketPoint(a, _sock);
+      if (live) {
+        out.x = live.x;
+        out.y = live.y;
+        out.z = live.z;
+        return out;
+      }
+    }
     return finalBodyPoint(a, this.bx, this.by, this.bz, this.facing, this.height, out);
   }
 
@@ -349,7 +369,7 @@ export class FinalBodyFx {
   private charge(age: number, dt: number): void {
     const H = this.height;
     const k = Math.min(1, age / FINAL_SHIFT.burst);
-    const look = FINAL_ELEMENT_LOOK[this.shiftTo];
+    const look = FINAL_ELEMENT_LOOK[finalFormElement(this.shiftTo)];
     const p = this.host.particles;
     const heart = this.point('heart', _p);
     const n = Math.round(dt * (40 + 120 * k) * this.host.density + this.host.rand());
@@ -596,7 +616,7 @@ export class FinalBodyFx {
   /** The crown re-forming: its light pulsing at the brow, motes rising off it
    *  into the new colour, the shell's last cracks flickering. */
   private crown(age: number, dt: number): void {
-    const look = FINAL_ELEMENT_LOOK[this.shiftTo];
+    const look = FINAL_ELEMENT_LOOK[finalFormElement(this.shiftTo)];
     const H = this.height;
     const st = finalShiftStage(age);
     const k = st.stage === 'crown' ? st.k : 1;

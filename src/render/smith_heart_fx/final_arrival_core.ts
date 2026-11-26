@@ -16,9 +16,8 @@
 //     the sky flaring;
 //  4. the collapse: the beam falls back down into the boss, its cracks fill
 //     with the colours and its eyes ignite;
-//  5. it stands (its Rise clip, scripts/build_masterless_strength_arrival_
-//     anims.mjs) and roars (its Shift clip) with a four-colour shockwave out
-//     over the raid.
+//  5. it stands (its Rise clip, authored on the rig) and roars (its Shift
+//     clip) with a four-colour shockwave out over the raid.
 // A pull during it runs the scene on to its end in under a second (the fight
 // never waits on a show); a raid that first sees the heart already awake (a
 // late arrival, a reconnect) sees the boss standing.
@@ -64,8 +63,8 @@ export const ARRIVAL = {
   beamFall: 0.7,
   /** The cracks lit, a breath before it pushes up off its knee. */
   riseDelay: 0.3,
-  /** The Rise clip's length (the arrival anims' build script). */
-  riseSeconds: 2.4,
+  /** The Rise clip's length (final_body_core.ts FINAL_BODY_CLIP). */
+  riseSeconds: FINAL_BODY_CLIP.riseLength,
   /** The roar's shockwave rides out this long; then the scene settles. */
   waveSeconds: 1.5,
   settle: 0.2,
@@ -288,9 +287,6 @@ export function arrivalSkyFlare(t: number): number {
 
 // ---- the body -----------------------------------------------------------------------------------
 
-/** Kneeling, the model's anchors stand this share of its height. */
-export const ARRIVAL_KNEEL_HEIGHT = 0.72;
-
 /** Where the body is in the scene at `t` (asleep, `t` < 0, is dormant). */
 export type ArrivalBodyStage = 'dormant' | 'waking' | 'rising' | 'roaring' | 'awake';
 
@@ -327,13 +323,13 @@ export function arrivalForming(t: number, dead: boolean): boolean {
   return !dead && t < ARRIVAL_ROAR_AT;
 }
 
-/** The model's height share at `t` for its anchors (the heart, the eyes):
- *  kneeling until the push, standing by the roar. */
-export function arrivalHeightShare(t: number, dead: boolean): number {
-  if (dead || t >= ARRIVAL_ROAR_AT) return 1;
-  if (t < ARRIVAL_RISE_AT) return ARRIVAL_KNEEL_HEIGHT;
-  const k = smooth((t - ARRIVAL_RISE_AT - 0.35) / (ARRIVAL.riseSeconds - 0.8));
-  return ARRIVAL_KNEEL_HEIGHT + (1 - ARRIVAL_KNEEL_HEIGHT) * k;
+/** How far onto its knee the body is at `t` for its anchors (the heart, the
+ *  eyes; final_body_core.ts finalBodyKneelPoint): 1 kneeling until its Rise
+ *  clip's push, 0 on its feet (the clip stands before the roar). */
+export function arrivalKneel(t: number, dead: boolean): number {
+  if (dead || t >= ARRIVAL_ROAR_AT) return 0;
+  const into = t - ARRIVAL_RISE_AT - FINAL_BODY_CLIP.risePush;
+  return 1 - smooth(into / (FINAL_BODY_CLIP.riseStood - FINAL_BODY_CLIP.risePush));
 }
 
 /** How bright the heart in its chest burns at `t` (dim asleep, waking as the
