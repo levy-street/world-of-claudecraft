@@ -1811,6 +1811,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/smith_heart_ring_crystal.glb": "/media/models/props/smith_heart_ring_crystal.c6d8b180c9bb.glb",
   "models/props/smith_heart_ring_kit.glb": "/media/models/props/smith_heart_ring_kit.96dd994e4681.glb",
   "models/props/smith_heart_rock_kit.glb": "/media/models/props/smith_heart_rock_kit.7f0fc03dbf47.glb",
+  "models/props/smith_heart_vein_crystals.glb": "/media/models/props/smith_heart_vein_crystals.d0f610415369.glb",
   "models/props/spore_burster.glb": "/media/models/props/spore_burster.dc83392e0d05.glb",
   "models/props/stag_shrine.glb": "/media/models/props/stag_shrine.212a9bf579fc.glb",
   "models/props/star_heart_crystal.glb": "/media/models/props/star_heart_crystal.413842e8d919.glb",

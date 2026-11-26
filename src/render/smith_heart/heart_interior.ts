@@ -130,6 +130,7 @@ import {
   ringKitReady,
 } from './ring_kit';
 import { buildRingSet } from './ring_set';
+import { buildVeinCrystals, ensureVeinCrystals } from './vein_crystal';
 
 export interface SmithHeartInteriorDeps {
   lowGfx: boolean;
@@ -166,6 +167,7 @@ export async function buildSmithHeartInterior(
     ensureHeartRoomKit(),
     ensureHeartFourSky(),
     ensureRingCrystal(),
+    ensureVeinCrystals(),
   ]);
   // The Ring kit draws the two stairs tread by tread and the dais's keel
   // (phase 2F); without it the field's own ramps and keel stand.
@@ -349,6 +351,10 @@ export async function buildSmithHeartInterior(
   const ringSet = buildRingSet(deps.lowGfx);
   group.add(ringSet.group);
   group.add(rivers.group);
+  // Each river's head in its guardian's arena: a collar over the ribbon's end, and the
+  // crystal that grows out of it when the guardian falls (vein_crystal.ts).
+  const veinCrystals = buildVeinCrystals();
+  group.add(veinCrystals.group);
   const seal = buildHeartSeal();
   group.add(seal.group);
   const portals = buildHeartPortals(deps.lowGfx, ground);
@@ -449,6 +455,7 @@ export async function buildSmithHeartInterior(
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);
       rivers.update(view);
+      veinCrystals.update(view);
       ringSet.update(view);
       seal.update(view);
       portals.update(stage, hop, hopSide, view.exitSince);
