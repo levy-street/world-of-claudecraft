@@ -198,7 +198,8 @@ export const tr_TR: EnTranslations = {
     },
     "bisTier": {
       "nyth": "Nyth",
-      "forge": "Forge"
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {

@@ -1948,6 +1948,7 @@ export type TranslationKeyFlat =
   | 'devCommand.actions.town.label'
   | 'devCommand.bisTier.forge'
   | 'devCommand.bisTier.nyth'
+  | 'devCommand.bisTier.pvp'
   | 'devCommand.categories.inventory'
   | 'devCommand.categories.player'
   | 'devCommand.categories.progress'

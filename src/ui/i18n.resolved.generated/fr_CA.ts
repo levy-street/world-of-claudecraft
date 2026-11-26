@@ -198,7 +198,8 @@ export const fr_CA: EnTranslations = {
     },
     "bisTier": {
       "nyth": "Nyth",
-      "forge": "Forge"
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {

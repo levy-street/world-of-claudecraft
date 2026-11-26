@@ -165,7 +165,7 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     // dresses whatever the character is currently specced into. The tier picks
     // the Nyth or the Forge kit; anything else falls back to Nyth.
     command: (values) => {
-      const tier = values.bisTier === 'forge' ? 'forge' : 'nyth';
+      const tier = values.bisTier === 'forge' || values.bisTier === 'pvp' ? values.bisTier : 'nyth';
       const spec = token(values, 'bisSpec');
       return spec ? `/dev bis ${tier} ${spec}` : `/dev bis ${tier}`;
     },

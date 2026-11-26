@@ -2,6 +2,8 @@
 // one dev-only payload write; draws no rng.
 //
 // Rules (owner call, 2026-11-25):
+//   - PvP kits (pvp_bis_loadouts.ts) use the same armor plan and the Forge
+//     weapon formulas, the best in the game.
 //   - Every enchantable slot takes the spec's main stat: Strength, Agility or
 //     Intellect, with Stamina where the slot offers nothing on that axis and
 //     for tanks. Spirit is never chosen (nothing in the game spends it).
@@ -31,7 +33,7 @@ import { refreshModsForEquipmentChange } from '../progression/talents';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, PlayerClass } from '../types';
 
-export type DevEnchantTier = 'nyth' | 'forge';
+export type DevEnchantTier = 'nyth' | 'forge' | 'pvp';
 type Line = 'str' | 'agi' | 'tank' | 'caster' | 'healer';
 
 // Candidates per line and slot, best first. 'weapon' covers any weapon worn in
@@ -94,7 +96,7 @@ const ARMOR: Record<Line, Partial<Record<SlotKey, readonly string[]>>> = {
 };
 ARMOR.healer = ARMOR.caster;
 
-const WEAPON: Record<DevEnchantTier, Record<Line, readonly string[]>> = {
+const WEAPON: Record<'nyth' | 'forge', Record<Line, readonly string[]>> = {
   nyth: {
     str: ['enchant_weapon_lucent_might'],
     tank: ['enchant_weapon_lucent_might'],
@@ -151,7 +153,9 @@ export function devBisEnchantsFor(
 ): Partial<Record<EquipSlot, string>> {
   const line = lineFor(cls, kit);
   // Hunters shoot: ranged attacks never trigger the Forge melee procs.
-  const weaponList = cls === 'hunter' ? WEAPON.nyth.agi : WEAPON[tier][line];
+  // PvP kits take the best (Forge) weapon formulas.
+  const weapons = WEAPON[tier === 'nyth' ? 'nyth' : 'forge'];
+  const weaponList = cls === 'hunter' ? WEAPON.nyth.agi : weapons[line];
   const out: Partial<Record<EquipSlot, string>> = {};
   for (const [slot, itemId] of Object.entries(gear) as [EquipSlot, string][]) {
     const item = ITEMS[itemId];
@@ -165,9 +169,9 @@ export function devBisEnchantsFor(
     // A spell-power weapon takes the caster rune; a weapon whose def slot is
     // the offhand falls through to the offhand enchants.
     const spellWeaponOnMelee = (item.spellPower ?? 0) > 0 && line !== 'caster' && line !== 'healer';
-    const weapons = spellWeaponOnMelee ? WEAPON[tier].caster : weaponList;
+    const handList = spellWeaponOnMelee ? weapons.caster : weaponList;
     const list =
-      key === 'weapon' ? [...weapons, ...(ARMOR[line].offhand ?? [])] : (ARMOR[line][key] ?? []);
+      key === 'weapon' ? [...handList, ...(ARMOR[line].offhand ?? [])] : (ARMOR[line][key] ?? []);
     const pick = list.find((id) => enchantFitsItem(id, itemId));
     if (pick) out[slot] = pick;
   }

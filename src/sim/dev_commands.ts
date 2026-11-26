@@ -927,7 +927,7 @@ export function handleDevChat(
     if (!meta) return null;
     const args = parseDevBisArgs(bisMatch[1].trim().split(/\s+/).filter(Boolean));
     if (!args) {
-      ctx.error(pid, '[dev] Usage: /dev bis [nyth|forge] [spec].');
+      ctx.error(pid, '[dev] Usage: /dev bis [nyth|forge|pvp] [spec].');
       return null;
     }
     const spec = args.spec ?? meta.talents.spec ?? null;
@@ -936,7 +936,7 @@ export function handleDevChat(
       ctx.error(pid, `[dev] '${spec}' is not a ${meta.cls} spec. Try: ${known}.`);
       return null;
     }
-    const tierName = args.tier === 'forge' ? 'Forge' : 'Nyth';
+    const tierName = args.tier === 'forge' ? 'Forge' : args.tier === 'pvp' ? 'PvP' : 'Nyth';
     const equipped = equipBestInSlotForDev(ctx, pid, spec ?? undefined, args.tier);
     if (equipped === 0) ctx.error(pid, '[dev] Could not outfit best-in-slot gear.');
     else if (spec) {
@@ -1568,7 +1568,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev pvpbot [name], /dev vendor, /dev bg, /dev bis [nyth|forge] [spec], /dev enchant <slot> <enchant id>, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout|wake|sleep], /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev sanctum [enter|tp|gates|kill|pack|spawn|trigger|face|reset], /dev trashkit [demo|cast|wall|pool|split|freeze|brand|quench|clear], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev pvpbot [name], /dev vendor, /dev bg, /dev bis [nyth|forge|pvp] [spec], /dev enchant <slot> <enchant id>, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout|wake|sleep], /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev sanctum [enter|tp|gates|kill|pack|spawn|trigger|face|reset], /dev trashkit [demo|cast|wall|pool|split|freeze|brand|quench|clear], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

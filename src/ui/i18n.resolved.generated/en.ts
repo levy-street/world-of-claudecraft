@@ -198,7 +198,8 @@ export const en: EnTranslations = {
     },
     "bisTier": {
       "nyth": "Nyth",
-      "forge": "Forge"
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -259,7 +260,7 @@ export const en: EnTranslations = {
       },
       "biskit": {
         "label": "Equip BIS-20 kit",
-        "description": "Wear a best-in-slot loadout for a spec, enchants included: Nyth (Nythraxis raid) or Forge (Ignivar raid, crafted pieces and legendary weapons)."
+        "description": "Wear a best-in-slot loadout for a spec, enchants included: Nyth (Nythraxis raid), Forge (Ignivar raid, crafted pieces and legendary weapons) or PvP (Warfare Season 2 with Season 1 belt and boots)."
       },
       "enchant": {
         "label": "Enchant item",

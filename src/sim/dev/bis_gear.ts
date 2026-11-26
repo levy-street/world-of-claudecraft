@@ -32,6 +32,7 @@ import { resolveDevBisKit } from './bis_kits';
 import { forgeBisGearFor } from './forge_bis_loadouts';
 import { collectionFitsRole, collectionRoleForSpec } from './gear_selection';
 import { parseBisGearFor } from './parse_bis_loadouts';
+import { pvpBisGearFor } from './pvp_bis_loadouts';
 
 const SEASON2_STOCK_IDS: ReadonlySet<string> = new Set(SEASON2_STOCK);
 
@@ -269,7 +270,7 @@ function applyDevGear(
 // The two /dev bis tiers: 'nyth' is the frozen Nythraxis top-parse snapshot
 // (parse_bis_loadouts.ts, the default), 'forge' the Ignivar-raid kit with the
 // Crucible crafted pair and the legendary weapons (forge_bis_loadouts.ts).
-export const DEV_BIS_TIERS = ['nyth', 'forge'] as const;
+export const DEV_BIS_TIERS = ['nyth', 'forge', 'pvp'] as const;
 export type DevBisTier = (typeof DEV_BIS_TIERS)[number];
 export function isDevBisTier(value: string): value is DevBisTier {
   return (DEV_BIS_TIERS as readonly string[]).includes(value);
@@ -312,7 +313,8 @@ export function equipBestInSlotForDev(
   if (!meta) return 0;
   const word = selectedKit ?? meta.talents?.spec ?? null;
   const resolved = word ? resolveDevBisKit(meta.cls, word) : null;
-  const tierGear = tier === 'forge' ? forgeBisGearFor : parseBisGearFor;
+  const tierGear =
+    tier === 'forge' ? forgeBisGearFor : tier === 'pvp' ? pvpBisGearFor : parseBisGearFor;
   const kit = resolved ? tierGear(meta.cls, resolved.kit) : null;
   if (!kit || !resolved) {
     return applyDevGear(ctx, pid, bestEpicGearFor(meta.cls, resolved?.spec ?? word), true);

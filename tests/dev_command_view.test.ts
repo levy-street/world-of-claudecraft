@@ -14,6 +14,9 @@ describe('developer command view', () => {
     expect(buildDevCommand('biskit', { bisSpec: 'protection' })).toBe('/dev bis nyth protection');
     // Token-gated like every other field: an injection-shaped value never ships.
     expect(buildDevCommand('biskit', { bisSpec: 'prot; /dev gold 999' })).toBe('/dev bis nyth');
+    expect(buildDevCommand('biskit', { bisTier: 'pvp', bisSpec: 'stonebound' })).toBe(
+      '/dev bis pvp stonebound',
+    );
     expect(buildDevCommand('biskit', { bisTier: 'forge', bisSpec: 'bear' })).toBe(
       '/dev bis forge bear',
     );

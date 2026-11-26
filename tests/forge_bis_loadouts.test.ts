@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { DEV_KIT_ROLE_COUNT, DEV_KIT_ROLES } from '../src/sim/content/dev_kit_roles';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
+import {
+  SEASON2_JEWELRY_IDS,
+  SEASON2_SETS,
+  SEASON2_WEAPON_IDS,
+} from '../src/sim/content/pvp_honor_season2';
 import { ITEMS } from '../src/sim/data';
 import {
   applyDevEnchant,
@@ -11,6 +17,7 @@ import { parseDevBisArgs } from '../src/sim/dev/bis_gear';
 import { devBisKitChoices, resolveDevBisKit } from '../src/sim/dev/bis_kits';
 import { forgeBisGearFor, forgeBisLoadoutEntries } from '../src/sim/dev/forge_bis_loadouts';
 import { parseBisGearFor, parseBisLoadoutEntries } from '../src/sim/dev/parse_bis_loadouts';
+import { pvpBisGearFor } from '../src/sim/dev/pvp_bis_loadouts';
 import {
   canEquipItemInSlot,
   displacedSlotForEquip,
@@ -28,6 +35,7 @@ const KITS: Kit[] = (Object.keys(DEV_KIT_ROLES) as PlayerClass[]).flatMap((cls) 
 const TIERS = [
   ['nyth', parseBisGearFor],
   ['forge', forgeBisGearFor],
+  ['pvp', pvpBisGearFor],
 ] as const;
 const roleOf = (k: Kit) => DEV_KIT_ROLES[k.cls].find((r) => r.spec === k.spec)!;
 const TANK_KITS = new Set(['bear', 'stonebound']);
@@ -283,6 +291,66 @@ describe('BIS enchants', () => {
   });
 });
 
+describe('PvP BIS loadouts', () => {
+  const baseSpec = (k: Kit) => resolveDevBisKit(k.cls, k.kit)?.spec;
+
+  it('wears the spec Season 2 set, weapon and jewelry with Season 1 belt and boots', () => {
+    for (const k of KITS) {
+      const label = `${k.cls} ${k.word}`;
+      const gear = pvpBisGearFor(k.cls, k.kit) ?? {};
+      const set = SEASON2_SETS.find((s) => s.cls === k.cls && s.spec === baseSpec(k));
+      expect(set, label).toBeDefined();
+      for (const id of set?.itemIds ?? []) expect(Object.values(gear), label).toContain(id);
+      expect(WARFARE_ITEMS[gear.waist ?? ''], `${label} waist`).toBeDefined();
+      expect(WARFARE_ITEMS[gear.feet ?? ''], `${label} feet`).toBeDefined();
+      for (const slot of ['neck', 'ring1', 'ring2'] as const) {
+        expect(SEASON2_JEWELRY_IDS, `${label} ${slot}`).toContain(gear[slot]);
+      }
+      expect(SEASON2_WEAPON_IDS, `${label} mainhand`).toContain(gear.mainhand);
+      expect(gear.trinket, label).toBe('medallion_of_defiance');
+      // A Warfare off hand when one exists, else the Nyth shield or quiver.
+      if (gear.offhand && !SEASON2_WEAPON_IDS.includes(gear.offhand)) {
+        expect(gear.offhand, label).toBe(parseBisGearFor(k.cls, k.kit)?.offhand);
+      }
+    }
+    expect(pvpBisGearFor('warrior', 'fury')).toMatchObject({
+      mainhand: 'vanguard_verdict_greatsword',
+      offhand: 'vanguard_verdict_greatsword',
+    });
+    expect(pvpBisGearFor('druid', 'bear')?.mainhand).toBe('vanguard_feral_staff');
+    expect(pvpBisGearFor('shaman', 'stonebound')?.helmet).toBe(
+      pvpBisGearFor('shaman', 'enhancement')?.helmet,
+    );
+  });
+
+  it('enchants every piece with Stamina or the main stat and the weapons with the Forge formulas', () => {
+    const pvp = (cls: PlayerClass, kit: string) =>
+      devBisEnchantsFor(cls, kit, 'pvp', pvpBisGearFor(cls, kit) ?? {});
+    for (const k of KITS) {
+      for (const id of Object.values(pvp(k.cls, k.kit))) {
+        const bonus = ENCHANTS[id ?? '']?.statBonus ?? {};
+        expect(bonus.spi ?? 0, `${k.word} ${id}`).toBe(0);
+      }
+    }
+    expect(pvp('warrior', 'arms').mainhand).toBe('enchant_weapon_piston_drive');
+    expect(pvp('rogue', 'combat').offhand).toBe('enchant_weapon_riftwalkers_grace');
+    expect(pvp('mage', 'fire').mainhand).toBe('enchant_weapon_dawnfire_etching');
+    expect(pvp('priest', 'holy').mainhand).toBe('enchant_weapon_dawns_benediction');
+    expect(pvp('hunter', 'survival').mainhand).toBe('enchant_weapon_agility');
+  });
+
+  it('/dev bis pvp equips the PvP kit for the current spec, enchanted', () => {
+    const sim = devSim('rogue');
+    sim.chat('/dev bis pvp combat');
+    const meta = sim.meta(sim.playerId);
+    expect(meta?.equipment).toEqual(pvpBisGearFor('rogue', 'combat'));
+    expect(meta?.equipmentInstance.mainhand?.enchant).toBe('enchant_weapon_riftwalkers_grace');
+    expect(
+      sim.drainEvents().some((e) => e.type === 'log' && e.text.includes('PvP BiS rogue combat')),
+    ).toBe(true);
+  });
+});
+
 describe('/dev bis and /dev enchant commands', () => {
   it('reads an optional tier and spec in either order', () => {
     expect(parseDevBisArgs([])).toEqual({ tier: 'nyth', spec: null });
@@ -290,6 +358,7 @@ describe('/dev bis and /dev enchant commands', () => {
     expect(parseDevBisArgs(['Forge'])).toEqual({ tier: 'forge', spec: null });
     expect(parseDevBisArgs(['forge', 'fury'])).toEqual({ tier: 'forge', spec: 'fury' });
     expect(parseDevBisArgs(['fury', 'nyth'])).toEqual({ tier: 'nyth', spec: 'fury' });
+    expect(parseDevBisArgs(['PvP', 'cat'])).toEqual({ tier: 'pvp', spec: 'cat' });
     expect(parseDevBisArgs(['nyth', 'forge'])).toBeNull();
     expect(parseDevBisArgs(['fury', 'arms'])).toBeNull();
     expect(parseDevBisArgs(['forge', 'fury', 'x'])).toBeNull();

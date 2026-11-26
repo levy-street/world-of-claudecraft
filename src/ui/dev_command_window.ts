@@ -180,7 +180,7 @@ function actionFields(actionId: string): string {
           ? selectField(
               'devCommand.fields.bisTier',
               'bisTier',
-              `<option value="nyth">${esc(t('devCommand.bisTier.nyth'))}</option><option value="forge">${esc(t('devCommand.bisTier.forge'))}</option>`,
+              `<option value="nyth">${esc(t('devCommand.bisTier.nyth'))}</option><option value="forge">${esc(t('devCommand.bisTier.forge'))}</option><option value="pvp">${esc(t('devCommand.bisTier.pvp'))}</option>`,
             )
           : ''
       }${selectField(
