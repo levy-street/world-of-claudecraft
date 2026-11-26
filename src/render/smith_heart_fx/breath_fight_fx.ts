@@ -68,7 +68,6 @@ import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { FloorTellPool } from '../floor_telegraph/floor_tell';
-import { countInside } from '../floor_telegraph/floor_tell_core';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -92,6 +91,7 @@ import {
   corniceOutline,
   cradleLook,
   cradleNeedOf,
+  cradleUnder,
   easeDir,
   FORK_BEAM_SECONDS,
   FORK_REACH,
@@ -573,6 +573,9 @@ export class BreathFightFx {
   /** The players' drawn spots this frame for the cradles' count (pooled). */
   private readonly cradleAt: { x: number; z: number }[] = [];
   private cradleAtCount = 0;
+  /** The cradles' spots and the players under each this frame (pooled). */
+  private readonly cradleSpots: { x: number; z: number }[] = [];
+  private readonly cradleCounts: number[] = [];
   private readonly chargedFans: FanSlot[] = [];
   private readonly cradleFans: FanSlot[] = [];
   private readonly barFans: FanSlot[] = [];
@@ -2014,9 +2017,35 @@ export class BreathFightFx {
         );
       }
     }
+    // The circles' spots (an empty slot parked far away), then who stands
+    // under each by the sim's rule (`cradleUnder`: the nearest circle only).
     let circles = 0;
-    for (const s of this.cradleFans) if (s.id >= 0 && world.entities.get(s.id)) circles++;
-    if (circles > 0) this.refreshCradleAt(world);
+    for (let i = 0; i < this.cradleFans.length; i++) {
+      const s = this.cradleFans[i];
+      const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
+      const spot = this.cradleSpots[i] ?? { x: 0, z: 0 };
+      this.cradleSpots[i] = spot;
+      if (e) {
+        const at = fxAnchor(e);
+        spot.x = at.x;
+        spot.z = at.z;
+        circles++;
+      } else {
+        spot.x = Number.POSITIVE_INFINITY;
+        spot.z = Number.POSITIVE_INFINITY;
+      }
+    }
+    if (circles > 0) {
+      this.refreshCradleAt(world);
+      cradleUnder(
+        this.cradleSpots,
+        this.cradleFans.length,
+        this.cradleAt,
+        this.cradleAtCount,
+        T.cradleR,
+        this.cradleCounts,
+      );
+    }
     const need = cradleNeedOf(world.dungeonRun?.difficulty, circles);
     for (let i = 0; i < this.cradleFans.length; i++) {
       const s = this.cradleFans[i];
@@ -2031,12 +2060,12 @@ export class BreathFightFx {
       // The shared soak marker IS the gather circle (every tier; only the
       // wisps thin with the density): its pips the players under it, its
       // countdown arc the channel's hold (the kit's fill before it).
-      const at = fxAnchor(e);
+      const spot = this.cradleSpots[i];
       this.cradleTells.paint(i, {
         kind: 'share',
-        x: at.x,
-        y: this.groundY(at.x, at.z),
-        z: at.z,
+        x: spot.x,
+        y: this.groundY(spot.x, spot.z),
+        z: spot.z,
         radius,
         color: C.soak,
         element: 'lightning',
@@ -2044,7 +2073,7 @@ export class BreathFightFx {
         clock: this.clock,
         reduced: this.reducedMotion(),
         need,
-        have: countInside(at.x, at.z, radius, this.cradleAt, this.cradleAtCount),
+        have: this.cradleCounts[i] ?? 0,
         detail: this.density,
         timer: look.fill,
       });

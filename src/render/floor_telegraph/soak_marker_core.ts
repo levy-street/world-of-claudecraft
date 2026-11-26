@@ -199,6 +199,13 @@ export function soakRipple(time: number, k: number): { r: number; a: number } {
   };
 }
 
+/** The body's gentle flicker at `time` (0.9 .. 1), once a frame on the CPU
+ *  rather than per fragment. Still under reduced motion (the held time). */
+export function soakFlicker(time: number): number {
+  const w = Math.sin(time * 6.3) * Math.sin(time * 2.9 + 1.1);
+  return 0.95 + 0.05 * w;
+}
+
 /** The wisps drawn at a tier's `detail` (0 low .. 1 full). */
 export function soakWispCount(detail: number): number {
   const d = clamp01(detail);

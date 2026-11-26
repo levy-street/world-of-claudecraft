@@ -12,7 +12,11 @@ import {
   VARKHUL_SHARED_PYRE_RADIUS,
   VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
 } from '../sim/varkhul_shared_pyre';
-import { buildSoakMarkerGeometry, SoakMarker } from './floor_telegraph/soak_marker';
+import {
+  buildSoakMarkerGeometry,
+  SoakMarker,
+  type SoakMarkerPaint,
+} from './floor_telegraph/soak_marker';
 import type { SoakElement } from './floor_telegraph/soak_marker_core';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 
@@ -85,6 +89,19 @@ export function buildIgnivarSoakTelegraph(
   return root;
 }
 
+/** The sync's frame, reused (no per-frame allocation; the marker sits at
+ *  the root's origin). */
+const _paint: SoakMarkerPaint = {
+  x: 0,
+  y: 0,
+  z: 0,
+  radius: 1,
+  element: 'fire',
+  fill: 0,
+  clock: 0,
+  reduced: false,
+};
+
 /** The marker a built soak telegraph carries. */
 export function soakMarkerOf(root: THREE.Object3D): SoakMarker | null {
   return (root.userData.soakMarker as SoakMarker | undefined) ?? null;
@@ -125,18 +142,15 @@ export function syncIgnivarSoakTelegraph(
   if (!root.visible) marker.hide();
   const style =
     (root.userData.soakStyle as SoakTelegraphStyle | undefined) ?? IGNIVAR_SOAK_DEFAULT_STYLE;
-  marker.paint({
-    x: 0,
-    y: 0,
-    z: 0,
-    radius: style.radius,
-    element: style.element,
-    fill: root.userData.progress,
-    clock,
-    reduced: reducedMotion,
-    need: root.userData.requiredPlayers,
-    have: root.userData.playersInside,
-    timer: root.userData.progress,
-  });
+  const q = _paint;
+  q.radius = style.radius;
+  q.element = style.element;
+  q.fill = root.userData.progress;
+  q.clock = clock;
+  q.reduced = reducedMotion;
+  q.need = root.userData.requiredPlayers;
+  q.have = root.userData.playersInside;
+  q.timer = root.userData.progress;
+  marker.paint(q);
   root.visible = true;
 }

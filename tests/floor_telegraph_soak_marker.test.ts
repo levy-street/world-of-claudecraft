@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { buildBalgathRangedStandIn } from '../src/render/balgath_ranged_fx';
 import { FloorTellPool } from '../src/render/floor_telegraph/floor_tell';
 import { buildSoakMarkerGeometry, SoakMarker } from '../src/render/floor_telegraph/soak_marker';
 import {
@@ -21,7 +22,8 @@ import {
   soakWispCount,
   soakWispHeight,
 } from '../src/render/floor_telegraph/soak_marker_core';
-import { cradleNeedOf } from '../src/render/smith_heart_fx/breath_fight_fx_core';
+import { cradleNeedOf, cradleUnder } from '../src/render/smith_heart_fx/breath_fight_fx_core';
+import { buildVarkhulEncounterPrewarmVisual } from '../src/render/varkhul_encounter';
 import { BREATH_DIFFICULTY } from '../src/sim/encounters/smith_heart/breath_ids';
 
 const lum = (hex: number) => {
@@ -235,11 +237,75 @@ describe('the soak marker shape (gather in, yard-true, tier-fair)', () => {
   });
 });
 
+describe('the soak marker programs are prewarmed', () => {
+  const names = (root: THREE.Object3D) => {
+    const out = new Set<string>();
+    root.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+      if (m && (m as THREE.ShaderMaterial).isShaderMaterial) out.add(m.name);
+    });
+    return out;
+  };
+  it("Varkhul's and Balgath's prewarm visuals carry both marker programs", () => {
+    for (const root of [buildVarkhulEncounterPrewarmVisual(), buildBalgathRangedStandIn()]) {
+      const n = names(root);
+      expect(n.has('soakMarkerDisc')).toBe(true);
+      expect(n.has('soakMarkerWisps')).toBe(true);
+    }
+  });
+});
+
+describe('the marker information is never faded or ghosted', () => {
+  it('draws the rim and pips whole while held, drops them at once on release', () => {
+    const m = new SoakMarker(buildSoakMarkerGeometry(), [], 26);
+    const paint = {
+      x: 0,
+      y: 0,
+      z: 0,
+      radius: 5,
+      element: 'fire' as const,
+      fill: 0,
+      clock: 1,
+      reduced: false,
+      need: 4,
+      have: 4,
+    };
+    m.paint(paint);
+    const u = m.discMat.uniforms;
+    expect(u.uInfo.value).toBe(1);
+    expect(u.uAlpha.value).toBeLessThan(1); // the body is still blooming in
+    expect(u.uFlare.value).toBe(1); // ready: every soaker inside
+    m.release();
+    m.settle(1.1);
+    expect(m.shown).toBe(true);
+    expect(u.uInfo.value).toBe(0);
+  });
+});
+
 describe("the Thunder's Cradle's want", () => {
   it('reads the claim difficulty, or the circles when the run view is missing', () => {
     expect(cradleNeedOf('normal', 1)).toBe(BREATH_DIFFICULTY.normal.cradleSoakers);
     expect(cradleNeedOf('heroic', 1)).toBe(BREATH_DIFFICULTY.heroic.cradleSoakers);
     expect(cradleNeedOf(null, 3)).toBe(BREATH_DIFFICULTY.heroic.cradleSoakers);
     expect(cradleNeedOf(undefined, 1)).toBe(BREATH_DIFFICULTY.normal.cradleSoakers);
+    expect(cradleNeedOf('mythic', 1)).toBe(BREATH_DIFFICULTY.mythic.cradleSoakers);
+  });
+
+  it('counts a body for the nearest circle only, as the sim discharges it', () => {
+    const circles = [
+      { x: 0, z: 0 },
+      { x: 8, z: 0 },
+      { x: Number.POSITIVE_INFINITY, z: Number.POSITIVE_INFINITY },
+    ];
+    const pts = [
+      { x: 0, z: 0 }, // the lifted player over circle 0
+      { x: 3, z: 0 }, // under both: nearer circle 0
+      { x: 5, z: 0 }, // under both: nearer circle 1
+      { x: 8, z: 6 }, // the rim of circle 1 (inclusive)
+      { x: 30, z: 0 }, // under none
+    ];
+    const out: number[] = [];
+    expect(cradleUnder(circles, 3, pts, pts.length, 6, out)).toEqual([2, 2, 0]);
+    expect(cradleUnder(circles, 3, pts, 1, 6, out)).toEqual([1, 0, 0]);
   });
 });

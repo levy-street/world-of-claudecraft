@@ -9,14 +9,16 @@
 // motion holds every motion still.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
-import { FLOOR_TELL_PIPS, soakPips } from './floor_tell_core';
+import { FLOOR_TELL_PIPS } from './floor_tell_core';
 import {
   newSoakMarkerLook,
   SOAK_CHARACTER,
   SOAK_MARKER,
   SOAK_PALETTES,
   type SoakElement,
+  soakFlicker,
   soakMarkerLook,
   soakMarkerStage,
   soakTimerLeft,
@@ -51,6 +53,9 @@ uniform float uRipEvery;
 uniform float uRipTo;
 uniform vec4 uChar;
 uniform vec2 uChar2;
+uniform float uDetail;
+uniform float uFlick;
+uniform float uInfo;
 uniform vec3 uDeep;
 uniform vec3 uBody;
 uniform vec3 uBright;
@@ -87,7 +92,8 @@ vec2 rot(vec2 p, float a) {
 
 void main() {
   float r = length(vXZ);
-  if (r > 1.0) discard;
+  // The disc is the unit circle: no discard (it would cost early depth).
+  r = min(r, 1.0);
   float aa = fwidth(r) * 1.5 + 0.003;
   float spd = uChar2.y;
   float spin = uSpin * spd;
@@ -107,9 +113,12 @@ void main() {
   vec2 ringB = vec2(cos(angB), sin(angB));
   float drift = time * 0.5;
   float stA = fbm(ringA * 2.0 + vec2(rb * 7.0 + drift, 0.0));
-  float stA2 = fbm(ringA * 4.4 + vec2(rb * 19.0 + drift * 1.7, 4.1));
+  // The low tier sheds two layers' octaves (cosmetic depth only).
+  vec2 qA2 = ringA * 4.4 + vec2(rb * 19.0 + drift * 1.7, 4.1);
+  float stA2 = uDetail > 0.5 ? fbm(qA2) : vnoise(qA2) * 0.94;
   float stB = fbm(ringB * 1.6 + vec2(rb * 5.0 + drift * 0.6, 7.3));
-  float turb = fbm(ringB * 1.1 + vec2(rb * 2.6 - drift * 0.3, 9.7));
+  vec2 qT = ringB * 1.1 + vec2(rb * 2.6 - drift * 0.3, 9.7);
+  float turb = uDetail > 0.5 ? fbm(qT) : vnoise(qT) * 0.94;
   float smoke = uChar.w;
   float sA = smoothstep(0.46 + 0.08 * smoke, 0.8, stA);
   // Thin bright filaments: spiral strands wound into the middle (two
@@ -121,8 +130,6 @@ void main() {
     * smoothstep(0.35, 0.7, stA2 + 0.15) * smoothstep(0.18, 0.5, rb);
   float filB = pow(1.0 - abs(2.0 * fract(sp2) - 1.0), 14.0)
     * smoothstep(0.45, 0.75, stA) * smoothstep(0.15, 0.45, rb);
-  // A gentle flicker over the whole body.
-  float flick = 0.9 + 0.1 * vnoise(vec2(time * 6.0, 3.0));
   // The radial shape: a darker turbulent core, a body, a hot inner ring
   // near the rim, a soft-to-crisp falloff onto the rim.
   float band = smoothstep(0.28, 0.72, rb) * (1.0 - smoothstep(0.92, 1.0, rb));
@@ -166,7 +173,8 @@ void main() {
     col = mix(col, uHot, st * 0.8);
     a = max(a, st * 0.85);
   }
-  col *= flick;
+  // A gentle flicker over the whole body (soakFlicker, once a frame).
+  col *= uFlick;
   // Grains (earth's sand, fire's embers, air's motes): specks carried round
   // the vortex, twinkling.
   if (uChar.x > 0.0) {
@@ -211,11 +219,13 @@ void main() {
   // frame says GATHER too.
   float u = fract(t * 8.0 + 0.0625) - 0.5;
   float v = r - abs(u) * 0.9;
+  float info = 0.0;
   float chev = (1.0 - smoothstep(0.012, 0.012 + aa, abs(v - 0.58))) *
     (1.0 - smoothstep(0.07, 0.1, abs(u)));
   col = mix(col, uHot, chev * 0.9);
   a = max(a, chev * 0.9);
   occ = max(occ, chev * 0.5);
+  info = max(info, chev);
   // The rim: a crisp bright line at the sim's own radius, a thin dark
   // keyline inside it so it holds on any floor.
   float rw = max(0.09 / uRadius, aa * 1.2);
@@ -225,6 +235,7 @@ void main() {
   col = mix(col, uDeep * 0.5, key * 0.6);
   a = max(a, key * 0.55);
   occ = max(occ, key * 0.6 + rimLine * 0.9);
+  info = max(info, rimLine);
   col = mix(col, mix(uBright, uHot, clamp(0.45 + 0.55 * uFlare, 0.0, 1.0)), rimLine);
   a = mix(a, 1.0, rimLine * 0.95);
   // Crackle (lightning; the air's storm accent): thin arcs flickering
@@ -248,6 +259,7 @@ void main() {
     float arc = (1.0 - smoothstep(0.014, 0.014 + aa, abs(r - 0.9))) * step(t, uTimer);
     col = mix(col, uHot, arc);
     a = max(a, arc);
+    info = max(info, arc);
   }
   // The pips: uNeed round the rim, the first uLit bright; a dark socket
   // under each so they read over the bright band.
@@ -263,21 +275,36 @@ void main() {
     col = mix(col, uDeep * 0.35, socket * 0.85);
     a = mix(a, 0.92, socket);
     occ = max(occ, socket * 0.85);
+    info = max(info, socket);
     float gemCore = 1.0 - smoothstep(0.0, uPipSize, d);
     vec3 gemCol = mix(uBright, uHot, gemCore);
     col = mix(col, mix(uBody, gemCol, on), mix(hollow, gem, on));
     a = max(a, mix(hollow, gem, on));
   }
+  // Ready (every soaker inside): a bright ring round the middle and a
+  // hotter rim, so a full share reads at a glance.
+  if (uFlare > 0.5) {
+    float ready = 1.0 - smoothstep(0.02, 0.02 + aa, abs(r - 0.22));
+    col = mix(col, uHot, ready);
+    a = max(a, ready);
+    occ = max(occ, ready * 0.6);
+    info = max(info, ready);
+  }
   col *= 1.0 + 0.25 * uFlare;
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
-  gl_FragColor = vec4(gl_FragColor.rgb * clamp(a, 0.0, 1.0) * 1.35, clamp(occ, 0.0, 1.0)) * uAlpha;
+  // The information (rim, pips, chevrons, arc, ready ring) draws whole from
+  // the first frame and goes at once with the mark (uInfo); only the body
+  // blooms in and decays.
+  float k = mix(uAlpha, uInfo, clamp(info, 0.0, 1.0));
+  gl_FragColor = vec4(gl_FragColor.rgb * clamp(a, 0.0, 1.0) * 1.35, clamp(occ, 0.0, 1.0)) * k;
 }
 `;
 
 /** The wisps: each ribbon a strip up a spiral, its width turned to the
  *  camera, its life a rise out of the disc and a fade off the top. */
 const WISP_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 attribute float aRibbon;
 attribute float aV;
 attribute float aSide;
@@ -329,7 +356,7 @@ void main() {
   vV = vv;
   vFade = taper * (1.0 - smoothstep(0.55, 1.0, vv)) * smoothstep(0.0, 0.08, vv)
     * (1.0 - smoothstep(0.85, 1.0, life));
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 
@@ -465,6 +492,9 @@ export class SoakMarker {
         uRipTo: { value: SOAK_MARKER.rippleTo },
         uChar: { value: new THREE.Vector4() },
         uChar2: { value: new THREE.Vector2(0, 1) },
+        uDetail: { value: 1 },
+        uFlick: { value: 1 },
+        uInfo: { value: 1 },
         uDeep: { value: new THREE.Color() },
         uBody: { value: new THREE.Color() },
         uBright: { value: new THREE.Color() },
@@ -532,10 +562,11 @@ export class SoakMarker {
     }
     this.lastClock = p.clock;
     this.lastReduced = p.reduced;
-    const pips = soakPips(p.need ?? 0, p.have ?? 0);
-    const ready = pips.need > 0 && pips.lit >= pips.need;
+    const need = Math.max(0, Math.min(FLOOR_TELL_PIPS.most, Math.round(p.need ?? 0)));
+    const lit = Math.max(0, Math.min(need, Math.round(p.have ?? 0)));
+    const ready = need > 0 && lit >= need;
     soakMarkerLook(p.clock, p.clock - this.bornAt, null, p.fill, ready, p.reduced, _look);
-    this.apply(p, pips.need, pips.lit);
+    this.apply(p, need, lit);
   }
 
   /** The mark is gone: play the decay (or hide at once under reduced motion
@@ -563,6 +594,8 @@ export class SoakMarker {
     u.uAlpha.value = _look.alpha;
     u.uSpin.value = _look.spin;
     u.uTime.value = _look.time;
+    // The mark is gone: its information goes with it at once.
+    u.uInfo.value = 0;
     this.wispMat.uniforms.uAlpha.value = _look.alpha * _look.wisp;
     this.wispMat.uniforms.uSpin.value = _look.spin;
     this.wispMat.uniforms.uTime.value = _look.time;
@@ -607,11 +640,14 @@ export class SoakMarker {
     u.uBloom.value = _look.bloom;
     u.uAlpha.value = _look.alpha;
     u.uFlare.value = _look.flare;
+    u.uInfo.value = 1;
     u.uNeed.value = need;
     u.uLit.value = lit;
     u.uRimOn.value = p.rim === false ? 0 : 1;
     u.uTimer.value = soakTimerLeft(p.timer);
     u.uRadius.value = p.radius;
+    u.uDetail.value = p.detail ?? 1;
+    u.uFlick.value = soakFlicker(_look.time);
     u.uPipAt.value = p.pipAt ?? FLOOR_TELL_PIPS.at;
     w.uTime.value = _look.time;
     w.uSpin.value = _look.spin;

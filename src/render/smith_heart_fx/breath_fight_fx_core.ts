@@ -510,11 +510,47 @@ export function cradleLook(age: number, hold: number): { fill: number; charge: n
 }
 
 /** How many players a Thunder's Cradle circle wants under it, read off the
- *  claim's difficulty (the run view) or, failing that, off the circles: only
- *  Heroic and Mythic lift more than one (BREATH_DIFFICULTY cradleCount). */
+ *  claim's (or the dev tier's) difficulty or, failing that, off the circles:
+ *  only Heroic and Mythic lift more than one (BREATH_DIFFICULTY cradleCount). */
 export function cradleNeedOf(difficulty: string | null | undefined, circles: number): number {
-  const tier = difficulty === 'heroic' || circles > 1 ? 'heroic' : 'normal';
-  return BREATH_DIFFICULTY[tier].cradleSoakers;
+  if (difficulty === 'heroic' || difficulty === 'mythic' || difficulty === 'normal')
+    return BREATH_DIFFICULTY[difficulty].cradleSoakers;
+  return BREATH_DIFFICULTY[circles > 1 ? 'heroic' : 'normal'].cradleSoakers;
+}
+
+/**
+ * The players under each Cradle circle by the sim's own rule
+ * (encounters/smith_heart/breath_cradle.ts `dischargeCradles`): a body
+ * within `radius` of a circle counts for the NEAREST circle only (under two
+ * overlapping circles it shares the nearer one; a lifted player hangs over
+ * its own). Fills `out[i]` for circle i; allocation-free.
+ */
+export function cradleUnder(
+  circles: readonly { x: number; z: number }[],
+  nCircles: number,
+  points: readonly { x: number; z: number }[],
+  nPoints: number,
+  radius: number,
+  out: number[],
+): number[] {
+  for (let i = 0; i < nCircles; i++) out[i] = 0;
+  const r2 = (radius + 1e-6) * (radius + 1e-6);
+  for (let k = 0; k < nPoints; k++) {
+    const p = points[k];
+    let best = -1;
+    let bestD = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < nCircles; i++) {
+      const dx = p.x - circles[i].x;
+      const dz = p.z - circles[i].z;
+      const d = dx * dx + dz * dz;
+      if (d <= r2 && d < bestD) {
+        best = i;
+        bestD = d;
+      }
+    }
+    if (best >= 0) out[best]++;
+  }
+  return out;
 }
 
 /** A strike's bolt from the cloud: a jagged path from `height` down to the

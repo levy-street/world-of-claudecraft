@@ -20,7 +20,7 @@ import {
   floorTellLook,
   soakPips,
 } from './floor_tell_core';
-import { buildSoakMarkerGeometry, SoakMarker } from './soak_marker';
+import { buildSoakMarkerGeometry, SoakMarker, type SoakMarkerPaint } from './soak_marker';
 import type { SoakElement } from './soak_marker_core';
 
 const VERT = /* glsl */ `
@@ -127,13 +127,26 @@ export interface FloorTellPaint {
 }
 
 const _look: FloorTellLook = { phase: 0, rim: 0, alpha: 0 };
+/** The share marker's frame, reused (no per-frame allocation). */
+const _soak: SoakMarkerPaint = {
+  x: 0,
+  y: 0,
+  z: 0,
+  radius: 1,
+  element: 'earth',
+  fill: 0,
+  clock: 0,
+  reduced: false,
+};
 
 /** A fixed pool of soak / avoid tells. */
 export class FloorTellPool {
   private readonly slots: TellSlot[] = [];
 
   /** `rung`: the owner's floor ladder rung (over its footprint's fill);
-   *  `share`: build the soak marker too (off for an avoid-only pool). */
+   *  `share`: build the soak marker too (off for an avoid-only pool). The
+   *  pool's markers share one wisp mesh, so they share one `detail`: an owner
+   *  passes its one tier density to every slot. */
   constructor(
     root: THREE.Object3D,
     size: number,
@@ -201,22 +214,22 @@ export class FloorTellPool {
     if (!s) return;
     if (p.kind === 'share' && s.soak) {
       if (s.mesh.visible) s.mesh.visible = false;
-      s.soak.paint({
-        x: p.x,
-        y: p.y,
-        z: p.z,
-        radius: p.radius,
-        element: p.element ?? 'earth',
-        fill: p.fill,
-        clock: p.clock,
-        reduced: p.reduced,
-        need: p.need,
-        have: p.have,
-        rim: p.rim,
-        detail: p.detail,
-        timer: p.timer,
-        pipAt: p.pipAt,
-      });
+      const q = _soak;
+      q.x = p.x;
+      q.y = p.y;
+      q.z = p.z;
+      q.radius = p.radius;
+      q.element = p.element ?? 'earth';
+      q.fill = p.fill;
+      q.clock = p.clock;
+      q.reduced = p.reduced;
+      q.need = p.need;
+      q.have = p.have;
+      q.rim = p.rim;
+      q.detail = p.detail;
+      q.timer = p.timer;
+      q.pipAt = p.pipAt;
+      s.soak.paint(q);
       return;
     }
     s.soak?.hide();

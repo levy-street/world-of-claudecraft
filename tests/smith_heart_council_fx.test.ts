@@ -293,18 +293,24 @@ describe('CouncilFx over a fake world', () => {
     expect(soakPaint?.uniforms.uShadow.value).toBeLessThan(1);
     expect(soakPaint?.uniforms.uHeat.value).toBeGreaterThan(0);
     // The shared soak / avoid tell (the team's playtest of 2026-11-25): the
-    // rock's chevrons in with a pip per soaker it needs (one inside: its own
-    // player), Resonance's chevrons out.
-    expect(shown('floorTell')).toBe(2);
+    // rock wears the shared soak marker (earth) with a pip per soaker it
+    // needs (one inside: its own player), Resonance its chevrons out.
+    expect(shown('floorTell')).toBe(1);
+    expect(shown('floorTellSoakDisc')).toBe(1);
     const tells: THREE.ShaderMaterial[] = [];
     root?.traverse((c) => {
-      if (c.name === 'floorTell' && c.visible)
+      if (
+        (c.name === 'floorTell' || c.name === 'floorTellSoakDisc') &&
+        c.visible &&
+        c.parent?.visible
+      )
         tells.push((c as THREE.Mesh).material as THREE.ShaderMaterial);
     });
-    const share = tells.find((m) => m.uniforms.uDir.value === -1);
-    const avoid = tells.find((m) => m.uniforms.uDir.value === 1);
+    const share = tells.find((m) => m.name === 'soakMarkerDisc');
+    const avoid = tells.find((m) => m.name === 'floorTell');
     expect(share?.uniforms.uNeed.value).toBe(T.rockMinSoakers);
     expect(share?.uniforms.uLit.value).toBe(1);
+    expect(avoid?.uniforms.uDir.value).toBe(1);
     expect(avoid?.uniforms.uNeed.value).toBe(0);
     // The Wrath's real shadow behind both pillars, with its light curtains,
     // over its own arena-wide floor.
