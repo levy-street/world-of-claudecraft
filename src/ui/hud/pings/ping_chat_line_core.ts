@@ -56,7 +56,7 @@ const UNIT_CALLOUT_KEYS: Readonly<Record<number, TranslationKey>> = Object.freez
   [PING_ASSIST]: 'hudChrome.pings.calloutAssistUnit',
 });
 
-/** The class that tints a ping's chat line, wheel slot and badge: .ping-kind-N. */
+/** The class that tints a ping's chat line, wheel slot and icon: .ping-kind-N. */
 export function pingKindClass(kind: number): string {
   return `ping-kind-${kind in UNIT_CALLOUT_KEYS ? kind : PING_LOOK}`;
 }

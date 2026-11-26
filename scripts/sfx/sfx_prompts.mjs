@@ -19,6 +19,7 @@
 // hit (the engine pitch-randomizes and alternates to avoid repetition).
 
 import { FURY_SFX } from './fury_sfx.mjs';
+import { PING_SFX } from './ping_sfx.mjs';
 import { SMITH_HEART_MECHANIC_SFX } from './smith_heart_mechanic_sfx.mjs';
 import { UI_SFX_CATALOG } from './ui_sfx.mjs';
 import { WARRIOR_CONTACT_SFX } from './warrior_contact_sfx.mjs';
@@ -89,6 +90,7 @@ const mob = (family, who, aggro, attack, death, hurt, idle) => {
 };
 
 export const SFX = [
+  ...PING_SFX,
   ...FURY_SFX,
   ...WARRIOR_CONTACT_SFX,
   ...WARRIOR_VOICE_SFX,

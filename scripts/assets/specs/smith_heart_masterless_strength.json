@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "rigSource": "tmp/asset_src/smith_heart_masterless_strength_woc.glb",
+      "src": "tmp/asset_src/smith_heart_masterless_strength_woc.slim.glb",
+      "out": "models/creatures/smith_heart_masterless_strength.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Attack",
+        "Attack2",
+        "Slam",
+        "Wrath",
+        "Pour",
+        "Shift",
+        "Hit",
+        "Kneel",
+        "KneelIdle",
+        "Death",
+        "Dormant",
+        "Rise",
+        "Channel"
+      ],
+      "dropStillChannels": true,
+      "maxTex": 1024
+    }
+  ]
+}

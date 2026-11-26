@@ -1,13 +1,23 @@
-// The party ping icons, procedural canvas art in the house style (the raid
-// marker recipe in icons.ts is the sibling): a round enamelled badge in the
-// ping's colour (render/party_pings_core.ts PARTY_PING_COLORS) with a dark
-// keyline and a lit rim, carrying one white glyph with a dark outline so it
-// reads over a bright sky and a dark floor alike. Our own glyphs: an eye
-// (Look Here), a sword (Attack), a warning triangle (Warning), a down arrow
-// on a ground bar (On My Way) and a flag (Assist).
+// The party ping icons. Each kind ships one painted icon,
+// public/ui/pings/<name>.webp (ChatGPT image generation in the house painted
+// style, one saturated slightly neon colour per kind, no circle or badge, keyed
+// and encoded by scripts/convert_chrome_icons_webp.mjs --dir public/ui/pings;
+// provenance in that folder's mapping.json). The wheel, the chat line and the
+// minimap show the file itself (pingIconUrl); the world icon draws it onto a
+// canvas with a glow in the kind's colour (render/party_pings_core.ts
+// PARTY_PING_COLORS) so it pops over a bright sky and a dark floor alike.
 //
-// One canvas per kind and size, built on first use and cached for the
-// session; the world icon, the wheel and the minimap all draw the same art.
+// The art loads on first use, once per kind per session (a failed load is not
+// retried). Until it arrives (or if it never does) a canvas carries the
+// procedural glyph: our own eye, sword, warning triangle, arrow and flag, white
+// with a dark outline and no badge behind it. When a kind's art loads, every
+// cached canvas of that kind is repainted in place and onPingIconArt listeners
+// hear it, so a texture built from one can re-upload; pingIconArtSettled lets
+// the world icon's prewarm wait for the art so that upload happens behind the
+// loading curtain. An <img> set through setPingIconImg falls back to the glyph
+// if its file fails, so no surface ever shows a broken image where a ping is.
+//
+// One canvas per kind and size, built on first use and cached for the session.
 
 import { partyPingColorCss } from '../render/party_pings_core';
 import {
@@ -20,7 +30,67 @@ import {
 import { require2dContext } from './canvas_context';
 
 const canvases = new Map<string, HTMLCanvasElement>();
-const urls = new Map<string, string>();
+
+/** The painted icon files, by kind (public/ui/pings/<name>.webp). */
+const ART_NAMES: Readonly<Record<number, string>> = Object.freeze({
+  [PING_LOOK]: 'look',
+  [PING_ATTACK]: 'attack',
+  [PING_WARNING]: 'warning',
+  [PING_ON_MY_WAY]: 'on_my_way',
+  [PING_ASSIST]: 'assist',
+});
+const ART_DIR = '/ui/pings';
+/** The share of the canvas the painted icon fills; the rest is glow room. */
+const ART_FILL = 0.84;
+
+const art = new Map<number, HTMLImageElement>();
+/** One load per kind per session: settles on load or on failure. */
+const artSettledByKind = new Map<number, Promise<void>>();
+const artFailed = new Set<number>();
+const artListeners = new Set<(kind: number) => void>();
+const glyphUrls = new Map<number, string>();
+
+/** Static URL of a kind's painted icon. */
+export function pingIconArtUrl(kind: number): string {
+  return `${ART_DIR}/${ART_NAMES[kind] ?? ART_NAMES[PING_LOOK]}.webp`;
+}
+
+/** Hear when a kind's painted art has loaded and its cached canvases were
+ *  repainted (a texture built from one should re-upload). Returns the
+ *  unsubscribe. */
+export function onPingIconArt(listener: (kind: number) => void): () => void {
+  artListeners.add(listener);
+  return () => artListeners.delete(listener);
+}
+
+/** Settles once every art load started so far has loaded or failed. */
+export function pingIconArtSettled(): Promise<void> {
+  return Promise.all(artSettledByKind.values()).then(() => undefined);
+}
+
+function loadArt(kind: number): void {
+  if (artSettledByKind.has(kind) || typeof Image === 'undefined') return;
+  const settled = new Promise<void>((resolve) => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => {
+      art.set(kind, img);
+      for (const [key, canvas] of canvases) {
+        const [k, px] = key.split(':').map(Number);
+        if (k === kind) repaint(canvas, kind, px);
+      }
+      for (const listener of artListeners) listener(kind);
+      resolve();
+    };
+    // A missing file keeps the procedural glyph, for the rest of the session.
+    img.onerror = () => {
+      artFailed.add(kind);
+      resolve();
+    };
+    img.src = pingIconArtUrl(kind);
+  });
+  artSettledByKind.set(kind, settled);
+}
 
 const INK = 'rgba(12, 9, 6, 0.92)';
 const GLYPH = '#fffaf0';
@@ -43,47 +113,6 @@ function inkAndFill(ctx: CanvasRenderingContext2D, width = 5): void {
   ctx.lineWidth = width;
   ctx.stroke();
   ctx.fillStyle = GLYPH;
-  ctx.fill();
-}
-
-function drawBadge(ctx: CanvasRenderingContext2D, color: string): void {
-  // Drop shadow under the badge.
-  ctx.save();
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
-  ctx.shadowBlur = 6;
-  ctx.shadowOffsetY = 2;
-  ctx.beginPath();
-  ctx.arc(0, 0, 40, 0, Math.PI * 2);
-  ctx.fillStyle = INK;
-  ctx.fill();
-  ctx.restore();
-  // The enamel: lit from the top left.
-  const g = ctx.createRadialGradient(-12, -16, 4, 0, 0, 40);
-  g.addColorStop(0, shade(color, 0.45));
-  g.addColorStop(0.55, color);
-  g.addColorStop(1, shade(color, -0.45));
-  ctx.beginPath();
-  ctx.arc(0, 0, 36, 0, Math.PI * 2);
-  ctx.fillStyle = g;
-  ctx.fill();
-  // The lit rim and an inner keyline.
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = shade(color, 0.6);
-  ctx.beginPath();
-  ctx.arc(0, 0, 36.5, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.lineWidth = 1.5;
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
-  ctx.beginPath();
-  ctx.arc(0, 0, 31, 0, Math.PI * 2);
-  ctx.stroke();
-  // A glaze highlight across the top.
-  const hi = ctx.createLinearGradient(0, -34, 0, 2);
-  hi.addColorStop(0, 'rgba(255, 255, 255, 0.42)');
-  hi.addColorStop(1, 'rgba(255, 255, 255, 0)');
-  ctx.beginPath();
-  ctx.ellipse(0, -14, 26, 17, 0, 0, Math.PI * 2);
-  ctx.fillStyle = hi;
   ctx.fill();
 }
 
@@ -201,9 +230,28 @@ function drawFlag(ctx: CanvasRenderingContext2D): void {
   inkAndFill(ctx, 3);
 }
 
-function paint(ctx: CanvasRenderingContext2D, kind: number): void {
+/** The painted icon, fitted with room left for a glow in the kind's colour.
+ *  The context is in the 100-unit icon space centred on 0, 0; shadow blur is
+ *  in device pixels, so it scales with `px`. */
+function paintArt(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  kind: number,
+  px: number,
+): void {
+  const size = 100 * ART_FILL;
+  ctx.save();
+  ctx.shadowColor = partyPingColorCss(kind);
+  ctx.shadowBlur = px * 0.1;
+  ctx.drawImage(img, -size / 2, -size / 2, size, size);
+  ctx.shadowBlur = px * 0.035;
+  ctx.drawImage(img, -size / 2, -size / 2, size, size);
+  ctx.restore();
+}
+
+/** The procedural glyph alone (no badge): the fallback before the art loads. */
+function paintGlyph(ctx: CanvasRenderingContext2D, kind: number): void {
   const color = partyPingColorCss(kind);
-  drawBadge(ctx, color);
   if (kind === PING_ATTACK) drawSword(ctx);
   else if (kind === PING_WARNING) drawWarning(ctx, color);
   else if (kind === PING_ON_MY_WAY) drawArrow(ctx);
@@ -211,7 +259,19 @@ function paint(ctx: CanvasRenderingContext2D, kind: number): void {
   else if (kind === PING_LOOK) drawEye(ctx, color);
 }
 
-/** The ping icon for `kind` at `px` square pixels (cached per kind and size). */
+function repaint(canvas: HTMLCanvasElement, kind: number, px: number): void {
+  const ctx = require2dContext(canvas);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.scale(px / 100, px / 100);
+  ctx.translate(50, 50);
+  const img = art.get(kind);
+  if (img) paintArt(ctx, img, kind, px);
+  else paintGlyph(ctx, kind);
+}
+
+/** The ping icon for `kind` at `px` square pixels (cached per kind and size):
+ *  the painted art with its glow once loaded, the glyph until then. */
 export function pingIconCanvas(kind: number, px = 128): HTMLCanvasElement {
   const key = `${kind}:${px}`;
   const cached = canvases.get(key);
@@ -219,20 +279,35 @@ export function pingIconCanvas(kind: number, px = 128): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = px;
   canvas.height = px;
-  const ctx = require2dContext(canvas);
-  ctx.scale(px / 100, px / 100);
-  ctx.translate(50, 50);
-  paint(ctx, kind);
   canvases.set(key, canvas);
+  repaint(canvas, kind, px);
+  loadArt(kind);
   return canvas;
 }
 
-/** The same icon as a PNG data URL (an <img> source for the wheel and the minimap). */
-export function pingIconUrl(kind: number, px = 64): string {
-  const key = `${kind}:${px}`;
-  const cached = urls.get(key);
-  if (cached) return cached;
-  const url = pingIconCanvas(kind, px).toDataURL();
-  urls.set(key, url);
+/** The glyph as a data URL: what an <img> shows when the art cannot load. */
+function glyphUrl(kind: number): string {
+  let url = glyphUrls.get(kind);
+  if (url === undefined) {
+    url = pingIconCanvas(kind).toDataURL();
+    glyphUrls.set(kind, url);
+  }
   return url;
+}
+
+/** An <img> source for the wheel, the chat line and the minimap (their CSS adds
+ *  the glow): the painted icon's file, or the glyph once that file has failed. */
+export function pingIconUrl(kind: number): string {
+  loadArt(kind);
+  return artFailed.has(kind) ? glyphUrl(kind) : pingIconArtUrl(kind);
+}
+
+/** Point `img` at a kind's icon, swapping to the glyph if the file fails to
+ *  load, so a ping never shows as a broken image. */
+export function setPingIconImg(img: HTMLImageElement, kind: number): void {
+  img.onerror = () => {
+    img.onerror = null;
+    img.src = glyphUrl(kind);
+  };
+  img.src = pingIconUrl(kind);
 }

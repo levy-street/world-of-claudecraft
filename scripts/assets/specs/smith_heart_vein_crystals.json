@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/arena_crystals/out/smith_heart_vein_crystals_src.glb",
+      "out": "models/props/smith_heart_vein_crystals.glb",
+      "type": "static",
+      "maxTex": 1024
+    }
+  ]
+}

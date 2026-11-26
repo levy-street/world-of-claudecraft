@@ -12411,7 +12411,7 @@
     height: 15px;
     flex: none;
   }
-  /* A ping's chat callout (src/ui/hud/pings/ping_chat_line.ts): the kind's badge,
+  /* A ping's chat callout (src/ui/hud/pings/ping_chat_line.ts): the kind's icon,
      the sender, the callout words in the kind's colour token and the unit's name
      in its reaction colour, so it reads apart from party talk at a glance. */
   .ping-chat-line.ping-kind-0 {
@@ -12454,7 +12454,7 @@
   }
   /* Party pings (src/ui/hud/pings/): the hold wheel centred on the cursor (the
      root is a zero-size anchor moved by transform; everything inside is placed
-     around it) and the badges on the minimap. Kind colours are the ping tokens. */
+     around it) and the icons on the minimap. Kind colours are the ping tokens. */
   .ping-wheel {
     position: fixed;
     left: 0;
@@ -12504,31 +12504,73 @@
       scale: 1;
     }
   }
+  /* The wheel in the house panel recipe: dark glass, a dark keyline outside a
+     fine gold edge, gold studs in the gaps. A wedge sits dark with a faint
+     tint of its kind; the lit one glows its kind's colour from the centre out
+     (the per-kind radial gradients the controller builds) and its painted icon
+     and label light up in that colour. */
   .ping-wheel-backdrop {
-    fill: color-mix(in srgb, var(--color-ping-glass) 66%, transparent);
-    stroke: color-mix(in srgb, var(--gold) 35%, transparent);
-    stroke-width: 1.5;
+    fill: color-mix(in srgb, var(--color-ping-glass) 82%, transparent);
+    stroke: none;
+  }
+  .ping-wheel-keyline {
+    fill: none;
+    stroke: var(--color-ping-glass);
+    stroke-width: 4;
+  }
+  .ping-wheel-rim {
+    fill: none;
+    stroke: var(--color-gold-600);
+    stroke-width: 1.6;
+  }
+  .ping-wheel-stud {
+    fill: var(--color-gold-500);
+    stroke: var(--color-ping-glass);
+    stroke-width: 1.2;
+  }
+  .ping-wheel-glow-core {
+    stop-color: var(--ping-color);
+    stop-opacity: 0.05;
+  }
+  .ping-wheel-glow-mid {
+    stop-color: var(--ping-color);
+    stop-opacity: 0.32;
+  }
+  .ping-wheel-glow-edge {
+    stop-color: var(--ping-color);
+    stop-opacity: 0.66;
   }
   .ping-wheel-wedge {
-    fill: color-mix(in srgb, var(--ping-color) 16%, var(--color-ping-glass));
-    fill-opacity: 0.86;
-    stroke: color-mix(in srgb, var(--ping-color) 45%, transparent);
-    stroke-width: 1.5;
+    fill: color-mix(in srgb, var(--ping-color) 9%, var(--color-ping-glass));
+    fill-opacity: 0.9;
+    stroke: color-mix(in srgb, var(--ping-color) 28%, transparent);
+    stroke-width: 1;
     transition:
       fill calc(90ms * var(--motion-scale, 1)) ease-out,
       stroke calc(90ms * var(--motion-scale, 1)) ease-out;
   }
   .ping-wheel-wedge.is-lit {
-    fill: color-mix(in srgb, var(--ping-color) 48%, var(--color-ping-glass));
-    fill-opacity: 0.95;
-    stroke: color-mix(in srgb, var(--ping-color) 70%, var(--color-text-light));
-    stroke-width: 3;
-    filter: drop-shadow(0 0 10px var(--ping-color));
+    fill-opacity: 1;
+    stroke: var(--ping-color);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 12px var(--ping-color));
+  }
+  .ping-wheel-wedge.ping-kind-1.is-lit {
+    fill: url(#ping-wheel-glow-1);
+  }
+  .ping-wheel-wedge.ping-kind-2.is-lit {
+    fill: url(#ping-wheel-glow-2);
+  }
+  .ping-wheel-wedge.ping-kind-3.is-lit {
+    fill: url(#ping-wheel-glow-3);
+  }
+  .ping-wheel-wedge.ping-kind-4.is-lit {
+    fill: url(#ping-wheel-glow-4);
   }
   .ping-wheel-center circle {
-    fill: color-mix(in srgb, var(--color-ping-glass) 82%, transparent);
-    stroke: color-mix(in srgb, var(--gold) 45%, transparent);
-    stroke-width: 1.5;
+    fill: var(--color-ping-glass);
+    stroke: var(--color-gold-600);
+    stroke-width: 1.6;
   }
   .ping-wheel-x {
     fill: none;
@@ -12545,39 +12587,49 @@
   }
   .ping-wheel-slot {
     position: absolute;
-    left: -36px;
-    top: -36px;
-    width: 72px;
-    height: 72px;
+    left: -40px;
+    top: -40px;
+    width: 80px;
+    height: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 3px;
   }
+  /* The painted icons carry their own dark outline; the glow is their colour. */
   .ping-wheel-icon {
-    width: 44px;
-    height: 44px;
-    transition: scale calc(90ms * var(--motion-scale, 1)) ease-out;
+    width: 52px;
+    height: 52px;
+    opacity: 0.86;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--ping-color) 55%, transparent))
+      drop-shadow(0 2px 2px var(--color-ping-glass));
+    transition:
+      scale calc(90ms * var(--motion-scale, 1)) ease-out,
+      opacity calc(90ms * var(--motion-scale, 1)) ease-out;
   }
   .ping-wheel-slot.is-lit .ping-wheel-icon {
-    scale: 1.22;
+    scale: 1.18;
+    opacity: 1;
+    filter: drop-shadow(0 0 10px var(--ping-color)) drop-shadow(0 2px 2px var(--color-ping-glass));
   }
   .ping-wheel-label {
-    font: 700 11px / 1.1 var(--font-ui);
-    letter-spacing: 0.3px;
+    font: 700 12px / 1.1 var(--font-display);
+    letter-spacing: 0.6px;
     color: var(--color-text-light);
     text-shadow:
       0 1px 2px var(--color-ping-glass),
       0 0 4px var(--color-ping-glass);
     white-space: nowrap;
   }
+  /* Cream over the lit glow (the kind's colour on its own glow loses contrast),
+     haloed in that colour. */
   .ping-wheel-slot.is-lit .ping-wheel-label {
     color: var(--color-text-light);
     text-shadow:
       0 1px 2px var(--color-ping-glass),
-      0 0 6px var(--color-ping-glass),
-      0 0 10px var(--color-ping-glass);
+      0 0 3px var(--color-ping-glass),
+      0 0 10px var(--ping-color);
   }
   .ping-wheel-cancel {
     position: absolute;
@@ -12611,6 +12663,7 @@
   .ping-minimap-mark img {
     width: 18px;
     height: 18px;
+    filter: drop-shadow(0 0 2px var(--color-ping-glass));
     animation: ping-minimap-pulse calc(1100ms * var(--motion-scale, 1)) ease-out infinite;
   }
   .ping-minimap-mark.is-edge img {

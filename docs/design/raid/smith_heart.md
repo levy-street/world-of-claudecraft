@@ -747,6 +747,7 @@ no light is added; all draw on every tier but the shake (reduced motion).
 
 | Moment | Look | Where |
 |---|---|---|
+| A guardian falls, in its own arena | at the head of its vein's river (the first point of `LIGHT_RIVERS`: under the Hammer's and the Quench's guardians, past the Heat's wellspring lip, on the Breath's landing) a low collar of dark slabs has covered the ribbon's bare end from the start, its seams dimly lit; as the guardian dies a small crystal of its element grows up out of the collar (a rise with a small overshoot, a flare, then at rest; whole for a late arrival): the seal's own four crystals in small, one element each (the owner's ask of 2026-11-26; sheets `docs/design/raid/kit/vein_crystals_src/`). No collider: it stands where the guardian fell, after its fight | `vein_crystal_core.ts`, `vein_crystal.ts` |
 | A colour arrives | the river's ribbon flows toward the seal with a white-hot surge riding the light's front (`heartRiverSurgeHead`); its element's crystals light foot to tip behind a white-hot front (`ringCrystalState`, from `heartSealQuarterFill`), the heart glowing a little more; its column stands up; a shockwave of its colour runs out across the chasm and the whole Ring (`heartSealArrivalWave`); the camera thuds | `heart_rivers.ts`, `ring_crystal.ts`, `heart_seal.ts`, `seal_shake.ts` |
 | The crystal is ready | all four lit and the Ring clear (the markers' ready bit): once the slowest element has finished filling the whole crystal breathes with a thin white-gold rim, the sign that the first raider onto the dais will break it | `ring_crystal_core.ts` (`ringCrystalState`), `ring_crystal_material.ts` |
 | The crystal bursts | a living player steps onto the dais once it is charged (section 5.2): it overloads and whitens (`HEART_PORTAL_OPEN.charge`), then shatters into a blinding pillar standing up off the seal (`flash`), a beam stands up out of the seal to the sky (`HEART_PORTAL_SKY_BEAM`), the crystal's pieces fly outward tumbling (`ringCrystalPiecePose`) and the plinth's slabs crack apart and sink into the dais, a four-colour ring wave and a wall of light ride out across the whole Ring, the camera trembles, jolts on the flash and shakes again as the pieces climb (`HEART_PORTAL_SHAKES`) | `heart_portal.ts`, `ring_crystal.ts`, `seal_shake.ts` |
@@ -946,8 +947,8 @@ markings), leaping the central ring's kerb and spiralling in to it; the four str
 of light, a white-hot core in a swirl of the four colours, shooting far up into the sky
 (`ARRIVAL_BEAM`, many times the room's width) (the floor's shockwave in the four colours, the camera's thud, the sky flaring round the
 beam, `heart_arrival_light_core.ts`); the beam falls back down into the boss, its cracks fill
-with light and its eyes ignite; it pushes up off its knee (its `Rise` clip,
-`scripts/build_masterless_strength_arrival_anims.mjs`) and roars (its `Shift` clip) with a
+with light and its eyes ignite; it pushes up off its knee (its `Rise` clip, authored on the
+rig) and roars (its `Shift` clip) with a
 four-colour shockwave out over the raid. The sim says the waking whisper as it opens and the
 roar's line on the roar (`final_voice.ts` `ARRIVAL_LINE_AT`, pinned to `ARRIVAL_VOICE`); the
 rising line is no longer said over it (the whisper alone fills most of the scene and a queued
@@ -956,7 +957,20 @@ a second, so the fight never waits on a show and the boss is never fought while 
 dormant. Every material is built under the effects' root before its gated attach.
 
 **The body.** (Replaced by its own rigged model in phase 2O, `final_body_fx.ts`; the rock
-pieces' body and their joints are gone since the 2026-11-09 arrival.) As first built: a
+pieces' body and their joints are gone since the 2026-11-09 arrival.) Rebuilt on 2026-11-26
+(the owner's ask: a last boss that reads as the master of all four elements) as the
+four-element titan: a towering stone titan-king quartered between the elements round a
+white-gold heart crystal, a crown of four crystal tines, a halo ring of stone with a crystal
+per element. ONE mesh and UV set in five paintings (`final_body_core.ts` `FINAL_BODY_FORMS`):
+the base form in the ring, at the arrival and on the pull, and one element over the whole body
+in each quarter; a form change swaps the painting and its glow map, never the model (the GLB
+lists the body as five mesh nodes over the same vertex data, pinned by
+`tests/smith_heart_final_body.test.ts`). Its clips keep the first model's names and beats; the
+arrival's `Dormant` and `Rise` are authored on the rig. Since the owner's playtest of 2026-11-26 its
+swings alternate two blows (`Attack`, the right fist's hammer; `Attack2`, the left fist's low
+backhand, on the same beat) and Call of the Quarters holds its own loop (`Channel`: braced wide,
+hauling strength up and driving it back down) in place of the generic cast's throw. Sources:
+`docs/design/raid/kit/final_boss_src/README.md`. As first built: a
 bodyless target with a colossus of the kit's rock pieces bound to the crystal heart, some
 twenty yards tall, hovering and breathing.
 

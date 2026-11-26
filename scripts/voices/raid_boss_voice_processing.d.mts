@@ -34,6 +34,8 @@ export declare const SMITH_HEART_CLEAN_VOICE_FILTER: string;
 
 export interface SmithHeartCleanVoicePreset {
   id: string;
+  /** The whole performance's pitch drop, applied before the sub and the room. */
+  pitchSemitones?: number;
   highpass: number;
   compressor: { threshold: number; ratio: number; attack: number; release: number };
   sub: { gain: number; lowpass: number };

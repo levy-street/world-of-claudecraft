@@ -94,6 +94,13 @@ const EXCLUDED: Record<string, string> = {
     'assembles the Frostveil spire group, which frost_sky.ts adds to the zone scene, so the zone ' +
     'prepare and the boot scene sweep reach every mesh wearing it. Same ruling as the mailbox and ' +
     'the Vale Cup kit: built when its zone builds.',
+  'vein_crystal.ts':
+    "Smith's Heart interior scenery, not a cast: the collars and crystals are fetched by " +
+    'ensureVeinCrystals(), which heart_interior.ts awaits before buildVeinCrystals() clones the ' +
+    "file's one material onto every part under the interior group, so the interior compile gate " +
+    'links the one program while the crystals are still hidden; a guardian dying only flips ' +
+    'visibility, scale and glow. A model that lands late joins behind heartKitCompileGate. Same ' +
+    'ruling as the sanctum face: reachable only inside that one interior.',
 };
 
 /** Files whose module ABILITY_MATERIAL_SOURCES stages, by basename. Held here
@@ -278,8 +285,9 @@ describe('the lazy-material sweep', () => {
     // Minus Gloamveil's face-veil kit, retired with the veil (the form's look
     // now mints no lazy module cache: gloam_field.ts builds its three
     // materials in its constructor): 23, 22.
-    expect(hits.length).toBeGreaterThanOrEqual(23);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(22);
+    // + the Smith's Heart vein crystals' baked model (interior scenery, excluded): 24, 23.
+    expect(hits.length).toBeGreaterThanOrEqual(24);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(23);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

@@ -1,9 +1,9 @@
 // What the group's pings do on this client beyond the world icon (the
 // renderer draws that, render/party_pings.ts): each NEW ping in view plays
 // its kind's sound once and writes its chat callout once (ping_chat_line.ts:
-// the kind's badge, the sender, the callout in the kind's colour, the unit's
+// the kind's icon, the sender, the callout in the kind's colour, the unit's
 // name in its reaction colour; settings.partyPingsChat can drop it), and every live
-// ping in view sits on the minimap as its badge (pulled in to the rim when
+// ping in view sits on the minimap as its icon (pulled in to the rim when
 // it lies past it). Every decision is in ping_feed_core.ts.
 //
 // With pings turned off (settings.partyPings) nothing here shows or sounds,
@@ -16,7 +16,7 @@
 import type { PartyPing } from '../../../sim/social/party_pings';
 import type { Entity } from '../../../sim/types';
 import type { PainterHostWriters } from '../../painter_host';
-import { pingIconUrl } from '../../ping_icons';
+import { setPingIconImg } from '../../ping_icons';
 import { pingChatLineNodes } from './ping_chat_line';
 import { pingChatLineModel, pingTargetReaction } from './ping_chat_line_core';
 import {
@@ -122,7 +122,7 @@ export class PingFeedController {
           const mark = this.mark(layer, n++);
           if (mark.kind !== ping.kind) {
             mark.kind = ping.kind;
-            mark.img.src = pingIconUrl(ping.kind, 32);
+            setPingIconImg(mark.img, ping.kind);
           }
           const w = this.deps.writers;
           w.setTransform(mark.el, `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px)`);

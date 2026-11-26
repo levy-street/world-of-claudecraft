@@ -114,11 +114,11 @@ describe('ping feed: sounds', () => {
       Array.from({ length: PING_KIND_COUNT }, (_, k) => [k, PING_SOUNDS[k].key]),
     );
     expect(byKind).toEqual({
-      0: 'ui_aura_glass_ping', // Look Here
-      1: 'ui_aura_sword_draw', // Attack
-      2: 'ui_aura_hard_bell', // Warning
-      3: 'ui_aura_wind_whoosh', // On My Way
-      4: 'ui_aura_soft_chime', // Assist
+      0: 'ui_ping_look', // Look Here
+      1: 'ui_ping_attack', // Attack
+      2: 'ui_ping_warning', // Warning
+      3: 'ui_ping_on_my_way', // On My Way
+      4: 'ui_ping_assist', // Assist
     });
   });
 });

@@ -1,7 +1,7 @@
 // The chat callout a ping writes, the DOM half (the parts are
 // ping_chat_line_core.ts): one line wrapped in .ping-chat-line plus the kind's
 // .ping-kind-N class (which sets --ping-color from the --color-ping-* token),
-// led by the kind's own badge (src/ui/ping_icons.ts), then the sender as the
+// led by the kind's painted icon (src/ui/ping_icons.ts), then the sender as the
 // usual clickable chat name, the callout words in the kind's colour and the
 // unit's name in its reaction colour (.is-hostile / .is-friendly /
 // .is-neutral). A player's name, sender or target, opens the same player menu
@@ -11,7 +11,7 @@
 // player and wire text.
 
 import { t } from '../../i18n';
-import { pingIconUrl } from '../../ping_icons';
+import { setPingIconImg } from '../../ping_icons';
 import { bindTouchTap } from '../../touch_tap';
 import type { PingChatLineModel } from './ping_chat_line_core';
 
@@ -21,9 +21,6 @@ export interface PingChatLineDeps {
   /** Whether the pinged unit is a player (its name then opens the menu too). */
   targetIsPlayer?: boolean;
 }
-
-/** The icon's size in the line (CSS px; drawn at 2x for a crisp badge). */
-const ICON_DRAW_PX = 32;
 
 function playerName(
   doc: Document,
@@ -68,7 +65,7 @@ export function pingChatLineNodes(
   icon.alt = '';
   icon.draggable = false;
   icon.setAttribute('aria-hidden', 'true');
-  icon.src = pingIconUrl(model.kind, ICON_DRAW_PX);
+  setPingIconImg(icon, model.kind);
   line.append(icon);
   for (const part of model.parts) {
     if (part.part === 'text') {

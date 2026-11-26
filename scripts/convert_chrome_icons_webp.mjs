@@ -29,14 +29,20 @@
 // Nothing converts at BUILD time (this is a pre-commit tool, NOT wired into `npm run
 // build`, so CI never re-encodes). Re-running with everything already WebP is a no-op.
 //
-// Flags: --quality <n> overrides the default 88.
+// Flags: --quality <n> overrides the default 88. --dir <folder> runs the same pipeline on
+// another magenta-keyed art tree instead of public/ui/chrome (the party ping icons:
+// `node scripts/convert_chrome_icons_webp.mjs --dir public/ui/pings`).
 
 import { existsSync, readdirSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
 const root = process.cwd();
-const chromeDir = path.join(root, 'public/ui/chrome');
+const dirFlag = process.argv.indexOf('--dir');
+const chromeDir =
+  dirFlag !== -1 && process.argv[dirFlag + 1]
+    ? path.resolve(root, process.argv[dirFlag + 1])
+    : path.join(root, 'public/ui/chrome');
 
 // The served icon square, and the box the trimmed content is fitted into inside it. The
 // HUD renders these at 20 to 26px and upscales on 3x mobile, so the master stays at 128.

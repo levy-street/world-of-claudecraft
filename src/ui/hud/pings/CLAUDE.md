@@ -11,15 +11,16 @@ party scope); the world icon is the renderer's (`src/render/party_pings.ts`).
   built once on first open, Escape and the centre cancel. One single-shot hold timer,
   no repeating driver.
 - `ping_feed_core.ts` (pure): new-ping detection, the view range, the chat line keys,
-  each kind's sound (existing sampled cues only), the minimap point.
+  each kind's sound (its own layered `ui_ping_*` cue, built by
+  `scripts/sfx/build_ping_sfx.mjs` from `scripts/sfx/ping_sfx.mjs`), the minimap point.
 - `ping_chat_line_core.ts` (pure): the chat callout's parts (sender, the callout
   words, the unit name and its reaction) from two templates, `chatLine` and the
   kind's `callout*Unit`, so a locale keeps its own word order; the `.ping-kind-N`
   colour class; the unit reaction rule (hostile red, friendly green, neutral yellow).
-- `ping_chat_line.ts` (DOM): those parts as nodes: the kind's badge, the sender and a
+- `ping_chat_line.ts` (DOM): those parts as nodes: the kind's icon, the sender and a
   pinged player as clickable chat names (the Hud player menu), the tinted callout.
 - `ping_feed_controller.ts` (DOM): the fast-band tick: sound and chat line once per
-  new ping in view (the line lands on the party channel, solo too), the badges on
+  new ping in view (the line lands on the party channel, solo too), the icons on
   the minimap.
 - `hud_pings.ts`: the Hud factory (untyped Hud, members welded in
   `tests/party_pings_hud.test.ts`), built lazily. Hud holds one field and one
@@ -33,5 +34,9 @@ refuse into no ping.
 Every surface honours `settings.partyPings` (`src/game/party_pings_setting.ts`):
 off, the key does nothing and nothing from others' pings shows or sounds.
 `settings.partyPingsChat` ("Show Pings in Chat", default on) drops only the chat line. The
-icons are our own procedural badges (`src/ui/ping_icons.ts`); the kind colours
-live in `PARTY_PING_COLORS` and the `--color-ping-*` tokens, pinned equal.
+icons are painted art, one per kind (`public/ui/pings/*.webp`, ChatGPT-made,
+keyed by `scripts/convert_chrome_icons_webp.mjs --dir public/ui/pings`, provenance
+in `public/ui/pings/mapping.json`), loaded and glowed by `src/ui/ping_icons.ts`,
+which falls back to its procedural glyphs until the art arrives; the kind colours
+live in `PARTY_PING_COLORS` and the `--color-ping-*` tokens, pinned equal and
+sampled from that art.

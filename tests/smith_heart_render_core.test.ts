@@ -95,6 +95,7 @@ import {
   heartWallSolids,
   heatEnvSolids,
   quenchEnvSolids,
+  veinCrystalSolids,
 } from '../src/render/smith_heart/heart_sightline_core';
 import {
   CORNICE_WALL_SCALE,
@@ -742,6 +743,8 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     ...quenchEnvSolids(),
     // The Heat vein's painted ring of basalt stacks round the hall.
     ...heatEnvSolids(),
+    // The vein crystals at the river heads (walked through, no collider).
+    ...veinCrystalSolids(),
   ];
   const seal = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 0.5, z: HEART_SEAL.z };
   const portalEye = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 9, z: HEART_SEAL.z };
@@ -760,6 +763,18 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     expect(
       heartSightlineHits({ x: g.x + 3, y: low, z: g.z }, { x: g.x - 3, y: low, z: g.z }, solids),
     ).toContain('anvil_mouth:sill');
+    // The vein crystals: one volume a river head, and a line through one finds it.
+    const crystals = veinCrystalSolids();
+    expect(crystals.map((c) => c.what).sort()).toEqual(
+      ['breath', 'hammer', 'heat', 'quench'].map((v) => `vein crystal ${v}`),
+    );
+    for (const c of crystals) {
+      if (c.kind !== 'cyl') throw new Error('a vein crystal is a cylinder');
+      const mid = (c.y0 + c.y1) / 2;
+      expect(
+        heartSightlineHits({ x: c.x + 4, y: mid, z: c.z }, { x: c.x - 4, y: mid, z: c.z }, solids),
+      ).toContain(c.what);
+    }
   });
 
   it('every point of the Ring sees the seal and the portal over every gate, prop and rock', () => {

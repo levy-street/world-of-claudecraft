@@ -529,6 +529,49 @@ describe.sequential('SFX Studio server security', () => {
     expect((await repo.json()).error).toContain('symlink escapes the allowed root');
   });
 
+  it('serves listen-only voice lines from the raid speaker folders and nothing else', async () => {
+    const voiceRoot = join(repoRoot, 'public/audio/voice');
+    const line = await fetch(
+      `${url}/voice/heart_masterless_strength/yell__back_into_the_stone.mp3`,
+    );
+    expect(line.status).toBe(200);
+    expect(line.headers.get('content-type')).toBe('audio/mpeg');
+
+    // A real clip in a folder that is not one of the raid's speakers.
+    const outsider = readdirSync(join(voiceRoot, 'ignivar')).find((name) => name.endsWith('.mp3'));
+    expect(outsider).toBeTruthy();
+    expect((await fetch(`${url}/voice/ignivar/${outsider}`)).status).toBe(404);
+    // Encoded traversal and a non-mp3 name never reach the file system.
+    expect(
+      (await fetch(`${url}/voice/heart_masterless_strength/..%2F..%2Fsfx%2Ffoot_grass.mp3`)).status,
+    ).toBe(404);
+    expect((await fetch(`${url}/voice/heart_masterless_strength/notes.txt`)).status).toBe(404);
+    // Captain Thessaly's town lines sit beside her raid yells: only the yells are served.
+    expect(existsSync(join(voiceRoot, 'captain_thessaly', 'greeting__captain_thessaly.mp3'))).toBe(
+      true,
+    );
+    expect(
+      (await fetch(`${url}/voice/captain_thessaly/greeting__captain_thessaly.mp3`)).status,
+    ).toBe(404);
+    // A missing clip is a plain 404 that names no local path.
+    const missing = await fetch(`${url}/voice/heart_masterless_strength/yell__no_such_line.mp3`);
+    expect(missing.status).toBe(404);
+    expect(await missing.text()).toBe('not found');
+
+    // A symlink planted in an allowed speaker folder cannot reach out of it.
+    const escapeName = `zz_sfx_studio_security_${process.pid}.mp3`;
+    const escapeLink = join(voiceRoot, 'heart_masterless_strength', escapeName);
+    rmSync(escapeLink, { force: true });
+    symlinkSync(join(repoRoot, 'package.json'), escapeLink);
+    try {
+      const escaped = await fetch(`${url}/voice/heart_masterless_strength/${escapeName}`);
+      expect(escaped.status).toBe(404);
+      expect(await escaped.text()).toBe('not found');
+    } finally {
+      rmSync(escapeLink, { force: true });
+    }
+  });
+
   it('hides and rejects symlinked version archives', async () => {
     expect(
       listVersions('foot_grass').some(

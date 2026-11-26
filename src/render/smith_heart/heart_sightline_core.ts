@@ -47,6 +47,7 @@ import {
   quenchEnvOwnsRock,
 } from './quench_env_plan_core';
 import { planRingEdges, planRingMouths } from './ring_kit_plan_core';
+import { planVeinCrystals, VEIN_CRYSTAL, veinCrystalBound } from './vein_crystal_core';
 
 /** An upright cylinder (y0 to y1, radius r) or a box turned by `yaw` about
  *  its centre (three's rotation.y), half extents hw x hh x hd. */
@@ -479,4 +480,23 @@ export function heartRingSolids(): HeartSolid[] {
     }
   }
   return out;
+}
+
+/** The vein crystals (vein_crystal_core.ts): each river head's collar and grown crystal
+ *  as one cylinder, at the height of the rise's overshoot. Render-only and walked
+ *  through by decision, so the pin is what keeps them out of the raid's sightlines. */
+export function veinCrystalSolids(): HeartSolid[] {
+  const bound = veinCrystalBound();
+  return planVeinCrystals().map((s) => {
+    const y0 = authoredFieldHeight(SMITH_HEART_FIELD, s.x, s.z) - VEIN_CRYSTAL.sink;
+    return {
+      kind: 'cyl',
+      x: s.x,
+      z: s.z,
+      r: bound.r,
+      y0,
+      y1: y0 + bound.h,
+      what: `vein crystal ${s.vein}`,
+    };
+  });
 }

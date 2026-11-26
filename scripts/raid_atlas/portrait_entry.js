@@ -14,7 +14,7 @@
 import * as THREE from 'three';
 import { buildModel, skinAwareBounds } from '../../src/guide/viewer/model';
 import {
-  FINAL_BODY_ELEMENTS,
+  FINAL_BODY_FORMS,
   FINAL_BODY_NODES,
 } from '../../src/render/smith_heart_fx/final_body_core';
 
@@ -59,13 +59,13 @@ window.renderBust = (spec, tint, framing) =>
         const pivot = new THREE.Group();
         pivot.rotation.y = BASE_YAW + (framing.yaw ?? 0);
         pivot.add(built.root);
-        // A model carrying several bodies on one rig (the Masterless
-        // Strength's four elements, final_body_core.ts) shows only the one
-        // the framing names, the way the game toggles them.
+        // A model listing its one body once per painting (the Masterless
+        // Strength's five forms, final_body_core.ts) shows only the one the
+        // framing names, the way the game toggles them.
         if (framing.body) {
-          for (const element of FINAL_BODY_ELEMENTS) {
-            if (element === framing.body) continue;
-            for (const name of FINAL_BODY_NODES[element]) {
+          for (const form of FINAL_BODY_FORMS) {
+            if (form === framing.body) continue;
+            for (const name of FINAL_BODY_NODES[form]) {
               const node = built.root.getObjectByName(name);
               if (node) node.visible = false;
             }

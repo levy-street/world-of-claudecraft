@@ -1,12 +1,11 @@
-// The Masterless Strength's own model (phase 2O): the GLB, its wiring in the
-// character manifest, and the pure plan of its element bodies and its
-// transformation (src/render/smith_heart_fx/final_body_core.ts).
+// The Masterless Strength's own model (phase 2O; rebuilt as the four-element
+// titan on 2026-11-26): the GLB, its wiring in the character manifest, and
+// the pure plan of its five forms on one mesh and its transformation
+// (src/render/smith_heart_fx/final_body_core.ts).
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
-  MASTERLESS_STRENGTH_ARRIVAL_CLIPS,
-  MASTERLESS_STRENGTH_ARRIVAL_URL,
   MASTERLESS_STRENGTH_CLIPS,
   MASTERLESS_STRENGTH_URL,
   SMITH_HEART_BOSS_LOOKS,
@@ -16,13 +15,16 @@ import {
   boltJoint,
   FINAL_BODY_CLIP,
   FINAL_BODY_ELEMENTS,
+  FINAL_BODY_FORMS,
   FINAL_BODY_GESTURES,
   FINAL_BODY_HEIGHT,
   FINAL_BODY_NODES,
   FINAL_ELEMENT_LOOK,
   FINAL_SHIFT,
   finalBodyElement,
+  finalBodyForm,
   finalBodyPoint,
+  finalFormElement,
   finalShiftAura,
   finalShiftStage,
   finalShiftStarts,
@@ -30,9 +32,18 @@ import {
 import { FORGE_FIST_CUE } from '../src/render/smith_heart_fx/final_fx_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { FINAL_BOSS, FINAL_CASTS } from '../src/sim/encounters/smith_heart/final_ids';
+import { FINAL_PHASE_CASTS } from '../src/sim/encounters/smith_heart/final_phase_ids';
 
 function glbJson(rel: string): {
   nodes: { name?: string; mesh?: number; skin?: number }[];
+  meshes: {
+    primitives: { attributes: Record<string, number>; indices?: number; material?: number }[];
+  }[];
+  materials: {
+    name?: string;
+    pbrMetallicRoughness?: { baseColorTexture?: { index: number; texCoord?: number } };
+    emissiveTexture?: { index: number; texCoord?: number };
+  }[];
   animations: { name: string }[];
   extensionsRequired?: string[];
   images?: { mimeType?: string }[];
@@ -59,21 +70,15 @@ describe('the Masterless Strength model', () => {
     expect(visualKeyFor(boss)).toBe(key);
   });
 
-  it('ships every clip it binds, KTX2 textures, and the four element bodies', () => {
+  it('ships every clip it binds, KTX2 textures, and the five forms', () => {
     const json = glbJson(MASTERLESS_STRENGTH_URL);
     const own = json.animations.map((a) => a.name).sort();
     expect(own).toEqual([...MASTERLESS_STRENGTH_CLIPS].sort());
-    // The arrival's two clips ride their own mesh-free GLB (animUrls), bound
-    // to the rig's own bones.
-    expect(def.animUrls).toEqual([MASTERLESS_STRENGTH_ARRIVAL_URL]);
-    const arrival = glbJson(MASTERLESS_STRENGTH_ARRIVAL_URL);
-    expect(arrival.animations.map((a) => a.name).sort()).toEqual(
-      [...MASTERLESS_STRENGTH_ARRIVAL_CLIPS].sort(),
-    );
-    expect(arrival.nodes.filter((n) => n.mesh !== undefined)).toEqual([]);
-    const bones = new Set(json.nodes.map((n) => n.name));
-    for (const n of arrival.nodes) expect(bones.has(n.name), n.name).toBe(true);
-    const names = [...own, ...MASTERLESS_STRENGTH_ARRIVAL_CLIPS];
+    // The arrival's two clips are authored on the rig itself (no clip-only
+    // GLB beside it any more).
+    expect(MASTERLESS_STRENGTH_CLIPS).toEqual(expect.arrayContaining(['Dormant', 'Rise']));
+    expect(def.animUrls).toBeUndefined();
+    const names = own;
     const c = def.clips;
     const bound = [
       c.idle,
@@ -91,9 +96,66 @@ describe('the Masterless Strength model', () => {
     expect(json.extensionsRequired).toContain('KHR_texture_basisu');
     expect((json.images ?? []).every((i) => i.mimeType === 'image/ktx2')).toBe(true);
     const meshNodes = json.nodes.filter((n) => n.mesh !== undefined).map((n) => n.name);
-    for (const el of FINAL_BODY_ELEMENTS)
-      for (const node of FINAL_BODY_NODES[el]) expect(meshNodes, node).toContain(node);
+    for (const form of FINAL_BODY_FORMS)
+      for (const node of FINAL_BODY_NODES[form]) expect(meshNodes, node).toContain(node);
+    expect(meshNodes.length).toBe(FINAL_BODY_FORMS.length);
     for (const n of json.nodes.filter((x) => x.mesh !== undefined)) expect(n.skin).toBeDefined();
+  });
+
+  it('changes form by its painting alone: one mesh, one UV set, a material per form', () => {
+    const json = glbJson(MASTERLESS_STRENGTH_URL);
+    const prims = FINAL_BODY_FORMS.map((form) => {
+      const node = json.nodes.find((n) => n.name === FINAL_BODY_NODES[form][0]);
+      const mesh = json.meshes[node?.mesh ?? -1];
+      expect(mesh?.primitives.length, form).toBe(1);
+      return { form, skin: node?.skin, prim: mesh.primitives[0] };
+    });
+    const base = prims[0];
+    // Every form draws the SAME vertex and index data on the same skin: the
+    // model itself never changes between forms.
+    for (const p of prims) {
+      expect(p.prim.attributes, p.form).toEqual(base.prim.attributes);
+      expect(p.prim.indices, p.form).toBe(base.prim.indices);
+      expect(p.skin, p.form).toBe(base.skin);
+    }
+    expect(Object.keys(base.prim.attributes).filter((k) => k.startsWith('TEXCOORD'))).toEqual([
+      'TEXCOORD_0',
+    ]);
+    // What differs is the material: its own painting and its own glow map,
+    // both on that one UV set.
+    const mats = prims.map((p) => p.prim.material);
+    expect(new Set(mats).size).toBe(FINAL_BODY_FORMS.length);
+    const paintings = new Set<number>();
+    const glows = new Set<number>();
+    for (const p of prims) {
+      const mat = json.materials[p.prim.material ?? -1];
+      const paint = mat?.pbrMetallicRoughness?.baseColorTexture;
+      const glow = mat?.emissiveTexture;
+      expect(paint, p.form).toBeDefined();
+      expect(glow, p.form).toBeDefined();
+      expect(paint?.texCoord ?? 0, p.form).toBe(0);
+      expect(glow?.texCoord ?? 0, p.form).toBe(0);
+      paintings.add(paint?.index ?? -1);
+      glows.add(glow?.index ?? -1);
+    }
+    expect(paintings.size).toBe(FINAL_BODY_FORMS.length);
+    expect(glows.size).toBe(FINAL_BODY_FORMS.length);
+    // The base form is listed last, so a viewer that draws every node (the
+    // mob portrait, the wiki still) shows it.
+    const last = json.nodes.filter((n) => n.mesh !== undefined).at(-1);
+    expect(last?.name).toBe(FINAL_BODY_NODES.four[0]);
+  });
+
+  it('alternates two melee blows that land on the same beat', () => {
+    const c = def.clips;
+    // Never the same swing twice running: the right fist's hammer, then the left's backhand.
+    expect(c.attack).toEqual(['Attack', 'Attack2']);
+    expect(new Set(c.attack).size).toBe(2);
+    expect(c.contacts?.Attack).toEqual([FINAL_BODY_CLIP.attack]);
+    expect(c.contacts?.Attack2).toEqual([FINAL_BODY_CLIP.attack]);
+    // The kneeling and dormant stances inherit both.
+    for (const phase of Object.values(def.phaseClips ?? {}))
+      expect(phase.clips.attack).toEqual(['Attack', 'Attack2']);
   });
 
   it('plays its own clip for every bar and the frontal, timed to the bar end', () => {
@@ -103,6 +165,14 @@ describe('the Masterless Strength model', () => {
     for (const id of [FINAL_CASTS.fist, FINAL_CASTS.anvil])
       expect(c.castByAbility?.[id]).toBe('Wrath');
     expect(c.castByAbility?.[FINAL_CASTS.bolt]).toBe('Pour');
+    // Call of the Quarters is a long channel: it holds its own loop, never the
+    // generic cast (a throw, hurled over and over through the call), is not
+    // sped to a bar's end, and lets go by a plain crossfade when the call ends.
+    expect(c.castByAbility?.[FINAL_PHASE_CASTS.call]).toBe('Channel');
+    expect(c.cast).not.toBe('Channel');
+    expect(c.castTimeScaleByAbility?.[FINAL_PHASE_CASTS.call]).toBeUndefined();
+    expect(def.castClipSync).not.toContain(FINAL_PHASE_CASTS.call);
+    expect(c.castPlayOut).not.toContain('Channel');
     expect(def.castClipSync).toEqual(
       expect.arrayContaining([FINAL_CASTS.fist, FINAL_CASTS.anvil, FINAL_CASTS.bolt]),
     );
@@ -113,18 +183,19 @@ describe('the Masterless Strength model', () => {
     );
   });
 
-  it('binds one show and one hide gesture per element body, and the whole model', () => {
+  it('binds one show and one hide gesture per form, and the whole model', () => {
     const toggles = def.meshToggles ?? [];
     expect(toggles[0]).toMatchObject({
       nodes: ['*'],
       hideNow: FINAL_BODY_GESTURES.hide,
       showNow: FINAL_BODY_GESTURES.show,
     });
-    for (const el of FINAL_BODY_ELEMENTS) {
-      const t = toggles.find((x) => x.showNow === FINAL_BODY_GESTURES.on[el]);
-      expect(t?.hideNow).toBe(FINAL_BODY_GESTURES.off[el]);
-      expect(t?.nodes).toEqual(FINAL_BODY_NODES[el]);
+    for (const form of FINAL_BODY_FORMS) {
+      const t = toggles.find((x) => x.showNow === FINAL_BODY_GESTURES.on[form]);
+      expect(t?.hideNow).toBe(FINAL_BODY_GESTURES.off[form]);
+      expect(t?.nodes).toEqual(FINAL_BODY_NODES[form]);
     }
+    expect(toggles.length).toBe(1 + FINAL_BODY_FORMS.length);
     const all = [
       FINAL_BODY_GESTURES.hide,
       FINAL_BODY_GESTURES.show,
@@ -142,20 +213,31 @@ describe('the Masterless Strength model', () => {
   });
 });
 
-describe('the element bodies and the transformation (final_body_core)', () => {
-  it('wears its quarter, the Hammer basalt in the ring', () => {
+describe('the forms and the transformation (final_body_core)', () => {
+  it('wears its quarter, the four-element base form in the ring', () => {
+    expect(finalBodyForm('heat')).toBe('heat');
+    expect(finalBodyForm('quench')).toBe('quench');
+    expect(finalBodyForm('breath')).toBe('breath');
+    expect(finalBodyForm('hammer')).toBe('hammer');
+    expect(finalBodyForm('ring')).toBe('four');
+    expect(FINAL_BODY_FORMS).toEqual(['four', ...FINAL_BODY_ELEMENTS]);
+    // The aura and burst stay the quarter's element; the ring's is the
+    // Hammer's floating rock round the base form.
     expect(finalBodyElement('heat')).toBe('heat');
-    expect(finalBodyElement('quench')).toBe('quench');
-    expect(finalBodyElement('breath')).toBe('breath');
-    expect(finalBodyElement('hammer')).toBe('hammer');
     expect(finalBodyElement('ring')).toBe('hammer');
+    expect(finalFormElement('four')).toBe('hammer');
+    for (const el of FINAL_BODY_ELEMENTS) expect(finalFormElement(el)).toBe(el);
   });
 
-  it('transforms only between two elements of a body seen whole', () => {
+  it('transforms only between two forms of a body seen whole', () => {
     expect(finalShiftStarts('hammer', 'heat', true)).toBe(true);
     expect(finalShiftStarts('heat', 'heat', true)).toBe(false);
     expect(finalShiftStarts(null, 'heat', true)).toBe(false);
     expect(finalShiftStarts('hammer', 'heat', false)).toBe(false);
+    // Out of the ring into the Hammer's own quarter: the same element, a new
+    // painting, so the set piece still plays.
+    expect(finalShiftStarts('four', 'hammer', true)).toBe(true);
+    expect(finalShiftStarts('four', 'four', true)).toBe(false);
   });
 
   it('runs charge, burst, crown, settle in order and bursts on the roar', () => {
@@ -186,7 +268,7 @@ describe('the element bodies and the transformation (final_body_core)', () => {
     // Facing +z: the heart is ahead (+z) and up; the left shoulder is +x.
     finalBodyPoint('heart', 0, 0, 0, 0, 20, out);
     expect(out.z).toBeGreaterThan(0);
-    expect(out.y).toBeCloseTo(20 * 0.69, 6);
+    expect(out.y).toBeCloseTo(20 * 0.64, 6);
     finalBodyPoint('shoulderL', 0, 0, 0, 0, 20, out);
     expect(out.x).toBeGreaterThan(0);
     // Facing +x: the heart is ahead on +x.
