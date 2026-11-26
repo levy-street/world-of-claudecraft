@@ -68,11 +68,13 @@ export function heatAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescript
       };
     case HEAT_AURAS.grip: {
       const stacks = Math.max(1, a.stacks ?? 1);
+      // The tier's burn rides the aura (heat_grip.ts): its per-stack share.
+      const total = Math.round(a.value ?? T.gripPerTick * stacks);
       return {
         key: `${KEY}.grip`,
         nums: {
-          total: Math.round(a.value ?? T.gripPerTick * stacks),
-          per: T.gripPerTick,
+          total,
+          per: Math.round(total / stacks),
           stacks,
           seconds: T.gripSeconds,
           most: T.gripMaxStacks,

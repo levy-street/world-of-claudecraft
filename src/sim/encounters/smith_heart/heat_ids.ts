@@ -246,6 +246,10 @@ export interface HeatDifficultyRules {
    *  template's, set at the pull (tier_swing.ts). The template swing is one
    *  for every tier, so each tier's raise lives here (the pass of 2026-11-16). */
   swingMult: number;
+  /** Cinder Grip's burn a second for each stack (heat_grip.ts; the
+   *  template's is HEAT_TUNING.gripPerTick, Normal's). The owner's call of
+   *  2026-11-26: Heroic a little more than Normal, Mythic more than Heroic. */
+  gripPerTick: number;
   /** The boss's health pool against the template's, set at the pull
    *  (tier_health.ts). */
   healthMult: number;
@@ -335,6 +339,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     damageMult: 1.3,
     punishMult: 1,
     swingMult: 1.5,
+    // 75 a second at the swap's 5 stacks.
+    gripPerTick: 15,
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
@@ -369,6 +375,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // 1.15 to 1.5 with the team's playtest of 2026-11-25 (the tanks' hit +30
     // percent on every tier).
     swingMult: 1.5,
+    // 90 a second at the swap's 5 stacks.
+    gripPerTick: 18,
     // 1.45 to 1.2 with the base raised to 77,000 (2026-11-12): the Heroic
     // pool stays about where it was (92,800 to 92,400 base).
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
@@ -394,6 +402,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     damageMult: 1.4375,
     punishMult: 1.25,
     swingMult: 1.5,
+    // 105 a second at the swap's 5 stacks.
+    gripPerTick: 21,
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).

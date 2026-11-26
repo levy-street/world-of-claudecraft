@@ -299,6 +299,29 @@ describe('Guardian of the Heat: the guardian', () => {
     expect(grip?.stacks ?? 0).toBeGreaterThanOrEqual(3);
     expect(has(f.players[1], HEAT_AURAS.grip)).toBe(false);
   });
+
+  it("Cinder Grip burns at each tier's own rate: Heroic above Normal, Mythic above Heroic", () => {
+    const per = (t: 'normal' | 'heroic' | 'mythic') => HEAT_DIFFICULTY[t].gripPerTick;
+    expect(per('normal')).toBe(T.gripPerTick);
+    expect(per('heroic')).toBeGreaterThan(per('normal'));
+    expect(per('mythic')).toBeGreaterThan(per('heroic'));
+    for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+      const f = heatFight(2, 31);
+      if (tier !== 'normal') f.dev(`/dev heart heat ${tier}`);
+      expect(f.dev('/dev heart heat pull')).toBe(true);
+      expect(f.state()?.difficulty).toBe(tier);
+      f.boss().threat.set(f.players[0].id, 1e6);
+      f.tick(2);
+      hold(f);
+      const tank = f.players[0];
+      f.put(tank, HEARTH_WELL.x + HEARTH_WELL.r + 0.5, 0);
+      f.tick(ticks(14));
+      const grip = aura(tank, HEAT_AURAS.grip);
+      const stacks = grip?.stacks ?? 0;
+      expect(stacks).toBeGreaterThanOrEqual(3);
+      expect(grip?.value).toBe(per(tier) * stacks);
+    }
+  });
 });
 
 describe('Guardian of the Heat: phase 1', () => {

@@ -65,6 +65,7 @@ import {
 import { clearCoals, coalHoldsWheel, setCoals, stepCoals } from './heat_coal';
 import { clearFist, FIST_SPAN, floorHoldsFist, landFist, startFist, stepSwells } from './heat_fist';
 import { flare, keepOffLip, stepFlare, stepWellFire } from './heat_flare';
+import { stepGrip } from './heat_grip';
 import {
   HEAT_AURAS,
   HEAT_CASTS,
@@ -612,6 +613,7 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
   holdStance(s);
   stepSwells(s);
   stepWellFire(s);
+  stepGrip(s);
   stepSeeds(s);
   stepZones(s);
   stepWheel(s);
