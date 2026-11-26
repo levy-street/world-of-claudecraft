@@ -477,15 +477,80 @@ function waveformPlayheadTime() {
   return outputToSourceTime(state.playhead);
 }
 
+// Listen-only voice lines (scripts/sfx_studio/voice_catalog.mjs): one shared
+// player, a click plays a line and a second click on it stops. They are not
+// Studio cues, so nothing here touches the editor, drafts or publishing.
+const voicePlayer = new Audio();
+voicePlayer.preload = 'auto';
+let voicePlayingId = '';
+voicePlayer.addEventListener('ended', () => {
+  voicePlayingId = '';
+  renderCatalog();
+});
+
+function playVoiceLine(line) {
+  if (voicePlayingId === line.id) {
+    voicePlayer.pause();
+    voicePlayingId = '';
+    setStatus(`Stopped ${line.speakerLabel}: "${line.title}"`);
+  } else {
+    voicePlayer.pause();
+    voicePlayer.src = line.url;
+    voicePlayer.currentTime = 0;
+    voicePlayingId = line.id;
+    void voicePlayer.play().catch((error) => {
+      voicePlayingId = '';
+      setStatus(`Voice playback failed: ${error.message ?? error}`, 'error');
+      renderCatalog();
+    });
+    setStatus(`Playing ${line.speakerLabel}: "${line.title}" (voice line, listen only)`, 'ok');
+  }
+  renderCatalog();
+}
+
+function renderVoiceList(group, query) {
+  const lines = (state.catalog.voices?.lines ?? []).filter((line) => {
+    if (group !== 'voice_smith_heart' && group !== `voice_${line.speaker}`) return false;
+    return !query || `${line.title} ${line.speakerLabel}`.toLowerCase().includes(query);
+  });
+  const list = $('cue-list');
+  list.replaceChildren();
+  for (const line of lines) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'cue voice-line';
+    button.role = 'option';
+    button.ariaSelected = String(line.id === voicePlayingId);
+    button.addEventListener('click', () => playVoiceLine(line));
+    const title = document.createElement('span');
+    title.className = 'cue-key';
+    title.textContent = line.title;
+    const badge = document.createElement('span');
+    badge.className = 'cue-level';
+    badge.textContent = line.id === voicePlayingId ? 'playing' : 'play';
+    const meta = document.createElement('span');
+    meta.className = 'cue-meta';
+    meta.textContent = `${line.speakerLabel}  ${formatBytes(line.bytes)}  voice line`;
+    button.append(title, badge, meta);
+    list.append(button);
+  }
+}
+
 function renderCatalog() {
   if (!state.catalog) return;
   const summary = state.catalog.summary;
   $('summary').textContent =
     `${summary.clips} sampled cues, ${summary.tracks} published tracks, ${summary.loops} loops, ${summary.routed} routed, ${summary.modified} modified cues, ${formatBytes(summary.bytes)}`;
   const query = $('search').value.trim().toLowerCase();
+  const group = $('group').value;
+  if (group.startsWith('voice_')) {
+    renderVoiceList(group, query);
+    return;
+  }
   const category = $('category').value;
   const routing = $('routing').value;
   state.filtered = state.catalog.clips.filter((clip) => {
+    if (group !== 'all' && !clip.groups?.includes(group)) return false;
     if (category !== 'all' && clip.category !== category) return false;
     if (query && !`${clip.key} ${clip.prompt}`.toLowerCase().includes(query)) return false;
     if (routing === 'routed' && !clip.integration.routed) return false;
@@ -2038,6 +2103,12 @@ function wireControls() {
     drawWaveform();
   });
   $('search').addEventListener('input', renderCatalog);
+  $('group').addEventListener('change', () => {
+    // A group is a whole slice of content: a category left over from an
+    // earlier search would silently hide most of it.
+    $('category').value = 'all';
+    renderCatalog();
+  });
   $('category').addEventListener('change', renderCatalog);
   $('routing').addEventListener('change', renderCatalog);
   $('play').addEventListener('click', () => void play());
@@ -2098,6 +2169,24 @@ async function init() {
     $('toolchain').textContent = state.catalog.toolchain.ready
       ? state.catalog.toolchain.ffmpeg
       : `FFmpeg unavailable: ${state.catalog.toolchain.error}`;
+    for (const group of state.catalog.groups ?? []) {
+      const option = document.createElement('option');
+      option.value = group.id;
+      option.textContent = `${group.label} (${group.count})`;
+      $('group').append(option);
+    }
+    const voiceGroups = state.catalog.voices?.groups ?? [];
+    if (voiceGroups.length) {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = 'Voice lines (listen only)';
+      for (const group of voiceGroups) {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = `${group.label} (${group.count})`;
+        optgroup.append(option);
+      }
+      $('group').append(optgroup);
+    }
     const categories = [...new Set(state.catalog.clips.map((clip) => clip.category))].sort();
     for (const category of categories) {
       const option = document.createElement('option');

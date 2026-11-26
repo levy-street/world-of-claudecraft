@@ -40,6 +40,7 @@ import {
   sourceUrl,
 } from './audio_io.mjs';
 import { collectSfxCatalog } from './catalog.mjs';
+import { isVoiceSpeaker } from './voice_catalog.mjs';
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const DIR = fileURLToPath(new URL('.', import.meta.url));
@@ -465,6 +466,18 @@ export async function startSfxStudio({ port = 5181 } = {}) {
           });
         }
         if (url.pathname === '/viewer_live.js') return send(res, 200, MIME['.js'], viewer);
+        if (url.pathname.startsWith('/voice/')) {
+          // Listen-only voice lines: an allowlisted speaker folder and a plain
+          // mp3 name, resolved through the same real-path containment.
+          const match = url.pathname.match(/^\/voice\/([a-z0-9_]+)\/([a-z0-9_]+\.mp3)$/);
+          if (!match || !isVoiceSpeaker(match[1])) return send(res, 404, 'text/plain', 'not found');
+          const path = safeRealFile(
+            join(REPO_ROOT, 'public/audio/voice', match[1]),
+            match[2],
+            new Set(['.mp3']),
+          );
+          return streamFile(req, res, path);
+        }
         if (url.pathname.startsWith('/audio/')) {
           const key = assertSfxKey(url.pathname.slice('/audio/'.length).replace(/\.mp3$/, ''));
           const path = publishedPath(key);

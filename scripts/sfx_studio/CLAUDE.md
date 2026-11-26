@@ -22,6 +22,13 @@ bundled into the game client or server. Root `CLAUDE.md` and
   activate the stable runtime manifest only after every blob is in place.
 - Treat every filename, upload, project value, and URL as hostile. Resolve paths
   through containment checks and pass ffmpeg arguments as an array, never a shell.
+- The `/voice/<speaker>/<file>.mp3` route is read-only and serves only the raid
+  speakers listed in `VOICE_SPEAKERS` (`voice_catalog.mjs`), a plain lowercase
+  file name, and a real file inside that speaker's folder under
+  `public/audio/voice/`. Voices are listen-only here; their own pipeline renders
+  and publishes them (pinned by `tests/sfx_studio_server_security.test.ts`).
+  Cue groups (`cue_groups.mjs`) are a list filter only and never change what a
+  cue is or how it renders.
 - Keep editing non-destructive in `tmp/sfx_studio/`. Audio Publish may
   transactionally replace `public/audio/sfx/<key>.mp3` and the bounded render
   recipe, then regenerate the runtime manifest for the new content hash. It must
@@ -85,7 +92,8 @@ bundled into the game client or server. Root `CLAUDE.md` and
 
 After authoring changes here, run the studio and conform suites
 (`npx vitest run tests/sfx_studio.test.ts tests/sfx_studio_server_security.test.ts
-tests/sfx_export_core.test.ts tests/sfx_conform.test.ts`), the runtime manifest and
+tests/sfx_export_core.test.ts tests/sfx_conform.test.ts tests/sfx_studio_cue_groups.test.ts
+tests/sfx_studio_voice_catalog.test.ts`), the runtime manifest and
 pack suites (`npx vitest run tests/sfx_manifest.test.ts tests/sfx_runtime_pack.test.ts
 tests/sfx_gain_ceiling.test.ts`), changed-file Biome (`npm run ci:changed`),
 `npx tsc --noEmit`, and the real browser smoke (`npm run sfx:studio:smoke`).

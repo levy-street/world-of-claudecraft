@@ -38,6 +38,14 @@ category, routing state, modified state, or unsafe peak. The summary reports
 both cue count and published track count because one cue can have multiple
 round-robin takes.
 
+The Group menu above the list narrows it to one set of cues: the Smith's Heart
+raid as a whole, each of its fights, the raid's shared cues, or the party pings
+(`scripts/sfx_studio/cue_groups.mjs`). Changing the group resets the category
+filter. The same menu also lists the raid's boss voices, one entry per speaker:
+those are listen-only clips from `public/audio/voice/`, rendered by their own
+pipeline (`scripts/render_smith_heart_voice_pack.mjs`), so the Studio plays them
+but never edits or publishes them.
+
 Selecting a cue loads:
 
 - its published audio and content hash;
