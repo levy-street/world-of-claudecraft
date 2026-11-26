@@ -25269,6 +25269,11 @@
   .dev-command-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* The cards set a min-height, which turns off the automatic content
+       minimum, so auto rows would squeeze to the window and overlap their
+       Run buttons once a category holds three rows: size rows to content and
+       let the grid scroll. */
+    grid-auto-rows: max-content;
     align-content: start;
     gap: 10px;
     padding: 14px 16px;

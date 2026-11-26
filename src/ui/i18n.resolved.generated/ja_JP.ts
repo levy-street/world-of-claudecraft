@@ -166,6 +166,7 @@ export const ja_JP: EnTranslations = {
     "itemUnknown": "そのIDのアイテムはありません。",
     "itemHeroicTag": "ヒロイック",
     "kitCurrentSpec": "現在のスペック",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
     "invalidValues": "実行する前に有効な値を選択してください。",
     "sent": "送信済み：{command}",
@@ -186,11 +187,19 @@ export const ja_JP: EnTranslations = {
       "difficulty": "難易度",
       "name": "名前",
       "spec": "スペック",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "畝のID（任意）"
     },
     "difficulty": {
       "normal": "ノーマル",
       "heroic": "ヒロイック"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -252,6 +261,10 @@ export const ja_JP: EnTranslations = {
       "biskit": {
         "label": "BIS-20キットを装備",
         "description": "指定したスペック向けの最高のエピック装備を全部位に装備します。装備品のみです。"
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "ゴールドを追加",

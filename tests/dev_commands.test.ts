@@ -78,9 +78,7 @@ describe('dev commands', () => {
     expect(
       sim
         .drainEvents()
-        .some(
-          (event) => event.type === 'log' && event.text.includes('top-parse mage fire loadout'),
-        ),
+        .some((event) => event.type === 'log' && event.text.includes('Nyth BiS mage fire loadout')),
     ).toBe(true);
   });
 

@@ -162,10 +162,23 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     labelKey: 'devCommand.actions.biskit.label',
     descriptionKey: 'devCommand.actions.biskit.description',
     // Same optional-spec contract as the fresh-20 kit: blank means the server
-    // dresses whatever the character is currently specced into.
+    // dresses whatever the character is currently specced into. The tier picks
+    // the Nyth or the Forge kit; anything else falls back to Nyth.
     command: (values) => {
+      const tier = values.bisTier === 'forge' || values.bisTier === 'pvp' ? values.bisTier : 'nyth';
       const spec = token(values, 'bisSpec');
-      return spec ? `/dev bis ${spec}` : '/dev bis';
+      return spec ? `/dev bis ${tier} ${spec}` : `/dev bis ${tier}`;
+    },
+  },
+  {
+    id: 'enchant',
+    category: 'inventory',
+    labelKey: 'devCommand.actions.enchant.label',
+    descriptionKey: 'devCommand.actions.enchant.description',
+    command: (values) => {
+      const slot = token(values, 'enchantSlot');
+      const enchant = token(values, 'enchant');
+      return slot && enchant ? `/dev enchant ${slot} ${enchant}` : null;
     },
   },
   {

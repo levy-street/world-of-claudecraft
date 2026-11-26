@@ -10,6 +10,7 @@
 // Date.now (enforced by tests/architecture.test.ts).
 
 import { DEV_KIT_ROLES, type DevKitRole, devKitRole } from '../content/dev_kit_roles';
+import { ENCHANTS } from '../content/enchants';
 import { SEASON2_STOCK } from '../content/pvp_honor_season2';
 import { RIFT_GEAR_ITEM_ID_SET } from '../content/rift/items';
 import { ITEMS } from '../data';
@@ -19,14 +20,19 @@ import {
   displacedSlotForEquip,
   MASTERWROUGHT_EQUIP_CAP,
 } from '../equipment_rules';
+import { enchantedPayloadFor } from '../professions/enchanting';
 import { refreshModsForEquipmentChange } from '../progression/talents';
 import { RIFT_BAND_MAX_UPGRADE } from '../rift/band_ladder';
 import { createRiftGearInstance } from '../rift/progression';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, ItemDef, PlayerClass } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
+import { devBisEnchantsFor } from './bis_enchants';
+import { resolveDevBisKit } from './bis_kits';
+import { forgeBisGearFor } from './forge_bis_loadouts';
 import { collectionFitsRole, collectionRoleForSpec } from './gear_selection';
 import { parseBisGearFor } from './parse_bis_loadouts';
+import { pvpBisGearFor } from './pvp_bis_loadouts';
 
 const SEASON2_STOCK_IDS: ReadonlySet<string> = new Set(SEASON2_STOCK);
 
@@ -213,12 +219,15 @@ export function bestEpicGearFor(
 }
 
 // Applies picks to the caller: dev-only direct equipment write, cleared
-// crafted-instance payloads, one stat recalc. Returns the equipped count.
+// crafted-instance payloads, the optional enchant per slot baked into the
+// worn copy the way a real enchant mints it, one stat recalc. Returns the
+// equipped count.
 function applyDevGear(
   ctx: SimContext,
   pid: number,
   picks: Partial<Record<EquipSlot, string>>,
   clearStaleSlots: boolean,
+  enchants: Partial<Record<EquipSlot, string>> = {},
 ): number {
   const meta = ctx.players.get(pid);
   const player = ctx.entities.get(pid);
@@ -246,6 +255,10 @@ function applyDevGear(
     } else {
       meta.equipment[slot] = itemId;
     }
+    const enchant = enchants[slot] ? ENCHANTS[enchants[slot]] : undefined;
+    if (enchant) {
+      meta.equipmentInstance[slot] = enchantedPayloadFor(meta.equipmentInstance[slot], enchant);
+    }
     equipped++;
   }
   refreshModsForEquipmentChange(ctx, meta);
@@ -254,15 +267,61 @@ function applyDevGear(
   return equipped;
 }
 
-// The /dev bis command: the selected spec's frozen top-parse loadout, with the
-// generic epic scorer as the spec-less fallback. Clears every slot first so a
-// two-handed loadout cannot retain a stale shield or offhand.
-export function equipBestInSlotForDev(ctx: SimContext, pid: number, selectedSpec?: string): number {
+// The two /dev bis tiers: 'nyth' is the frozen Nythraxis top-parse snapshot
+// (parse_bis_loadouts.ts, the default), 'forge' the Ignivar-raid kit with the
+// Crucible crafted pair and the legendary weapons (forge_bis_loadouts.ts).
+export const DEV_BIS_TIERS = ['nyth', 'forge', 'pvp'] as const;
+export type DevBisTier = (typeof DEV_BIS_TIERS)[number];
+export function isDevBisTier(value: string): value is DevBisTier {
+  return (DEV_BIS_TIERS as readonly string[]).includes(value);
+}
+
+// The /dev bis arguments: an optional tier and an optional spec, in either
+// order: "/dev bis", "/dev bis forge", "/dev bis forge fury", "/dev bis fury".
+// A missing tier is 'nyth'; a missing spec is null (the caller's current one).
+// Two specs, two tiers, or more than two words is not a valid form (null).
+export function parseDevBisArgs(
+  words: readonly string[],
+): { tier: DevBisTier; spec: string | null } | null {
+  if (words.length > 2) return null;
+  let tier: DevBisTier | null = null;
+  let spec: string | null = null;
+  for (const word of words) {
+    const lower = word.toLowerCase();
+    if (isDevBisTier(lower)) {
+      if (tier) return null;
+      tier = lower;
+    } else {
+      if (spec) return null;
+      spec = word;
+    }
+  }
+  return { tier: tier ?? 'nyth', spec };
+}
+
+// The /dev bis command: the selected kit (a spec or a variant word, see
+// resolveDevBisKit) for the chosen tier, with the generic epic scorer as the
+// spec-less fallback. Clears every slot first so a two-handed loadout cannot
+// retain a stale shield or offhand.
+export function equipBestInSlotForDev(
+  ctx: SimContext,
+  pid: number,
+  selectedKit?: string,
+  tier: DevBisTier = 'nyth',
+): number {
   const meta = ctx.players.get(pid);
   if (!meta) return 0;
-  const spec = selectedSpec ?? meta.talents?.spec ?? null;
-  const picks = (spec ? parseBisGearFor(meta.cls, spec) : null) ?? bestEpicGearFor(meta.cls, spec);
-  return applyDevGear(ctx, pid, picks, true);
+  const word = selectedKit ?? meta.talents?.spec ?? null;
+  const resolved = word ? resolveDevBisKit(meta.cls, word) : null;
+  const tierGear =
+    tier === 'forge' ? forgeBisGearFor : tier === 'pvp' ? pvpBisGearFor : parseBisGearFor;
+  const kit = resolved ? tierGear(meta.cls, resolved.kit) : null;
+  if (!kit || !resolved) {
+    return applyDevGear(ctx, pid, bestEpicGearFor(meta.cls, resolved?.spec ?? word), true);
+  }
+  // A spec kit wears its tier's enchants (bis_enchants.ts); the spec-less
+  // epic fallback stays bare.
+  return applyDevGear(ctx, pid, kit, true, devBisEnchantsFor(meta.cls, resolved.kit, tier, kit));
 }
 
 // The deterministic reference kit for the balance probes and their pinned DPS

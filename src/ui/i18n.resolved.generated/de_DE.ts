@@ -166,6 +166,7 @@ export const de_DE: EnTranslations = {
     "itemUnknown": "Kein Gegenstand hat diese ID.",
     "itemHeroicTag": "Heroisch",
     "kitCurrentSpec": "Aktuelle Spezialisierung",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Server-Cheats erfordern weiterhin ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Wähle gültige Werte, bevor du diesen Befehl ausführst.",
     "sent": "Gesendet: {command}",
@@ -186,11 +187,19 @@ export const de_DE: EnTranslations = {
       "difficulty": "Schwierigkeitsgrad",
       "name": "Name",
       "spec": "Spezialisierung",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Beet-ID (optional)"
     },
     "difficulty": {
       "normal": "Normal",
       "heroic": "Heroisch"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -252,6 +261,10 @@ export const de_DE: EnTranslations = {
       "biskit": {
         "label": "BIS-20-Set anlegen",
         "description": "Das beste Epos-Set einer Spezialisierung in jedem Platz anlegen. Nur Ausrüstung."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Gold hinzufügen",

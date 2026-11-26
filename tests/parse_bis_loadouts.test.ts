@@ -12,7 +12,7 @@ import type { EquipSlot, PlayerClass } from '../src/sim/types';
 describe('top parse BIS loadouts', () => {
   it('covers every class and spec with a complete legal observed loadout', () => {
     const entries = parseBisLoadoutEntries();
-    expect(entries).toHaveLength(DEV_KIT_ROLE_COUNT);
+    expect(entries).toHaveLength(DEV_KIT_ROLE_COUNT + 2);
 
     for (const [cls, roles] of Object.entries(DEV_KIT_ROLES) as [
       PlayerClass,
@@ -77,11 +77,23 @@ describe('top parse BIS loadouts', () => {
     });
     expect(parseBisGearFor('warrior', 'prot')).toMatchObject({
       helmet: 'heroic_crownforged_dreadhelm',
-      mainhand: 'heroic_kingsbane_last_oath',
+      mainhand: 'heroic_gravecourt_hewer',
       offhand: 'heroic_bonewrought_bulwark',
       ring1: 'riftbound_band_of_might',
       ring2: 'riftbound_band_of_might',
     });
+  });
+
+  it('wears no legendary weapon: legendaries belong to the Forge kit', () => {
+    for (const entry of parseBisLoadoutEntries()) {
+      for (const slot of ['mainhand', 'offhand'] as const) {
+        const id = entry.gear[slot];
+        if (!id) continue;
+        expect(ITEMS[id].quality, `${entry.cls} ${entry.spec} ${slot}: ${id}`).not.toBe(
+          'legendary',
+        );
+      }
+    }
   });
 
   it('returns null for an unknown or cross-class spec', () => {

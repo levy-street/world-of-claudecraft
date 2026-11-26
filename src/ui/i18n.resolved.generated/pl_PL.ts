@@ -166,6 +166,7 @@ export const pl_PL: EnTranslations = {
     "itemUnknown": "Żaden przedmiot nie ma takiego identyfikatora.",
     "itemHeroicTag": "Heroiczny",
     "kitCurrentSpec": "Obecna specjalizacja",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Cheaty serwera nadal wymagają ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Wybierz prawidłowe wartości przed uruchomieniem tego polecenia.",
     "sent": "Wysłano: {command}",
@@ -186,11 +187,19 @@ export const pl_PL: EnTranslations = {
       "difficulty": "Poziom trudności",
       "name": "Nazwa",
       "spec": "Specjalizacja",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Identyfikator grządki (opcjonalnie)"
     },
     "difficulty": {
       "normal": "Normalny",
       "heroic": "Heroiczny"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -252,6 +261,10 @@ export const pl_PL: EnTranslations = {
       "biskit": {
         "label": "Załóż zestaw BIS na 20. poziom",
         "description": "Załóż najlepszy epicki zestaw wybranej specjalizacji we wszystkich miejscach. Tylko ekwipunek."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Dodaj złoto",

@@ -7,6 +7,13 @@
 // HPS, and tanks by survived DTPS so the selected character was actually taking
 // the boss. Four specs without a complete 0.40.1 raid sample use the newest
 // complete historical Nythraxis top parse. No character identity is retained.
+//
+// Nyth kits wear no legendary weapon (2026-11-25): those belong to the Forge
+// kit (forge_bis_loadouts.ts). The six parses that held one (Thronebane or the
+// Heartwood) carry the best non-legendary epic at item level 33 or below that
+// fits beside their offhand instead: Gravecourt Hewer for the shield tanks,
+// Direfang Greatblade for beast mastery (a hunter shoots with the main hand),
+// Courtier's Bonefang for combat, and the Deathless Court scepter for priests.
 
 import type { EquipSlot, PlayerClass } from '../types';
 
@@ -63,7 +70,7 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       gloves: 'crownforged_gauntlets',
       helmet: 'heroic_crownforged_dreadhelm',
       offhand: 'heroic_bonewrought_bulwark',
-      mainhand: 'heroic_kingsbane_last_oath',
+      mainhand: 'heroic_gravecourt_hewer',
       shoulder: 'heroic_crownforged_warspaulders',
     }),
   }),
@@ -95,7 +102,7 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       gloves: 'crownforged_gauntlets',
       helmet: 'heroic_crownforged_dreadhelm',
       offhand: 'heroic_bonewrought_bulwark',
-      mainhand: 'heroic_kingsbane_last_oath',
+      mainhand: 'heroic_gravecourt_hewer',
       shoulder: 'heroic_crownforged_warspaulders',
     }),
     // Strongest complete Heroic DPS loadout, build 0.40.1, fight 52058.
@@ -126,7 +133,7 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       gloves: 'wyrmshadow_talongrips',
       helmet: 'heroic_nighttalon_crown',
       offhand: 'heroic_direfang_quiver',
-      mainhand: 'heroic_kingsbane_last_oath',
+      mainhand: 'heroic_direfang_greatblade',
       shoulder: 'heroic_nighttalon_shoulderguards',
     }),
     // Heroic DPS rank 1, build 0.40.1, fight 51084.
@@ -188,7 +195,7 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       gloves: 'heroic_wyrmshadow_talongrips',
       helmet: 'heroic_nighttalon_crown',
       offhand: 'heroic_duskwhisper',
-      mainhand: 'kingsbane_last_oath',
+      mainhand: 'heroic_courtiers_bonefang',
       shoulder: 'heroic_nighttalon_shoulderguards',
     }),
     // Heroic DPS rank 1, build 0.40.1, fight 51621.
@@ -235,7 +242,7 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       gloves: 'soulflame_gloves',
       helmet: 'heroic_soulflame_cowl',
       offhand: 'heroic_wraithfire_orb',
-      mainhand: 'heroic_deathless_heartwood',
+      mainhand: 'scepter_of_the_deathless_court',
       shoulder: 'heroic_soulflame_mantle',
     }),
     // Heroic DPS rank 1, build 0.40.1, fight 51551.
@@ -250,7 +257,7 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       gloves: 'soulflame_gloves',
       helmet: 'heroic_soulflame_cowl',
       offhand: 'heroic_wraithfire_orb',
-      mainhand: 'deathless_heartwood',
+      mainhand: 'scepter_of_the_deathless_court',
       shoulder: 'heroic_soulflame_mantle',
     }),
   }),
@@ -284,6 +291,22 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       offhand: 'gravewyrm_cleaver',
       mainhand: 'gravewyrm_cleaver',
       shoulder: 'heroic_crownforged_warspaulders',
+    }),
+    // Warspirit in Stonebound (the tank posture): Heroic DTPS, build 0.40.1,
+    // fight 63727.
+    stonebound: Object.freeze({
+      mainhand: 'gravewyrm_cleaver',
+      offhand: 'heroic_bonewrought_bulwark',
+      helmet: 'heroic_crownforged_dreadhelm',
+      neck: 'medallion_of_endless_profit',
+      shoulder: 'heroic_crownforged_warspaulders',
+      chest: 'deathlord_warplate',
+      waist: 'crownforged_girdle',
+      legs: 'heroic_deathlord_legguards',
+      gloves: 'crownforged_gauntlets',
+      feet: 'deathlord_sabatons',
+      ring1: 'oath_of_the_round_table',
+      ring2: 'oath_of_the_round_table',
     }),
     // Heroic HPS rank 1, build 0.40.1, fight 51465.
     restoration: Object.freeze({
@@ -410,20 +433,39 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       mainhand: 'scepter_of_the_deathless_court',
       shoulder: 'heroic_soulflame_mantle',
     }),
-    // Heroic DTPS rank 1, build 0.40.1, fight 51742.
+    // Cat (the default feral kit). The 0.40.1 cat parses wore Agility gear from
+    // before feral moved to Strength, so this is the Nythraxis-tier Strength
+    // kit instead: the heroic Bramblehide set, the heroic Maul of the Scourged
+    // Wilds, the Medallion and two Seals of the Nine Oaths.
     feral: Object.freeze({
-      feet: 'wyrmshadow_treads',
-      legs: 'korgaths_chainwraps',
+      mainhand: 'heroic_maul_of_the_scourged_wilds',
+      helmet: 'heroic_bramblehide_crown',
       neck: 'medallion_of_endless_profit',
-      chest: 'ashstalker_harness',
+      shoulder: 'heroic_bramblehide_mantle',
+      chest: 'heroic_bramblehide_harness',
+      waist: 'heroic_bramblehide_cinch',
+      legs: 'heroic_bramblehide_legguards',
+      gloves: 'heroic_bramblehide_grips',
+      feet: 'heroic_bramblehide_treads',
+      ring1: 'seal_of_the_nine_oaths',
+      ring2: 'seal_of_the_nine_oaths',
+    }),
+    // Bear: the Strength twin of the cat kit (owner call, 2026-11-25). The
+    // bear parses predate the Strength flip (Agility leather, a dagger and a
+    // caster orb), so bear wears the same heroic Bramblehide set and Maul,
+    // with the tank Stamina rings in place of the cat's Seals.
+    bear: Object.freeze({
+      mainhand: 'heroic_maul_of_the_scourged_wilds',
+      helmet: 'heroic_bramblehide_crown',
+      neck: 'medallion_of_endless_profit',
+      shoulder: 'heroic_bramblehide_mantle',
+      chest: 'heroic_bramblehide_harness',
+      waist: 'heroic_bramblehide_cinch',
+      legs: 'heroic_bramblehide_legguards',
+      gloves: 'heroic_bramblehide_grips',
+      feet: 'heroic_bramblehide_treads',
       ring1: 'oath_of_the_round_table',
-      ring2: 'sutils_gambit',
-      waist: 'nighttalon_waistband',
-      gloves: 'nighttalon_grips',
-      helmet: 'heroic_nighttalon_crown',
-      offhand: 'heroic_wraithfire_orb',
-      mainhand: 'first_blood_razor',
-      shoulder: 'heroic_nighttalon_shoulderguards',
+      ring2: 'oath_of_the_round_table',
     }),
     // Strongest complete Heroic HPS loadout, build 0.40.1, fight 51269.
     restoration: Object.freeze({

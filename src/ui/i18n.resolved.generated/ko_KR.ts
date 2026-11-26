@@ -166,6 +166,7 @@ export const ko_KR: EnTranslations = {
     "itemUnknown": "해당 ID를 가진 아이템이 없습니다.",
     "itemHeroicTag": "영웅",
     "kitCurrentSpec": "현재 전문화",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "서버 치트 기능에는 여전히 ALLOW_DEV_COMMANDS=1이 필요합니다.",
     "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
     "sent": "전송됨: {command}",
@@ -186,11 +187,19 @@ export const ko_KR: EnTranslations = {
       "difficulty": "난이도",
       "name": "이름",
       "spec": "전문화",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "경작지 ID (선택 사항)"
     },
     "difficulty": {
       "normal": "일반",
       "heroic": "영웅"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -252,6 +261,10 @@ export const ko_KR: EnTranslations = {
       "biskit": {
         "label": "20레벨 최고 장비 세트 착용",
         "description": "특성에 맞는 부위별 최고 에픽 장비를 모든 부위에 착용합니다. 장비만 해당됩니다."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "골드 추가",

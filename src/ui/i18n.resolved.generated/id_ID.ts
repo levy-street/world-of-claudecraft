@@ -166,6 +166,7 @@ export const id_ID: EnTranslations = {
     "itemUnknown": "Tidak ada barang dengan id itu.",
     "itemHeroicTag": "Heroik",
     "kitCurrentSpec": "Spesialisasi saat ini",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Perintah curang server tetap memerlukan ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Pilih nilai yang valid sebelum menjalankan perintah ini.",
     "sent": "Terkirim: {command}",
@@ -186,11 +187,19 @@ export const id_ID: EnTranslations = {
       "difficulty": "Tingkat kesulitan",
       "name": "Nama",
       "spec": "Spesialisasi",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Id petak (opsional)"
     },
     "difficulty": {
       "normal": "Normal",
       "heroic": "Heroik"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -252,6 +261,10 @@ export const id_ID: EnTranslations = {
       "biskit": {
         "label": "Kenakan kit BIS level 20",
         "description": "Kenakan set epik terbaik untuk sebuah spesialisasi di semua slot. Hanya perlengkapan."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Tambah emas",

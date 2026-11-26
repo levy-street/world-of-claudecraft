@@ -166,6 +166,7 @@ export const zh_TW: EnTranslations = {
     "itemUnknown": "沒有該 ID 的物品。",
     "itemHeroicTag": "英雄",
     "kitCurrentSpec": "目前專精",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "伺服器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
     "invalidValues": "執行此指令前請選擇有效值。",
     "sent": "已傳送：{command}",
@@ -186,11 +187,19 @@ export const zh_TW: EnTranslations = {
       "difficulty": "難度",
       "name": "名稱",
       "spec": "專精",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "田畦ID（選填）"
     },
     "difficulty": {
       "normal": "普通",
       "heroic": "英雄"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -252,6 +261,10 @@ export const zh_TW: EnTranslations = {
       "biskit": {
         "label": "裝備20級最佳套裝",
         "description": "為指定專精在所有欄位穿上最佳史詩裝備。僅限裝備。"
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "新增金幣",

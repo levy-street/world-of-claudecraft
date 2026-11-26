@@ -166,6 +166,7 @@ export const ru_RU: EnTranslations = {
     "itemUnknown": "Нет предмета с таким идентификатором.",
     "itemHeroicTag": "Героический",
     "kitCurrentSpec": "Текущая специализация",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Для серверных читов всё ещё требуется ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Выберите допустимые значения перед запуском этой команды.",
     "sent": "Отправлено: {command}",
@@ -186,11 +187,19 @@ export const ru_RU: EnTranslations = {
       "difficulty": "Сложность",
       "name": "Имя",
       "spec": "Специализация",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "ID грядки (необязательно)"
     },
     "difficulty": {
       "normal": "Обычная",
       "heroic": "Героическая"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -252,6 +261,10 @@ export const ru_RU: EnTranslations = {
       "biskit": {
         "label": "Экипировать комплект BIS 20 уровня",
         "description": "Надеть лучший эпический комплект для выбранной специализации во все ячейки. Только снаряжение."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Добавить золото",

@@ -166,6 +166,7 @@ export const en: EnTranslations = {
     "itemUnknown": "No item has that id.",
     "itemHeroicTag": "Heroic",
     "kitCurrentSpec": "Current spec",
+    "slotIndexed": "{slot} {index}",
     "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Choose valid values before running this command.",
     "sent": "Sent: {command}",
@@ -186,11 +187,19 @@ export const en: EnTranslations = {
       "difficulty": "Difficulty",
       "name": "Name",
       "spec": "Spec",
+      "bisTier": "Kit",
+      "slot": "Slot",
+      "enchant": "Enchant",
       "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
       "heroic": "Heroic"
+    },
+    "bisTier": {
+      "nyth": "Nyth",
+      "forge": "Forge",
+      "pvp": "PvP"
     },
     "actions": {
       "heal": {
@@ -251,7 +260,11 @@ export const en: EnTranslations = {
       },
       "biskit": {
         "label": "Equip BIS-20 kit",
-        "description": "Wear the strongest complete raid-parse loadout observed for a spec. Gear only."
+        "description": "Wear a best-in-slot loadout for a spec, enchants included: Nyth (Nythraxis raid), Forge (Ignivar raid, crafted pieces and legendary weapons) or PvP (Warfare Season 2 with Season 1 belt and boots)."
+      },
+      "enchant": {
+        "label": "Enchant item",
+        "description": "Put an enchant on the item worn in a slot, replacing any enchant already there. No recipe, skill, or reagents needed."
       },
       "gold": {
         "label": "Add gold",
