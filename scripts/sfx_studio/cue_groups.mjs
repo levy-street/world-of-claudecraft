@@ -17,6 +17,7 @@ export const SMITH_HEART_SHARED_CUES = Object.freeze([
   'melee_swing_heavy',
   'proj_frost',
   'rift_lava_tick',
+  'ui_aura_anvil_strike',
   'ui_aura_blaring_horn',
   'ui_aura_soft_chime',
   'ui_aura_steam_hiss',
@@ -82,7 +83,7 @@ export const CUE_GROUPS = Object.freeze(
 );
 
 /** Every group id a cue belongs to, in dropdown order (a cue may sit in
- *  several: a fight and the whole raid, or a shared cue the pings also use). */
+ *  several: a fight and the whole raid, or a raid cue that also sits in the shared set). */
 export function cueGroupsFor(key) {
   return CUE_GROUPS.filter((group) => group.matches(key)).map((group) => group.id);
 }

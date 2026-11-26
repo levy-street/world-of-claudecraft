@@ -10,6 +10,7 @@ export interface VoiceLine {
   title: string;
   url: string;
   bytes: number;
+  groups: string[];
 }
 export interface VoiceGroup {
   id: string;
@@ -19,6 +20,7 @@ export interface VoiceGroup {
 export declare const VOICE_SPEAKERS: readonly VoiceSpeaker[];
 export declare const VOICE_FILE_PATTERN: RegExp;
 export declare function isVoiceSpeaker(speaker: string): boolean;
+export declare function isVoiceFile(speaker: string, file: string): boolean;
 export declare function voiceLineTitle(fileName: string): string;
 export declare function collectVoiceCatalog(voiceRoot: string): {
   groups: VoiceGroup[];

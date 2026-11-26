@@ -510,7 +510,7 @@ function playVoiceLine(line) {
 
 function renderVoiceList(group, query) {
   const lines = (state.catalog.voices?.lines ?? []).filter((line) => {
-    if (group !== 'voice_smith_heart' && group !== `voice_${line.speaker}`) return false;
+    if (!line.groups.includes(group)) return false;
     return !query || `${line.title} ${line.speakerLabel}`.toLowerCase().includes(query);
   });
   const list = $('cue-list');

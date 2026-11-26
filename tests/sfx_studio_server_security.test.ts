@@ -546,6 +546,17 @@ describe.sequential('SFX Studio server security', () => {
       (await fetch(`${url}/voice/heart_masterless_strength/..%2F..%2Fsfx%2Ffoot_grass.mp3`)).status,
     ).toBe(404);
     expect((await fetch(`${url}/voice/heart_masterless_strength/notes.txt`)).status).toBe(404);
+    // Captain Thessaly's town lines sit beside her raid yells: only the yells are served.
+    expect(existsSync(join(voiceRoot, 'captain_thessaly', 'greeting__captain_thessaly.mp3'))).toBe(
+      true,
+    );
+    expect(
+      (await fetch(`${url}/voice/captain_thessaly/greeting__captain_thessaly.mp3`)).status,
+    ).toBe(404);
+    // A missing clip is a plain 404 that names no local path.
+    const missing = await fetch(`${url}/voice/heart_masterless_strength/yell__no_such_line.mp3`);
+    expect(missing.status).toBe(404);
+    expect(await missing.text()).toBe('not found');
 
     // A symlink planted in an allowed speaker folder cannot reach out of it.
     const escapeName = `zz_sfx_studio_security_${process.pid}.mp3`;
@@ -554,8 +565,8 @@ describe.sequential('SFX Studio server security', () => {
     symlinkSync(join(repoRoot, 'package.json'), escapeLink);
     try {
       const escaped = await fetch(`${url}/voice/heart_masterless_strength/${escapeName}`);
-      expect(escaped.status).toBe(400);
-      expect((await escaped.json()).error).toContain('symlink escapes the allowed root');
+      expect(escaped.status).toBe(404);
+      expect(await escaped.text()).toBe('not found');
     } finally {
       rmSync(escapeLink, { force: true });
     }

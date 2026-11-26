@@ -40,7 +40,7 @@ import {
   sourceUrl,
 } from './audio_io.mjs';
 import { collectSfxCatalog } from './catalog.mjs';
-import { isVoiceSpeaker } from './voice_catalog.mjs';
+import { isVoiceFile } from './voice_catalog.mjs';
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const DIR = fileURLToPath(new URL('.', import.meta.url));
@@ -467,15 +467,24 @@ export async function startSfxStudio({ port = 5181 } = {}) {
         }
         if (url.pathname === '/viewer_live.js') return send(res, 200, MIME['.js'], viewer);
         if (url.pathname.startsWith('/voice/')) {
-          // Listen-only voice lines: an allowlisted speaker folder and a plain
-          // mp3 name, resolved through the same real-path containment.
+          // Listen-only voice lines: exactly what the voice catalog lists (an
+          // allowlisted speaker, a plain mp3 name, the speaker's raid prefix),
+          // resolved through the same real-path containment. Anything else,
+          // a missing file or an escaping link included, is a plain 404.
           const match = url.pathname.match(/^\/voice\/([a-z0-9_]+)\/([a-z0-9_]+\.mp3)$/);
-          if (!match || !isVoiceSpeaker(match[1])) return send(res, 404, 'text/plain', 'not found');
-          const path = safeRealFile(
-            join(REPO_ROOT, 'public/audio/voice', match[1]),
-            match[2],
-            new Set(['.mp3']),
-          );
+          if (!match || !isVoiceFile(match[1], match[2])) {
+            return send(res, 404, 'text/plain', 'not found');
+          }
+          let path;
+          try {
+            path = safeRealFile(
+              join(REPO_ROOT, 'public/audio/voice', match[1]),
+              match[2],
+              new Set(['.mp3']),
+            );
+          } catch {
+            return send(res, 404, 'text/plain', 'not found');
+          }
           return streamFile(req, res, path);
         }
         if (url.pathname.startsWith('/audio/')) {

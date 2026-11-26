@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   collectVoiceCatalog,
+  isVoiceFile,
   isVoiceSpeaker,
   VOICE_SPEAKERS,
   voiceLineInGroup,
@@ -54,6 +55,13 @@ describe('SFX Studio voice catalog', () => {
       ]);
       expect(isVoiceSpeaker('ignivar')).toBe(false);
       expect(isVoiceSpeaker('heart_masterless_strength')).toBe(true);
+      // The one rule the catalog and the /voice/ route share.
+      expect(isVoiceFile('heart_masterless_strength', 'yell__one_body.mp3')).toBe(true);
+      expect(isVoiceFile('captain_thessaly', 'yell__hold_the_line.mp3')).toBe(true);
+      expect(isVoiceFile('captain_thessaly', 'greeting__captain_thessaly.mp3')).toBe(false);
+      expect(isVoiceFile('heart_masterless_strength', 'Bad Name.mp3')).toBe(false);
+      expect(isVoiceFile('heart_masterless_strength', 'notes.txt')).toBe(false);
+      expect(isVoiceFile('ignivar', 'yell__not_the_raid.mp3')).toBe(false);
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
