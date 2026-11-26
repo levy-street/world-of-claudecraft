@@ -11,7 +11,8 @@ party scope); the world icon is the renderer's (`src/render/party_pings.ts`).
   built once on first open, Escape and the centre cancel. One single-shot hold timer,
   no repeating driver.
 - `ping_feed_core.ts` (pure): new-ping detection, the view range, the chat line keys,
-  each kind's sound (existing sampled cues only), the minimap point.
+  each kind's sound (its own layered `ui_ping_*` cue, built by
+  `scripts/sfx/build_ping_sfx.mjs` from `scripts/sfx/ping_sfx.mjs`), the minimap point.
 - `ping_chat_line_core.ts` (pure): the chat callout's parts (sender, the callout
   words, the unit name and its reaction) from two templates, `chatLine` and the
   kind's `callout*Unit`, so a locale keeps its own word order; the `.ping-kind-N`

@@ -45,17 +45,20 @@ export function takeNewPings(seen: Set<number>, pings: readonly PartyPing[]): Pa
   return fresh;
 }
 
-/** Each kind's sound: an existing sampled UI cue, one per kind and chosen for
- *  its meaning (no new audio): Look Here a bright glass ping, Attack a drawn
- *  blade, Warning an alarm bell, On My Way a travelling whoosh, Assist a soft
- *  chime. Every one plays on the SFX bus (sfx.playUi, the SFX volume). */
+/** Each kind's sound: its own layered ping cue (scripts/sfx/ping_sfx.mjs),
+ *  one per kind and built for its meaning: Look Here a bright glass ping,
+ *  Attack a blade shing that lands on a punch, Warning one clashing, wobbling bell,
+ *  On My Way a clean fluttering beacon tone, Assist a warm bowl
+ *  with a soft sparkle. Mastered at their own pitch (rate 1); the gains even
+ *  out the five's loudness. Every one plays on the SFX bus (sfx.playUi, the
+ *  SFX volume). */
 export const PING_SOUNDS: Readonly<Record<number, { key: string; rate: number; gain: number }>> =
   Object.freeze({
-    [PING_LOOK]: { key: 'ui_aura_glass_ping', rate: 1.05, gain: 0.6 },
-    [PING_ATTACK]: { key: 'ui_aura_sword_draw', rate: 1.1, gain: 0.7 },
-    [PING_WARNING]: { key: 'ui_aura_hard_bell', rate: 1.15, gain: 0.6 },
-    [PING_ON_MY_WAY]: { key: 'ui_aura_wind_whoosh', rate: 1.15, gain: 0.6 },
-    [PING_ASSIST]: { key: 'ui_aura_soft_chime', rate: 1.1, gain: 0.65 },
+    [PING_LOOK]: { key: 'ui_ping_look', rate: 1, gain: 1 },
+    [PING_ATTACK]: { key: 'ui_ping_attack', rate: 1, gain: 1 },
+    [PING_WARNING]: { key: 'ui_ping_warning', rate: 1, gain: 1 },
+    [PING_ON_MY_WAY]: { key: 'ui_ping_on_my_way', rate: 1, gain: 0.8 },
+    [PING_ASSIST]: { key: 'ui_ping_assist', rate: 1, gain: 0.85 },
   });
 
 /** The localized name of a ping's unit: the live entity's display name when

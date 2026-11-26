@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed, the destrier, the Smith Heart raid and the Gourdlight Eve cues in 541 keys', () => {
+  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed, the destrier, the Smith Heart raid, the Gourdlight Eve cues and the party pings in 546 keys', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
     // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
@@ -190,9 +190,10 @@ describe('buildManifest', () => {
     // Smith's Heart's AAA sound pass (scripts/sfx/smith_heart_mechanic_sfx.mjs)
     // adds 89: four personal marks, five council, sixteen breath, eight quench,
     // the Heat's twenty-four (its first own takes) and the final boss's
-    // thirty-two: 541.
+    // thirty-two: 541. The five party pings (one layered cue per ping kind,
+    // scripts/sfx/ping_sfx.mjs) make 546, UI cues 97.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(541);
+    expect(keys.size).toBe(546);
     expect([...keys].filter((key) => key.startsWith('heart_council_'))).toHaveLength(23);
     expect([...keys].filter((key) => key.startsWith('heart_breath_'))).toHaveLength(31);
     expect([...keys].filter((key) => key.startsWith('heart_quench_'))).toHaveLength(19);
@@ -215,7 +216,14 @@ describe('buildManifest', () => {
     expect([...keys].filter((key) => key.startsWith('signature_'))).toHaveLength(0);
     expect(keys.has('piercing_howl')).toBe(true);
     expect([...keys].filter((key) => key.startsWith('ui_aura_'))).toHaveLength(20);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(92);
+    expect([...keys].filter((key) => key.startsWith('ui_ping_'))).toEqual([
+      'ui_ping_look',
+      'ui_ping_attack',
+      'ui_ping_warning',
+      'ui_ping_on_my_way',
+      'ui_ping_assist',
+    ]);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(97);
     expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(43);
     expect(keys.has('ui_craft_cast')).toBe(true);
     expect(keys.has('ui_farm_plant')).toBe(true);
@@ -309,7 +317,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(541);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(546);
     expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });

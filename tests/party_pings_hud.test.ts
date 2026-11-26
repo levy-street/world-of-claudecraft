@@ -271,7 +271,7 @@ describe('ping feed controller', () => {
     h.feed.frame();
     h.feed.frame();
     expect(h.logs).toEqual(['Jose: Warning']);
-    expect(h.sounds).toEqual(['ui_aura_hard_bell']);
+    expect(h.sounds).toEqual(['ui_ping_warning']);
     const marks = h.disc.querySelectorAll<HTMLElement>('.ping-minimap-mark');
     expect(marks).toHaveLength(1);
     expect(marks[0].style.display).toBe('block');
@@ -290,7 +290,7 @@ describe('ping feed controller', () => {
     h.state.pings = [ping({ known: true }), ping({ id: 2, kind: PING_ATTACK })];
     h.feed.frame();
     expect(h.logs).toEqual(['Jose: Attack']);
-    expect(h.sounds).toEqual(['ui_aura_sword_draw']);
+    expect(h.sounds).toEqual(['ui_ping_attack']);
   });
 
   it("the sender's own ping sounds and logs on the sender's client too", () => {
@@ -298,7 +298,7 @@ describe('ping feed controller', () => {
     // The feed never filters by sender: a ping from the local player plays.
     h.state.pings = [ping({ from: 1, fromName: 'Me', kind: PING_ASSIST })];
     h.feed.frame();
-    expect(h.sounds).toEqual(['ui_aura_soft_chime']);
+    expect(h.sounds).toEqual(['ui_ping_assist']);
     expect(h.logs).toEqual(['Me: Assist']);
   });
 
@@ -419,7 +419,7 @@ describe('the chat callout line', () => {
     h.state.chat = false;
     h.state.pings = [ping({ kind: PING_ATTACK })];
     h.feed.frame();
-    expect(h.sounds).toEqual(['ui_aura_sword_draw']);
+    expect(h.sounds).toEqual(['ui_ping_attack']);
     expect(h.logs).toEqual([]);
     expect(h.disc.querySelectorAll('.ping-minimap-mark')).toHaveLength(1);
     h.state.chat = true;

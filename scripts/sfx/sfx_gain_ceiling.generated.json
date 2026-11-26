@@ -5789,6 +5789,61 @@
       }
     ]
   },
+  "ui_ping_assist": {
+    "ceilingDb": 5.9,
+    "tracks": [
+      {
+        "filename": "ui_ping_assist.mp3",
+        "sha256": "5ad5e6a04539ab0146cc00f5a903ee7bcbce33811afce7e703f248f3e4d36de6",
+        "size": 27001,
+        "peakDb": -6.9
+      }
+    ]
+  },
+  "ui_ping_attack": {
+    "ceilingDb": 5.7,
+    "tracks": [
+      {
+        "filename": "ui_ping_attack.mp3",
+        "sha256": "0cdf52d15175f464f54c75cdeeec59bb92168bd8993446fce5188dbb8e87040c",
+        "size": 23239,
+        "peakDb": -6.7
+      }
+    ]
+  },
+  "ui_ping_look": {
+    "ceilingDb": 5.8,
+    "tracks": [
+      {
+        "filename": "ui_ping_look.mp3",
+        "sha256": "724b045e2a0e231670dd01cf7b3ebb5c28b6b773e90d2418b3217a0fb8542fe3",
+        "size": 24493,
+        "peakDb": -6.8
+      }
+    ]
+  },
+  "ui_ping_on_my_way": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "ui_ping_on_my_way.mp3",
+        "sha256": "5a8f6e66e9c395f6b01ddf9da289aa7440c73aadde4ad1d403886d79b6140281",
+        "size": 27001,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "ui_ping_warning": {
+    "ceilingDb": 5.8,
+    "tracks": [
+      {
+        "filename": "ui_ping_warning.mp3",
+        "sha256": "6f9618edb4de09d93d705bd08d324d7883b958ea9b918f575a4cad963198c228",
+        "size": 20732,
+        "peakDb": -6.8
+      }
+    ]
+  },
   "ui_ready_check": {
     "ceilingDb": 4.7,
     "tracks": [
