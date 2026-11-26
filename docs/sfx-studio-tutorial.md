@@ -90,7 +90,10 @@ but they do not define the final production level. Every exact preview and
 publish ends with the fixed repository conform pass:
 
 - clips shorter than 1 second target -6 dBFS true peak;
-- clips at least 1 second long target -14 LUFS integrated loudness;
+- clips at least 1 second long target -14 LUFS integrated loudness, with at
+  most 4 dB of limiting on the loudest peak; a transient-heavy cue that would
+  need more publishes under -14 LUFS, marked `peakLimited`, with its punch
+  intact;
 - output is a 44.1 kHz, 192 kbps MP3.
 
 This two-branch standard is intentional. Peak normalization suits short

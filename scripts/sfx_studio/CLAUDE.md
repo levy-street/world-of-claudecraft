@@ -36,10 +36,15 @@ bundled into the game client or server. Root `CLAUDE.md` and
   construction, tone, dynamics, limiter, and output channel layout. Every exact
   preview and publish must be a decoded-QA-verified 44.1 kHz, 192 kbps MP3 using
   true-peak normalization below one second and, at or above one second, LUFS
-  normalization bounded by the post-encode true-peak ceiling: a peak-constrained
-  clip may publish under the LUFS target and is marked `peakLimited`
-  (`conformSfxAudio` in `scripts/sfx/conform_audio.mjs`, pinned by
-  `tests/sfx_conform.test.ts`).
+  normalization bounded by the post-encode true-peak ceiling and a 4 dB limiter
+  budget (`MAX_LONG_FORM_LIMITING_DB`): a clip either bound holds back may
+  publish under the LUFS target and is marked `peakLimited`, only ever with a
+  shortfall `sfx:check` excuses (`conformSfxAudio` in
+  `scripts/sfx/conform_audio.mjs`, pinned by `tests/sfx_conform.test.ts`).
+  `normalizeProductionMastering` accepts exactly what that conform can write:
+  the `peakLimited` flag and up to `CONFORM_MAX_ATTEMPTS` per branch. Bump
+  `MASTERING_REVISION` whenever the conform's output changes, or the preview
+  cache serves renders from the old behavior.
 - The catalog loop flag is a runtime contract. Loop cues must publish through
   seam processing and one-shots must not. Runtime playback rate changes the
   wall-clock loop duration without changing the rendered seam samples.

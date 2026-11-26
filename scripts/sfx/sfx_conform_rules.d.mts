@@ -33,3 +33,4 @@ export interface Classification {
 }
 
 export declare function classify(stats: FileStats): Classification;
+export declare function isPeakConstrainedShortfall(peakDb: number, lufs: number): boolean;

@@ -50,6 +50,16 @@ export function channelProblem(channels, expected) {
  * @param {{ duration: number, bitrate: number, sampleRate: number, peakDb?: number|null, lufs?: number|null, isLossless?: boolean, isMp3?: boolean }} stats
  * @returns {{ reject: boolean, problems: string[], advisories: string[], normBranch: 'peak'|'lufs'|null }}
  */
+/** Whether a long clip's loudness shortfall is excused by its peak: the gain
+ *  that would close it would lift the true peak to within NORM_TOLERANCE of
+ *  the safety ceiling, or past it. The one rule both this check and
+ *  conformSfxAudio's limiter budget read, so a master the conform publishes
+ *  under target is always one this check accepts. */
+export function isPeakConstrainedShortfall(peakDb, lufs) {
+  const hypotheticalPeakAtTarget = peakDb + (TARGET_LUFS - lufs);
+  return hypotheticalPeakAtTarget - TARGET_PEAK_DBFS > -NORM_TOLERANCE;
+}
+
 export function classify({
   duration,
   bitrate,
@@ -120,10 +130,7 @@ export function classify({
     // NORM_TOLERANCE slop already accepted everywhere else in this file
     // (a hypothetical landing within it of the ceiling counts as
     // constrained too) rather than requiring a clean, certain overshoot.
-    const hypotheticalPeakAtTarget = peakDb !== null ? peakDb + (TARGET_LUFS - lufs) : null;
-    const peakConstrained =
-      hypotheticalPeakAtTarget !== null &&
-      hypotheticalPeakAtTarget - TARGET_PEAK_DBFS > -NORM_TOLERANCE;
+    const peakConstrained = peakDb !== null && isPeakConstrainedShortfall(peakDb, lufs);
     if (lufsOver || (lufsUnder && !peakConstrained)) {
       problems.push(`${lufs.toFixed(1)} LUFS (want ${TARGET_LUFS} LUFS)`);
     }

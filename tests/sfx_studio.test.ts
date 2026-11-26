@@ -1037,6 +1037,52 @@ describe('SFX Studio project schema', () => {
     ).toThrow('invalid attempts');
   });
 
+  it('accepts the peak-safe conform fallback and its whole attempt budget', () => {
+    // conform_audio.mjs falls back to its best peak-safe attempt, marked
+    // peakLimited, when a sustained cue cannot reach -14 LUFS under the
+    // true-peak ceiling, and its LUFS branch may spend up to 40 attempts. Both
+    // are documented publishable outcomes, so a render that lands either way
+    // must pass the metadata check rather than fail every peak-limited cue.
+    const attempt = { gainDb: 8, measuredOutput: -16, measuredPeakDb: -6, error: 2 };
+    const peakLimited = {
+      revision: MASTERING_REVISION,
+      mode: 'production-conform',
+      authoringMode: 'direct',
+      measurement: null,
+      conform: {
+        normBranch: 'lufs',
+        inputLevel: -24,
+        outputLevel: -16,
+        gainDb: 8,
+        peakLimited: true,
+        attempts: Array.from({ length: 40 }, () => attempt),
+      },
+    };
+    expect(normalizeProductionMastering(peakLimited)).toEqual(peakLimited);
+    expect(() =>
+      normalizeProductionMastering({
+        ...peakLimited,
+        conform: { ...peakLimited.conform, attempts: Array.from({ length: 41 }, () => attempt) },
+      }),
+    ).toThrow('invalid attempts');
+    expect(() =>
+      normalizeProductionMastering({
+        ...peakLimited,
+        conform: {
+          ...peakLimited.conform,
+          normBranch: 'peak',
+          attempts: Array.from({ length: 17 }, () => attempt),
+        },
+      }),
+    ).toThrow('invalid attempts');
+    expect(() =>
+      normalizeProductionMastering({
+        ...peakLimited,
+        conform: { ...peakLimited.conform, peakLimited: 'yes' },
+      }),
+    ).toThrow('invalid peak-limited flag');
+  });
+
   it('keeps restored recipes intact and mastered-loop working drafts neutral', () => {
     const archivedProject = normalizeProject(
       { segments: [{ start: 8, end: 9 }] },

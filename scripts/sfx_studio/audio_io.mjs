@@ -20,7 +20,11 @@ import {
 } from 'node:fs';
 import { basename, dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { conformSfxAudio, inspectSfxConformance } from '../sfx/conform_audio.mjs';
+import {
+  CONFORM_MAX_ATTEMPTS,
+  conformSfxAudio,
+  inspectSfxConformance,
+} from '../sfx/conform_audio.mjs';
 import { FFMPEG_PATH, FFPROBE_PATH } from '../sfx/ffmpeg_paths.mjs';
 import {
   readSfxMix,
@@ -68,7 +72,9 @@ export const STUDIO_ROOT = resolve(
     ? DEFAULT_STUDIO_ROOT
     : process.env.WOC_SFX_STUDIO_ROOT || DEFAULT_STUDIO_ROOT,
 );
-export const MASTERING_REVISION = 7;
+// 8: the LUFS conform branch caps its limiter (MAX_LONG_FORM_LIMITING_DB), so
+// previews mastered by the uncapped search are re-rendered, never reused.
+export const MASTERING_REVISION = 8;
 const PLAYBACK_PROFILE_DRAFT = 'playback_profile.json';
 const DRAFT_PUBLICATION_STATE = 'draft_publication_state.json';
 
@@ -1142,16 +1148,22 @@ export function normalizeProductionMastering(raw, { allowHistoricalRevision = fa
   const measurement = normalizeMasteringMeasurement(raw.measurement);
   assertOnlyFields(
     raw.conform,
-    new Set(['normBranch', 'inputLevel', 'outputLevel', 'gainDb', 'attempts']),
+    new Set(['normBranch', 'inputLevel', 'outputLevel', 'gainDb', 'peakLimited', 'attempts']),
     'production conform metadata',
   );
   if (!['peak', 'lufs'].includes(raw.conform.normBranch)) {
     throw new Error('production conform metadata has an invalid branch');
   }
+  // conformSfxAudio marks a cue its true-peak ceiling or limiter budget holds
+  // under the loudness target with peakLimited: true and never writes any
+  // other value.
+  if (Object.hasOwn(raw.conform, 'peakLimited') && raw.conform.peakLimited !== true) {
+    throw new Error('production conform metadata has an invalid peak-limited flag');
+  }
   if (
     !Array.isArray(raw.conform.attempts) ||
     raw.conform.attempts.length < 1 ||
-    raw.conform.attempts.length > 16
+    raw.conform.attempts.length > CONFORM_MAX_ATTEMPTS[raw.conform.normBranch]
   ) {
     throw new Error('production conform metadata has invalid attempts');
   }
@@ -1184,6 +1196,7 @@ export function normalizeProductionMastering(raw, { allowHistoricalRevision = fa
       inputLevel: masteringNumber(raw.conform.inputLevel, 'conform input level'),
       outputLevel: masteringNumber(raw.conform.outputLevel, 'conform output level'),
       gainDb: masteringNumber(raw.conform.gainDb, 'conform gain'),
+      ...(raw.conform.peakLimited === true ? { peakLimited: true } : {}),
       attempts,
     },
   };

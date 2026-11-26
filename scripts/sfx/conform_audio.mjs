@@ -9,6 +9,7 @@ import { basename, dirname, extname, join } from 'node:path';
 import {
   classify,
   DURATION_THRESHOLD,
+  isPeakConstrainedShortfall,
   LOSSLESS_EXTENSIONS,
   NORM_TOLERANCE,
   TARGET_BITRATE,
@@ -115,6 +116,28 @@ export function measureSfxLufs(file, ffmpegPath) {
 // LUFS-target (>=1s) clips clip on real playback, since this branch never
 // re-measured its own post-encode true peak (see the loop below, now fixed).
 const LONG_FORM_LIMIT_DB = TARGET_PEAK_DBFS - 1;
+
+/** The most conform attempts each branch may spend. A peak-overshoot
+ *  correction (below) spends an attempt purely pulling gain down rather than
+ *  converging LUFS, so the lufs branch gets a larger budget than the simpler
+ *  peak branch: without it, a file whose peak only transiently overshoots
+ *  mid-search (but has real headroom overall) could exhaust its attempts
+ *  before fully reconverging and fall back to a needlessly-quiet peak-safe
+ *  result instead of a real LUFS match. Exported so the SFX Studio's mastering
+ *  metadata check accepts exactly the attempt lists this loop can produce. */
+export const CONFORM_MAX_ATTEMPTS = Object.freeze({ peak: 16, lufs: 40 });
+
+/** The most gain reduction the LUFS branch's limiter may apply to a cue's
+ *  loudest peak. Past it, a wide-crest cue (a hard hit over a quiet tail) is
+ *  published under the loudness target, peak-limited, rather than flattened
+ *  to reach it: once the limiter saturates, extra gain barely moves the
+ *  integrated loudness, so an uncapped search kept pushing (a cleaned raid
+ *  impact went out with +55 dB of gain) and lifted the noise floor and fade
+ *  tail with it. Four dB keeps a transient's shape. A cue the budget holds
+ *  under the target publishes peak-limited only when
+ *  isPeakConstrainedShortfall (sfx_conform_rules.mjs, the check's own rule)
+ *  excuses the shortfall; a smaller shortfall is closed past the budget. */
+export const MAX_LONG_FORM_LIMITING_DB = 4;
 const LONG_FORM_LIMIT = Number((10 ** (LONG_FORM_LIMIT_DB / 20)).toFixed(8));
 
 function filterNumber(value) {
@@ -205,20 +228,24 @@ export function conformSfxAudio({
         : measureSfxTruePeakDb(inputFile, ffmpegPath)
       : measureSfxLufs(inputFile, ffmpegPath);
   const target = normBranch === 'peak' ? TARGET_PEAK_DBFS : TARGET_LUFS;
-  let gainDb = target - measuredInput;
+  // The LUFS branch drives the input's loudest peak at most
+  // MAX_LONG_FORM_LIMITING_DB past the limiter's ceiling (lifted only to close
+  // a small shortfall the check would not excuse, and lowered by a peak
+  // overshoot).
+  let maxGainDb =
+    normBranch === 'lufs'
+      ? LONG_FORM_LIMIT_DB +
+        MAX_LONG_FORM_LIMITING_DB -
+        (Number.isFinite(peakDb) ? peakDb : measureSfxTruePeakDb(inputFile, ffmpegPath))
+      : Number.POSITIVE_INFINITY;
+  let gainDb = Math.min(target - measuredInput, maxGainDb);
   const temporary = join(
     dirname(outputFile),
     `.${basename(outputFile, extname(outputFile))}.${process.pid}.${randomBytes(6).toString('hex')}.tmp.mp3`,
   );
   const attempts = [];
   let bestPeakSafeAttempt = null;
-  // A peak-overshoot correction (below) spends an attempt purely pulling
-  // gain down rather than converging LUFS, so the lufs branch gets a larger
-  // budget than the simpler peak branch: without it, a file whose peak only
-  // transiently overshoots mid-search (but has real headroom overall) could
-  // exhaust its attempts before fully reconverging and fall back to a
-  // needlessly-quiet peak-safe result instead of a real LUFS match.
-  const maxAttempts = normBranch === 'lufs' ? 40 : 16;
+  const maxAttempts = CONFORM_MAX_ATTEMPTS[normBranch];
   try {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const plan = buildSfxConformArgs({
@@ -268,13 +295,41 @@ export function conformSfxAudio({
         // Peak is the binding constraint this attempt: pull gain down by the
         // overshoot directly rather than the damped LUFS correction below,
         // which would otherwise keep chasing loudness into more overshoot.
+        // A gain that overshot once overshoots again, so the budget comes down
+        // to halfway between it and the corrected gain: a capped cue no longer
+        // climbs back to the same overshoot until its attempts run out, and the
+        // limiter's nonlinearity (the corrected gain is usually more than safe)
+        // still leaves room to converge above it.
+        maxGainDb = Math.min(maxGainDb, gainDb - peakOver / 2);
         gainDb -= peakOver;
         continue;
+      }
+      // Under target, peak-safe, and the limiter already at its budget: this
+      // attempt is the loudest the cue gets without flattening its transient,
+      // so publish it as the peak-limited result now, provided the check will
+      // excuse the shortfall. A small shortfall with the peak still below the
+      // check's slack is closed instead: the budget lifts by just that much.
+      if (error > NORM_TOLERANCE && gainDb >= maxGainDb) {
+        if (!isPeakConstrainedShortfall(measuredPeakDb, measuredOutput)) {
+          maxGainDb += error;
+          gainDb = Math.min(gainDb + error * 0.5, maxGainDb);
+          continue;
+        }
+        renameSync(temporary, outputFile);
+        return {
+          outputFile,
+          normBranch,
+          inputLevel: measuredInput,
+          outputLevel: measuredOutput,
+          gainDb: filterNumber(gainDb),
+          peakLimited: true,
+          attempts,
+        };
       }
       // MP3 true-peak measurements are quantized and a limiter makes sustained
       // loudness response non-linear. A damped correction avoids oscillating
       // across the tolerance window while still converging quickly.
-      gainDb += error * 0.5;
+      gainDb = Math.min(gainDb + error * 0.5, maxGainDb);
     }
     if (bestPeakSafeAttempt) {
       const plan = buildSfxConformArgs({

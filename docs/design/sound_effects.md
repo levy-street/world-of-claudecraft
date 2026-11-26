@@ -55,9 +55,16 @@ through it before writing, so a regenerated clip already meets the standard.
   limiter saw). Peak safety is the binding constraint: a wide-crest-factor clip
   that cannot reach -14 LUFS without breaching the ceiling ships as the best
   peak-safe result, under the nominal target and marked `peakLimited`
-  (`conformSfxAudio` in `scripts/sfx/conform_audio.mjs`). `npm run sfx:check`
-  accepts that peak-constrained shortfall and hard-fails an over-target LUFS
-  or a true-peak overshoot (`classify` in `scripts/sfx/sfx_conform_rules.mjs`).
+  (`conformSfxAudio` in `scripts/sfx/conform_audio.mjs`). The LUFS branch also
+  spends at most `MAX_LONG_FORM_LIMITING_DB` (4 dB) of limiter gain reduction
+  on a clip's loudest peak: a hard hit over a quiet tail ships under target,
+  `peakLimited`, rather than flattened to reach it, and a clip whose input peak
+  already sits high can come out slightly quieter than its source.
+  `npm run sfx:check` accepts that peak-constrained shortfall and hard-fails an
+  over-target LUFS or a true-peak overshoot (`classify` in
+  `scripts/sfx/sfx_conform_rules.mjs`). Both read one rule,
+  `isPeakConstrainedShortfall`, so the conform never publishes a shortfall
+  the check would reject: a smaller one is closed past the budget instead.
   On top of the asset ceiling, the engine caps per-play gain at 1.0 under a
   0.85 master, so runtime gain staging cannot clip a conformed clip.
 - **Channels (mono/stereo policy per playback path):** mono, except global
