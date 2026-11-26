@@ -518,7 +518,10 @@ export const HEAT_TUNING = {
   // burned 90 a second each for 15 s, more than two level-20 healers keep up.
   // 9 until the team's playtest of 2026-11-25 ("the tank buster and its melee
   // hit too soft"): 12, a third more, 60 a second at the swap's 5 stacks.
-  gripPerTick: 12,
+  // 12 until the owner's call of 2026-11-26 ("very little damage"): 15, 75 a
+  // second at the swap, about 1,500 a tank's turn (still under the 18 the bot
+  // raid of 2026-11-04 found more than two healers keep up).
+  gripPerTick: 15,
   gripSeconds: 15,
   gripMaxStacks: 10,
   /** The tanks swap at this many Cinder Grip stacks, every tier (the bot
