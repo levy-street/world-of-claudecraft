@@ -7,8 +7,9 @@
 // and a handful of thin luminous wisps spiralling up out of the disc.
 //
 // What it says, on every graphics tier (docs/design/graphics-settings-
-// fairness.md): the circle at the sim's radius (the rim is yard-true, nothing
-// is ever drawn outside it on the floor), GATHER HERE (the vortex and its
+// fairness.md): the circle at the sim's radius (the rim is yard-true; past it
+// only the rim's halo and the thin rings it sends out, light, never a fill),
+// GATHER HERE (the vortex and its
 // rings pull IN, and a ring of chevrons points in, so a still frame says it
 // too), a pip round the rim per player the soak needs, lit one per player
 // inside (floor_tell_core.ts `soakPips`), and an optional countdown arc.
@@ -47,7 +48,7 @@ export interface SoakPalette {
 }
 
 export const SOAK_PALETTES: Readonly<Record<SoakElement, Readonly<SoakPalette>>> = {
-  fire: { deep: 0x3c0700, body: 0xc4220a, bright: 0xff7a14, hot: 0xffe27a },
+  fire: { deep: 0x3a0400, body: 0xe01806, bright: 0xff5210, hot: 0xffcc48 },
   earth: { deep: 0x2a1608, body: 0x8c5628, bright: 0xe2a462, hot: 0xfff0cc },
   air: { deep: 0x0c2a34, body: 0x4a9cac, bright: 0xa8e8ec, hot: 0xf6ffff },
   lightning: { deep: 0x020a30, body: 0x1840d0, bright: 0x64a8ff, hot: 0xeaf6ff },
@@ -106,6 +107,12 @@ export const SOAK_MARKER = {
   ripples: 3,
   rippleEvery: 0.75,
   rippleTo: 0.3,
+  /** The disc reaches past the rim by this share of the radius: only the
+   *  rim's soft halo and the thin rings it sends out live there (light, no
+   *  fill), one leaving every `emitEvery` seconds; the birth sends a strong
+   *  one. The rim itself (r = 1) is the sim's radius. */
+  outer: 1.45,
+  emitEvery: 1.1,
   /** Wisps: on the full tier, at least on the low one. */
   wisps: 14,
   wispsLow: 6,
@@ -134,6 +141,8 @@ export function soakMarkerStage(age: number, decayAge: number | null): SoakMarke
 export interface SoakMarkerLook {
   /** The vortex's spread (0..1: 1 reaches the rim). */
   bloom: number;
+  /** The birth's progress (0 laid .. 1 born): the strong ring it sends out. */
+  born: number;
   /** How strong the whole marker draws (0..1). */
   alpha: number;
   /** The vortex's turn (radians). */
@@ -147,7 +156,7 @@ export interface SoakMarkerLook {
 }
 
 export function newSoakMarkerLook(): SoakMarkerLook {
-  return { bloom: 1, alpha: 1, spin: 0, time: 0, wisp: 1, flare: 0 };
+  return { bloom: 1, born: 1, alpha: 1, spin: 0, time: 0, wisp: 1, flare: 0 };
 }
 
 /** The clock a reduced-motion marker is held at (a frame with the rings
@@ -175,6 +184,7 @@ export function soakMarkerLook(
   out.bloom =
     (SOAK_MARKER.bloomFrom + (1 - SOAK_MARKER.bloomFrom) * born) *
     (1 - (1 - SOAK_MARKER.bloomTo) * (reduced ? 0 : gone));
+  out.born = born;
   out.alpha = (0.4 + 0.6 * born) * (1 - gone) * (0.82 + 0.18 * f);
   out.spin = reduced
     ? 0

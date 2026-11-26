@@ -4,7 +4,8 @@
 // ribbon mesh of thin wisps spiralling up out of it (one draw, one program,
 // additive). Built once by its OWNER under the owner's gated root (no GPU work
 // after boot), no light, no texture, no per-frame allocation. The disc's rim
-// is the sim's radius; nothing on the floor draws outside it. Every tier draws
+// is the sim's radius; past it only the rim's halo and the thin rings it sends
+// out (light, never a fill). Every tier draws
 // the disc whole; only the wisps' count follows the tier's detail. Reduced
 // motion holds every motion still.
 
@@ -40,6 +41,7 @@ const DISC_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uSpin;
 uniform float uBloom;
+uniform float uBorn;
 uniform float uAlpha;
 uniform float uFlare;
 uniform float uNeed;
@@ -51,6 +53,8 @@ uniform float uTimer;
 uniform float uRadius;
 uniform float uRipEvery;
 uniform float uRipTo;
+uniform float uOuter;
+uniform float uEmitEvery;
 uniform vec4 uChar;
 uniform vec2 uChar2;
 uniform float uDetail;
@@ -91,178 +95,215 @@ vec2 rot(vec2 p, float a) {
 }
 
 void main() {
-  float r = length(vXZ);
-  // The disc is the unit circle: no discard (it would cost early depth).
-  r = min(r, 1.0);
+  // The mesh reaches past the rim (uOuter of the radius) for the halo and the
+  // rings it emits; the rim (r = 1) is the sim's radius.
+  float r = min(length(vXZ), uOuter);
   float aa = fwidth(r) * 1.5 + 0.003;
   float spd = uChar2.y;
   float spin = uSpin * spd;
   float time = uTime * spd;
   float th = atan(vXZ.x, vXZ.y);
   float t = fract(th / 6.2831853 + 0.5);
-  // The bloom: a newborn vortex spreads out from the middle, a dying one is
-  // drawn back into it.
-  float rb = r / max(uBloom, 0.05);
-  float spread = 1.0 - smoothstep(0.9, 1.05, rb);
-  // Two counter-rotating layers: the inner turns faster than the rim (a
-  // vortex), the streaks spiral in as their radial coordinate drifts.
-  float twist = 2.8 * (1.0 - r);
-  float angA = th + spin * (1.0 + 1.6 * (1.0 - r)) + twist;
-  float angB = th - spin * 0.55 - twist * 0.6 + 1.3;
-  vec2 ringA = vec2(cos(angA), sin(angA));
-  vec2 ringB = vec2(cos(angB), sin(angB));
-  float drift = time * 0.5;
-  float stA = fbm(ringA * 2.0 + vec2(rb * 7.0 + drift, 0.0));
-  // The low tier sheds two layers' octaves (cosmetic depth only).
-  vec2 qA2 = ringA * 4.4 + vec2(rb * 19.0 + drift * 1.7, 4.1);
-  float stA2 = uDetail > 0.5 ? fbm(qA2) : vnoise(qA2) * 0.94;
-  float stB = fbm(ringB * 1.6 + vec2(rb * 5.0 + drift * 0.6, 7.3));
-  vec2 qT = ringB * 1.1 + vec2(rb * 2.6 - drift * 0.3, 9.7);
-  float turb = uDetail > 0.5 ? fbm(qT) : vnoise(qT) * 0.94;
   float smoke = uChar.w;
-  float sA = smoothstep(0.46 + 0.08 * smoke, 0.8, stA);
-  // Thin bright filaments: spiral strands wound into the middle (two
-  // counter-turning sets), broken up and bent by the noise.
-  float lr = log(max(rb, 0.03));
-  float sp1 = t * 6.0 - lr * 1.6 + (spin * (1.0 + 0.8 * (1.0 - r))) / 1.0472 + (stB - 0.5) * 1.8;
-  float sp2 = t * 4.0 + lr * 0.9 - spin * 0.35 / 1.5708 + (turb - 0.5) * 2.2;
-  float fil = pow(1.0 - abs(2.0 * fract(sp1) - 1.0), 10.0)
-    * smoothstep(0.35, 0.7, stA2 + 0.15) * smoothstep(0.18, 0.5, rb);
-  float filB = pow(1.0 - abs(2.0 * fract(sp2) - 1.0), 14.0)
-    * smoothstep(0.45, 0.75, stA) * smoothstep(0.15, 0.45, rb);
-  // The radial shape: a darker turbulent core, a body, a hot inner ring
-  // near the rim, a soft-to-crisp falloff onto the rim.
-  float band = smoothstep(0.28, 0.72, rb) * (1.0 - smoothstep(0.92, 1.0, rb));
-  float core = 1.0 - smoothstep(0.0, 0.5, rb);
-  float hotR = 0.78 + 0.04 * (turb - 0.5);
-  float hotRing = exp(-pow((rb - hotR) / 0.06, 2.0)) * (0.45 + 0.7 * sA);
-  // The body: the element's own colour, deepening into the core.
-  vec3 col = mix(uBody * 0.55, uBody, turb);
-  col = mix(col, uDeep, core * (0.75 - 0.4 * turb));
-  float lit = clamp(sA * (0.12 + 0.6 * band) + 0.75 * fil * (0.25 + band) + 0.5 * filB * band, 0.0, 1.0);
-  col = mix(col, uBright, lit * (1.0 - 0.5 * smoke));
-  float white = clamp(fil * sA * band * 1.4 + hotRing * fil * 1.2 + hotRing * 0.25, 0.0, 1.0);
-  col = mix(col, uHot, white * (1.0 - 0.5 * smoke));
-  col = mix(col, uBright, hotRing * 0.45 * (1.0 - white));
-  float a = (0.42 + 0.3 * turb + 0.55 * lit + 0.5 * hotRing) * spread;
-  a = max(a, core * (0.55 + 0.2 * smoke) * spread);
-  // The birth's (and the decay's) bright front at the vortex's edge: the
-  // bloom lands with a flash.
-  float front = exp(-pow((rb - 0.96) / 0.07, 2.0)) * smoothstep(0.98, 0.6, uBloom) * step(rb, 1.1);
-  col = mix(col, uHot, clamp(front * 1.2, 0.0, 1.0));
-  a = max(a, front);
-  // Light it ADDS (a) and floor it covers (occ) part: the floor's own
-  // detail shows through the vortex; the rim and the pips cover it.
-  float occ = (0.22 + 0.25 * lit + 0.45 * core + 0.4 * smoke) * spread;
-  // Smoke (shadow): soft dark plumes curling in over the body.
-  if (smoke > 0.0) {
-    float plume = fbm(rot(vXZ, spin * 0.8 + twist * 1.4) * 3.0 + vec2(0.0, -drift * 0.8));
-    float sm = smoothstep(0.42, 0.72, plume) * smoothstep(0.15, 0.6, rb) * smoke;
-    col = mix(col, uDeep * 0.6, sm * 0.7);
-    float lip = smoothstep(0.62, 0.7, plume) * (1.0 - smoothstep(0.7, 0.8, plume));
-    col += uBright * lip * smoke * 0.5;
-    a = max(a, sm * 0.75 * spread);
-  }
-  // Streams (air): long thin wind ribbons drawn round the swirl.
-  if (uChar2.x > 0.0) {
-    float arm = fract(t * 5.0 + log(max(r, 0.02)) * 1.35 + spin * 0.45);
-    float wob = 0.03 * sin(r * 21.0 + time * 3.0);
-    float line = 1.0 - smoothstep(0.0, 0.035 + aa * 2.0, abs(arm - 0.5 + wob));
-    float seg = smoothstep(0.35, 0.6, vnoise(vec2(t * 9.0 + spin, r * 3.0 - time * 1.4)));
-    float st = line * seg * smoothstep(0.2, 0.5, rb) * spread * uChar2.x;
-    col = mix(col, uHot, st * 0.8);
-    a = max(a, st * 0.85);
-  }
-  // A gentle flicker over the whole body (soakFlicker, once a frame).
-  col *= uFlick;
-  // Grains (earth's sand, fire's embers, air's motes): specks carried round
-  // the vortex, twinkling.
-  if (uChar.x > 0.0) {
-    vec2 gq = rot(vXZ, spin * 1.25 + twist * 0.8) * 22.0;
-    vec2 cell = floor(gq);
-    float h = hash2(cell);
-    vec2 off = vec2(hash2(cell + 7.1), hash2(cell + 3.7)) - 0.5;
-    float d = length(fract(gq) - 0.5 - off * 0.6);
-    float tw = 0.5 + 0.5 * sin(time * (3.0 + 5.0 * h) + h * 40.0);
-    float g = step(0.8, h) * (1.0 - smoothstep(0.06, 0.16, d)) * tw * smoothstep(0.15, 0.4, rb);
-    g *= uChar.x * spread;
-    col = mix(col, uHot, g);
-    a = max(a, g);
-  }
-  // Tongues (fire): the hot edge licks inward from the rim in flame tongues.
-  if (uChar.z > 0.0) {
-    vec2 rf = vec2(cos(th + spin * 0.3), sin(th + spin * 0.3));
-    float n = fbm(rf * 3.2 + vec2(-time * 1.3, time * 0.4));
-    float edge = 0.97 - 0.48 * n * n;
-    float tongue = smoothstep(edge - 0.02, edge + 0.06, r) * (1.0 - smoothstep(0.97, 1.0, r));
-    float tip = smoothstep(edge - 0.02, edge + 0.02, r) * (1.0 - smoothstep(edge + 0.02, edge + 0.1, r));
-    tongue *= uChar.z * spread;
-    vec3 flame = mix(mix(uBody, uBright, 0.55 + 0.45 * n), uHot, tip * 0.8);
-    col = mix(col, flame, tongue * 0.9);
-    a = max(a, tongue);
-    occ = max(occ, tongue * 0.45);
-  }
-  // The converging rings (gather in): one leaves the rim every uRipEvery
-  // seconds and closes on the middle as it fades.
-  float rip = 0.0;
-  for (int k = 0; k < 3; k++) {
-    float ph = fract(uTime / (uRipEvery * 3.0) + float(k) / 3.0);
-    float rr = 1.0 - ph * (1.0 - uRipTo);
-    float w = 0.005 + 0.007 * ph;
-    float ra = smoothstep(0.0, 0.12, ph) * (1.0 - ph) * (1.0 - ph);
-    rip += ra * (1.0 - smoothstep(w, w + aa, abs(r - rr)));
-  }
-  rip = clamp(rip, 0.0, 1.0);
-  col = mix(col, uBright, rip * 0.8);
-  a += rip * 0.45;
-  // The inward chevrons: eight arrowheads pointing at the middle, so a still
-  // frame says GATHER too.
-  float u = fract(t * 8.0 + 0.0625) - 0.5;
-  float v = r - abs(u) * 0.9;
+  vec3 col = vec3(0.0);
+  // Light added (e, premultiplied) and floor covered (occ).
+  float e = 0.0;
+  float occ = 0.0;
   float info = 0.0;
-  float chev = (1.0 - smoothstep(0.012, 0.012 + aa, abs(v - 0.58))) *
-    (1.0 - smoothstep(0.07, 0.1, abs(u)));
-  col = mix(col, uHot, chev * 0.9);
-  a = max(a, chev * 0.9);
-  occ = max(occ, chev * 0.5);
+  float inside = 1.0 - smoothstep(1.0 - aa, 1.0, r);
+
+  // ---- the vortex (inside the rim) ----
+  if (r < 1.0) {
+    float rb = r / max(uBloom, 0.05);
+    float spread = 1.0 - smoothstep(0.9, 1.04, rb);
+    float twist = 2.8 * (1.0 - r);
+    // Two counter-rotating layers: the inner turns faster (a vortex).
+    float angA = th + spin * (1.0 + 1.6 * (1.0 - r)) + twist;
+    float angB = th - spin * 0.6 - twist * 0.7 + 1.3;
+    vec2 ringA = vec2(cos(angA), sin(angA));
+    vec2 ringB = vec2(cos(angB), sin(angB));
+    float drift = time * 0.5;
+    float stA = fbm(ringA * 2.0 + vec2(rb * 7.0 + drift, 0.0));
+    vec2 qA2 = ringA * 4.4 + vec2(rb * 19.0 + drift * 1.7, 4.1);
+    float stA2 = uDetail > 0.5 ? fbm(qA2) : vnoise(qA2) * 0.94;
+    float stB = fbm(ringB * 1.6 + vec2(rb * 5.0 + drift * 0.6, 7.3));
+    vec2 qT = ringB * 1.1 + vec2(rb * 2.6 - drift * 0.3, 9.7);
+    float turb = uDetail > 0.5 ? fbm(qT) : vnoise(qT) * 0.94;
+    float sA = smoothstep(0.46 + 0.08 * smoke, 0.8, stA);
+    // Thin bright filaments: spiral strands wound into the middle.
+    float lr = log(max(rb, 0.03));
+    float sp1 = t * 6.0 - lr * 1.6 + spin * (1.0 + 0.8 * (1.0 - r)) / 1.0472 + (stB - 0.5) * 1.8;
+    float sp2 = t * 4.0 + lr * 0.9 - spin * 0.35 / 1.5708 + (turb - 0.5) * 2.2;
+    float fil = pow(1.0 - abs(2.0 * fract(sp1) - 1.0), 10.0)
+      * smoothstep(0.35, 0.7, stA2 + 0.15) * smoothstep(0.2, 0.5, rb);
+    float filB = pow(1.0 - abs(2.0 * fract(sp2) - 1.0), 14.0)
+      * smoothstep(0.45, 0.75, stA) * smoothstep(0.15, 0.45, rb);
+    // The shape: a dark turbulent centre fading to clear, the body, a hot
+    // inner ring near 70 percent, the light swelling toward the rim.
+    float band = smoothstep(0.3, 0.7, rb) * (1.0 - smoothstep(0.93, 1.0, rb));
+    float core = 1.0 - smoothstep(0.0, 0.5, rb);
+    float hotR = 0.7 + 0.04 * (turb - 0.5);
+    float hotRing = exp(-pow((rb - hotR) / 0.07, 2.0)) * (0.5 + 0.8 * sA);
+    float lit = clamp(sA * (0.08 + 0.5 * band) + 0.9 * fil * (0.2 + band) + 0.6 * filB * band, 0.0, 1.0);
+    vec3 body = mix(uDeep, uBody, clamp(0.25 + 0.9 * turb * (1.0 - 0.5 * core), 0.0, 1.0));
+    vec3 c = mix(body, uBright, lit * (1.0 - 0.45 * smoke));
+    float white = clamp(fil * sA * band * 1.5 + hotRing * fil * 1.4 + hotRing * 0.35, 0.0, 1.0);
+    c = mix(c, uHot, white * (1.0 - 0.45 * smoke));
+    // Emission: little in the dark centre, strong in the band and streaks.
+    float glow = (0.2 + 0.6 * turb * (1.0 - 0.7 * core) + 0.9 * lit + 0.8 * hotRing + 0.3 * band) * spread;
+    // The centre darkens the floor a little (its turbulence moving), the
+    // body barely covers it: the floor shows through.
+    float cov = (0.1 + 0.42 * core * (0.6 + 0.6 * turb) + 0.1 * band + 0.5 * smoke * band) * spread;
+    // Smoke (shadow): soft dark plumes curling in.
+    if (smoke > 0.0) {
+      float plume = fbm(rot(vXZ, spin * 0.8 + twist * 1.4) * 3.0 + vec2(0.0, -drift * 0.8));
+      float sm = smoothstep(0.42, 0.72, plume) * smoothstep(0.15, 0.6, rb) * smoke;
+      c = mix(c, uDeep, sm * 0.7);
+      glow *= 1.0 - 0.6 * sm;
+      cov = max(cov, sm * 0.65 * spread);
+      float lip = smoothstep(0.62, 0.7, plume) * (1.0 - smoothstep(0.7, 0.8, plume));
+      c += uBright * lip * smoke * 0.6;
+      glow += lip * smoke * 0.6 * spread;
+    }
+    // Streams (air): long thin wind ribbons round the swirl.
+    if (uChar2.x > 0.0) {
+      float arm = fract(t * 5.0 + log(max(r, 0.02)) * 1.35 + spin * 0.45);
+      float wob = 0.03 * sin(r * 21.0 + time * 3.0);
+      float line = 1.0 - smoothstep(0.0, 0.035 + aa * 2.0, abs(arm - 0.5 + wob));
+      float seg = smoothstep(0.35, 0.6, vnoise(vec2(t * 9.0 + spin, r * 3.0 - time * 1.4)));
+      float st = line * seg * smoothstep(0.2, 0.5, rb) * spread * uChar2.x;
+      c = mix(c, uHot, st * 0.8);
+      glow += st;
+    }
+    // Grains (sand, embers, motes) carried round the vortex, twinkling.
+    if (uChar.x > 0.0) {
+      vec2 gq = rot(vXZ, spin * 1.25 + twist * 0.8) * 22.0;
+      vec2 cell = floor(gq);
+      float h = hash2(cell);
+      vec2 off = vec2(hash2(cell + 7.1), hash2(cell + 3.7)) - 0.5;
+      float d = length(fract(gq) - 0.5 - off * 0.6);
+      float tw = 0.5 + 0.5 * sin(time * (3.0 + 5.0 * h) + h * 40.0);
+      float g = step(0.8, h) * (1.0 - smoothstep(0.06, 0.16, d)) * tw * smoothstep(0.15, 0.4, rb);
+      g *= uChar.x * spread;
+      c = mix(c, uHot, g);
+      glow += g;
+    }
+    // The birth's bright front at the vortex's edge: the bloom lands.
+    float front = exp(-pow((rb - 0.96) / 0.07, 2.0)) * smoothstep(0.98, 0.6, uBloom) * step(rb, 1.1);
+    c = mix(c, uHot, clamp(front * 1.2, 0.0, 1.0));
+    glow += front;
+    // The converging rings inside (gather in): one leaves the rim every
+    // uRipEvery seconds and closes on the middle as it fades.
+    float rip = 0.0;
+    for (int k = 0; k < 3; k++) {
+      float ph = fract(uTime / (uRipEvery * 3.0) + float(k) / 3.0);
+      float rr = 1.0 - ph * (1.0 - uRipTo);
+      float w = 0.006 + 0.008 * ph;
+      float ra = smoothstep(0.0, 0.12, ph) * (1.0 - ph) * (1.0 - ph);
+      rip += ra * (1.0 - smoothstep(w, w + aa, abs(r - rr)));
+    }
+    rip = clamp(rip, 0.0, 1.0);
+    c = mix(c, uBright, rip * 0.8);
+    glow += rip * 0.5;
+    col = c * uFlick;
+    e = glow;
+    occ = cov;
+  }
+
+  // ---- the inward chevrons: bold arrowheads at the middle's edge ----
+  float u = fract(t * 8.0 + 0.0625) - 0.5;
+  float v = r - abs(u) * 0.75;
+  float chev = (1.0 - smoothstep(0.022, 0.022 + aa, abs(v - 0.5))) *
+    (1.0 - smoothstep(0.1, 0.13, abs(u))) * inside;
+  col = mix(col, uHot, chev);
+  e = max(e, chev * 1.1);
+  occ = max(occ, chev * 0.55);
   info = max(info, chev);
-  // The rim: a crisp bright line at the sim's own radius, a thin dark
-  // keyline inside it so it holds on any floor.
-  float rw = max(0.09 / uRadius, aa * 1.2);
-  float rimLine = smoothstep(1.0 - rw - aa, 1.0 - rw, r) * uRimOn;
-  float keyIn = smoothstep(1.0 - rw * 1.8 - aa, 1.0 - rw * 1.8, r);
-  float key = (keyIn - smoothstep(1.0 - rw - aa, 1.0 - rw, r)) * uRimOn;
-  col = mix(col, uDeep * 0.5, key * 0.6);
-  a = max(a, key * 0.55);
-  occ = max(occ, key * 0.6 + rimLine * 0.9);
-  info = max(info, rimLine);
-  col = mix(col, mix(uBright, uHot, clamp(0.45 + 0.55 * uFlare, 0.0, 1.0)), rimLine);
-  a = mix(a, 1.0, rimLine * 0.95);
-  // Crackle (lightning; the air's storm accent): thin arcs flickering
-  // along the rim.
+
+  // ---- the rim: a hot luminous ring, brighter on its inner edge, a soft
+  // halo past it, flickering in the element's way ----
+  float rw = max(0.13 / uRadius, aa * 1.5);
+  float fr = floor(uTime * 14.0);
+  // Per element: fire's licks, lightning's crackle, earth's sand streaks,
+  // shadow's smoke (each a gentle wobble of the rim's light, never its place).
+  float lick = fbm(vec2(t * 22.0, time * 1.6)) * uChar.z;
+  float crack = step(0.55, vnoise(vec2(t * 30.0, fr))) * uChar.y;
+  float sand = vnoise(vec2(t * 60.0 - time * 3.0, 2.0)) * uChar.x * 0.6;
+  float fume = fbm(vec2(t * 9.0 + time * 0.4, 5.0)) * uChar.w;
+  float rimFlick = clamp(0.8 + 0.5 * lick + 0.6 * crack + 0.3 * sand - 0.35 * fume, 0.45, 1.6);
+  float rimBand = smoothstep(1.0 - rw - aa, 1.0 - rw, r) * (1.0 - smoothstep(1.0, 1.0 + aa, r));
+  float rimInner = exp(-pow((r - (1.0 - rw)) / (rw * 0.45), 2.0));
+  vec3 rimCol = mix(uBright, uHot, clamp(0.15 + 0.55 * rimInner + 0.5 * uFlare, 0.0, 1.0));
+  float rimL = rimBand * uRimOn;
+  col = mix(col, rimCol, rimL);
+  e = mix(e, 1.15 * rimFlick, rimL);
+  occ = max(occ, rimL * 0.75);
+  info = max(info, rimL);
+  // The halo: a soft glow just outside the rim (light only, never a fill).
+  float halo = r > 1.0 ? exp(-(r - 1.0) / 0.05) * 0.55 * uRimOn * rimFlick : 0.0;
+  halo += (r < 1.0 ? exp(-(1.0 - r) / 0.06) * 0.35 * uRimOn : 0.0);
+  col = mix(col, uBright, clamp(halo, 0.0, 1.0) * (1.0 - rimL));
+  e += halo * (1.0 - rimL);
+
+  // ---- the rings it sends out: thin rings leaving the rim on a rhythm,
+  // spreading a short way past it and fading (light only); the birth sends
+  // a strong one ----
+  if (r > 0.98) {
+    float out_ = 0.0;
+    for (int k = 0; k < 2; k++) {
+      float ph = fract(uTime / (uEmitEvery * 2.0) + float(k) * 0.5);
+      float rr = 1.0 + ph * (uOuter - 1.05);
+      float w = 0.007 + 0.01 * ph;
+      float ra = smoothstep(0.0, 0.06, ph) * (1.0 - ph) * 1.1;
+      out_ += ra * (1.0 - smoothstep(w, w + aa, abs(r - rr)));
+    }
+    if (uBorn < 1.0) {
+      float rr = 1.0 + uBorn * (uOuter - 1.05);
+      float w = 0.012 + 0.02 * uBorn;
+      out_ += (1.0 - uBorn) * 1.3 * (1.0 - smoothstep(w, w + aa, abs(r - rr)));
+    }
+    out_ *= uRimOn;
+    float outer = clamp(out_, 0.0, 1.0) * step(1.0 + rw * 0.5, r);
+    col = mix(col, mix(uBright, uHot, 0.12), outer);
+    e += outer * 1.3;
+  }
+
+  // ---- crackle (lightning; the air's storm accent): short arcs leaping
+  // along the rim and across the bright band ----
   if (uChar.y > 0.0) {
-    float fr = floor(uTime * 14.0);
     float jag = (vnoise(vec2(t * 40.0, fr)) - 0.5) * 0.05
       + (vnoise(vec2(t * 110.0, fr + 3.0)) - 0.5) * 0.02;
     float arcLine = 1.0 - smoothstep(0.004, 0.004 + aa, abs(r - 0.94 - jag));
     float on = step(0.66, vnoise(vec2(t * 21.0, fr * 1.7)));
-    // A second, inner set of short arcs leaping across the bright band.
     float jag2 = (vnoise(vec2(t * 60.0, fr + 9.0)) - 0.5) * 0.06;
-    float arc2 = 1.0 - smoothstep(0.003, 0.003 + aa, abs(r - 0.76 - jag2));
+    float arc2 = 1.0 - smoothstep(0.003, 0.003 + aa, abs(r - 0.72 - jag2));
     float on2 = step(0.74, vnoise(vec2(t * 17.0 + 5.0, fr * 2.3)));
-    float cr = max(arcLine * on, arc2 * on2 * 0.8) * uChar.y;
-    col = mix(col, uHot * 1.3, cr);
-    a = max(a, cr);
+    float cr = max(arcLine * on, arc2 * on2 * 0.8) * uChar.y * inside;
+    col = mix(col, uHot, cr);
+    e = max(e, cr * 1.3);
   }
-  // The countdown arc (when the owner has one): what is left of the bar.
+  // ---- tongues (fire): the hot edge licks inward from the rim ----
+  if (uChar.z > 0.0 && r < 1.0) {
+    vec2 rf = vec2(cos(th + spin * 0.3), sin(th + spin * 0.3));
+    float n = fbm(rf * 3.2 + vec2(-time * 1.3, time * 0.4));
+    float edge = 0.97 - 0.42 * n * n;
+    float tongue = smoothstep(edge - 0.02, edge + 0.06, r) * (1.0 - smoothstep(0.96, 0.99, r));
+    float tip = smoothstep(edge - 0.02, edge + 0.02, r) * (1.0 - smoothstep(edge + 0.02, edge + 0.1, r));
+    tongue *= uChar.z * (1.0 - smoothstep(0.9, 1.04, r / max(uBloom, 0.05)));
+    vec3 flame = mix(mix(uBody, uBright, 0.6 + 0.4 * n), uHot, tip * 0.8);
+    col = mix(col, flame, tongue * 0.85);
+    e = max(e, tongue * 1.05);
+  }
+  // ---- the countdown arc (when the owner has one) ----
   if (uTimer >= 0.0) {
-    float arc = (1.0 - smoothstep(0.014, 0.014 + aa, abs(r - 0.9))) * step(t, uTimer);
+    float arc = (1.0 - smoothstep(0.016, 0.016 + aa, abs(r - 0.885))) * step(t, uTimer);
     col = mix(col, uHot, arc);
-    a = max(a, arc);
+    e = max(e, arc * 1.1);
+    occ = max(occ, arc * 0.5);
     info = max(info, arc);
   }
-  // The pips: uNeed round the rim, the first uLit bright; a dark socket
-  // under each so they read over the bright band.
+  // ---- the pips: uNeed round the rim, the first uLit bright, a dark socket
+  // under each so they read over the bright band ----
   if (uNeed > 0.5) {
     float k = floor(t * uNeed);
     float local = (fract(t * uNeed) - 0.5) * 6.2831853 * uPipAt / uNeed;
@@ -272,32 +313,32 @@ void main() {
     float gem = 1.0 - smoothstep(uPipSize - pw, uPipSize, d);
     float hollow = smoothstep(uPipSize * 0.6 - pw, uPipSize * 0.6, d) * gem;
     float on = step(k + 0.5, uLit);
-    col = mix(col, uDeep * 0.35, socket * 0.85);
-    a = mix(a, 0.92, socket);
-    occ = max(occ, socket * 0.85);
-    info = max(info, socket);
     float gemCore = 1.0 - smoothstep(0.0, uPipSize, d);
     vec3 gemCol = mix(uBright, uHot, gemCore);
-    col = mix(col, mix(uBody, gemCol, on), mix(hollow, gem, on));
-    a = max(a, mix(hollow, gem, on));
+    col = mix(col, uDeep * 0.3, socket * 0.7);
+    e = mix(e, 0.35, socket * 0.7);
+    occ = max(occ, socket * 0.7);
+    float pip = mix(hollow, gem, on);
+    col = mix(col, mix(uBody * 1.3, gemCol, on), pip);
+    e = max(e, pip * mix(0.9, 1.2, on));
+    info = max(info, socket);
   }
-  // Ready (every soaker inside): a bright ring round the middle and a
-  // hotter rim, so a full share reads at a glance.
+  // ---- ready (every soaker inside): a bright ring round the middle ----
   if (uFlare > 0.5) {
     float ready = 1.0 - smoothstep(0.02, 0.02 + aa, abs(r - 0.22));
     col = mix(col, uHot, ready);
-    a = max(a, ready);
-    occ = max(occ, ready * 0.6);
+    e = max(e, ready * 1.2);
+    occ = max(occ, ready * 0.5);
     info = max(info, ready);
   }
-  col *= 1.0 + 0.25 * uFlare;
+  col *= 1.0 + 0.2 * uFlare;
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
   // The information (rim, pips, chevrons, arc, ready ring) draws whole from
-  // the first frame and goes at once with the mark (uInfo); only the body
-  // blooms in and decays.
-  float k = mix(uAlpha, uInfo, clamp(info, 0.0, 1.0));
-  gl_FragColor = vec4(gl_FragColor.rgb * clamp(a, 0.0, 1.0) * 1.35, clamp(occ, 0.0, 1.0)) * k;
+  // the first frame and goes at once with the mark (uInfo); only the body,
+  // its halo and its rings bloom in and decay.
+  float kk = mix(uAlpha, uInfo, clamp(info, 0.0, 1.0));
+  gl_FragColor = vec4(gl_FragColor.rgb * clamp(e, 0.0, 1.6), clamp(occ, 0.0, 1.0)) * kk;
 }
 `;
 
@@ -387,7 +428,8 @@ export interface SoakMarkerGeometry {
 }
 
 export function buildSoakMarkerGeometry(geometries?: THREE.BufferGeometry[]): SoakMarkerGeometry {
-  const disc = new THREE.CircleGeometry(1, 96).rotateX(-Math.PI / 2);
+  // Past the rim by SOAK_MARKER.outer: the halo and the rings it sends out.
+  const disc = new THREE.CircleGeometry(SOAK_MARKER.outer, 112).rotateX(-Math.PI / 2);
   const n = SOAK_MARKER.wisps;
   const verts = n * (WISP_SEGMENTS + 1) * 2;
   const pos = new Float32Array(verts * 3);
@@ -479,6 +521,9 @@ export class SoakMarker {
         uTime: { value: 0 },
         uSpin: { value: 0 },
         uBloom: { value: 1 },
+        uBorn: { value: 1 },
+        uOuter: { value: SOAK_MARKER.outer },
+        uEmitEvery: { value: SOAK_MARKER.emitEvery },
         uAlpha: { value: 0 },
         uFlare: { value: 0 },
         uNeed: { value: 0 },
@@ -638,6 +683,7 @@ export class SoakMarker {
     u.uTime.value = _look.time;
     u.uSpin.value = _look.spin;
     u.uBloom.value = _look.bloom;
+    u.uBorn.value = _look.born;
     u.uAlpha.value = _look.alpha;
     u.uFlare.value = _look.flare;
     u.uInfo.value = 1;

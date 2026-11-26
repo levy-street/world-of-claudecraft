@@ -88,6 +88,9 @@ describe('the soak marker clips (birth, hold, decay)', () => {
     expect(look.wisp).toBe(0);
     const born = soakMarkerLook(10, SOAK_MARKER.birth, null, 0, false, false, newSoakMarkerLook());
     expect(born.bloom).toBeCloseTo(1, 6);
+    // The birth's strong outward ring runs on `born` (0 laid .. 1 born).
+    expect(look.born).toBe(0);
+    expect(born.born).toBe(1);
     expect(born.alpha).toBeGreaterThan(look.alpha);
     const dying = soakMarkerLook(
       10,
@@ -179,6 +182,11 @@ describe('the soak marker shape (gather in, yard-true, tier-fair)', () => {
     });
     expect(m.shown).toBe(true);
     expect(m.disc.scale.x).toBe(6);
+    // The disc's unit radius is the rim; only the halo and the emitted rings
+    // reach past it, to SOAK_MARKER.outer.
+    m.disc.geometry.computeBoundingSphere();
+    expect(m.disc.geometry.boundingSphere?.radius).toBeCloseTo(SOAK_MARKER.outer, 6);
+    expect(SOAK_MARKER.outer).toBeLessThan(1.6);
     expect(m.group.position.toArray()).toEqual([3, 1, -2]);
     const u = m.discMat.uniforms;
     expect(u.uNeed.value).toBe(3);

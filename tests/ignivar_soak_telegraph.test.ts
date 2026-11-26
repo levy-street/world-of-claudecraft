@@ -47,8 +47,10 @@ describe('the soak telegraph on a marked player (the shared soak marker)', () =>
     expect(discOf(soak)).toBeInstanceOf(THREE.Mesh);
     expect(soak.getObjectByName(IGNIVAR_SOAK_WISPS_NAME)).toBeInstanceOf(THREE.Mesh);
     expect(soak.userData.requiredPlayers).toBe(VARKHUL_SHARED_PYRE_REQUIRED_NORMAL);
-    // The rim is the sim's own radius: never drawn past it, never short of it.
-    expect(drawnRadius(soak)).toBeCloseTo(VARKHUL_SHARED_PYRE_RADIUS, 4);
+    // The rim (the shader's unit radius) is the sim's own radius; past it
+    // the disc carries only the rim's halo and the thin rings it sends out.
+    expect(discOf(soak).scale.x).toBeCloseTo(VARKHUL_SHARED_PYRE_RADIUS, 6);
+    expect(drawnRadius(soak)).toBeCloseTo(VARKHUL_SHARED_PYRE_RADIUS * SOAK_MARKER.outer, 4);
     const fire = new THREE.Color(SOAK_PALETTES.fire.body);
     expect((uniformsOf(soak).uBody.value as THREE.Color).equals(fire)).toBe(true);
     expect(floorVfxLayerOf(discOf(soak).renderOrder)).toBe('encounter');
@@ -57,7 +59,7 @@ describe('the soak telegraph on a marked player (the shared soak marker)', () =>
   it('dresses the Barrow Burden in shadow at its own radius', () => {
     const soak = buildIgnivarSoakTelegraph(4, BURDEN_SOAK_STYLE);
     expect(BURDEN_SOAK_STYLE.element).toBe('shadow');
-    expect(drawnRadius(soak)).toBeCloseTo(BURDEN_SOAK_STYLE.radius, 4);
+    expect(discOf(soak).scale.x).toBeCloseTo(BURDEN_SOAK_STYLE.radius, 6);
     const shadow = new THREE.Color(SOAK_PALETTES.shadow.body);
     expect((uniformsOf(soak).uBody.value as THREE.Color).equals(shadow)).toBe(true);
   });
