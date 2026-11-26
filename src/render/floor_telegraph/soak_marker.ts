@@ -359,12 +359,10 @@ uniform float uCount;
 // A coherent helix: the ribbons evenly spaced round the axis, all winding
 // the same way at one pitch, narrowing toward the top (smoke curls in more).
 vec3 wispPoint(float k, float v) {
-  float ang = k / uCount * 6.2831853 + uSpin * uSpeed * 0.45 + v * 3.6 * uCurl;
-  float rad = mix(0.46, uCurl > 0.0 ? 0.3 : 0.14, v)
-    + 0.025 * sin(v * 5.0 + k * 2.1 + uTime * uSpeed * 1.3);
-  // Lightning's ribbons jag a little, a few times a second.
-  float jf = floor(uTime * 11.0);
-  rad += uJag * 0.035 * (h1(floor(v * 9.0) + k * 13.0 + jf) - 0.5);
+  // One smooth helix per ribbon: evenly spaced, a gentle twist, the radius
+  // narrowing as it rises (a vortex funnel); smoke curls in tighter.
+  float ang = k / uCount * 6.2831853 + uSpin * uSpeed * 0.45 + v * 3.0 * uCurl;
+  float rad = mix(0.44, uCurl > 0.0 ? 0.26 : 0.14, v * (2.0 - v));
   float y = v * uRise;
   return vec3(sin(ang) * rad, y, cos(ang) * rad);
 }
@@ -384,13 +382,19 @@ void main() {
   // vortex as a loop: it fades out as the view runs along it.
   float endOn = 1.0 - smoothstep(0.55, 0.9, abs(dot(tng, toCam)));
   // Tapering to a point at the top, soft at the foot.
-  float taper = smoothstep(0.0, 0.12, vv) * (1.0 - vv);
-  w.xyz += side * aSide * uWidth * (0.25 + 0.75 * taper);
+  // Wide at the foot, easing to a fine tip.
+  float taper = smoothstep(0.0, 0.08, vv) * pow(1.0 - vv, 0.85);
+  w.xyz += side * aSide * uWidth * (0.12 + 0.88 * taper);
   vSide = aSide;
   vV = vv;
   // Light flowing up each ribbon (a slow travelling swell), fading at the top.
-  float flow = 0.55 + 0.45 * sin(vv * 7.0 - uTime * uSpeed * 2.4 + k * 1.7);
-  vFade = smoothstep(0.0, 0.1, vv) * (1.0 - smoothstep(0.55, 1.0, vv)) * flow * endOn;
+  // Light flowing up each ribbon (a slow travelling swell); lightning adds
+  // only a faint flicker to its brightness, never to its shape.
+  float flow = 0.6 + 0.4 * sin(vv * 6.0 - uTime * uSpeed * 2.2 + k * 1.7);
+  float flick = 1.0 - uJag * 0.25 * step(0.6, h1(floor(uTime * 12.0) + k * 7.0));
+  // An ease-out fade to the top.
+  float top = 1.0 - vv;
+  vFade = smoothstep(0.0, 0.1, vv) * top * top * (3.0 - 2.0 * top) * flow * flick * endOn;
   gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
@@ -403,9 +407,12 @@ varying float vSide;
 varying float vFade;
 varying float vV;
 void main() {
-  float core = 1.0 - abs(vSide);
-  float a = min(1.0, vFade * pow(core, 1.4) * 1.7) * uAlpha;
-  vec3 col = mix(uBright, uHot, core * core * (1.0 - 0.6 * vV));
+  // A soft gaussian cross-section: a bright core and a soft glowing edge.
+  float x = vSide;
+  float coreG = exp(-x * x * 18.0);
+  float glowG = exp(-x * x * 4.0);
+  float a = min(1.0, vFade * (coreG + 0.45 * glowG) * 1.5) * uAlpha;
+  vec3 col = mix(uBright, uHot, coreG * (1.0 - 0.5 * vV));
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
   gl_FragColor = vec4(gl_FragColor.rgb * a, a);
@@ -413,7 +420,7 @@ void main() {
 `;
 
 /** Segments up a wisp. */
-const WISP_SEGMENTS = 14;
+const WISP_SEGMENTS = 40;
 
 /** The geometry a pool of markers shares (built once by the owner). */
 export interface SoakMarkerGeometry {

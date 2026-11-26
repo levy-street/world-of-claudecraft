@@ -49,7 +49,9 @@ export interface SoakPalette {
 
 export const SOAK_PALETTES: Readonly<Record<SoakElement, Readonly<SoakPalette>>> = {
   fire: { deep: 0x3a0400, body: 0xe01806, bright: 0xff5210, hot: 0xffcc48 },
-  earth: { deep: 0x2a1608, body: 0x8c5628, bright: 0xe2a462, hot: 0xfff0cc },
+  // Earth: a saturated golden amber with a hot-gold rim and dark umber
+  // trailing sides, so it holds over grey and brown stone (never fire's red).
+  earth: { deep: 0x1e0e02, body: 0xa65a08, bright: 0xffae1c, hot: 0xffe78a },
   air: { deep: 0x0c2a34, body: 0x4a9cac, bright: 0xa8e8ec, hot: 0xf6ffff },
   lightning: { deep: 0x020a30, body: 0x1840d0, bright: 0x64a8ff, hot: 0xeaf6ff },
   shadow: { deep: 0x08010f, body: 0x3a0f5c, bright: 0x8a3ee8, hot: 0xd9b2ff },
@@ -79,13 +81,13 @@ export interface SoakCharacter {
 }
 
 export const SOAK_CHARACTER: Readonly<Record<SoakElement, Readonly<SoakCharacter>>> = {
-  fire: { grain: 0.7, crackle: 0, tongues: 1, smoke: 0, streams: 0, speed: 1.1, wisp: 0.2 },
-  earth: { grain: 1, crackle: 0, tongues: 0, smoke: 0.25, streams: 0, speed: 0.85, wisp: 0.24 },
-  air: { grain: 0.45, crackle: 0.3, tongues: 0, smoke: 0, streams: 1, speed: 1.7, wisp: 0.16 },
-  lightning: { grain: 0.2, crackle: 1, tongues: 0, smoke: 0, streams: 0.3, speed: 1.3, wisp: 0.12 },
-  shadow: { grain: 0.15, crackle: 0, tongues: 0, smoke: 1, streams: 0, speed: 0.7, wisp: 0.3 },
-  frost: { grain: 0.6, crackle: 0.2, tongues: 0, smoke: 0.2, streams: 0.3, speed: 0.8, wisp: 0.16 },
-  water: { grain: 0.2, crackle: 0, tongues: 0, smoke: 0.2, streams: 0.6, speed: 0.9, wisp: 0.2 },
+  fire: { grain: 0.7, crackle: 0, tongues: 1, smoke: 0, streams: 0, speed: 1.1, wisp: 0.3 },
+  earth: { grain: 1, crackle: 0, tongues: 0, smoke: 0.1, streams: 0, speed: 0.85, wisp: 0.32 },
+  air: { grain: 0.45, crackle: 0.3, tongues: 0, smoke: 0, streams: 1, speed: 1.7, wisp: 0.24 },
+  lightning: { grain: 0.2, crackle: 1, tongues: 0, smoke: 0, streams: 0.3, speed: 1.3, wisp: 0.2 },
+  shadow: { grain: 0.15, crackle: 0, tongues: 0, smoke: 1, streams: 0, speed: 0.7, wisp: 0.4 },
+  frost: { grain: 0.6, crackle: 0.2, tongues: 0, smoke: 0.2, streams: 0.3, speed: 0.8, wisp: 0.24 },
+  water: { grain: 0.2, crackle: 0, tongues: 0, smoke: 0.2, streams: 0.6, speed: 0.9, wisp: 0.3 },
 };
 
 /** The look's numbers (seconds; radii as a share of the sim's radius). */
