@@ -134,8 +134,8 @@ void main() {
     float a = fract(ph);
     float h = hash2(vec2(idx, 3.1));
     // Each arm its own reach: it tapers to a tip short of the eye.
-    float tip = 0.24 + 0.2 * h;
-    float reach = smoothstep(tip, tip + 0.36, rb) * (1.0 - smoothstep(0.9, 1.0, rb));
+    float tip = 0.4 + 0.1 * h;
+    float reach = smoothstep(tip, tip + 0.3, rb) * (1.0 - smoothstep(0.9, 1.0, rb));
     // Narrower toward its tip: the trailing fade quickens inward.
     float fall = mix(3.2, 9.0, 1.0 - smoothstep(0.2, 0.9, rb));
     float lead = smoothstep(0.0, 0.03, a) * exp(-a * fall);
@@ -146,37 +146,35 @@ void main() {
     // tier keeps the coarse set and drops the fine one.
     float st1 = vnoise(vec2(ph * 9.0, lr * 1.6 - drift * 1.2));
     float st2 = uDetail > 0.5 ? vnoise(vec2(ph * 27.0 + 3.0, lr * 3.5 - drift * 2.0)) : 0.5;
-    float streak = smoothstep(0.25, 0.85, 0.6 * st1 + 0.4 * st2);
-    float arm = lead * reach * (0.72 + 0.28 * h) * (0.45 + 0.75 * streak);
+    float streak = smoothstep(0.2, 0.9, 0.75 * st1 + 0.25 * st2);
+    float arm = lead * reach * (0.75 + 0.25 * h) * (0.6 + 0.5 * streak);
     float armEdge = edge * reach * reach * (0.6 + 0.6 * streak);
     float armTrail = trail * reach * (0.55 + 0.45 * st1);
     // The eye: clean, deep, slowly turning (one faint inner ring).
-    float eye = 1.0 - smoothstep(0.06, 0.34, rb);
-    float eyeRing = exp(-pow((rb - 0.2) / 0.035, 2.0)) * (0.4 + 0.6 * vnoise(vec2((th + spin * 0.4) * 2.0, 1.0)));
+    float eye = 1.0 - smoothstep(0.1, 0.42, rb);
     float band = smoothstep(0.3, 0.7, rb) * (1.0 - smoothstep(0.93, 1.0, rb));
     float hotRing = exp(-pow((rb - 0.7) / 0.08, 2.0)) * (0.35 + 0.9 * arm);
     vec3 c = mix(uDeep, uBody, clamp(0.2 + 0.45 * turb + 0.45 * armTrail, 0.0, 1.0));
     c = mix(c, uDeep * 0.6, eye * 0.85);
     c = mix(c, uBright, clamp(arm * 1.25, 0.0, 1.0) * (1.0 - 0.4 * smoke));
     c = mix(c, uHot, clamp(armEdge * 1.1 + hotRing * arm * 0.6, 0.0, 1.0) * (1.0 - 0.4 * smoke));
-    c = mix(c, uBright, eyeRing * 0.5);
     // Emission: the arms and their hot edges carry the light; the trail a
     // soft wash; the eye almost none.
     float glow = (0.1 + 0.18 * turb * (1.0 - eye) + 0.38 * armTrail + 1.05 * arm + 0.7 * armEdge
-      + 0.4 * hotRing + 0.15 * band + 0.25 * eyeRing) * spread;
+      + 0.4 * hotRing + 0.15 * band) * spread;
     // The eye darkens the floor a little; the body barely covers it.
     float cov = (0.08 + 0.5 * eye + 0.12 * armTrail + 0.08 * band + 0.5 * smoke * band) * spread;
     // Smoke (shadow): soft dark plumes curling in.
     if (smoke > 0.0) {
       // In the arms' own coordinates: the smoke streams along them, curling in.
       float plume = fbm(vec2(ph * 2.2, lr * 1.4 - drift * 0.9) + vec2(twist * 0.3, 0.0));
-      float sm = smoothstep(0.42, 0.72, plume) * smoothstep(0.15, 0.6, rb) * smoke;
+      float sm = smoothstep(0.42, 0.72, plume) * smoothstep(0.4, 0.7, rb) * smoke;
       c = mix(c, uDeep, sm * 0.7);
       glow *= 1.0 - 0.6 * sm;
       cov = max(cov, sm * 0.65 * spread);
       float lip = smoothstep(0.62, 0.7, plume) * (1.0 - smoothstep(0.7, 0.8, plume));
-      c += uBright * lip * smoke * 0.6;
-      glow += lip * smoke * 0.6 * spread;
+      c += uBright * lip * smoke * 0.35;
+      glow += lip * smoke * 0.35 * spread;
     }
     // Streams (air): long thin wind ribbons round the swirl.
     if (uChar2.x > 0.0) {
@@ -196,7 +194,7 @@ void main() {
       vec2 off = vec2(hash2(cell + 7.1), hash2(cell + 3.7)) - 0.5;
       float d = length(fract(gq) - 0.5 - off * 0.6);
       float tw = 0.5 + 0.5 * sin(time * (3.0 + 5.0 * h) + h * 40.0);
-      float g = step(0.8, h) * (1.0 - smoothstep(0.06, 0.16, d)) * tw * smoothstep(0.15, 0.4, rb);
+      float g = step(0.84, h) * (1.0 - smoothstep(0.06, 0.15, d)) * tw * smoothstep(0.45, 0.65, rb) * 0.6;
       g *= uChar.x * spread;
       c = mix(c, uHot, g);
       glow += g;
@@ -275,7 +273,7 @@ void main() {
     float jag2 = (vnoise(vec2(t * 60.0, fr + 9.0)) - 0.5) * 0.06;
     float arc2 = 1.0 - smoothstep(0.003, 0.003 + aa, abs(r - 0.72 - jag2));
     float on2 = step(0.74, vnoise(vec2(t * 17.0 + 5.0, fr * 2.3)));
-    float cr = max(arcLine * on, arc2 * on2 * 0.8) * uChar.y * inside;
+    float cr = max(arcLine * on, arc2 * on2 * 0.5) * uChar.y * inside;
     col = mix(col, uHot, cr);
     e = max(e, cr * 1.3);
   }
@@ -357,31 +355,24 @@ varying float vSide;
 varying float vFade;
 varying float vV;
 float h1(float n) { return fract(sin(n * 12.9898) * 43758.5453); }
-vec3 wispPoint(float seed, float v, float life) {
-  float t = uTime * uSpeed;
-  float ang = seed * 6.2831853 + uSpin * uSpeed * 0.5
-    + v * (1.6 + 1.8 * h1(seed + 2.0)) * uCurl + life * 1.1;
-  float r0 = 0.25 + 0.42 * h1(seed + 1.0);
-  // Rising flames and sand ribbons lean out and fan at the top (uCurl 1);
-  // smoke curls in over the middle (uCurl -1).
-  float lean = uCurl > 0.0 ? 0.16 * v * v : -0.5 * v;
-  float rad = max(0.04, r0 * (1.0 - 0.35 * v) + lean
-    + 0.08 * sin(v * 6.5 + seed * 7.0 + t * 1.9));
-  // Lightning's wisps jag and jump a few times a second.
+uniform float uCount;
+// A coherent helix: the ribbons evenly spaced round the axis, all winding
+// the same way at one pitch, narrowing toward the top (smoke curls in more).
+vec3 wispPoint(float k, float v) {
+  float ang = k / uCount * 6.2831853 + uSpin * uSpeed * 0.45 + v * 3.6 * uCurl;
+  float rad = mix(0.46, uCurl > 0.0 ? 0.3 : 0.14, v)
+    + 0.025 * sin(v * 5.0 + k * 2.1 + uTime * uSpeed * 1.3);
+  // Lightning's ribbons jag a little, a few times a second.
   float jf = floor(uTime * 11.0);
-  rad += uJag * 0.07 * (h1(floor(v * 9.0) + seed * 13.0 + jf) - 0.5);
-  ang += uJag * 0.25 * (h1(floor(v * 9.0) + seed * 7.0 + jf + 3.0) - 0.5);
-  float y = v * (0.55 + 0.45 * h1(seed + 4.0)) * uRise;
+  rad += uJag * 0.035 * (h1(floor(v * 9.0) + k * 13.0 + jf) - 0.5);
+  float y = v * uRise;
   return vec3(sin(ang) * rad, y, cos(ang) * rad);
 }
 void main() {
-  float seed = aRibbon * 1.618 + 0.37;
-  float life = fract(uTime * uSpeed * (0.32 + 0.22 * h1(seed + 6.0)) + h1(seed + 7.0));
-  float head = smoothstep(0.0, 0.45, life);
-  float tail = smoothstep(0.5, 1.0, life);
-  float vv = mix(tail, head, aV);
-  vec3 p = wispPoint(seed, vv, life);
-  vec3 q = wispPoint(seed, vv + 0.03, life);
+  float k = aRibbon;
+  float vv = aV;
+  vec3 p = wispPoint(k, vv);
+  vec3 q = wispPoint(k, vv + 0.03);
   vec4 w = modelMatrix * vec4(p, 1.0);
   vec4 w2 = modelMatrix * vec4(q, 1.0);
   vec3 tng = w2.xyz - w.xyz;
@@ -392,12 +383,14 @@ void main() {
   // Seen end-on (from overhead) a rising ribbon would lie flat over the
   // vortex as a loop: it fades out as the view runs along it.
   float endOn = 1.0 - smoothstep(0.55, 0.9, abs(dot(tng, toCam)));
-  float taper = sin(3.14159265 * aV);
-  w.xyz += side * aSide * uWidth * (0.35 + 0.65 * taper) * (1.0 - 0.5 * vv);
+  // Tapering to a point at the top, soft at the foot.
+  float taper = smoothstep(0.0, 0.12, vv) * (1.0 - vv);
+  w.xyz += side * aSide * uWidth * (0.25 + 0.75 * taper);
   vSide = aSide;
   vV = vv;
-  vFade = taper * (1.0 - smoothstep(0.55, 1.0, vv)) * smoothstep(0.0, 0.08, vv)
-    * (1.0 - smoothstep(0.85, 1.0, life)) * endOn;
+  // Light flowing up each ribbon (a slow travelling swell), fading at the top.
+  float flow = 0.55 + 0.45 * sin(vv * 7.0 - uTime * uSpeed * 2.4 + k * 1.7);
+  vFade = smoothstep(0.0, 0.1, vv) * (1.0 - smoothstep(0.55, 1.0, vv)) * flow * endOn;
   gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
@@ -411,7 +404,7 @@ varying float vFade;
 varying float vV;
 void main() {
   float core = 1.0 - abs(vSide);
-  float a = vFade * pow(core, 1.6) * uAlpha;
+  float a = min(1.0, vFade * pow(core, 1.4) * 1.7) * uAlpha;
   vec3 col = mix(uBright, uHot, core * core * (1.0 - 0.6 * vV));
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
@@ -572,6 +565,7 @@ export class SoakMarker {
         uSpeed: { value: 1 },
         uCurl: { value: 1 },
         uJag: { value: 0 },
+        uCount: { value: SOAK_MARKER.wisps },
         uAlpha: { value: 0 },
         uBright: { value: new THREE.Color() },
         uHot: { value: new THREE.Color() },
@@ -703,6 +697,7 @@ export class SoakMarker {
     const n = soakWispCount(p.detail ?? 1);
     const want = n * WISP_SEGMENTS * 6;
     if (this.wisps.geometry.drawRange.count !== want) this.wisps.geometry.setDrawRange(0, want);
+    w.uCount.value = n;
     this.group.position.set(p.x, p.y, p.z);
     this.disc.position.y = 0.14;
     this.disc.scale.setScalar(p.radius);

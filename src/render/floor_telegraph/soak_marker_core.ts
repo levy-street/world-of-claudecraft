@@ -106,7 +106,7 @@ export const SOAK_MARKER = {
    *  reaches `rippleTo` of the radius as it fades. */
   ripples: 3,
   rippleEvery: 0.75,
-  rippleTo: 0.3,
+  rippleTo: 0.45,
   /** The disc reaches a hair past the rim, for the rim's own soft halo
    *  only (light, never a fill). Nothing of a share marker moves outward
    *  (the Round 02 rule: outward motion says keep out, inward says come in);
@@ -117,8 +117,8 @@ export const SOAK_MARKER = {
   arms: 4,
   pitch: 1.05,
   /** Wisps: on the full tier, at least on the low one. */
-  wisps: 14,
-  wispsLow: 6,
+  wisps: 4,
+  wispsLow: 3,
   /** Their height, yards: a share of the radius, clamped. */
   wispPerRadius: 1.25,
   wispMin: 3.2,
