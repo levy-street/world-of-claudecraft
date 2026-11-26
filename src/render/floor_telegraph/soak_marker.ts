@@ -4,8 +4,8 @@
 // ribbon mesh of thin wisps spiralling up out of it (one draw, one program,
 // additive). Built once by its OWNER under the owner's gated root (no GPU work
 // after boot), no light, no texture, no per-frame allocation. The disc's rim
-// is the sim's radius; past it only the rim's halo and the thin rings it sends
-// out (light, never a fill). Every tier draws
+// is the sim's radius; past it only the rim's own soft halo (light, never a
+// fill, never moving out: a share only moves IN). Every tier draws
 // the disc whole; only the wisps' count follows the tier's detail. Reduced
 // motion holds every motion still.
 
@@ -54,7 +54,6 @@ uniform float uRadius;
 uniform float uRipEvery;
 uniform float uRipTo;
 uniform float uOuter;
-uniform float uEmitEvery;
 uniform float uArms;
 uniform float uPitch;
 uniform vec4 uChar;
@@ -97,8 +96,8 @@ vec2 rot(vec2 p, float a) {
 }
 
 void main() {
-  // The mesh reaches past the rim (uOuter of the radius) for the halo and the
-  // rings it emits; the rim (r = 1) is the sim's radius.
+  // The mesh reaches a hair past the rim (uOuter of the radius) for the
+  // rim's soft halo only; the rim (r = 1) is the sim's radius.
   float r = min(length(vXZ), uOuter);
   float aa = fwidth(r) * 1.5 + 0.003;
   float spd = uChar2.y;
@@ -254,33 +253,17 @@ void main() {
   occ = max(occ, rimL * 0.75);
   info = max(info, rimL);
   // The halo: a soft glow just outside the rim (light only, never a fill).
-  float halo = r > 1.0 ? exp(-(r - 1.0) / 0.05) * 0.55 * uRimOn * rimFlick : 0.0;
+  float halo = r > 1.0
+    ? exp(-(r - 1.0) / 0.05) * 0.55 * uRimOn * rimFlick * (1.0 - smoothstep(1.1, 1.15, r))
+    : 0.0;
   halo += (r < 1.0 ? exp(-(1.0 - r) / 0.06) * 0.35 * uRimOn : 0.0);
   col = mix(col, uBright, clamp(halo, 0.0, 1.0) * (1.0 - rimL));
   e += halo * (1.0 - rimL);
 
-  // ---- the rings it sends out: thin rings leaving the rim on a rhythm,
-  // spreading a short way past it and fading (light only); the birth sends
-  // a strong one ----
-  if (r > 0.98) {
-    float out_ = 0.0;
-    for (int k = 0; k < 2; k++) {
-      float ph = fract(uTime / (uEmitEvery * 2.0) + float(k) * 0.5);
-      float rr = 1.0 + ph * (uOuter - 1.05);
-      float w = 0.007 + 0.01 * ph;
-      float ra = smoothstep(0.0, 0.06, ph) * (1.0 - ph) * 1.1;
-      out_ += ra * (1.0 - smoothstep(w, w + aa, abs(r - rr)));
-    }
-    if (uBorn < 1.0) {
-      float rr = 1.0 + uBorn * (uOuter - 1.05);
-      float w = 0.012 + 0.02 * uBorn;
-      out_ += (1.0 - uBorn) * 1.3 * (1.0 - smoothstep(w, w + aa, abs(r - rr)));
-    }
-    out_ *= uRimOn;
-    float outer = clamp(out_, 0.0, 1.0) * step(1.0 + rw * 0.5, r);
-    col = mix(col, mix(uBright, uHot, 0.12), outer);
-    e += outer * 1.3;
-  }
+  // ---- the birth: the rim flares in place as the vortex blooms out to it
+  // (a share only ever moves IN: nothing travels past the rim) ----
+  float birthFlare = (1.0 - uBorn) * uRimOn;
+  e += (rimL + halo * (1.0 - rimL)) * birthFlare * 0.9;
 
   // ---- crackle (lightning; the air's storm accent): short arcs leaping
   // along the rim and across the bright band ----
@@ -446,7 +429,7 @@ export interface SoakMarkerGeometry {
 }
 
 export function buildSoakMarkerGeometry(geometries?: THREE.BufferGeometry[]): SoakMarkerGeometry {
-  // Past the rim by SOAK_MARKER.outer: the halo and the rings it sends out.
+  // Past the rim by SOAK_MARKER.outer: only the rim's own soft halo.
   const disc = new THREE.CircleGeometry(SOAK_MARKER.outer, 112).rotateX(-Math.PI / 2);
   const n = SOAK_MARKER.wisps;
   const verts = n * (WISP_SEGMENTS + 1) * 2;
@@ -541,7 +524,6 @@ export class SoakMarker {
         uBloom: { value: 1 },
         uBorn: { value: 1 },
         uOuter: { value: SOAK_MARKER.outer },
-        uEmitEvery: { value: SOAK_MARKER.emitEvery },
         uArms: { value: SOAK_MARKER.arms },
         uPitch: { value: SOAK_MARKER.pitch },
         uAlpha: { value: 0 },

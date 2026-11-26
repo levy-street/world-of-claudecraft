@@ -48,7 +48,7 @@ describe('the soak telegraph on a marked player (the shared soak marker)', () =>
     expect(soak.getObjectByName(IGNIVAR_SOAK_WISPS_NAME)).toBeInstanceOf(THREE.Mesh);
     expect(soak.userData.requiredPlayers).toBe(VARKHUL_SHARED_PYRE_REQUIRED_NORMAL);
     // The rim (the shader's unit radius) is the sim's own radius; past it
-    // the disc carries only the rim's halo and the thin rings it sends out.
+    // the disc carries only the rim's own soft halo.
     expect(discOf(soak).scale.x).toBeCloseTo(VARKHUL_SHARED_PYRE_RADIUS, 6);
     expect(drawnRadius(soak)).toBeCloseTo(VARKHUL_SHARED_PYRE_RADIUS * SOAK_MARKER.outer, 4);
     const fire = new THREE.Color(SOAK_PALETTES.fire.body);

@@ -8,7 +8,7 @@
 //
 // What it says, on every graphics tier (docs/design/graphics-settings-
 // fairness.md): the circle at the sim's radius (the rim is yard-true; past it
-// only the rim's halo and the thin rings it sends out, light, never a fill),
+// only the rim's own soft halo, light, never a fill; nothing moves outward),
 // GATHER HERE (the vortex and its
 // rings pull IN, and a ring of chevrons points in, so a still frame says it
 // too), a pip round the rim per player the soak needs, lit one per player
@@ -107,16 +107,15 @@ export const SOAK_MARKER = {
   ripples: 3,
   rippleEvery: 0.75,
   rippleTo: 0.3,
-  /** The disc reaches past the rim by this share of the radius: only the
-   *  rim's soft halo and the thin rings it sends out live there (light, no
-   *  fill), one leaving every `emitEvery` seconds; the birth sends a strong
-   *  one. The rim itself (r = 1) is the sim's radius. */
-  outer: 1.45,
+  /** The disc reaches a hair past the rim, for the rim's own soft halo
+   *  only (light, never a fill). Nothing of a share marker moves outward
+   *  (the Round 02 rule: outward motion says keep out, inward says come in);
+   *  the rim itself (r = 1) is the sim's radius. */
+  outer: 1.15,
   /** The vortex's arms: coherent logarithmic spirals (how many, and how
    *  tightly they wind per unit of log radius). */
   arms: 4,
   pitch: 1.05,
-  emitEvery: 1.1,
   /** Wisps: on the full tier, at least on the low one. */
   wisps: 14,
   wispsLow: 6,
@@ -145,7 +144,7 @@ export function soakMarkerStage(age: number, decayAge: number | null): SoakMarke
 export interface SoakMarkerLook {
   /** The vortex's spread (0..1: 1 reaches the rim). */
   bloom: number;
-  /** The birth's progress (0 laid .. 1 born): the strong ring it sends out. */
+  /** The birth's progress (0 laid .. 1 born): the rim flares in place. */
   born: number;
   /** How strong the whole marker draws (0..1). */
   alpha: number;

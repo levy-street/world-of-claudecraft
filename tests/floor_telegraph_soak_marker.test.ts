@@ -3,6 +3,8 @@
 // circle, its palette driven by the element, its share meaning carried by the
 // shape and the motion (rings converging, chevrons in), never by the hue.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildBalgathRangedStandIn } from '../src/render/balgath_ranged_fx';
@@ -152,6 +154,27 @@ describe('the soak marker shape (gather in, yard-true, tier-fair)', () => {
     expect(fresh.a).toBeGreaterThan(old.a);
   });
 
+  it('no share-marker ring moves outside the rim: only the soft halo lies past it', () => {
+    // The Round 02 rule: outward motion says keep out, so a share soak only
+    // moves IN. The disc reaches a hair past the rim for the halo alone.
+    expect(SOAK_MARKER.outer).toBeGreaterThan(1);
+    expect(SOAK_MARKER.outer).toBeLessThanOrEqual(1.2);
+    expect('emitEvery' in SOAK_MARKER).toBe(false);
+    // Every ring it draws converges inside the rim, at every moment.
+    for (let k = 0; k < SOAK_MARKER.ripples; k++)
+      for (let t = 0; t < 6; t += 0.05) expect(soakRipple(t, k).r).toBeLessThanOrEqual(1);
+    // The shader carries no outward-emitted ring (its uniform and loop are gone).
+    const src = readFileSync(
+      join(__dirname, '../src/render/floor_telegraph/soak_marker.ts'),
+      'utf8',
+    );
+    expect(src).not.toMatch(/uEmitEvery|rings it sends out/);
+    // The disc's mesh stops at the halo's reach.
+    const m = new SoakMarker(buildSoakMarkerGeometry(), [], 26);
+    m.disc.geometry.computeBoundingSphere();
+    expect(m.disc.geometry.boundingSphere?.radius).toBeLessThanOrEqual(1.2);
+  });
+
   it('only the wisps thin on the low tier, never to none', () => {
     expect(soakWispCount(1)).toBe(SOAK_MARKER.wisps);
     expect(soakWispCount(0)).toBe(SOAK_MARKER.wispsLow);
@@ -182,11 +205,11 @@ describe('the soak marker shape (gather in, yard-true, tier-fair)', () => {
     });
     expect(m.shown).toBe(true);
     expect(m.disc.scale.x).toBe(6);
-    // The disc's unit radius is the rim; only the halo and the emitted rings
-    // reach past it, to SOAK_MARKER.outer.
+    // The disc's unit radius is the rim; only the rim's soft halo
+    // reaches past it, to SOAK_MARKER.outer.
     m.disc.geometry.computeBoundingSphere();
     expect(m.disc.geometry.boundingSphere?.radius).toBeCloseTo(SOAK_MARKER.outer, 6);
-    expect(SOAK_MARKER.outer).toBeLessThan(1.6);
+    expect(SOAK_MARKER.outer).toBeLessThanOrEqual(1.2);
     expect(m.group.position.toArray()).toEqual([3, 1, -2]);
     const u = m.discMat.uniforms;
     expect(u.uNeed.value).toBe(3);

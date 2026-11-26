@@ -11,7 +11,7 @@ Bastion's boss casts all lay through `TelegraphKit`.
 | `floor_tell_core.ts` | PURE (`RENDER_PURE_CORES`): the shared SOAK / AVOID tell (the team's playtest of 2026-11-25 on the Hammer Council): `share` (gather in: chevrons pointing IN and rings converging, a pip round the rim per player the soak needs, lit one per player inside: `soakPips`, `countInside`) and `avoid` (keep out: chevrons pointing OUT, rings growing to the rim, the rim throbbing outward); the direction in the shape and the motion (`tellBand`, pinned), the frame's look (`floorTellLook`). |
 | `floor_tell.ts` | `FloorTellPool`: the tell's painter, a fixed pool built by the OWNER in its constructor under its gated root and laid over its footprint each frame (`paint`, `hide`, `settle` every frame for the share marker's decay, `hideAll`): an `avoid` slot is one flat disc (one draw), a `share` slot is the shared soak marker (pass `share = false` for an avoid-only pool). |
 | `soak_marker_core.ts` | PURE (`RENDER_PURE_CORES`): the shared SOAK marker's plan (the owner's request of 2026-11-26, a raid-language soak marker in our own procedural style): the element palettes (`SOAK_PALETTES`: fire, earth, air, lightning, shadow, frost, water) and each element's character (`SOAK_CHARACTER`: grains, rim crackle, flame tongues, smoke, wind streams, speed), the clips (`soakMarkerStage`, `soakMarkerLook`: Birth blooms out of the middle, Hold loops, Decay draws it back in), the converging rings (`soakRipple`), the wisps per tier (`soakWispCount`). |
-| `soak_marker.ts` | `SoakMarker`: the marker's painter, two draws (the vortex disc, mostly additive light over the floor: counter-rotating noise, spiral filaments, a hot inner ring, a darker turbulent centre, the luminous rim at the sim's radius with its halo and the rings it sends out, rings converging on the middle, inward chevrons, the soakers' pips, an optional countdown arc, a ready ring; and one ribbon mesh of wisps spiralling up, camera-relative; the rim, pips, chevrons and arc draw whole from the first frame and go at once with the mark, only the body blooms and decays), built once by the owner, no texture, no light. Worn by `FloorTellPool`'s share slots and by `../ignivar_soak_telegraph.ts` (a soak carried on a player). |
+| `soak_marker.ts` | `SoakMarker`: the marker's painter, two draws (the vortex disc, mostly additive light over the floor: counter-rotating noise, spiral filaments, a hot inner ring, a darker turbulent centre, the luminous rim at the sim's radius with its soft halo, rings converging on the middle, inward chevrons, the soakers' pips, an optional countdown arc, a ready ring; and one ribbon mesh of wisps spiralling up, camera-relative; the rim, pips, chevrons and arc draw whole from the first frame and go at once with the mark, only the body blooms and decays), built once by the owner, no texture, no light. Worn by `FloorTellPool`'s share slots and by `../ignivar_soak_telegraph.ts` (a soak carried on a player). |
 | `telegraph_kit.ts` | Pooled fans and lanes: footprint draped on the real floor plus the curtain; built once per slot, attached by the OWNER through its compile gate. On the floor VFX ladder's `encounter` band. |
 
 Rules:
@@ -31,9 +31,12 @@ Rules:
   MOTION (share: a vortex pulled in, rings converging from the rim, chevrons
   pointing in, wisps rising, the soakers' pips; avoid: chevrons pointing out, rings
   racing to a throbbing rim). The share marker's rim (a crisp luminous ring) is
-  the sim's radius; past it (to `SOAK_MARKER.outer`) only the rim's soft halo
-  and the thin rings it sends out on a rhythm, light only, never a fill, so the
-  floor outside stays readable.
+  the sim's radius; past it (to `SOAK_MARKER.outer`) only the rim's own soft
+  halo, light only, never a fill, so the floor outside stays readable. A share
+  marker only ever moves IN (the Round 02 rule: outward motion says keep out):
+  no ring, front or flare travels past its rim; its birth blooms from the
+  middle out TO the rim and flares the rim in place. Pinned by
+  `tests/floor_telegraph_soak_marker.test.ts`.
 - Every other telegraph's colour is the THREAT, never the school: a new avoid tell,
   cone, ring or lane picks one of the four threat colours
   (`tests/floor_telegraph_look.test.ts` pins every crypt and Bastion spec to the
