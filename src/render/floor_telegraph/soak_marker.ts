@@ -356,21 +356,24 @@ varying float vFade;
 varying float vV;
 float h1(float n) { return fract(sin(n * 12.9898) * 43758.5453); }
 uniform float uCount;
-// A coherent helix: the ribbons evenly spaced round the axis, all winding
-// the same way at one pitch, narrowing toward the top (smoke curls in more).
+// The rising vortex funnel: each strand starts ON the rim, evenly spaced
+// round it, and wraps about one full turn round the axis as it rises (the
+// same way the floor's arms wind in, so the spiral carries on into the air),
+// on the surface of a cone narrowing upward; their heights a little staggered.
+// Ribbon 0 is the faint glow column on the axis that binds them.
 vec3 wispPoint(float k, float v) {
-  // One smooth helix per ribbon: evenly spaced, a gentle twist, the radius
-  // narrowing as it rises (a vortex funnel); smoke curls in tighter.
-  float ang = k / uCount * 6.2831853 + uSpin * uSpeed * 0.45 + v * 3.0 * uCurl;
-  float rad = mix(0.44, uCurl > 0.0 ? 0.26 : 0.14, v * (2.0 - v));
-  float y = v * uRise;
+  float ang = k / uCount * 6.2831853 + uSpin * uSpeed * 0.45 + v * 5.2;
+  float rad = mix(0.97, uCurl > 0.0 ? 0.3 : 0.18, pow(v, 0.8));
+  // It lifts off the rim briskly, then winds on up toward the top.
+  float y = (1.0 - pow(1.0 - v, 1.5)) * uRise * (0.82 + 0.18 * h1(k + 4.0));
   return vec3(sin(ang) * rad, y, cos(ang) * rad);
 }
 void main() {
-  float k = aRibbon;
+  bool column = aRibbon < 0.5;
+  float k = aRibbon - 1.0;
   float vv = aV;
-  vec3 p = wispPoint(k, vv);
-  vec3 q = wispPoint(k, vv + 0.03);
+  vec3 p = column ? vec3(0.0, vv * uRise * 0.9, 0.0) : wispPoint(k, vv);
+  vec3 q = column ? vec3(0.0, (vv + 0.03) * uRise * 0.9, 0.0) : wispPoint(k, vv + 0.03);
   vec4 w = modelMatrix * vec4(p, 1.0);
   vec4 w2 = modelMatrix * vec4(q, 1.0);
   vec3 tng = w2.xyz - w.xyz;
@@ -380,21 +383,24 @@ void main() {
   side = length(side) > 1e-5 ? normalize(side) : vec3(1.0, 0.0, 0.0);
   // Seen end-on (from overhead) a rising ribbon would lie flat over the
   // vortex as a loop: it fades out as the view runs along it.
-  float endOn = 1.0 - smoothstep(0.55, 0.9, abs(dot(tng, toCam)));
-  // Tapering to a point at the top, soft at the foot.
-  // Wide at the foot, easing to a fine tip.
+  float endOn = 1.0 - smoothstep(0.7, 0.95, abs(dot(tng, toCam))) * smoothstep(0.7, 0.95, toCam.y);
+  // Wide at the foot, easing to a fine tip (the column a broad soft mist).
   float taper = smoothstep(0.0, 0.08, vv) * pow(1.0 - vv, 0.85);
-  w.xyz += side * aSide * uWidth * (0.12 + 0.88 * taper);
+  float width = column ? uWidth * 5.0 * (0.4 + 0.6 * (1.0 - vv)) : uWidth * (0.12 + 0.88 * taper);
+  w.xyz += side * aSide * width;
   vSide = aSide;
   vV = vv;
-  // Light flowing up each ribbon (a slow travelling swell), fading at the top.
   // Light flowing up each ribbon (a slow travelling swell); lightning adds
   // only a faint flicker to its brightness, never to its shape.
   float flow = 0.6 + 0.4 * sin(vv * 6.0 - uTime * uSpeed * 2.2 + k * 1.7);
   float flick = 1.0 - uJag * 0.25 * step(0.6, h1(floor(uTime * 12.0) + k * 7.0));
   // An ease-out fade to the top.
   float top = 1.0 - vv;
-  vFade = smoothstep(0.0, 0.1, vv) * top * top * (3.0 - 2.0 * top) * flow * flick * endOn;
+  // Overhead the strands' feet would ride the rim and its pips: from above
+  // they thin to a whisper (the floor's information stays clear).
+  float above = 1.0 - 0.8 * smoothstep(0.75, 0.97, toCam.y);
+  vFade = smoothstep(0.04, 0.2, vv) * top * top * (3.0 - 2.0 * top) * flow * flick * endOn * above;
+  if (column) vFade = smoothstep(0.0, 0.15, vv) * top * top * 0.16;
   gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
@@ -431,7 +437,8 @@ export interface SoakMarkerGeometry {
 export function buildSoakMarkerGeometry(geometries?: THREE.BufferGeometry[]): SoakMarkerGeometry {
   // Past the rim by SOAK_MARKER.outer: only the rim's own soft halo.
   const disc = new THREE.CircleGeometry(SOAK_MARKER.outer, 112).rotateX(-Math.PI / 2);
-  const n = SOAK_MARKER.wisps;
+  // Ribbon 0 is the axis's glow column, then the strands.
+  const n = SOAK_MARKER.wisps + 1;
   const verts = n * (WISP_SEGMENTS + 1) * 2;
   const pos = new Float32Array(verts * 3);
   const rib = new Float32Array(verts);
@@ -702,7 +709,7 @@ export class SoakMarker {
     w.uSpin.value = _look.spin;
     w.uAlpha.value = _look.alpha * _look.wisp;
     const n = soakWispCount(p.detail ?? 1);
-    const want = n * WISP_SEGMENTS * 6;
+    const want = (n + 1) * WISP_SEGMENTS * 6;
     if (this.wisps.geometry.drawRange.count !== want) this.wisps.geometry.setDrawRange(0, want);
     w.uCount.value = n;
     this.group.position.set(p.x, p.y, p.z);

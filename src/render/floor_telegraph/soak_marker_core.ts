@@ -119,12 +119,12 @@ export const SOAK_MARKER = {
   arms: 4,
   pitch: 1.05,
   /** Wisps: on the full tier, at least on the low one. */
-  wisps: 4,
-  wispsLow: 3,
+  wisps: 6,
+  wispsLow: 4,
   /** Their height, yards: a share of the radius, clamped. */
-  wispPerRadius: 1.25,
+  wispPerRadius: 1.6,
   wispMin: 3.2,
-  wispMax: 7.5,
+  wispMax: 8,
 } as const;
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));

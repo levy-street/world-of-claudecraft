@@ -219,8 +219,9 @@ describe('the soak marker shape (gather in, yard-true, tier-fair)', () => {
       (u.uBody.value as THREE.Color).equals(new THREE.Color(SOAK_PALETTES.lightning.body)),
     ).toBe(true);
     // The low tier keeps a few wisps (the drawRange of the ribbon mesh).
-    const perWisp = m.wisps.geometry.index!.count / SOAK_MARKER.wisps;
-    expect(m.wisps.geometry.drawRange.count).toBe(SOAK_MARKER.wispsLow * perWisp);
+    // The strands plus the axis's glow column (ribbon 0, always drawn).
+    const perWisp = m.wisps.geometry.index!.count / (SOAK_MARKER.wisps + 1);
+    expect(m.wisps.geometry.drawRange.count).toBe((SOAK_MARKER.wispsLow + 1) * perWisp);
     // Released: it decays, then hides on its own clock.
     m.release();
     expect(m.decaying).toBe(true);
