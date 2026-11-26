@@ -25,7 +25,7 @@
 import * as THREE from 'three';
 import { partyPingsEnabled } from '../game/party_pings_setting';
 import { PING_KIND_COUNT } from '../sim/social/party_pings';
-import { pingIconCanvas } from '../ui/ping_icons';
+import { onPingIconArt, pingIconCanvas } from '../ui/ping_icons';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   createPartyPingAnchor,
@@ -163,6 +163,8 @@ export class PartyPingLayer {
   private readonly unitAt = { x: 0, y: 0, z: 0, top: 0 };
   private shownCount = 0;
   private disposed = false;
+  /** Unsubscribes the painted-icon load signal (ui/ping_icons.ts). */
+  private readonly stopArt: () => void;
   private stagedRoot: THREE.Group | null = null;
 
   constructor(
@@ -177,6 +179,13 @@ export class PartyPingLayer {
       texture.colorSpace = THREE.SRGBColorSpace;
       this.icons.push(texture);
     }
+    // The painted icon art loads after boot; when a kind's arrives its canvas
+    // is repainted in place, so its texture re-uploads once (five small
+    // 128 px textures, once per session).
+    this.stopArt = onPingIconArt((kind) => {
+      const texture = this.icons[kind];
+      if (texture && !this.disposed) texture.needsUpdate = true;
+    });
     this.glowTexture = new THREE.CanvasTexture(glowCanvas());
     this.glowTexture.colorSpace = THREE.SRGBColorSpace;
     // The ring's plane stays in its local xy (the shader's rim units); the
@@ -379,6 +388,7 @@ export class PartyPingLayer {
     if (this.disposed) return;
     this.disposed = true;
     this.stagedRoot = null;
+    this.stopArt();
     const errors: unknown[] = [];
     const tryRelease = (release: () => void): void => {
       try {

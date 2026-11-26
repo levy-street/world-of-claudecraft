@@ -122,7 +122,7 @@ export class PingFeedController {
           const mark = this.mark(layer, n++);
           if (mark.kind !== ping.kind) {
             mark.kind = ping.kind;
-            mark.img.src = pingIconUrl(ping.kind, 32);
+            mark.img.src = pingIconUrl(ping.kind);
           }
           const w = this.deps.writers;
           w.setTransform(mark.el, `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px)`);

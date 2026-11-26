@@ -195,12 +195,14 @@
     --color-team-red: #d8342c;
     /* Party pings (src/ui/hud/pings/): one colour per kind, in lockstep with
        PARTY_PING_COLORS in src/render/party_pings_core.ts (the world icon and its
-       ring draw the same five), plus the wheel's dark glass. */
-    --color-ping-look: #f1ead2;
-    --color-ping-attack: #ff4a3d;
-    --color-ping-warning: #ffb12e;
-    --color-ping-on-my-way: #45a9ff;
-    --color-ping-assist: #4fdc7a;
+       ring draw the same five), plus the wheel's dark glass. Sampled from the
+       painted icons in public/ui/pings/: saturated, slightly neon, so a ping
+       pops on any ground. */
+    --color-ping-look: #ffe81a;
+    --color-ping-attack: #ff2d1e;
+    --color-ping-warning: #ff8c00;
+    --color-ping-on-my-way: #1a8cff;
+    --color-ping-assist: #1ff53c;
     --color-ping-glass: #0d0b09;
     /* Per-school debuff border tints (WoW-style poison/magic/curse reads); physical
        keeps the base --color-debuff red. Driven by the aura node's data-school. */

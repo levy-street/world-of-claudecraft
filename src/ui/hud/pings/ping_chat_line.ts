@@ -22,9 +22,6 @@ export interface PingChatLineDeps {
   targetIsPlayer?: boolean;
 }
 
-/** The icon's size in the line (CSS px; drawn at 2x for a crisp badge). */
-const ICON_DRAW_PX = 32;
-
 function playerName(
   doc: Document,
   className: string,
@@ -68,7 +65,7 @@ export function pingChatLineNodes(
   icon.alt = '';
   icon.draggable = false;
   icon.setAttribute('aria-hidden', 'true');
-  icon.src = pingIconUrl(model.kind, ICON_DRAW_PX);
+  icon.src = pingIconUrl(model.kind);
   line.append(icon);
   for (const part of model.parts) {
     if (part.part === 'text') {

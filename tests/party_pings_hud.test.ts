@@ -35,6 +35,7 @@ setLanguage('en');
 vi.mock('../src/ui/ping_icons', () => ({
   pingIconUrl: (kind: number) => `data:ping-${kind}`,
   pingIconCanvas: () => document.createElement('canvas'),
+  onPingIconArt: () => () => {},
 }));
 
 const writers: PainterHostWriters = {

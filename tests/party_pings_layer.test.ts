@@ -14,6 +14,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const setting = { on: true };
 vi.mock('../src/ui/ping_icons', () => ({
   pingIconCanvas: () => document.createElement('canvas'),
+  onPingIconArt: () => () => {},
 }));
 vi.mock('../src/game/party_pings_setting', () => ({
   partyPingsEnabled: () => setting.on,

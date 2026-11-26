@@ -21,16 +21,18 @@ import {
   PING_WARNING,
 } from '../sim/social/party_pings';
 
-/** One colour per ping kind (0xRRGGBB), by wire index: Look Here ivory,
- *  Attack red, Warning amber, On My Way blue, Assist green. Every ping
- *  surface (the world icon, its ring, the wheel and the minimap) reads these. */
+/** One colour per ping kind (0xRRGGBB), by wire index: Look Here yellow,
+ *  Attack red, Warning orange, On My Way blue, Assist green, saturated and
+ *  slightly neon, sampled from the painted icons (public/ui/pings/). Every ping
+ *  surface (the world icon's glow, its ring, the wheel and the chat callout)
+ *  reads these. */
 export const PARTY_PING_COLORS: readonly number[] = (() => {
   const c: number[] = [];
-  c[PING_LOOK] = 0xf1ead2;
-  c[PING_ATTACK] = 0xff4a3d;
-  c[PING_WARNING] = 0xffb12e;
-  c[PING_ON_MY_WAY] = 0x45a9ff;
-  c[PING_ASSIST] = 0x4fdc7a;
+  c[PING_LOOK] = 0xffe81a;
+  c[PING_ATTACK] = 0xff2d1e;
+  c[PING_WARNING] = 0xff8c00;
+  c[PING_ON_MY_WAY] = 0x1a8cff;
+  c[PING_ASSIST] = 0x1ff53c;
   return Object.freeze(c);
 })();
 

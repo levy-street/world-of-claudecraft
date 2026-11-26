@@ -37,6 +37,14 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 /** The wedge band's inner edge and the icons' radius (CSS px). */
 const WEDGE_INNER_PX = PING_WHEEL_CENTER_PX + 6;
 const ICON_RADIUS_PX = 88;
+/** A rim stud's half size (CSS px). */
+const STUD_PX = 6;
+/** A lit wedge's glow stops: faint at the centre, strongest at the rim. */
+const GLOW_STOPS: readonly (readonly [string, string])[] = [
+  ['0.3', 'core'],
+  ['0.78', 'mid'],
+  ['1', 'edge'],
+];
 
 export interface PingWheelDeps {
   doc: Document;
@@ -186,6 +194,26 @@ export class PingWheelController {
     svg.setAttribute('class', 'ping-wheel-ring');
     svg.setAttribute('viewBox', `${-r - 8} ${-r - 8} ${2 * r + 16} ${2 * r + 16}`);
     svg.setAttribute('aria-hidden', 'true');
+    // One radial glow per kind for its lit wedge: the stops read the kind's
+    // --ping-color through the gradient's own ping-kind class (CSS).
+    const defs = doc.createElementNS(SVG_NS, 'defs');
+    for (const wedge of PING_WHEEL_WEDGES) {
+      const glow = doc.createElementNS(SVG_NS, 'radialGradient');
+      glow.setAttribute('id', `ping-wheel-glow-${wedge.kind}`);
+      glow.setAttribute('class', `ping-kind-${wedge.kind}`);
+      glow.setAttribute('gradientUnits', 'userSpaceOnUse');
+      glow.setAttribute('cx', '0');
+      glow.setAttribute('cy', '0');
+      glow.setAttribute('r', String(r));
+      for (const [offset, part] of GLOW_STOPS) {
+        const stop = doc.createElementNS(SVG_NS, 'stop');
+        stop.setAttribute('offset', offset);
+        stop.setAttribute('class', `ping-wheel-glow-${part}`);
+        glow.appendChild(stop);
+      }
+      defs.appendChild(glow);
+    }
+    svg.appendChild(defs);
     const backdrop = doc.createElementNS(SVG_NS, 'circle');
     backdrop.setAttribute('class', 'ping-wheel-backdrop');
     backdrop.setAttribute('r', String(r + 4));
@@ -205,7 +233,7 @@ export class PingWheelController {
       slot.style.transform = `translate(${at.x.toFixed(1)}px, ${at.y.toFixed(1)}px)`;
       const img = doc.createElement('img');
       img.className = 'ping-wheel-icon';
-      img.src = pingIconUrl(wedge.kind, 96);
+      img.src = pingIconUrl(wedge.kind);
       img.alt = '';
       img.draggable = false;
       const label = doc.createElement('span');
@@ -213,6 +241,29 @@ export class PingWheelController {
       label.textContent = t(PING_KIND_LABEL_KEYS[wedge.kind]);
       slot.append(img, label);
       slots.set(wedge.kind, slot);
+    }
+    // The rim: a dark keyline outside a fine gold edge, with a gold stud in
+    // each gap between the wedges.
+    for (const [cls, rr] of [
+      ['ping-wheel-keyline', r + 6],
+      ['ping-wheel-rim', r + 4],
+    ] as const) {
+      const ring = doc.createElementNS(SVG_NS, 'circle');
+      ring.setAttribute('class', cls);
+      ring.setAttribute('r', String(rr));
+      svg.appendChild(ring);
+    }
+    for (const wedge of PING_WHEEL_WEDGES) {
+      const at = pingWedgeIconAt(wedge.angle + 45, r + 4);
+      const x = (dx: number) => (at.x + dx).toFixed(1);
+      const y = (dy: number) => (at.y + dy).toFixed(1);
+      const stud = doc.createElementNS(SVG_NS, 'path');
+      stud.setAttribute('class', 'ping-wheel-stud');
+      stud.setAttribute(
+        'd',
+        `M ${x(0)} ${y(-STUD_PX)} L ${x(STUD_PX)} ${y(0)} L ${x(0)} ${y(STUD_PX)} L ${x(-STUD_PX)} ${y(0)} Z`,
+      );
+      svg.appendChild(stud);
     }
     const center = doc.createElementNS(SVG_NS, 'g');
     center.setAttribute('class', 'ping-wheel-center');

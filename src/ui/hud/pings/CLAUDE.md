@@ -34,5 +34,9 @@ refuse into no ping.
 Every surface honours `settings.partyPings` (`src/game/party_pings_setting.ts`):
 off, the key does nothing and nothing from others' pings shows or sounds.
 `settings.partyPingsChat` ("Show Pings in Chat", default on) drops only the chat line. The
-icons are our own procedural badges (`src/ui/ping_icons.ts`); the kind colours
-live in `PARTY_PING_COLORS` and the `--color-ping-*` tokens, pinned equal.
+icons are painted art, one per kind (`public/ui/pings/*.webp`, ChatGPT-made,
+keyed by `scripts/convert_chrome_icons_webp.mjs --dir public/ui/pings`, provenance
+in `public/ui/pings/mapping.json`), loaded and glowed by `src/ui/ping_icons.ts`,
+which falls back to its procedural glyphs until the art arrives; the kind colours
+live in `PARTY_PING_COLORS` and the `--color-ping-*` tokens, pinned equal and
+sampled from that art.

@@ -3609,7 +3609,8 @@ const UI_DOM_MODULES = [
   'src/ui/icon_prewarm.ts',
   'src/ui/icon_prewarm_worker.ts',
   'src/ui/icons.ts',
-  // The party ping badges: procedural canvases minted on document, cached.
+  // The party ping icons: loads the painted art (Image) and mints cached
+  // canvases on document (the glowed world icon, procedural glyph fallback).
   'src/ui/ping_icons.ts',
   'src/ui/inspect_window.ts',
   'src/ui/interface_unlock.ts',
