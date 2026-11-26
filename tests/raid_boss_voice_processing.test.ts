@@ -81,14 +81,29 @@ describe('raid boss voice processing', () => {
 });
 
 describe("the Smith's Heart's clean voice treatments", () => {
-  it.each(SMITH_HEART_CLEAN_VOICE_PRESETS as { id: string }[])(
-    '$id stays clean: no modulation or voice pitch shift, keeps the length',
-    ({ id }) => {
+  it('drops only the Masterless Strength three semitones, before the sub and room', () => {
+    // The owner's call (2026-11-26): the final boss needs a lower, deeper
+    // voice. The whole performance moves down, formants with it, so the sub
+    // and the room follow the new pitch.
+    const pitched = (SMITH_HEART_CLEAN_VOICE_PRESETS as { id: string; pitchSemitones?: number }[])
+      .filter((preset) => preset.pitchSemitones)
+      .map((preset) => [preset.id, preset.pitchSemitones]);
+    expect(pitched).toEqual([['masterless-clean', -3]]);
+    const graph = buildSmithHeartVoiceFilter('masterless-clean');
+    const head = graph.slice(0, graph.indexOf('asplit'));
+    expect(head).toContain(`asetrate=${Math.round(44100 * 2 ** (-3 / 12))}`);
+    expect(head).toContain(`atempo=${(1 / 2 ** (-3 / 12)).toFixed(6)}`);
+  });
+
+  it.each(SMITH_HEART_CLEAN_VOICE_PRESETS as { id: string; pitchSemitones?: number }[])(
+    '$id stays clean: no modulation, keeps the length',
+    ({ id, pitchSemitones }) => {
       const graph = buildSmithHeartVoiceFilter(id);
       for (const effect of ['tremolo', 'flanger', 'chorus', 'anoisesrc', 'afreqshift'])
         expect(graph).not.toContain(effect);
-      // The one rate shift is the sub, an octave under the voice.
-      expect(graph.match(/asetrate=/g)).toHaveLength(1);
+      // The sub, an octave under the voice, is the one rate shift, plus the
+      // performance's own drop on a preset that sets one.
+      expect(graph.match(/asetrate=/g)).toHaveLength(pitchSemitones ? 2 : 1);
       expect(graph).toContain('loudnorm=I=-15:TP=-1.5');
       // A 1 s tone renders to about 1 s (the room adds its tail only): an
       // unpinned mix format once made loudnorm's output four times too long.

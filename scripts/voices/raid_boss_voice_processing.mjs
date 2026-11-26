@@ -122,7 +122,9 @@ export const SMITH_HEART_VOICE_LOUDNESS = 'loudnorm=I=-15:TP=-1.5:LRA=7';
 // light high-pass, gentle compression, a soft sub an octave down at a very
 // low level and a short, low-wet early-reflection room (wet only, so the dry
 // voice is never doubled), then the pack's loudness. No vocoder, ring
-// modulation, noise carrier, tremolo or pitch shift of the voice itself.
+// modulation, noise carrier or tremolo, and no pitch shift of the voice
+// itself except a preset's own `pitchSemitones` (the Masterless Strength's
+// lower, deeper voice, 2026-11-26).
 
 export const SMITH_HEART_CLEAN_VOICE_PRESETS = [
   {
@@ -142,6 +144,16 @@ export const SMITH_HEART_CLEAN_VOICE_PRESETS = [
   },
   {
     id: 'masterless-clean',
+    // The owner's call (2026-11-26): the final boss needs a lower, deeper
+    // voice. The whole performance drops three semitones, formants with it,
+    // before the sub and the room, so both follow the new pitch.
+    // The 25 clips shipped with this change were NOT rendered by this preset:
+    // the raw takes were not on the machine that made it, so the previously
+    // published clips were pitched down three semitones and levelled again.
+    // Their sub therefore sits 15 semitones under the voice and their room is
+    // pitched too; the next render from raw takes applies the preset as
+    // written and will sound slightly cleaner.
+    pitchSemitones: -3,
     highpass: 65,
     compressor: { threshold: 0.16, ratio: 2.2, attack: 10, release: 150 },
     sub: { gain: 0.07, lowpass: 140 },
@@ -152,8 +164,9 @@ export const SMITH_HEART_CLEAN_VOICE_PRESETS = [
 function buildSmithHeartCleanPresetFilter(preset) {
   const c = preset.compressor;
   const r = preset.room;
+  const pitch = preset.pitchSemitones ? `${pitchFilters(preset.pitchSemitones)},` : '';
   return (
-    `aresample=${SAMPLE_RATE},highpass=f=${preset.highpass},` +
+    `aresample=${SAMPLE_RATE},${pitch}highpass=f=${preset.highpass},` +
     `acompressor=threshold=${c.threshold}:ratio=${c.ratio}:attack=${c.attack}:release=${c.release}:makeup=1,` +
     'asplit=3[dry][sub_in][room_in];' +
     `[sub_in]${pitchFilters(-12)},lowpass=f=${preset.sub.lowpass},volume=${preset.sub.gain}[sub];` +
