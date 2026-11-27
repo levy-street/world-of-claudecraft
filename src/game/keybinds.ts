@@ -360,7 +360,7 @@ export const BIND_ACTIONS: BindAction[] = [
   },
   // Target Buffs and Debuffs moved from Shift+J to Shift+B (B for Buffs) when
   // the Adventure Journal took Shift+J, the classic MMO key for the encounter
-  // journal. A player who rebound either keeps their own binding.
+  // journal.
   {
     id: 'targetAuras',
     label: 'Target Buffs and Debuffs',

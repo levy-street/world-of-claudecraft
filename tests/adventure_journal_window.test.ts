@@ -315,6 +315,36 @@ describe('AdventureJournalWindow', () => {
     expect(root.querySelector('.aj-shell')?.classList.contains('aj-nav-open')).toBe(false);
   });
 
+  it('returns focus to Browse when a drawer pick closes the drawer', () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    root.querySelector<HTMLButtonElement>('[data-browse]')?.click();
+    root.querySelector<HTMLButtonElement>('[data-boss="heart_quench_guardian"]')?.click();
+    expect(document.activeElement).toBe(root.querySelector('[data-browse]'));
+  });
+
+  it('keeps the reader in place when the same page repaints, and starts a new page at the top', () => {
+    world.player.pos.x = xOf(SMITH_HEART_DUNGEON);
+    world.raidRun = raidRun(null);
+    journal.toggle();
+    (root.querySelector('.aj-page') as HTMLElement).scrollTop = 240;
+    (root.querySelector('.aj-nav') as HTMLElement).scrollTop = 90;
+    world.raidRun = raidRun(HEAT_GUARDIAN);
+    journal.syncRun();
+    expect((root.querySelector('.aj-page') as HTMLElement).scrollTop).toBe(240);
+    expect((root.querySelector('.aj-nav') as HTMLElement).scrollTop).toBe(90);
+    root.querySelector<HTMLButtonElement>('[data-step="1"]')?.click();
+    expect((root.querySelector('.aj-page') as HTMLElement).scrollTop).toBe(0);
+    expect((root.querySelector('.aj-nav') as HTMLElement).scrollTop).toBe(90);
+  });
+
+  it('never opens a dev-gated instance from outside for a player without dev tools', () => {
+    unreleased = false;
+    expect(journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN)).toBe(
+      journalInstance(SMITH_HEART_DUNGEON)?.released ?? false,
+    );
+    expect(journal.openJournal('gravewyrm_sanctum')).toBe(true);
+  });
+
   it('does nothing on an unchanged tick and repaints when a boss falls', () => {
     world.player.pos.x = xOf(SMITH_HEART_DUNGEON);
     world.raidRun = raidRun(null);

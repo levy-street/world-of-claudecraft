@@ -3935,11 +3935,11 @@
     width: 26px;
     height: 26px;
   }
-  /* A landscape phone is short: the header keeps a small portrait so the
-     tabs and the page start above the fold. */
   body.mobile-touch #adventure-journal-window .aj-nav {
     background-color: var(--color-rbg-frame-end);
   }
+  /* A landscape phone is short: the header keeps a small portrait so the
+     tabs and the page start above the fold. */
   body.mobile-touch #adventure-journal-window .aj-hero {
     grid-template-columns: 104px minmax(0, 1fr);
     min-height: 0;

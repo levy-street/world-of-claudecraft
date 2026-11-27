@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { SMITH_HEART_DUNGEON, SMITH_HEART_PLAYABLE } from '../src/sim/content/smith_heart';
+import { SMITH_HEART_ESSENCE_QUEST } from '../src/sim/content/smith_heart_rewards';
 import { MOBS } from '../src/sim/data';
 import {
   COUNCIL_GUARDIAN,
@@ -151,6 +152,19 @@ describe('journal navigation', () => {
     ).toEqual({ defeated: true, engaged: false, tracked: true });
   });
 
+  it('passes an untracked miniboss once a later tracked page is down', () => {
+    const keys = sanctum().source.bossKeys;
+    const run = (defeated: string[]): JournalProgress => ({
+      dungeonId: 'gravewyrm_sanctum',
+      difficulty: 'normal',
+      // The first page (a miniboss) is not a run row at all.
+      bosses: keys.slice(1).map((mobId) => ({ mobId, defeated: defeated.includes(mobId) })),
+    });
+    expect(journalPageState(sanctum(), keys[0], run([])).tracked).toBe(false);
+    expect(journalLandingBoss(sanctum(), run([]), null)).toBe(keys[0]);
+    expect(journalLandingBoss(sanctum(), run([keys[1]]), null)).toBe(keys[2]);
+  });
+
   it('lands on a shipped raid room boss, and on the first page with no run', () => {
     const crucible = journalInstance(IGNIVAR_RAID_ARENA_ID)!;
     expect(journalLandingBoss(crucible, null, 'varkhul')).toBe('varkhul');
@@ -223,7 +237,7 @@ describe('journal loot', () => {
   it("marks the Smith's Heart essence as a quest drop and merges a council's tables", () => {
     const rows = journalLoot(['heart_masterless_strength'], 'normal');
     expect(rows.length).toBeGreaterThan(0);
-    expect(rows.every((r) => r.gatedByQuestId)).toBe(true);
+    expect(rows.every((r) => r.gatedByQuestId === SMITH_HEART_ESSENCE_QUEST)).toBe(true);
     expect(journalLoot([COUNCIL_GUARDIAN, COUNCIL_SEAM_SINGER], 'heroic')).toEqual(
       [
         ...journalLoot([COUNCIL_GUARDIAN], 'heroic'),

@@ -109,6 +109,8 @@ export class AdventureJournalWindow {
   private seenRoom: string | null | undefined = undefined;
   private seenDungeonRun: DungeonRunView | null = null;
   private seenRaidRun: RaidRunView | null = null;
+  /** The page the last render painted (instance:boss), for the scroll pair. */
+  private renderedPage: string | null = null;
 
   constructor(
     private readonly deps: AdventureJournalDeps,
@@ -194,7 +196,8 @@ export class AdventureJournalWindow {
    *  when the instance has no journal or that boss no page. */
   openJournal(dungeonId: string, bossMobId?: string, difficulty?: DungeonDifficulty): boolean {
     const instance = journalInstanceForRoom(dungeonId);
-    if (!instance) return false;
+    // A dev-gated instance opens only where the list would show it.
+    if (!instance || !this.visible().some((entry) => entry.id === instance.id)) return false;
     const bossKey =
       instance.source.bossKeys.find(
         (key) => !bossMobId || journalPageBodies(instance.source, key).includes(bossMobId),
@@ -290,6 +293,14 @@ export class AdventureJournalWindow {
     if (!selection || !instance) return;
     const root = this.deps.root();
     const restoreKey = focusKey ?? captureFocusKey(root) ?? undefined;
+    // The scroll pair (the vendor family's): a repaint of the SAME page (a boss
+    // falling mid-read, a tab, a tier) keeps the reader where they were; a new
+    // page starts at its top. The list always keeps its place.
+    const pageKey = `${selection.instanceId}:${selection.bossKey}`;
+    const keepPage = pageKey === this.renderedPage;
+    const pageTop = keepPage ? (root.querySelector<HTMLElement>('.aj-page')?.scrollTop ?? 0) : 0;
+    const navTop = root.querySelector<HTMLElement>('.aj-nav')?.scrollTop ?? 0;
+    this.renderedPage = pageKey;
     const world = this.deps.world();
     this.seenRoom = this.room();
     this.seenDungeonRun = world.dungeonRun;
@@ -348,6 +359,10 @@ export class AdventureJournalWindow {
         },
       )}${difficultyHtml(instance, this.tier)}${page}</section></div>`;
 
+    const freshPage = root.querySelector<HTMLElement>('.aj-page');
+    const freshNav = root.querySelector<HTMLElement>('.aj-nav');
+    if (freshPage && pageTop > 0) freshPage.scrollTop = pageTop;
+    if (freshNav && navTop > 0) freshNav.scrollTop = navTop;
     this.mountModel(root, instance, headerView, bossName);
     this.wire(root, instance, view);
     if (restoreKey) {
@@ -401,8 +416,11 @@ export class AdventureJournalWindow {
   private goTo(instance: JournalInstance, bossKey: string, focusKey: string): void {
     this.deps.hideTooltip();
     this.select(instance, bossKey, null);
+    // A pick from the phone drawer closes it, and a closed drawer's buttons are
+    // hidden: focus returns to Browse, the control that reopens it.
+    const fromDrawer = this.navOpen;
     this.navOpen = false;
-    this.render(focusKey);
+    this.render(fromDrawer ? 'browse' : focusKey);
   }
 
   private wire(root: HTMLElement, instance: JournalInstance, view: JournalBossView | null): void {

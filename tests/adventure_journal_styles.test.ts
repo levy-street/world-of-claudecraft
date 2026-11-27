@@ -69,6 +69,14 @@ describe('Adventure Journal styles', () => {
   });
 
   it('draws an explicit tokenized focus ring on every journal control', () => {
+    // Every journal selector below shares ONE grouped rule; the ring is read
+    // off that rule's body (its last selector anchors the match).
+    const ring = desktopCss.slice(
+      desktopCss.indexOf('#adventure-journal-window .aj-boss:focus-visible'),
+    );
+    expect(ring.slice(0, ring.indexOf('}'))).toMatch(
+      /outline:\s*2px solid var\(--color-border-focus\)/,
+    );
     for (const selector of [
       '#adventure-journal-window .aj-boss:focus-visible',
       '#adventure-journal-window .aj-instance-toggle:focus-visible',
@@ -85,7 +93,9 @@ describe('Adventure Journal styles', () => {
     ]) {
       expect(desktopCss).toContain(selector);
     }
-    expect(desktopCss).toMatch(/outline:\s*2px solid var\(--color-border-focus\)/);
+    expect(
+      rule(desktopCss, '#adventure-journal-window .rbg-model-stage > canvas:focus-visible'),
+    ).toMatch(/outline:\s*2px solid var\(--color-border-focus\)/);
   });
 
   it('contains boss posters instead of cropping their silhouettes', () => {

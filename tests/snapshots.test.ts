@@ -6733,7 +6733,7 @@ describe('full self-state snapshot delta fixture', () => {
       // pinned in tests/shared_map_marks_wire.test.ts. pings (the group's party
       // pings) is null until someone pings; its arrival is pinned in
       // tests/party_pings_wire.test.ts. rdrun (the raid run) is null outside a
-      // tracked raid, like dgrun; its arrival is pinned in tests/raid_run.test.ts.
+      // tracked raid, like dgrun; its arrival is pinned in tests/server/raid_run_wire.test.ts.
       const gatedNull = ['cvault', 'dgrun', 'rdrun', 'udiff', 'mmarks', 'pings'];
       if (gatedNull.includes(key)) {
         expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();

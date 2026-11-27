@@ -138,5 +138,14 @@ describe('raid run (IWorld.raidRun)', () => {
     expect(
       decodeRaidRun({ ...good, bosses: [{ mobId: 'not_a_mob', defeated: true, engaged: false }] }),
     ).toBeNull();
+    expect(
+      decodeRaidRun({
+        ...good,
+        bosses: [{ mobId: SMITH_HEART_FINAL_BOSS, defeated: 'yes', engaged: false }],
+      }),
+    ).toBeNull();
+    expect(decodeRaidRun({ ...good, bosses: [] })).toBeNull();
+    expect(decodeRaidRun({ ...good, bosses: Array(17).fill(good.bosses[0]) })).toBeNull();
+    expect(decodeRaidRun({ ...good, bosses: ['row'] })).toBeNull();
   });
 });

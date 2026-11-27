@@ -1224,6 +1224,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // Preserve the courier body and its two storage grids' scroll offsets (one
   // read and one write each) only across a changed render, never per frame.
   { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
+  // The Adventure Journal's scroll pair, read before its cold rebuild and written
+  // back after, for the page and the list: a boss falling (syncRun) or a tab
+  // click must not throw a reader back to the top. Rebuild-only, never a frame.
+  {
+    file: 'hud/journal/adventure_journal_window.ts',
+    reflowAllow: { '.scrollTop': 4 },
+    driverAllow: {},
+  },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
   // usable items and the picker was deleted. The sheet now reads nothing and
