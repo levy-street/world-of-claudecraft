@@ -17383,6 +17383,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Esplosione Cadaverica',
   'entities.abilities.coven.description':
     'Crea Malocchi secondari su un massimo di 4 nemici vicini per 15 sec. Alimentano la riserva condivisa di Condanna al 50%, e Sentenza riecheggia su di loro per il 35% dei danni.',
+  'entities.abilities.plague_bloom.description':
+    "Spende 60 Condanna: fino a 5 nemici entro 30 yard colpiti dal tuo Marciume Nero subiscono all'istante 4 tick di ogni tuo effetto di danno periodico su di loro.",
   'entities.abilities.coven.name': 'Congrega',
   'entities.abilities.cruel_pact.description':
     "Sacrifica il 12% della tua salute massima per ripristinare l'1,5% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno.",

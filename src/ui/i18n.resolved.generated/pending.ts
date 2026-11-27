@@ -11,40 +11,28 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "es_ES": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "fr_FR": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "fr_CA": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "de_DE": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -52,57 +40,39 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "nl_NL": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "pl_PL": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "id_ID": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "tr_TR": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "sv_SE": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "vi_VN": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ],
   "da_DK": [
     "entities.abilities.hard_bargain.description",
-    "entities.abilities.plague_bloom.description",
-    "entities.abilities.plague_bloom.name",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.plague_bloom.name"
   ]
 };

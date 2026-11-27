@@ -18346,7 +18346,7 @@ export const de_DE: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Verbraucht 60 Verdammnis: Bis zu 5 Gegner im Umkreis von 30 Yard, die deine Schwarzfäule tragen, erleiden sofort 4 Ticks jedes deiner regelmäßigen Schadenseffekte auf ihnen."
       },
       "fear": {
         "name": "Heimsuchung",

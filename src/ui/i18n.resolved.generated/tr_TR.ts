@@ -18346,7 +18346,7 @@ export const tr_TR: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "60 Mahkûmiyet harcar: 30 metre içinde senin Kara Çürüme etkini taşıyan en fazla 5 düşman, üzerlerindeki her bir periyodik hasar etkinden anında 4 tik hasar alır."
       },
       "fear": {
         "name": "Dehşet",

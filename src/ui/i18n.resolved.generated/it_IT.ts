@@ -18346,7 +18346,7 @@ export const it_IT: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Spende 60 Condanna: fino a 5 nemici entro 30 yard colpiti dal tuo Marciume Nero subiscono all'istante 4 tick di ogni tuo effetto di danno periodico su di loro."
       },
       "fear": {
         "name": "Tormento",

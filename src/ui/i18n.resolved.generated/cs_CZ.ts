@@ -18346,7 +18346,7 @@ export const cs_CZ: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Spotřebuje 60 Odsouzení: až 5 nepřátel do 30 yardů s vaší Černou hnilobou okamžitě utrpí 4 tiky každého vašeho periodického poškození, které na nich je."
       },
       "fear": {
         "name": "Děs",

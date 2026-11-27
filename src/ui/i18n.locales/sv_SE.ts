@@ -16469,6 +16469,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Likexplosion',
   'entities.abilities.coven.description':
     'Skapar sekundära onda ögon på upp till 4 närliggande fiender i 15 sek. De matar den delade Fördömelse-poolen med 50%, och Dom ekar till dem för 35% skada.',
+  'entities.abilities.plague_bloom.description':
+    'Förbrukar 60 Fördömelse: upp till 5 fiender inom 30 meter som bär din Svartröta tar omedelbart 4 tick av var och en av dina skada-över-tid-effekter på dem.',
   'entities.abilities.coven.name': 'Häxring',
   'entities.abilities.cruel_pact.description':
     'Offrar 12% av din maximala hälsa för att återställa 1,5% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa.',

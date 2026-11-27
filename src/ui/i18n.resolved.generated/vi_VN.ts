@@ -18346,7 +18346,7 @@ export const vi_VN: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Tiêu hao 60 Kết Án: tối đa 5 kẻ địch trong vòng 30 yard đang mang Hắc Hủ của bạn lập tức chịu 4 nhịp của mỗi hiệu ứng sát thương theo thời gian của bạn trên chúng."
       },
       "fear": {
         "name": "Giày Vò",

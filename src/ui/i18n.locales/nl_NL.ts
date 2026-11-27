@@ -16639,6 +16639,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Lijkontploffing',
   'entities.abilities.coven.description':
     'Creëert secundaire Boze ogen op tot 4 nabije vijanden gedurende 15 sec. Ze voeden de gedeelde Verdoemenis-pool voor 50%, en Vonnis weerklinkt naar hen voor 35% schade.',
+  'entities.abilities.plague_bloom.description':
+    'Verbruikt 60 Verdoemenis: tot 5 vijanden binnen 30 meter met jouw Zwartrot krijgen direct 4 ticks van elk van jouw schade-over-tijd-effecten op hen.',
   'entities.abilities.coven.name': 'Heksenkring',
   'entities.abilities.cruel_pact.description':
     'Offert 12% van je maximale gezondheid op om 1,5% van je maximale mana te herstellen en 20 Verdoemenis te genereren. Kan niet worden gebruikt op of onder 20% gezondheid.',

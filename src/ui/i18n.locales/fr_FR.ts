@@ -17067,6 +17067,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Explosion de cadavre',
   'entities.abilities.coven.description':
     "Crée jusqu'à 4 Mauvais œil secondaires sur des ennemis proches pendant 15 s. Ils alimentent la réserve commune de Condamnation à 50%, et Sentence se répercute sur eux pour 35% de dégâts.",
+  'entities.abilities.plague_bloom.description':
+    "Dépense 60 Condamnation : jusqu'à 5 ennemis à moins de 30 mètres portant votre Pourriture noire subissent instantanément 4 tics de chacun de vos effets de dégâts périodiques sur eux.",
   'entities.abilities.coven.name': 'Sabbat',
   'entities.abilities.cruel_pact.description':
     'Sacrifie 12% de vos points de vie maximum pour restaurer 1,5% de votre mana maximum et générer 20 Condamnation. Inutilisable à 20% de points de vie ou moins.',

@@ -18346,7 +18346,7 @@ export const nl_NL: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Verbruikt 60 Verdoemenis: tot 5 vijanden binnen 30 meter met jouw Zwartrot krijgen direct 4 ticks van elk van jouw schade-over-tijd-effecten op hen."
       },
       "fear": {
         "name": "Teisteren",

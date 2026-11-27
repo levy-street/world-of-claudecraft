@@ -18346,7 +18346,7 @@ export const fr_FR: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Dépense 60 Condamnation : jusqu'à 5 ennemis à moins de 30 mètres portant votre Pourriture noire subissent instantanément 4 tics de chacun de vos effets de dégâts périodiques sur eux."
       },
       "fear": {
         "name": "Tourment",

@@ -16535,6 +16535,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Nổ Xác',
   'entities.abilities.coven.description':
     'Tạo các Ác Nhãn phụ trên tối đa 4 kẻ địch gần đó trong 15 giây. Chúng nạp vào bể Kết Án chung ở mức 50%, và Phán Quyết vọng đến chúng với 35% sát thương.',
+  'entities.abilities.plague_bloom.description':
+    'Tiêu hao 60 Kết Án: tối đa 5 kẻ địch trong vòng 30 yard đang mang Hắc Hủ của bạn lập tức chịu 4 nhịp của mỗi hiệu ứng sát thương theo thời gian của bạn trên chúng.',
   'entities.abilities.coven.name': 'Hội Phù Thủy',
   'entities.abilities.cruel_pact.description':
     'Hy sinh 12% máu tối đa của bạn để hồi 1,5% mana tối đa và tạo ra 20 Kết Án. Không thể dùng khi máu ở mức 20% hoặc thấp hơn.',

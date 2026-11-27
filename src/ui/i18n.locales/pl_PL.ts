@@ -16585,6 +16585,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Wybuch Zwłok',
   'entities.abilities.coven.description':
     'Tworzy drugorzędne Złe Oko na maksymalnie 4 pobliskich wrogach na 15 sekund. Zasilają one wspólną pulę Potępienia w 50%, a Wyrok odbija się do nich za 35% obrażeń.',
+  'entities.abilities.plague_bloom.description':
+    'Zużywa 60 Potępienia: do 5 wrogów w promieniu 30 jardów objętych twoją Czarną zgnilizną natychmiast otrzymuje 4 tyknięcia każdego twojego efektu obrażeń okresowych, który na nich ciąży.',
   'entities.abilities.coven.name': 'Sabat',
   'entities.abilities.cruel_pact.description':
     'Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić 1,5% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej.',

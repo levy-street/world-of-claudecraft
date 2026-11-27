@@ -18346,7 +18346,7 @@ export const pl_PL: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Zużywa 60 Potępienia: do 5 wrogów w promieniu 30 jardów objętych twoją Czarną zgnilizną natychmiast otrzymuje 4 tyknięcia każdego twojego efektu obrażeń okresowych, który na nich ciąży."
       },
       "fear": {
         "name": "Trwoga",

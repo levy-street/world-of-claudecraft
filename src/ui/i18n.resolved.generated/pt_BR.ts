@@ -18346,7 +18346,7 @@ export const pt_BR: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Gasta 60 de Condenação: até 5 inimigos a até 30 metros com sua Podridão Negra sofrem instantaneamente 4 pulsos de cada efeito de dano periódico seu sobre eles."
       },
       "fear": {
         "name": "Atormentar",

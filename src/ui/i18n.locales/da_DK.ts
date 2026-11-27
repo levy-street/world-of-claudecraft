@@ -16414,6 +16414,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Ligeksplosion',
   'entities.abilities.coven.description':
     'Skaber sekundære onde øjne på op til 4 nærliggende fjender i 15 sek. De fodrer den delte Fordømmelse-pulje med 50%, og Dom ekkoer til dem for 35% skade.',
+  'entities.abilities.plague_bloom.description':
+    'Forbruger 60 Fordømmelse: op til 5 fjender inden for 30 yards, der bærer din Sortråd, tager øjeblikkeligt 4 tik af hver af dine skade-over-tid-effekter på dem.',
   'entities.abilities.coven.name': 'Heksekreds',
   'entities.abilities.cruel_pact.description':
     'Ofrer 12% af dit maksimale helbred for at genoprette 1,5% af din maksimale mana og generere 20 Fordømmelse. Kan ikke bruges ved eller under 20% helbred.',

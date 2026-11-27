@@ -16941,6 +16941,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Leichenexplosion',
   'entities.abilities.coven.description':
     'Erschafft für 15 Sek. sekundäre Böse Augen auf bis zu 4 nahen Gegnern. Sie speisen den gemeinsamen Verdammnis-Vorrat mit 50%, und Schuldspruch hallt zu ihnen für 35% Schaden wider.',
+  'entities.abilities.plague_bloom.description':
+    'Verbraucht 60 Verdammnis: Bis zu 5 Gegner im Umkreis von 30 Yard, die deine Schwarzfäule tragen, erleiden sofort 4 Ticks jedes deiner regelmäßigen Schadenseffekte auf ihnen.',
   'entities.abilities.coven.name': 'Hexenzirkel',
   'entities.abilities.cruel_pact.description':
     'Opfert 12% Eurer maximalen Gesundheit, um 1,5% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter.',

@@ -16659,6 +16659,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Ledakan Mayat',
   'entities.abilities.coven.description':
     'Menciptakan Mata Jahat sekunder pada hingga 4 musuh terdekat selama 15 detik. Mereka mengisi kumpulan Kecaman bersama sebesar 50%, dan Vonis bergema kepada mereka sebesar 35% kerusakan.',
+  'entities.abilities.plague_bloom.description':
+    'Menghabiskan 60 Kecaman: hingga 5 musuh dalam 30 yard yang terkena Busuk Hitam milikmu langsung menerima 4 detak dari setiap efek kerusakan berkala milikmu pada mereka.',
   'entities.abilities.coven.name': 'Persekutuan Penyihir',
   'entities.abilities.cruel_pact.description':
     'Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa.',

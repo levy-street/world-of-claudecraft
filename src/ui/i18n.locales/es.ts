@@ -5428,6 +5428,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.coven.name': 'Aquelarre',
   'entities.abilities.coven.description':
     'Crea Males de ojo secundarios sobre hasta 4 enemigos cercanos durante 15 s. Alimentan la reserva compartida de Condena al 50% y reciben un eco del 35% del daño de Sentencia.',
+  'entities.abilities.plague_bloom.description':
+    'Gasta 60 de Condena: hasta 5 enemigos a menos de 30 m que tengan tu Putrefacción Negra reciben al instante 4 tics de cada uno de tus efectos de daño periódico sobre ellos.',
   'entities.mobs.necromancy_gravewing.name': 'Alatumba',
   'entities.abilities.soul_harvest.name': 'Cosecha de esencia',
   'entities.abilities.soul_harvest.description':

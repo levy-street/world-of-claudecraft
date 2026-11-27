@@ -16470,6 +16470,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Ceset Patlaması',
   'entities.abilities.coven.description':
     'Yakındaki en fazla 4 düşman üzerinde 15 sn süreyle ikincil Kem Gözler oluşturur. Bunlar ortak Mahkûmiyet havuzunu %50 oranında besler ve Hüküm onlara %35 hasarla yankılanır.',
+  'entities.abilities.plague_bloom.description':
+    '60 Mahkûmiyet harcar: 30 metre içinde senin Kara Çürüme etkini taşıyan en fazla 5 düşman, üzerlerindeki her bir periyodik hasar etkinden anında 4 tik hasar alır.',
   'entities.abilities.coven.name': 'Cadı Meclisi',
   'entities.abilities.cruel_pact.description':
     "Azami canının %12'sini feda ederek azami manasının %1,5'ini geri kazandırır ve 20 Mahkûmiyet üretir. Can %20 veya altındayken kullanılamaz.",

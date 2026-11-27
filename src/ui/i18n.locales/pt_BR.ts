@@ -17295,6 +17295,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Explosão Cadavérica',
   'entities.abilities.coven.description':
     'Cria Olhos Malignos secundários em até 4 inimigos próximos por 15 s. Eles alimentam a reserva compartilhada de Condenação a 50%, e Sentença ecoa até eles por 35% de dano.',
+  'entities.abilities.plague_bloom.description':
+    'Gasta 60 de Condenação: até 5 inimigos a até 30 metros com sua Podridão Negra sofrem instantaneamente 4 pulsos de cada efeito de dano periódico seu sobre eles.',
   'entities.abilities.coven.name': 'Conciliábulo',
   'entities.abilities.cruel_pact.description':
     'Sacrifica 12% da sua vida máxima para restaurar 1,5% da sua mana máxima e gerar 20 de Condenação. Não pode ser usada com 20% de vida ou menos.',

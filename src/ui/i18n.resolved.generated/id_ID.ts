@@ -18346,7 +18346,7 @@ export const id_ID: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Menghabiskan 60 Kecaman: hingga 5 musuh dalam 30 yard yang terkena Busuk Hitam milikmu langsung menerima 4 detak dari setiap efek kerusakan berkala milikmu pada mereka."
       },
       "fear": {
         "name": "Cekaman",

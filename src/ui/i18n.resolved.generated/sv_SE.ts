@@ -18346,7 +18346,7 @@ export const sv_SE: EnTranslations = {
       },
       "plague_bloom": {
         "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "description": "Förbrukar 60 Fördömelse: upp till 5 fiender inom 30 meter som bär din Svartröta tar omedelbart 4 tick av var och en av dina skada-över-tid-effekter på dem."
       },
       "fear": {
         "name": "Plåga",

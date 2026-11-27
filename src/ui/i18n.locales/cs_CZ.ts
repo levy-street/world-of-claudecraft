@@ -16390,6 +16390,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Výbuch mrtvoly',
   'entities.abilities.coven.description':
     'Na 15 s vytvoří vedlejší Uhrančivá oka až na 4 blízkých nepřátelích. Krmí sdílenou zásobu Odsouzení z 50 % a Rozsudek se k nim šíří ozvěnou za 35 % poškození.',
+  'entities.abilities.plague_bloom.description':
+    'Spotřebuje 60 Odsouzení: až 5 nepřátel do 30 yardů s vaší Černou hnilobou okamžitě utrpí 4 tiky každého vašeho periodického poškození, které na nich je.',
   'entities.abilities.coven.name': 'Sabat',
   'entities.abilities.cruel_pact.description':
     'Obětuje 12 % tvého maximálního zdraví, obnoví 1,5 % tvé maximální many a vygeneruje 20 Odsouzení. Nelze použít při 20 % zdraví nebo méně.',
