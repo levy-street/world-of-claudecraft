@@ -259,7 +259,7 @@ export class NeedleOfFateVfx {
     const eye = new THREE.Group();
     eye.name = `needle-of-fate-windup-eye-${index}`;
     const outerMaterial = new THREE.MeshBasicMaterial({
-      color: color(0xc35cff, 2.8),
+      color: color(0xb7ff5c, 2.8),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -275,7 +275,7 @@ export class NeedleOfFateVfx {
       side: THREE.DoubleSide,
     });
     const glowMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x7220bd, 2),
+      color: color(0x78bd20, 2),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -301,7 +301,7 @@ export class NeedleOfFateVfx {
       runes.name = `needle-of-fate-windup-runes-${index}`;
       for (let runeIndex = 0; runeIndex < 4; runeIndex++) {
         const material = new THREE.MeshBasicMaterial({
-          color: color(runeIndex % 2 === 0 ? 0x68ffa3 : 0xd986ff, 2.3),
+          color: color(runeIndex % 2 === 0 ? 0x68ffa3 : 0xcaff86, 2.3),
           transparent: true,
           opacity: 0,
           blending: THREE.AdditiveBlending,
@@ -348,7 +348,7 @@ export class NeedleOfFateVfx {
     group.visible = false;
     const billboard = new THREE.Group();
     const outerMaterial = new THREE.MeshBasicMaterial({
-      color: color(0xa844ff, 3),
+      color: color(0xadff44, 3),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -364,7 +364,7 @@ export class NeedleOfFateVfx {
       side: THREE.DoubleSide,
     });
     const flashMaterial = new THREE.MeshBasicMaterial({
-      color: color(0xe8c7ff, 2.5),
+      color: color(0xfffbd2, 2.5),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -414,7 +414,7 @@ export class NeedleOfFateVfx {
       depthWrite: false,
     });
     const veilMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x8e2be2, this.lowDetail ? 1.2 : 2.4),
+      color: color(0x91e22b, this.lowDetail ? 1.2 : 2.4),
       transparent: true,
       opacity: 0.34,
       blending: THREE.AdditiveBlending,
@@ -450,7 +450,7 @@ export class NeedleOfFateVfx {
 
     const coreRibbon = ribbonGeometry(TRAIL_POINTS);
     const trailMaterial = new THREE.MeshBasicMaterial({
-      color: color(0xe5b8ff, this.lowDetail ? 1.5 : 2.8),
+      color: color(0xfff9c6, this.lowDetail ? 1.5 : 2.8),
       transparent: true,
       opacity: 0.86,
       blending: THREE.AdditiveBlending,
@@ -470,7 +470,7 @@ export class NeedleOfFateVfx {
       const glowRibbon = ribbonGeometry(TRAIL_POINTS);
       ribbonGlowPositions = glowRibbon.positions;
       ribbonGlowMaterial = new THREE.MeshBasicMaterial({
-        color: color(0x751dc4, 2.5),
+        color: color(0x7bc41d, 2.5),
         transparent: true,
         opacity: 0.46,
         blending: THREE.AdditiveBlending,
@@ -525,7 +525,7 @@ export class NeedleOfFateVfx {
     const eye = new THREE.Group();
     eye.name = `needle-of-fate-impact-eye-${index}`;
     const outerMaterial = new THREE.MeshBasicMaterial({
-      color: color(0xc05aff, 3.1),
+      color: color(0xb6ff5a, 3.1),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -541,14 +541,14 @@ export class NeedleOfFateVfx {
       side: THREE.DoubleSide,
     });
     const lashMaterial = new THREE.LineBasicMaterial({
-      color: color(0xf0d2ff, 2.8),
+      color: color(0xfffbdb, 2.8),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
     const flashMaterial = new THREE.MeshBasicMaterial({
-      color: color(0xc989ff, 2.1),
+      color: color(0xcbff89, 2.1),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -573,7 +573,7 @@ export class NeedleOfFateVfx {
     group.add(billboard);
 
     const shockwaveMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x9c3cff, this.lowDetail ? 1.3 : 2.6),
+      color: color(0xa9ff3c, this.lowDetail ? 1.3 : 2.6),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -603,7 +603,7 @@ export class NeedleOfFateVfx {
     let sparkDirections: Float32Array | null = null;
     if (!this.lowDetail) {
       pillarMaterial = new THREE.MeshBasicMaterial({
-        color: color(0x7421a8, 1.8),
+        color: color(0x6da821, 1.8),
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -629,7 +629,7 @@ export class NeedleOfFateVfx {
       position.setUsage(THREE.DynamicDrawUsage);
       sparkGeometry.setAttribute('position', position);
       sparkMaterial = new THREE.PointsMaterial({
-        color: color(0xdca2ff, 3.8),
+        color: color(0xfff8b5, 3.8),
         map: glowTexture,
         size: 0.34,
         transparent: true,

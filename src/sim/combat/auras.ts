@@ -47,7 +47,14 @@ import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
-import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
+import {
+  addFateThread,
+  gainDoom,
+  tickAfflictionAura,
+  tickHexOfViolence,
+  tickMaledictGaze,
+} from './affliction';
+import { blightOnDotTick, blightTickMult, veinleechOverhealShield } from './affliction_blight';
 import { releaseStoneStatue, tickGutteredGlare } from './balgath_trinkets';
 import { regenParkedCatEnergy } from './cat_form_energy';
 import { isStunned } from './cc';
@@ -83,7 +90,11 @@ import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
-import { tickSacrilegiousMarch, tickWarlockTalentState } from './warlock_talents';
+import {
+  sustainLeadenHexFromDotTick,
+  tickSacrilegiousMarch,
+  tickWarlockTalentState,
+} from './warlock_talents';
 
 const SECOND_WIND_THRESHOLD = 0.35;
 
@@ -388,13 +399,19 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
             if (bleedAmp > 0) tickDamage = Math.round(tickDamage * (1 + bleedAmp));
           }
+          // Hexcraft Blight Coven: Evil Eye's bonus on its target (1 otherwise).
+          const blightMult = blightTickMult(dotSource, e, a);
+          if (blightMult !== 1) tickDamage = Math.round(tickDamage * blightMult);
           ctx.emit({
             type: 'spellfx',
             sourceId: a.sourceId,
             targetId: e.id,
             school: a.school,
             fx: 'tick',
+            dot: a.id,
           });
+          // Leaden Hex: the warlock's DoT ticks hold its slow in place (no stack, no root).
+          sustainLeadenHexFromDotTick(e, a);
           const periodicHit =
             a.school === 'shadow' && !a.finalDamage
               ? shadowPeriodicHit(ctx, dotSource, a.id, tickDamage)
@@ -437,6 +454,41 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             resolution,
           );
           if (resolution) healVampiricTouch(ctx, dotSource, a, resolution.landedHpLoss);
+          blightOnDotTick(ctx, dotSource, e, a, periodicHit.amount, {
+            gainDoom,
+            addStack: () => dotSource && addFateThread(ctx, dotSource),
+            repeatTick: () => {
+              if (e.dead) return;
+              ctx.dealDamage(
+                dotSource,
+                e,
+                periodicHit.amount,
+                periodicHit.crit,
+                a.school,
+                a.name,
+                'hit',
+                true,
+                undefined,
+                false,
+                false,
+                false,
+                null,
+              );
+              blightOnDotTick(
+                ctx,
+                dotSource,
+                e,
+                a,
+                periodicHit.amount,
+                {
+                  gainDoom,
+                  repeatTick: () => {},
+                  addStack: () => dotSource && addFateThread(ctx, dotSource),
+                },
+                true,
+              );
+            },
+          });
           shadowSecondVerseTick(ctx, e, a);
           vespersOnDotTick(ctx, e, a);
           thundercallOnDotTick(ctx, dotSource, a, tickLanded);
@@ -472,6 +524,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
                 });
                 if (healed > 0) ctx.healingThreat(src, src, healed);
               }
+              veinleechOverhealShield(ctx, src, a, overheal);
             }
           }
           if (e.dead) return;

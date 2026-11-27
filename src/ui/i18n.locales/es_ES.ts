@@ -402,8 +402,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.cold_blood.description':
     'Concentra tu instinto asesino para que tus próximos 5 ataques sean golpes críticos. (motor de Knifework)',
-  'entities.abilities.dark_pact.description':
-    'Sacrifica un 10% de tu salud actual para absorber una cantidad de daño equivalente al 30% de tu salud máxima durante 8 s.',
   'entities.abilities.dark_pact.name': 'Sanguine Covenant',
   'entities.abilities.elemental_trance.description':
     'Entra en un trance elemental durante 15 s, reduciendo el daño recibido un 30% y convirtiendo el 20% de todo el daño que infliges en maná. (habilidad distintiva de Espíritu Guerrero)',
@@ -488,7 +486,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Reduce el daño recibido un {pct}%. El {mana}% de todo el daño que infliges se convierte en maná',
   'hudChrome.auraEffect.galeheartWeapon':
     'Completar la cadencia del Espíritu Guerrero de {steps} golpes hace eco del golpe {count} veces, infligiendo un {pct}% de su daño como daño de Naturaleza',
-  'hudChrome.warlock.fateThreadsStatus': '{value} de {max} Hilos del destino.',
   'hudChrome.bags.itemAriaLocked': '{item}, cantidad {count}, artículo bloqueado',
   'hudChrome.bags.itemLockedLine': 'Artículo bloqueado',
   'hudChrome.bags.lockItem': 'Bloquear artículo',

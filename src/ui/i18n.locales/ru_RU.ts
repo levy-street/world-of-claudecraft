@@ -8114,16 +8114,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     'Сжигает врага, нанося {damage} ед. урона от огня и еще {overTime} за 15 сек.',
   'entities.abilities.corruption.name': 'Чёрная гниль',
-  'entities.abilities.corruption.description':
-    'Поражает цель порчей, нанося {damage} ед. урона от темной магии за 18 сек.',
-  'entities.abilities.life_tap.name': 'Тяжёлая сделка',
-  'entities.abilities.life_tap.description': 'Преобразует {damage} здоровья в {damage} маны.',
-  'entities.abilities.curse_of_agony.name': 'Порча муки',
-  'entities.abilities.curse_of_agony.description':
-    'Проклинает цель агонией: {damage} ед. урона от темной магии за 24 сек.',
   'entities.abilities.drain_life.name': 'Поглощение',
-  'entities.abilities.drain_life.description':
-    'Пожирает жизненные силы цели, нанося {damage} урона от тьмы каждую секунду и передавая вам 70% от него здоровьем. Гибель передаёт вместо этого всё. Направленное на ваш главный Дурной глаз, оно расходует в начале все Нити судьбы, и каждая Нить даёт 1 дополнительное Осуждение за тик.',
   'entities.abilities.fear.name': 'Терзание',
   'entities.abilities.fear.description':
     'Вселяет ужас во врага, заставляя его дрожать до 5 сек. Накопленный урон в размере 8% от максимального запаса здоровья цели прерывает эффект.',
@@ -8333,8 +8324,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     'В течение 12 сек. Дуговая стрела даёт 2 Грома. Ваша следующая Дуговая стрела или Разветвленная молния мгновенна, а следующая полная выплата Грома наносит на 25% больше урона. (знаковое умение Стихий)',
   'entities.abilities.siphon_life.name': 'Вытягивание жизни',
-  'entities.abilities.siphon_life.description':
-    'Вытягивает жизнь из врага, нанося {damage} ед. урона от темной магии за 30 сек. и исцеляя вас на величину нанесенного урона. (знаковое умение Колдовства)',
   'entities.abilities.conflagrate.name': 'Поджигание',
   'entities.abilities.conflagrate.description':
     'Приближает будущий тик вашего Пылающего договора, затем поджигает цель на {damage} урона от огня. Даёт 1 Опустошение и 1 Крах. Держит {charges} заряда. (знаковое умение Разрушения)',
@@ -11884,8 +11873,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Тратит вашу активную печать, чтобы ударить врага с короткой дистанции.',
   'guide.abilityHook.lesser_heal':
     'Размеренное накладывание, чтобы подлечить союзника, когда есть время постоять на месте.',
-  'guide.abilityHook.life_tap':
-    'Обменивает часть вашего здоровья обратно в ману, когда вы выдыхаетесь.',
   'guide.abilityHook.lightning_bolt':
     'Накладываемый удар силами природы с дистанции, ваш основной способ бить издалека.',
   'guide.abilityHook.lightning_shield':
@@ -13412,9 +13399,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.frostquench.bonus4':
     'Зимняя плеть накладывает 3 заряда «Зимней стужи» вместо 2.',
   'entities.itemSets.hexthread.name': 'Покров колдовской нити',
-  'entities.itemSets.hexthread.bonus2':
-    'Игла судьбы создаёт дополнительно 2 ед. Осуждения. Получаемый урон больше не замедляет чтение ваших заклинаний.',
-  'entities.itemSets.hexthread.bonus4': 'Вынесение Приговора возвращает 10 ед. Осуждения.',
   'entities.itemSets.gravebrand.name': 'Регалии могильного клейма',
   'entities.itemSets.gravebrand.bonus2':
     'Время восстановления Приказа жатвы сокращается на 2 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
@@ -19410,17 +19394,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Сначала жертвует Костяным магом, затем Скелетом-воином и лишь в крайнем случае Могильным крылом. Среди одинаковых прислужников выбирает того, кому осталось меньше времени, затем самого слабого, и наносит противникам в выбранной точке {damage} ед. урона от темной магии.',
   'entities.abilities.corpse_explosion.name': 'Взрыв останков',
-  'entities.abilities.coven.description':
-    'Создаёт вторичные дурные глаза на срок 15 сек. не более чем на 4 ближайших врагах. Они пополняют общий запас Осуждения с эффективностью 50% и получают 35% урона «Приговора».',
-  'entities.abilities.coven.name': 'Ковен',
-  'entities.abilities.cruel_pact.description':
-    'Жертвует 12% максимального здоровья и создаёт 20 ед. Осуждения. Нельзя применить при 15% здоровья или меньше.',
   'entities.abilities.cruel_pact.name': 'Жестокий договор',
-  'entities.abilities.cursed_accomplice.description':
-    'Если союзник не выбран, связывает вас с проклятым оком, и его взор создаёт 2 ед. Осуждения. При связи с союзником его урон по цели дурного глаза создаёт 3 ед. Эффект срабатывает не чаще раза в 2 сек.',
   'entities.abilities.cursed_accomplice.name': 'Проклятый сообщник',
-  'entities.abilities.dark_pact.description':
-    'Жертвует 10% текущего здоровья и на 8 сек. поглощает урон в размере 30% максимального здоровья.',
   'entities.abilities.dark_pact.name': 'Кровавый завет',
   'entities.abilities.dawn_devotion.description':
     'На 30 мин. увеличивает силу атаки у вас и участников группы на 40. Заменяет вашу «Сияющую преданность» или «Преданность благодати», но действует одновременно с Преданностями других паладинов и боевыми кличами воинов.',
@@ -19440,9 +19415,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_trance.description':
     'Вы входите в стихийный транс на 15 сек: получаемый урон снижается на 30%, а 20% всего нанесенного вами урона преобразуется в ману. (Особая способность Духа войны)',
   'entities.abilities.elemental_trance.name': 'Стихийный транс',
-  'entities.abilities.evil_eye.description':
-    'Отмечает одного врага как средоточие ваших проклятий. Перенос дурного глаза сохраняет Осуждение, но не обновляет его время действия в 20 сек.',
-  'entities.abilities.evil_eye.name': 'Дурной глаз',
   'entities.abilities.eviscerate.specNote_assassination':
     'При 6 этапах Ядовитого ритуала эта кнопка становится «Ядовитым разрывом»: удар, который мгновенно наносит весь урон, что еще нанесли бы ваши кровотечения, наносит новую ядовитую рану и восстанавливает 20 ед. энергии.',
   'entities.abilities.eviscerate.specNote_combat':
@@ -19481,12 +19453,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_grace.description':
     'Мгновенно бросает священный молот во врага в пределах 20 м, нанося {damage} ед. урона, восстанавливая 70 маны, исцеляя вас на 50% нанесенного урона и создавая 1 ед. Преданности при нанесении урона. «Солнечное возмездие» позволяет «Молоту благодати» игнорировать время восстановления и исцелять вас на 100% нанесенного урона.',
   'entities.abilities.hammer_of_grace.name': 'Молот благодати',
-  'entities.abilities.hex_of_violence.description':
-    'Проклинает врага на 8 сек., нанося урон от Тьмы и создавая 2 ед. Осуждения каждые 2 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 17 ед. урона от Тьмы.',
-  'entities.abilities.hex_of_violence.name': 'Проклятие насилия',
-  'entities.abilities.hour_of_judgment.description':
-    'Обрушивает суд на ваш основной дурной глаз на 15 сек., создаёт 40 ед. Осуждения и 3 Нити судьбы, активирует Одержимость, удваивает Осуждение от основного дурного глаза и повышает урон «Приговора» на 20%. Первый «Приговор» возвращает 50 ед. Осуждения.',
-  'entities.abilities.hour_of_judgment.name': 'Час суда',
   'entities.abilities.hunting_momentum.description':
     'Пассивно: Потрошащий удар и Шрапнельный заряд, попавший по врагу, дают по 1 заряду Охотничьего натиска, максимум 3. Заряды остаются до расходования или выхода из боя; каждый повышает скорость движения на 15%. При 3 зарядах Рваная рана наносит на 60% больше урона удара и расходует заряды. (Выживание)',
   'entities.abilities.hunting_momentum.name': 'Охотничий натиск',
@@ -19502,11 +19468,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lifespring_weapon.description':
     'Наполняет оружие живой водой, увеличивая накопление Потока исцеления на 20%.',
   'entities.abilities.lifespring_weapon.name': 'Оружие живого источника',
-  'entities.abilities.litany_of_guilt.description':
-    'Проклинает основную цель дурного глаза на 8 сек. Получение Осуждения выпускает волну, которая наносит урон максимум 4 другим противникам в радиусе 8 м. Эффект срабатывает не чаще раза в секунду.',
   'entities.abilities.litany_of_guilt.name': 'Литания вины',
-  'entities.abilities.maledict_gaze.description':
-    'Ваше проклятое око раз в 2,5 сек. атакует выбранную основную цель дурного глаза и наносит урон от Тьмы. Одержимость дурным глазом удваивает скорость атак.',
   'entities.abilities.maledict_gaze.name': 'Проклятый взор',
   'entities.abilities.marrowbreak.description':
     'Расходует ваши 3 стадии Старой крови на мощный удар с высокой угрозой, наносящий {damage} ед. урона. Ниже половины здоровья вместо удара он исцеляет вас на 18% максимального здоровья и возвращает 15 ед. ярости.',
@@ -19530,9 +19492,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Только в облике Лунного крыла. Наносит {damage} ед. урона от тайной магии, добавляет 1 стадию Лунного прилива (максимум 3) и продлевает вашу Лунную бурю на 6 сек. Не более {duration} сек за одно наложение. При 3 стадиях Лунного прилива эта кнопка становится Лунным всплеском: мгновенный удар, наносящий от 240 до 285 ед. урона от тайной магии и расходующий все 3 стадии.',
   'entities.abilities.moonseed.name': 'Лунное семя',
-  'entities.abilities.needle_of_fate.description':
-    'Пронзает врага и наносит {damage} ед. урона от Тьмы. Если на цели есть ваш дурной глаз, создаёт {needleDoom} ед. Осуждения; если его нет, сначала отмечает цель.',
-  'entities.abilities.needle_of_fate.name': 'Игла судьбы',
   'entities.abilities.oath_chain.description':
     'Мгновенно связывает далекого врага священной цепью. Враг движется к вам со скоростью 18 м в секунду, пока не приблизится на 3 м, после чего его скорость снижается на 50% на 4 сек. Во время Вознесения связывает второго ближайшего врага.',
   'entities.abilities.oath_chain.name': 'Цепь клятвы',
@@ -19550,9 +19509,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pack_rally.description':
     'Принимает Облик скакуна и воодушевляет ближайших союзников, повышая на 10 сек. скорость передвижения на 30%, а скорость атак и применения способностей на 10%.',
   'entities.abilities.pack_rally.name': 'Сбор стаи',
-  'entities.abilities.possess_evil_eye.description':
-    'Проклинатель овладевает вашим основным дурным глазом на 15 сек. и создаёт 35 ед. Осуждения. «Игла судьбы» применяется за 1 сек. и создаёт ещё 2 ед. Осуждения, «Поглощение» поддерживается в движении, а «Приговор» наносит на 25% больше урона. Отложенное эхо повторяет 60% урона, снижаясь до 30% с 17-го по 20-й уровень.',
-  'entities.abilities.possess_evil_eye.name': 'Одержимость дурным глазом',
   'entities.abilities.primal_exaltation.description':
     'На 12 сек. высвобождает силу вашей специализации, усиливая ее обычную ротацию. (Талант шамана)',
   'entities.abilities.primal_exaltation.name': 'Первозданное возвышение',
@@ -19609,9 +19565,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scouring_mercy.description':
     'Наносит {damage} урона Светом врагу или исцеляет союзную цель на {healing}. Урон растет от силы заклинаний; исцеление растет от силы исцеления. Доктрина превращает этот урон в исцеление через ваши связи. Если ни один связанный раненый член группы не находится в пределах 30 метров, исцеляет раненого члена группы с наименьшим здоровьем в пределах 30 метров на 15% от урона. Исцеление члена группы также исцеляет еще до 2 других раненых членов группы в пределах 10 метров от этой цели и в вашей прямой видимости, каждого на 50% от восстановленного здоровья. Это дополнительное исцеление не может быть критическим и не создает связи Доктрины. (Особая способность Доктрины)',
   'entities.abilities.scouring_mercy.name': 'Карающее милосердие',
-  'entities.abilities.sentence.description':
-    'Расходует всё Осуждение и Нити судьбы, вынося врагу приговор. Каждая Нить увеличивает урон на 6%, а дополнительные эффекты усиливаются при 20, 50, 80 и 100 ед. Осуждения. После 16-го уровня рост урона замедляется.',
-  'entities.abilities.sentence.name': 'Приговор',
   'entities.abilities.seraphic_vigil.description':
     'Накладывает на союзника оберегающее благословение, исцеляющее его на {buff} ед. при опасном падении здоровья. Особая способность Благословения.',
   'entities.abilities.seraphic_vigil.name': 'Серафическое бдение',
@@ -19679,8 +19632,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trailbreak.description':
     'Отпрыгивает на 25 м назад и снимает эффекты обездвиживания и замедления. После приземления скорость передвижения повышается на 50% на 3 сек. Если у вас есть Охотничий натиск, он обновляется и дает Подготовленное возвращение на 12 сек.',
   'entities.abilities.trailbreak.name': 'Разрыв следа',
-  'entities.abilities.umbral_anchor.description':
-    'Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек.',
   'entities.abilities.umbral_anchor.name': 'Сумрачный якорь',
   'entities.abilities.unholy_command.description':
     'Расходует 3 осколка души и приказывает всем вашим мертвецам наносить на 25% больше урона и действовать на 20% быстрее в течение 12 сек.',
@@ -19713,8 +19664,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venomrend.description':
     'Расходует ваши 6 этапов Ядовитого ритуала: наносит 100 плюс 55 за каждое очко серии приемов, мгновенно наносит весь урон, что еще нанесли бы ваши кровотечения, а затем наносит новую ядовитую рану (120 ед. урона за 20 сек.). Восстанавливает 20 ед. энергии. (механика Ликвидации)',
   'entities.abilities.venomrend.name': 'Ядовитый разрыв',
-  'entities.abilities.vicarious_suffering.description':
-    'Связывает страдания на 8 сек. и создаёт до 15 ед. Осуждения от вражеских ударов. На себе снижает получаемый урон на 20%. На союзнике перенаправляет вам до 20% урона, но не опускает ваше здоровье ниже 15%.',
   'entities.abilities.vicarious_suffering.name': 'Перенесённое страдание',
   'entities.abilities.vowkeeper_strike.description':
     'Наносит удар с высокой угрозой и создает 1 ед. Преданности. Успешный удар с вероятностью 20% дает «Солнечное возмездие» на 8 сек., а каждый успешный блок с вероятностью 25%. «Солнечное возмездие» усиливает следующий «Солнечный диск», «Молот благодати» или «Целительный свет». Вознесение также дает небольшой поглощающий щит.',
@@ -19759,8 +19708,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Поражает одну цель и перескакивает на двух ближайших врагов, давая один заряд Грома за все применение.',
   'guide.abilityHook.consecration':
     'Освящает землю вокруг вас, постоянно нанося урон от Света и создавая угрозу.',
-  'guide.abilityHook.evil_eye':
-    'Отмечает врага, чьи действия и страдания будут накапливать ваше Осуждение.',
   'guide.abilityHook.galeheart_weapon':
     'Наполняет оба оружия штормовым ветром и вознаграждает ровный ритм атак.',
   'guide.abilityHook.hammer_of_justice':
@@ -20657,26 +20604,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'Приказывает Угольку выпустить по вашей цели дополнительный снаряд Скверны. Восстановление: 8 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.',
   'hud.pet.felboltTitle': 'Стрела Скверны',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'Подходящий урон создаёт {value} Осуждения не чаще раза в {interval} сек.',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Похищение жизни поглощает {stacks} Нити судьбы и создаёт ещё {doom} Осуждения за тик',
-  'hudChrome.auraEffect.afflictionEye':
-    'Проклятый взгляд атакует раз в {interval} сек.; эффекты на этом оке создают {pct}% Осуждения',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Эффекты на этом оке создают {doomPct}% Осуждения; Приговор отражается сюда с {echoPct}% урона',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    'Нити судьбы: {stacks}. Приговор наносит на {sentencePct}% больше урона, либо каждый тик Похищения жизни создаёт ещё {doom} Осуждения',
-  'hudChrome.auraEffect.afflictionJudgment':
-    'Главное око создаёт на {eyePct}% больше Осуждения; Приговор наносит на {sentencePct}% больше урона, а первый возвращает {refund} Осуждения',
-  'hudChrome.auraEffect.afflictionLitany':
-    'Получение Осуждения наносит {damage} ед. урона от темной магии до {targets} врагам в радиусе {radius} м, не чаще раза в секунду',
-  'hudChrome.auraEffect.afflictionPossession':
-    'Усиливает Иглу судьбы, Похищение жизни, Проклятый взгляд и Приговор',
-  'hudChrome.auraEffect.afflictionVicarious':
-    'Перенаправляет или снижает {pct}% входящего урона и может создать до {max} Осуждения',
-  'hudChrome.auraEffect.afflictionViolence':
-    'Осталось возмездий: {charges}. Атака врага создаёт {doom} Осуждения и наносит ему {damage} ед. урона от темной магии',
   'hudChrome.auraEffect.aoeEcho':
     'Осталось отражений: {charges}. Одиночные умения наносят {pct}% урона ещё до {targets} ближайшим врагам',
   'hudChrome.auraEffect.arcaneCharge':
@@ -20703,8 +20630,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Наносимый урон повышен на {damagePct}%, скорость атак — на {hastePct}%, скорость передвижения — на {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     'Заряды: {charges}. Ледяное копьё считает цель замороженной и наносит {pct}% урона по замороженной цели',
-  'hudChrome.auraEffect.forbiddenReflectionLock':
-    'Запретное отражение пока нельзя подготовить снова',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Следующее подходящее умение чернокнижника можно применить повторно',
   'hudChrome.auraEffect.formLich':
@@ -20805,15 +20730,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinStatus': 'Гибель: {value} из {max}',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Осколки душ',
   'hudChrome.statInfo.effects.manaRegenCombat': 'Около {value} ед. маны каждые 5 сек. в бою',
-  'hudChrome.warlock.doomEmptyStatus': 'Осуждение: {value} из {max}.',
-  'hudChrome.warlock.doomLabel': 'Осуждение',
-  'hudChrome.warlock.doomStatus': 'Осуждение: {value} из {max}; осталось {remaining}.',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Три Нити судьбы: «Поглощение» может сплести их в дополнительное Осуждение.',
-  'hudChrome.warlock.fateThreadsLabel': 'Нити судьбы',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Три Нити судьбы: «Приговор» может израсходовать их ради 18% дополнительного урона.',
-  'hudChrome.warlock.fateThreadsStatus': 'Нити судьбы: {value} из {max}.',
   'itemUi.tooltip.useHealingPotionPct':
     'Использование: мгновенно восстанавливает {percent}% максимального здоровья. Можно использовать в бою. Восстановление 2 мин.',
   'guide.controls.clickMoveNote':

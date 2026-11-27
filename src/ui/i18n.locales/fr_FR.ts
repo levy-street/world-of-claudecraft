@@ -10221,16 +10221,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     "Brûle l'ennemi pour {damage} points de dégâts de Feu et {overTime} points supplémentaires en 15 s.",
   'entities.abilities.corruption.name': 'Pourriture noire',
-  'entities.abilities.corruption.description':
-    "Corrompt la cible et inflige {damage} points de dégâts d'Ombre en 18 s.",
-  'entities.abilities.life_tap.name': 'Marché brutal',
-  'entities.abilities.life_tap.description': 'Convertit {damage} points de vie en {damage} mana.',
-  'entities.abilities.curse_of_agony.name': "Maléfice d'angoisse",
-  'entities.abilities.curse_of_agony.description':
-    "Maudit la cible d'agonie: {damage} points de dégâts d'Ombre en 24 s.",
   'entities.abilities.drain_life.name': 'Consumer',
-  'entities.abilities.drain_life.description':
-    "Consume la vitalité de la cible, infligeant {damage} points de dégâts d'Ombre chaque seconde et vous en transférant 70% sous forme de vie. Affliction en transfère la totalité à la place. Canalisé sur votre Mauvais œil principal, il consomme tous les Fils du destin au départ, et chaque Fil génère 1 Condamnation supplémentaire par tic.",
   'entities.abilities.fear.name': 'Tourment',
   'entities.abilities.fear.description':
     "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet.",
@@ -10392,8 +10383,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     "Pendant 12 s, Éclair d'arc accorde 2 Tonnerre. Votre prochain Éclair d'arc ou Éclair fourchu est instantané, et votre prochaine pleine décharge de Tonnerre inflige 25% de dégâts en plus. (Signature Élémentaire)",
   'entities.abilities.siphon_life.name': 'Siphon de vie',
-  'entities.abilities.siphon_life.description':
-    'Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)',
   'entities.abilities.conflagrate.name': 'Conflagration',
   'entities.abilities.conflagrate.description':
     'Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient {charges} charges. (Signature Destruction)',
@@ -12552,8 +12541,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Dépense votre Sceau actif pour frapper un ennemi à courte portée.',
   'guide.abilityHook.lesser_heal':
     'Une incantation régulière pour remonter un allié quand on a le temps de rester immobile.',
-  'guide.abilityHook.life_tap':
-    'Échange une part de votre propre vie contre du mana quand vous êtes à sec.',
   'guide.abilityHook.lightning_bolt':
     'Une incantation à distance de dégâts de Nature, votre solution de prédilection de loin.',
   'guide.abilityHook.lightning_shield':
@@ -17063,24 +17050,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     "Sacrifie d'abord un Mage d’os, puis un Guerrier squelette, et une Aile funéraire seulement en dernier recours. Parmi les doublons, choisit celui dont la durée restante est la plus faible, puis le plus faible, pour infliger {damage} points de dégâts d'Ombre à l'endroit choisi.",
   'entities.abilities.corpse_explosion.name': 'Explosion de cadavre',
-  'entities.abilities.coven.description':
-    "Crée jusqu'à 4 Mauvais œil secondaires sur des ennemis proches pendant 15 s. Ils alimentent la réserve commune de Condamnation à 50%, et Sentence se répercute sur eux pour 35% de dégâts.",
-  'entities.abilities.coven.name': 'Sabbat',
-  'entities.abilities.cruel_pact.description':
-    'Sacrifie 12% de vos points de vie maximum pour restaurer 1,5% de votre mana maximum et générer 20 Condamnation. Inutilisable à 20% de points de vie ou moins.',
   'entities.abilities.cruel_pact.name': 'Pacte cruel',
-  'entities.abilities.cursed_accomplice.description':
-    "Lie votre Œil maudit quand aucun allié n'est sélectionné, faisant générer 2 Condamnation à son Regard. Lier un membre du groupe sélectionné fait que seuls ses dégâts sur votre Mauvais œil génèrent 3 à la place. Un nouveau lien remplace le précédent et peut se déclencher une fois toutes les 2 s.",
   'entities.abilities.cursed_accomplice.name': 'Complice maudit',
-  'entities.abilities.dark_pact.description':
-    'Sacrifie 10% de vos points de vie actuels pour absorber des dégâts égaux à 30% de vos points de vie maximum pendant 8 s.',
   'entities.abilities.dark_pact.name': 'Pacte sanguinaire',
   'entities.abilities.elemental_trance.description':
     'Entrez en transe élémentaire pendant 15 s, réduisant les dégâts subis de 30% et convertissant 20% des dégâts infligés en mana. (signature Warspirit)',
   'entities.abilities.elemental_trance.name': 'Transe élémentaire',
-  'entities.abilities.evil_eye.description':
-    "Marque un ennemi comme le foyer de vos malédictions. Déplacer l'Œil préserve la Condamnation mais ne réinitialise pas son expiration de 20 s.",
-  'entities.abilities.evil_eye.name': 'Mauvais œil',
   'entities.abilities.eviscerate.description': 'Technique de finition qui inflige {damage}.',
   'entities.abilities.eviscerate.specNote_assassination':
     'À 6 Rituel du venin, ce bouton devient Déchirure venimeuse : une frappe qui inflige instantanément tous les dégâts que vos saignements auraient encore infligés, plante une nouvelle plaie de venin, et restaure 20 énergie.',
@@ -17105,19 +17080,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Frappe l'ennemi pour les dégâts de l'arme plus {damage} et augmente vos chances d'esquive de 15% pendant 7 s. Confère 1 point de combo. (talent de Voleur)",
   'entities.abilities.hemorrhage.description':
     "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Fourberie)",
-  'entities.abilities.hex_of_violence.description':
-    "Maudit l'ennemi pendant 8 s, lui infligeant des dégâts d'Ombre et générant 2 Condamnation toutes les 2 s. Ses 3 prochaines actions offensives génèrent chacune 7 Condamnation et lui infligent 17 points de dégâts d'Ombre.",
-  'entities.abilities.hex_of_violence.name': 'Malédiction de violence',
-  'entities.abilities.hour_of_judgment.description':
-    "Appelle le jugement sur votre Mauvais œil principal pendant 15 s, accordant 40 Condamnation et 3 Fils du destin, activant la Possession, doublant la Condamnation générée par l'Œil principal, et augmentant les dégâts de Sentence de 20%. La première Sentence rembourse 50 Condamnation.",
-  'entities.abilities.hour_of_judgment.name': 'Heure du jugement',
   'entities.abilities.kidney_shot.description':
     'Technique de finition qui étourdit la cible pendant 2 s plus 1 s par point de combo (5 points de combo : 7 s).',
-  'entities.abilities.litany_of_guilt.description':
-    "Maudit votre Mauvais œil principal pendant 6 s. Les gains de Condamnation libèrent une onde qui inflige des dégâts à 2 autres ennemis au plus dans un rayon de 8 m, au plus une fois par seconde. Le rang 2 l'étend à 8 s et 4 ennemis.",
   'entities.abilities.litany_of_guilt.name': 'Litanie de la culpabilité',
-  'entities.abilities.maledict_gaze.description':
-    "Votre Œil maudit attaque votre Mauvais œil principal sélectionné toutes les 2,5 s pour des dégâts d'Ombre. Posséder le Mauvais œil double sa vitesse d'attaque.",
   'entities.abilities.maledict_gaze.name': 'Regard maudit',
   'entities.abilities.maul.description':
     "Une attaque brutale qui augmente les dégâts de mêlée de {damage} et cause une forte menace. S'active à votre prochain coup. Forme de Bruin uniquement.",
@@ -17127,15 +17092,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Brûle l'ennemi avec le feu lunaire pour {damage} points de dégâts d'Arcane plus des dégâts sur la durée.",
   'entities.abilities.moonfire.specNote_balance':
     'Entretenez le feu : Graine lunaire le prolonge de 6 s.',
-  'entities.abilities.needle_of_fate.description':
-    "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère {needleDoom} Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible.",
-  'entities.abilities.needle_of_fate.name': 'Aiguille du destin',
   'entities.abilities.ossuary_mark.description':
     "Marque un ennemi pendant 15 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 mètres et crée 1 Fragment d'âme.",
   'entities.abilities.ossuary_mark.name': "Marque de l'ossuaire",
-  'entities.abilities.possess_evil_eye.description':
-    "Le Maudisseur possède votre Mauvais œil principal pendant 15 s et génère 35 Condamnation. Aiguille du destin s'incante en 1 s et génère 2 Condamnation supplémentaire, Consumer peut être canalisé en mouvement, et Sentence inflige 25% de dégâts en plus et libère un écho différé pour 60% de dégâts, dégressif jusqu'à 30% entre les niveaux 17 et 20.",
-  'entities.abilities.possess_evil_eye.name': 'Posséder le Mauvais œil',
   'entities.abilities.raise_bone_mage.description':
     "Dépense 2 Fragments d'âme pour ajouter un Mage d’os à distance permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Ses attaques exposent la cible à 5% de dégâts magiques en plus pendant 6 s, et Commandement de la moisson porte cette faiblesse à 8%.",
   'entities.abilities.raise_bone_mage.name': 'Relever un Mage d’os',
@@ -17175,9 +17134,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Augmente la vitesse de déplacement de 35%, mais sacrifie 2% de vos points de vie maximum chaque seconde. Relancez pour annuler. Se désactive à 20% de points de vie.',
   'entities.abilities.sacrilegious_march.name': 'Marche sacrilège',
-  'entities.abilities.sentence.description':
-    "Consomme toute la Condamnation et les Fils du destin pour prononcer la sentence sur l'ennemi. Chaque Fil augmente les dégâts de 6%. Des effets supplémentaires s'ajoutent à 20, 50, 80 et 100 Condamnation. Sa montée en dégâts se stabilise après le niveau 16.",
-  'entities.abilities.sentence.name': 'Sentence',
   'entities.abilities.sinister_strike.description':
     "Une frappe instantanée pour les dégâts de l'arme plus {damage}. Confère 1 point de combo.",
   'entities.abilities.sinister_strike.specNote_assassination':
@@ -17208,16 +17164,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.description':
     'Balayez vos griffes à travers les ennemis proches pour {damage} points de dégâts. Cause une menace supplémentaire. Forme de Bruin uniquement.',
   'entities.abilities.swipe.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
-  'entities.abilities.umbral_anchor.description':
-    "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, consommant l'ancre et déclenchant une recharge de 45 s.",
   'entities.abilities.umbral_anchor.name': 'Ancre ombrale',
   'entities.abilities.unholy_command.description':
     "Dépense 3 Fragments d'âme pour ordonner à tous vos morts-vivants d'infliger 25% de dégâts en plus et d'agir 20% plus vite pendant 12 s.",
   'entities.abilities.unholy_command.name': 'Commandement impie',
   'entities.abilities.venom_dart.specNote_assassination':
     'Ajoute 1 Rituel du venin et prolonge votre plaie de venin de 6 s (la plaie ne dépasse jamais 20 s).',
-  'entities.abilities.vicarious_suffering.description':
-    "Lie votre souffrance pendant 8 s et génère jusqu'à 15 Condamnation à partir des coups ennemis subis. Sur vous-même, réduit les dégâts subis de 20%. Sur un allié, redirige jusqu'à 20% vers vous sans vous faire descendre sous 15% de points de vie.",
   'entities.abilities.vicarious_suffering.name': 'Souffrance par procuration',
   'entities.abilities.wrath.description':
     "Lance un trait d'énergie naturelle pour {damage} points de dégâts de Nature.",
@@ -17232,8 +17184,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Mage d’os',
   'entities.mobs.necromancy_gravewing.name': 'Aile funéraire',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Guerrier squelette',
-  'guide.abilityHook.evil_eye':
-    "Désigne l'ennemi dont les actions et les souffrances alimenteront votre Condamnation.",
   'hud.pet.abyssalChain': 'Chaîne abyssale',
   'hud.pet.abyssalChainDesc':
     "Ordonne à Duskmurk de tirer vers lui un ennemi normal situé à plus de 8 mètres et jusqu'à 20 mètres. Les boss ne peuvent pas être tirés de cette façon. Recharge de 15 secondes. Clic droit, appui long ou Maj+Entrée pour activer ou désactiver l'attaque automatique.",
@@ -17246,26 +17196,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     "Ordonne à Emberkin de lancer un projectile fel supplémentaire sur votre cible. Recharge de 8 secondes. Clic droit, appui long ou Maj+Entrée pour activer ou désactiver l'attaque automatique.",
   'hud.pet.felboltTitle': 'Éclair fel',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'Les dégâts valables accordent {value} Condamnation, au plus une fois toutes les {interval} s',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Consumer consomme {stacks} Fils du destin pour {doom} Condamnation supplémentaire par tick',
-  'hudChrome.auraEffect.afflictionEye':
-    'Regard maudit attaque toutes les {interval} s ; les effets sur cet Œil génèrent {pct}% de Condamnation',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Les effets sur cet Œil génèrent {doomPct}% de Condamnation ; Sentence se répercute ici pour {echoPct}% de dégâts',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Fils du destin : Sentence inflige {sentencePct}% de dégâts en plus, ou Consumer gagne {doom} Condamnation supplémentaire par tick',
-  'hudChrome.auraEffect.afflictionJudgment':
-    "L'Œil principal génère {eyePct}% de Condamnation en plus ; Sentence inflige {sentencePct}% de dégâts en plus et la première rembourse {refund} Condamnation",
-  'hudChrome.auraEffect.afflictionLitany':
-    "Les gains de Condamnation infligent {damage} points de dégâts d'Ombre à {targets} ennemis au plus dans un rayon de {radius} m, une fois par seconde",
-  'hudChrome.auraEffect.afflictionPossession':
-    'Renforce Aiguille du destin, Consumer, Regard maudit et Sentence',
-  'hudChrome.auraEffect.afflictionVicarious':
-    "Redirige ou réduit {pct}% des dégâts subis et peut générer jusqu'à {max} Condamnation",
-  'hudChrome.auraEffect.afflictionViolence':
-    "{charges} représailles restantes ; une attaque ennemie accorde {doom} Condamnation et inflige {damage} points de dégâts d'Ombre en retour",
   'hudChrome.auraEffect.aoeEcho':
     '{charges} échos restants : les capacités ciblées infligent {pct}% de dégâts à {targets} ennemis proches au plus',
   'hudChrome.auraEffect.arcaneCharge':
@@ -17290,8 +17220,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Dégâts infligés augmentés de {damagePct}%, vitesse d'attaque de {hastePct}%, et vitesse de déplacement de {movePct}%",
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} charges : Lance de glace traite sa cible comme gelée et inflige {pct}% de dégâts de givre',
-  'hudChrome.auraEffect.forbiddenReflectionLock':
-    'Reflet interdit ne peut pas encore être préparé de nouveau',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Votre prochain temps de recharge de Démoniste éligible peut être relancé',
   'hudChrome.auraEffect.formLich':
@@ -17368,15 +17296,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Ruine',
   'hudChrome.procOverlay.ruinStatus': '{value} sur {max} Ruine',
   'hudChrome.procOverlay.soulFragmentsMeter': "Fragments d'âme",
-  'hudChrome.warlock.doomEmptyStatus': '{value} sur {max} Condamnation.',
-  'hudChrome.warlock.doomLabel': 'Condamnation',
-  'hudChrome.warlock.doomStatus': '{value} sur {max} Condamnation ; {remaining}.',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Trois Fils du destin : Consumer peut les tisser en Condamnation supplémentaire.',
-  'hudChrome.warlock.fateThreadsLabel': 'Fils du destin',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Trois Fils du destin : Sentence peut les consommer pour 18% de dégâts supplémentaires.',
-  'hudChrome.warlock.fateThreadsStatus': '{value} sur {max} Fils du destin.',
   'itemUi.tooltip.useHealingPotionPct':
     'Utiliser : rend instantanément {percent}% de vos points de vie maximum. Utilisable en combat. Recharge de 2 min.',
   'guide.controls.reliquary': 'Le Reliquaire',
@@ -18191,9 +18110,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdoyance.',
   'entities.itemSets.grovespring.name': 'Habillement de la Source sylvestre',
-  'entities.itemSets.hexthread.bonus2':
-    'Aiguille du destin confère 2 Condamnations supplémentaires. Les dégâts subis ne retardent plus vos incantations.',
-  'entities.itemSets.hexthread.bonus4': 'Sentence rend 10 points de Condamnation.',
   'entities.itemSets.hexthread.name': 'Linceul de fil maudit',
   'entities.itemSets.moonscorch.bonus2':
     'Graine lunaire peut prolonger Tempête lunaire deux fois par application, jusqu’à un maximum de 12 s. Les dégâts subis ne retardent plus vos incantations.',

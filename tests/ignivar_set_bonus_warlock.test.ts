@@ -1,11 +1,10 @@
 // Warlock Crucible set bonuses (docs/prd/ignivar-set-bonus-final.md): each
-// bonus proven at the seam it rides. Hexthread 2pc is a RESOLVED rewrite of
-// the afflictionNeedle doom payload in applyTalentMods (7 to 9), the one
-// number the dispatch (resolveNeedleOfFate) and the {needleDoom} tooltip
-// splice both read; eyeGeneration still multiplies the total (x0.5 secondary
-// Eyes with rounding, x2 under Hour of Judgment). Hexthread 4pc refunds 10
-// Condemnation at the post-consume site in resolveSentence, additive beside
-// Hour of Judgment's once-per-90s charge. Gravebrand 2pc is a resolved
+// bonus proven at the seam it rides. Hexthread 2pc (Blight Coven) gives each
+// DoT tick on the primary Rotmark target a 10% chance to add a Carrion stack,
+// rolled in blightOnDotTick; the Carrion Dart payload stays 7. Hexthread 4pc
+// refunds 10 Blight per Carrion stack a resolved Putrefy consumes, at the
+// post-consume site in resolveSentence, additive beside Hour of Rot's
+// once-per-90s charge. Gravebrand 2pc is a resolved
 // cooldownFlat row on Reaping Command (8 to 6) with the rider auras and the
 // Soul Fragment bank pinned untouched; 4pc multiplies reapingDamage at its
 // one caller, so the unison strikes and the derived cleave both carry 1.25x.
@@ -15,21 +14,17 @@
 // DELIVERED (0.242 against the 1.21 post-v0.42.0 destruction baseline: the
 // 0.1 spec-baseline spellDmgPct floor plus the v0.42.0 Ruination offense-only
 // spell bonus of 0.11, 20 percent exactly). Non-wearer rng stays
-// byte-identical everywhere; no warlock bend draws rng.
-import { describe, expect, it } from 'vitest';
-import {
-  doomValue,
-  gainDoom,
-  resolveNeedleOfFate,
-  resolveSentence,
-} from '../src/sim/combat/affliction';
+// byte-identical everywhere; only the Hexthread 2pc draws rng, and only for wearers.
+import { describe, expect, it, vi } from 'vitest';
+import { addFateThread, doomValue, gainDoom, resolveSentence } from '../src/sim/combat/affliction';
+import { blightOnDotTick } from '../src/sim/combat/affliction_blight';
 import { SOUL_FRAGMENT_CAP, soulFragmentCount } from '../src/sim/combat/necromancy';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   GRAVEBRAND_2PC_REAPING_COOLDOWN_CUT_SEC,
   GRAVEBRAND_4PC_UNISON_DAMAGE_MULT,
-  HEXTHREAD_2PC_NEEDLE_DOOM_BONUS,
-  HEXTHREAD_4PC_SENTENCE_DOOM_REFUND,
+  HEXTHREAD_2PC_TICK_STACK_CHANCE,
+  HEXTHREAD_4PC_REFUND_PER_STACK,
   RUINCALLER_2PC_CONFLAGRATE_BONUS_CHARGES,
   RUINCALLER_4PC_CHAOS_BOLT_DMG_PCT,
   setBonusFlag,
@@ -40,7 +35,7 @@ import { createMob } from '../src/sim/entity';
 import { computeCharacterModifiers } from '../src/sim/set_bonus_mods';
 import { Sim } from '../src/sim/sim';
 import { resolveTalentHitMult } from '../src/sim/talent_hit_mult';
-import type { Entity, SimEvent } from '../src/sim/types';
+import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
 
 const SET_SLOTS = ['helmet', 'shoulder', 'chest', 'gloves', 'legs'] as const;
@@ -156,8 +151,8 @@ describe('warlock Crucible sets: the resolver registration', () => {
   });
 });
 
-describe('Hexthread 2pc: Needle of Fate grants 2 additional Condemnation', () => {
-  it('the resolved payload: 9 for wearers, 7 base, and unequipping re-resolves to 7', () => {
+describe('Hexthread 2pc: Rotmark DoT ticks can add a Carrion stack', () => {
+  it('leaves the Carrion Dart payload at 7 for wearers and pins the 10% chance', () => {
     const entryDoom = (equipment: Partial<Record<string, string>>) => {
       const entry = expectDefined(
         abilitiesKnownAt('warlock', 25, warlockMods('affliction', equipment)).find(
@@ -173,92 +168,82 @@ describe('Hexthread 2pc: Needle of Fate grants 2 additional Condemnation', () =>
       return expectDefined(eff).doom;
     };
     expect(entryDoom({})).toBe(7);
-    expect(entryDoom(worn('hexthread', 2))).toBe(7 + HEXTHREAD_2PC_NEEDLE_DOOM_BONUS);
+    expect(entryDoom(worn('hexthread', 2))).toBe(7);
+    expect(HEXTHREAD_2PC_TICK_STACK_CHANCE).toBe(0.1);
 
-    // The live recompute: equipping resolves 9, unequipping back to 7.
+    // The live recompute: wearing the set keeps the resolved payload at 7.
     const sim = liveWarlock(511, 'affliction');
     equipSet(sim, 'hexthread', 2);
-    expect(resolvedNeedleDoom(sim)).toBe(7 + HEXTHREAD_2PC_NEEDLE_DOOM_BONUS);
-    sim.unequipItem('helmet');
     expect(resolvedNeedleDoom(sim)).toBe(7);
   });
 
-  it('a landed Needle on the primary Eye generates 9 through the real cast path (control 7)', () => {
-    function doomAfterNeedle(wearer: boolean): number {
-      const sim = liveWarlock(512, 'affliction');
-      if (wearer) equipSet(sim, 'hexthread', 2);
-      const target = addHostileTarget(sim);
-      finishCast(sim, 'needle_of_fate', target);
-      return doomValue(sim.player);
-    }
-    expect(doomAfterNeedle(true)).toBe(7 + HEXTHREAD_2PC_NEEDLE_DOOM_BONUS);
-    expect(doomAfterNeedle(false)).toBe(7);
+  // Calls the tick hook directly with the roll forced, so the proc is pinned
+  // without depending on how many ticks a seed happens to need.
+  function stacksFromOneTick(wearer: boolean, onRotmark: boolean, roll: boolean): number {
+    const sim = liveWarlock(512, 'affliction');
+    if (wearer) equipSet(sim, 'hexthread', 2);
+    const host = sim as unknown as { ctx: Parameters<typeof blightOnDotTick>[0] };
+    const target = addHostileTarget(sim);
+    if (onRotmark) finishCast(sim, 'evil_eye', target);
+    vi.spyOn(host.ctx.rng, 'chance').mockReturnValue(roll);
+    const blackrot = {
+      id: 'corruption',
+      name: 'Blackrot',
+      kind: 'dot',
+      remaining: 45,
+      duration: 45,
+      value: 10,
+      sourceId: sim.player.id,
+      school: 'shadow',
+    } as Aura;
+    let added = 0;
+    blightOnDotTick(host.ctx, sim.player, target, blackrot, 10, {
+      gainDoom: () => 0,
+      repeatTick: () => {},
+      addStack: () => {
+        added += 1;
+      },
+    });
+    return added;
+  }
+
+  it('adds a stack on a won roll for a wearer ticking the Rotmark target', () => {
+    expect(stacksFromOneTick(true, true, true)).toBe(1);
+    expect(stacksFromOneTick(true, true, false)).toBe(0);
   });
 
-  it('the secondary Coven Eye x0.5-with-rounding pays +1 (a +1 bonus would pay zero)', () => {
-    function doomThroughSecondaryEye(wearer: boolean): number {
-      const sim = liveWarlock(513, 'affliction');
-      if (wearer) equipSet(sim, 'hexthread', 2);
-      const host = sim as unknown as { ctx: Parameters<typeof resolveNeedleOfFate>[0] };
-      const target = addHostileTarget(sim);
-      host.ctx.applyAura(target, {
-        id: 'coven',
-        name: 'Coven',
-        kind: 'affliction_eye_secondary',
-        remaining: 15,
-        duration: 15,
-        value: 0.5,
-        sourceId: sim.player.id,
-        school: 'shadow',
-      });
-      resolveNeedleOfFate(host.ctx, sim.player, target, resolvedNeedleDoom(sim));
-      return doomValue(sim.player);
-    }
-    // Math.round(7 x 0.5) = 4; Math.round(9 x 0.5) = 5: the +2 survives the
-    // secondary-Eye rounding as +1, exactly the set doc's disclosure.
-    expect(doomThroughSecondaryEye(false)).toBe(4);
-    expect(doomThroughSecondaryEye(true)).toBe(5);
+  it('never procs for a non-wearer or on an enemy without the Rotmark', () => {
+    expect(stacksFromOneTick(false, true, true)).toBe(0);
+    expect(stacksFromOneTick(true, false, true)).toBe(0);
   });
 
-  it('Hour of Judgment doubles the whole payload on the primary Eye (18 vs 14)', () => {
-    function doomUnderJudgment(wearer: boolean): number {
-      const sim = liveWarlock(514, 'affliction');
-      if (wearer) equipSet(sim, 'hexthread', 2);
-      const host = sim as unknown as { ctx: Parameters<typeof resolveNeedleOfFate>[0] };
-      const target = addHostileTarget(sim);
-      finishCast(sim, 'evil_eye', target);
-      host.ctx.applyAura(sim.player, {
-        id: 'hour_of_judgment',
-        name: 'Hour of Judgment',
-        kind: 'affliction_judgment',
-        remaining: 15,
-        duration: 15,
-        value: 50,
-        charges: 1,
-        sourceId: sim.player.id,
-        school: 'shadow',
-      });
-      const before = doomValue(sim.player);
-      resolveNeedleOfFate(host.ctx, sim.player, target, resolvedNeedleDoom(sim));
-      return doomValue(sim.player) - before;
-    }
-    expect(doomUnderJudgment(false)).toBe(14);
-    expect(doomUnderJudgment(true)).toBe(2 * (7 + HEXTHREAD_2PC_NEEDLE_DOOM_BONUS));
+  it('addFateThread stacks one at a time up to 3', () => {
+    const sim = liveWarlock(513, 'affliction');
+    const host = sim as unknown as { ctx: Parameters<typeof addFateThread>[0] };
+    const stacks = () =>
+      sim.player.auras.find((aura) => aura.kind === 'affliction_fate_threads')?.stacks ?? 0;
+    addFateThread(host.ctx, sim.player);
+    expect(stacks()).toBe(1);
+    addFateThread(host.ctx, sim.player);
+    addFateThread(host.ctx, sim.player);
+    addFateThread(host.ctx, sim.player);
+    expect(stacks()).toBe(3);
   });
 });
 
-describe('Hexthread 4pc: Passing Sentence refunds 10 Condemnation', () => {
-  function doomAfterSentence(wearer: boolean, withJudgment = false): number {
+describe('Hexthread 4pc: Putrefy refunds 10 Blight per Carrion stack it consumes', () => {
+  function doomAfterSentence(wearer: boolean, stacks: number, withJudgment = false): number {
     const sim = liveWarlock(515, 'affliction');
     if (wearer) equipSet(sim, 'hexthread', 4);
     const host = sim as unknown as { ctx: Parameters<typeof resolveSentence>[0] };
     const target = addHostileTarget(sim);
     finishCast(sim, 'evil_eye', target);
     gainDoom(host.ctx, sim.player, 50);
+    for (let i = 0; i < stacks; i++) addFateThread(host.ctx, sim.player);
     if (withJudgment) {
       host.ctx.applyAura(sim.player, {
         id: 'hour_of_judgment',
-        name: 'Hour of Judgment',
+        name: 'Hour of Rot',
         kind: 'affliction_judgment',
         remaining: 15,
         duration: 15,
@@ -272,24 +257,27 @@ describe('Hexthread 4pc: Passing Sentence refunds 10 Condemnation', () => {
     return doomValue(sim.player);
   }
 
-  it('a resolved Sentence leaves 10 Condemnation for wearers (control 0)', () => {
-    expect(doomAfterSentence(true)).toBe(HEXTHREAD_4PC_SENTENCE_DOOM_REFUND);
-    expect(doomAfterSentence(false)).toBe(0);
+  it('refunds 10 per consumed stack for wearers (control 0)', () => {
+    expect(doomAfterSentence(true, 0)).toBe(0);
+    expect(doomAfterSentence(true, 1)).toBe(HEXTHREAD_4PC_REFUND_PER_STACK);
+    expect(doomAfterSentence(true, 3)).toBe(3 * HEXTHREAD_4PC_REFUND_PER_STACK);
+    expect(doomAfterSentence(false, 3)).toBe(0);
   });
 
-  it("is additive beside Hour of Judgment's once-per-90s 50-refund charge", () => {
-    expect(doomAfterSentence(true, true)).toBe(50 + HEXTHREAD_4PC_SENTENCE_DOOM_REFUND);
-    expect(doomAfterSentence(false, true)).toBe(50);
+  it("is additive beside Hour of Rot's once-per-90s 50-refund charge", () => {
+    expect(doomAfterSentence(true, 3, true)).toBe(50 + 3 * HEXTHREAD_4PC_REFUND_PER_STACK);
+    expect(doomAfterSentence(false, 3, true)).toBe(50);
   });
 
-  it('pays nothing on a sub-20 Sentence resolve (the early return filters first)', () => {
+  it('pays nothing on a sub-20 Putrefy resolve (the early return filters first)', () => {
     const sim = liveWarlock(516, 'affliction');
     equipSet(sim, 'hexthread', 4);
     const host = sim as unknown as { ctx: Parameters<typeof resolveSentence>[0] };
     const target = addHostileTarget(sim);
     finishCast(sim, 'evil_eye', target);
     gainDoom(host.ctx, sim.player, 10);
-    resolveSentence(host.ctx, sim.player, target, 'Sentence');
+    addFateThread(host.ctx, sim.player);
+    resolveSentence(host.ctx, sim.player, target, 'Putrefy');
     expect(doomValue(sim.player)).toBe(0);
   });
 });
@@ -601,8 +589,8 @@ describe('Ruincaller 4pc: Ruinbolt strikes 20 percent harder, delivered', () => 
 
 describe('the wearer literals against the authored copy', () => {
   it('pins every audited warlock constant', () => {
-    expect(HEXTHREAD_2PC_NEEDLE_DOOM_BONUS).toBe(2);
-    expect(HEXTHREAD_4PC_SENTENCE_DOOM_REFUND).toBe(10);
+    expect(HEXTHREAD_2PC_TICK_STACK_CHANCE).toBe(0.1);
+    expect(HEXTHREAD_4PC_REFUND_PER_STACK).toBe(10);
     expect(GRAVEBRAND_2PC_REAPING_COOLDOWN_CUT_SEC).toBe(2);
     expect(GRAVEBRAND_4PC_UNISON_DAMAGE_MULT).toBeCloseTo(1.25, 10);
     expect(RUINCALLER_2PC_CONFLAGRATE_BONUS_CHARGES).toBe(1);

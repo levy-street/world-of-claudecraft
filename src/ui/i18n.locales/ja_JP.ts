@@ -6290,16 +6290,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     '敵を燃やして{damage}の火炎ダメージを与え、15秒間で追加の{overTime}を与えます。',
   'entities.abilities.corruption.name': '黒腐れ',
-  'entities.abilities.corruption.description':
-    '対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。',
-  'entities.abilities.life_tap.name': '過酷な取引',
-  'entities.abilities.life_tap.description': '体力{damage}をマナ{damage}に変換します。',
-  'entities.abilities.curse_of_agony.name': '苦悶の呪い',
-  'entities.abilities.curse_of_agony.description':
-    '対象に苦痛の呪いをかけ、24秒間で {damage} の暗黒ダメージを与えます。',
   'entities.abilities.drain_life.name': '喰らう',
-  'entities.abilities.drain_life.description':
-    '対象の生命力を貪り、毎秒{damage}の影ダメージを与え、その70%を体力としてあなたへ移します。苦痛はその全てを移します。主たる邪眼へ詠唱を維持すると、開始時に運命の糸をすべて消費し、糸1本ごとに刻みあたり追加で断罪が1得られます。',
   'entities.abilities.fear.name': '責め苦',
   'entities.abilities.fear.description':
     '敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。',
@@ -6507,8 +6498,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     '12秒間、電弧の矢が雷を2与えます。次の電弧の矢か枝分かれの稲妻は即時発動になり、次の満額の雷の払い出しはダメージが25%増えます。（エレメンタルの象徴）',
   'entities.abilities.siphon_life.name': 'サイフォンライフ',
-  'entities.abilities.siphon_life.description':
-    '敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）',
   'entities.abilities.conflagrate.name': 'コンフラグレート',
   'entities.abilities.conflagrate.description':
     '灼熱の契約の先の刻みを一つ手前へ引き、続けて対象を燃やして{damage}の火炎ダメージを与えます。破滅的猛攻を1と破滅を1生みます。チャージを{charges}つ持ちます。（破壊の象徴）',
@@ -9943,7 +9932,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.judgement': '現在のシールを消費し、近距離から敵を打ち据えます。',
   'guide.abilityHook.lesser_heal':
     '立ち止まる余裕があるときに味方の体力を満タンに戻す、安定した詠唱です。',
-  'guide.abilityHook.life_tap': 'マナが尽きたとき、自分の体力を一部マナに変換します。',
   'guide.abilityHook.lightning_bolt': 'ネイチャーダメージを与える遠距離詠唱。遠くからの主力です。',
   'guide.abilityHook.lightning_shield':
     '身にまとい、攻撃してきた相手にネイチャーダメージを与えます。',
@@ -11431,9 +11419,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.frostquench.bonus4':
     'ウィンターラッシュが付与するウィンターズ・チルが2チャージではなく3チャージになります。',
   'entities.itemSets.hexthread.name': 'ヘックススレッドの外套',
-  'entities.itemSets.hexthread.bonus2':
-    '運命の針が断罪を追加で2生成します。被ダメージで詠唱が遅れなくなります。',
-  'entities.itemSets.hexthread.bonus4': '宣告を下すたびに断罪を10返還します。',
   'entities.itemSets.gravebrand.name': 'グレイヴブランドの礼装',
   'entities.itemSets.gravebrand.bonus2':
     '刈り取りの号令のクールダウンが2秒短縮されます。被ダメージで詠唱が遅れなくなります。',
@@ -17361,17 +17346,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'まずボーン・メイジ、次にスケルタル・ウォリアーを生贄にし、グレイヴウィングは最後の手段としてのみ選ぶ。同系統が複数いる場合は残り時間が最も短いもの、次に最も弱いものを選び、指定地点の敵に{damage}のシャドウダメージを与える。',
   'entities.abilities.corpse_explosion.name': '骸の爆裂',
-  'entities.abilities.coven.description':
-    '周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。',
-  'entities.abilities.coven.name': '魔女盟約',
-  'entities.abilities.cruel_pact.description':
-    '最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。',
   'entities.abilities.cruel_pact.name': '残酷な契約',
-  'entities.abilities.cursed_accomplice.description':
-    '味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。',
   'entities.abilities.cursed_accomplice.name': '呪われた共犯者',
-  'entities.abilities.dark_pact.description':
-    '現在の体力の10%を捧げ、8秒間、最大体力の30%に相当するダメージを吸収します。',
   'entities.abilities.dark_pact.name': '血の盟約',
   'entities.abilities.dawn_devotion.description':
     '30分間、自身とパーティメンバーの攻撃力を40増加させる。自身の光輝または恩寵の献身を置き換えるが、他のパラディンの献身やウォリアーの雄叫びとは共存する。',
@@ -17391,9 +17367,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_trance.description':
     '15秒間エレメンタルトランス状態に入り、受けるダメージを30%軽減し、与えた全ダメージの20%をマナに変換する。（ウォースピリット固有能力）',
   'entities.abilities.elemental_trance.name': 'エレメンタルトランス',
-  'entities.abilities.evil_eye.description':
-    '敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。',
-  'entities.abilities.evil_eye.name': '邪眼',
   'entities.abilities.eviscerate.specNote_assassination':
     '毒の儀式が6段階のとき、このボタンは毒裂きに変化する：出血効果が与えるはずだった残りダメージを即座にすべて与え、新しい毒の傷を刻み、エナジーを20回復する一撃。',
   'entities.abilities.eviscerate.specNote_combat':
@@ -17432,12 +17405,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_grace.description':
     '20メートル以内の敵に聖なる槌を即座に投げ、{damage}ダメージを与える。マナを70回復し、与えたダメージの50%だけ自身を回復して、命中時に献身を1生成する。太陽の報復により、恩寵の槌はクールダウンを無視し、与えたダメージの100%だけ自身を回復する。',
   'entities.abilities.hammer_of_grace.name': '恩寵の槌',
-  'entities.abilities.hex_of_violence.description':
-    '敵を8秒間呪い、2秒ごとに影ダメージを与えて断罪を2生成します。次の3回の攻撃行動ごとに断罪を7生成し、17の影ダメージで反撃します。',
-  'entities.abilities.hex_of_violence.name': '暴虐の呪い',
-  'entities.abilities.hour_of_judgment.description':
-    '主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。',
-  'entities.abilities.hour_of_judgment.name': '審判の刻',
   'entities.abilities.hunting_momentum.description':
     'パッシブ：腹裂きの一撃と敵に命中した榴散弾装薬は、それぞれ狩猟の勢いを1獲得します。最大3で、消費するか戦闘を離れるまで持続し、1段階ごとに移動速度が15%上昇します。3段階で傷裂きの打撃ダメージが60%増加し、段階を消費します。（生存）',
   'entities.abilities.hunting_momentum.name': '狩猟の勢い',
@@ -17453,11 +17420,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lifespring_weapon.description':
     '武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。',
   'entities.abilities.lifespring_weapon.name': '命泉の武器',
-  'entities.abilities.litany_of_guilt.description':
-    '主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。',
   'entities.abilities.litany_of_guilt.name': '罪責の連祷',
-  'entities.abilities.maledict_gaze.description':
-    '呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。',
   'entities.abilities.maledict_gaze.name': '呪眼の凝視',
   'entities.abilities.marrowbreak.description':
     '古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
@@ -17479,9 +17442,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     '月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大{duration}秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。',
   'entities.abilities.moonseed.name': '月の種',
-  'entities.abilities.needle_of_fate.description':
-    '敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を{needleDoom}生成し、邪眼がなければ先に対象を指定します。',
-  'entities.abilities.needle_of_fate.name': '運命の針',
   'entities.abilities.oath_chain.description':
     '遠くの敵を聖なる鎖で即座に縛る。敵は秒速18メートルで自身へ引き寄せられ、3メートルまで近づくと4秒間、移動速度が50%低下する。昇天中は周囲の敵をもう1体縛る。',
   'entities.abilities.oath_chain.name': '誓いの鎖',
@@ -17499,9 +17459,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pack_rally.description':
     '駿馬の相をまとい、周囲の味方を鼓舞します。10秒間、移動速度を30%、攻撃速度と詠唱速度を10%上昇させます。',
   'entities.abilities.pack_rally.name': '群れの結集',
-  'entities.abilities.possess_evil_eye.description':
-    '呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えます。遅延反響は60%のダメージを与え、レベル17から20にかけて30%まで低下します。',
-  'entities.abilities.possess_evil_eye.name': '邪眼憑依',
   'entities.abilities.primal_exaltation.description':
     '専門分野の力を12秒間解放し、通常のローテーションを強化します。（シャーマンのタレント）',
   'entities.abilities.primal_exaltation.name': '原初の高揚',
@@ -17556,9 +17513,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scouring_mercy.description':
     '敵に{damage}の聖なるダメージを与えるか、味方1体を{healing}回復する。ダメージは魔力で、回復量は治癒力で上昇する。ドクトリンは絆を通じてこのダメージを回復に変換する。30メートル以内に絆を結んだ負傷パーティメンバーがいない場合、30メートル以内で体力が最も低い負傷パーティメンバーをダメージの15%分回復する。パーティメンバーを回復すると、その対象から10メートル以内かつ視界内にいる負傷パーティメンバーを最大2人まで追加で回復し、それぞれ回復量の50%分を回復する。この追加回復はクリティカルにならず、ドクトリンの絆も生成しない。（ドクトリン固有能力）',
   'entities.abilities.scouring_mercy.name': '浄罪の慈悲',
-  'entities.abilities.sentence.description':
-    '断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。',
-  'entities.abilities.sentence.name': '宣告',
   'entities.abilities.seraphic_vigil.description':
     '味方1体に見守りの祝福を与え、危機に陥った時に体力を{buff}回復する。ベネディクション固有能力。',
   'entities.abilities.seraphic_vigil.name': '熾天使の見守り',
@@ -17623,8 +17577,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trailbreak.description':
     '後方へ25ヤード跳び、移動不能効果と移動速度低下効果を解除します。着地すると移動速度が3秒間50%上がります。狩猟の勢いがある場合はそれを更新し、再突入準備を12秒間付与します。',
   'entities.abilities.trailbreak.name': '離脱跳躍',
-  'entities.abilities.umbral_anchor.description':
-    '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',
   'entities.abilities.umbral_anchor.name': '影の錨',
   'entities.abilities.unholy_command.description':
     '魂の欠片を3個消費してすべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。',
@@ -17657,8 +17609,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venomrend.description':
     '毒の儀式を6段階消費する：100にコンボポイントごとに55を加えたダメージを与え、出血効果が与えるはずだった残りダメージを即座にすべて与え、その後新しい毒の傷を与える（20秒かけて120ダメージ）。エナジーを20回復する。（ナイフワーク）',
   'entities.abilities.venomrend.name': '毒裂き',
-  'entities.abilities.vicarious_suffering.description':
-    '8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。',
   'entities.abilities.vicarious_suffering.name': '苦痛の肩代わり',
   'entities.abilities.vowkeeper_strike.description':
     '高い脅威を与える一撃を放ち、献身を1生成する。命中時に20%の確率で8秒間、太陽の報復を得る。ブロック成功時にも25%の確率で得る。太陽の報復は次の陽光の円盤、恩寵の槌、癒やしの光のいずれかを強化する。昇天中は小さな吸収盾も付与する。',
@@ -17699,7 +17649,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.chain_lightning':
     '1体を攻撃して近くの敵2体へ跳び、1回の発動全体で雷鳴を1つ蓄えます。',
   'guide.abilityHook.consecration': '周囲の地を聖別し、持続的な神聖ダメージと脅威を与える。',
-  'guide.abilityHook.evil_eye': '敵を一体指定し、その行動と苦痛から断罪を蓄積します。',
   'guide.abilityHook.galeheart_weapon': '二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。',
   'guide.abilityHook.hammer_of_justice': '短時間の確実なスタンで敵1体を止める。',
   'guide.abilityHook.hammer_of_wrath':
@@ -18590,26 +18539,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'エンバーキンに、対象へ追加の邪悪な弾を放つよう命令します。クールダウン8秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。',
   'hud.pet.felboltTitle': 'フェルボルト',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    '対象となるダメージが断罪を{value}生成する。{interval}秒に1回まで',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する',
-  'hudChrome.auraEffect.afflictionEye':
-    'マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する',
-  'hudChrome.auraEffect.afflictionJudgment':
-    '主邪眼の断罪生成が{eyePct}%増加し、センテンスのダメージが{sentencePct}%増加、最初の1回は断罪を{refund}返還する',
-  'hudChrome.auraEffect.afflictionLitany':
-    '断罪獲得時、{radius}ヤード内の最大{targets}体に{damage}の影ダメージを与える。1秒に1回まで',
-  'hudChrome.auraEffect.afflictionPossession':
-    'ニードル・オブ・フェイト、ドレイン・ライフ、マレディクト・ゲイズ、センテンスを強化する',
-  'hudChrome.auraEffect.afflictionVicarious':
-    '受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する',
-  'hudChrome.auraEffect.afflictionViolence':
-    '報復は残り{charges}回。敵の攻撃で断罪を{doom}生成し、{damage}の影ダメージを返す',
   'hudChrome.auraEffect.aoeEcho':
     '残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える',
   'hudChrome.auraEffect.arcaneCharge':
@@ -18633,8 +18562,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '与えるダメージが{damagePct}%、攻撃速度が{hastePct}%、移動速度が{movePct}%上昇する',
   'hudChrome.auraEffect.fingersOfFrost':
     '残り{charges}チャージ：アイス・ランスは対象を凍結扱いにし、凍結時ダメージ{pct}%を与える',
-  'hudChrome.auraEffect.forbiddenReflectionLock':
-    'フォービドゥン・リフレクションはまだ再準備できない',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     '次の対象となるウォーロックのクールダウンを再使用できる',
   'hudChrome.auraEffect.formLich':
@@ -18727,14 +18654,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinStatus': '破滅 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '魂の欠片',
   'hudChrome.statInfo.effects.manaRegenCombat': '戦闘中、5秒ごとにマナが約{value}回復',
-  'hudChrome.warlock.doomEmptyStatus': '断罪 {value}/{max}。',
-  'hudChrome.warlock.doomLabel': '断罪',
-  'hudChrome.warlock.doomStatus': '断罪 {value}/{max}、残り {remaining}。',
-  'hudChrome.warlock.fateThreadsConsumeReady': '運命の糸が3本: 喰らうで追加の断罪へ紡げます。',
-  'hudChrome.warlock.fateThreadsLabel': '運命の糸',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    '運命の糸が3本: 宣告で消費するとダメージが18%増加します。',
-  'hudChrome.warlock.fateThreadsStatus': '運命の糸 {value}/{max}。',
   'itemUi.tooltip.useHealingPotionPct':
     '使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。',
   'guide.controls.clickMoveNote':

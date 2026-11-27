@@ -4,7 +4,7 @@
 // whether engaging would actually connect (rather than error). Host-agnostic (type-only
 // sim import), so a Vitest drives them directly; the HUD gates on the player's setting.
 
-import type { AbilityEffect, Entity } from '../../../sim/types';
+import type { AbilityDef, AbilityEffect, Entity } from '../../../sim/types';
 import type { BgInfo } from '../../../world_api/battleground';
 import type { ArenaInfo, DuelInfo } from '../../../world_api/duel_arena';
 
@@ -112,6 +112,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   selfDamagePctMax: 'other',
   selfDamagePctCurrent: 'other',
   selfHealPctMax: 'other',
+  hardBargain: 'other',
   selfAbsorbPctMax: 'other',
   gainSoulFragments: 'other',
   summonUndead: 'other',
@@ -131,6 +132,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   afflictionVicarious: 'other',
   warlockUmbralAnchor: 'other',
   afflictionCoven: 'other',
+  afflictionContagion: 'other',
+  afflictionPlagueBloom: 'damage',
   afflictionPossession: 'other',
   afflictionJudgment: 'other',
   selfHotPctMax: 'other',
@@ -201,10 +204,18 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
  * went to the party frame.
  */
 export function pressStartsAutoAttack(
-  effects: AbilityEffect[],
+  ability: { effects: AbilityEffect[]; def?: Pick<AbilityDef, 'requiresOwnTargetAuraKind'> },
   redirectedToAlly: boolean,
+  target?: Pick<Entity, 'auras'> | null,
+  caster?: Pick<Entity, 'id'>,
 ): boolean {
-  return !redirectedToAlly && abilityStartsAutoAttack(effects);
+  // A press the sim will refuse (Litany of Guilt with no Rotmark on the target) must
+  // not start swinging either: an instant engages before the refusal comes back.
+  const kind = ability.def?.requiresOwnTargetAuraKind;
+  if (kind && !target?.auras.some((aura) => aura.kind === kind && aura.sourceId === caster?.id)) {
+    return false;
+  }
+  return !redirectedToAlly && abilityStartsAutoAttack(ability.effects);
 }
 
 /**

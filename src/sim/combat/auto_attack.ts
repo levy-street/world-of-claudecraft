@@ -58,6 +58,7 @@ import {
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
+import { MALEDICT_GAZE_LABEL, maledictEyeFiresWand } from './affliction';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { druidEngineOnLandedStrike } from './druid_engines';
@@ -449,15 +450,31 @@ export function rangedSwing(
   ranged: { min: number; max: number; speed: number; wand?: boolean; school?: string },
 ): void {
   const school = ranged.wand ? (ranged.school ?? 'arcane') : 'physical';
-  const label = ranged.wand ? 'Wand' : AUTO_SHOT_LABEL;
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: attacker.id,
-    targetId: target.id,
-    school,
-    fx: 'projectile',
-    ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
-  });
+  // Blightcaller: cosmetic only. The Maledict Eye's gaze ray is drawn in place of the
+  // wand bolt (no wand animation on the warlock); damage, timing and rolls are the
+  // wand's own, so the shot still travels and lands like any wand bolt.
+  const eyeShot = ranged.wand === true && maledictEyeFiresWand(ctx, attacker);
+  const label = eyeShot ? MALEDICT_GAZE_LABEL : ranged.wand ? 'Wand' : AUTO_SHOT_LABEL;
+  if (eyeShot) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: attacker.id,
+      targetId: target.id,
+      school,
+      fx: 'evilEyeGaze',
+      duration: 0.28,
+      ability: 'maledict_gaze',
+    });
+  } else {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: attacker.id,
+      targetId: target.id,
+      school,
+      fx: 'projectile',
+      ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
+    });
+  }
   if (!ranged.wand && attacker.kind === 'player') {
     onCastCompleted(ctx, attacker, 'auto_shot', target);
   }

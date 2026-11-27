@@ -270,6 +270,7 @@ import {
   ashenFocusCastTimeMult,
   canUseForbiddenReflection,
   consumeForbiddenReflection,
+  forbiddenReflectionTakesWithoutCooldown,
   grantShadowCredit,
   tickUnbrokenRitual,
 } from './warlock_talents';
@@ -1554,8 +1555,14 @@ export function castAbility(
     // NPC. Refuse before any cost/cooldown is paid, so an out-of-group target never
     // silently burns the cast on an empty selection.
     if (ability.partyOnlyTarget && target.id !== p.id) {
+      // partyPetTarget: a pet counts as its owner, so your own pet or a group
+      // member's pet is a valid target too.
+      const memberId =
+        ability.partyPetTarget && target.kind === 'mob' && target.ownerId !== null
+          ? target.ownerId
+          : target.id;
       const party = ctx.partyOf(p.id);
-      if (!party?.members.includes(target.id)) {
+      if (memberId !== p.id && !party?.members.includes(memberId)) {
         ctx.error(p.id, 'That ally is not in your group.');
         return;
       }
@@ -1724,6 +1731,19 @@ export function castAbility(
   if (lifeTap && p.hp <= lifeTap.hp) {
     ctx.error(p.id, 'Not enough health.');
     return;
+  }
+  // Hard Bargain: refuse before the GCD when the mana is not there or there is
+  // nothing to heal, so a wasted press costs nothing.
+  const bargain = res.effects.find((effect) => effect.type === 'hardBargain');
+  if (bargain) {
+    if (p.resourceType !== 'mana' || p.resource < Math.round(p.maxResource * bargain.manaPctMax)) {
+      ctx.error(p.id, 'Not enough mana.');
+      return;
+    }
+    if (p.hp >= p.maxHp) {
+      ctx.error(p.id, 'You are already at full health.');
+      return;
+    }
   }
   // Voidfeast (requiresDispellable): the devour is only castable when the
   // target actually carries something to eat, refused BEFORE billing mana or
@@ -1914,7 +1934,7 @@ export function castAbility(
   // An Assist-stance pet attacks the enemy this cast is aimed at (pet/pet_assist.ts).
   // Recorded here, where the cast is certain and before every commit branch,
   // including the on-swing one below.
-  notePetAssistCast(ctx, p, meta, target);
+  if (!ability.noPetAssist) notePetAssistCast(ctx, p, meta, target);
   // Auto-dismount when the player is mounted or mid-summon-channel and casts any
   // ability. The one exception is a mount-safe form toggle (combat/forms.ts:
   // Moonwing, Gloamveil): it only adorns the rider, so it neither dismounts nor
@@ -2393,7 +2413,11 @@ function armAbilityCooldownWithReflection(
     resolved.bonusCharges ?? 0,
   );
   if (resolved.def.id === OSSUARY_MARK_ABILITY_ID) return;
-  if (!togglingOff && player.cooldowns.has(resolved.def.id)) {
+  if (
+    !togglingOff &&
+    (player.cooldowns.has(resolved.def.id) ||
+      forbiddenReflectionTakesWithoutCooldown(resolved.def.id))
+  ) {
     armForbiddenReflection(ctx, player, meta, resolved.def, resolved.cooldown);
   }
 }

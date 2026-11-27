@@ -250,6 +250,7 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'bloodbath',
   'colossal_might',
   'combat_mastery',
+  'corruption_shadow',
   'crushing_charge',
   'double_blink',
   'double_charge',

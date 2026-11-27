@@ -1102,48 +1102,57 @@ const classAbilityNamesEn = {
       [
         'corruption',
         'Blackrot',
-        'Corrupts the target, causing {damage} Shadow damage over 18 sec.',
+        'Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it.',
       ],
       [
         'evil_eye',
-        'Evil Eye',
-        'Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry.',
+        'Rotmark',
+        'Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry.',
       ],
       [
         'maledict_gaze',
         'Maledict Gaze',
-        'Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed.',
+        'Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged.',
       ],
       [
         'needle_of_fate',
-        'Needle of Fate',
-        'Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
+        'Carrion Dart',
+        'Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies.',
       ],
       [
         'sentence',
-        'Sentence',
-        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
+        'Putrefy',
+        'Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16.',
       ],
-      ['life_tap', 'Hard Bargain', 'Converts {damage} health into {damage} mana.'],
+      [
+        'hard_bargain',
+        'Hard Bargain',
+        'Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health.',
+      ],
+      [
+        'life_tap',
+        'Cruel Pact',
+        'Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health.',
+      ],
       [
         'cursed_accomplice',
         'Cursed Accomplice',
-        'Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec.',
+        "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one.",
       ],
       [
         'curse_of_agony',
-        'Hex of Anguish',
-        'Curses the target with agony: {damage} Shadow damage over 24 sec.',
+        'Festerhex',
+        'Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight.',
       ],
       [
         'drain_life',
         'Consume',
-        "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Affliction transfers all of it instead. When channeled on your primary Evil Eye, it consumes all Fate Threads at the start, and each Thread generates 1 extra Condemnation per tick.",
+        "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick.",
       ],
       [
         'litany_of_guilt',
         'Litany of Guilt',
-        'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
+        'Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
       ],
       [
         'cinderhide',
@@ -1153,7 +1162,7 @@ const classAbilityNamesEn = {
       [
         'umbral_anchor',
         'Umbral Anchor',
-        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown.',
       ],
       [
         'soulwell',
@@ -1162,33 +1171,38 @@ const classAbilityNamesEn = {
       ],
       [
         'hex_of_violence',
-        'Hex of Violence',
-        'Hexes the enemy for 8 sec, dealing Shadow damage and generating 2 Condemnation every 2 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
+        'Rotfever',
+        'Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown.',
       ],
       [
         'cruel_pact',
         'Cruel Pact',
-        'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+        'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health.',
       ],
       [
         'vicarious_suffering',
         'Vicarious Suffering',
-        'Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health.',
+        'Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health.',
       ],
       [
         'possess_evil_eye',
-        'Possess the Evil Eye',
-        'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20.',
+        'Possess the Rotmark',
+        'The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20.',
       ],
       [
         'hour_of_judgment',
-        'Hour of Judgment',
-        'Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation.',
+        'Hour of Rot',
+        'Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight.',
       ],
       [
         'coven',
-        'Coven',
-        'Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
+        'Contagion',
+        'Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd.',
+      ],
+      [
+        'plague_bloom',
+        'Plague Bloom',
+        'Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them.',
       ],
       [
         'fear',
@@ -1627,7 +1641,7 @@ const classAbilityNamesEn = {
       [
         'siphon_life',
         'Veinleech',
-        'Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
+        'Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight.',
       ],
       [
         'conflagrate',
@@ -1950,7 +1964,7 @@ const classAbilityNamesEn = {
       [
         'dark_pact',
         'Sanguine Covenant',
-        'Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec.',
+        'Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec.',
       ],
       [
         'cloak_of_shadows',

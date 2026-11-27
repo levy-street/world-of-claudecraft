@@ -1029,13 +1029,13 @@ export const sv_SE: EnTranslations = {
       "shotRules": "Sikta innanför det markerade området. Ingen manakostnad. Skada skalas inte med utrustning eller talanger."
     },
     "warlock": {
-      "doomLabel": "Fördömelse",
-      "fateThreadsLabel": "Ödestrådar",
-      "doomEmptyStatus": "{value} av {max} Fördömelse.",
-      "doomStatus": "{value} av {max} Fördömelse; {remaining}.",
-      "fateThreadsStatus": "{value} av {max} Ödestrådar.",
-      "fateThreadsConsumeReady": "Tre Ödestrådar: Förtär kan väva in dem till ytterligare Fördömelse.",
-      "fateThreadsSentenceReady": "Tre Ödestrådar: Dom kan förbruka dem för 18% ökad skada."
+      "doomLabel": "Blight",
+      "fateThreadsLabel": "Rot Splinters",
+      "doomEmptyStatus": "{value} of {max} Blight.",
+      "doomStatus": "{value} of {max} Blight; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
+      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
+      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
     },
     "priest": {
       "gloomtitheLabel": "Skymningstionde",
@@ -4795,7 +4795,7 @@ export const sv_SE: EnTranslations = {
       "effigyLanternOut": "Halmförmannens lykta är släckt för dig: dina och ditt husdjurs slag ignorerar dess plankhud och gör full skada",
       "leadenHexLock": "Blytung förbannelse kan inte rota fast detta mål igen än",
       "forbiddenReflectionReady": "Din nästa kvalificerade häxmästarförmåga kan kastas igen",
-      "forbiddenReflectionLock": "Förbjuden spegling kan inte förberedas igen än",
+      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
       "internalCooldown": "Denna effekt kan inte utlösas igen förrän timern löper ut",
       "carriedFlag": "Du bär på fiendens flagga. Avbryt den här förstärkningen för att tappa den.",
       "carryingFreight": "Du bär frakt. Förflyttningshastigheten är reducerad med {pct}%.",
@@ -4965,16 +4965,16 @@ export const sv_SE: EnTranslations = {
       "formShadow": "Dunkelslöja: skuggskada ökad med {pct}%",
       "resourceCount": "{value} av {max}",
       "formLich": "Själslans träffar även upp till {targets} närliggande fiender för {pct}% skada",
-      "afflictionEye": "Förbannad blick attackerar var {interval}:e sek; effekter vid detta onda öga genererar {pct}% Fördömelse",
-      "afflictionEyeSecondary": "Effekter vid detta onda öga genererar {doomPct}% Fördömelse; Dom ekar hit för {echoPct}% skada",
-      "afflictionAccomplice": "Kvalificerande skada ger {value} Fördömelse, högst en gång var {interval}:e sek",
-      "afflictionViolence": "{charges} vedergällningar återstår; en fiendeattack ger {doom} Fördömelse och vållar {damage} skuggskada tillbaka",
-      "afflictionVicarious": "Omdirigerar eller minskar {pct}% av inkommande skada och kan generera upp till {max} Fördömelse",
-      "afflictionPossession": "Förstärker Ödets nål, Förtär, Förbannad blick och Dom",
-      "afflictionJudgment": "Det primära onda ögat genererar {eyePct}% mer Fördömelse; Dom gör {sentencePct}% mer skada och den första återbetalar {refund} Fördömelse",
-      "afflictionLitany": "Fördömelse-vinster vållar {damage} skuggskada till upp till {targets} fiender inom {radius} m, en gång per sekund",
-      "afflictionFateThreads": "{stacks} Ödestrådar: Dom gör {sentencePct}% mer skada, eller Förtär får {doom} extra Fördömelse per tillfälle",
-      "afflictionConsumeThreads": "Förtär förbrukar {stacks} Ödestrådar för {doom} extra Fördömelse per tillfälle",
+      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
+      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
+      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
+      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
+      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
+      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
+      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
       "necromancyHarvestMark": "Döden kan skapa 1 Själfragment",
       "necromancyOssuaryMark": "Lagrar {storedPct}% av din och dina odödas skada, plus {lancePct}% av Själslans-skada; kasta igen för att detonera. Döden exploderar inom {radius} yards och skapar 1 Själfragment",
       "necromancyDeathEcho": "Föråldrat Dödseko; ingen nuvarande förmåga förbrukar det",
@@ -10084,7 +10084,7 @@ export const sv_SE: EnTranslations = {
       "none": "Ingen klass matchar varje filter. Rensa ett för att se fler."
     },
     "abilityHook": {
-      "evil_eye": "Namnger fienden vars handlingar och lidande föder din Fördömelse.",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
       "heroic_strike": "Köar ett tyngre svingslag som förbrukar raseri på ditt nästa slag.",
       "revenge": "Träffar fiender framför dig och kan bli kostnadsfri efter en undvikning eller parering.",
       "hamstring": "Hämmar en fiendes rörelse så att den inte kan fly.",
@@ -10163,7 +10163,8 @@ export const sv_SE: EnTranslations = {
       "demon_skin": "En varaktig självförstärkning som härdar din hud och ger rustning.",
       "immolate": "Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.",
       "corruption": "Förmultnar ett mål med skugga som tickar medan du gör andra saker.",
-      "life_tap": "Byter en del av din egen hälsa tillbaka till mana när du sinar.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "En naturpil kastad mot ett mål från avstånd, din förstavalskanon.",
       "healing_touch": "En stor enmålsläkning med lång kasttid, för att toppa upp någon.",
       "mark_of_the_wild": "En varaktig välsignelse du lägger på dig själv eller en allierad före en strid.",
@@ -18265,43 +18266,47 @@ export const sv_SE: EnTranslations = {
       },
       "corruption": {
         "name": "Svartröta",
-        "description": "Fördärvar målet och vållar {damage} skuggskada under 18 sek."
+        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
       },
       "evil_eye": {
-        "name": "Onda ögat",
-        "description": "Märker en fiende som fokus för dina förbannelser. Att flytta Onda ögat bevarar Fördömelse men förnyar inte dess 20 sekunders utgång."
+        "name": "Rotmark",
+        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "Förbannad blick",
-        "description": "Ditt förbannade öga attackerar ditt valda primära onda öga var 2,5:e sek för skuggskada. Besätt det onda ögat fördubblar dess attackhastighet."
+        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
       },
       "needle_of_fate": {
-        "name": "Ödets nål",
-        "description": "Genomborrar fienden för {damage} skuggskada och genererar {needleDoom} Fördömelse om den bär ditt onda öga. Varje träff på ditt primära onda öga lägger till en Ödestråd i 12 sek, upp till 3. Om inget ont öga finns märker nålen först sitt mål."
+        "name": "Carrion Dart",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
       },
       "sentence": {
-        "name": "Dom",
-        "description": "Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16."
+        "name": "Putrefy",
+        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+      },
+      "hard_bargain": {
+        "name": "Hard Bargain",
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Hårt köpslag",
-        "description": "Omvandlar {damage} hälsa till {damage} mana."
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "Förbannad medhjälpare",
-        "description": "Länkar ditt förbannade öga när ingen allierad är vald, vilket får dess Förbannad blick att generera 2 Fördömelse. Att länka en vald gruppmedlem gör att bara deras skada mot ditt onda öga genererar 3 i stället. En ny länk ersätter den föregående och kan utlösas högst en gång var 2:e sek."
+        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
       },
       "curse_of_agony": {
-        "name": "Våndans häxkonst",
-        "description": "Förbannar målet med plåga: {damage} skuggskada över 24 sek."
+        "name": "Festerhex",
+        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
       },
       "drain_life": {
         "name": "Förtär",
-        "description": "Förtär målets livskraft, vållar {damage} Skuggskada varje sekund och överför 70% av den som hälsa till er. Vanmakt överför i stället alltihop. Kanaliserad på ert främsta onda öga förbrukar den alla Ödestrådar vid början, och varje Tråd alstrar 1 extra Fördömelse per tick."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
       },
       "litany_of_guilt": {
         "name": "Skuldens litania",
-        "description": "Förbannar ditt primära onda öga i 6 sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender inom 8 yards, högst en gång per sekund. Rang 2 förlänger den till 8 sek och 4 fiender."
+        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
         "name": "Glödhud",
@@ -18309,35 +18314,39 @@ export const sv_SE: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Skuggankare",
-        "description": "Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
         "name": "Själsbrunn",
         "description": "Frammanar en Själsbrunn i 3 min. Utanför strid kan gruppmedlemmar fylla på sina Själstenar upp till 3. En Själsten återställer 25% av maximal hälsa och delar nedkylning med drycker."
       },
       "hex_of_violence": {
-        "name": "Våldets förbannelse",
-        "description": "Förhäxar fienden i 8 sek, vållar skuggskada och genererar 2 Fördömelse var 2:e sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 17 skuggskada."
+        "name": "Rotfever",
+        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
       },
       "cruel_pact": {
         "name": "Grym pakt",
-        "description": "Offrar 12% av din maximala hälsa för att återställa 1,5% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa."
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
         "name": "Ställföreträdande lidande",
-        "description": "Länkar ditt lidande i 8 sek och genererar upp till 15 Fördömelse från fientliga träffar. På dig själv minskar den mottagen skada med 20%. På en allierad omdirigerar den upp till 20% till dig utan att ta dig under 15% hälsa."
+        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "Besätt det onda ögat",
-        "description": "Maledictorn tar över ditt primära onda öga i 15 sek och genererar 35 Fördömelse. Ödets nål kastas på 1 sek och genererar 2 extra Fördömelse, Förtär kan kanaliseras i rörelse, och Dom gör 25% mer skada och släpper ett fördröjt eko för 60% skada, avtagande till 30% mellan nivåerna 17 och 20."
+        "name": "Possess the Rotmark",
+        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "Domens timme",
-        "description": "Kallar fram dom över ditt primära onda öga i 15 sek, vilket ger 40 Fördömelse och 3 Ödestrådar, aktiverar Besättelse, fördubblar Fördömelse genererad genom det primära ögat, och ökar skadan från Dom med 20%. Den första Domen återbetalar 50 Fördömelse."
+        "name": "Hour of Rot",
+        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
       },
       "coven": {
-        "name": "Häxring",
-        "description": "Skapar sekundära onda ögon på upp till 4 närliggande fiender i 15 sek. De matar den delade Fördömelse-poolen med 50%, och Dom ekar till dem för 35% skada."
+        "name": "Contagion",
+        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
       },
       "fear": {
         "name": "Plåga",
@@ -18689,7 +18698,7 @@ export const sv_SE: EnTranslations = {
       },
       "siphon_life": {
         "name": "Livssifon",
-        "description": "Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)"
+        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
       },
       "conflagrate": {
         "name": "Storbrand",
@@ -18944,7 +18953,7 @@ export const sv_SE: EnTranslations = {
       },
       "dark_pact": {
         "name": "Blodsförbund",
-        "description": "Offrar 10% av din nuvarande hälsa för att absorbera skada motsvarande 30% av din maximala hälsa i 8 sek."
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
       },
       "cloak_of_shadows": {
         "name": "Skuggmantel",
@@ -30862,8 +30871,8 @@ export const sv_SE: EnTranslations = {
       },
       "hexthread": {
         "name": "Hextrådens svepning",
-        "bonus2": "Ödets nål ger 2 extra fördömelse. Skada du tar fördröjer inte längre dina besvärjelser.",
-        "bonus4": "Avkunnad dom återbetalar 10 fördömelse."
+        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
       },
       "moonscorch": {
         "name": "Månbränd dräkt",

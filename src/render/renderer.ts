@@ -105,6 +105,7 @@ import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { type BladeGrassBandView, buildBladeGrassBand } from './blade_grass_band';
+import { BLIGHTCRAFT_FX_SCHOOL, blightcraftFxEvent, blightcraftFxSchool } from './blightcraft_fx';
 import {
   type BlobShadowSlot,
   blobBaseRadius,
@@ -7103,7 +7104,7 @@ export class Renderer {
   // including those between other players and mobs).
   private sentenceImpactFeedback(sourceId: number, targetId: number, condemnation: number): void {
     const plan = sentenceImpactPlan(condemnation, sourceId === this.sim.playerId);
-    this.pulseAt(targetId, 'shadow', plan.light, plan.duration);
+    this.pulseAt(targetId, BLIGHTCRAFT_FX_SCHOOL, plan.light, plan.duration);
     if (plan.shake > 0) this.addShake(plan.shake);
     if (plan.fovPunch > 0) this.punchFov(plan.fovPunch);
   }
@@ -7113,7 +7114,9 @@ export class Renderer {
     // the prototype so a host that borrows handleEvent reaches the switch too.
     const scope = enterSpellEvent(ev);
     try {
-      Renderer.prototype.dispatchEvent.call(this, ev);
+      // Blightcaller's spells keep the shadow school in the sim but draw rot green.
+      const shown = blightcraftFxEvent(ev, (id) => this.sim.entities.get(id)?.auras);
+      Renderer.prototype.dispatchEvent.call(this, shown);
     } finally {
       leaveSpellEvent(scope);
     }
@@ -10973,7 +10976,10 @@ export class Renderer {
               ? 'frost'
               : e.castingAbility === 'demon_heal'
                 ? 'shadow'
-                : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
+                : blightcraftFxSchool(
+                    e.castingAbility ?? undefined,
+                    ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane',
+                  ),
             dt,
             // per-ability spec color when the casting ability has one
             this.abilityVfx.sparkleColorFor(e.castingAbility),

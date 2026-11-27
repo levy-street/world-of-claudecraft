@@ -947,12 +947,12 @@ export function createActionBarView(
         const devotionReady =
           def.devotionCost === undefined ||
           (player.paladinDevotion?.value ?? 0) >= def.devotionCost;
-        const requiresPrimaryEye = def.id === 'sentence' || def.id === 'coven';
+        // Putrefy, Contagion and Litany of Guilt need your Rotmark on the target.
+        const ownMark = def.requiresOwnTargetAuraKind;
         const primaryEyeReady =
-          !requiresPrimaryEye ||
-          target?.auras.some(
-            (aura) => aura.sourceId === player.id && aura.kind === 'affliction_eye',
-          ) === true;
+          !ownMark ||
+          target?.auras.some((aura) => aura.sourceId === player.id && aura.kind === ownMark) ===
+            true;
         const dominionTemplateId = dominionTemplateForAbility(def.id);
         let dominionReady = true;
         if (dominionTemplateId !== null) {

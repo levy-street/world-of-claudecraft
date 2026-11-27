@@ -41,7 +41,7 @@ describe('isSelfOnlyAbility', () => {
     ['evasion', true], // selfBuff
     ['ice_barrier', true], // absorb
     ['instant_poison', true], // imbue
-    ['life_tap', true], // lifeTap
+    ['life_tap', true], // afflictionCruelPact (Cruel Pact)
     ['adrenaline_rush', true], // gainResource
     ['avenging_wrath', true], // selfBuff + grantDevotion
     ['bloodrage', true], // selfDamagePctMax + gainResource

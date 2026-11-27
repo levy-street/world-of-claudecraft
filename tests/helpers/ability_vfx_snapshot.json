@@ -285,8 +285,8 @@
       "full": "976bf758f69b1843b87deddc374802b64461fbb1f50a8f1374479d2b02f4f5c1"
     },
     "curse_of_agony": {
-      "spec": "e352b4e7e05cf8513204b9a6ba32d99c1f295c7fba530bae2aeb0bf8c8698003",
-      "full": "455e366590ef2de6f2d3beed86e4ea88c79f7976011aaa6e3eccb30f7115ee72"
+      "spec": "acf4a880372699eaa89ac8f71e4a16bb284eb0187d3a224998b1385f0b88fafe",
+      "full": "299b760839c7773052f7a211e8e696fdbbd9bfcd67e9a99b9a9702a398191aa5"
     },
     "curse_of_exhaustion": {
       "spec": "ce98196786e228dd7beead24e541d982667766a7e8c63f9d14fa7ff931b9a279",
@@ -600,6 +600,10 @@
       "spec": "a9705a492db63b402e37de80d4c8c49ec1b7e8fa920144fb92f879ed7d333bc3",
       "full": "b5576f01f7ffc44ab2c39c0e56a133203fdee833f58fd830532f422b5b115430"
     },
+    "hard_bargain": {
+      "spec": "f14de51361627c10e164b59f6ac9846a725708ea9f081200c2f7d5508e6ac3ff",
+      "full": "79ab76979820a8a3c7677ba89a36f2be6dbed18b0d8d7a8d918bb706fb5b0080"
+    },
     "heal": {
       "spec": "8047ebb38394896ce88c5388e8fd0e8310fdaf96ec35eff860e45ec492c7f5e1",
       "full": "de5c0194713d9bf28ad09f6651eeb1db70e5c94fb858dfbf692b5386a1f56c11"
@@ -899,6 +903,10 @@
     "phosphor_flask": {
       "spec": "55723709657d635bf1f6b41d86cbb0d9ccb6930659f168ce6dc603b274ac8709",
       "full": "236631f1de67f0375f612c2c6e2f82a94e85143daccaf4bc081bc3f115036ad2"
+    },
+    "plague_bloom": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "play_dead": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",

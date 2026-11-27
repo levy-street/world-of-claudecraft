@@ -17,6 +17,10 @@ export const SELF_ONLY_EFFECT_TYPES = new Set<AbilityEffect['type']>([
   'absorb',
   'imbue',
   'lifeTap',
+  // Cruel Pact (life_tap): health for mana, on the caster.
+  'afflictionCruelPact',
+  // Hard Bargain: mana for health, on the caster.
+  'hardBargain',
   'gainResource',
   'grantDevotion',
   'selfDamagePctMax',

@@ -8001,15 +8001,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Mentahbiskan tanah selama 9 detik dan menimbulkan {damage} kerusakan Suci tiap detik. Penjaga Iman menerima 10% lebih sedikit kerusakan di dalamnya.',
   'entities.abilities.consecration.name': 'Tanah Suci',
-  'entities.abilities.corruption.description':
-    'Mencemari target, menimbulkan {damage} kerusakan Bayangan selama 18 detik.',
   'entities.abilities.corruption.name': 'Busuk Hitam',
   'entities.abilities.crippling_poison.description':
     'Menyerang target dengan bisa timah, memberi {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik.',
   'entities.abilities.crippling_poison.name': 'Bisa Timah',
-  'entities.abilities.curse_of_agony.description':
-    'Mengutuk target dengan penderitaan: {damage} kerusakan Bayangan selama 24 detik.',
-  'entities.abilities.curse_of_agony.name': 'Tenung Derita',
   'entities.abilities.dash.description':
     'Berubah ke Wujud Kucing jika belum, lalu berlari dengan kecepatan 50% lebih tinggi selama 15 dtk. Dapat dipakai dalam wujud apa pun. Instan dan tidak memicu jeda global.',
   'entities.abilities.dash.name': 'Lesatan',
@@ -8036,8 +8031,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.divine_protection.description':
     'Perisai suci menyerap {damage}% dari kesehatan maksimummu selama {duration} detik.',
   'entities.abilities.divine_protection.name': 'Tameng Iman',
-  'entities.abilities.drain_life.description':
-    'Melahap daya hidup sasaran, memberi {damage} kerusakan Bayangan setiap detik dan memindahkan 70% darinya kepadamu sebagai nyawa. Derita justru memindahkan seluruhnya. Ketika disalurkan pada Mata Jahat utamamu, ia menghabiskan seluruh Benang Takdir di awal, dan setiap Benang menghasilkan 1 Kecaman tambahan per denyut.',
   'entities.abilities.drain_life.name': 'Melahap',
   'entities.abilities.earth_shock.description':
     'Memberi {damage} kerusakan Alam. Kerusakan meningkat dengan Kekuatan Mantra. Elemental: pada 5 Guntur, memberi 125% kerusakan lebih besar dan menghabiskan seluruh Guntur. Terikat Batu: memaksa sasaran menyerangmu selama 3 dtk.',
@@ -8169,8 +8162,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.lesser_heal.name': 'Doa Berbisik',
-  'entities.abilities.life_tap.description': 'Mengubah {damage} kesehatan menjadi {damage} mana.',
-  'entities.abilities.life_tap.name': 'Tawar Getir',
   'entities.abilities.lightning_bolt.description':
     'Memberi {damage} kerusakan Alam. Kerusakan meningkat dengan Kekuatan Mantra. Elemental: pukulan telak memberi 1 Guntur.',
   'entities.abilities.lightning_bolt.name': 'Sambaran Busur',
@@ -8377,8 +8368,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     'Selama 12 dtk, Sambaran Busur memberi 2 Guntur. Sambaran Busur atau Petir Bercabang berikutnya menjadi seketika, dan pembayaran Guntur penuh berikutnya memberi 25% kerusakan lebih besar. (Ciri khas Elemental)',
   'entities.abilities.siphon_life.name': 'Sifon Nyawa',
-  'entities.abilities.siphon_life.description':
-    'Menyedot nyawa dari musuh, menimbulkan {damage} kerusakan Bayangan selama 30 dtk dan memulihkanmu sebesar kerusakan yang terjadi. (ciri khas Penderitaan)',
   'entities.abilities.conflagrate.name': 'Kobaran Api',
   'entities.abilities.conflagrate.description':
     'Memajukan satu denyut mendatang dari Pakta Membaramu, lalu membakar sasaran sebesar {damage} kerusakan Api. Menghasilkan 1 Pemusnahan dan 1 Kehancuran. Menampung {charges} muatan. (Ciri khas Penghancuran)',
@@ -10614,8 +10603,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan Segel aktifmu untuk menghantam musuh dari jarak dekat.',
   'guide.abilityHook.lesser_heal':
     'Rapalan mantap untuk memenuhi nyawa sekutu saat ada waktu untuk diam.',
-  'guide.abilityHook.life_tap':
-    'Menukar sebagian nyawamu sendiri kembali menjadi mana saat kamu kehabisan.',
   'guide.abilityHook.lightning_bolt': 'Rapalan kerusakan Alam jarak jauh, andalanmu dari kejauhan.',
   'guide.abilityHook.lightning_shield':
     'Mengisi tubuhmu sehingga penyerang menerima kerusakan Alam saat mereka memukulmu.',
@@ -16655,24 +16642,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Mengorbankan Penyihir Tulang terlebih dahulu, lalu Prajurit Kerangka, dan Sayap Kubur hanya sebagai upaya terakhir. Di antara duplikat, ia memilih yang durasi tersisanya paling sedikit, lalu yang terlemah, untuk memberikan {damage} kerusakan Bayangan di lokasi yang dipilih.',
   'entities.abilities.corpse_explosion.name': 'Ledakan Mayat',
-  'entities.abilities.coven.description':
-    'Menciptakan Mata Jahat sekunder pada hingga 4 musuh terdekat selama 15 detik. Mereka mengisi kumpulan Kecaman bersama sebesar 50%, dan Vonis bergema kepada mereka sebesar 35% kerusakan.',
-  'entities.abilities.coven.name': 'Persekutuan Penyihir',
-  'entities.abilities.cruel_pact.description':
-    'Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa.',
   'entities.abilities.cruel_pact.name': 'Perjanjian Kejam',
-  'entities.abilities.cursed_accomplice.description':
-    'Menautkan Maledict Eye-mu saat tidak ada sekutu yang dipilih, membuat Gaze miliknya menghasilkan 2 Kecaman. Menautkan satu anggota grup yang dipilih membuat hanya kerusakan mereka terhadap Mata Jahat-mu yang menghasilkan 3 sebagai gantinya. Tautan baru menggantikan yang sebelumnya dan dapat terpicu sekali setiap 2 detik.',
   'entities.abilities.cursed_accomplice.name': 'Sekutu Terkutuk',
-  'entities.abilities.dark_pact.description':
-    'Mengorbankan 10% dari nyawamu saat ini untuk menyerap kerusakan setara 30% dari nyawa maksimummu selama 8 detik.',
   'entities.abilities.dark_pact.name': 'Perjanjian Darah',
   'entities.abilities.elemental_trance.description':
     'Memasuki trans elemental selama 15 detik, mengurangi kerusakan yang diterima sebesar 30% dan mengubah 20% dari semua kerusakan yang kamu berikan menjadi mana. (mesin Warspirit)',
   'entities.abilities.elemental_trance.name': 'Trans Unsur',
-  'entities.abilities.evil_eye.description':
-    'Menandai satu musuh sebagai fokus kutukanmu. Memindahkan Eye mempertahankan Kecaman tetapi tidak memperbarui masa berlakunya yang 20 detik.',
-  'entities.abilities.evil_eye.name': 'Mata Jahat',
   'entities.abilities.eviscerate.description': 'Jurus penutup yang menyebabkan {damage}.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Pada 6 Ritus Bisa, tombol ini berubah menjadi Venomrend: serangan yang seketika menimbulkan seluruh kerusakan yang masih akan diberikan pendarahanmu, menanamkan luka bisa yang segar, dan memulihkan 20 energi.',
@@ -16697,19 +16672,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghantam musuh sebesar kerusakan senjata ditambah {damage} dan meningkatkan peluang mengelakmu sebesar 15% selama 7 detik. Memberi 1 poin combo. (talenta Rogue)',
   'entities.abilities.hemorrhage.description':
     'Menghantam musuh sebesar kerusakan senjata ditambah {damage}, menyebabkan kerusakan pendarahan selama 12 detik, dan meningkatkan kerusakan pendarahan yang diterima sebesar 40%. Memberi 1 poin combo. Setiap penggunaan ke-2 menambah 1 Gloam (maks 3). (mesin Skulduggery)',
-  'entities.abilities.hex_of_violence.description':
-    'Mengutuk musuh selama 8 detik, memberikan kerusakan Bayangan dan menghasilkan 2 Kecaman setiap 2 detik. 3 tindakan merusak berikutnya masing-masing menghasilkan 7 Kecaman dan mencambuknya sebesar 17 kerusakan Bayangan.',
-  'entities.abilities.hex_of_violence.name': 'Kutukan Kekerasan',
-  'entities.abilities.hour_of_judgment.description':
-    'Memanggil penghakiman atas Mata Jahat utamamu selama 15 detik, memberikan 40 Kecaman dan 3 Benang Takdir, mengaktifkan Possession, menggandakan Kecaman yang dihasilkan melalui Eye utama, dan meningkatkan kerusakan Vonis sebesar 20%. Vonis pertama mengembalikan 50 Kecaman.',
-  'entities.abilities.hour_of_judgment.name': 'Saat Penghakiman',
   'entities.abilities.kidney_shot.description':
     'Jurus penutup yang membuat target terpana selama 2 detik plus 1 detik per poin combo (5 poin combo: 7 detik).',
-  'entities.abilities.litany_of_guilt.description':
-    'Mengutuk Mata Jahat utamamu selama 6 detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain dalam radius 8 yard, paling banyak sekali per detik. Peringkat 2 memperpanjangnya menjadi 8 detik dan 4 musuh.',
   'entities.abilities.litany_of_guilt.name': 'Litani Rasa Bersalah',
-  'entities.abilities.maledict_gaze.description':
-    'Maledict Eye-mu menyerang Mata Jahat utama yang kamu pilih setiap 2,5 detik untuk kerusakan Bayangan. Rasuki Mata Jahat menggandakan kecepatan serangnya.',
   'entities.abilities.maledict_gaze.name': 'Tatapan Kutukan',
   'entities.abilities.maul.description':
     'Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman besar. Aktif pada ayunanmu berikutnya. Hanya dalam Wujud Bruin.',
@@ -16719,15 +16684,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Membakar musuh dengan api rembulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu.',
   'entities.abilities.moonfire.specNote_balance':
     'Jaga agar tetap membara: Moonseed memperpanjangnya selama 6 detik.',
-  'entities.abilities.needle_of_fate.description':
-    'Menusuk musuh dengan {damage} kerusakan Bayangan dan menghasilkan {needleDoom} Kecaman saat mengenai jika musuh masih menyandang Mata Jahatmu. Menyelesaikan rapalan memindahkan Mata Jahat utamamu ke sasaran dan menambah satu Benang Takdir selama 12 detik, hingga 3. Benang Takdir tetap bersamamu saat Mata berpindah atau sasarannya mati. Menyasar Mata sekunder dari Persekutuan Penyihir menukarnya dengan Mata utama.',
-  'entities.abilities.needle_of_fate.name': 'Jarum Takdir',
   'entities.abilities.ossuary_mark.description':
     'Menandai musuh selama 15 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 yard dan menciptakan 1 Serpihan Jiwa.',
   'entities.abilities.ossuary_mark.name': 'Tanda Rumah Tulang',
-  'entities.abilities.possess_evil_eye.description':
-    'Maledictor merasuki Mata Jahat utamamu selama 15 detik dan menghasilkan 35 Kecaman. Jarum Takdir dirapal dalam 1 detik dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, dan Vonis memberikan 25% kerusakan lebih besar dan melepaskan gema tertunda sebesar 60% kerusakan, menurun menjadi 30% sepanjang level 17-20.',
-  'entities.abilities.possess_evil_eye.name': 'Rasuki Mata Jahat',
   'entities.abilities.raise_bone_mage.description':
     'Menghabiskan 2 Serpihan Jiwa untuk menambahkan Penyihir Tulang jarak jauh yang persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Serangannya membuat target terbuka terhadap 5% kerusakan sihir lebih besar selama 6 detik, dan Perintah Penuaian menaikkan kelemahan itu menjadi 8%.',
   'entities.abilities.raise_bone_mage.name': 'Bangkitkan Penyihir Tulang',
@@ -16769,9 +16728,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Meningkatkan kecepatan gerak sebesar 35%, tetapi mengorbankan 2% dari nyawa maksimummu setiap detik. Rapal lagi untuk membatalkan. Efek ini nonaktif secara otomatis pada 20% nyawa.',
   'entities.abilities.sacrilegious_march.name': 'Barisan Penodaan',
-  'entities.abilities.sentence.description':
-    'Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16.',
-  'entities.abilities.sentence.name': 'Vonis',
   'entities.abilities.sinister_strike.description':
     'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Menambah 1 Ritus Bisa (maks 6).',
@@ -16802,16 +16758,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Sapukan cakarmu melalui musuh terdekat sebesar {damage} kerusakan. Menimbulkan ancaman ekstra. Hanya dalam Wujud Bruin.',
   'entities.abilities.swipe.specNote_feral':
     'Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
-  'entities.abilities.umbral_anchor.description':
-    'Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik.',
   'entities.abilities.umbral_anchor.name': 'Jangkar Bayangan',
   'entities.abilities.unholy_command.description':
     'Menghabiskan 3 Serpihan Jiwa untuk memerintahkan semua mayat hidupmu memberikan 25% kerusakan lebih besar dan bertindak 20% lebih cepat selama 12 detik.',
   'entities.abilities.unholy_command.name': 'Perintah Tak Suci',
   'entities.abilities.venom_dart.specNote_assassination':
     'Menambah 1 Ritus Bisa dan memperpanjang luka bisamu selama 6 detik (luka itu tidak akan pernah melebihi 20 detik).',
-  'entities.abilities.vicarious_suffering.description':
-    'Menautkan penderitaanmu selama 8 detik dan menghasilkan hingga 15 Kecaman dari pukulan bermusuhan. Pada dirimu sendiri, mengurangi kerusakan yang diterima sebesar 20%. Pada sekutu, mengalihkan hingga 20% kepadamu tanpa membuat nyawamu turun di bawah 15%.',
   'entities.abilities.vicarious_suffering.name': 'Derita Pengganti',
   'entities.abilities.wrath.description':
     'Melontarkan baut energi alam sebesar {damage} kerusakan Alam.',
@@ -16826,8 +16778,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Penyihir Tulang',
   'entities.mobs.necromancy_gravewing.name': 'Sayap Kubur',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Prajurit Kerangka',
-  'guide.abilityHook.evil_eye':
-    'Menandai musuh yang tindakan dan penderitaannya akan mengisi Kecaman-mu.',
   'hud.pet.abyssalChain': 'Rantai Jurang',
   'hud.pet.abyssalChainDesc':
     'Perintahkan Duskmurk untuk menyeret musuh biasa dari jarak lebih dari 8 hingga 20 m kembali ke dirinya. Bos tidak bisa ditarik. Jeda 15 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.',
@@ -16840,26 +16790,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'Perintahkan Emberkin untuk melontarkan proyektil fel tambahan ke targetmu. Jeda 8 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.',
   'hud.pet.felboltTitle': 'Baut Fel',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'Kerusakan yang memenuhi syarat memberikan {value} Kecaman, paling banyak sekali setiap {interval} dtk',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Melahap sedang mengonsumsi {stacks} Benang Takdir untuk {doom} Kecaman tambahan per tik',
-  'hudChrome.auraEffect.afflictionEye':
-    'Tatapan Kutukan menyerang setiap {interval} dtk; efek pada Eye ini menghasilkan {pct}% Kecaman',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Efek pada Eye ini menghasilkan {doomPct}% Kecaman; Vonis bergema di sini sebesar {echoPct}% kerusakan',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Benang Takdir: Vonis memberikan {sentencePct}% kerusakan lebih besar, atau Melahap memperoleh {doom} Kecaman tambahan per tik',
-  'hudChrome.auraEffect.afflictionJudgment':
-    'Eye utama menghasilkan {eyePct}% lebih banyak Kecaman; Vonis memberikan {sentencePct}% kerusakan lebih besar dan yang pertama mengembalikan {refund} Kecaman',
-  'hudChrome.auraEffect.afflictionLitany':
-    'Perolehan Kecaman memberikan {damage} kerusakan Bayangan kepada hingga {targets} musuh dalam radius {radius} m, sekali per detik',
-  'hudChrome.auraEffect.afflictionPossession':
-    'Memperkuat Jarum Takdir, Melahap, Tatapan Kutukan, dan Vonis',
-  'hudChrome.auraEffect.afflictionVicarious':
-    'Mengalihkan atau mengurangi {pct}% kerusakan masuk dan dapat menghasilkan hingga {max} Kecaman',
-  'hudChrome.auraEffect.afflictionViolence':
-    '{charges} balasan tersisa; serangan musuh memberikan {doom} Kecaman dan membalas {damage} kerusakan Bayangan',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} gema tersisa: kemampuan bertarget tunggal memberikan {pct}% kerusakan kepada hingga {targets} musuh terdekat',
   'hudChrome.auraEffect.arcaneCharge':
@@ -16885,7 +16815,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kerusakan yang diberikan meningkat {damagePct}%, kecepatan serang {hastePct}%, dan kecepatan gerak {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} muatan: Tombak Es memperlakukan targetnya seolah membeku dan memberikan {pct}% kerusakan beku',
-  'hudChrome.auraEffect.forbiddenReflectionLock': 'Pantulan Terlarang belum bisa disiapkan lagi',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Jeda Penyihir Iblis berikutnya yang memenuhi syarat dapat dirapal kembali',
   'hudChrome.auraEffect.formLich':
@@ -16950,15 +16879,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Wrack',
   'hudChrome.procOverlay.ruinStatus': '{value} dari {max} Wrack',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Serpihan Jiwa',
-  'hudChrome.warlock.doomEmptyStatus': '{value} dari {max} Kecaman.',
-  'hudChrome.warlock.doomLabel': 'Kecaman',
-  'hudChrome.warlock.doomStatus': '{value} dari {max} Kecaman; {remaining}.',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Tiga Benang Takdir: Melahap dapat menganyamnya menjadi Kecaman tambahan.',
-  'hudChrome.warlock.fateThreadsLabel': 'Benang Takdir',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Tiga Benang Takdir: Vonis dapat mengonsumsinya untuk 18% kerusakan tambahan.',
-  'hudChrome.warlock.fateThreadsStatus': '{value} dari {max} Benang Takdir.',
   'itemUi.tooltip.useHealingPotionPct':
     'Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 2 mnt.',
   'guide.controls.reliquary': 'Relikuari',
@@ -17941,9 +17861,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Mekar Berlebih memanen 75 persen efek Anda yang tersisa dan setelahnya menyimpan 1 Verdansi.',
   'entities.itemSets.grovespring.name': 'Busana Mata Air Rimba',
-  'entities.itemSets.hexthread.bonus2':
-    'Jarum Takdir memberikan 2 Penghukuman tambahan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
-  'entities.itemSets.hexthread.bonus4': 'Vonis Berlalu mengembalikan 10 Penghukuman.',
   'entities.itemSets.hexthread.name': 'Selubung Benang Hex',
   'entities.itemSets.moonscorch.bonus2':
     'Benih Bulan dapat memperpanjang Badai Purnama dua kali per penerapan, hingga maksimum 12 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',

@@ -3,7 +3,13 @@ import { ABILITIES, CLASSES } from '../src/sim/content/classes';
 import { SPEC_PRIMARY_STAT } from '../src/sim/content/spec_primary_stat';
 import { TALENTS } from '../src/sim/content/talents';
 import type { PlayerClass } from '../src/sim/types';
-import { CLASS_DETAILS, SIGNATURE_ABILITIES, SPEC_CARD_INFO } from '../src/ui/class_details_data';
+import {
+  CLASS_DETAILS,
+  SIGNATURE_ABILITIES,
+  SIGNATURE_ICON_IDS,
+  SPEC_CARD_INFO,
+} from '../src/ui/class_details_data';
+import { abilityImageUrl } from '../src/ui/icons';
 
 // Guards the hand-maintained character-select showcase data against drift from
 // the sim's source of truth. If a class's ability kit or roster changes, these
@@ -109,5 +115,16 @@ describe('specialization card metadata', () => {
   it('showcases the Hourglass as Chronomancy identity instead of Perfect Moment', () => {
     expect(SPEC_CARD_INFO.mage.arcane.examples).toContain('temporal_hourglass');
     expect(SPEC_CARD_INFO.mage.arcane.examples).not.toContain('perfect_moment');
+  });
+
+  it('keeps the warlock preview on shadow-purple Blackrot art while Blightcaller shows rot green', () => {
+    expect(SIGNATURE_ABILITIES.warlock).toContain('corruption');
+    expect(abilityImageUrl(SIGNATURE_ICON_IDS.corruption)).toBe(
+      '/ui/skills/warlock/corruption_shadow.webp',
+    );
+    expect(abilityImageUrl('corruption')).toBe('/ui/skills/warlock/corruption.webp');
+    for (const id of Object.keys(SIGNATURE_ICON_IDS)) {
+      expect(Object.values(SIGNATURE_ABILITIES).flat(), id).toContain(id);
+    }
   });
 });

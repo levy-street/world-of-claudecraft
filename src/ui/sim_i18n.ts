@@ -27352,8 +27352,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
 
 const WARLOCK_ABILITY_AURA_IDS: Readonly<Record<string, string>> = {
   'Umbral Anchor': 'umbral_anchor',
-  'Possess the Evil Eye': 'possess_evil_eye',
-  'Hour of Judgment': 'hour_of_judgment',
+  'Possess the Rotmark': 'possess_evil_eye',
+  'Hour of Rot': 'hour_of_judgment',
   Coven: 'coven',
   'Sacrilegious March': 'sacrilegious_march',
   'Sanguine Covenant': 'dark_pact',
@@ -27438,8 +27438,8 @@ export function localizeSimAuraName(name: string): string | null {
   if (trinketItemId) return tEntity({ kind: 'item', id: trinketItemId, field: 'name' });
   const namedAbilityId = ABILITY_NAMED_AURA_IDS[name];
   if (namedAbilityId) return tEntity({ kind: 'ability', id: namedAbilityId, field: 'name' });
-  if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');
-  if (name === 'Fate Threads') return t('hudChrome.warlock.fateThreadsLabel');
+  if (name === 'Blight') return t('hudChrome.warlock.doomLabel');
+  if (name === 'Rot Splinters') return t('hudChrome.warlock.fateThreadsLabel');
   if (name === 'Soul Fragments') return t('hudChrome.procOverlay.soulFragmentsMeter');
   const abilityId = WARLOCK_ABILITY_AURA_IDS[name];
   if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });

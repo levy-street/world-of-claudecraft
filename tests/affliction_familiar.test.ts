@@ -130,6 +130,6 @@ describe('Affliction Maledict Eye familiar', () => {
     expect(vfxSource).toContain('AFFLICTION_FAMILIAR_LOCAL_X');
     expect(vfxSource).toContain("slot.kind === 'evilEyeGaze'");
     expect(vfxSource).toContain('const GAZE_CORE = 0xc8ff86');
-    expect(vfxSource).toContain('const GAZE_FLOW = 0x7d36bd');
+    expect(vfxSource).toContain('const GAZE_FLOW = 0x76c834');
   });
 });

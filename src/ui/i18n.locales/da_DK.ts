@@ -7800,15 +7800,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Indvier jorden i 9 sek. og giver {damage} Hellig skade hvert sekund. Trosvogtere tager 10% mindre skade, mens de står i området.',
   'entities.abilities.consecration.name': 'Hellig Jord',
-  'entities.abilities.corruption.description':
-    'Fordærver målet, og forvolder {damage} Skygge-skade over 18 sek.',
   'entities.abilities.corruption.name': 'Sortråd',
   'entities.abilities.crippling_poison.description':
     'Slår målet med en blytung gift, der giver {damage} Natur-skade og nedsætter dets bevægelseshastighed med 50% i 12 sek.',
   'entities.abilities.crippling_poison.name': 'Blytung Gift',
-  'entities.abilities.curse_of_agony.description':
-    'Forbander målet med kval: {damage} skyggeskade over 24 sek.',
-  'entities.abilities.curse_of_agony.name': 'Kvalens Forgørelse',
   'entities.abilities.dash.description':
     'Skift til Katteform, hvis du ikke allerede er i den, og sprint med 50% ekstra hastighed i 15 sek. Kan bruges i alle former. Øjeblikkelig og udløser ikke global nedkøling.',
   'entities.abilities.dash.name': 'Ræs',
@@ -7834,8 +7829,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.divine_protection.description':
     'Et helligt skjold opsuger {damage}% af dit maksimale helbred i {duration} sek.',
   'entities.abilities.divine_protection.name': 'Troens Værn',
-  'entities.abilities.drain_life.description':
-    'Fortærer målets livskraft, volder {damage} Skyggeskade hvert sekund og overfører 70% af den som helbred til jer. Plage overfører i stedet det hele. Kanaliseret på jeres primære onde øje bruger den alle Skæbnetråde ved begyndelsen, og hver Tråd skaber 1 ekstra Fordømmelse per tik.',
   'entities.abilities.drain_life.name': 'Fortær',
   'entities.abilities.earth_shock.description':
     'Volder {damage} Naturskade. Skaden stiger med Besværgelseskraft. Elementær: ved 5 Torden voldes 125% mere skade, hvorefter al Torden bruges. Stenbundet: tvinger målet til at angribe jer i 3 sek.',
@@ -7963,8 +7956,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.lesser_heal.name': 'Hvisket Bøn',
-  'entities.abilities.life_tap.description': 'Omdanner {damage} helbred til {damage} mana.',
-  'entities.abilities.life_tap.name': 'Hård Handel',
   'entities.abilities.lightning_bolt.description':
     'Volder {damage} Naturskade. Skaden stiger med Besværgelseskraft. Elementær: et træf giver 1 Torden.',
   'entities.abilities.lightning_bolt.name': 'Lysbuelyn',
@@ -8169,8 +8160,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     'I 12 sek. giver Lysbuelyn 2 Torden. Jeres næste Lysbuelyn eller Gaffellyn er øjeblikkelig, og jeres næste fulde Tordenudbetaling volder 25% mere skade. (Kendetegn for Elementær)',
   'entities.abilities.siphon_life.name': 'Sug liv',
-  'entities.abilities.siphon_life.description':
-    'Suger liv fra fjenden, påfører {damage} skyggeskade over 30 sek og helbreder dig for den skade, der bliver gjort. (Lidelsessignatur)',
   'entities.abilities.conflagrate.name': 'Antændelse',
   'entities.abilities.conflagrate.description':
     'Fremrykker et kommende tik af jeres Brændende Pagt og antænder derefter målet for {damage} Ildskade. Skaber 1 Forødelse og 1 Tilintetgørelse. Rummer {charges} ladninger. (Kendetegn for Ødelæggelse)',
@@ -9663,8 +9652,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.judgement': 'Bruger dit aktive Segl til at ramme en fjende på kort afstand.',
   'guide.abilityHook.lesser_heal':
     'En stabil besværgelse til at fylde en allieret op når der er tid til at stå stille.',
-  'guide.abilityHook.life_tap':
-    'Bytter noget af dit eget helbred tilbage til mana når du løber tør.',
   'guide.abilityHook.lightning_bolt':
     'En besværgelse med Naturskade på afstand, dit foretrukne valg langt fra.',
   'guide.abilityHook.lightning_shield':
@@ -16410,24 +16397,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Ofrer først en Knoglemagiker, dernæst en Skeletkriger, og en Gravvinge kun som sidste udvej. Blandt dubletter vælges den med kortest resterende varighed, dernæst den svageste, for at give {damage} Skyggeskade på det valgte sted.',
   'entities.abilities.corpse_explosion.name': 'Ligeksplosion',
-  'entities.abilities.coven.description':
-    'Skaber sekundære onde øjne på op til 4 nærliggende fjender i 15 sek. De fodrer den delte Fordømmelse-pulje med 50%, og Dom ekkoer til dem for 35% skade.',
-  'entities.abilities.coven.name': 'Heksekreds',
-  'entities.abilities.cruel_pact.description':
-    'Ofrer 12% af dit maksimale helbred for at genoprette 1,5% af din maksimale mana og generere 20 Fordømmelse. Kan ikke bruges ved eller under 20% helbred.',
   'entities.abilities.cruel_pact.name': 'Grusom pagt',
-  'entities.abilities.cursed_accomplice.description':
-    'Forbinder dit forbandede øje, når ingen allieret er valgt, så dets Forbandet blik genererer 2 Fordømmelse. At forbinde ét valgt gruppemedlem gør i stedet, at kun deres skade til dit onde øje genererer 3. Et nyt bånd erstatter det forrige og kan udløses højst én gang hvert 2. sek.',
   'entities.abilities.cursed_accomplice.name': 'Forbandet medskyldig',
-  'entities.abilities.dark_pact.description':
-    'Ofrer 10% af dit nuværende helbred for at opsuge skade svarende til 30% af dit maksimale helbred i 8 sek.',
   'entities.abilities.dark_pact.name': 'Blodpagt',
   'entities.abilities.elemental_trance.description':
     'Gå i elementær trance i 15 sek., hvilket reducerer skade modtaget med 30% og omdanner 20% af al skade, du gør, til mana. (Krigsånd-motoren)',
   'entities.abilities.elemental_trance.name': 'Elementær trance',
-  'entities.abilities.evil_eye.description':
-    'Mærker én fjende som fokus for dine forbandelser. At flytte Øjet bevarer Fordømmelse, men fornyer ikke dets 20 sek. udløb.',
-  'entities.abilities.evil_eye.name': 'Onde øje',
   'entities.abilities.eviscerate.description': 'Afsluttende manøvre, der giver {damage}.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Ved 6 Giftritual bliver denne knap til Giftflænge: et slag, der øjeblikkeligt giver al den skade, dine blødninger stadig ville have givet, planter et frisk giftsår og gendanner 20 energi.',
@@ -16451,19 +16426,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Slår fjenden for våbenskade plus {damage} og øger din undvigelseschance med 15% i 7 sek. Giver 1 combopoint. (slyngeltalent)',
   'entities.abilities.hemorrhage.description':
     'Slår fjenden for våbenskade plus {damage}, giver blødningsskade over 12 sek. og øger blødningsskade modtaget med 40%. Giver 1 combopoint. Hver 2. brug tilføjer 1 Tusmørke (maks. 3). (Skulduggery-motoren)',
-  'entities.abilities.hex_of_violence.description':
-    'Forhekser fjenden i 8 sek., hvilket forårsager Skyggeskade og genererer 2 Fordømmelse hvert 2. sek. Dens næste 3 skadevoldende handlinger genererer hver 7 Fordømmelse og pisker den for 17 Skyggeskade.',
-  'entities.abilities.hex_of_violence.name': 'Voldens forbandelse',
-  'entities.abilities.hour_of_judgment.description':
-    'Kalder dom over dit primære onde øje i 15 sek., giver 40 Fordømmelse og 3 Skæbnetråde, aktiverer Besættelse, fordobler Fordømmelse genereret gennem det primære Øje og øger Dom-skade med 20%. Den første Dom refunderer 50 Fordømmelse.',
-  'entities.abilities.hour_of_judgment.name': 'Dommens time',
   'entities.abilities.kidney_shot.description':
     'Afsluttende manøvre, der bedøver målet i 2 sek. plus 1 sek. pr. combopoint (5 combopoint: 7 sek.).',
-  'entities.abilities.litany_of_guilt.description':
-    'Forbander dit primære onde øje i 6 sek. Fordømmelsesgevinster udløser en bølge, der skader op til 2 andre fjender inden for 8 yards, højst én gang pr. sekund. Rang 2 forlænger den til 8 sek. og 4 fjender.',
   'entities.abilities.litany_of_guilt.name': 'Skyldens litani',
-  'entities.abilities.maledict_gaze.description':
-    'Dit forbandede øje angriber dit valgte primære onde øje hvert 2,5 sek for Skyggeskade. Besæt det onde øje fordobler dets angrebshastighed.',
   'entities.abilities.maledict_gaze.name': 'Forbandet blik',
   'entities.abilities.maul.description':
     'Et knusende angreb, der øger nærkampsskaden med {damage} og forårsager en stor mængde trussel. Aktiveres ved dit næste sving. Kun i Bruin-form.',
@@ -16473,15 +16438,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Brænder fjenden med månebrand for {damage} arkan skade plus skade over tid.',
   'entities.abilities.moonfire.specNote_balance':
     'Hold den brændende: Månefrø forlænger den med 6 sek.',
-  'entities.abilities.needle_of_fate.description':
-    'Gennemborer fjenden for {damage} Skyggeskade og genererer {needleDoom} Fordømmelse, hvis den bærer dit onde øje. Hvert træf på dit primære onde øje tilføjer en Skæbnetråd i 12 sek., op til 3. Findes intet ondt øje, mærker Skæbnens nål først sit mål.',
-  'entities.abilities.needle_of_fate.name': 'Skæbnens nål',
   'entities.abilities.ossuary_mark.description':
     'Mærker en fjende i 15 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 yards og skaber 1 Sjælesplint.',
   'entities.abilities.ossuary_mark.name': 'Benhusmærke',
-  'entities.abilities.possess_evil_eye.description':
-    'Maledictor besætter dit primære onde øje i 15 sek. og genererer 35 Fordømmelse. Skæbnens nål kastes på 1 sek. og genererer 2 ekstra Fordømmelse, Fortær kan kanaliseres, mens du bevæger dig, og Dom gør 25% mere skade og udløser et forsinket ekko for 60% skade, aftagende til 30% hen over niveau 17 til 20.',
-  'entities.abilities.possess_evil_eye.name': 'Besæt det onde øje',
   'entities.abilities.raise_bone_mage.description':
     'Bruger 2 Sjælesplinter for at tilføje en vedvarende Knoglemagiker på afstand til dit 2-plads Herredømme. Kun én kan tjene dig ad gangen. Dens angreb blotter målet for 5% mere magisk skade i 6 sek., og Høstende befaling hæver den svaghed til 8%.',
   'entities.abilities.raise_bone_mage.name': 'Væk knoglemagiker',
@@ -16522,9 +16481,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Øger bevægelseshastigheden med 35%, men ofrer 2% af dit maksimale helbred hvert sekund. Kast igen for at annullere. Den slår fra ved 20% helbred.',
   'entities.abilities.sacrilegious_march.name': 'Vanhellig march',
-  'entities.abilities.sentence.description':
-    'Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Hver Tråd øger skaden med 6%. Ekstra effekter eskalerer ved 20, 50, 80 og 100 Fordømmelse. Dens skadesskalering flader ud efter niveau 16.',
-  'entities.abilities.sentence.name': 'Dom',
   'entities.abilities.sinister_strike.description':
     'Et øjeblikkeligt slag for våbenskade plus {damage}. Giver 1 combopoint.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Tilføjer 1 Giftritual (maks. 6).',
@@ -16555,16 +16511,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Fej dine kløer gennem nærliggende fjender for {damage} skade. Forårsager ekstra trussel. Kun i Bruin-form.',
   'entities.abilities.swipe.specNote_feral':
     'Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3).',
-  'entities.abilities.umbral_anchor.description':
-    'Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket forbruger ankeret og starter en 45 sek. nedkøling.',
   'entities.abilities.umbral_anchor.name': 'Skyggeanker',
   'entities.abilities.unholy_command.description':
     'Bruger 3 Sjælesplinter for at befale alle dine udøde at gøre 25% mere skade og handle 20% hurtigere i 12 sek.',
   'entities.abilities.unholy_command.name': 'Vanhellig befaling',
   'entities.abilities.venom_dart.specNote_assassination':
     'Tilføjer 1 Giftritual og forlænger dit giftsår med 6 sek. (såret kommer aldrig over 20 sek.).',
-  'entities.abilities.vicarious_suffering.description':
-    'Forbinder din lidelse i 8 sek. og genererer op til 15 Fordømmelse fra fjendtlige træf. På dig selv reducerer det skade modtaget med 20%. På en allieret omdirigerer det op til 20% til dig, uden at bringe dig under 15% helbred.',
   'entities.abilities.vicarious_suffering.name': 'Stedfortrædende lidelse',
   'entities.abilities.wrath.description': 'Kaster et lyn af naturenergi for {damage} naturskade.',
   'entities.abilities.wrath.specNote_balance':
@@ -16578,8 +16530,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Knoglemagiker',
   'entities.mobs.necromancy_gravewing.name': 'Gravvinge',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Skeletkriger',
-  'guide.abilityHook.evil_eye':
-    'Navngiver den fjende, hvis handlinger og lidelse vil fodre din Fordømmelse.',
   'hud.pet.abyssalChain': 'Afgrundskæde',
   'hud.pet.abyssalChainDesc':
     'Befal Duskmurkn at trække en normal fjende mere end 8 og op til 20 m tilbage til sig selv. Bosser kan ikke trækkes. 15 sekunders nedkøling. Højreklik, langt tryk eller tryk Shift+Enter for at slå automatisk kast til/fra.',
@@ -16592,26 +16542,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'Befal Emberkinen at affyre endnu et dæmonprojektil mod dit mål. 8 sekunders nedkøling. Højreklik, langt tryk eller tryk Shift+Enter for at slå automatisk kast til/fra.',
   'hud.pet.felboltTitle': 'Dæmonlyn',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'Kvalificerende skade giver {value} Fordømmelse, højst én gang hvert {interval}. sek',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Fortær forbruger {stacks} Skæbnetråde for {doom} ekstra Fordømmelse pr. tik',
-  'hudChrome.auraEffect.afflictionEye':
-    'Forbandet blik angriber hvert {interval}. sek; effekter ved dette Øje genererer {pct}% Fordømmelse',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Effekter ved dette Øje genererer {doomPct}% Fordømmelse; Dom ekkoer hertil for {echoPct}% skade',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Skæbnetråde: Dom gør {sentencePct}% mere skade, eller Fortær får {doom} ekstra Fordømmelse pr. tik',
-  'hudChrome.auraEffect.afflictionJudgment':
-    'Det primære Øje genererer {eyePct}% mere Fordømmelse; Dom gør {sentencePct}% mere skade, og den første refunderer {refund} Fordømmelse',
-  'hudChrome.auraEffect.afflictionLitany':
-    'Fordømmelsesgevinster gør {damage} Skyggeskade til op til {targets} fjender inden for {radius} m, én gang pr. sek',
-  'hudChrome.auraEffect.afflictionPossession':
-    'Styrker Skæbnens nål, Fortær, Forbandet blik og Dom',
-  'hudChrome.auraEffect.afflictionVicarious':
-    'Omdirigerer eller reducerer {pct}% af indkommende skade og kan generere op til {max} Fordømmelse',
-  'hudChrome.auraEffect.afflictionViolence':
-    '{charges} gengældelser tilbage; et fjendtligt angreb giver {doom} Fordømmelse og giver {damage} Skyggeskade tilbage',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} ekkoer tilbage: enkeltmålsevner gør {pct}% skade til op til {targets} nærliggende fjender',
   'hudChrome.auraEffect.arcaneCharge':
@@ -16636,7 +16566,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Skade gjort øget med {damagePct}%, angrebshastighed med {hastePct}%, og bevægelseshastighed med {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} ladninger: Islanse behandler sit mål som frosset og gør {pct}% frossen skade',
-  'hudChrome.auraEffect.forbiddenReflectionLock': 'Forbudt Spejling kan ikke forberedes igen endnu',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Din næste kvalificerede Heksemester-nedkøling kan kastes igen',
   'hudChrome.auraEffect.formLich':
@@ -16696,15 +16625,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Wrack',
   'hudChrome.procOverlay.ruinStatus': '{value} af {max} Wrack',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Sjælesplinter',
-  'hudChrome.warlock.doomEmptyStatus': '{value} af {max} Fordømmelse.',
-  'hudChrome.warlock.doomLabel': 'Fordømmelse',
-  'hudChrome.warlock.doomStatus': '{value} af {max} Fordømmelse; {remaining}.',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Tre Skæbnetråde: Fortær kan flette dem ind i yderligere Fordømmelse.',
-  'hudChrome.warlock.fateThreadsLabel': 'Skæbnetråde',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Tre Skæbnetråde: Dom kan forbruge dem for 18% øget skade.',
-  'hudChrome.warlock.fateThreadsStatus': '{value} af {max} Skæbnetråde.',
   'itemUi.tooltip.useHealingPotionPct':
     'Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 2 min afkøling.',
   'guide.controls.reliquary': 'Relikvariet',
@@ -17632,9 +17552,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Overbloom høster 75 procent af dine resterende effekter og oplagrer derefter 1 Verdance.',
   'entities.itemSets.grovespring.name': 'Grovespring-dragt',
-  'entities.itemSets.hexthread.bonus2':
-    'Skæbnens nål giver 2 ekstra Fordømmelse. Modtaget skade forsinker ikke længere dine besværgelser.',
-  'entities.itemSets.hexthread.bonus4': 'Dom refunderer 10 Fordømmelse.',
   'entities.itemSets.hexthread.name': 'Hexthread-svøb',
   'entities.itemSets.moonscorch.bonus2':
     'Moonseed kan forlænge Lunar Tempest to gange pr. påføring, op til højst 12 sek. Modtaget skade forsinker ikke længere dine besværgelser.',

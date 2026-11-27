@@ -152,10 +152,10 @@ describe('Sentence VFX painter', () => {
     expect(peakChannel(secondaryWave)).toBeLessThan(0.12);
     expect(peakChannel(verticalHaloMaterial.color)).toBeLessThan(0.12);
     expect(brightestStarburstChannel).toBeLessThan(0.12);
-    expect(residue.color.b).toBeGreaterThan(residue.color.g);
+    expect(residue.color.g).toBeGreaterThan(residue.color.b);
     expect(residue.blending).toBe(THREE.NormalBlending);
     expect((residue as THREE.MeshBasicMaterial).map).toBe(TEST_TEXTURES.rune);
-    expect(greenDominantStarburstVertex).toBe(false);
+    expect(greenDominantStarburstVertex).toBe(true);
     expect(rupture.blending).toBe(THREE.NormalBlending);
     expect((starburst.material as THREE.MeshBasicMaterial).blending).toBe(THREE.NormalBlending);
 

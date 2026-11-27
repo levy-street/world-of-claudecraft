@@ -35,6 +35,23 @@ const LEADEN_MAX_STACKS = 3;
 const LEADEN_DURATION = 5;
 const LEADEN_ROOT_DURATION = 3.5;
 const LEADEN_ROOT_LOCK = 15;
+// The three Blightcaller DoTs whose ticks hold an existing Leaden slow in place.
+const LEADEN_SUSTAINING_DOT_IDS = new Set(['corruption', 'curse_of_agony', 'siphon_life']);
+
+/**
+ * A tick of the warlock's Blackrot, Festerhex or Veinleech keeps their Leaden Hex slow on
+ * the target from wearing off. It never adds a stack and never roots: stacks and the root
+ * still come only from a cast (applyLeadenHex).
+ */
+export function sustainLeadenHexFromDotTick(target: Entity, dot: Aura): void {
+  if (!LEADEN_SUSTAINING_DOT_IDS.has(dot.id) || dot.sourceId === undefined) return;
+  const slow = target.auras.find(
+    (aura) => aura.id === LEADEN_SLOW_ID && aura.sourceId === dot.sourceId,
+  );
+  if (!slow) return;
+  slow.remaining = Math.max(slow.remaining, LEADEN_DURATION);
+  slow.duration = LEADEN_DURATION;
+}
 
 const SHADOW_CREDIT_ID = 'wlk_shadow_credit';
 const SHADOW_CREDIT_GENERATORS = [...WARLOCK_GENERATOR_IDS];
@@ -51,6 +68,13 @@ const BLACKTIDE_SPEED_ID = 'wlk_blacktide_speed';
 const BLACKTIDE_SPEED_DURATION = 4;
 const LEVEL_20_ABILITY_IDS = new Set(['abyssal_rift']);
 const FORBIDDEN_REFLECTION_EXCLUDED_IDS = new Set(['soulwell', 'army_of_the_dead']);
+/** No-cooldown abilities the reflection still takes (Blightcaller's Festerhex).
+ *  With no cooldown to skip, their reflected copy costs no Mana instead. */
+const FORBIDDEN_REFLECTION_FREE_COPY_IDS = new Set(['curse_of_agony']);
+
+export function forbiddenReflectionTakesWithoutCooldown(abilityId: string): boolean {
+  return FORBIDDEN_REFLECTION_FREE_COPY_IDS.has(abilityId);
+}
 
 function warlockMods(ctx: SimContext, player: Entity) {
   const meta = ctx.players.get(player.id);
@@ -319,8 +343,9 @@ export function armForbiddenReflection(
   ability: AbilityDef,
   cooldown: number,
 ): void {
+  const freeCopy = cooldown <= 0 && FORBIDDEN_REFLECTION_FREE_COPY_IDS.has(ability.id);
   if (
-    cooldown <= 0 ||
+    (cooldown <= 0 && !freeCopy) ||
     meta.cls !== 'warlock' ||
     ctx.playerMods(meta).global.warlockForbiddenReflection <= 0 ||
     !isEligibleWarlockCooldownAbility(ability) ||
@@ -332,7 +357,9 @@ export function armForbiddenReflection(
   ctx.applyAura(player, {
     id: REFLECTION_READY_ID,
     name: 'Forbidden Reflection',
-    kind: 'internal_cd',
+    // A free copy rides the shared next-cast-free bill (combat/empower_next.ts),
+    // scoped to the one ability by empowerAbilities, so the cost tail zeroes it.
+    kind: freeCopy ? 'next_cast_free' : 'internal_cd',
     value: 0,
     remaining: REFLECTION_WINDOW,
     duration: REFLECTION_WINDOW,

@@ -86,7 +86,7 @@ describe('Evil Eye overhead markers', () => {
     ).toEqual({ stacks: 1, remaining: 4, duration: 12 });
   });
 
-  it('wraps the primary victim in one visible tether per Fate Thread', () => {
+  it('lodges one visible Rot Splinter in the primary victim per held stack', () => {
     vi.spyOn(performance, 'now').mockReturnValue(1000);
     const player = {
       id: 1,
@@ -95,7 +95,7 @@ describe('Evil Eye overhead markers', () => {
         {
           ...eye('affliction_eye'),
           id: 'fate_threads',
-          name: 'Fate Threads',
+          name: 'Rot Splinters',
           kind: 'affliction_fate_threads',
           stacks: 2,
           value: 2,
@@ -122,14 +122,15 @@ describe('Evil Eye overhead markers', () => {
 
     markers.update(world, new Map([[target.id, { group, height: 3 }]]));
 
-    const first = group.getObjectByName('fate-thread-1') as THREE.Line;
-    const second = group.getObjectByName('fate-thread-2') as THREE.Line;
-    const third = group.getObjectByName('fate-thread-3') as THREE.Line;
+    const first = group.getObjectByName('rot-splinter-1') as THREE.Group;
+    const second = group.getObjectByName('rot-splinter-2') as THREE.Group;
+    const third = group.getObjectByName('rot-splinter-3') as THREE.Group;
     expect(first.visible).toBe(true);
     expect(second.visible).toBe(true);
     expect(third.visible).toBe(false);
     expect(first.scale.x).toBeCloseTo(0.5, 4);
-    expect((first.material as THREE.LineBasicMaterial).opacity).toBeGreaterThan(0.3);
+    const shard = first.children[0] as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
+    expect(shard.material.opacity).toBeGreaterThan(0.3);
 
     player.auras = [];
     markers.update(world, new Map([[target.id, { group, height: 3 }]]));

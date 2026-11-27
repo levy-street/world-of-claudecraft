@@ -1029,13 +1029,13 @@ export const ko_KR: EnTranslations = {
       "shotRules": "표시된 구역 안을 조준하세요. 마나 소모 없음. 피해는 장비나 특성의 영향을 받지 않습니다."
     },
     "warlock": {
-      "doomLabel": "단죄",
-      "fateThreadsLabel": "운명의 실타래",
-      "doomEmptyStatus": "단죄 {value}/{max}.",
-      "doomStatus": "단죄 {value}/{max}, 남은 시간 {remaining}.",
-      "fateThreadsStatus": "운명의 실타래 {value}/{max}.",
-      "fateThreadsConsumeReady": "운명의 실타래 3개: 집어삼키기로 추가 단죄를 자아낼 수 있습니다.",
-      "fateThreadsSentenceReady": "운명의 실타래 3개: 선고로 소모하면 피해가 18% 증가합니다."
+      "doomLabel": "Blight",
+      "fateThreadsLabel": "Rot Splinters",
+      "doomEmptyStatus": "{value} of {max} Blight.",
+      "doomStatus": "{value} of {max} Blight; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
+      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
+      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
     },
     "priest": {
       "gloomtitheLabel": "암흑 십일조",
@@ -4795,7 +4795,7 @@ export const ko_KR: EnTranslations = {
       "effigyLanternOut": "당신에게는 짚 감독관의 등불이 꺼져 있다: 당신과 소환수의 공격이 판자 가죽을 무시하고 온전히 들어간다",
       "leadenHexLock": "납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다",
       "forbiddenReflectionReady": "다음 적용 가능한 흑마법사 재사용 기술을 다시 사용할 수 있습니다",
-      "forbiddenReflectionLock": "금지된 반영을 아직 다시 준비할 수 없습니다",
+      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
       "internalCooldown": "타이머가 끝날 때까지 이 효과가 다시 발동하지 않습니다",
       "carriedFlag": "적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.",
       "carryingFreight": "화물을 운반 중입니다. 이동 속도가 {pct}% 감소합니다.",
@@ -4965,16 +4965,16 @@ export const ko_KR: EnTranslations = {
       "formShadow": "어스름장막 변신: 암흑 피해가 {pct}% 증가합니다",
       "resourceCount": "{value}/{max}",
       "formLich": "영혼 창이 주변 최대 {targets}명에게도 {pct}% 피해를 줍니다",
-      "afflictionEye": "저주의 시선이 {interval}초마다 공격하며, 이 사안에서 발동한 효과는 규탄을 {pct}% 생성합니다",
-      "afflictionEyeSecondary": "이 사안의 효과는 규탄을 {doomPct}% 생성하며, 선고가 이곳에 {echoPct}% 피해로 메아리칩니다",
-      "afflictionAccomplice": "조건을 만족하는 피해가 규탄을 {value} 생성합니다. {interval}초에 한 번만 발동합니다",
-      "afflictionViolence": "보복 {charges}회 남음: 적의 공격이 규탄을 {doom} 생성하고 {damage}의 암흑 피해로 반격합니다",
-      "afflictionVicarious": "받는 피해의 {pct}%를 이전하거나 감소시키고 규탄을 최대 {max} 생성합니다",
-      "afflictionPossession": "운명의 바늘, 생명력 흡수, 저주의 시선, 선고를 강화합니다",
-      "afflictionJudgment": "주 사안의 규탄 생성량이 {eyePct}% 증가하고 선고 피해가 {sentencePct}% 증가하며 첫 선고가 규탄 {refund}을 돌려줍니다",
-      "afflictionLitany": "규탄을 얻을 때 {radius}미터 내 최대 {targets}명에게 {damage}의 암흑 피해를 줍니다. 초당 한 번만 발동합니다",
-      "afflictionFateThreads": "운명의 실 {stacks}중첩: 선고 피해가 {sentencePct}% 증가하거나 생명력 흡수 매 틱이 규탄을 {doom} 추가 생성합니다",
-      "afflictionConsumeThreads": "생명력 흡수가 운명의 실 {stacks}중첩을 소모해 매 틱 규탄을 {doom} 추가 생성합니다",
+      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
+      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
+      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
+      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
+      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
+      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
+      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
       "necromancyHarvestMark": "대상이 죽으면 영혼 조각 1개를 생성할 수 있습니다",
       "necromancyOssuaryMark": "당신과 언데드가 준 피해의 {storedPct}%와 영혼 창 피해의 추가 {lancePct}%를 저장합니다. 다시 사용하면 폭발합니다. 죽으면 {radius}미터 내에서 폭발하고 영혼 조각 1개를 생성합니다",
       "necromancyDeathEcho": "이전 버전의 죽음의 메아리입니다. 현재 어떤 능력도 이를 소모하지 않습니다",
@@ -10084,7 +10084,7 @@ export const ko_KR: EnTranslations = {
       "none": "모든 조건에 맞는 직업이 없습니다. 조건을 하나 지우면 더 많은 직업이 나타납니다."
     },
     "abilityHook": {
-      "evil_eye": "적 하나를 지정해 그 행동과 고통으로 단죄를 축적합니다.",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
       "heroic_strike": "다음 타격에 분노를 소모해 더 강하게 휘두르도록 예약합니다.",
       "revenge": "전방의 적을 휩쓸며, 회피하거나 무기 막기 후 자원 소모 없이 사용할 수 있습니다.",
       "hamstring": "적의 움직임을 방해해 달아나지 못하게 합니다.",
@@ -10163,7 +10163,8 @@ export const ko_KR: EnTranslations = {
       "demon_skin": "피부를 단단하게 만들어 방어도를 높여 주는 지속형 자기 강화입니다.",
       "immolate": "대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.",
       "corruption": "대상을 어둠으로 부식시켜, 다른 일을 하는 동안에도 피해가 들어갑니다.",
-      "life_tap": "마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "원거리에서 대상에게 던지는 자연 화살로, 주력 공격기입니다.",
       "healing_touch": "시전 시간이 긴 강력한 단일 대상 치유로, 체력을 가득 채울 때 씁니다.",
       "mark_of_the_wild": "전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.",
@@ -18265,43 +18266,47 @@ export const ko_KR: EnTranslations = {
       },
       "corruption": {
         "name": "검은 부패",
-        "description": "대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다."
+        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
       },
       "evil_eye": {
-        "name": "사안",
-        "description": "적 하나를 저주의 중심으로 지정합니다. 사안을 옮겨도 단죄는 유지되지만 20초의 만료 시간은 갱신되지 않습니다."
+        "name": "Rotmark",
+        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "저주의 응시",
-        "description": "저주의 눈이 선택한 주 사안 대상을 2.5초마다 공격해 암흑 피해를 줍니다. 사안 빙의 중에는 공격 속도가 두 배가 됩니다."
+        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
       },
       "needle_of_fate": {
-        "name": "운명의 바늘",
-        "description": "적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 {needleDoom} 생성하고, 사안이 없으면 먼저 대상을 지정합니다."
+        "name": "Carrion Dart",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
       },
       "sentence": {
-        "name": "선고",
-        "description": "모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다."
+        "name": "Putrefy",
+        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+      },
+      "hard_bargain": {
+        "name": "Hard Bargain",
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "가혹한 거래",
-        "description": "생명력 {damage}을 마나 {damage}으로 전환합니다."
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "저주받은 공모자",
-        "description": "아군 플레이어를 선택하지 않았다면 저주의 눈과 연결해 응시가 단죄를 2 생성하게 합니다. 아군과 연결하면 그 아군이 사안 대상에게 피해를 줄 때 3을 생성합니다. 2초에 한 번만 발동합니다."
+        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
       },
       "curse_of_agony": {
-        "name": "고뇌의 저주",
-        "description": "대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다."
+        "name": "Festerhex",
+        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
       },
       "drain_life": {
         "name": "집어삼키기",
-        "description": "대상의 생명력을 집어삼켜 매초 {damage}의 암흑 피해를 입히고 그중 70%를 생명력으로 당신에게 옮깁니다. 고통은 대신 전부를 옮깁니다. 주된 사안에 정신을 집중하면 시작할 때 운명의 실타래를 모두 소모하고, 실타래마다 매 주기 단죄를 1씩 더 만듭니다."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
       },
       "litany_of_guilt": {
         "name": "죄책의 연도",
-        "description": "주 사안을 8초 동안 저주합니다. 단죄를 얻을 때마다 파동을 일으켜 8미터 안의 다른 적 최대 4명에게 피해를 줍니다. 1초에 한 번만 발동합니다."
+        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
         "name": "잿가죽",
@@ -18309,35 +18314,39 @@ export const ko_KR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "암영 닻",
-        "description": "처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
         "name": "영혼샘",
         "description": "영혼샘을 3분 동안 소환합니다. 전투 중이 아니면 파티원이 영혼석을 3개까지 채울 수 있습니다. 영혼석은 최대 생명력의 25%를 회복하며 물약과 재사용 대기시간을 공유합니다."
       },
       "hex_of_violence": {
-        "name": "폭력의 주술",
-        "description": "적을 8초 동안 저주해 암흑 피해를 입히고 2초마다 단죄를 2 생성합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 17의 암흑 피해를 되돌려 받습니다."
+        "name": "Rotfever",
+        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
       },
       "cruel_pact": {
         "name": "잔혹한 계약",
-        "description": "최대 생명력의 12%를 희생해 단죄를 20 생성합니다. 생명력이 15% 이하일 때는 사용할 수 없습니다."
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
         "name": "고통 전이",
-        "description": "8초 동안 고통을 연결해 적의 공격으로 최대 15의 단죄를 생성합니다. 자신에게 사용하면 받는 피해가 20% 감소합니다. 아군에게 사용하면 피해의 최대 20%를 자신에게 옮기지만 생명력이 15% 아래로 내려가지는 않습니다."
+        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "사안 빙의",
-        "description": "저주술사가 주 사안에 15초 동안 빙의하고 단죄를 35 생성합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고, 선고는 피해가 25% 증가합니다. 지연 반향은 60%의 피해를 주며 17레벨부터 20레벨까지 30%로 감소합니다."
+        "name": "Possess the Rotmark",
+        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "심판의 시간",
-        "description": "15초 동안 주 사안에 심판을 내려 단죄 40과 운명의 실 3개를 얻고 빙의를 활성화하며, 주 사안을 통해 생성되는 단죄를 두 배로 만들고 선고의 피해를 20% 증가시킵니다. 첫 번째 선고는 단죄 50을 돌려받습니다."
+        "name": "Hour of Rot",
+        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
       },
       "coven": {
-        "name": "마녀회",
-        "description": "주변 적 최대 4명에게 15초 동안 유지되는 보조 사안을 만듭니다. 공유 단죄를 50% 효율로 채우며 선고 피해의 35%를 메아리로 받습니다."
+        "name": "Contagion",
+        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
       },
       "fear": {
         "name": "번민",
@@ -18689,7 +18698,7 @@ export const ko_KR: EnTranslations = {
       },
       "siphon_life": {
         "name": "생명력 착취",
-        "description": "적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)"
+        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
       },
       "conflagrate": {
         "name": "점화",
@@ -18944,7 +18953,7 @@ export const ko_KR: EnTranslations = {
       },
       "dark_pact": {
         "name": "피의 서약",
-        "description": "현재 생명력의 10%를 희생해 8초 동안 최대 생명력의 30%에 해당하는 피해를 흡수합니다."
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
       },
       "cloak_of_shadows": {
         "name": "그림자망토",
@@ -30862,8 +30871,8 @@ export const ko_KR: EnTranslations = {
       },
       "hexthread": {
         "name": "주술실 장막",
-        "bonus2": "운명의 바늘이 단죄를 2 추가로 생성합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
-        "bonus4": "선고를 내리면 단죄 10을 돌려받습니다."
+        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
       },
       "moonscorch": {
         "name": "달그을림 예복",

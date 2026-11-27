@@ -7819,15 +7819,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Inviger marken i 9 sek och orsakar {damage} helig skada varje sekund. Trosväktare tar 10% mindre skada medan de står där.',
   'entities.abilities.consecration.name': 'Helig mark',
-  'entities.abilities.corruption.description':
-    'Fördärvar målet och vållar {damage} skuggskada under 18 sek.',
   'entities.abilities.corruption.name': 'Svartröta',
   'entities.abilities.crippling_poison.description':
     'Träffar målet med ett blytungt gift som vållar {damage} naturskada och saktar dess förflyttningshastighet med 50 % i 12 sek.',
   'entities.abilities.crippling_poison.name': 'Blytungt gift',
-  'entities.abilities.curse_of_agony.description':
-    'Förbannar målet med plåga: {damage} skuggskada över 24 sek.',
-  'entities.abilities.curse_of_agony.name': 'Våndans häxkonst',
   'entities.abilities.dash.description':
     'Skifta till Kattform om du inte redan är i den och sprinta med 50% högre hastighet i 15 sek. Kan användas i alla former. Omedelbar och utlöser inte global återhämtning.',
   'entities.abilities.dash.name': 'Rusa',
@@ -7853,8 +7848,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.divine_protection.description':
     'En helig sköld absorberar {damage}% av din maximala hälsa i {duration} sek.',
   'entities.abilities.divine_protection.name': 'Trons värn',
-  'entities.abilities.drain_life.description':
-    'Förtär målets livskraft, vållar {damage} Skuggskada varje sekund och överför 70% av den som hälsa till er. Vanmakt överför i stället alltihop. Kanaliserad på ert främsta onda öga förbrukar den alla Ödestrådar vid början, och varje Tråd alstrar 1 extra Fördömelse per tick.',
   'entities.abilities.drain_life.name': 'Förtär',
   'entities.abilities.earth_shock.description':
     'Vållar {damage} Naturskada. Skadan ökar med Besvärjelsekraft. Elementär: vid 5 Åska vållas 125% mer skada, varefter all Åska förbrukas. Stenbunden: tvingar målet att anfalla er i 3 sek.',
@@ -7982,8 +7975,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft.',
   'entities.abilities.lesser_heal.name': 'Viskad bön',
-  'entities.abilities.life_tap.description': 'Omvandlar {damage} hälsa till {damage} mana.',
-  'entities.abilities.life_tap.name': 'Hårt köpslag',
   'entities.abilities.lightning_bolt.description':
     'Vållar {damage} Naturskada. Skadan ökar med Besvärjelsekraft. Elementär: en träff ger 1 Åska.',
   'entities.abilities.lightning_bolt.name': 'Bågblixt',
@@ -8188,8 +8179,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     'I 12 sek ger Bågblixt 2 Åska. Er nästa Bågblixt eller Gaffelblixt är omedelbar, och er nästa fulla Åskutbetalning vållar 25% mer skada. (Signatur för Elementär)',
   'entities.abilities.siphon_life.name': 'Livssifon',
-  'entities.abilities.siphon_life.description':
-    'Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)',
   'entities.abilities.conflagrate.name': 'Storbrand',
   'entities.abilities.conflagrate.description':
     'För fram ett kommande tick av er Brinnande pakt och antänder sedan målet för {damage} Eldskada. Alstrar 1 Förödelse och 1 Ödeläggelse. Rymmer {charges} laddningar. (Signatur för Förstörelse)',
@@ -9796,7 +9785,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar ditt aktiva sigill för att slå en fiende från kort avstånd.',
   'guide.abilityHook.lesser_heal':
     'En stadig kastning för att toppa upp en allierad när det finns tid att stå still.',
-  'guide.abilityHook.life_tap': 'Byter en del av din egen hälsa tillbaka till mana när du sinar.',
   'guide.abilityHook.lightning_bolt':
     'En avståndskastning av naturskada, ditt förstaval på långt håll.',
   'guide.abilityHook.lightning_shield':
@@ -16465,24 +16453,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Offrar först en Benmagiker, sedan en Skelettkrigare, och en Gravvinge endast som sista utväg. Bland dubbletter väljs den med kortast återstående varaktighet, sedan den svagaste, för att vålla {damage} skuggskada på den valda platsen.',
   'entities.abilities.corpse_explosion.name': 'Likexplosion',
-  'entities.abilities.coven.description':
-    'Skapar sekundära onda ögon på upp till 4 närliggande fiender i 15 sek. De matar den delade Fördömelse-poolen med 50%, och Dom ekar till dem för 35% skada.',
-  'entities.abilities.coven.name': 'Häxring',
-  'entities.abilities.cruel_pact.description':
-    'Offrar 12% av din maximala hälsa för att återställa 1,5% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa.',
   'entities.abilities.cruel_pact.name': 'Grym pakt',
-  'entities.abilities.cursed_accomplice.description':
-    'Länkar ditt förbannade öga när ingen allierad är vald, vilket får dess Förbannad blick att generera 2 Fördömelse. Att länka en vald gruppmedlem gör att bara deras skada mot ditt onda öga genererar 3 i stället. En ny länk ersätter den föregående och kan utlösas högst en gång var 2:e sek.',
   'entities.abilities.cursed_accomplice.name': 'Förbannad medhjälpare',
-  'entities.abilities.dark_pact.description':
-    'Offrar 10% av din nuvarande hälsa för att absorbera skada motsvarande 30% av din maximala hälsa i 8 sek.',
   'entities.abilities.dark_pact.name': 'Blodsförbund',
   'entities.abilities.elemental_trance.description':
     'Gå in i en elementär trans i 15 sek, vilket minskar mottagen skada med 30% och omvandlar 20% av all skada du vållar till mana. (Warspirit-motorn)',
   'entities.abilities.elemental_trance.name': 'Elementartrans',
-  'entities.abilities.evil_eye.description':
-    'Märker en fiende som fokus för dina förbannelser. Att flytta Onda ögat bevarar Fördömelse men förnyar inte dess 20 sekunders utgång.',
-  'entities.abilities.evil_eye.name': 'Onda ögat',
   'entities.abilities.eviscerate.description': 'Avslutande drag som orsakar {damage}.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Vid 6 Giftritual blir denna knapp Giftrivning: ett slag som omedelbart ger all skada dina blödningar ännu skulle ha gett, planterar ett färskt Giftrivning-sår och återställer 20 energi.',
@@ -16506,19 +16482,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slår fienden för vapenskada plus {damage} och ökar din chans att väja med 15% i 7 sek. Ger 1 kombopoäng. (skurktalang)',
   'entities.abilities.hemorrhage.description':
     'Slår fienden för vapenskada plus {damage}, orsakar blödningsskada under 12 sek och ökar mottagen blödningsskada med 40%. Ger 1 kombopoäng. Var 2:a användning lägger till 1 Skymningsförråd (max 3). (Skulduggery-motorn)',
-  'entities.abilities.hex_of_violence.description':
-    'Förhäxar fienden i 8 sek, vållar skuggskada och genererar 2 Fördömelse var 2:e sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 17 skuggskada.',
-  'entities.abilities.hex_of_violence.name': 'Våldets förbannelse',
-  'entities.abilities.hour_of_judgment.description':
-    'Kallar fram dom över ditt primära onda öga i 15 sek, vilket ger 40 Fördömelse och 3 Ödestrådar, aktiverar Besättelse, fördubblar Fördömelse genererad genom det primära ögat, och ökar skadan från Dom med 20%. Den första Domen återbetalar 50 Fördömelse.',
-  'entities.abilities.hour_of_judgment.name': 'Domens timme',
   'entities.abilities.kidney_shot.description':
     'Avslutande drag som bedövar målet i 2 sek plus 1 sek per kombopoäng (5 kombopoäng: 7 sek).',
-  'entities.abilities.litany_of_guilt.description':
-    'Förbannar ditt primära onda öga i 6 sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender inom 8 yards, högst en gång per sekund. Rang 2 förlänger den till 8 sek och 4 fiender.',
   'entities.abilities.litany_of_guilt.name': 'Skuldens litania',
-  'entities.abilities.maledict_gaze.description':
-    'Ditt förbannade öga attackerar ditt valda primära onda öga var 2,5:e sek för skuggskada. Besätt det onda ögat fördubblar dess attackhastighet.',
   'entities.abilities.maledict_gaze.name': 'Förbannad blick',
   'entities.abilities.maul.description':
     'En krossande attack som ökar närstridsskadan med {damage} och orsakar stort hot. Aktiveras vid ditt nästa slag. Endast i Bruinform.',
@@ -16528,15 +16494,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bränner fienden med Månstorm för {damage} arkan skada plus skada över tid.',
   'entities.abilities.moonfire.specNote_balance':
     'Håll den brinnande: Månfrö förlänger den med 6 sek.',
-  'entities.abilities.needle_of_fate.description':
-    'Genomborrar fienden för {damage} skuggskada och genererar {needleDoom} Fördömelse om den bär ditt onda öga. Varje träff på ditt primära onda öga lägger till en Ödestråd i 12 sek, upp till 3. Om inget ont öga finns märker nålen först sitt mål.',
-  'entities.abilities.needle_of_fate.name': 'Ödets nål',
   'entities.abilities.ossuary_mark.description':
     'Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment.',
   'entities.abilities.ossuary_mark.name': 'Benhusmärke',
-  'entities.abilities.possess_evil_eye.description':
-    'Maledictorn tar över ditt primära onda öga i 15 sek och genererar 35 Fördömelse. Ödets nål kastas på 1 sek och genererar 2 extra Fördömelse, Förtär kan kanaliseras i rörelse, och Dom gör 25% mer skada och släpper ett fördröjt eko för 60% skada, avtagande till 30% mellan nivåerna 17 och 20.',
-  'entities.abilities.possess_evil_eye.name': 'Besätt det onda ögat',
   'entities.abilities.raise_bone_mage.description':
     'Förbrukar 2 Själfragment för att lägga till en beständig Benmagiker på avstånd i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Dess attacker exponerar målet för 5% mer magisk skada i 6 sek, och Skördande befallning höjer den svagheten till 8%.',
   'entities.abilities.raise_bone_mage.name': 'Väck benmagiker',
@@ -16577,9 +16537,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Ökar förflyttningshastigheten med 35%, men offrar 2% av din maximala hälsa varje sekund. Kasta igen för att avbryta. Den stängs av vid 20% hälsa.',
   'entities.abilities.sacrilegious_march.name': 'Vanhelgande marsch',
-  'entities.abilities.sentence.description':
-    'Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16.',
-  'entities.abilities.sentence.name': 'Dom',
   'entities.abilities.sinister_strike.description':
     'Ett omedelbart slag för vapenskada plus {damage}. Ger 1 kombopoäng.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Lägger till 1 Giftritual (max 6).',
@@ -16610,16 +16567,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Svep dina klor genom närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.',
   'entities.abilities.swipe.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
-  'entities.abilities.umbral_anchor.description':
-    'Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning.',
   'entities.abilities.umbral_anchor.name': 'Skuggankare',
   'entities.abilities.unholy_command.description':
     'Förbrukar 3 Själfragment för att befalla alla dina odöda att vålla 25% mer skada och agera 20% snabbare i 12 sek.',
   'entities.abilities.unholy_command.name': 'Ohelig befallning',
   'entities.abilities.venom_dart.specNote_assassination':
     'Lägger till 1 Giftritual och förlänger ditt Giftrivning-sår med 6 sek (såret går aldrig över 20 sek).',
-  'entities.abilities.vicarious_suffering.description':
-    'Länkar ditt lidande i 8 sek och genererar upp till 15 Fördömelse från fientliga träffar. På dig själv minskar den mottagen skada med 20%. På en allierad omdirigerar den upp till 20% till dig utan att ta dig under 15% hälsa.',
   'entities.abilities.vicarious_suffering.name': 'Ställföreträdande lidande',
   'entities.abilities.wrath.description':
     'Slungar en stråle av naturenergi för {damage} naturskada.',
@@ -16634,7 +16587,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Benmagiker',
   'entities.mobs.necromancy_gravewing.name': 'Gravvinge',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Skelettkrigare',
-  'guide.abilityHook.evil_eye': 'Namnger fienden vars handlingar och lidande föder din Fördömelse.',
   'hud.pet.abyssalChain': 'Abyssal Chain',
   'hud.pet.abyssalChainDesc':
     'Befall Duskmurk att dra en normal fiende mer än 8 och upp till 20 meter tillbaka till sig själv. Bossar kan inte dras. 15 sekunders nedkylning. Högerklicka, tryck och håll, eller tryck Shift+Enter för att växla auto-kasta.',
@@ -16647,26 +16599,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'Befall Emberkin att avfyra en extra demonisk projektil mot ditt mål. 8 sekunders nedkylning. Högerklicka, tryck och håll, eller tryck Shift+Enter för att växla auto-kasta.',
   'hud.pet.felboltTitle': 'Felbolt',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'Kvalificerande skada ger {value} Fördömelse, högst en gång var {interval}:e sek',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Förtär förbrukar {stacks} Ödestrådar för {doom} extra Fördömelse per tillfälle',
-  'hudChrome.auraEffect.afflictionEye':
-    'Förbannad blick attackerar var {interval}:e sek; effekter vid detta onda öga genererar {pct}% Fördömelse',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Effekter vid detta onda öga genererar {doomPct}% Fördömelse; Dom ekar hit för {echoPct}% skada',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Ödestrådar: Dom gör {sentencePct}% mer skada, eller Förtär får {doom} extra Fördömelse per tillfälle',
-  'hudChrome.auraEffect.afflictionJudgment':
-    'Det primära onda ögat genererar {eyePct}% mer Fördömelse; Dom gör {sentencePct}% mer skada och den första återbetalar {refund} Fördömelse',
-  'hudChrome.auraEffect.afflictionLitany':
-    'Fördömelse-vinster vållar {damage} skuggskada till upp till {targets} fiender inom {radius} m, en gång per sekund',
-  'hudChrome.auraEffect.afflictionPossession':
-    'Förstärker Ödets nål, Förtär, Förbannad blick och Dom',
-  'hudChrome.auraEffect.afflictionVicarious':
-    'Omdirigerar eller minskar {pct}% av inkommande skada och kan generera upp till {max} Fördömelse',
-  'hudChrome.auraEffect.afflictionViolence':
-    '{charges} vedergällningar återstår; en fiendeattack ger {doom} Fördömelse och vållar {damage} skuggskada tillbaka',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} ekon återstår: förmågor mot ett enda mål vållar {pct}% skada till upp till {targets} närliggande fiender',
   'hudChrome.auraEffect.arcaneCharge':
@@ -16690,7 +16622,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Vållad skada ökad med {damagePct}%, attackhastighet med {hastePct}% och förflyttningshastighet med {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} laddningar: Islans behandlar sitt mål som fryst och vållar {pct}% frusen skada',
-  'hudChrome.auraEffect.forbiddenReflectionLock': 'Förbjuden spegling kan inte förberedas igen än',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Din nästa kvalificerade häxmästarförmåga kan kastas igen',
   'hudChrome.auraEffect.formLich':
@@ -16749,15 +16680,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Wrack',
   'hudChrome.procOverlay.ruinStatus': '{value} av {max} Wrack',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Själfragment',
-  'hudChrome.warlock.doomEmptyStatus': '{value} av {max} Fördömelse.',
-  'hudChrome.warlock.doomLabel': 'Fördömelse',
-  'hudChrome.warlock.doomStatus': '{value} av {max} Fördömelse; {remaining}.',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Tre Ödestrådar: Förtär kan väva in dem till ytterligare Fördömelse.',
-  'hudChrome.warlock.fateThreadsLabel': 'Ödestrådar',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Tre Ödestrådar: Dom kan förbruka dem för 18% ökad skada.',
-  'hudChrome.warlock.fateThreadsStatus': '{value} av {max} Ödestrådar.',
   'itemUi.tooltip.useHealingPotionPct':
     'Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 2 min nedkylning.',
   'guide.controls.reliquary': 'Relikvariet',
@@ -17735,9 +17657,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Överblomning skördar 75 procent av dina återstående effekter och lagrar därefter 1 Grönska.',
   'entities.itemSets.grovespring.name': 'Lundkällans dräkt',
-  'entities.itemSets.hexthread.bonus2':
-    'Ödets nål ger 2 extra fördömelse. Skada du tar fördröjer inte längre dina besvärjelser.',
-  'entities.itemSets.hexthread.bonus4': 'Avkunnad dom återbetalar 10 fördömelse.',
   'entities.itemSets.hexthread.name': 'Hextrådens svepning',
   'entities.itemSets.moonscorch.bonus2':
     'Månfrö kan förlänga Månens storm två gånger per applicering, upp till maximalt 12 sek. Skada du tar fördröjer inte längre dina besvärjelser.',

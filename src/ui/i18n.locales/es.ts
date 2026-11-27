@@ -5382,52 +5382,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.title': 'Auras del objetivo',
   'hudChrome.targetAuras.unlock': 'Mover la ventana de auras del objetivo',
   'hudChrome.targetAuras.visibleRows': 'Filas de auras preferidas: {count}',
-  'hudChrome.warlock.doomLabel': 'Condena',
-  'hudChrome.warlock.fateThreadsLabel': 'Hilos del destino',
-  'hudChrome.warlock.doomEmptyStatus': '{value} de {max} de Condena.',
-  'hudChrome.warlock.doomStatus': '{value} de {max} de Condena; quedan {remaining}.',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Fragmentos de alma',
-  'guide.abilityHook.evil_eye':
-    'Señala al enemigo cuyas acciones y sufrimiento alimentarán tu Condena.',
-  'entities.abilities.evil_eye.name': 'Mal de ojo',
-  'entities.abilities.evil_eye.description':
-    'Marca a un enemigo como foco de tus maldiciones. Mover el Mal de ojo conserva la Condena, pero no renueva su duración de 20 s.',
   'entities.abilities.maledict_gaze.name': 'Mirada maléfica',
-  'entities.abilities.maledict_gaze.description':
-    'Tu ojo maléfico ataca cada 2,5 s al objetivo principal de Mal de ojo e inflige daño de las Sombras. Poseer el Mal de ojo duplica su velocidad de ataque.',
-  'entities.abilities.needle_of_fate.name': 'Aguja del destino',
-  'entities.abilities.needle_of_fate.description':
-    'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera {needleDoom} de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
-  'entities.abilities.sentence.name': 'Sentencia',
-  'entities.abilities.sentence.description':
-    'Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16.',
   'entities.abilities.cursed_accomplice.name': 'Cómplice maldito',
-  'entities.abilities.cursed_accomplice.description':
-    'Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s.',
   'entities.abilities.litany_of_guilt.name': 'Liturgia de culpa',
-  'entities.abilities.litany_of_guilt.description':
-    'Maldice tu Mal de ojo principal durante 8 s. Obtener Condena libera una onda que daña a un máximo de 4 enemigos más en 8 m, como máximo una vez por segundo.',
   'entities.abilities.umbral_anchor.name': 'Ancla umbría',
-  'entities.abilities.umbral_anchor.description':
-    'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s.',
-  'entities.abilities.hex_of_violence.name': 'Maleficio de violencia',
-  'entities.abilities.hex_of_violence.description':
-    'Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras.',
   'entities.abilities.cruel_pact.name': 'Pacto cruel',
-  'entities.abilities.cruel_pact.description':
-    'Sacrifica un 12% de tu salud máxima para generar 20 de Condena. No se puede usar con un 15% de salud o menos.',
   'entities.abilities.vicarious_suffering.name': 'Sufrimiento vicario',
-  'entities.abilities.vicarious_suffering.description':
-    'Enlaza el sufrimiento durante 8 s y genera hasta 15 de Condena con golpes hostiles. Sobre ti reduce un 20% el daño recibido. Sobre un aliado redirige hasta un 20% hacia ti sin bajarte del 15% de salud.',
-  'entities.abilities.possess_evil_eye.name': 'Poseer el Mal de ojo',
-  'entities.abilities.possess_evil_eye.description':
-    'El maldictor posee tu Mal de ojo principal durante 15 s y genera 35 de Condena. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento, y Sentencia inflige un 25% más de daño y libera un eco retardado del 60%, que se reduce al 30% entre los niveles 17 y 20.',
-  'entities.abilities.hour_of_judgment.name': 'Hora del juicio',
-  'entities.abilities.hour_of_judgment.description':
-    'Desata el juicio sobre tu Mal de ojo principal durante 15 s: obtienes 40 de Condena y 3 Hilos del destino, activas Posesión, duplicas la Condena generada mediante el Mal de ojo principal y aumentas un 20% el daño de Sentencia. La primera Sentencia devuelve 50 de Condena.',
-  'entities.abilities.coven.name': 'Aquelarre',
-  'entities.abilities.coven.description':
-    'Crea Males de ojo secundarios sobre hasta 4 enemigos cercanos durante 15 s. Alimentan la reserva compartida de Condena al 50% y reciben un eco del 35% del daño de Sentencia.',
   'entities.mobs.necromancy_gravewing.name': 'Alatumba',
   'entities.abilities.soul_harvest.name': 'Cosecha de esencia',
   'entities.abilities.soul_harvest.description':
@@ -5886,8 +5847,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Maleficio plomizo aún no puede volver a inmovilizar a este objetivo',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Puedes volver a usar tu próxima facultad de brujo con reutilización que cumpla los requisitos',
-  'hudChrome.auraEffect.forbiddenReflectionLock':
-    'Reflejo prohibido aún no puede volver a prepararse',
   'hudChrome.auraEffect.internalCooldown':
     'Este efecto no puede volver a activarse hasta que termine el temporizador',
   'hudChrome.auraEffect.enrage':
@@ -5916,26 +5875,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Forma de velo umbrío: daño de las Sombras aumentado un {pct}%',
   'hudChrome.auraEffect.formLich':
     'Lanza de alma también golpea hasta a {targets} enemigos cercanos por un {pct}% de daño',
-  'hudChrome.auraEffect.afflictionEye':
-    'Mirada maléfica ataca cada {interval} s; los efectos en este Ojo generan un {pct}% de Condena',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Los efectos en este Ojo generan un {doomPct}% de Condena; Sentencia hace eco aquí por un {echoPct}% de daño',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'El daño válido genera {value} de Condena, como máximo una vez cada {interval} s',
-  'hudChrome.auraEffect.afflictionViolence':
-    'Quedan {charges} represalias; un ataque enemigo genera {doom} de Condena y devuelve {damage} de daño de las Sombras',
-  'hudChrome.auraEffect.afflictionVicarious':
-    'Redirige o reduce un {pct}% del daño recibido y puede generar hasta {max} de Condena',
-  'hudChrome.auraEffect.afflictionPossession':
-    'Potencia Aguja del destino, Drenar vida, Mirada maléfica y Sentencia',
-  'hudChrome.auraEffect.afflictionJudgment':
-    'El Ojo principal genera un {eyePct}% más de Condena; Sentencia inflige un {sentencePct}% más y la primera devuelve {refund} de Condena',
-  'hudChrome.auraEffect.afflictionLitany':
-    'Obtener Condena inflige {damage} de daño de las Sombras a hasta {targets} enemigos en {radius} m, una vez por segundo',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Hilos del destino: Sentencia inflige un {sentencePct}% más, o Drenar vida genera {doom} de Condena extra por pulso',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Drenar vida consume {stacks} Hilos del destino para generar {doom} de Condena extra por pulso',
   'hudChrome.auraEffect.necromancyHarvestMark': 'La muerte puede crear 1 fragmento de alma',
   'hudChrome.auraEffect.necromancyOssuaryMark':
     'Almacena un {storedPct}% de tu daño y el de tus no-muertos, más un {lancePct}% del daño de Lanza de alma; vuelve a lanzar para detonar. Al morir, explota en {radius} m y crea 1 fragmento de alma',
@@ -9513,16 +9452,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     'Quema al enemigo por {damage} de daño de Fuego y {overTime} adicionales durante 15 s.',
   'entities.abilities.corruption.name': 'Putrefacción Negra',
-  'entities.abilities.corruption.description':
-    'Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s.',
-  'entities.abilities.life_tap.name': 'Trato Amargo',
-  'entities.abilities.life_tap.description': 'Convierte {damage} de salud en {damage} de maná.',
-  'entities.abilities.curse_of_agony.name': 'Sortilegio de Angustia',
-  'entities.abilities.curse_of_agony.description':
-    'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',
   'entities.abilities.drain_life.name': 'Consumir',
-  'entities.abilities.drain_life.description':
-    'Consume la vitalidad del objetivo, infligiendo {damage} de daño de Sombra cada segundo y transfiriéndote un 70% como salud. Aflicción transfiere en cambio la totalidad. Cuando se canaliza sobre tu Mal de ojo principal, consume todos los Hilos del destino al comenzar, y cada Hilo genera 1 de Condena adicional por pulso.',
   'entities.abilities.fear.name': 'Espanto',
   'entities.abilities.fear.description':
     'Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto.',
@@ -9677,8 +9607,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     'Durante 12 s, Arco Eléctrico otorga 2 de Trueno. Tu próximo Arco Eléctrico o Relámpago Bifurcado es instantáneo, y tu próxima descarga completa de Trueno inflige un 25% más de daño. (Distintivo de Elemental)',
   'entities.abilities.siphon_life.name': 'Succionar vida',
-  'entities.abilities.siphon_life.description':
-    'Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)',
   'entities.abilities.conflagrate.name': 'Conflagrar',
   'entities.abilities.conflagrate.description':
     'Adelanta un pulso futuro de tu Pacto Ardiente y luego enciende al objetivo por {damage} de daño de Fuego. Genera 1 de Devastación y 1 de Ruina. Guarda {charges} cargas. (Distintivo de Destrucción)',
@@ -11922,8 +11850,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Gasta tu Sello activo para golpear a un enemigo a corta distancia.',
   'guide.abilityHook.lesser_heal':
     'Un lanzamiento constante para reponer a un aliado cuando hay tiempo para quedarse quieto.',
-  'guide.abilityHook.life_tap':
-    'Convierte parte de tu propia salud en maná cuando te quedas sin él.',
   'guide.abilityHook.lightning_bolt':
     'Un lanzamiento a distancia de daño de Naturaleza, tu recurso habitual desde lejos.',
   'guide.abilityHook.lightning_shield':
@@ -16822,8 +16748,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cada golpe conectado añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.cold_blood.description':
     'Concentra tu instinto asesino para que tus siguientes 5 ataques sean golpes críticos. (motor de Knifework)',
-  'entities.abilities.dark_pact.description':
-    'Sacrifica un 10% de tu salud actual para absorber daño equivalente a un 30% de tu salud máxima durante 8 s.',
   'entities.abilities.dark_pact.name': 'Pacto de Sangre',
   'entities.abilities.elemental_trance.description':
     'Entra en un trance elemental durante 15 s, que reduce el daño recibido un 30% y convierte el 20% de todo el daño que infliges en maná. (habilidad distintiva de Espíritu Guerrero)',
@@ -16943,11 +16867,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.resourceCount': '{value} de {max}',
   'hudChrome.procOverlay.ruinMeter': 'Ruina',
   'hudChrome.procOverlay.ruinStatus': '{value} de {max} de Ruina',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Tres Hilos del destino: Consumir puede tejerlos en Condena adicional.',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Tres Hilos del destino: Sentencia puede consumirlos para un 18% más de daño.',
-  'hudChrome.warlock.fateThreadsStatus': '{value} de {max} de Hilos del destino.',
   'itemUi.tooltip.useHealingPotionPct':
     'Uso: restaura al instante el {percent}% de la salud máxima. Se puede usar en combate. Reutilización de 2 min.',
   'guide.controls.reliquary': 'El Relicario',
@@ -17897,9 +17816,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Sobrefloración cosecha el 75% de tus efectos restantes y almacena 1 Verdancia después.',
   'entities.itemSets.grovespring.name': 'Atuendo de Fuente del Bosque',
-  'entities.itemSets.hexthread.bonus2':
-    'Aguja del Destino otorga 2 Condenas adicionales. El daño recibido ya no retrasa tus hechizos.',
-  'entities.itemSets.hexthread.bonus4': 'Sentencia Final devuelve 10 de Condena.',
   'entities.itemSets.hexthread.name': 'Sudario de Hilo Maldito',
   'entities.itemSets.moonscorch.bonus2':
     'Semilla Lunar puede prolongar Tempestad Lunar dos veces por aplicación, hasta un máximo de 12 s. El daño recibido ya no retrasa tus hechizos.',

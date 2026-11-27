@@ -338,13 +338,13 @@ const WARLOCK_SPECS: SpecDef[] = [
   spec(
     'affliction',
     'warlock',
-    'Hexcraft',
+    'Blightcaller',
     'dps',
     '*',
-    'A curse-weaver who turns enemy and allied actions into Condemnation.',
+    'A rot-weaver who festers enemies with DoTs and turns their suffering into Blight.',
     'evil_eye',
-    'Sentence',
-    'Increases Needle of Fate, Sentence, and Litany of Guilt damage by 10%.',
+    'Putrefy',
+    'Increases Carrion Dart, Putrefy, Litany of Guilt, Blackrot, Festerhex, and Veinleech damage by 10%, and reduces Consume damage by 10%.',
     {
       ability: [
         { ability: 'needle_of_fate', dmgPct: 0.1 },
@@ -353,6 +353,12 @@ const WARLOCK_SPECS: SpecDef[] = [
         // top (tests/warlock_viability_fixes.test.ts pins 6/10/15 resolved);
         // the wiring was missed when the ability landed.
         { ability: 'litany_of_guilt', dmgPct: 0.1 },
+        // Blight Coven: the mastery also reaches the three DoTs.
+        { ability: 'corruption', dmgPct: 0.1 },
+        { ability: 'curse_of_agony', dmgPct: 0.1 },
+        { ability: 'siphon_life', dmgPct: 0.1 },
+        // Blight Coven: Consume deals 10% less for Hexcraft only.
+        { ability: 'drain_life', dmgPct: -0.1 },
       ],
     },
   ),

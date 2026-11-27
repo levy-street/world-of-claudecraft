@@ -29,7 +29,6 @@ import {
   CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE,
   GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
   GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT,
-  HEXTHREAD_2PC_NEEDLE_DOOM_BONUS,
   MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC,
   setBonusFlag,
   WILDFANG_2PC_REDHARVEST_ENERGY_MULT,
@@ -524,9 +523,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'needle_of_fate',
       'sentence',
       'life_tap',
+      'hard_bargain',
       'cursed_accomplice',
       'summon_voidwalker',
       'curse_of_agony',
+      'siphon_life',
       'drain_life',
       'searing_pain',
       'soul_lance',
@@ -538,6 +539,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'ossuary_mark',
       'fear',
       'cruel_pact',
+      'plague_bloom',
       'shadowburn',
       'ruinous_brand',
       'cinderhide',
@@ -5327,20 +5329,21 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== WARLOCK ======================
   evil_eye: {
     id: 'evil_eye',
-    name: 'Evil Eye',
+    name: 'Rotmark',
     class: 'warlock',
     specs: ['affliction'],
     learnLevel: 5,
     cost: 15,
     castTime: 0,
     cooldown: 1,
-    range: 30,
+    range: 50,
     school: 'shadow',
     requiresTarget: true,
     projectile: false,
+    noPetAssist: true,
     effects: [{ type: 'afflictionEvilEye' }],
     description:
-      'Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry.',
+      'Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry.',
   },
   maledict_gaze: {
     id: 'maledict_gaze',
@@ -5357,11 +5360,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     passive: true,
     effects: [],
     description:
-      'Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed.',
+      'Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged.',
   },
   needle_of_fate: {
     id: 'needle_of_fate',
-    name: 'Needle of Fate',
+    name: 'Carrion Dart',
     class: 'warlock',
     specs: ['affliction'],
     learnLevel: 5,
@@ -5373,7 +5376,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [
       { type: 'afflictionNeedle', doom: 7 },
-      { type: 'directDamage', min: 22, max: 27 },
+      { type: 'directDamage', min: 22, max: 27, damageMult: 0.54 },
     ],
     ranks: [
       {
@@ -5382,7 +5385,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 30,
         effects: [
           { type: 'afflictionNeedle', doom: 7 },
-          { type: 'directDamage', min: 36, max: 43 },
+          { type: 'directDamage', min: 36, max: 43, damageMult: 0.54 },
         ],
       },
       {
@@ -5391,7 +5394,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 35,
         effects: [
           { type: 'afflictionNeedle', doom: 7 },
-          { type: 'directDamage', min: 41, max: 49 },
+          { type: 'directDamage', min: 41, max: 49, damageMult: 0.54 },
         ],
       },
     ],
@@ -5400,11 +5403,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // reserved for the translated catalog). The catalog row splices the
     // RESOLVED payload as {needleDoom}, so Hexthread 2pc wearers read 9 there.
     description:
-      'Pierces the enemy for $d Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
+      'Pierces the enemy for $d Shadow damage and generates 7 Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies.',
   },
   sentence: {
     id: 'sentence',
-    name: 'Sentence',
+    name: 'Putrefy',
     class: 'warlock',
     specs: ['affliction'],
     learnLevel: 5,
@@ -5416,9 +5419,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     requiresAuraKind: 'affliction_doom',
     requiresAuraStacks: 20,
-    effects: [{ type: 'afflictionSentence' }],
+    requiresOwnTargetAuraKind: 'affliction_eye',
+    effects: [{ type: 'afflictionSentence', damageMult: 0.72 }],
     description:
-      'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
+      'Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16.',
   },
   cursed_accomplice: {
     id: 'cursed_accomplice',
@@ -5434,42 +5438,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     partyOnlyTarget: true,
+    partyPetTarget: true,
     effects: [{ type: 'afflictionAccomplice' }],
     description:
-      'Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec.',
+      "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one.",
   },
   hex_of_violence: {
     id: 'hex_of_violence',
-    name: 'Hex of Violence',
+    name: 'Rotfever',
     class: 'warlock',
     specs: ['affliction'],
     learnLevel: 12,
-    cost: 55,
+    cost: 20,
     castTime: 0,
-    cooldown: 15,
+    cooldown: 20,
+    offGcd: true,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
     projectile: false,
-    effects: [
-      {
-        type: 'afflictionViolence',
-        duration: 8,
-        charges: 3,
-        doomPerProc: 7,
-        damage: 16,
-        interval: 2,
-        tickDoom: 2,
-      },
-    ],
+    effects: [{ type: 'afflictionViolence', duration: 8, chance: 0.7 }],
     description:
-      'Hexes the enemy for 8 sec, dealing Shadow damage and generating 2 Condemnation every 2 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
+      'Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown.',
   },
   cruel_pact: {
     id: 'cruel_pact',
     name: 'Cruel Pact',
     class: 'warlock',
     specs: ['affliction'],
+    // RETIRED: Blightcaller's own Cruel Pact folded into life_tap, which now carries the
+    // Cruel Pact name for every spec. The def stays, hidden, so persisted action bars
+    // can identify and discard it (the death_coil contract).
+    hiddenFromPlayer: true,
     learnLevel: 9,
     cost: 0,
     castTime: 0,
@@ -5486,7 +5486,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+      'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health.',
   },
   vicarious_suffering: {
     id: 'vicarious_suffering',
@@ -5503,11 +5503,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'afflictionVicarious', duration: 8, maxDoom: 15 }],
     description:
-      'Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health.',
+      'Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health.',
   },
   possess_evil_eye: {
     id: 'possess_evil_eye',
-    name: 'Possess the Evil Eye',
+    name: 'Possess the Rotmark',
     class: 'warlock',
     specs: ['affliction'],
     learnLevel: 13,
@@ -5526,11 +5526,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'afflictionPossession', duration: 15, doom: 35 }],
     description:
-      'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20.',
+      'The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20.',
   },
   hour_of_judgment: {
     id: 'hour_of_judgment',
-    name: 'Hour of Judgment',
+    name: 'Hour of Rot',
     class: 'warlock',
     specs: ['affliction'],
     learnLevel: 20,
@@ -5547,24 +5547,49 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'afflictionJudgment', duration: 15, doom: 40, refund: 50 }],
     description:
-      'Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation.',
+      'Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight.',
   },
   coven: {
     id: 'coven',
-    name: 'Coven',
+    name: 'Contagion',
     class: 'warlock',
     specs: ['affliction'],
     learnLevel: 17,
-    cost: 120,
+    cost: 0,
     castTime: 0,
-    cooldown: 90,
+    cooldown: 15,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
     projectile: false,
-    effects: [{ type: 'afflictionCoven', duration: 15, radius: 15, maxSecondary: 4 }],
+    requiresAuraKind: 'affliction_doom',
+    requiresAuraStacks: 30,
+    // Pays 30 of the bank at cast commit (required_aura.ts), keeping the rest.
+    consumesRequiredAuraStacks: 30,
+    requiresOwnTargetAuraKind: 'affliction_eye',
+    effects: [{ type: 'afflictionContagion', cost: 30, maxTargets: 3, radius: 12 }],
     description:
-      'Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
+      'Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd.',
+  },
+  plague_bloom: {
+    id: 'plague_bloom',
+    name: 'Plague Bloom',
+    class: 'warlock',
+    specs: ['affliction'],
+    learnLevel: 15,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: false,
+    projectile: false,
+    requiresAuraKind: 'affliction_doom',
+    requiresAuraStacks: 60,
+    consumesRequiredAuraStacks: 60,
+    effects: [{ type: 'afflictionPlagueBloom', cost: 60, ticks: 4, maxTargets: 5, range: 30 }],
+    description:
+      'Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them.',
   },
   shadow_bolt: {
     id: 'shadow_bolt',
@@ -5701,37 +5726,41 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'corruption',
     name: 'Blackrot',
     class: 'warlock',
-    excludeSpecs: ['affliction', 'demonology', 'destruction'],
+    specs: ['affliction'],
     learnLevel: 2,
-    cost: 35,
-    castTime: 2.0,
+    cost: 60,
+    castTime: 0,
     cooldown: 0,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'dot', total: 40, duration: 18, interval: 3 }],
+    // Blight Coven: the long, weakest DoT. Stealth strips cannot remove it and
+    // it jumps to the nearest enemy when its host dies (affliction_blight.ts).
+    effects: [{ type: 'dot', total: 140, duration: 45, interval: 3, spCoeff: 0.7 }],
     ranks: [
       {
         rank: 2,
         level: 12,
-        cost: 55,
-        effects: [{ type: 'dot', total: 72, duration: 18, interval: 3 }],
+        cost: 60,
+        effects: [{ type: 'dot', total: 293, duration: 45, interval: 3, spCoeff: 1.4 }],
       },
       {
         rank: 3,
         level: 18,
-        cost: 75,
-        effects: [{ type: 'dot', total: 85, duration: 18, interval: 3 }],
+        cost: 60,
+        effects: [{ type: 'dot', total: 433, duration: 45, interval: 3, spCoeff: 2.11 }],
       },
     ],
-    description: 'Corrupts the target, causing $d Shadow damage over 18 sec.',
+    description:
+      'Rots the target for $d Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it.',
   },
+  // The warlock's one health-for-mana spell for every spec (it replaced both the flat
+  // Hard Bargain and Blightcaller's separate Cruel Pact). The id stays life_tap so saved
+  // action bars and talents keep pointing at it.
   life_tap: {
     id: 'life_tap',
-    name: 'Hard Bargain',
+    name: 'Cruel Pact',
     class: 'warlock',
-    excludeSpecs: ['affliction'],
-    excludeSpecsAtLevel: 14,
     learnLevel: 4,
     cost: 0,
     castTime: 0,
@@ -5739,51 +5768,62 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'lifeTap', hp: 30, mana: 30 }],
-    ranks: [
+    effects: [
       {
-        rank: 2,
-        level: 14,
-        cost: 0,
-        effects: [{ type: 'lifeTap', hp: 55, mana: 55 }],
-      },
-      {
-        rank: 3,
-        level: 20,
-        cost: 0,
-        effects: [{ type: 'lifeTap', hp: 85, mana: 85 }],
+        type: 'afflictionCruelPact',
+        healthPct: 0.1,
+        manaPctMax: 0.2,
+        // No Blight: with no cooldown it would be unlimited Blight for health.
+        doom: 0,
       },
     ],
-    description: 'Converts $d health into $d mana.',
+    description:
+      'Sacrifices 10% of your maximum health to restore 20% of your maximum mana. Cannot be used at or below 20% health.',
+  },
+  // Cruel Pact's opposite: mana for health, for every spec, on the global cooldown.
+  hard_bargain: {
+    id: 'hard_bargain',
+    name: 'Hard Bargain',
+    class: 'warlock',
+    learnLevel: 4,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [{ type: 'hardBargain', manaPctMax: 0.2, healPctMax: 0.2 }],
+    description: 'Sacrifices 20% of your maximum mana to restore 20% of your maximum health.',
   },
   curse_of_agony: {
     id: 'curse_of_agony',
-    name: 'Hex of Anguish',
+    name: 'Festerhex',
     class: 'warlock',
-    excludeSpecs: ['affliction', 'demonology', 'destruction'],
+    specs: ['affliction'],
     learnLevel: 8,
-    cost: 25,
+    cost: 45,
     castTime: 0,
     cooldown: 0,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'dot', total: 36, duration: 24, interval: 3 }],
+    effects: [{ type: 'dot', total: 70, duration: 16, interval: 2, spCoeff: 0.59 }],
     ranks: [
       {
         rank: 2,
         level: 14,
-        cost: 40,
-        effects: [{ type: 'dot', total: 72, duration: 24, interval: 3 }],
+        cost: 45,
+        effects: [{ type: 'dot', total: 129, duration: 16, interval: 2, spCoeff: 1.05 }],
       },
       {
         rank: 3,
         level: 20,
-        cost: 60,
-        effects: [{ type: 'dot', total: 78, duration: 24, interval: 3 }],
+        cost: 45,
+        effects: [{ type: 'dot', total: 176, duration: 16, interval: 2, spCoeff: 1.4 }],
       },
     ],
-    description: 'Curses the target with agony: $d Shadow damage over 24 sec.',
+    description:
+      'Curses the target with festering rot: $d Shadow damage over 16 sec, each tick generating 2 Blight.',
   },
   drain_life: {
     id: 'drain_life',
@@ -5814,7 +5854,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Consumes the target's vitality, dealing $d Shadow damage each second and transferring 70% of it as health. Affliction transfers all of it instead. When channeled on your primary Evil Eye, it consumes all Fate Threads at the start, and each Thread generates 1 extra Condemnation per tick.",
+      "Consumes the target's vitality, dealing $d Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick.",
   },
   soul_lance: {
     id: 'soul_lance',
@@ -5863,6 +5903,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     projectile: false,
+    requiresOwnTargetAuraKind: 'affliction_eye',
     effects: [
       {
         type: 'afflictionLitany',
@@ -5903,7 +5944,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
+      'Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
   },
   umbral_anchor: {
     id: 'umbral_anchor',
@@ -5916,9 +5957,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'warlockUmbralAnchor', duration: 300, maxRange: 40 }],
+    effects: [{ type: 'warlockUmbralAnchor', duration: 300, maxRange: 40, recallHealPctMax: 0.1 }],
     description:
-      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown.',
   },
   soulwell: {
     id: 'soulwell',
@@ -6077,7 +6118,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'summon_voidwalker',
     name: 'Summon Duskmurk',
     class: 'warlock',
-    excludeSpecs: ['affliction', 'demonology'],
+    // Blightcaller may field the tank demon beside its Rotmark companion.
+    excludeSpecs: ['demonology'],
     learnLevel: 5,
     cost: 80,
     castTime: 5,
@@ -8127,16 +8169,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'siphon_life',
     name: 'Veinleech',
     class: 'warlock',
+    specs: ['affliction'],
     learnLevel: 10,
-    cost: 45,
+    cost: 50,
     castTime: 0,
     cooldown: 0,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'dot', total: 60, duration: 30, interval: 3, leechPct: 1 }],
+    effects: [{ type: 'dot', total: 164, duration: 24, interval: 3, leechPct: 1, spCoeff: 1.17 }],
     description:
-      'Siphons life from the enemy, causing $d Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
+      'Siphons life from the enemy: $d Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight.',
   },
   conflagrate: {
     id: 'conflagrate',
@@ -9212,7 +9255,9 @@ function scaleEffect(
         flat: (eff.flat ?? 0) + flat,
       };
     case 'afflictionViolence':
-      return { ...eff, damage: Math.round(eff.damage * dmgMult + flat) };
+      return eff.damage === undefined
+        ? eff
+        : { ...eff, damage: Math.round(eff.damage * dmgMult + flat) };
     case 'afflictionLitany':
       return { ...eff, damage: Math.round(eff.damage * dmgMult + flat) };
     case 'finisherDamage':
@@ -9459,35 +9504,30 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
                 // the same resolved rate the dispatch consumes.
                 e.type === 'absorbSpentResource'
                 ? { ...e, mult: Math.round(e.mult * mul) }
-                : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
-                  // shield's flat amount and its max-health fraction are both
-                  // buff-shaped, so the per-ability knob scales them and the
-                  // {damage} splice reads the same resolved fraction the
-                  // dispatch consumes.
-                  e.type === 'absorb'
-                  ? {
-                      ...e,
-                      amount: Math.round(e.amount * mul),
-                      casterMaxHpPct:
-                        e.casterMaxHpPct === undefined
-                          ? undefined
-                          : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
-                    }
-                  : e,
+                : // Blood Credit: Cruel Pact's mana and Hard Bargain's health,
+                  // resolved here so the {manaPct}/{healPct} tooltip splice and
+                  // the dispatch read the same share.
+                  e.type === 'afflictionCruelPact'
+                  ? { ...e, manaPctMax: Math.round(e.manaPctMax * mul * 10_000) / 10_000 }
+                  : e.type === 'hardBargain'
+                    ? { ...e, healPctMax: Math.round(e.healPctMax * mul * 10_000) / 10_000 }
+                    : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
+                      // shield's flat amount and its max-health fraction are both
+                      // buff-shaped, so the per-ability knob scales them and the
+                      // {damage} splice reads the same resolved fraction the
+                      // dispatch consumes.
+                      e.type === 'absorb'
+                      ? {
+                          ...e,
+                          amount: Math.round(e.amount * mul),
+                          casterMaxHpPct:
+                            e.casterMaxHpPct === undefined
+                              ? undefined
+                              : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
+                        }
+                      : e,
       );
     }
-  }
-  // Hexthread 2pc (the Crucible set doc): Needle of Fate grants 2 additional
-  // Condemnation. The bonus is baked into the RESOLVED afflictionNeedle
-  // payload, the ONE number the dispatch (resolveNeedleOfFate) and the
-  // {needleDoom} description splice both read, so the engine and the printed
-  // figure can never diverge. eyeGeneration still multiplies the total after
-  // (x0.5-with-rounding secondary Eyes, x2 under Hour of Judgment), the set
-  // doc's disclosures.
-  if (entry.def.id === 'needle_of_fate' && mods.selected[setBonusFlag('hexthread', 2)] === true) {
-    entry.effects = entry.effects.map((e) =>
-      e.type === 'afflictionNeedle' ? { ...e, doom: e.doom + HEXTHREAD_2PC_NEEDLE_DOOM_BONUS } : e,
-    );
   }
   // Moonscorch 2pc (the Crucible set doc): Moonseed may extend Lunar Tempest
   // twice per application. The per-application cap is baked into the RESOLVED

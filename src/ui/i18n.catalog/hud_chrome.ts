@@ -370,18 +370,17 @@ export const hudChromeStrings = {
       'Aim inside the marked field. No mana cost. Damage does not scale with gear or talents.',
   },
   warlock: {
-    doomLabel: 'Condemnation',
-    fateThreadsLabel: 'Fate Threads',
+    doomLabel: 'Blight',
+    fateThreadsLabel: 'Rot Splinters',
     // The doom meter's per-frame move/lock strings retired with its private
     // mover: the frame rides the shared interfaceUnlock chrome now, and its
     // name chip reuses doomLabel above (the mechanic's own in-game name).
-    doomEmptyStatus: '{value} of {max} Condemnation.',
-    doomStatus: '{value} of {max} Condemnation; {remaining}.',
-    fateThreadsStatus: '{value} of {max} Fate Threads.',
-    fateThreadsConsumeReady:
-      'Three Fate Threads: Consume can weave them into additional Condemnation.',
+    doomEmptyStatus: '{value} of {max} Blight.',
+    doomStatus: '{value} of {max} Blight; {remaining}.',
+    fateThreadsStatus: '{value} of {max} Rot Splinters.',
+    fateThreadsConsumeReady: 'Three Rot Splinters: Consume can draw them into additional Blight.',
     fateThreadsSentenceReady:
-      'Three Fate Threads: Sentence can consume them for 18% increased damage.',
+      'Three Rot Splinters: Putrefy can consume them for 18% increased damage.',
   },
   priest: {
     gloomtitheLabel: 'Gloomtithe',
@@ -6008,7 +6007,9 @@ export const hudChromeStrings = {
       "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
     leadenHexLock: 'Leaden Hex cannot root this target again yet',
     forbiddenReflectionReady: 'Your next eligible Warlock cooldown can be cast again',
-    forbiddenReflectionLock: 'Forbidden Reflection cannot be prepared again yet',
+    // Shown on the 60 sec lockout buff (REFLECTION_LOCK in combat/warlock_talents.ts).
+    forbiddenReflectionLock:
+      'Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)',
     internalCooldown: 'This effect cannot trigger again until the timer expires',
     // The carried-flag buff's tooltip: the ONLY place the voluntary-drop
     // affordance is spelled out, so the player can find it without folklore.
@@ -6258,24 +6259,23 @@ export const hudChromeStrings = {
     resourceCount: '{value} of {max}',
     formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',
     afflictionEye:
-      'Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation',
+      'Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight',
     afflictionEyeSecondary:
-      'Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage',
+      'Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage',
     afflictionAccomplice:
-      'Qualifying damage grants {value} Condemnation, at most once every {interval} sec',
-    afflictionViolence:
-      '{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back',
+      'Qualifying damage grants {value} Blight, at most once every {interval} sec',
+    afflictionViolence: 'Your DoT ticks here have a {pct}% chance to tick again',
     afflictionVicarious:
-      'Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation',
-    afflictionPossession: 'Empowers Needle of Fate, Consume, Maledict Gaze, and Sentence',
+      'Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight',
+    afflictionPossession: 'Empowers Carrion Dart, Consume, and Putrefy',
     afflictionJudgment:
-      'Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation',
+      'Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight',
     afflictionLitany:
-      'Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec',
+      'Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec',
     afflictionFateThreads:
-      '{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Consume gains {doom} extra Condemnation per tick',
+      '{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick',
     afflictionConsumeThreads:
-      'Consume is devouring {stacks} Fate Threads for {doom} extra Condemnation per tick',
+      'Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick',
     necromancyHarvestMark: 'Death can create 1 Soul Fragment',
     necromancyOssuaryMark:
       'Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment',

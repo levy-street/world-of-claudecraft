@@ -1029,13 +1029,13 @@ export const it_IT: EnTranslations = {
       "shotRules": "Mira dentro il campo segnato. Nessun costo in mana. I danni non scalano con equipaggiamento o talenti."
     },
     "warlock": {
-      "doomLabel": "Condanna",
-      "fateThreadsLabel": "Filamenti del Fato",
-      "doomEmptyStatus": "{value} su {max} Condanna.",
-      "doomStatus": "{value} su {max} Condanna; {remaining}.",
-      "fateThreadsStatus": "{value} su {max} Filamenti del Fato.",
-      "fateThreadsConsumeReady": "Tre Filamenti del Fato: Divorare può intrecciarli in Condanna aggiuntiva.",
-      "fateThreadsSentenceReady": "Tre Filamenti del Fato: Sentenza può consumarli per un aumento del 18% dei danni."
+      "doomLabel": "Blight",
+      "fateThreadsLabel": "Rot Splinters",
+      "doomEmptyStatus": "{value} of {max} Blight.",
+      "doomStatus": "{value} of {max} Blight; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
+      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
+      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
     },
     "priest": {
       "gloomtitheLabel": "Decima oscura",
@@ -4795,7 +4795,7 @@ export const it_IT: EnTranslations = {
       "effigyLanternOut": "Per te la lanterna del Caposquadra di paglia è spenta: i tuoi colpi e quelli del tuo famiglio ignorano la Pelle d'Assi e infliggono danni pieni",
       "leadenHexLock": "Maleficio Plum beo non può ancora radicare di nuovo questo bersaglio",
       "forbiddenReflectionReady": "Il tuo prossimo tempo di recupero idoneo dello Stregone può essere lanciato di nuovo",
-      "forbiddenReflectionLock": "Il Riflesso Proibito non può ancora essere preparato di nuovo",
+      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
       "internalCooldown": "Questo effetto non può attivarsi di nuovo prima che il timer scada",
       "carriedFlag": "Stai portando la bandiera nemica. Annulla questo effetto per lasciarla cadere.",
       "carryingFreight": "Stai trasportando un carico. La velocità di movimento è ridotta del {pct}%.",
@@ -4965,16 +4965,16 @@ export const it_IT: EnTranslations = {
       "formShadow": "Forma d'Ombra: danni da Ombra aumentati del {pct}%",
       "resourceCount": "{value} su {max}",
       "formLich": "Lancia dell'Anima colpisce anche fino a {targets} nemici vicini per il {pct}% dei danni",
-      "afflictionEye": "Sguardo Maledetto attacca ogni {interval} sec; gli effetti su questo Malocchio generano il {pct}% di Condanna",
-      "afflictionEyeSecondary": "Gli effetti su questo Malocchio generano il {doomPct}% di Condanna; Sentenza riecheggia qui per il {echoPct}% dei danni",
-      "afflictionAccomplice": "I danni idonei concedono {value} Condanna, al massimo una volta ogni {interval} sec",
-      "afflictionViolence": "Restano {charges} rappresaglie; un attacco nemico concede {doom} Condanna e infligge {damage} danni da Ombra di ritorno",
-      "afflictionVicarious": "Reindirizza o riduce il {pct}% dei danni subiti e può generare fino a {max} Condanna",
-      "afflictionPossession": "Potenzia Ago del Destino, Divorare, Sguardo Maledetto e Sentenza",
-      "afflictionJudgment": "Il Malocchio primario genera il {eyePct}% di Condanna in più; Sentenza infligge il {sentencePct}% di danni in più e la prima rimborsa {refund} Condanna",
-      "afflictionLitany": "I guadagni di Condanna infliggono {damage} danni da Ombra fino a {targets} nemici entro {radius} metri, una volta al secondo",
-      "afflictionFateThreads": "{stacks} Filamenti del Fato: Sentenza infligge il {sentencePct}% di danni in più, oppure Divorare guadagna {doom} Condanna extra per tick",
-      "afflictionConsumeThreads": "Divorare sta consumando {stacks} Filamenti del Fato per {doom} Condanna extra per tick",
+      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
+      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
+      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
+      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
+      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
+      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
+      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
       "necromancyHarvestMark": "La morte può creare 1 Frammento d'Anima",
       "necromancyOssuaryMark": "Accumula il {storedPct}% dei tuoi danni e di quelli dei tuoi non morti, più il {lancePct}% dei danni di Lancia dell'Anima; rilancia per farla detonare. La morte esplode entro {radius} iarde e crea 1 Frammento d'Anima",
       "necromancyDeathEcho": "Eco della Morte residuo; nessuna abilità attuale lo consuma",
@@ -10084,7 +10084,7 @@ export const it_IT: EnTranslations = {
       "none": "Nessuna classe corrisponde a tutti i filtri. Azzerane uno per vederne di più."
     },
     "abilityHook": {
-      "evil_eye": "Nomina il nemico le cui azioni e sofferenza alimentano la tua Condanna.",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
       "heroic_strike": "Mette in coda un fendente più pesante che spende ira al tuo prossimo colpo.",
       "revenge": "Colpisce i nemici davanti a te e può diventare gratuita dopo una schivata o una parata.",
       "hamstring": "Ostacola il movimento di un nemico per impedirgli di fuggire.",
@@ -10163,7 +10163,8 @@ export const it_IT: EnTranslations = {
       "demon_skin": "Un potenziamento personale duraturo che irrobustisce la pelle e aggiunge corazza.",
       "immolate": "Incendia un bersaglio per un colpo iniziale e un'ustione che perdura.",
       "corruption": "Marcisce il bersaglio con l'ombra, che continua a pulsare mentre fai altro.",
-      "life_tap": "Converte parte della tua salute in mana quando resti a secco.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Un dardo di natura scagliato su un bersaglio dalla distanza, il tuo colpo di riferimento.",
       "healing_touch": "Una grande cura a bersaglio singolo dal lancio lungo, per rimettere in piedi qualcuno.",
       "mark_of_the_wild": "Una benedizione duratura che metti su di te o un alleato prima di uno scontro.",
@@ -18265,43 +18266,47 @@ export const it_IT: EnTranslations = {
       },
       "corruption": {
         "name": "Marciume Nero",
-        "description": "Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s."
+        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
       },
       "evil_eye": {
-        "name": "Malocchio",
-        "description": "Marchia un nemico come bersaglio delle tue maledizioni. Spostare il Malocchio preserva la Condanna ma non rinnova la sua scadenza di 20 sec."
+        "name": "Rotmark",
+        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "Sguardo Maledetto",
-        "description": "Il tuo Occhio Maledetto attacca il tuo Malocchio primario selezionato ogni 2,5 sec per danni da Ombra. Possessione del Malocchio raddoppia la sua velocità d'attacco."
+        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
       },
       "needle_of_fate": {
-        "name": "Ago del Destino",
-        "description": "Trafigge il nemico per {damage} danni da Ombra e genera {needleDoom} Condanna se porta il tuo Malocchio. Ogni colpo sul tuo Malocchio primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Malocchio, Ago del Destino marchia per primo il suo bersaglio."
+        "name": "Carrion Dart",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
       },
       "sentence": {
-        "name": "Sentenza",
-        "description": "Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16."
+        "name": "Putrefy",
+        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+      },
+      "hard_bargain": {
+        "name": "Hard Bargain",
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Patto Amaro",
-        "description": "Converte {damage} salute in {damage} mana."
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "Complice Maledetto",
-        "description": "Collega il tuo Malocchio quando nessun alleato è selezionato, facendo sì che il suo Sguardo Maledetto generi 2 Condanna. Collegare un membro del gruppo selezionato fa sì che solo i loro danni al tuo Malocchio generino 3 invece. Un nuovo collegamento sostituisce quello precedente e può attivarsi una volta ogni 2 sec."
+        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
       },
       "curse_of_agony": {
-        "name": "Maleficio dell'Angoscia",
-        "description": "Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s."
+        "name": "Festerhex",
+        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
       },
       "drain_life": {
         "name": "Divorare",
-        "description": "Consuma la vitalità del bersaglio, infliggendo {damage} danni da Ombra ogni secondo e trasferendovene il 70% come salute. Afflizione ne trasferisce invece la totalità. Quando è incanalato sul vostro Malocchio primario, consuma all'inizio tutti i Filamenti del Fato, e ogni Filamento genera 1 Condanna in più per impulso."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
       },
       "litany_of_guilt": {
         "name": "Litania della Colpa",
-        "description": "Maledice il tuo Malocchio primario per 6 sec. I guadagni di Condanna rilasciano un'onda che danneggia fino a 2 altri nemici entro 8 iarde, al massimo una volta al secondo. Il Grado 2 lo estende a 8 sec e 4 nemici."
+        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
         "name": "Pelle di Scorie",
@@ -18309,35 +18314,39 @@ export const it_IT: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Ancora d'Ombra",
-        "description": "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, consumando l'ancora e avviando un tempo di recupero di 45 sec."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
         "name": "Pozzo delle Anime",
         "description": "Evoca un Pozzo delle Anime per 3 min. Fuori dal combattimento, i membri del gruppo possono ricaricare le loro Pietre dell'Anima fino a 3. Una Pietra dell'Anima ripristina il 25% della salute massima e condivide il tempo di recupero delle pozioni."
       },
       "hex_of_violence": {
-        "name": "Maleficio della Violenza",
-        "description": "Lancia un maleficio sul nemico per 8 sec, infliggendo danni da Ombra e generando 2 Condanna ogni 2 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 17 danni da Ombra."
+        "name": "Rotfever",
+        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
       },
       "cruel_pact": {
         "name": "Patto Crudele",
-        "description": "Sacrifica il 12% della tua salute massima per ripristinare l'1,5% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno."
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
         "name": "Sofferenza Vicaria",
-        "description": "Collega la tua sofferenza per 8 sec e genera fino a 15 Condanna dai colpi ostili. Su te stesso, riduce i danni subiti del 20%. Su un alleato, reindirizza fino al 20% verso di te senza farti scendere sotto il 15% di salute."
+        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "Possessione del Malocchio",
-        "description": "Il Maledicente possiede il tuo Malocchio primario per 15 sec e genera 35 Condanna. Ago del Destino si lancia in 1 sec e genera 2 Condanna extra, Divorare può essere incanalato in movimento, e Sentenza infligge il 25% di danni in più e rilascia un'eco ritardata per il 60% dei danni, che scende al 30% tra i livelli 17 e 20."
+        "name": "Possess the Rotmark",
+        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "Ora del Giudizio",
-        "description": "Chiama un giudizio sul tuo Malocchio primario per 15 sec, concedendo 40 Condanna e 3 Filamenti del Fato, attivando la Possessione, raddoppiando la Condanna generata tramite il Malocchio primario e aumentando i danni di Sentenza del 20%. La prima Sentenza rimborsa 50 Condanna."
+        "name": "Hour of Rot",
+        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
       },
       "coven": {
-        "name": "Congrega",
-        "description": "Crea Malocchi secondari su un massimo di 4 nemici vicini per 15 sec. Alimentano la riserva condivisa di Condanna al 50%, e Sentenza riecheggia su di loro per il 35% dei danni."
+        "name": "Contagion",
+        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
       },
       "fear": {
         "name": "Tormento",
@@ -18689,7 +18698,7 @@ export const it_IT: EnTranslations = {
       },
       "siphon_life": {
         "name": "Risucchio Vitale",
-        "description": "Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)"
+        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
       },
       "conflagrate": {
         "name": "Conflagrazione",
@@ -18944,7 +18953,7 @@ export const it_IT: EnTranslations = {
       },
       "dark_pact": {
         "name": "Patto Sanguigno",
-        "description": "Sacrifica il 10% della tua salute attuale per assorbire danni pari al 30% della tua salute massima per 8 sec."
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
       },
       "cloak_of_shadows": {
         "name": "Manto d’Ombra",
@@ -30862,8 +30871,8 @@ export const it_IT: EnTranslations = {
       },
       "hexthread": {
         "name": "Sudario Hexthread",
-        "bonus2": "Ago del Destino concede 2 Condanne aggiuntive. I danni subiti non ritardano più il lancio degli incantesimi.",
-        "bonus4": "Sentenza Inappellabile restituisce 10 Condanne."
+        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
       },
       "moonscorch": {
         "name": "Paramento Moonscorch",

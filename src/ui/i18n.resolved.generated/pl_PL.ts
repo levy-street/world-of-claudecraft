@@ -1029,13 +1029,13 @@ export const pl_PL: EnTranslations = {
       "shotRules": "Celujesz wewnątrz zaznaczonego pola. Bez kosztu many. Obrażenia nie skalują się wraz z ekwipunkiem ani zdolnościami."
     },
     "warlock": {
-      "doomLabel": "Potępienie",
-      "fateThreadsLabel": "Nici Przeznaczenia",
-      "doomEmptyStatus": "{value} z {max} Potępienia.",
-      "doomStatus": "{value} z {max} Potępienia; {remaining}.",
-      "fateThreadsStatus": "{value} z {max} Nici Przeznaczenia.",
-      "fateThreadsConsumeReady": "Trzy Nici Przeznaczenia: Pochłonięcie może wpleść je w dodatkowe Potępienie.",
-      "fateThreadsSentenceReady": "Trzy Nici Przeznaczenia: Wyrok może je zużyć, zyskując 18% zwiększonych obrażeń."
+      "doomLabel": "Blight",
+      "fateThreadsLabel": "Rot Splinters",
+      "doomEmptyStatus": "{value} of {max} Blight.",
+      "doomStatus": "{value} of {max} Blight; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
+      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
+      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
     },
     "priest": {
       "gloomtitheLabel": "Mroczna dziesięcina",
@@ -4795,7 +4795,7 @@ export const pl_PL: EnTranslations = {
       "effigyLanternOut": "Latarnia Słomianego Nadzorcy jest dla ciebie zgaszona: twoje ciosy i ciosy twojego zwierzaka ignorują Skórę z desek i trafiają z pełną siłą",
       "leadenHexLock": "Ołowiana Klątwa nie może jeszcze ponownie unieruchomić tego celu",
       "forbiddenReflectionReady": "Możesz ponownie rzucić swoją następną kwalifikującą się umiejętność czarnoksiężnika, mimo że jest w odnowieniu",
-      "forbiddenReflectionLock": "Zakazane Odbicie nie może zostać jeszcze ponownie przygotowane",
+      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
       "internalCooldown": "Ten efekt nie może się ponownie uruchomić, dopóki nie upłynie jego czas",
       "carriedFlag": "Niesiesz wrogą flagę. Anuluj to wzmocnienie, aby ją upuścić.",
       "carryingFreight": "Nosisz ładunek. Prędkość ruchu zmniejszona o {pct}%.",
@@ -4965,16 +4965,16 @@ export const pl_PL: EnTranslations = {
       "formShadow": "Postać cienia: obrażenia od Cienia zwiększone o {pct}%",
       "resourceCount": "{value} z {max}",
       "formLich": "Lanca Duszy trafia też do {targets} pobliskich wrogów, zadając {pct}% obrażeń",
-      "afflictionEye": "Spojrzenie Przekleństwa atakuje co {interval} s; efekty na tym oku generują {pct}% Potępienia",
-      "afflictionEyeSecondary": "Efekty na tym oku generują {doomPct}% Potępienia; Wyrok odbija się tutaj za {echoPct}% obrażeń",
-      "afflictionAccomplice": "Kwalifikujące się obrażenia przyznają {value} Potępienia, najwyżej raz na {interval} s",
-      "afflictionViolence": "Pozostało {charges} odwetów; atak wroga przyznaje {doom} Potępienia i zadaje mu {damage} obrażeń od Cienia",
-      "afflictionVicarious": "Przekierowuje lub zmniejsza {pct}% otrzymywanych obrażeń i może wygenerować do {max} Potępienia",
-      "afflictionPossession": "Wzmacnia Igłę Przeznaczenia, Pochłonięcie, Spojrzenie Przekleństwa i Wyrok",
-      "afflictionJudgment": "Główne oko generuje o {eyePct}% więcej Potępienia; Wyrok zadaje o {sentencePct}% więcej obrażeń, a pierwsze użycie zwraca {refund} Potępienia",
-      "afflictionLitany": "Zyski Potępienia zadają {damage} obrażeń od Cienia maksymalnie {targets} wrogom w promieniu {radius} m, raz na sekundę",
-      "afflictionFateThreads": "{stacks} Nici Przeznaczenia: Wyrok zadaje o {sentencePct}% więcej obrażeń, albo Pochłonięcie zyskuje dodatkowe {doom} Potępienia na tik",
-      "afflictionConsumeThreads": "Pochłonięcie zużywa {stacks} Nici Przeznaczenia, zyskując dodatkowe {doom} Potępienia na tik",
+      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
+      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
+      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
+      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
+      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
+      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
+      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
       "necromancyHarvestMark": "Śmierć może stworzyć 1 Odłamek Duszy",
       "necromancyOssuaryMark": "Gromadzi {storedPct}% obrażeń zadanych przez ciebie i twoich nieumarłych, plus {lancePct}% obrażeń Lanca Duszy; rzuć ponownie, aby zdetonować. Śmierć celu powoduje eksplozję w promieniu {radius} m i tworzy 1 Odłamek Duszy",
       "necromancyDeathEcho": "Przestarzałe Echo Śmierci; żadna obecna zdolność go nie zużywa",
@@ -10084,7 +10084,7 @@ export const pl_PL: EnTranslations = {
       "none": "Żadna klasa nie pasuje do wszystkich filtrów. Usuń jeden, by zobaczyć więcej."
     },
     "abilityHook": {
-      "evil_eye": "Wskazuje wroga, którego działania i cierpienie będą zasilać twoje Potępienie.",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
       "heroic_strike": "Kolejkuje cięższy zamach, który zużywa wściekłość przy następnym ciosie.",
       "revenge": "Uderza wrogów przed tobą i może stać się darmowa po uniku lub sparowaniu.",
       "hamstring": "Ogranicza ruch wroga, aby nie mógł uciec.",
@@ -10163,7 +10163,8 @@ export const pl_PL: EnTranslations = {
       "demon_skin": "Trwałe wzmocnienie, które utwardza skórę i zwiększa pancerz.",
       "immolate": "Podpala cel, zadając początkowy cios i pozostawiając utrzymujące się płomienie.",
       "corruption": "Skaża cel cieniem, który zadaje obrażenia, gdy zajmujesz się czymś innym.",
-      "life_tap": "Zamienia część własnego zdrowia z powrotem na manę, gdy ci jej zabraknie.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.",
       "healing_touch": "Potężne leczenie pojedynczego celu o długim czasie rzucania, do uzupełnienia komuś zdrowia.",
       "mark_of_the_wild": "Trwałe błogosławieństwo, które nakładasz na siebie lub sojusznika przed walką.",
@@ -18265,43 +18266,47 @@ export const pl_PL: EnTranslations = {
       },
       "corruption": {
         "name": "Czarna zgnilizna",
-        "description": "Skaża cel, zadając {damage} obrażeń cienia przez 18 sek."
+        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
       },
       "evil_eye": {
-        "name": "Złe Oko",
-        "description": "Oznacza jednego wroga jako ognisko twoich klątw. Przeniesienie oka zachowuje Potępienie, ale nie odświeża jego 20-sekundowego czasu wygaśnięcia."
+        "name": "Rotmark",
+        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "Spojrzenie Przekleństwa",
-        "description": "Twoje Oko Przekleństwa atakuje wybrane główne Złe Oko co 2,5 sekundy, zadając obrażenia od Cienia. Opętaj Złe Oko podwaja jego szybkość ataku."
+        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
       },
       "needle_of_fate": {
-        "name": "Igła Przeznaczenia",
-        "description": "Przebija wroga za {damage} obrażeń od Cienia i generuje {needleDoom} Potępienia, jeśli nosi on twoje Złe Oko. Każde trafienie w twoje główne Złe Oko dodaje Nić Przeznaczenia na 12 sekund, maksymalnie do 3. Jeśli nie istnieje żadne Złe Oko, Igła najpierw oznacza swój cel."
+        "name": "Carrion Dart",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
       },
       "sentence": {
-        "name": "Wyrok",
-        "description": "Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Każda Nić zwiększa obrażenia o 6%. Dodatkowe efekty eskalują przy 20, 50, 80 i 100 Potępienia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie."
+        "name": "Putrefy",
+        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+      },
+      "hard_bargain": {
+        "name": "Hard Bargain",
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Trudny targ",
-        "description": "Zamienia {damage} zdrowia na {damage} many."
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "Przeklęty Wspólnik",
-        "description": "Wiąże twoje Oko Przekleństwa, gdy nie wybrano żadnego sojusznika, dzięki czemu jego Spojrzenie Przekleństwa generuje 2 Potępienia. Powiązanie jednego wybranego członka grupy sprawia, że zamiast tego tylko jego obrażenia zadane twojemu Złemu Oku generują 3. Nowe powiązanie zastępuje poprzednie i może się uruchomić nie częściej niż raz na 2 sekundy."
+        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
       },
       "curse_of_agony": {
-        "name": "Urok udręki",
-        "description": "Przeklina cel agonią: {damage} obrażeń od cienia w ciągu 24 sek."
+        "name": "Festerhex",
+        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
       },
       "drain_life": {
         "name": "Pochłonięcie",
-        "description": "Pochłania witalność celu, zadając {damage} obrażeń od cienia co sekundę i przenosząc ci 70% z nich jako zdrowie. Udręka przenosi zamiast tego całość. Kanałowane na twoim głównym Złym Oku zużywa na starcie wszystkie Nici Przeznaczenia, a każda Nić generuje 1 dodatkowe Potępienie na tyknięcie."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
       },
       "litany_of_guilt": {
         "name": "Litania Winy",
-        "description": "Rzuca klątwę na twoje główne Złe Oko na 6 sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom w promieniu 8 m, najwyżej raz na sekundę. Ranga 2 wydłuża to do 8 sekund i 4 wrogów."
+        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
         "name": "Żarowa Skóra",
@@ -18309,35 +18314,39 @@ export const pl_PL: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Mroczna Kotwica",
-        "description": "Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, zużywając kotwicę i rozpoczynając 45-sekundowy czas odnowienia."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
         "name": "Studnia Dusz",
         "description": "Przywołuje Studnię Dusz na 3 minuty. Poza walką członkowie grupy mogą uzupełniać swoje Kamienie Duszy do 3 sztuk. Kamień Duszy przywraca 25% maksymalnego zdrowia i dzieli czas odnowienia z miksturami."
       },
       "hex_of_violence": {
-        "name": "Klątwa Przemocy",
-        "description": "Rzuca urok na wroga na 8 sekund, zadając obrażenia od Cienia i generując 2 Potępienia co 2 sekundy. Jego następne 3 zadające obrażenia działania generują po 7 Potępienia i smagają go za 17 obrażeń od Cienia."
+        "name": "Rotfever",
+        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
       },
       "cruel_pact": {
         "name": "Okrutny Pakt",
-        "description": "Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić 1,5% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej."
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
         "name": "Zastępcze Cierpienie",
-        "description": "Wiąże twoje cierpienie na 8 sekund i generuje do 15 Potępienia z wrogich trafień. Użyte na sobie, zmniejsza otrzymywane obrażenia o 20%. Użyte na sojuszniku, przekierowuje do 20% obrażeń na ciebie, nie obniżając twojego zdrowia poniżej 15%."
+        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "Opętaj Złe Oko",
-        "description": "Maledyktor opętuje twoje główne Złe Oko na 15 sekund i generuje 35 Potępienia. Igła Przeznaczenia rzuca się w 1 sekundę i generuje 2 dodatkowe Potępienia, Pochłonięcie można kanalizować podczas ruchu, a Wyrok zadaje o 25% więcej obrażeń i uwalnia opóźnione echo za 60% obrażeń, malejące do 30% między poziomem 17 a 20."
+        "name": "Possess the Rotmark",
+        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "Godzina Sądu",
-        "description": "Przywołuje sąd nad twoim głównym Złym Okiem na 15 sekund, przyznając 40 Potępienia i 3 Nici Przeznaczenia, aktywując Opętanie, podwajając Potępienie generowane przez główne oko i zwiększając obrażenia Wyroku o 20%. Pierwsze użycie Wyroku zwraca 50 Potępienia."
+        "name": "Hour of Rot",
+        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
       },
       "coven": {
-        "name": "Sabat",
-        "description": "Tworzy drugorzędne Złe Oko na maksymalnie 4 pobliskich wrogach na 15 sekund. Zasilają one wspólną pulę Potępienia w 50%, a Wyrok odbija się do nich za 35% obrażeń."
+        "name": "Contagion",
+        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
       },
       "fear": {
         "name": "Trwoga",
@@ -18689,7 +18698,7 @@ export const pl_PL: EnTranslations = {
       },
       "siphon_life": {
         "name": "Wyssanie życia",
-        "description": "Wysysa życie z wroga, zadając {damage} obrażeń od Cienia przez 30 sek. i lecząc cię za zadane obrażenia. (specjalizacja Udręka)"
+        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
       },
       "conflagrate": {
         "name": "Pożoga",
@@ -18944,7 +18953,7 @@ export const pl_PL: EnTranslations = {
       },
       "dark_pact": {
         "name": "Krwawe Przymierze",
-        "description": "Poświęca 10% twojego obecnego zdrowia, aby na 8 sekund pochłonąć obrażenia równe 30% twojego maksymalnego zdrowia."
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
       },
       "cloak_of_shadows": {
         "name": "Cieniopłaszcz",
@@ -30862,8 +30871,8 @@ export const pl_PL: EnTranslations = {
       },
       "hexthread": {
         "name": "Całun Klątwy",
-        "bonus2": "Igła Losu zapewnia 2 dodatkowe punkty Potępienia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
-        "bonus4": "Wykonanie Wyroku zwraca 10 punktów Potępienia."
+        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
       },
       "moonscorch": {
         "name": "Strój Księżycowego Żaru",

@@ -528,7 +528,6 @@ const specs = {
       'coven',
       'hex_of_violence',
       'vicarious_suffering',
-      'cruel_pact',
       'sentence',
       'drain_life',
       'needle_of_fate',

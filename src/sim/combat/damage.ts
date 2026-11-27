@@ -112,6 +112,7 @@ import {
   mitigateVicariousSuffering,
   onAfflictionDamage,
 } from './affliction';
+import { blightPvpDamageMult } from './affliction_blight';
 import { barrowstoneSave } from './balgath_trinkets';
 import { isUnbreakableControlAura } from './cc';
 import { stopChannelVisual } from './channel_visuals';
@@ -623,7 +624,12 @@ export function dealDamage(
     sourcePlayer.id !== targetPlayer.id &&
     ctx.isHostileTo(source, target)
   ) {
-    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer)));
+    // Hexcraft (Blight Coven) hits players 10% harder; its pets do not.
+    const specMult = source === sourcePlayer ? blightPvpDamageMult(ctx, source) : 1;
+    amount = Math.max(
+      0,
+      Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer) * specMult),
+    );
   }
 
   if (

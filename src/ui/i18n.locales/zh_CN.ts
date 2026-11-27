@@ -7657,15 +7657,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     '灼烧敌人，造成 {damage} 点火焰伤害，并在 15 秒内额外造成 {overTime}。',
   'entities.abilities.corruption.name': '黑腐术',
-  'entities.abilities.corruption.description': '腐蚀目标，在 18 秒内造成 {damage} 点暗影伤害。',
-  'entities.abilities.life_tap.name': '苛酷交易',
-  'entities.abilities.life_tap.description': '将 {damage} 点生命值转化为 {damage} 点法力值。',
-  'entities.abilities.curse_of_agony.name': '苦楚妖术',
-  'entities.abilities.curse_of_agony.description':
-    '以痛苦诅咒目标：在 24 秒内造成 {damage} 点暗影伤害。',
   'entities.abilities.drain_life.name': '吞噬',
-  'entities.abilities.drain_life.description':
-    '吞噬目标的生命力，每秒造成 {damage} 点暗影伤害，并将其中的 70% 转化为生命传给你。痛苦则改为全部转化。当引导在你的主邪眼之上时，它会在开始时消耗全部命运丝线，而每一根丝线都会让每一跳额外产生 1 点谴罪。',
   'entities.abilities.fear.name': '惊惧',
   'entities.abilities.fear.description':
     '使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。',
@@ -7865,8 +7857,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     '在 12 秒内，电弧箭给予 2 点雷霆。你的下一次电弧箭或叉状闪电为瞬发，而你下一次完整的雷霆兑现伤害提高 25%。（元素标志技能）',
   'entities.abilities.siphon_life.name': '生命虹吸',
-  'entities.abilities.siphon_life.description':
-    '虹吸敌人的生命，在30秒内造成{damage}点暗影伤害，并按造成的伤害治疗你。（痛苦专精招牌）',
   'entities.abilities.conflagrate.name': '燃尽',
   'entities.abilities.conflagrate.description':
     '将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 {charges} 层充能。（毁灭标志技能）',
@@ -11163,7 +11153,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.immolate': '点燃目标，打出一记起手伤害并留下持续燃烧。',
   'guide.abilityHook.judgement': '消耗你激活的圣印，从近距离打击敌人。',
   'guide.abilityHook.lesser_heal': '稳健的施法治疗，有空站定时为盟友补血。',
-  'guide.abilityHook.life_tap': '在法力枯竭时，将部分自身生命值转化为法力。',
   'guide.abilityHook.lightning_bolt': '一次远程施法的自然伤害，是你远距离的常用手段。',
   'guide.abilityHook.lightning_shield': '为你充能，让攻击者打中你时受到自然伤害。',
   'guide.abilityHook.mark_of_the_wild': '开战前为自己或盟友施加的持续祝福。',
@@ -12611,8 +12600,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '凛霜之矛的致命一击会额外积存一枚冰刺，上限仍为 5 枚。受到伤害不再延迟你的施法。',
   'entities.itemSets.frostquench.bonus4': '凛冬之鞭施加 3 层凛冬之寒（原为 2 层）。',
   'entities.itemSets.hexthread.name': '咒线罩袍',
-  'entities.itemSets.hexthread.bonus2': '命运之针额外生成 2 点谴罪。受到伤害不再延迟你的施法。',
-  'entities.itemSets.hexthread.bonus4': '施放裁决后返还 10 点谴罪。',
   'entities.itemSets.gravebrand.name': '墓印礼装',
   'entities.itemSets.gravebrand.bonus2': '收割号令的冷却时间缩短 2 秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.gravebrand.bonus4': '收割号令的齐击造成的伤害提高 25%。',
@@ -18183,17 +18170,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     '优先牺牲骸骨法师，其次是骷髅战士，只有在别无选择时才牺牲墓翼。同类仆从中先选择剩余持续时间最短者，再选择最虚弱者，对目标地点的敌人造成 {damage} 点暗影伤害。',
   'entities.abilities.corpse_explosion.name': '尸骸爆裂',
-  'entities.abilities.coven.description':
-    '在最多4名附近敌人身上制造持续15秒的次级邪眼。它们以50%的效率补充共享谴罪池，并承受裁决35%的回响伤害。',
-  'entities.abilities.coven.name': '巫契',
-  'entities.abilities.cruel_pact.description':
-    '牺牲最大生命值的12%以生成20点谴罪。生命值不高于15%时无法使用。',
   'entities.abilities.cruel_pact.name': '残酷契约',
-  'entities.abilities.cursed_accomplice.description':
-    '未选择友方玩家时连接你的咒眼，使其凝视生成2点谴罪；连接友方玩家时，该玩家对邪眼目标造成伤害会生成3点。每2秒最多触发一次。',
   'entities.abilities.cursed_accomplice.name': '受咒同谋',
-  'entities.abilities.dark_pact.description':
-    '牺牲当前生命值的10%，在8秒内吸收相当于最大生命值30%的伤害。',
   'entities.abilities.dark_pact.name': '血契',
   'entities.abilities.dawn_devotion.description':
     '使你和小队成员的攻击强度提高 40 点，持续 30 分钟。会替换你自己的辉光或恩典虔诚，但可与其他圣骑士的虔诚及战士的战吼共存。',
@@ -18213,9 +18191,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_trance.description':
     '进入元素恍惚状态，持续15秒：受到的伤害降低30%，你造成的所有伤害的20%转化为法力值。（战魂特色技能）',
   'entities.abilities.elemental_trance.name': '元素恍惚',
-  'entities.abilities.evil_eye.description':
-    '将一名敌人标记为诅咒焦点。移动邪眼会保留谴罪，但不会刷新其20秒的持续时间。',
-  'entities.abilities.evil_eye.name': '邪眼',
   'entities.abilities.eviscerate.specNote_assassination':
     '毒祭达到6层时，此按钮变为蚀毒撕裂：这次打击立即引爆你的流血效果的全部剩余伤害，施加一个新的蚀毒伤口，并恢复20点能量。',
   'entities.abilities.eviscerate.specNote_combat':
@@ -18254,12 +18229,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_grace.description':
     '立即向 20 米内的敌人掷出圣锤，造成 {damage} 点伤害，恢复 70 点法力，为自己恢复相当于伤害量 50% 的生命值，并在造成伤害时产生 1 点虔诚。烈阳反击会使恩典之锤无视冷却时间，并为你恢复相当于伤害量 100% 的生命值。',
   'entities.abilities.hammer_of_grace.name': '恩典之锤',
-  'entities.abilities.hex_of_violence.description':
-    '诅咒敌人8秒，造成暗影伤害并每2秒生成2点谴罪。其接下来的3次伤害行为各生成7点谴罪，并反噬17点暗影伤害。',
-  'entities.abilities.hex_of_violence.name': '暴行咒',
-  'entities.abilities.hour_of_judgment.description':
-    '对你的主要邪眼降下持续15秒的审判，获得40点谴罪和3层命运丝线，激活附身，使通过主要邪眼生成的谴罪翻倍，并使裁决伤害提高20%。第一次裁决返还50点谴罪。',
-  'entities.abilities.hour_of_judgment.name': '审判时刻',
   'entities.abilities.hunting_momentum.description':
     '被动：剖膛一击和命中敌人的榴片炸弹各提供1层狩猎势能，最多3层。持续到消耗或脱离战斗，每层提高15%移动速度。达到3层时，裂创的直接攻击伤害提高60%，并消耗这些层数。（生存）',
   'entities.abilities.hunting_momentum.name': '狩猎势能',
@@ -18274,11 +18243,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lifespring_weapon.description':
     '为武器灌注生命之水，使愈合水流的注入量提高20%。',
   'entities.abilities.lifespring_weapon.name': '活泉武器',
-  'entities.abilities.litany_of_guilt.description':
-    '诅咒你的主要邪眼8秒。每次获得谴罪时会释放冲击波，对8码内最多4名其他敌人造成伤害，每秒最多触发一次。',
   'entities.abilities.litany_of_guilt.name': '罪责祷文',
-  'entities.abilities.maledict_gaze.description':
-    '你的咒眼每2.5秒攻击所选的主要邪眼目标，造成暗影伤害。附身邪眼会使其攻击速度加倍。',
   'entities.abilities.maledict_gaze.name': '咒眼凝视',
   'entities.abilities.marrowbreak.description':
     '消耗你的3层古血，造成{damage}点伤害的高威胁重击。生命值低于一半时，改为恢复相当于最大生命值18%的生命值，并返还15点怒气。',
@@ -18300,9 +18265,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     '仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长{duration}秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。',
   'entities.abilities.moonseed.name': '月种',
-  'entities.abilities.needle_of_fate.description':
-    '刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成{needleDoom}点谴罪；若不存在邪眼，则先标记目标。',
-  'entities.abilities.needle_of_fate.name': '命运之针',
   'entities.abilities.oath_chain.description':
     '立即用神圣锁链束缚一名远处敌人。敌人以每秒 18 米的速度向你移动，直至距离 3 米，随后移动速度降低 50%，持续 4 秒。升华期间还会束缚附近的第二名敌人。',
   'entities.abilities.oath_chain.name': '誓约锁链',
@@ -18320,9 +18282,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pack_rally.description':
     '进入骏马之姿，并激励附近盟友，使其移动速度提高 30%、攻击与施法速度提高 10%，持续 10 秒。',
   'entities.abilities.pack_rally.name': '兽群集结',
-  'entities.abilities.possess_evil_eye.description':
-    '咒术者附身你的主要邪眼15秒，并生成35点谴罪。命运之针施法时间变为1秒并额外生成2点谴罪；吞噬可在移动中引导；裁决造成的伤害提高25%。延迟回响造成60%的伤害，并在17至20级间逐步降至30%。',
-  'entities.abilities.possess_evil_eye.name': '附身邪眼',
   'entities.abilities.primal_exaltation.description':
     '解放你的专精力量，持续12秒，强化其常规循环。（萨满祭司天赋）',
   'entities.abilities.primal_exaltation.name': '原初升华',
@@ -18376,9 +18335,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scouring_mercy.description':
     '对敌人造成{damage}点神圣伤害，或为一名友方目标治疗{healing}点生命值。伤害随法术强度提高，治疗随治疗强度提高。教义会通过你的纽带将此伤害转化为治疗。若30米内没有已建立纽带且受伤的队伍成员，则治疗30米内生命值最低的受伤队伍成员，治疗量为伤害的15%。治疗一名队伍成员时，还会为该目标10米内、且处于你视野中的至多2名其他受伤队伍成员治疗，每人恢复量为已恢复生命值的50%。这些额外治疗不会触发暴击，也不会建立教义纽带。（教义专属技能）',
   'entities.abilities.scouring_mercy.name': '涤罪慈悲',
-  'entities.abilities.sentence.description':
-    '消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。',
-  'entities.abilities.sentence.name': '裁决',
   'entities.abilities.seraphic_vigil.description':
     '为一名盟友施加守望祝福，在其陷入危险时恢复 {buff} 点生命值。赐福专属技能。',
   'entities.abilities.seraphic_vigil.name': '炽天使守望',
@@ -18442,8 +18398,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trailbreak.description':
     '向后跃出25码，并解除定身和移动减速效果。落地后移动速度提高50%，持续3秒。若你拥有狩猎势能，则将其刷新，并使你获得蓄势返场，持续12秒。',
   'entities.abilities.trailbreak.name': '断迹',
-  'entities.abilities.umbral_anchor.description':
-    '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。',
   'entities.abilities.umbral_anchor.name': '暗影锚',
   'entities.abilities.unholy_command.description':
     '消耗 3 枚灵魂碎片号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。',
@@ -18476,8 +18430,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venomrend.description':
     '消耗你的6层毒祭：造成100点伤害，每个连击点额外造成55点，立即引爆你的流血效果的全部剩余伤害，随后施加一个新的蚀毒伤口（20秒内造成120点伤害）。恢复20点能量。（刺杀专精）',
   'entities.abilities.venomrend.name': '蚀毒撕裂',
-  'entities.abilities.vicarious_suffering.description':
-    '连接苦痛8秒，受到敌对攻击时最多生成15点谴罪。对自己使用时受到的伤害降低20%；对盟友使用时最多将20%的伤害转移给你，但不会使你的生命值降至15%以下。',
   'entities.abilities.vicarious_suffering.name': '苦痛转承',
   'entities.abilities.vowkeeper_strike.description':
     '发动高仇恨攻击并产生 1 点虔诚。成功命中有 20% 几率获得持续 8 秒的烈阳反击；每次成功格挡有 25% 几率触发。烈阳反击会强化你的下一次向阳飞盾、恩典之锤或治愈之光。升华还会给予一个小型吸收护盾。',
@@ -18517,7 +18469,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.bastion_sweep': '用盾牌横扫一群敌人，夺取仇恨并积累虔诚。',
   'guide.abilityHook.chain_lightning': '攻击一个目标并跳向附近两名敌人，整次施法产生一层雷霆。',
   'guide.abilityHook.consecration': '以持续的神圣伤害和仇恨占据周围地面。',
-  'guide.abilityHook.evil_eye': '标记一个敌人，使其行动与承受的苦难为你积累谴罪。',
   'guide.abilityHook.galeheart_weapon': '为双持武器灌注风暴之风，以稳定的攻击节奏获取回报。',
   'guide.abilityHook.hammer_of_justice': '以短暂而可靠的昏迷阻止一名敌人。',
   'guide.abilityHook.hammer_of_wrath': '从远处处决一名受伤的敌人，或在圣翼激活时处决任意敌人。',
@@ -19349,25 +19300,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     '命令烬裔向你的目标额外发射一枚邪能弹。冷却时间 8 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。',
   'hud.pet.felboltTitle': '邪能箭',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    '符合条件的伤害产生 {value} 点定罪值，每 {interval} 秒最多一次',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    '吸取生命正在消耗 {stacks} 层命运丝线，每跳额外产生 {doom} 点定罪值',
-  'hudChrome.auraEffect.afflictionEye':
-    '恶咒凝视每 {interval} 秒攻击一次；此邪眼上的效果产生 {pct}% 的定罪值',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    '此邪眼上的效果产生 {doomPct}% 的定罪值；宣判在此回响并造成 {echoPct}% 伤害',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} 层命运丝线：宣判伤害提高 {sentencePct}%，或使吸取生命每跳额外产生 {doom} 点定罪值',
-  'hudChrome.auraEffect.afflictionJudgment':
-    '主邪眼产生的定罪值提高 {eyePct}%；宣判伤害提高 {sentencePct}%，第一次返还 {refund} 点定罪值',
-  'hudChrome.auraEffect.afflictionLitany':
-    '获得定罪值时，对 {radius} 码内最多 {targets} 个敌人造成 {damage} 点暗影伤害，每秒最多一次',
-  'hudChrome.auraEffect.afflictionPossession': '强化命运之针、吸取生命、恶咒凝视和宣判',
-  'hudChrome.auraEffect.afflictionVicarious':
-    '转移或降低 {pct}% 的受到伤害，并可产生最多 {max} 点定罪值',
-  'hudChrome.auraEffect.afflictionViolence':
-    '剩余 {charges} 次报复；敌人攻击会产生 {doom} 点定罪值并反击 {damage} 点暗影伤害',
   'hudChrome.auraEffect.aoeEcho':
     '剩余 {charges} 次回响：单体技能对附近最多 {targets} 个敌人造成 {pct}% 伤害',
   'hudChrome.auraEffect.arcaneCharge':
@@ -19391,7 +19323,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '造成的伤害提高 {damagePct}%，攻击速度提高 {hastePct}%，移动速度提高 {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     '剩余 {charges} 层：冰枪术视目标为冻结状态，并造成 {pct}% 的冻结伤害',
-  'hudChrome.auraEffect.forbiddenReflectionLock': '禁忌映像暂时无法再次准备',
   'hudChrome.auraEffect.forbiddenReflectionReady': '下一个符合条件的术士冷却技能可再次施放',
   'hudChrome.auraEffect.formLich': '灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害',
   'hudChrome.auraEffect.formMetamorph': '恶魔形态：体型增大 {pct}%；其他加成由独立增益提供',
@@ -19471,13 +19402,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinStatus': '毁灭 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '灵魂碎片',
   'hudChrome.statInfo.effects.manaRegenCombat': '战斗中每5秒约恢复 {value} 点法力',
-  'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 谴罪。',
-  'hudChrome.warlock.doomLabel': '谴罪',
-  'hudChrome.warlock.doomStatus': '{value}/{max} 谴罪；剩余 {remaining}。',
-  'hudChrome.warlock.fateThreadsConsumeReady': '三层命运丝线：吞噬可将其编织为额外的谴罪。',
-  'hudChrome.warlock.fateThreadsLabel': '命运丝线',
-  'hudChrome.warlock.fateThreadsSentenceReady': '三层命运丝线：裁决可消耗它们以提高18%的伤害。',
-  'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命运丝线。',
   'itemUi.tooltip.useHealingPotionPct':
     '使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。',
   'guide.controls.clickMoveNote':

@@ -792,7 +792,8 @@ export function auraEffectDescriptor(
     case 'affliction_eye':
       return {
         key: `${KEY}.afflictionEye`,
-        nums: { interval: a.tickInterval ?? 2.5, pct: 100 },
+        // affliction_blight.ts BLIGHT_EYE_DOT_BONUS and BLIGHT_EYE_ECHO_PCT.
+        nums: { dotPct: 20, echoPct: 15, pct: 100 },
       };
     case 'affliction_eye_secondary':
       return { key: `${KEY}.afflictionEyeSecondary`, nums: { doomPct: 50, echoPct: 35 } };
@@ -804,14 +805,12 @@ export function auraEffectDescriptor(
     case 'affliction_violence':
       return {
         key: `${KEY}.afflictionViolence`,
-        nums: {
-          charges: a.charges ?? 1,
-          doom: round(a.value),
-          damage: round(a.value2 ?? 0),
-        },
+        // Rotfever: value is the repeat-tick chance (0.7).
+        nums: { pct: round(a.value * 100) },
       };
     case 'affliction_vicarious':
-      return { key: `${KEY}.afflictionVicarious`, nums: { pct: 20, max: round(a.value) } };
+      // affliction.ts VICARIOUS_SHARE (0.4).
+      return { key: `${KEY}.afflictionVicarious`, nums: { pct: 40, max: round(a.value) } };
     case 'affliction_possession':
       return { key: `${KEY}.afflictionPossession`, nums: {} };
     case 'affliction_judgment':

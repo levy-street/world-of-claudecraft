@@ -8098,15 +8098,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Wijdt de grond 9 sec en veroorzaakt elke seconde {damage} Heilige schade. Geloofswachters krijgen binnenin 10% minder schade.',
   'entities.abilities.consecration.name': 'Heilige Grond',
-  'entities.abilities.corruption.description':
-    'Bederft het doelwit en veroorzaakt {damage} Schaduwschade gedurende 18 sec.',
   'entities.abilities.corruption.name': 'Zwartrot',
   'entities.abilities.crippling_poison.description':
     'Treft het doelwit met een loodzwaar gif, brengt {damage} Natuurschade toe en vertraagt de bewegingssnelheid met 50% gedurende 12 sec.',
   'entities.abilities.crippling_poison.name': 'Loodzwaar Gif',
-  'entities.abilities.curse_of_agony.description':
-    'Vervloekt het doelwit met pijn: {damage} Schaduwschade gedurende 24 sec.',
-  'entities.abilities.curse_of_agony.name': 'Ban van Kwelling',
   'entities.abilities.dash.description':
     'Neem Katgedaante aan als dat nodig is en sprint met 50% extra snelheid voor 15 sec. In elke gedaante bruikbaar. Direct en activeert geen globale herlaadtijd.',
   'entities.abilities.dash.name': 'Spurt',
@@ -8133,8 +8128,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.divine_protection.description':
     'Een heilig schild absorbeert {damage}% van je maximale gezondheid gedurende {duration} sec.',
   'entities.abilities.divine_protection.name': 'Wering van Geloof',
-  'entities.abilities.drain_life.description':
-    'Verteert de levenskracht van het doelwit, brengt elke seconde {damage} Schaduwschade toe en draagt daarvan 70% als gezondheid aan u over. Kwelling draagt in plaats daarvan alles over. Gekanaliseerd op uw voornaamste Boze oog verbruikt de spreuk bij aanvang alle Lotsdraden, en elke Draad wekt per tik 1 extra Verdoemenis op.',
   'entities.abilities.drain_life.name': 'Verteren',
   'entities.abilities.earth_shock.description':
     'Brengt {damage} Natuurschade toe. De schade stijgt met de Spreukkracht. Elementair: bij 5 Donder 125% meer schade, waarna alle Donder wordt verbruikt. Steengebonden: dwingt het doelwit u 3 sec lang aan te vallen.',
@@ -8265,8 +8258,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht.',
   'entities.abilities.lesser_heal.name': 'Gefluisterd Gebed',
-  'entities.abilities.life_tap.description': 'Zet {damage} levenskracht om in {damage} mana.',
-  'entities.abilities.life_tap.name': 'Zware Koop',
   'entities.abilities.lightning_bolt.description':
     'Brengt {damage} Natuurschade toe. De schade stijgt met de Spreukkracht. Elementair: een treffer verleent 1 Donder.',
   'entities.abilities.lightning_bolt.name': 'Boogbliksem',
@@ -8473,8 +8464,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     '12 sec lang verleent Boogbliksem 2 Donder. Uw volgende Boogbliksem of Gevorkte bliksem is onmiddellijk, en uw volgende volle Donderuitbetaling brengt 25% meer schade toe. (Kenmerk van Elementair)',
   'entities.abilities.siphon_life.name': 'Levenshevel',
-  'entities.abilities.siphon_life.description':
-    'Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)',
   'entities.abilities.conflagrate.name': 'Ontvlamming',
   'entities.abilities.conflagrate.description':
     'Haalt een toekomstige tik van uw Brandpact naar voren en ontsteekt dan het doelwit voor {damage} Vuurschade. Wekt 1 Verwoesting en 1 Ondergang op. Houdt {charges} ladingen. (Kenmerk van Vernietiging)',
@@ -9946,8 +9935,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Besteedt je actieve Zegel om een vijand van korte afstand te raken.',
   'guide.abilityHook.lesser_heal':
     'Een gestage spreuk om een bondgenoot aan te vullen als er tijd is om stil te staan.',
-  'guide.abilityHook.life_tap':
-    'Ruilt een deel van je eigen gezondheid terug om in mana wanneer je droog komt te staan.',
   'guide.abilityHook.lightning_bolt':
     'Een spreuk van Natuurschade op afstand, je vertrouwde keuze van veraf.',
   'guide.abilityHook.lightning_shield':
@@ -16635,24 +16622,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Offert eerst een Botmagiër op, dan een Skeletkrijger, en pas als laatste redmiddel een Grafvleugel. Bij duplicaten kiest het degene met de minste resterende duur, en anders de zwakste, om {damage} Schaduwschade toe te brengen op de gekozen locatie.',
   'entities.abilities.corpse_explosion.name': 'Lijkontploffing',
-  'entities.abilities.coven.description':
-    'Creëert secundaire Boze ogen op tot 4 nabije vijanden gedurende 15 sec. Ze voeden de gedeelde Verdoemenis-pool voor 50%, en Vonnis weerklinkt naar hen voor 35% schade.',
-  'entities.abilities.coven.name': 'Heksenkring',
-  'entities.abilities.cruel_pact.description':
-    'Offert 12% van je maximale gezondheid op om 1,5% van je maximale mana te herstellen en 20 Verdoemenis te genereren. Kan niet worden gebruikt op of onder 20% gezondheid.',
   'entities.abilities.cruel_pact.name': 'Wreed pact',
-  'entities.abilities.cursed_accomplice.description':
-    'Verbindt je Maledict Eye wanneer geen bondgenoot is geselecteerd, waardoor de Gaze 2 Verdoemenis genereert. Het verbinden van één geselecteerd groepslid zorgt ervoor dat alleen hun schade aan je Boze oog in plaats daarvan 3 genereert. Een nieuwe verbinding vervangt de vorige en kan hoogstens eenmaal per 2 sec activeren.',
   'entities.abilities.cursed_accomplice.name': 'Vervloekte handlanger',
-  'entities.abilities.dark_pact.description':
-    'Offert 10% van je huidige gezondheid op om schade te absorberen gelijk aan 30% van je maximale gezondheid gedurende 8 sec.',
   'entities.abilities.dark_pact.name': 'Bloedverbond',
   'entities.abilities.elemental_trance.description':
     'Ga een elementaire trance aan gedurende 15 sec, waardoor je 30% minder schade oploopt en 20% van alle schade die je aanricht wordt omgezet in mana. (Krijgsgeest-kenmerk)',
   'entities.abilities.elemental_trance.name': 'Elementaire trance',
-  'entities.abilities.evil_eye.description':
-    'Markeert één vijand als het middelpunt van je vervloekingen. Het Oog verplaatsen behoudt de Verdoemenis, maar vernieuwt zijn vervaltijd van 20 sec niet.',
-  'entities.abilities.evil_eye.name': 'Boze oog',
   'entities.abilities.eviscerate.description': 'Afmaakactie die {damage} veroorzaakt.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Bij 6 Gifritueel wordt deze knop Gifscheur: een slag die onmiddellijk alle schade toebrengt die je bloedingen nog zouden hebben toegebracht, een verse gifwond plant, en 20 energie herstelt.',
@@ -16677,19 +16652,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Slaat de vijand voor wapenschade plus {damage} en verhoogt je ontwijkingskans 7 sec lang met 15%. Levert 1 combopunt op. (schurkentalent)',
   'entities.abilities.hemorrhage.description':
     'Slaat de vijand voor wapenschade plus {damage}, veroorzaakt bloedende schade over 12 sec, en verhoogt de opgelopen bloedingsschade met 40%. Levert 1 combopunt op. Elk 2e gebruik voegt 1 Schemer toe (max 3). (Skulduggery-motor)',
-  'entities.abilities.hex_of_violence.description':
-    'Betovert de vijand gedurende 8 sec, waarbij Schaduwschade wordt toegebracht en elke 2 sec 2 Verdoemenis wordt gegenereerd. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 17 Schaduwschade.',
-  'entities.abilities.hex_of_violence.name': 'Geweldsvloek',
-  'entities.abilities.hour_of_judgment.description':
-    'Roept oordeel af over je primaire Boze oog gedurende 15 sec, wat 40 Verdoemenis en 3 Lotsdraden toekent, Possession activeert, de Verdoemenis die via het primaire Oog wordt gegenereerd verdubbelt, en de schade van Vonnis met 20% verhoogt. De eerste Vonnis geeft 50 Verdoemenis terug.',
-  'entities.abilities.hour_of_judgment.name': 'Uur van het oordeel',
   'entities.abilities.kidney_shot.description':
     'Afmaakactie die het doelwit verdooft voor 2 sec plus 1 sec per combopunt (5 combopunten: 7 sec).',
-  'entities.abilities.litany_of_guilt.description':
-    'Vervloekt je primaire Boze oog gedurende 6 sec. Verdoemenis-winsten laten een golf los die tot 2 andere vijanden binnen 8 yard beschadigt, hoogstens eenmaal per seconde. Rang 2 verlengt dit tot 8 sec en 4 vijanden.',
   'entities.abilities.litany_of_guilt.name': 'Schuldlitanie',
-  'entities.abilities.maledict_gaze.description':
-    'Je Maledict Eye valt je geselecteerde primaire Boze oog elke 2,5 sec aan voor Schaduwschade. Neem het Boze oog over verdubbelt zijn aanvalssnelheid.',
   'entities.abilities.maledict_gaze.name': 'Vloekblik',
   'entities.abilities.maul.description':
     'Een verpletterende aanval die je meleeschade met {damage} verhoogt en veel dreiging veroorzaakt. Wordt geactiveerd bij je volgende slag. Alleen in Bruingedaante.',
@@ -16699,15 +16664,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verbrandt de vijand met maanvuur voor {damage} Arcaneschade plus schade over tijd.',
   'entities.abilities.moonfire.specNote_balance':
     'Houd het brandend: Maanzaad verlengt het met 6 sec.',
-  'entities.abilities.needle_of_fate.description':
-    'Doorboort de vijand voor {damage} Schaduwschade en genereert {needleDoom} Verdoemenis als het je Boze oog draagt. Elke treffer op je primaire Boze oog voegt een Lotsdraad toe voor 12 sec, tot 3. Als er geen Boze oog bestaat, markeert de Needle eerst zijn doelwit.',
-  'entities.abilities.needle_of_fate.name': 'Naald van het lot',
   'entities.abilities.ossuary_mark.description':
     'Markeert een vijand gedurende 15 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 yards en creëert 1 Zielfragment.',
   'entities.abilities.ossuary_mark.name': 'Ossuariumteken',
-  'entities.abilities.possess_evil_eye.description':
-    'De Maledictor bezit je primaire Boze oog gedurende 15 sec en genereert 35 Verdoemenis. Naald van het lot wordt in 1 sec gespreukt en genereert 2 extra Verdoemenis, Verteren kan worden gekanaliseerd terwijl je beweegt, en Vonnis brengt 25% meer schade toe en laat een vertraagde echo los voor 60% schade, aflopend tot 30% over de niveaus 17-20.',
-  'entities.abilities.possess_evil_eye.name': 'Neem het Boze oog over',
   'entities.abilities.raise_bone_mage.description':
     'Besteedt 2 Zielfragmenten om een blijvende Botmagiër op afstand toe te voegen aan je Heerschappij met 2 vakken. Slechts één mag je dienen. Zijn aanvallen stellen het doelwit 6 sec lang bloot aan 5% meer magische schade, en Oogstbevel verhoogt die zwakte naar 8%.',
   'entities.abilities.raise_bone_mage.name': 'Wek Botmagiër',
@@ -16747,9 +16706,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Verhoogt je bewegingssnelheid met 35%, maar offert elke seconde 2% van je maximale gezondheid op. Spreuk opnieuw om te annuleren. Het schakelt uit bij 20% gezondheid.',
   'entities.abilities.sacrilegious_march.name': 'Heiligschennende mars',
-  'entities.abilities.sentence.description':
-    'Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Elke Draad verhoogt de schade met 6%. Extra effecten schalen op bij 20, 50, 80 en 100 Verdoemenis. De schaalvergroting van zijn schade vlakt af na niveau 16.',
-  'entities.abilities.sentence.name': 'Vonnis',
   'entities.abilities.sinister_strike.description':
     'Een directe slag voor wapenschade plus {damage}. Levert 1 combopunt op.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Voegt 1 Gifritueel toe (max 6).',
@@ -16779,16 +16735,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.description':
     'Veeg met je klauwen door nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.',
   'entities.abilities.swipe.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
-  'entities.abilities.umbral_anchor.description':
-    'Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij het anker wordt verbruikt en een afkoeltijd van 45 sec begint.',
   'entities.abilities.umbral_anchor.name': 'Schaduwanker',
   'entities.abilities.unholy_command.description':
     'Besteedt 3 Zielfragmenten om al je ondoden te bevelen 12 sec lang 25% meer schade toe te brengen en 20% sneller te handelen.',
   'entities.abilities.unholy_command.name': 'Onheilig bevel',
   'entities.abilities.venom_dart.specNote_assassination':
     'Voegt 1 Gifritueel toe en verlengt je gifwond met 6 sec (de wond komt nooit boven 20 sec).',
-  'entities.abilities.vicarious_suffering.description':
-    'Verbindt je lijden gedurende 8 sec en genereert tot 15 Verdoemenis van vijandige treffers. Op jezelf vermindert het de opgelopen schade met 20%. Op een bondgenoot leidt het tot 20% naar jou om, zonder je onder 15% gezondheid te brengen.',
   'entities.abilities.vicarious_suffering.name': 'Plaatsvervangend lijden',
   'entities.abilities.wrath.description':
     'Werpt een bout natuurenergie voor {damage} Natuurschade.',
@@ -16803,8 +16755,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Botmagiër',
   'entities.mobs.necromancy_gravewing.name': 'Grafvleugel',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Skeletkrijger',
-  'guide.abilityHook.evil_eye':
-    'Noemt de vijand wiens daden en lijden je Verdoemenis zullen voeden.',
   'hud.pet.abyssalChain': 'Afgrondketting',
   'hud.pet.abyssalChainDesc':
     'Beveelt je Duskmurk om een normale vijand van meer dan 8 tot 20 m naar zichzelf te trekken. Bazen kunnen niet worden getrokken. 15 seconden afkoeltijd. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om automatisch activeren aan of uit te zetten.',
@@ -16817,26 +16767,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'Beveelt je Emberkin om een extra fel-projectiel naar je doelwit te lanceren. 8 seconden afkoeltijd. Klik met rechts, houd aangeraakt, of druk op Shift+Enter om automatisch activeren aan of uit te zetten.',
   'hud.pet.felboltTitle': 'Felbolt',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'Kwalificerende schade kent {value} Verdoemenis toe, hoogstens eenmaal per {interval} sec',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Verteren verbruikt {stacks} Lotsdraden voor {doom} extra Verdoemenis per tik',
-  'hudChrome.auraEffect.afflictionEye':
-    'Vloekblik valt elke {interval} sec aan; effecten bij dit Oog genereren {pct}% Verdoemenis',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Effecten bij dit Oog genereren {doomPct}% Verdoemenis; Vonnis weerklinkt hier voor {echoPct}% schade',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Lotsdraden: Vonnis brengt {sentencePct}% meer schade toe, of Verteren krijgt {doom} extra Verdoemenis per tik',
-  'hudChrome.auraEffect.afflictionJudgment':
-    'Primaire Oog genereert {eyePct}% meer Verdoemenis; Vonnis brengt {sentencePct}% meer schade toe en de eerste geeft {refund} Verdoemenis terug',
-  'hudChrome.auraEffect.afflictionLitany':
-    'Verdoemenis-winsten brengen {damage} Schaduwschade toe aan tot {targets} vijanden binnen {radius} m, eenmaal per sec',
-  'hudChrome.auraEffect.afflictionPossession':
-    'Versterkt Naald van het lot, Verteren, Vloekblik en Vonnis',
-  'hudChrome.auraEffect.afflictionVicarious':
-    'Leidt {pct}% van de inkomende schade om of vermindert die, en kan tot {max} Verdoemenis genereren',
-  'hudChrome.auraEffect.afflictionViolence':
-    '{charges} vergeldingen resteren; een vijandelijke aanval kent {doom} Verdoemenis toe en brengt {damage} Schaduwschade terug toe',
   'hudChrome.auraEffect.aoeEcho':
     "{charges} echo's resteren: vaardigheden voor één doelwit brengen {pct}% schade toe aan tot {targets} nabije vijanden",
   'hudChrome.auraEffect.arcaneCharge':
@@ -16862,8 +16792,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Aangerichte schade verhoogd met {damagePct}%, aanvalssnelheid met {hastePct}%, en bewegingssnelheid met {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} ladingen: IJslans behandelt zijn doelwit als bevroren en brengt {pct}% bevroren schade toe',
-  'hudChrome.auraEffect.forbiddenReflectionLock':
-    'Verboden Weerspiegeling kan nog niet opnieuw worden voorbereid',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Je volgende in aanmerking komende Heksenmeester-afkoeltijd kan opnieuw worden ingezet',
   'hudChrome.auraEffect.formLich':
@@ -16926,15 +16854,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Ruïne',
   'hudChrome.procOverlay.ruinStatus': '{value} van {max} Ruïne',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Zielfragmenten',
-  'hudChrome.warlock.doomEmptyStatus': '{value} van {max} Verdoemenis.',
-  'hudChrome.warlock.doomLabel': 'Verdoemenis',
-  'hudChrome.warlock.doomStatus': '{value} van {max} Verdoemenis; {remaining}.',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Drie Lotsdraden: Verteren kan ze verweven tot extra Verdoemenis.',
-  'hudChrome.warlock.fateThreadsLabel': 'Lotsdraden',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Drie Lotsdraden: Vonnis kan ze verbruiken voor 18% meer schade.',
-  'hudChrome.warlock.fateThreadsStatus': '{value} van {max} Lotsdraden.',
   'itemUi.tooltip.useHealingPotionPct':
     'Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 2 min afkoeltijd.',
   'guide.controls.reliquary': 'Het Reliquarium',
@@ -17885,9 +17804,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Overbloom oogst 75 procent van je resterende effecten en slaat daarna 1 Verdance op.',
   'entities.itemSets.grovespring.name': 'Bosbron-Kledij',
-  'entities.itemSets.hexthread.bonus2':
-    'Naald van het lot verleent 2 extra Condemnation. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
-  'entities.itemSets.hexthread.bonus4': 'Passing Vonnis geeft 10 Condemnation terug.',
   'entities.itemSets.hexthread.name': 'Hexdraad-Sluier',
   'entities.itemSets.moonscorch.bonus2':
     'Moonseed kan Lunar Tempest per toepassing tweemaal verlengen, tot maximaal 12 sec. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',

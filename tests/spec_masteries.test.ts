@@ -70,7 +70,7 @@ describe('spec masteries', () => {
       ],
     });
     const afflictionMastery = TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery;
-    expect(afflictionMastery?.name).toBe('Sentence');
+    expect(afflictionMastery?.name).toBe('Putrefy');
     expect(afflictionMastery?.effect).toEqual({
       ability: [
         { ability: 'needle_of_fate', dmgPct: 0.1 },

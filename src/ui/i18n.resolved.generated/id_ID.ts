@@ -1029,13 +1029,13 @@ export const id_ID: EnTranslations = {
       "shotRules": "Bidik di dalam bidang yang ditandai. Tanpa biaya mana. Kerusakan tidak berkembang dengan perlengkapan atau bakat."
     },
     "warlock": {
-      "doomLabel": "Kecaman",
-      "fateThreadsLabel": "Benang Takdir",
-      "doomEmptyStatus": "{value} dari {max} Kecaman.",
-      "doomStatus": "{value} dari {max} Kecaman; {remaining}.",
-      "fateThreadsStatus": "{value} dari {max} Benang Takdir.",
-      "fateThreadsConsumeReady": "Tiga Benang Takdir: Melahap dapat menganyamnya menjadi Kecaman tambahan.",
-      "fateThreadsSentenceReady": "Tiga Benang Takdir: Vonis dapat mengonsumsinya untuk 18% kerusakan tambahan."
+      "doomLabel": "Blight",
+      "fateThreadsLabel": "Rot Splinters",
+      "doomEmptyStatus": "{value} of {max} Blight.",
+      "doomStatus": "{value} of {max} Blight; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
+      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
+      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
     },
     "priest": {
       "gloomtitheLabel": "Upeti Kelam",
@@ -4795,7 +4795,7 @@ export const id_ID: EnTranslations = {
       "effigyLanternOut": "Lentera Mandor Jerami padam bagimu: seranganmu dan peliharaanmu mengabaikan Kulit Papannya dan mengenai dengan kekuatan penuh",
       "leadenHexLock": "Kutuk Timah belum bisa mengakar target ini lagi",
       "forbiddenReflectionReady": "Jeda Penyihir Iblis berikutnya yang memenuhi syarat dapat dirapal kembali",
-      "forbiddenReflectionLock": "Pantulan Terlarang belum bisa disiapkan lagi",
+      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
       "internalCooldown": "Efek ini tidak dapat terpicu lagi hingga penghitung waktu berakhir",
       "carriedFlag": "Kamu membawa bendera musuh. Batalkan buff ini untuk menjatuhkannya.",
       "carryingFreight": "Anda sedang membawa kargo. Kecepatan gerak berkurang {pct}%.",
@@ -4965,16 +4965,16 @@ export const id_ID: EnTranslations = {
       "formShadow": "Wujud Bayangan: kerusakan Bayangan meningkat {pct}%",
       "resourceCount": "{value} dari {max}",
       "formLich": "Tombak Jiwa juga menghantam hingga {targets} musuh terdekat sebesar {pct}% kerusakan",
-      "afflictionEye": "Tatapan Kutukan menyerang setiap {interval} dtk; efek pada Eye ini menghasilkan {pct}% Kecaman",
-      "afflictionEyeSecondary": "Efek pada Eye ini menghasilkan {doomPct}% Kecaman; Vonis bergema di sini sebesar {echoPct}% kerusakan",
-      "afflictionAccomplice": "Kerusakan yang memenuhi syarat memberikan {value} Kecaman, paling banyak sekali setiap {interval} dtk",
-      "afflictionViolence": "{charges} balasan tersisa; serangan musuh memberikan {doom} Kecaman dan membalas {damage} kerusakan Bayangan",
-      "afflictionVicarious": "Mengalihkan atau mengurangi {pct}% kerusakan masuk dan dapat menghasilkan hingga {max} Kecaman",
-      "afflictionPossession": "Memperkuat Jarum Takdir, Melahap, Tatapan Kutukan, dan Vonis",
-      "afflictionJudgment": "Eye utama menghasilkan {eyePct}% lebih banyak Kecaman; Vonis memberikan {sentencePct}% kerusakan lebih besar dan yang pertama mengembalikan {refund} Kecaman",
-      "afflictionLitany": "Perolehan Kecaman memberikan {damage} kerusakan Bayangan kepada hingga {targets} musuh dalam radius {radius} m, sekali per detik",
-      "afflictionFateThreads": "{stacks} Benang Takdir: Vonis memberikan {sentencePct}% kerusakan lebih besar, atau Melahap memperoleh {doom} Kecaman tambahan per tik",
-      "afflictionConsumeThreads": "Melahap sedang mengonsumsi {stacks} Benang Takdir untuk {doom} Kecaman tambahan per tik",
+      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
+      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
+      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
+      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
+      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
+      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
+      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
       "necromancyHarvestMark": "Kematian dapat menciptakan 1 Serpihan Jiwa",
       "necromancyOssuaryMark": "Menyimpan {storedPct}% dari kerusakanmu dan mayat hidupmu, ditambah {lancePct}% dari kerusakan Tombak Jiwa; rapal ulang untuk meledakkannya. Kematian meledak dalam radius {radius} yard dan menciptakan 1 Serpihan Jiwa",
       "necromancyDeathEcho": "Gema Kematian warisan; tidak ada kemampuan saat ini yang mengonsumsinya",
@@ -10084,7 +10084,7 @@ export const id_ID: EnTranslations = {
       "none": "Tak ada kelas yang cocok dengan semua saringan. Bersihkan satu untuk melihat lebih banyak."
     },
     "abilityHook": {
-      "evil_eye": "Menandai musuh yang tindakan dan penderitaannya akan mengisi Kecaman-mu.",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
       "heroic_strike": "Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.",
       "revenge": "Menyapu musuh di depanmu dan dapat menjadi gratis setelah menghindar atau menangkis.",
       "hamstring": "Melumpuhkan gerakan musuh agar tidak dapat melarikan diri.",
@@ -10163,7 +10163,8 @@ export const id_ID: EnTranslations = {
       "demon_skin": "Penguat-diri tahan lama yang mengeraskan kulitmu dan menambah zirah.",
       "immolate": "Membakar sasaran untuk hantaman pembuka dan kobaran yang terus membara.",
       "corruption": "Membusukkan sasaran dengan bayangan yang menggerogoti sementara kamu melakukan hal lain.",
-      "life_tap": "Menukar sebagian nyawamu sendiri kembali menjadi mana saat kamu kehabisan.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Anak panah alam yang dilontarkan ke sasaran dari kejauhan, serangan andalanmu.",
       "healing_touch": "Penyembuhan besar sasaran tunggal dengan rapalan panjang, untuk memenuhi nyawa seseorang.",
       "mark_of_the_wild": "Berkah tahan lama yang kamu pasang pada dirimu atau sekutu sebelum pertarungan.",
@@ -18265,43 +18266,47 @@ export const id_ID: EnTranslations = {
       },
       "corruption": {
         "name": "Busuk Hitam",
-        "description": "Mencemari target, menimbulkan {damage} kerusakan Bayangan selama 18 detik."
+        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
       },
       "evil_eye": {
-        "name": "Mata Jahat",
-        "description": "Menandai satu musuh sebagai fokus kutukanmu. Memindahkan Eye mempertahankan Kecaman tetapi tidak memperbarui masa berlakunya yang 20 detik."
+        "name": "Rotmark",
+        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "Tatapan Kutukan",
-        "description": "Maledict Eye-mu menyerang Mata Jahat utama yang kamu pilih setiap 2,5 detik untuk kerusakan Bayangan. Rasuki Mata Jahat menggandakan kecepatan serangnya."
+        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
       },
       "needle_of_fate": {
-        "name": "Jarum Takdir",
-        "description": "Menusuk musuh dengan {damage} kerusakan Bayangan dan menghasilkan {needleDoom} Kecaman saat mengenai jika musuh masih menyandang Mata Jahatmu. Menyelesaikan rapalan memindahkan Mata Jahat utamamu ke sasaran dan menambah satu Benang Takdir selama 12 detik, hingga 3. Benang Takdir tetap bersamamu saat Mata berpindah atau sasarannya mati. Menyasar Mata sekunder dari Persekutuan Penyihir menukarnya dengan Mata utama."
+        "name": "Carrion Dart",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
       },
       "sentence": {
-        "name": "Vonis",
-        "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16."
+        "name": "Putrefy",
+        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+      },
+      "hard_bargain": {
+        "name": "Hard Bargain",
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Tawar Getir",
-        "description": "Mengubah {damage} kesehatan menjadi {damage} mana."
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "Sekutu Terkutuk",
-        "description": "Menautkan Maledict Eye-mu saat tidak ada sekutu yang dipilih, membuat Gaze miliknya menghasilkan 2 Kecaman. Menautkan satu anggota grup yang dipilih membuat hanya kerusakan mereka terhadap Mata Jahat-mu yang menghasilkan 3 sebagai gantinya. Tautan baru menggantikan yang sebelumnya dan dapat terpicu sekali setiap 2 detik."
+        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
       },
       "curse_of_agony": {
-        "name": "Tenung Derita",
-        "description": "Mengutuk target dengan penderitaan: {damage} kerusakan Bayangan selama 24 detik."
+        "name": "Festerhex",
+        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
       },
       "drain_life": {
         "name": "Melahap",
-        "description": "Melahap daya hidup sasaran, memberi {damage} kerusakan Bayangan setiap detik dan memindahkan 70% darinya kepadamu sebagai nyawa. Derita justru memindahkan seluruhnya. Ketika disalurkan pada Mata Jahat utamamu, ia menghabiskan seluruh Benang Takdir di awal, dan setiap Benang menghasilkan 1 Kecaman tambahan per denyut."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
       },
       "litany_of_guilt": {
         "name": "Litani Rasa Bersalah",
-        "description": "Mengutuk Mata Jahat utamamu selama 6 detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain dalam radius 8 yard, paling banyak sekali per detik. Peringkat 2 memperpanjangnya menjadi 8 detik dan 4 musuh."
+        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
         "name": "Kulit Bara",
@@ -18309,35 +18314,39 @@ export const id_ID: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Jangkar Bayangan",
-        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
         "name": "Sumur Jiwa",
         "description": "Memanggil Sumur Jiwa selama 3 menit. Selagi di luar pertempuran, anggota grup dapat mengisi ulang Batu Jiwa mereka hingga 3. Sebuah Batu Jiwa memulihkan 25% dari nyawa maksimum dan berbagi jeda ramuan."
       },
       "hex_of_violence": {
-        "name": "Kutukan Kekerasan",
-        "description": "Mengutuk musuh selama 8 detik, memberikan kerusakan Bayangan dan menghasilkan 2 Kecaman setiap 2 detik. 3 tindakan merusak berikutnya masing-masing menghasilkan 7 Kecaman dan mencambuknya sebesar 17 kerusakan Bayangan."
+        "name": "Rotfever",
+        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
       },
       "cruel_pact": {
         "name": "Perjanjian Kejam",
-        "description": "Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa."
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
         "name": "Derita Pengganti",
-        "description": "Menautkan penderitaanmu selama 8 detik dan menghasilkan hingga 15 Kecaman dari pukulan bermusuhan. Pada dirimu sendiri, mengurangi kerusakan yang diterima sebesar 20%. Pada sekutu, mengalihkan hingga 20% kepadamu tanpa membuat nyawamu turun di bawah 15%."
+        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "Rasuki Mata Jahat",
-        "description": "Maledictor merasuki Mata Jahat utamamu selama 15 detik dan menghasilkan 35 Kecaman. Jarum Takdir dirapal dalam 1 detik dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, dan Vonis memberikan 25% kerusakan lebih besar dan melepaskan gema tertunda sebesar 60% kerusakan, menurun menjadi 30% sepanjang level 17-20."
+        "name": "Possess the Rotmark",
+        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "Saat Penghakiman",
-        "description": "Memanggil penghakiman atas Mata Jahat utamamu selama 15 detik, memberikan 40 Kecaman dan 3 Benang Takdir, mengaktifkan Possession, menggandakan Kecaman yang dihasilkan melalui Eye utama, dan meningkatkan kerusakan Vonis sebesar 20%. Vonis pertama mengembalikan 50 Kecaman."
+        "name": "Hour of Rot",
+        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
       },
       "coven": {
-        "name": "Persekutuan Penyihir",
-        "description": "Menciptakan Mata Jahat sekunder pada hingga 4 musuh terdekat selama 15 detik. Mereka mengisi kumpulan Kecaman bersama sebesar 50%, dan Vonis bergema kepada mereka sebesar 35% kerusakan."
+        "name": "Contagion",
+        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
       },
       "fear": {
         "name": "Cekaman",
@@ -18689,7 +18698,7 @@ export const id_ID: EnTranslations = {
       },
       "siphon_life": {
         "name": "Sifon Nyawa",
-        "description": "Menyedot nyawa dari musuh, menimbulkan {damage} kerusakan Bayangan selama 30 dtk dan memulihkanmu sebesar kerusakan yang terjadi. (ciri khas Penderitaan)"
+        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
       },
       "conflagrate": {
         "name": "Kobaran Api",
@@ -18944,7 +18953,7 @@ export const id_ID: EnTranslations = {
       },
       "dark_pact": {
         "name": "Perjanjian Darah",
-        "description": "Mengorbankan 10% dari nyawamu saat ini untuk menyerap kerusakan setara 30% dari nyawa maksimummu selama 8 detik."
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
       },
       "cloak_of_shadows": {
         "name": "Jubah Bayang",
@@ -30862,8 +30871,8 @@ export const id_ID: EnTranslations = {
       },
       "hexthread": {
         "name": "Selubung Benang Hex",
-        "bonus2": "Jarum Takdir memberikan 2 Penghukuman tambahan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
-        "bonus4": "Vonis Berlalu mengembalikan 10 Penghukuman."
+        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
       },
       "moonscorch": {
         "name": "Busana Sangrai Bulan",

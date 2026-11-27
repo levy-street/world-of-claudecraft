@@ -1029,13 +1029,13 @@ export const ru_RU: EnTranslations = {
       "shotRules": "Цельтесь внутри отмеченного поля. Не расходует ману. Урон не зависит от снаряжения и талантов."
     },
     "warlock": {
-      "doomLabel": "Осуждение",
-      "fateThreadsLabel": "Нити судьбы",
-      "doomEmptyStatus": "Осуждение: {value} из {max}.",
-      "doomStatus": "Осуждение: {value} из {max}; осталось {remaining}.",
-      "fateThreadsStatus": "Нити судьбы: {value} из {max}.",
-      "fateThreadsConsumeReady": "Три Нити судьбы: «Поглощение» может сплести их в дополнительное Осуждение.",
-      "fateThreadsSentenceReady": "Три Нити судьбы: «Приговор» может израсходовать их ради 18% дополнительного урона."
+      "doomLabel": "Blight",
+      "fateThreadsLabel": "Rot Splinters",
+      "doomEmptyStatus": "{value} of {max} Blight.",
+      "doomStatus": "{value} of {max} Blight; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
+      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
+      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
     },
     "priest": {
       "gloomtitheLabel": "Мрачная десятина",
@@ -4795,7 +4795,7 @@ export const ru_RU: EnTranslations = {
       "effigyLanternOut": "Для вас фонарь Соломенного Десятника погас: ваши удары и удары питомца пробивают Дощатую шкуру и проходят в полную силу",
       "leadenHexLock": "Свинцовый сглаз пока не может снова обездвижить эту цель",
       "forbiddenReflectionReady": "Следующее подходящее умение чернокнижника можно применить повторно",
-      "forbiddenReflectionLock": "Запретное отражение пока нельзя подготовить снова",
+      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
       "internalCooldown": "Эффект не сработает снова до окончания таймера",
       "carriedFlag": "Вы несете вражеский флаг. Отмените этот эффект, чтобы бросить его.",
       "carryingFreight": "Вы несёте груз. Скорость передвижения снижена на {pct}%.",
@@ -4965,16 +4965,16 @@ export const ru_RU: EnTranslations = {
       "formShadow": "Сумрачный облик: урон от темной магии повышен на {pct}%",
       "resourceCount": "{value} из {max}",
       "formLich": "Копьё души поражает до {targets} ближайших врагов, нанося {pct}% урона",
-      "afflictionEye": "Проклятый взгляд атакует раз в {interval} сек.; эффекты на этом оке создают {pct}% Осуждения",
-      "afflictionEyeSecondary": "Эффекты на этом оке создают {doomPct}% Осуждения; Приговор отражается сюда с {echoPct}% урона",
-      "afflictionAccomplice": "Подходящий урон создаёт {value} Осуждения не чаще раза в {interval} сек.",
-      "afflictionViolence": "Осталось возмездий: {charges}. Атака врага создаёт {doom} Осуждения и наносит ему {damage} ед. урона от темной магии",
-      "afflictionVicarious": "Перенаправляет или снижает {pct}% входящего урона и может создать до {max} Осуждения",
-      "afflictionPossession": "Усиливает Иглу судьбы, Похищение жизни, Проклятый взгляд и Приговор",
-      "afflictionJudgment": "Главное око создаёт на {eyePct}% больше Осуждения; Приговор наносит на {sentencePct}% больше урона, а первый возвращает {refund} Осуждения",
-      "afflictionLitany": "Получение Осуждения наносит {damage} ед. урона от темной магии до {targets} врагам в радиусе {radius} м, не чаще раза в секунду",
-      "afflictionFateThreads": "Нити судьбы: {stacks}. Приговор наносит на {sentencePct}% больше урона, либо каждый тик Похищения жизни создаёт ещё {doom} Осуждения",
-      "afflictionConsumeThreads": "Похищение жизни поглощает {stacks} Нити судьбы и создаёт ещё {doom} Осуждения за тик",
+      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
+      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
+      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
+      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
+      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
+      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
+      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
       "necromancyHarvestMark": "Смерть может создать 1 осколок души",
       "necromancyOssuaryMark": "Накапливает {storedPct}% урона от вас и нежити и ещё {lancePct}% урона Копья души. Повторное применение взрывает метку. Смерть вызывает взрыв в радиусе {radius} м и создаёт 1 осколок души",
       "necromancyDeathEcho": "Устаревшее Эхо смерти; ни одна текущая способность его не поглощает",
@@ -10084,7 +10084,7 @@ export const ru_RU: EnTranslations = {
       "none": "Ни один класс не подходит под все фильтры. Снимите один, чтобы увидеть больше."
     },
     "abilityHook": {
-      "evil_eye": "Отмечает врага, чьи действия и страдания будут накапливать ваше Осуждение.",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
       "heroic_strike": "Готовит более тяжелый замах, который потратит ярость на следующем ударе.",
       "revenge": "Поражает противников перед вами и может не требовать затрат после уклонения или парирования.",
       "hamstring": "Ограничивает передвижение противника, не позволяя ему сбежать.",
@@ -10163,7 +10163,8 @@ export const ru_RU: EnTranslations = {
       "demon_skin": "Длительное усиление на себя, которое укрепляет кожу и добавляет броню.",
       "immolate": "Поджигает цель: наносит урон при наложении и оставляет затяжной ожог.",
       "corruption": "Поражает цель порчей, которая наносит урон, пока вы заняты другим.",
-      "life_tap": "Обменивает часть вашего здоровья обратно в ману, когда вы выдыхаетесь.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Удар силами природы, запущенный в цель с дистанции, ваш основной способ бить.",
       "healing_touch": "Большое лечение одной цели с долгим временем накладывания, чтобы кого-то долечить.",
       "mark_of_the_wild": "Длительное благословение, которое вы накладываете на себя или союзника перед боем.",
@@ -18265,43 +18266,47 @@ export const ru_RU: EnTranslations = {
       },
       "corruption": {
         "name": "Чёрная гниль",
-        "description": "Поражает цель порчей, нанося {damage} ед. урона от темной магии за 18 сек."
+        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
       },
       "evil_eye": {
-        "name": "Дурной глаз",
-        "description": "Отмечает одного врага как средоточие ваших проклятий. Перенос дурного глаза сохраняет Осуждение, но не обновляет его время действия в 20 сек."
+        "name": "Rotmark",
+        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "Проклятый взор",
-        "description": "Ваше проклятое око раз в 2,5 сек. атакует выбранную основную цель дурного глаза и наносит урон от Тьмы. Одержимость дурным глазом удваивает скорость атак."
+        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
       },
       "needle_of_fate": {
-        "name": "Игла судьбы",
-        "description": "Пронзает врага и наносит {damage} ед. урона от Тьмы. Если на цели есть ваш дурной глаз, создаёт {needleDoom} ед. Осуждения; если его нет, сначала отмечает цель."
+        "name": "Carrion Dart",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
       },
       "sentence": {
-        "name": "Приговор",
-        "description": "Расходует всё Осуждение и Нити судьбы, вынося врагу приговор. Каждая Нить увеличивает урон на 6%, а дополнительные эффекты усиливаются при 20, 50, 80 и 100 ед. Осуждения. После 16-го уровня рост урона замедляется."
+        "name": "Putrefy",
+        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+      },
+      "hard_bargain": {
+        "name": "Hard Bargain",
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Тяжёлая сделка",
-        "description": "Преобразует {damage} здоровья в {damage} маны."
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "Проклятый сообщник",
-        "description": "Если союзник не выбран, связывает вас с проклятым оком, и его взор создаёт 2 ед. Осуждения. При связи с союзником его урон по цели дурного глаза создаёт 3 ед. Эффект срабатывает не чаще раза в 2 сек."
+        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
       },
       "curse_of_agony": {
-        "name": "Порча муки",
-        "description": "Проклинает цель агонией: {damage} ед. урона от темной магии за 24 сек."
+        "name": "Festerhex",
+        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
       },
       "drain_life": {
         "name": "Поглощение",
-        "description": "Пожирает жизненные силы цели, нанося {damage} урона от тьмы каждую секунду и передавая вам 70% от него здоровьем. Гибель передаёт вместо этого всё. Направленное на ваш главный Дурной глаз, оно расходует в начале все Нити судьбы, и каждая Нить даёт 1 дополнительное Осуждение за тик."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
       },
       "litany_of_guilt": {
         "name": "Литания вины",
-        "description": "Проклинает основную цель дурного глаза на 8 сек. Получение Осуждения выпускает волну, которая наносит урон максимум 4 другим противникам в радиусе 8 м. Эффект срабатывает не чаще раза в секунду."
+        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
         "name": "Шлаковая кожа",
@@ -18309,35 +18314,39 @@ export const ru_RU: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Сумрачный якорь",
-        "description": "Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
         "name": "Колодец душ",
         "description": "Призывает Колодец душ на 3 мин. Вне боя участники группы могут пополнить свои Камни души до 3 штук. Камень души восстанавливает 25% максимального здоровья и имеет общее восстановление с зельями."
       },
       "hex_of_violence": {
-        "name": "Проклятие насилия",
-        "description": "Проклинает врага на 8 сек., нанося урон от Тьмы и создавая 2 ед. Осуждения каждые 2 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 17 ед. урона от Тьмы."
+        "name": "Rotfever",
+        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
       },
       "cruel_pact": {
         "name": "Жестокий договор",
-        "description": "Жертвует 12% максимального здоровья и создаёт 20 ед. Осуждения. Нельзя применить при 15% здоровья или меньше."
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
         "name": "Перенесённое страдание",
-        "description": "Связывает страдания на 8 сек. и создаёт до 15 ед. Осуждения от вражеских ударов. На себе снижает получаемый урон на 20%. На союзнике перенаправляет вам до 20% урона, но не опускает ваше здоровье ниже 15%."
+        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "Одержимость дурным глазом",
-        "description": "Проклинатель овладевает вашим основным дурным глазом на 15 сек. и создаёт 35 ед. Осуждения. «Игла судьбы» применяется за 1 сек. и создаёт ещё 2 ед. Осуждения, «Поглощение» поддерживается в движении, а «Приговор» наносит на 25% больше урона. Отложенное эхо повторяет 60% урона, снижаясь до 30% с 17-го по 20-й уровень."
+        "name": "Possess the Rotmark",
+        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "Час суда",
-        "description": "Обрушивает суд на ваш основной дурной глаз на 15 сек., создаёт 40 ед. Осуждения и 3 Нити судьбы, активирует Одержимость, удваивает Осуждение от основного дурного глаза и повышает урон «Приговора» на 20%. Первый «Приговор» возвращает 50 ед. Осуждения."
+        "name": "Hour of Rot",
+        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
       },
       "coven": {
-        "name": "Ковен",
-        "description": "Создаёт вторичные дурные глаза на срок 15 сек. не более чем на 4 ближайших врагах. Они пополняют общий запас Осуждения с эффективностью 50% и получают 35% урона «Приговора»."
+        "name": "Contagion",
+        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
       },
       "fear": {
         "name": "Терзание",
@@ -18689,7 +18698,7 @@ export const ru_RU: EnTranslations = {
       },
       "siphon_life": {
         "name": "Вытягивание жизни",
-        "description": "Вытягивает жизнь из врага, нанося {damage} ед. урона от темной магии за 30 сек. и исцеляя вас на величину нанесенного урона. (знаковое умение Колдовства)"
+        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
       },
       "conflagrate": {
         "name": "Поджигание",
@@ -18944,7 +18953,7 @@ export const ru_RU: EnTranslations = {
       },
       "dark_pact": {
         "name": "Кровавый завет",
-        "description": "Жертвует 10% текущего здоровья и на 8 сек. поглощает урон в размере 30% максимального здоровья."
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
       },
       "cloak_of_shadows": {
         "name": "Плащ теней",
@@ -30862,8 +30871,8 @@ export const ru_RU: EnTranslations = {
       },
       "hexthread": {
         "name": "Покров колдовской нити",
-        "bonus2": "Игла судьбы создаёт дополнительно 2 ед. Осуждения. Получаемый урон больше не замедляет чтение ваших заклинаний.",
-        "bonus4": "Вынесение Приговора возвращает 10 ед. Осуждения."
+        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
       },
       "moonscorch": {
         "name": "Одеяние лунного ожога",

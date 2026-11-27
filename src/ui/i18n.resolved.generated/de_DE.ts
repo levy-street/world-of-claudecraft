@@ -1029,13 +1029,13 @@ export const de_DE: EnTranslations = {
       "shotRules": "Ziele innerhalb des markierten Feldes. Kein Manaverbrauch. Der Schaden skaliert nicht mit Ausrüstung oder Talenten."
     },
     "warlock": {
-      "doomLabel": "Verdammnis",
-      "fateThreadsLabel": "Schicksalsfäden",
-      "doomEmptyStatus": "{value} von {max} Verdammnis.",
-      "doomStatus": "{value} von {max} Verdammnis; {remaining}.",
-      "fateThreadsStatus": "{value} von {max} Schicksalsfäden.",
-      "fateThreadsConsumeReady": "Drei Schicksalsfäden: Verzehren kann sie zu zusätzlicher Verdammnis verweben.",
-      "fateThreadsSentenceReady": "Drei Schicksalsfäden: Schuldspruch kann sie für 18% erhöhten Schaden verbrauchen."
+      "doomLabel": "Blight",
+      "fateThreadsLabel": "Rot Splinters",
+      "doomEmptyStatus": "{value} of {max} Blight.",
+      "doomStatus": "{value} of {max} Blight; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
+      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
+      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
     },
     "priest": {
       "gloomtitheLabel": "Düsterzehnt",
@@ -4795,7 +4795,7 @@ export const de_DE: EnTranslations = {
       "effigyLanternOut": "Die Laterne des Strohvorarbeiters ist für dich erloschen: Deine Schläge und die deines Begleiters ignorieren seine Bretterhaut und treffen mit voller Wucht",
       "leadenHexLock": "Bleierner Fluch kann dieses Ziel noch nicht erneut verwurzeln",
       "forbiddenReflectionReady": "Eure nächste berechtigte Hexenmeister-Fähigkeit mit Abklingzeit kann erneut gewirkt werden",
-      "forbiddenReflectionLock": "Forbidden Reflection kann noch nicht erneut vorbereitet werden",
+      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
       "internalCooldown": "Dieser Effekt kann erst erneut auslösen, wenn der Timer abgelaufen ist",
       "carriedFlag": "Ihr tragt die gegnerische Flagge. Hebt diesen Effekt auf, um sie fallen zu lassen.",
       "carryingFreight": "Du trägst Fracht. Verringert dein Bewegungstempo um {pct}%.",
@@ -4965,16 +4965,16 @@ export const de_DE: EnTranslations = {
       "formShadow": "Schattenform: Schattenschaden um {pct}% erhöht",
       "resourceCount": "{value} von {max}",
       "formLich": "Seelenlanze trifft zusätzlich bis zu {targets} nahe Gegner für {pct}% Schaden",
-      "afflictionEye": "Fluchblick greift alle {interval} Sek. an; Effekte an diesem Bösen Auge erzeugen {pct}% Verdammnis",
-      "afflictionEyeSecondary": "Effekte an diesem Bösen Auge erzeugen {doomPct}% Verdammnis; Schuldspruch hallt hier für {echoPct}% Schaden wider",
-      "afflictionAccomplice": "Qualifizierender Schaden gewährt {value} Verdammnis, höchstens einmal alle {interval} Sek.",
-      "afflictionViolence": "{charges} Vergeltungen verbleiben; ein feindlicher Angriff gewährt {doom} Verdammnis und verursacht {damage} Schattenschaden zurück",
-      "afflictionVicarious": "Leitet {pct}% des erlittenen Schadens um oder verringert ihn und kann bis zu {max} Verdammnis erzeugen",
-      "afflictionPossession": "Verstärkt Schicksalsnadel, Verzehren, Fluchblick und Schuldspruch",
-      "afflictionJudgment": "Primäres Böses Auge erzeugt {eyePct}% mehr Verdammnis; Schuldspruch verursacht {sentencePct}% mehr Schaden, und der erste erstattet {refund} Verdammnis",
-      "afflictionLitany": "Verdammnisgewinne verursachen {damage} Schattenschaden an bis zu {targets} Gegnern im Umkreis von {radius} m, einmal pro Sek.",
-      "afflictionFateThreads": "{stacks} Schicksalsfäden: Schuldspruch verursacht {sentencePct}% mehr Schaden, oder Verzehren gewinnt {doom} zusätzliche Verdammnis pro Tick",
-      "afflictionConsumeThreads": "Verzehren verbraucht {stacks} Schicksalsfäden für {doom} zusätzliche Verdammnis pro Tick",
+      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
+      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
+      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
+      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
+      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
+      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
+      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
       "necromancyHarvestMark": "Tod kann 1 Seelenfragment erschaffen",
       "necromancyOssuaryMark": "Speichert {storedPct}% Eures und des Schadens Eurer Untoten, plus {lancePct}% des Soul-Lance-Schadens; erneut wirken, um es zu detonieren. Tod lässt es im Umkreis von {radius} m explodieren und erschafft 1 Seelenfragment",
       "necromancyDeathEcho": "Veraltetes Todesecho; keine aktuelle Fähigkeit verbraucht es",
@@ -10084,7 +10084,7 @@ export const de_DE: EnTranslations = {
       "none": "Keine Klasse passt zu allen Filtern. Setze einen zurück, um mehr zu sehen."
     },
     "abilityHook": {
-      "evil_eye": "Bestimmt den Gegner, dessen Taten und Leiden deine Verdammnis nähren.",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
       "heroic_strike": "Reiht einen schwereren Schwung ein, der bei deinem nächsten Treffer Wut verbraucht.",
       "revenge": "Trifft Gegner vor Euch und kann nach einem Ausweichen oder Parieren kostenlos werden.",
       "hamstring": "Beeinträchtigt die Bewegung eines Gegners, damit er nicht entkommen kann.",
@@ -10163,7 +10163,8 @@ export const de_DE: EnTranslations = {
       "demon_skin": "Eine anhaltende Selbststärkung, die deine Haut abhärtet und Rüstung verleiht.",
       "immolate": "Setzt ein Ziel in Brand für einen Eröffnungstreffer und einen anhaltenden Brand.",
       "corruption": "Lässt ein Ziel mit Schatten verrotten, der tickt, während du anderes erledigst.",
-      "life_tap": "Tauscht einen Teil deiner eigenen Gesundheit in Mana zurück, wenn du leerläufst.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Ein Naturblitz, den du aus der Distanz auf ein Ziel schleuderst, dein erster Schadenszauber.",
       "healing_touch": "Eine große Einzelzielheilung mit langer Zauberzeit, um jemanden wieder aufzufüllen.",
       "mark_of_the_wild": "Ein anhaltender Segen, den du vor einem Kampf auf dich oder einen Verbündeten legst.",
@@ -18265,43 +18266,47 @@ export const de_DE: EnTranslations = {
       },
       "corruption": {
         "name": "Schwarzfäule",
-        "description": "Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden."
+        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
       },
       "evil_eye": {
-        "name": "Böses Auge",
-        "description": "Markiert einen Gegner als Fokus Eurer Flüche. Das Verschieben des Bösen Auges bewahrt die Verdammnis, erneuert aber nicht dessen 20-Sek.-Ablauf."
+        "name": "Rotmark",
+        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "Fluchblick",
-        "description": "Euer Fluchauge attackiert Euer gewähltes primäres Böses Auge alle 2,5 Sek. mit Schattenschaden. Besessenheit des Bösen Auges verdoppelt sein Angriffstempo."
+        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
       },
       "needle_of_fate": {
-        "name": "Schicksalsnadel",
-        "description": "Durchbohrt den Gegner für {damage} Schattenschaden und erzeugt {needleDoom} Verdammnis, wenn er Euer Böses Auge trägt. Jeder Treffer auf Euer primäres Böses Auge fügt für 12 Sek. einen Schicksalsfaden hinzu, bis zu 3. Existiert kein Böses Auge, markiert die Schicksalsnadel zuerst ihr Ziel."
+        "name": "Carrion Dart",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
       },
       "sentence": {
-        "name": "Schuldspruch",
-        "description": "Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Jeder Faden erhöht den Schaden um 6%. Zusätzliche Effekte eskalieren bei 20, 50, 80 und 100 Verdammnis. Seine Schadensskalierung flacht nach Stufe 16 ab."
+        "name": "Putrefy",
+        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+      },
+      "hard_bargain": {
+        "name": "Hard Bargain",
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Harter Handel",
-        "description": "Wandelt {damage} Gesundheit in {damage} Mana um."
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "Verfluchter Komplize",
-        "description": "Verbindet Euer Fluchauge, wenn kein Verbündeter ausgewählt ist, sodass dessen Fluchblick 2 Verdammnis erzeugt. Die Verbindung mit einem ausgewählten Gruppenmitglied lässt stattdessen nur dessen Schaden an Eurem Bösen Auge 3 erzeugen. Eine neue Verbindung ersetzt die vorherige und kann höchstens alle 2 Sek. auslösen."
+        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
       },
       "curse_of_agony": {
-        "name": "Fluch der Qual",
-        "description": "Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek."
+        "name": "Festerhex",
+        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
       },
       "drain_life": {
         "name": "Verzehren",
-        "description": "Zehrt die Lebenskraft des Ziels aus, verursacht jede Sekunde {damage} Schattenschaden und überträgt euch 70% davon als Gesundheit. Gebrechen überträgt stattdessen alles. Auf euer vorrangiges Böses Auge kanalisiert, verbraucht der Zauber zu Beginn alle Schicksalsfäden, und jeder Faden erzeugt 1 zusätzliche Verdammnis je Tick."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
       },
       "litany_of_guilt": {
         "name": "Litanei der Schuld",
-        "description": "Verflucht Euer primäres Böses Auge 6 Sek. lang. Verdammnisgewinne lösen eine Welle aus, die bis zu 2 weitere Gegner im Umkreis von 8 Yard schädigt, höchstens einmal pro Sekunde. Rang 2 verlängert dies auf 8 Sek. und 4 Gegner."
+        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
         "name": "Schlackenhaut",
@@ -18309,35 +18314,39 @@ export const de_DE: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Schattenanker",
-        "description": "Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück, verbraucht den Anker und startet eine 45-sekündige Abklingzeit."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
         "name": "Seelenbrunnen",
         "description": "Beschwört 3 Min. lang einen Seelenbrunnen. Außerhalb des Kampfes können Gruppenmitglieder ihre Seelensteine auf bis zu 3 auffüllen. Ein Seelenstein stellt 25% der maximalen Gesundheit wieder her und teilt sich die Abklingzeit mit Tränken."
       },
       "hex_of_violence": {
-        "name": "Fluch der Gewalt",
-        "description": "Belegt den Gegner 8 Sek. lang mit einem Hex, der Schattenschaden verursacht und alle 2 Sek. 2 Verdammnis erzeugt. Dessen nächste 3 Schadenshandlungen erzeugen je 7 Verdammnis und peitschen ihn für 17 Schattenschaden."
+        "name": "Rotfever",
+        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
       },
       "cruel_pact": {
         "name": "Grausamer Pakt",
-        "description": "Opfert 12% Eurer maximalen Gesundheit, um 1,5% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter."
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
         "name": "Stellvertretendes Leid",
-        "description": "Verbindet Euer Leiden 8 Sek. lang und erzeugt bis zu 15 Verdammnis durch feindliche Treffer. Auf Euch selbst verringert es erlittenen Schaden um 20%. Auf einen Verbündeten leitet es bis zu 20% auf Euch um, ohne Euch unter 15% Gesundheit zu bringen."
+        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "Besessenheit des Bösen Auges",
-        "description": "Der Fluchwirker besetzt Euer primäres Böses Auge 15 Sek. lang und erzeugt 35 Verdammnis. Schicksalsnadel wirkt in 1 Sek. und erzeugt 2 zusätzliche Verdammnis, Verzehren kann während der Bewegung kanalisiert werden, und Schuldspruch verursacht 25% mehr Schaden und löst ein verzögertes Echo für 60% Schaden aus, das über die Stufen 17-20 auf 30% abnimmt."
+        "name": "Possess the Rotmark",
+        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "Stunde des Gerichts",
-        "description": "Ruft 15 Sek. lang Urteil über Euer primäres Böses Auge herab, gewährt 40 Verdammnis und 3 Schicksalsfäden, aktiviert Besessenheit, verdoppelt die durch das primäre Böse Auge erzeugte Verdammnis und erhöht den Schaden von Schuldspruch um 20%. Der erste Schuldspruch erstattet 50 Verdammnis."
+        "name": "Hour of Rot",
+        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
       },
       "coven": {
-        "name": "Hexenzirkel",
-        "description": "Erschafft für 15 Sek. sekundäre Böse Augen auf bis zu 4 nahen Gegnern. Sie speisen den gemeinsamen Verdammnis-Vorrat mit 50%, und Schuldspruch hallt zu ihnen für 35% Schaden wider."
+        "name": "Contagion",
+        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
       },
       "fear": {
         "name": "Heimsuchung",
@@ -18689,7 +18698,7 @@ export const de_DE: EnTranslations = {
       },
       "siphon_life": {
         "name": "Lebensentzug",
-        "description": "Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)"
+        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
       },
       "conflagrate": {
         "name": "Feuersbrunst",
@@ -18944,7 +18953,7 @@ export const de_DE: EnTranslations = {
       },
       "dark_pact": {
         "name": "Blutpakt",
-        "description": "Opfert 10% Eurer aktuellen Gesundheit, um für 8 Sek. Schaden in Höhe von 30% Eurer maximalen Gesundheit zu absorbieren."
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
       },
       "cloak_of_shadows": {
         "name": "Schattenmantel",
@@ -30862,8 +30871,8 @@ export const de_DE: EnTranslations = {
       },
       "hexthread": {
         "name": "Schleier des Hexengewebes",
-        "bonus2": "Schicksalsnadel gewährt 2 zusätzliche Verurteilung. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
-        "bonus4": "Urteilsspruch erstattet 10 Verurteilung zurück."
+        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
       },
       "moonscorch": {
         "name": "Gewand des Mondbrandes",

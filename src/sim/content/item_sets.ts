@@ -872,12 +872,12 @@ export const ITEM_SETS: Record<string, ItemSet> = {
         effect: {},
         // The caster 2pc carries the pushback rider (full immunity, the raid
         // tier's upgrade over the leveling lineage's 50 percent).
-        text: 'Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.',
+        text: 'Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,
         effect: {},
-        text: 'Passing Sentence refunds 10 Condemnation.',
+        text: 'Putrefy refunds 10 Blight for each Rot Splinter it consumes.',
       },
     ],
   },

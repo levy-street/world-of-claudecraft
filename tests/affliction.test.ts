@@ -22,6 +22,7 @@ import {
   sentenceBaseDamage,
   sentenceEndgameDamageMultiplier,
 } from '../src/sim/combat/affliction';
+import { rangedSwing } from '../src/sim/combat/auto_attack';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
@@ -142,18 +143,25 @@ describe('Affliction Warlock', () => {
     expect(at(7)).not.toContain('searing_pain');
     expect(at(7)).not.toContain('litany_of_guilt');
     expect(at(8)).toContain('litany_of_guilt');
-    expect(at(9)).toContain('cruel_pact');
+    expect(at(9)).not.toContain('cruel_pact');
     expect(at(11)).toContain('litany_of_guilt');
     expect(at(12)).toContain('hex_of_violence');
+    expect(at(4)).toContain('life_tap');
     expect(at(13)).toContain('life_tap');
     expect(at(13)).toContain('possess_evil_eye');
-    expect(at(14)).not.toContain('life_tap');
+    expect(at(14)).toContain('life_tap');
+    expect(at(20)).toContain('life_tap');
     expect(at(14)).toContain('vicarious_suffering');
     expect(at(16)).not.toContain('coven');
     expect(at(17)).toContain('coven');
     expect(at(19)).not.toContain('hour_of_judgment');
     expect(at(20)).toContain('hour_of_judgment');
     expect(at(20)).not.toContain('curse_of_agony');
+    // The tank demon is the one summon Blightcaller keeps.
+    expect(at(4)).not.toContain('summon_voidwalker');
+    expect(at(5)).toContain('summon_voidwalker');
+    expect(at(20)).toContain('summon_voidwalker');
+    expect(at(20)).not.toContain('summon_imp');
     expect(at(20)).not.toEqual(
       expect.arrayContaining([
         'shadow_bolt',
@@ -162,7 +170,6 @@ describe('Affliction Warlock', () => {
         'curse_of_agony',
         'siphon_life',
         'summon_imp',
-        'summon_voidwalker',
         'summon_succubus',
         'summon_felhunter',
         'summon_felguard',
@@ -219,11 +226,11 @@ describe('Affliction Warlock', () => {
     expect(maledictGazeDamage(19)).toBe(9);
     expect(maledictGazeDamage(20)).toBe(10);
     expect(ABILITIES.needle_of_fate.description).toContain(
-      'Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread',
+      'Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter',
     );
     expect(ABILITIES.needle_of_fate.description).not.toContain('Each hit');
     expect(en.entities.abilities.needle_of_fate.description).toContain(
-      'Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread',
+      'Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter',
     );
     // The Condemnation figure is a live {needleDoom} splice in the CATALOG
     // since the Hexthread 2pc (the Crucible set doc); the sim-source
@@ -231,14 +238,14 @@ describe('Affliction Warlock', () => {
     // tests/ability_tooltip_consistency.test.ts). The number pin moved from
     // the resolved artifact to the two SOURCES, so the probe holds both
     // before and after the next i18n:gen rebuilds the resolved bundles.
-    expect(ABILITIES.needle_of_fate.description).toContain('generates 7 Condemnation on impact');
+    expect(ABILITIES.needle_of_fate.description).toContain('generates 7 Blight on impact');
     const abilitiesCatalogSource = readFileSync(
       new URL('../src/ui/i18n.catalog/abilities.ts', import.meta.url),
       'utf8',
     );
-    expect(abilitiesCatalogSource).toContain('generates {needleDoom} Condemnation on impact');
+    expect(abilitiesCatalogSource).toContain('generates {needleDoom} Blight on impact');
     expect(en.entities.abilities.needle_of_fate.description).toContain(
-      'Fate Threads stay with you when the Eye moves or its target dies',
+      'Rot Splinters stay with you when the Rotmark moves or its target dies',
     );
   });
 
@@ -804,7 +811,7 @@ describe('Affliction Warlock', () => {
         (event) =>
           event.type === 'damage' &&
           event.targetId === primary.id &&
-          event.ability === 'Sentence' &&
+          event.ability === 'Putrefy' &&
           event.amount > 0,
       )
       .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0);
@@ -822,7 +829,7 @@ describe('Affliction Warlock', () => {
           (event) =>
             event.type === 'damage' &&
             event.targetId === primary.id &&
-            event.ability === 'Demonic Sentence',
+            event.ability === 'Demonic Putrefy',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
     ).toBe(Math.round(initialPrimaryDamage * possessedSentenceEchoMultiplier(sim.player.level)));
@@ -1685,21 +1692,82 @@ describe('Affliction Warlock', () => {
     expect(allyHp - ally.hp).toBe(93);
   });
 
-  it('replaces Hard Bargain with health-paid mana and Condemnation at level 14', () => {
+  it('draws the Blightcaller wand auto-attack as the Maledict Eye gaze, cosmetic only', () => {
+    const WAND = { min: 3, max: 6, speed: 1.8, wand: true, school: 'shadow' } as const;
+    const sim = makeAffliction();
+    const target = addTarget(sim);
+    sim.player.hitBonus = 1;
+    const emit = vi.spyOn(ctx(sim), 'emit');
+    const hpBefore = target.hp;
+    rangedSwing(ctx(sim), sim.player, target, WAND);
+    const fx = emit.mock.calls.map(([event]) => event).filter((event) => event.type === 'spellfx');
+    expect(fx).toContainEqual(
+      expect.objectContaining({ fx: 'evilEyeGaze', ability: 'maledict_gaze', targetId: target.id }),
+    );
+    expect(fx.some((event) => event.type === 'spellfx' && event.fx === 'projectile')).toBe(false);
+    // Cosmetic only: the shot still travels and lands like a wand bolt.
+    expect(ctx(sim).pendingProjectiles).toHaveLength(1);
+    for (let i = 0; i < 200 && ctx(sim).pendingProjectiles.length > 0; i++) sim.tick();
+    expect(target.hp).toBeLessThan(hpBefore);
+
+    // Another spec still shoots a travelling wand bolt.
+    const destro = new Sim({
+      seed: 42,
+      playerClass: 'warlock',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    destro.setPlayerLevel(20);
+    expect(destro.setSpec('destruction')).toBe(true);
+    const mob = addTarget(destro);
+    const destroEmit = vi.spyOn(ctx(destro), 'emit');
+    rangedSwing(ctx(destro), destro.player, mob, WAND);
+    expect(destroEmit.mock.calls.map(([event]) => event)).toContainEqual(
+      expect.objectContaining({ type: 'spellfx', fx: 'projectile', wand: true }),
+    );
+    expect(ctx(destro).pendingProjectiles).toHaveLength(1);
+  });
+
+  it('reaches a 50 yd Rotmark without sending an Assist pet in', () => {
+    const sim = makeAffliction();
+    expect(ABILITIES.evil_eye.range).toBe(50);
+    const target = addTarget(sim, 45);
+    finishCast(sim, 'evil_eye', target);
+    expect(eye(target, sim.player.id)).toBe(true);
+    expect(sim.meta(sim.playerId)?.petAssistTargetId ?? null).toBeNull();
+  });
+
+  it('refuses Litany of Guilt without your Rotmark, before mana or the Assist pet', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim);
+    sim.targetEntity(target.id);
+    sim.player.resource = sim.player.maxResource;
+    const mana = sim.player.resource;
+    sim.events = [];
+    sim.castAbility('litany_of_guilt');
+    expect(sim.player.resource).toBe(mana);
+    expect(sim.player.cooldowns.has('litany_of_guilt')).toBe(false);
+    expect(sim.meta(sim.playerId)?.petAssistTargetId ?? null).toBeNull();
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'Your target has no Rotmark.' }),
+    );
+  });
+
+  it('lets Cruel Pact trade 10% health for 20% mana and no Blight', () => {
     const sim = makeAffliction();
     const fullHp = sim.player.hp;
     sim.player.resource = 0;
 
-    sim.castAbility('cruel_pact');
-    expect(sim.player.hp).toBe(fullHp - Math.round(sim.player.maxHp * 0.12));
-    expect(sim.player.resource).toBe(Math.round(sim.player.maxResource * 0.015));
-    expect(doomValue(sim.player)).toBe(20);
+    sim.castAbility('life_tap');
+    expect(sim.player.hp).toBe(fullHp - Math.round(sim.player.maxHp * 0.1));
+    expect(sim.player.resource).toBe(Math.round(sim.player.maxResource * 0.2));
+    expect(doomValue(sim.player)).toBe(0);
 
     for (let i = 0; i < 20 * 20; i++) sim.tick();
     sim.player.hp = Math.floor(sim.player.maxHp * 0.2);
     const mana = sim.player.resource;
     const doom = doomValue(sim.player);
-    sim.castAbility('cruel_pact');
+    sim.castAbility('life_tap');
     expect(sim.player.hp).toBe(Math.floor(sim.player.maxHp * 0.2));
     expect(sim.player.resource).toBe(mana);
     expect(doomValue(sim.player)).toBe(doom);
@@ -1731,7 +1799,7 @@ describe('Affliction Warlock', () => {
             (event) =>
               event.type === 'damage' &&
               event.targetId === target.id &&
-              event.ability === 'Sentence',
+              event.ability === 'Putrefy',
           )
           .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
       );
@@ -1780,7 +1848,7 @@ describe('Affliction Warlock', () => {
       for (let tick = 0; tick < 20; tick++) {
         echo += sim
           .tick()
-          .filter((event) => event.type === 'damage' && event.ability === 'Demonic Sentence')
+          .filter((event) => event.type === 'damage' && event.ability === 'Demonic Putrefy')
           .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0);
       }
 
@@ -1931,7 +1999,7 @@ describe('Affliction Warlock', () => {
       bossEvents
         .filter(
           (event) =>
-            event.type === 'damage' && event.targetId === boss.id && event.ability === 'Sentence',
+            event.type === 'damage' && event.targetId === boss.id && event.ability === 'Putrefy',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
     ).toBe(615);
@@ -2028,7 +2096,7 @@ describe('Affliction Warlock', () => {
     expect(hpBefore - target.hp).toBeLessThan(55);
   });
 
-  it('links Cursed Accomplice to the Eye when no allied player is selected', () => {
+  it('links Cursed Accomplice to yourself when no ally or pet is selected', () => {
     const sim = makeAffliction();
     sim.player.targetId = null;
     const mana = sim.player.resource;
@@ -2048,30 +2116,41 @@ describe('Affliction Warlock', () => {
     );
   });
 
-  it('makes an Eye-linked Maledict Gaze generate 2 Condemnation at most every 2 sec', () => {
+  it('makes a self-linked Cursed Accomplice turn your own Rotmark damage into 2 Blight every 2 sec', () => {
     const sim = makeAffliction();
     const target = addTarget(sim, 8);
     finishCast(sim, 'evil_eye', target);
     finishCast(sim, 'cursed_accomplice');
-    sim.player.inCombat = true;
-    sim.player.combatTimer = 0;
-    sim.targetEntity(target.id);
-    const primaryEye = target.auras.find((aura) => aura.kind === 'affliction_eye');
     const link = sim.player.auras.find((aura) => aura.kind === 'affliction_accomplice');
-    if (!primaryEye || !link) throw new Error('Expected Eye and accomplice link');
-    const doomBefore = doomValue(sim.player);
-    primaryEye.tickTimer = 0.05;
+    if (!link) throw new Error('Expected a self link');
     link.icd = 0;
+    const doomBefore = doomValue(sim.player);
 
-    sim.tick();
+    ctx(sim).dealDamage(sim.player, target, 10, false, 'shadow', 'Test Bolt', 'hit');
     expect(doomValue(sim.player)).toBe(doomBefore + 2);
-
-    primaryEye.tickTimer = 0.05;
-    sim.tick();
+    ctx(sim).dealDamage(sim.player, target, 10, false, 'shadow', 'Test Bolt', 'hit');
     expect(doomValue(sim.player)).toBe(doomBefore + 2);
   });
 
-  it('doubles Eye-linked Cursed Accomplice generation during Hour of Judgment', () => {
+  it('links a pet to Cursed Accomplice and turns its Rotmark damage into 3 Blight', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    const pet = addTarget(sim, 3);
+    pet.ownerId = sim.playerId;
+    pet.hostile = false;
+    finishCast(sim, 'cursed_accomplice', pet);
+    const link = pet.auras.find(
+      (aura) => aura.kind === 'affliction_accomplice' && aura.sourceId === sim.playerId,
+    );
+    expect(link?.value).toBe(3);
+    if (link) link.icd = 0;
+    const doomBefore = doomValue(sim.player);
+    ctx(sim).dealDamage(pet, target, 10, false, 'physical', 'Claw', 'hit');
+    expect(doomValue(sim.player)).toBe(doomBefore + 3);
+  });
+
+  it('doubles self-linked Cursed Accomplice generation during Hour of Rot', () => {
     const sim = makeAffliction();
     const target = addTarget(sim, 8);
     finishCast(sim, 'evil_eye', target);
@@ -2079,14 +2158,12 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'hour_of_judgment', target);
     sim.player.inCombat = true;
     target.inCombat = true;
-    const primaryEye = target.auras.find((aura) => aura.kind === 'affliction_eye');
     const link = sim.player.auras.find((aura) => aura.kind === 'affliction_accomplice');
-    if (!primaryEye || !link) throw new Error('Expected Eye and accomplice link');
+    if (!link) throw new Error('Expected a self link');
     const doomBefore = doomValue(sim.player);
-    primaryEye.tickTimer = 0.05;
     link.icd = 0;
 
-    sim.tick();
+    ctx(sim).dealDamage(sim.player, target, 10, false, 'shadow', 'Test Bolt', 'hit');
 
     expect(doomValue(sim.player)).toBe(doomBefore + 4);
   });

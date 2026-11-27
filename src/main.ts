@@ -503,7 +503,7 @@ import { wireCharselectRow } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
-import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import { CLASS_DETAILS, SIGNATURE_ABILITIES, SIGNATURE_ICON_IDS } from './ui/class_details_data';
 import { classIconUrl } from './ui/class_icon_art';
 import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
 import { isDevGuiCommand } from './ui/dev_command_view';
@@ -6927,7 +6927,7 @@ function renderClassDetails(
     .map((spellId) => {
       const a = ABILITIES[spellId];
       if (!a) return '';
-      const iconUrl = iconDataUrl('ability', spellId, 32);
+      const iconUrl = iconDataUrl('ability', SIGNATURE_ICON_IDS[spellId] ?? spellId, 32);
 
       // Format ability description dynamically by resolving rank 1 placeholders
       let dmgText = '';

@@ -9650,16 +9650,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     'Brucia il nemico per {damage} danni da Fuoco e altri {overTime} in 15 sec.',
   'entities.abilities.corruption.name': 'Marciume Nero',
-  'entities.abilities.corruption.description':
-    'Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s.',
-  'entities.abilities.life_tap.name': 'Patto Amaro',
-  'entities.abilities.life_tap.description': 'Converte {damage} salute in {damage} mana.',
-  'entities.abilities.curse_of_agony.name': "Maleficio dell'Angoscia",
-  'entities.abilities.curse_of_agony.description':
-    'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',
   'entities.abilities.drain_life.name': 'Divorare',
-  'entities.abilities.drain_life.description':
-    "Consuma la vitalità del bersaglio, infliggendo {damage} danni da Ombra ogni secondo e trasferendovene il 70% come salute. Afflizione ne trasferisce invece la totalità. Quando è incanalato sul vostro Malocchio primario, consuma all'inizio tutti i Filamenti del Fato, e ogni Filamento genera 1 Condanna in più per impulso.",
   'entities.abilities.fear.name': 'Tormento',
   'entities.abilities.fear.description':
     "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto.",
@@ -9821,8 +9812,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     'Per 12 sec, Dardo Folgorante concede 2 Tuono. Il vostro prossimo Dardo Folgorante o Fulmine Biforcuto è istantaneo, e la vostra prossima scarica piena di Tuono infligge il 25% di danno in più. (Distintivo di Elementale)',
   'entities.abilities.siphon_life.name': 'Risucchio Vitale',
-  'entities.abilities.siphon_life.description':
-    'Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)',
   'entities.abilities.conflagrate.name': 'Conflagrazione',
   'entities.abilities.conflagrate.description':
     'Anticipa un impulso futuro del vostro Patto Ardente, poi incendia il bersaglio per {damage} danni da Fuoco. Genera 1 Devastazione e 1 Rovina. Tiene {charges} cariche. (Distintivo di Distruzione)',
@@ -11854,7 +11843,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Spende il tuo Sigillo attivo per colpire un nemico dalla corta distanza.',
   'guide.abilityHook.lesser_heal':
     "Un lancio costante per rimettere in piedi un alleato quando c'è tempo per restare fermi.",
-  'guide.abilityHook.life_tap': 'Converte parte della tua salute in mana quando resti a secco.',
   'guide.abilityHook.lightning_bolt':
     'Un lancio a distanza di danno da Natura, il tuo punto di riferimento dalla lontananza.',
   'guide.abilityHook.lightning_shield':
@@ -17379,24 +17367,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     "Sacrifica prima un Mago d'Ossa, poi un Guerriero Scheletrico, e un'Ala Sepolcrale solo come ultima risorsa. Tra i duplicati sceglie quello con la durata residua minore, poi il più debole, per infliggere {damage} danni da Ombra nel punto scelto.",
   'entities.abilities.corpse_explosion.name': 'Esplosione Cadaverica',
-  'entities.abilities.coven.description':
-    'Crea Malocchi secondari su un massimo di 4 nemici vicini per 15 sec. Alimentano la riserva condivisa di Condanna al 50%, e Sentenza riecheggia su di loro per il 35% dei danni.',
-  'entities.abilities.coven.name': 'Congrega',
-  'entities.abilities.cruel_pact.description':
-    "Sacrifica il 12% della tua salute massima per ripristinare l'1,5% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno.",
   'entities.abilities.cruel_pact.name': 'Patto Crudele',
-  'entities.abilities.cursed_accomplice.description':
-    'Collega il tuo Malocchio quando nessun alleato è selezionato, facendo sì che il suo Sguardo Maledetto generi 2 Condanna. Collegare un membro del gruppo selezionato fa sì che solo i loro danni al tuo Malocchio generino 3 invece. Un nuovo collegamento sostituisce quello precedente e può attivarsi una volta ogni 2 sec.',
   'entities.abilities.cursed_accomplice.name': 'Complice Maledetto',
-  'entities.abilities.dark_pact.description':
-    'Sacrifica il 10% della tua salute attuale per assorbire danni pari al 30% della tua salute massima per 8 sec.',
   'entities.abilities.dark_pact.name': 'Patto Sanguigno',
   'entities.abilities.elemental_trance.description':
     'Entra in trance elementale per 15 sec, riducendo i danni subiti del 30% e convertendo il 20% di tutti i danni che infliggi in mana. (firma Warspirit)',
   'entities.abilities.elemental_trance.name': 'Trance Elementale',
-  'entities.abilities.evil_eye.description':
-    'Marchia un nemico come bersaglio delle tue maledizioni. Spostare il Malocchio preserva la Condanna ma non rinnova la sua scadenza di 20 sec.',
-  'entities.abilities.evil_eye.name': 'Malocchio',
   'entities.abilities.eviscerate.description': 'Mossa finale che infligge {damage}.',
   'entities.abilities.eviscerate.specNote_assassination':
     'A 6 Rituale del Veleno, questo pulsante diventa Squarcio velenoso: un colpo che infligge istantaneamente tutti i danni che i tuoi sanguinamenti avrebbero ancora inflitto, pianta una nuova ferita avvelenata e ripristina 20 energia.',
@@ -17421,19 +17397,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Colpisce il nemico per danni dell'arma più {damage} e aumenta la tua probabilità di schivata del 15% per 7 sec. Conferisce 1 punto combo. (talento del Ladro)",
   'entities.abilities.hemorrhage.description':
     "Colpisce il nemico per danni dell'arma più {damage}, causa danni da sanguinamento in 12 sec e aumenta i danni da sanguinamento subiti del 40%. Conferisce 1 punto combo. Ogni 2° uso aggiunge 1 Caligine (massimo 3). (firma Skulduggery)",
-  'entities.abilities.hex_of_violence.description':
-    'Lancia un maleficio sul nemico per 8 sec, infliggendo danni da Ombra e generando 2 Condanna ogni 2 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 17 danni da Ombra.',
-  'entities.abilities.hex_of_violence.name': 'Maleficio della Violenza',
-  'entities.abilities.hour_of_judgment.description':
-    'Chiama un giudizio sul tuo Malocchio primario per 15 sec, concedendo 40 Condanna e 3 Filamenti del Fato, attivando la Possessione, raddoppiando la Condanna generata tramite il Malocchio primario e aumentando i danni di Sentenza del 20%. La prima Sentenza rimborsa 50 Condanna.',
-  'entities.abilities.hour_of_judgment.name': 'Ora del Giudizio',
   'entities.abilities.kidney_shot.description':
     'Mossa finale che stordisce il bersaglio per 2 sec più 1 sec per punto combo (5 punti combo: 7 sec).',
-  'entities.abilities.litany_of_guilt.description':
-    "Maledice il tuo Malocchio primario per 6 sec. I guadagni di Condanna rilasciano un'onda che danneggia fino a 2 altri nemici entro 8 iarde, al massimo una volta al secondo. Il Grado 2 lo estende a 8 sec e 4 nemici.",
   'entities.abilities.litany_of_guilt.name': 'Litania della Colpa',
-  'entities.abilities.maledict_gaze.description':
-    "Il tuo Occhio Maledetto attacca il tuo Malocchio primario selezionato ogni 2,5 sec per danni da Ombra. Possessione del Malocchio raddoppia la sua velocità d'attacco.",
   'entities.abilities.maledict_gaze.name': 'Sguardo Maledetto',
   'entities.abilities.maul.description':
     "Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.",
@@ -17443,15 +17409,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.',
   'entities.abilities.moonfire.specNote_balance':
     'Mantienilo acceso: Seme Lunare lo estende di 6 sec.',
-  'entities.abilities.needle_of_fate.description':
-    'Trafigge il nemico per {damage} danni da Ombra e genera {needleDoom} Condanna se porta il tuo Malocchio. Ogni colpo sul tuo Malocchio primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Malocchio, Ago del Destino marchia per primo il suo bersaglio.',
-  'entities.abilities.needle_of_fate.name': 'Ago del Destino',
   'entities.abilities.ossuary_mark.description':
     "Marchia un nemico per 15 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima.",
   'entities.abilities.ossuary_mark.name': "Marchio dell'Ossario",
-  'entities.abilities.possess_evil_eye.description':
-    "Il Maledicente possiede il tuo Malocchio primario per 15 sec e genera 35 Condanna. Ago del Destino si lancia in 1 sec e genera 2 Condanna extra, Divorare può essere incanalato in movimento, e Sentenza infligge il 25% di danni in più e rilascia un'eco ritardata per il 60% dei danni, che scende al 30% tra i livelli 17 e 20.",
-  'entities.abilities.possess_evil_eye.name': 'Possessione del Malocchio',
   'entities.abilities.raise_bone_mage.description':
     "Spende 2 Frammenti d'Anima per aggiungere un Mago d'Ossa a distanza permanente al tuo Dominio a 2 posti. Solo uno può servirti. I suoi attacchi espongono il bersaglio a un 5% in più di danni magici per 6 sec, e Comando della Mietitura aumenta quella debolezza all'8%.",
   'entities.abilities.raise_bone_mage.name': "Rianimazione del Mago d'Ossa",
@@ -17492,9 +17452,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Aumenta la velocità di movimento del 35%, ma sacrifica il 2% della tua salute massima ogni secondo. Rilancia per annullare. Si disattiva al 20% di salute.',
   'entities.abilities.sacrilegious_march.name': 'Marcia Sacrilega',
-  'entities.abilities.sentence.description':
-    'Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16.',
-  'entities.abilities.sentence.name': 'Sentenza',
   'entities.abilities.sinister_strike.description':
     "Un colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
   'entities.abilities.sinister_strike.specNote_assassination':
@@ -17526,16 +17483,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpisci con gli artigli i nemici vicini per {damage} danni. Causa minaccia aggiuntiva. Solo Forma di Bruin.',
   'entities.abilities.swipe.specNote_feral':
     'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
-  'entities.abilities.umbral_anchor.description':
-    "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, consumando l'ancora e avviando un tempo di recupero di 45 sec.",
   'entities.abilities.umbral_anchor.name': "Ancora d'Ombra",
   'entities.abilities.unholy_command.description':
     "Spende 3 Frammenti d'Anima per comandare tutti i tuoi non morti a infliggere il 25% di danni in più e agire il 20% più velocemente per 12 sec.",
   'entities.abilities.unholy_command.name': 'Comando Empio',
   'entities.abilities.venom_dart.specNote_assassination':
     'Aggiunge 1 Rituale del Veleno ed estende la tua ferita avvelenata di 6 sec (la ferita non supera mai i 20 sec).',
-  'entities.abilities.vicarious_suffering.description':
-    'Collega la tua sofferenza per 8 sec e genera fino a 15 Condanna dai colpi ostili. Su te stesso, riduce i danni subiti del 20%. Su un alleato, reindirizza fino al 20% verso di te senza farti scendere sotto il 15% di salute.',
   'entities.abilities.vicarious_suffering.name': 'Sofferenza Vicaria',
   'entities.abilities.wrath.description':
     'Scaglia un fulmine di energia naturale per {damage} danni da Natura.',
@@ -17550,8 +17503,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': "Mago d'Ossa",
   'entities.mobs.necromancy_gravewing.name': 'Ala Sepolcrale',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Guerriero Scheletrico',
-  'guide.abilityHook.evil_eye':
-    'Nomina il nemico le cui azioni e sofferenza alimentano la tua Condanna.',
   'hud.pet.abyssalChain': 'Catena Abissale',
   'hud.pet.abyssalChainDesc':
     "Ordina a Duskmurk di trascinare a sé un nemico normale a più di 8 e fino a 20 metri di distanza. I boss non possono essere trascinati. Tempo di recupero: 15 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
@@ -17564,26 +17515,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     "Ordina a Emberkin di lanciare un dardo di cenere aggiuntivo contro il tuo bersaglio. Tempo di recupero: 8 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
   'hud.pet.felboltTitle': 'Dardo di Cenere',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'I danni idonei concedono {value} Condanna, al massimo una volta ogni {interval} sec',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Divorare sta consumando {stacks} Filamenti del Fato per {doom} Condanna extra per tick',
-  'hudChrome.auraEffect.afflictionEye':
-    'Sguardo Maledetto attacca ogni {interval} sec; gli effetti su questo Malocchio generano il {pct}% di Condanna',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Gli effetti su questo Malocchio generano il {doomPct}% di Condanna; Sentenza riecheggia qui per il {echoPct}% dei danni',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Filamenti del Fato: Sentenza infligge il {sentencePct}% di danni in più, oppure Divorare guadagna {doom} Condanna extra per tick',
-  'hudChrome.auraEffect.afflictionJudgment':
-    'Il Malocchio primario genera il {eyePct}% di Condanna in più; Sentenza infligge il {sentencePct}% di danni in più e la prima rimborsa {refund} Condanna',
-  'hudChrome.auraEffect.afflictionLitany':
-    'I guadagni di Condanna infliggono {damage} danni da Ombra fino a {targets} nemici entro {radius} metri, una volta al secondo',
-  'hudChrome.auraEffect.afflictionPossession':
-    'Potenzia Ago del Destino, Divorare, Sguardo Maledetto e Sentenza',
-  'hudChrome.auraEffect.afflictionVicarious':
-    'Reindirizza o riduce il {pct}% dei danni subiti e può generare fino a {max} Condanna',
-  'hudChrome.auraEffect.afflictionViolence':
-    'Restano {charges} rappresaglie; un attacco nemico concede {doom} Condanna e infligge {damage} danni da Ombra di ritorno',
   'hudChrome.auraEffect.aoeEcho':
     'Restano {charges} echi: le abilità a bersaglio singolo infliggono il {pct}% dei danni fino a {targets} nemici vicini',
   'hudChrome.auraEffect.arcaneCharge':
@@ -17608,8 +17539,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Danni inflitti aumentati del {damagePct}%, velocità d'attacco del {hastePct}%, e velocità di movimento del {movePct}%",
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} cariche: Lancia di Ghiaccio tratta il bersaglio come congelato e infligge il {pct}% di danni da congelamento',
-  'hudChrome.auraEffect.forbiddenReflectionLock':
-    'Il Riflesso Proibito non può ancora essere preparato di nuovo',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Il tuo prossimo tempo di recupero idoneo dello Stregone può essere lanciato di nuovo',
   'hudChrome.auraEffect.formLich':
@@ -17673,15 +17602,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Rovina',
   'hudChrome.procOverlay.ruinStatus': '{value} su {max} Rovina',
   'hudChrome.procOverlay.soulFragmentsMeter': "Frammenti d'Anima",
-  'hudChrome.warlock.doomEmptyStatus': '{value} su {max} Condanna.',
-  'hudChrome.warlock.doomLabel': 'Condanna',
-  'hudChrome.warlock.doomStatus': '{value} su {max} Condanna; {remaining}.',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Tre Filamenti del Fato: Divorare può intrecciarli in Condanna aggiuntiva.',
-  'hudChrome.warlock.fateThreadsLabel': 'Filamenti del Fato',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Tre Filamenti del Fato: Sentenza può consumarli per un aumento del 18% dei danni.',
-  'hudChrome.warlock.fateThreadsStatus': '{value} su {max} Filamenti del Fato.',
   'itemUi.tooltip.useHealingPotionPct':
     'Uso: ripristina istantaneamente il {percent}% della salute massima. Usabile in combattimento. Recupero 2 min.',
   'guide.controls.reliquary': 'Il Reliquiario',
@@ -18636,9 +18556,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Verzura.',
   'entities.itemSets.grovespring.name': 'Paramento Grovespring',
-  'entities.itemSets.hexthread.bonus2':
-    'Ago del Destino concede 2 Condanne aggiuntive. I danni subiti non ritardano più il lancio degli incantesimi.',
-  'entities.itemSets.hexthread.bonus4': 'Sentenza Inappellabile restituisce 10 Condanne.',
   'entities.itemSets.hexthread.name': 'Sudario Hexthread',
   'entities.itemSets.moonscorch.bonus2':
     'Seme Lunare può estendere Tempesta Lunare due volte per applicazione, fino a un massimo di 12 s. I danni subiti non ritardano più il lancio degli incantesimi.',

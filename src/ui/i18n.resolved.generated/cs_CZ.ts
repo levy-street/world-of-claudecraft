@@ -1029,13 +1029,13 @@ export const cs_CZ: EnTranslations = {
       "shotRules": "Miř do vyznačeného pole. Bez nákladů many. Poškození neroste s výbavou ani talenty."
     },
     "warlock": {
-      "doomLabel": "Odsouzení",
-      "fateThreadsLabel": "Nitě osudu",
-      "doomEmptyStatus": "Odsouzení {value} z {max}.",
-      "doomStatus": "Odsouzení {value} z {max}; {remaining}.",
-      "fateThreadsStatus": "Nitě osudu {value} z {max}.",
-      "fateThreadsConsumeReady": "Tři Nitě osudu: Vysát je dokáže vetkat do dalšího Odsouzení.",
-      "fateThreadsSentenceReady": "Tři Nitě osudu: Rozsudek je dokáže spotřebovat za 18% zvýšené poškození."
+      "doomLabel": "Blight",
+      "fateThreadsLabel": "Rot Splinters",
+      "doomEmptyStatus": "{value} of {max} Blight.",
+      "doomStatus": "{value} of {max} Blight; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
+      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
+      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
     },
     "priest": {
       "gloomtitheLabel": "Desátek temnoty",
@@ -4795,7 +4795,7 @@ export const cs_CZ: EnTranslations = {
       "effigyLanternOut": "Lucerna Slaměného předáka pro tebe zhasla: tvé údery i údery tvého mazlíčka ignorují jeho Prkennou kůži a zasahují plnou silou",
       "leadenHexLock": "Olověná kletba tento cíl zatím nemůže znovu zakořenit",
       "forbiddenReflectionReady": "Tvou příští způsobilou schopnost černokněžníka lze seslat znovu i mimo dobu obnovy",
-      "forbiddenReflectionLock": "Zakázaný odraz zatím nelze znovu připravit",
+      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
       "internalCooldown": "Tento efekt nelze spustit znovu, dokud nevyprší časovač",
       "carriedFlag": "Neseš nepřátelskou vlajku. Zrušením tohoto efektu ji upustíš.",
       "carryingFreight": "Neseš náklad. Rychlost pohybu je snížena o {pct} %.",
@@ -4965,16 +4965,16 @@ export const cs_CZ: EnTranslations = {
       "formShadow": "Podoba šerého závoje: stínové poškození zvýšeno o {pct} %",
       "resourceCount": "{value} z {max}",
       "formLich": "Kopí duše navíc zasáhne až {targets} blízké nepřátele za {pct} % poškození",
-      "afflictionEye": "Proklínající pohled útočí každých {interval} s; efekty na tomto Oku generují {pct} % Odsouzení",
-      "afflictionEyeSecondary": "Efekty na tomto Oku generují {doomPct} % Odsouzení; Rozsudek sem zasáhne ozvěnou za {echoPct} % poškození",
-      "afflictionAccomplice": "Způsobilé poškození uděluje {value} Odsouzení, nejvýše jednou za {interval} s",
-      "afflictionViolence": "Zbývá {charges} odplat: nepřátelský útok udělí {doom} Odsouzení a vrátí {damage} stínového poškození",
-      "afflictionVicarious": "Přesměruje nebo sníží {pct} % příchozího poškození a může vygenerovat až {max} Odsouzení",
-      "afflictionPossession": "Posiluje kouzla Jehla osudu, Vysát, Proklínající pohled a Rozsudek",
-      "afflictionJudgment": "Primární Oko generuje o {eyePct} % více Odsouzení; Rozsudek způsobuje o {sentencePct} % více poškození a první vrátí {refund} Odsouzení",
-      "afflictionLitany": "Zisky Odsouzení způsobí {damage} stínového poškození až {targets} nepřátelům v okruhu {radius} yardů, jednou za sekundu",
-      "afflictionFateThreads": "{stacks} Nití osudu: Rozsudek způsobuje o {sentencePct} % více poškození, nebo Vysát získává {doom} Odsouzení navíc za tik",
-      "afflictionConsumeThreads": "Vysát spotřebovává {stacks} Nití osudu za {doom} Odsouzení navíc za tik",
+      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
+      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
+      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
+      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
+      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
+      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
+      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
       "necromancyHarvestMark": "Smrt může vytvořit 1 Úlomek duše",
       "necromancyOssuaryMark": "Ukládá {storedPct} % tvého poškození a poškození tvých nemrtvých, plus {lancePct} % poškození Kopí duše; opětovným sesláním to odpálíš. Smrt vybuchne v okruhu {radius} yardů a vytvoří 1 Úlomek duše",
       "necromancyDeathEcho": "Zastaralá Ozvěna smrti; žádná současná schopnost ji nespotřebovává",
@@ -10084,7 +10084,7 @@ export const cs_CZ: EnTranslations = {
       "none": "Žádná třída nesplňuje všechny filtry. Vyčisti jeden a uvidíš víc."
     },
     "abilityHook": {
-      "evil_eye": "Pojmenuje nepřítele, jehož činy a utrpení krmí tvé Odsouzení.",
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
       "heroic_strike": "Zařadí těžší švih, který utratí vztek při příštím zásahu.",
       "revenge": "Sekne nepřátele před tebou a po úhybu nebo odražení může být zdarma.",
       "hamstring": "Zmrzačí pohyb nepřítele, aby nemohl uniknout.",
@@ -10163,7 +10163,8 @@ export const cs_CZ: EnTranslations = {
       "demon_skin": "Trvalý self-buff, který zpevní kůži a přidá zbroj.",
       "immolate": "Zapálí cíl úvodním zásahem a přetrvávajícím hořením.",
       "corruption": "Rozloží cíl stínem, který tiká, zatímco děláš jiné věci.",
-      "life_tap": "Vymění část tvého zdraví zpět za manu, když vyschneš.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Přírodní střela hozená na cíl z dálky, tvoje základní ničivé kouzlo.",
       "healing_touch": "Velké léčení jednoho cíle s dlouhým sesláním, pro úplné doléčení.",
       "mark_of_the_wild": "Trvalé požehnání, které dáváš sobě nebo spojenci před bojem.",
@@ -18265,43 +18266,47 @@ export const cs_CZ: EnTranslations = {
       },
       "corruption": {
         "name": "Černá hniloba",
-        "description": "Zkazí cíl a způsobí {damage} stínového poškození během 18 s."
+        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
       },
       "evil_eye": {
-        "name": "Uhrančivé oko",
-        "description": "Označí jednoho nepřítele jako terč tvých kleteb. Přesunutí Oka zachová Odsouzení, ale neobnoví jeho 20sekundové vypršení."
+        "name": "Rotmark",
+        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "Proklínající pohled",
-        "description": "Tvé Proklínající oko útočí na tvůj vybraný primární cíl Uhrančivého oka každých 2,5 s za stínové poškození. Posednutí Uhrančivého oka zdvojnásobí jeho rychlost útoku."
+        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
       },
       "needle_of_fate": {
-        "name": "Jehla osudu",
-        "description": "Probodne nepřítele za {damage} stínového poškození a vygeneruje {needleDoom} Odsouzení, pokud nese tvé Uhrančivé oko. Každý zásah primárního cíle Uhrančivého oka přidá na 12 s Nit osudu, až do 3. Pokud žádné Uhrančivé oko neexistuje, Jehla nejprve označí svůj cíl."
+        "name": "Carrion Dart",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
       },
       "sentence": {
-        "name": "Rozsudek",
-        "description": "Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Každá Nit zvýší poškození o 6 %. Přidané efekty eskalují při 20, 50, 80 a 100 Odsouzení. Škálování jeho poškození se po úrovni 16 zplošťuje."
+        "name": "Putrefy",
+        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+      },
+      "hard_bargain": {
+        "name": "Hard Bargain",
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Tvrdý obchod",
-        "description": "Převede {damage} zdraví na {damage} many."
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "Prokletý spolupachatel",
-        "description": "Pokud není vybrán spojenec, propojí tvé Proklínající oko a jeho Proklínající pohled pak generuje 2 Odsouzení. Propojení jednoho vybraného člena skupiny místo toho způsobí, že pouze jeho poškození cíli tvého Uhrančivého oka generuje 3. Nové propojení nahradí předchozí a může se spustit nejvýše jednou za 2 s."
+        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
       },
       "curse_of_agony": {
-        "name": "Kletba trýzně",
-        "description": "Prokleje cíl trýzní: {damage} stínového poškození během 24 s."
+        "name": "Festerhex",
+        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
       },
       "drain_life": {
         "name": "Vysát",
-        "description": "Stravuje životní sílu cíle, každou vteřinu působí {damage} stínového poškození a 70 % z něj ti převádí jako zdraví. Soužení místo toho převádí všechno. Sesíláno na tvůj hlavní cíl Uhrančivého oka spotřebuje na začátku všechny Nitě osudu a každá Nit vytvoří 1 Odsouzení navíc za tik."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
       },
       "litany_of_guilt": {
         "name": "Litanie viny",
-        "description": "Na 6 s prokleje tvé primární Uhrančivé oko. Zisky Odsouzení uvolní vlnu, která poškodí až 2 další nepřátele v okruhu 8 yardů, nejvýše jednou za sekundu. Stupeň 2 to prodlouží na 8 s a 4 nepřátele."
+        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
       },
       "cinderhide": {
         "name": "Strusková kůže",
@@ -18309,35 +18314,39 @@ export const cs_CZ: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Stínová kotva",
-        "description": "První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam, spotřebuješ kotvu a spustíš dobu obnovy 45 s."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
       },
       "soulwell": {
         "name": "Studnice duší",
         "description": "Na 3 min přivolá Studnici duší. Mimo boj si členové skupiny mohou doplnit své Kameny duše až na 3. Kámen duše obnoví 25 % maximálního zdraví a sdílí dobu obnovy s lektvary."
       },
       "hex_of_violence": {
-        "name": "Kletba násilí",
-        "description": "Uhrane nepřítele na 8 s, což způsobuje stínové poškození a generuje 2 Odsouzení každé 2 s. Jeho následující 3 poškozující akce každá vygenerují 7 Odsouzení a bičem mu způsobí 17 stínového poškození."
+        "name": "Rotfever",
+        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
       },
       "cruel_pact": {
         "name": "Krutá dohoda",
-        "description": "Obětuje 12 % tvého maximálního zdraví, obnoví 1,5 % tvé maximální many a vygeneruje 20 Odsouzení. Nelze použít při 20 % zdraví nebo méně."
+        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
       },
       "vicarious_suffering": {
         "name": "Zástupné utrpení",
-        "description": "Na 8 s propojí tvé utrpení a z nepřátelských zásahů vygeneruje až 15 Odsouzení. Na sobě sníží utrpěné poškození o 20 %. Na spojenci přesměruje až 20 % na tebe, aniž by tě to dostalo pod 15 % zdraví."
+        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
       },
       "possess_evil_eye": {
-        "name": "Posednutí Uhrančivého oka",
-        "description": "Proklínač posedne tvé primární Uhrančivé oko na 15 s a vygeneruje 35 Odsouzení. Jehla osudu se sešle za 1 s a vygeneruje 2 Odsouzení navíc, Vysát lze usměrňovat za pohybu a Rozsudek způsobí o 25 % více poškození a uvolní opožděnou ozvěnu za 60 % poškození, která na úrovních 17-20 klesá na 30 %."
+        "name": "Possess the Rotmark",
+        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
-        "name": "Hodina soudu",
-        "description": "Na 15 s vyvolá soud nad tvým primárním Uhrančivým okem: udělí 40 Odsouzení a 3 Nitě osudu, aktivuje Posednutí, zdvojnásobí Odsouzení generované skrze primární Oko a zvýší poškození Rozsudku o 20 %. První Rozsudek vrátí 50 Odsouzení."
+        "name": "Hour of Rot",
+        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
       },
       "coven": {
-        "name": "Sabat",
-        "description": "Na 15 s vytvoří vedlejší Uhrančivá oka až na 4 blízkých nepřátelích. Krmí sdílenou zásobu Odsouzení z 50 % a Rozsudek se k nim šíří ozvěnou za 35 % poškození."
+        "name": "Contagion",
+        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
       },
       "fear": {
         "name": "Děs",
@@ -18689,7 +18698,7 @@ export const cs_CZ: EnTranslations = {
       },
       "siphon_life": {
         "name": "Žilopijec",
-        "description": "Vysává život nepřítele, způsobí mu {damage} stínového poškození během 30 s a vyléčí tě za způsobené poškození. (klíčová schopnost Utrpení)"
+        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
       },
       "conflagrate": {
         "name": "Vzplanutí",
@@ -18944,7 +18953,7 @@ export const cs_CZ: EnTranslations = {
       },
       "dark_pact": {
         "name": "Krvavá úmluva",
-        "description": "Obětuje 10 % tvého aktuálního zdraví a na 8 s pohltí poškození ve výši 30 % tvého maximálního zdraví."
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
       },
       "cloak_of_shadows": {
         "name": "Stínoplášť",
@@ -30862,8 +30871,8 @@ export const cs_CZ: EnTranslations = {
       },
       "hexthread": {
         "name": "Plášť Šesti nití",
-        "bonus2": "Jehla osudu poskytuje 2 další odsouzení. Utržené poškození již nezpožďuje sesílání kouzel.",
-        "bonus4": "Vynesení rozsudku vrací 10 odsouzení."
+        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
       },
       "moonscorch": {
         "name": "Roucho Měsíčního žáru",

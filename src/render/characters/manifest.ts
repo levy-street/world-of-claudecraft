@@ -7999,6 +7999,7 @@ export const KAYKIT_WARLOCK: VisualDef = swims({
       shadowburn: 'Warlock_Cast_Burst',
       fear: 'Warlock_Cast_Burst',
       life_tap: 'Warlock_Cast_Burst',
+      hard_bargain: 'Warlock_Cast_Burst',
       demon_skin: 'Warlock_Cast_Burst',
       spell_lock: 'Warlock_Cast_Burst',
     },

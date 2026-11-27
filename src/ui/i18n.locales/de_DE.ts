@@ -9681,16 +9681,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     'Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek.',
   'entities.abilities.corruption.name': 'Schwarzfäule',
-  'entities.abilities.corruption.description':
-    'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
-  'entities.abilities.life_tap.name': 'Harter Handel',
-  'entities.abilities.life_tap.description': 'Wandelt {damage} Gesundheit in {damage} Mana um.',
-  'entities.abilities.curse_of_agony.name': 'Fluch der Qual',
-  'entities.abilities.curse_of_agony.description':
-    'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
   'entities.abilities.drain_life.name': 'Verzehren',
-  'entities.abilities.drain_life.description':
-    'Zehrt die Lebenskraft des Ziels aus, verursacht jede Sekunde {damage} Schattenschaden und überträgt euch 70% davon als Gesundheit. Gebrechen überträgt stattdessen alles. Auf euer vorrangiges Böses Auge kanalisiert, verbraucht der Zauber zu Beginn alle Schicksalsfäden, und jeder Faden erzeugt 1 zusätzliche Verdammnis je Tick.',
   'entities.abilities.fear.name': 'Heimsuchung',
   'entities.abilities.fear.description':
     'Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit des Ziels bricht den Effekt.',
@@ -9850,8 +9841,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     '12 Sek. lang gewährt Lichtbogenblitz 2 Donner. Euer nächster Lichtbogenblitz oder Gabelblitz ist sofort wirkbar, und eure nächste volle Donner-Auszahlung verursacht 25% mehr Schaden. (Elementar-Signatur)',
   'entities.abilities.siphon_life.name': 'Lebensentzug',
-  'entities.abilities.siphon_life.description':
-    'Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)',
   'entities.abilities.conflagrate.name': 'Feuersbrunst',
   'entities.abilities.conflagrate.description':
     'Zieht einen künftigen Tick eures Brennenden Pakts vor und entzündet dann das Ziel für {damage} Feuerschaden. Erzeugt 1 Verwüstung und 1 Verderben. Hält {charges} Aufladungen. (Zerstörungs-Signatur)',
@@ -11839,8 +11828,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbraucht dein aktives Siegel, um einen Gegner aus kurzer Distanz zu treffen.',
   'guide.abilityHook.lesser_heal':
     'Ein stetiger Zauber, um einen Verbündeten aufzufüllen, wenn Zeit zum Stillstehen bleibt.',
-  'guide.abilityHook.life_tap':
-    'Tauscht einen Teil deiner eigenen Gesundheit in Mana zurück, wenn du leerläufst.',
   'guide.abilityHook.lightning_bolt':
     'Ein Fernkampfzauber mit Naturschaden, deine erste Wahl aus der Distanz.',
   'guide.abilityHook.lightning_shield':
@@ -16937,24 +16924,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Opfert zuerst einen Knochenmagier, dann einen Skelettkrieger, und eine Grabschwinge nur als letzten Ausweg. Bei Duplikaten wählt es jenen mit der geringsten verbleibenden Dauer, dann den schwächsten, um {damage} Schattenschaden am gewählten Ort zu verursachen.',
   'entities.abilities.corpse_explosion.name': 'Leichenexplosion',
-  'entities.abilities.coven.description':
-    'Erschafft für 15 Sek. sekundäre Böse Augen auf bis zu 4 nahen Gegnern. Sie speisen den gemeinsamen Verdammnis-Vorrat mit 50%, und Schuldspruch hallt zu ihnen für 35% Schaden wider.',
-  'entities.abilities.coven.name': 'Hexenzirkel',
-  'entities.abilities.cruel_pact.description':
-    'Opfert 12% Eurer maximalen Gesundheit, um 1,5% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter.',
   'entities.abilities.cruel_pact.name': 'Grausamer Pakt',
-  'entities.abilities.cursed_accomplice.description':
-    'Verbindet Euer Fluchauge, wenn kein Verbündeter ausgewählt ist, sodass dessen Fluchblick 2 Verdammnis erzeugt. Die Verbindung mit einem ausgewählten Gruppenmitglied lässt stattdessen nur dessen Schaden an Eurem Bösen Auge 3 erzeugen. Eine neue Verbindung ersetzt die vorherige und kann höchstens alle 2 Sek. auslösen.',
   'entities.abilities.cursed_accomplice.name': 'Verfluchter Komplize',
-  'entities.abilities.dark_pact.description':
-    'Opfert 10% Eurer aktuellen Gesundheit, um für 8 Sek. Schaden in Höhe von 30% Eurer maximalen Gesundheit zu absorbieren.',
   'entities.abilities.dark_pact.name': 'Blutpakt',
   'entities.abilities.elemental_trance.description':
     'Versetzt Euch 15 Sek. lang in eine elementare Trance, verringert erlittenen Schaden um 30% und wandelt 20% des von Euch verursachten Schadens in Mana um. (Kriegsgeist-Signatur)',
   'entities.abilities.elemental_trance.name': 'Elementare Trance',
-  'entities.abilities.evil_eye.description':
-    'Markiert einen Gegner als Fokus Eurer Flüche. Das Verschieben des Bösen Auges bewahrt die Verdammnis, erneuert aber nicht dessen 20-Sek.-Ablauf.',
-  'entities.abilities.evil_eye.name': 'Böses Auge',
   'entities.abilities.eviscerate.description': 'Finishing-Move, der {damage} verursacht.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Bei 6 Giftritual wird diese Taste zu Giftriss: ein Schlag, der sofort allen Schaden verursacht, den Eure Blutungen noch verursacht hätten, eine frische Giftwunde setzt und 20 Energie wiederherstellt.',
@@ -16979,19 +16954,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Trifft den Gegner für Waffenschaden plus {damage} und erhöht Eure Ausweichchance 7 Sek. lang um 15%. Gewährt 1 Combopunkt. (Schurkentalent)',
   'entities.abilities.hemorrhage.description':
     'Trifft den Gegner für Waffenschaden plus {damage}, verursacht Blutungsschaden über 12 Sek. und erhöht erlittenen Blutungsschaden um 40%. Gewährt 1 Combopunkt. Jeder 2. Einsatz fügt 1 Dämmer hinzu (max. 3). (Skulduggery-Engine)',
-  'entities.abilities.hex_of_violence.description':
-    'Belegt den Gegner 8 Sek. lang mit einem Hex, der Schattenschaden verursacht und alle 2 Sek. 2 Verdammnis erzeugt. Dessen nächste 3 Schadenshandlungen erzeugen je 7 Verdammnis und peitschen ihn für 17 Schattenschaden.',
-  'entities.abilities.hex_of_violence.name': 'Fluch der Gewalt',
-  'entities.abilities.hour_of_judgment.description':
-    'Ruft 15 Sek. lang Urteil über Euer primäres Böses Auge herab, gewährt 40 Verdammnis und 3 Schicksalsfäden, aktiviert Besessenheit, verdoppelt die durch das primäre Böse Auge erzeugte Verdammnis und erhöht den Schaden von Schuldspruch um 20%. Der erste Schuldspruch erstattet 50 Verdammnis.',
-  'entities.abilities.hour_of_judgment.name': 'Stunde des Gerichts',
   'entities.abilities.kidney_shot.description':
     'Finishing-Move, der das Ziel 2 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 7 Sek.).',
-  'entities.abilities.litany_of_guilt.description':
-    'Verflucht Euer primäres Böses Auge 6 Sek. lang. Verdammnisgewinne lösen eine Welle aus, die bis zu 2 weitere Gegner im Umkreis von 8 Yard schädigt, höchstens einmal pro Sekunde. Rang 2 verlängert dies auf 8 Sek. und 4 Gegner.',
   'entities.abilities.litany_of_guilt.name': 'Litanei der Schuld',
-  'entities.abilities.maledict_gaze.description':
-    'Euer Fluchauge attackiert Euer gewähltes primäres Böses Auge alle 2,5 Sek. mit Schattenschaden. Besessenheit des Bösen Auges verdoppelt sein Angriffstempo.',
   'entities.abilities.maledict_gaze.name': 'Fluchblick',
   'entities.abilities.maul.description':
     'Ein malmender Angriff, der den Nahkampfschaden um {damage} erhöht und hohe Bedrohung verursacht. Aktiviert sich bei Eurem nächsten Schwung. Nur in Bruin-Gestalt.',
@@ -17001,15 +16966,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Versengt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
   'entities.abilities.moonfire.specNote_balance':
     'Haltet es brennend: Mondsaat verlängert es um 6 Sek.',
-  'entities.abilities.needle_of_fate.description':
-    'Durchbohrt den Gegner für {damage} Schattenschaden und erzeugt {needleDoom} Verdammnis, wenn er Euer Böses Auge trägt. Jeder Treffer auf Euer primäres Böses Auge fügt für 12 Sek. einen Schicksalsfaden hinzu, bis zu 3. Existiert kein Böses Auge, markiert die Schicksalsnadel zuerst ihr Ziel.',
-  'entities.abilities.needle_of_fate.name': 'Schicksalsnadel',
   'entities.abilities.ossuary_mark.description':
     'Markiert einen Gegner 15 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 Metern und erschafft 1 Seelenfragment.',
   'entities.abilities.ossuary_mark.name': 'Beinhausmal',
-  'entities.abilities.possess_evil_eye.description':
-    'Der Fluchwirker besetzt Euer primäres Böses Auge 15 Sek. lang und erzeugt 35 Verdammnis. Schicksalsnadel wirkt in 1 Sek. und erzeugt 2 zusätzliche Verdammnis, Verzehren kann während der Bewegung kanalisiert werden, und Schuldspruch verursacht 25% mehr Schaden und löst ein verzögertes Echo für 60% Schaden aus, das über die Stufen 17-20 auf 30% abnimmt.',
-  'entities.abilities.possess_evil_eye.name': 'Besessenheit des Bösen Auges',
   'entities.abilities.raise_bone_mage.description':
     'Verbraucht 2 Seelenfragmente, um Eurer Domäne mit 2 Plätzen einen dauerhaften Fernkampf-Knochenmagier hinzuzufügen. Nur einer kann Euch dienen. Seine Angriffe legen das Ziel 6 Sek. lang für 5% mehr Magieschaden offen, und Erntebefehl erhöht diese Schwäche auf 8%.',
   'entities.abilities.raise_bone_mage.name': 'Knochenmagier erwecken',
@@ -17051,9 +17010,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Erhöht das Bewegungstempo um 35%, opfert aber jede Sekunde 2% Eurer maximalen Gesundheit. Erneut wirken, um abzubrechen. Schaltet sich bei 20% Gesundheit automatisch ab.',
   'entities.abilities.sacrilegious_march.name': 'Frevelhafter Marsch',
-  'entities.abilities.sentence.description':
-    'Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Jeder Faden erhöht den Schaden um 6%. Zusätzliche Effekte eskalieren bei 20, 50, 80 und 100 Verdammnis. Seine Schadensskalierung flacht nach Stufe 16 ab.',
-  'entities.abilities.sentence.name': 'Schuldspruch',
   'entities.abilities.sinister_strike.description':
     'Ein sofortiger Schlag für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Fügt 1 Giftritual hinzu (max. 6).',
@@ -17084,16 +17040,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Fegt mit Euren Klauen durch nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin-Gestalt.',
   'entities.abilities.swipe.specNote_feral':
     'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3).',
-  'entities.abilities.umbral_anchor.description':
-    'Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück, verbraucht den Anker und startet eine 45-sekündige Abklingzeit.',
   'entities.abilities.umbral_anchor.name': 'Schattenanker',
   'entities.abilities.unholy_command.description':
     'Verbraucht 3 Seelenfragmente, um all Euren Untoten 12 Sek. lang zu befehlen, 25% mehr Schaden zu verursachen und 20% schneller zu handeln.',
   'entities.abilities.unholy_command.name': 'Unheiliger Befehl',
   'entities.abilities.venom_dart.specNote_assassination':
     'Fügt 1 Giftritual hinzu und verlängert Eure Giftwunde um 6 Sek. (die Wunde übersteigt nie 20 Sek.).',
-  'entities.abilities.vicarious_suffering.description':
-    'Verbindet Euer Leiden 8 Sek. lang und erzeugt bis zu 15 Verdammnis durch feindliche Treffer. Auf Euch selbst verringert es erlittenen Schaden um 20%. Auf einen Verbündeten leitet es bis zu 20% auf Euch um, ohne Euch unter 15% Gesundheit zu bringen.',
   'entities.abilities.vicarious_suffering.name': 'Stellvertretendes Leid',
   'entities.abilities.wrath.description':
     'Schleudert einen Blitz aus Naturenergie für {damage} Naturschaden.',
@@ -17108,8 +17060,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Knochenmagier',
   'entities.mobs.necromancy_gravewing.name': 'Grabschwinge',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Skelettkrieger',
-  'guide.abilityHook.evil_eye':
-    'Bestimmt den Gegner, dessen Taten und Leiden deine Verdammnis nähren.',
   'hud.pet.abyssalChain': 'Abyssal Chain',
   'hud.pet.abyssalChainDesc':
     'Befiehlt Duskmurk, einen normalen Gegner aus mehr als 8 bis zu 20 m Entfernung zu sich zurückzuziehen. Bosse können nicht herangezogen werden. 15 Sek. Abklingzeit. Rechtsklick, gedrückt halten oder Umschalt+Eingabetaste drücken, um die Automatik umzuschalten.',
@@ -17122,26 +17072,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'Befiehlt Emberkin, ein zusätzliches Verderbnisgeschoss auf Euer Ziel abzufeuern. 8 Sek. Abklingzeit. Rechtsklick, gedrückt halten oder Umschalt+Eingabetaste drücken, um die Automatik umzuschalten.',
   'hud.pet.felboltTitle': 'Verderbnisblitz',
-  'hudChrome.auraEffect.afflictionAccomplice':
-    'Qualifizierender Schaden gewährt {value} Verdammnis, höchstens einmal alle {interval} Sek.',
-  'hudChrome.auraEffect.afflictionConsumeThreads':
-    'Verzehren verbraucht {stacks} Schicksalsfäden für {doom} zusätzliche Verdammnis pro Tick',
-  'hudChrome.auraEffect.afflictionEye':
-    'Fluchblick greift alle {interval} Sek. an; Effekte an diesem Bösen Auge erzeugen {pct}% Verdammnis',
-  'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Effekte an diesem Bösen Auge erzeugen {doomPct}% Verdammnis; Schuldspruch hallt hier für {echoPct}% Schaden wider',
-  'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Schicksalsfäden: Schuldspruch verursacht {sentencePct}% mehr Schaden, oder Verzehren gewinnt {doom} zusätzliche Verdammnis pro Tick',
-  'hudChrome.auraEffect.afflictionJudgment':
-    'Primäres Böses Auge erzeugt {eyePct}% mehr Verdammnis; Schuldspruch verursacht {sentencePct}% mehr Schaden, und der erste erstattet {refund} Verdammnis',
-  'hudChrome.auraEffect.afflictionLitany':
-    'Verdammnisgewinne verursachen {damage} Schattenschaden an bis zu {targets} Gegnern im Umkreis von {radius} m, einmal pro Sek.',
-  'hudChrome.auraEffect.afflictionPossession':
-    'Verstärkt Schicksalsnadel, Verzehren, Fluchblick und Schuldspruch',
-  'hudChrome.auraEffect.afflictionVicarious':
-    'Leitet {pct}% des erlittenen Schadens um oder verringert ihn und kann bis zu {max} Verdammnis erzeugen',
-  'hudChrome.auraEffect.afflictionViolence':
-    '{charges} Vergeltungen verbleiben; ein feindlicher Angriff gewährt {doom} Verdammnis und verursacht {damage} Schattenschaden zurück',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} Echos verbleiben: Fähigkeiten mit einem Ziel verursachen {pct}% Schaden an bis zu {targets} nahen Gegnern',
   'hudChrome.auraEffect.arcaneCharge':
@@ -17167,8 +17097,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verursachter Schaden erhöht um {damagePct}%, Angriffstempo um {hastePct}%, und Bewegungstempo um {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} Aufladungen: Eislanze behandelt ihr Ziel als eingefroren und verursacht {pct}% Frostschaden',
-  'hudChrome.auraEffect.forbiddenReflectionLock':
-    'Forbidden Reflection kann noch nicht erneut vorbereitet werden',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Eure nächste berechtigte Hexenmeister-Fähigkeit mit Abklingzeit kann erneut gewirkt werden',
   'hudChrome.auraEffect.formLich':
@@ -17246,15 +17174,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Verderben',
   'hudChrome.procOverlay.ruinStatus': '{value} von {max} Verderben',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Seelenfragmente',
-  'hudChrome.warlock.doomEmptyStatus': '{value} von {max} Verdammnis.',
-  'hudChrome.warlock.doomLabel': 'Verdammnis',
-  'hudChrome.warlock.doomStatus': '{value} von {max} Verdammnis; {remaining}.',
-  'hudChrome.warlock.fateThreadsConsumeReady':
-    'Drei Schicksalsfäden: Verzehren kann sie zu zusätzlicher Verdammnis verweben.',
-  'hudChrome.warlock.fateThreadsLabel': 'Schicksalsfäden',
-  'hudChrome.warlock.fateThreadsSentenceReady':
-    'Drei Schicksalsfäden: Schuldspruch kann sie für 18% erhöhten Schaden verbrauchen.',
-  'hudChrome.warlock.fateThreadsStatus': '{value} von {max} Schicksalsfäden.',
   'itemUi.tooltip.useHealingPotionPct':
     'Benutzen: Stellt sofort {percent}% der maximalen Gesundheit wieder her. Im Kampf nutzbar. 2 Min. Abklingzeit.',
   'guide.controls.reliquary': 'Das Reliquiar',
@@ -18063,9 +17982,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Überblüte erntet 75 Prozent deiner verbleibenden Effekte und speichert danach 1 Üppigkeit.',
   'entities.itemSets.grovespring.name': 'Gewand der Hainquelle',
-  'entities.itemSets.hexthread.bonus2':
-    'Schicksalsnadel gewährt 2 zusätzliche Verurteilung. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
-  'entities.itemSets.hexthread.bonus4': 'Urteilsspruch erstattet 10 Verurteilung zurück.',
   'entities.itemSets.hexthread.name': 'Schleier des Hexengewebes',
   'entities.itemSets.moonscorch.bonus2':
     'Mondkeim kann Mondsturm pro Anwendung zweimal verlängern, bis maximal 12 Sek. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
