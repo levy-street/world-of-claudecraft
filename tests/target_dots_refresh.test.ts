@@ -114,8 +114,8 @@ describe('target dots against the live sim', () => {
     // Snapshot, never hold: the row is a pooled record the next tick rewrites.
     const fullDuration = before.rows[0].remaining;
 
-    // Run it most of the way down.
-    for (let i = 0; i < 20 * 8; i++) sim.tick();
+    // Run it most of the way down (Blackrot lasts 45 sec).
+    for (let i = 0; i < 20 * 20; i++) sim.tick();
     const drained = tickView(view, sim);
     expect(drained.count).toBe(1);
     const drainedRemaining = drained.rows[0].remaining;
@@ -179,7 +179,8 @@ describe('target dots against the live sim', () => {
     castUntilApplied(sim, 'corruption', mob.id);
     const view = makeView(sim.playerId);
     expect(tickView(view, sim).count).toBe(1);
-    for (let i = 0; i < 20 * 40; i++) sim.tick();
+    // Past Blackrot's 45 sec duration.
+    for (let i = 0; i < 20 * 50; i++) sim.tick();
     expect(tickView(view, sim).count).toBe(0);
   });
 });

@@ -37,8 +37,12 @@ describe('affliction 200 DPS anchors at 120 seconds', () => {
     // new-tier kit actually measures, above 200 included. #4048 lets the
     // off-GCD Possess/Hour openers fire without a primary Eye target and the
     // heroic four-seed mean rises to 193.51, still below the old 200 target.
-    expect(mean('dps')).toBeGreaterThanOrEqual(163);
-    expect(mean('dps')).toBeLessThanOrEqual(196);
+    // Re-anchored for the Blightcaller rework: the probe now keeps Blackrot,
+    // Festerhex and Veinleech running and spends Blight on Putrefy, and the
+    // heroic four-seed mean measures 220.0, inside the Demonology (216-239)
+    // and Destruction (224-249) heroic corridors. About plus or minus 5%.
+    expect(mean('dps')).toBeGreaterThanOrEqual(209);
+    expect(mean('dps')).toBeLessThanOrEqual(231);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 
@@ -50,8 +54,9 @@ describe('affliction 200 DPS anchors at 120 seconds', () => {
     // 208.8 measured at the 2026-08-23 re-anchor; about plus or minus 5%, so
     // the tripwire trips on a real collapse or runaway, not on engine drift.
     // Post-retune measurement 194.7 (see the heroic anchor note above).
-    expect(mean('dps')).toBeGreaterThanOrEqual(186);
-    expect(mean('dps')).toBeLessThanOrEqual(210);
+    // Blightcaller rotation (see the heroic note): 225.8, about plus or minus 5%.
+    expect(mean('dps')).toBeGreaterThanOrEqual(214);
+    expect(mean('dps')).toBeLessThanOrEqual(237);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 });

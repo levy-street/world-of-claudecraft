@@ -166,7 +166,7 @@ describe('warlock wave 2 choice rows', () => {
       .find((row) => row.level === 17)
       ?.options.find((option) => option.id === 'wlk_r17_death_coil');
     expect(grandMalediction?.description).toBe(
-      "Reduces your specialization's setup cooldown by 25%: Hex of Violence (Affliction; punishes the enemy's damaging actions), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
+      "Reduces your specialization's setup cooldown by 25%: Rotfever (Blightcaller; makes your DoT ticks tick again), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
     );
 
     const capstones = WARLOCK_CHOICE_ROWS.rows.find((row) => row.level === 20)?.options ?? [];
@@ -187,7 +187,8 @@ describe('warlock wave 2 choice rows', () => {
 
   it('Grand Malediction reduces an already-known setup cooldown for every specialization', () => {
     for (const [spec, ability, cooldown] of [
-      ['affliction', 'hex_of_violence', 11.25],
+      // Rotfever's base cooldown is 20 sec (Blightcaller rework).
+      ['affliction', 'hex_of_violence', 15],
       ['demonology', 'unholy_command', 33.75],
       ['destruction', 'ruinous_brand', 15],
     ] as const) {

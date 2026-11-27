@@ -708,11 +708,17 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     ).toBe(true);
   });
 
-  it('dims primary-Eye abilities until the selected target has the owned primary Eye', () => {
+  it('dims Rotmark abilities until the selected target has your own Rotmark', () => {
     const view = createActionBarView(
       descriptor(
         slot(1, {
-          ability: ability('coven', { requiresTarget: true, range: 30, cost: 0 }),
+          // Contagion's real data: it needs your Rotmark (the primary Eye) on the target.
+          ability: ability('coven', {
+            requiresTarget: true,
+            range: 30,
+            cost: 0,
+            requiresOwnTargetAuraKind: 'affliction_eye',
+          }),
         }),
       ),
       fakeDeps(),

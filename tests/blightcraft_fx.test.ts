@@ -12,9 +12,17 @@ import { ABILITIES } from '../src/sim/content/classes';
 import type { SimEvent } from '../src/sim/types';
 
 describe('Blightcaller rot-green effects', () => {
-  it('covers exactly the spells only Blightcaller casts', () => {
+  it('covers exactly the spells Blightcaller casts and the other two specs do not', () => {
+    // Blightcaller-only, or (Blackrot, Festerhex) also a starter DoT for a warlock with no spec.
     const blightcraftOnly = Object.values(ABILITIES)
-      .filter((ability) => ability.specs?.length === 1 && ability.specs[0] === 'affliction')
+      .filter(
+        (ability) =>
+          (ability.specs?.length === 1 && ability.specs[0] === 'affliction') ||
+          (ability.class === 'warlock' &&
+            ability.excludeSpecs?.includes('demonology') &&
+            ability.excludeSpecs.includes('destruction') &&
+            !ability.excludeSpecs.includes('affliction')),
+      )
       .map((ability) => ability.id)
       .sort();
     expect([...BLIGHTCRAFT_FX_ABILITIES].sort()).toEqual(blightcraftOnly);

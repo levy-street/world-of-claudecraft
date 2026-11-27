@@ -445,6 +445,32 @@ describe('warlock class talent tree', () => {
     expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
   });
 
+  it('keeps the Festerhex reflection when another free-cast buff pays instead', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' }, 'affliction');
+    addTarget(sim);
+    sim.castAbility('curse_of_agony');
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(true);
+    tick(sim, 30);
+    // A spell-agnostic free-cast buff found first: it pays for this Festerhex.
+    player.auras.unshift({
+      id: 'test_free_cast',
+      name: 'Test Free Cast',
+      kind: 'next_cast_free',
+      value: 1,
+      remaining: 30,
+      duration: 30,
+      sourceId: player.id,
+      school: 'arcane',
+    });
+    const resourceBefore = player.resource;
+
+    sim.castAbility('curse_of_agony');
+
+    expect(player.resource).toBe(resourceBefore);
+    expect(player.auras.some((aura) => aura.id === 'test_free_cast')).toBe(false);
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(true);
+  });
+
   it('lets Forbidden Reflection repeat one shared cooldown without restarting it', () => {
     const { sim, player } = rig({
       11: 'wlk_r11_fel_concentration',

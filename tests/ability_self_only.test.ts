@@ -20,9 +20,11 @@ describe('isSelfOnlyAbility', () => {
     expect([...SELF_ONLY_EFFECT_TYPES].sort()).toEqual(
       [
         'absorb',
+        'afflictionCruelPact',
         'dismissPet',
         'gainResource',
         'grantDevotion',
+        'hardBargain',
         'imbue',
         'lifeTap',
         'selfBuff',
