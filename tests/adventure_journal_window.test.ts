@@ -527,11 +527,13 @@ describe('AdventureJournalWindow', () => {
     journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
     const cells = () =>
       [...root.querySelectorAll<HTMLElement>('.aj-banner .aj-kill')].map((cell) =>
-        cell.textContent?.trim(),
+        [...cell.querySelectorAll('.aj-kill-tier, .aj-kill-count, .aj-kill-note')]
+          .map((part) => part.textContent)
+          .join(''),
       );
     expect(root.querySelector('.aj-progress-label')?.textContent).toBe('Your kills');
     expect(cells()).toEqual(['Normal7', 'Heroic0', 'MythicComing soon']);
-    expect(root.querySelector('.aj-kill.selected')?.getAttribute('aria-label')).toBe(
+    expect(root.querySelector('.aj-kill.selected .visually-hidden')?.textContent).toBe(
       'Normal kills: 7',
     );
     // The Smith's Heart has no lockout: no saved line, no saved chip.
@@ -555,6 +557,29 @@ describe('AdventureJournalWindow', () => {
     );
     expect(root.querySelector('.aj-lockout-reset')?.textContent).toMatch(/^Resets in 2d 1h, /);
     expect(root.querySelector('.aj-boss.active')?.classList.contains('defeated')).toBe(true);
+    // A fresh lockout array every read is still a no-op tick; the page
+    // repaints as free once the soonest lockout runs out.
+    const page = root.querySelector('.aj-page');
+    const raw = world.lockouts;
+    world.raidLockouts = () => raw.map((row) => ({ ...row }));
+    for (let i = 0; i < 3; i++) journal.syncRun();
+    expect(root.querySelector('.aj-page')).toBe(page);
+    const realNow = Date.now;
+    try {
+      Date.now = () => realNow() + raw[0].msRemaining + 1;
+      world.lockouts = [];
+      world.raidLockouts = () => [];
+      journal.syncRun();
+      expect(root.querySelector('.aj-page')).not.toBe(page);
+      expect(root.querySelector('.aj-chip-saved')).toBeNull();
+    } finally {
+      Date.now = realNow;
+    }
+    world.lockouts = raw;
+    world.raidLockouts = function () {
+      return this.lockouts;
+    };
+    journal.openJournal('ignivar_raid_arena', 'ignivar_herald_of_the_last_flame', 'heroic');
     // On Normal the same character is not saved.
     root.querySelector<HTMLButtonElement>('[data-difficulty="normal"]')?.click();
     expect(root.querySelector('.aj-chip-saved')).toBeNull();

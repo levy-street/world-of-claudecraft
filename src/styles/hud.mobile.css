@@ -3942,6 +3942,10 @@
   body.mobile-touch #adventure-journal-window .aj-kill {
     padding: 2px 9px 3px;
   }
+  /* The phone banner is short: the lockout line joins the kills row when it fits. */
+  body.mobile-touch #adventure-journal-window .aj-lockout {
+    flex-basis: auto;
+  }
   body.mobile-touch #adventure-journal-window .aj-diff button {
     min-height: 40px;
     font-size: 15px;

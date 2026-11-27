@@ -14299,7 +14299,8 @@
     #adventure-journal-window .aj-boss.active,
     #adventure-journal-window .aj-tab.active,
     #adventure-journal-window .aj-ab.open,
-    #adventure-journal-window .aj-diff button.active {
+    #adventure-journal-window .aj-diff button.active,
+    #adventure-journal-window .aj-kill.selected {
       outline: 2px solid Highlight;
       outline-offset: -2px;
     }

@@ -46,9 +46,12 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 - Numbers come from the sources, which resolve them from live tuning. Never type a number here.
 - The kill counts and lockouts are the character's, read through `IWorld` only; the sim
   raises a count at the real kill (`src/sim/boss_kill_tally.ts`) and stamps the lockouts.
-  `syncRun()` also repaints when the reference-stable `bossKills` record moves. A saved
-  page reads Defeated in the list on the difficulty being read; never invent a lockout
-  for an instance the sim does not lock.
+  `syncRun()` also repaints when the reference-stable `bossKills` record moves and once
+  the soonest lockout read at render runs out (never by comparing the fresh
+  `raidLockouts()` array); the countdown reads as of the render, beside its absolute time.
+  A saved page reads Defeated in the list on the difficulty being read. A lockout is the
+  sim's per ROOM, so a Heroic dungeon marks only its final boss page while the banner of
+  every page says Saved; never invent a lockout for an instance the sim does not lock.
 - The 3D model lives on the Overview tab (the encounter card); the banner portrait's eye
   button opens it. Abilities and Loot hold no WebGL context.
 - The Raids list reads in catalog order (`RAID_INSTANCES`): Nythraxis, the Crucible, the

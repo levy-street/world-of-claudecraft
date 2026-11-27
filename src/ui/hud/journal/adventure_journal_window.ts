@@ -126,6 +126,10 @@ export class AdventureJournalWindow {
   private seenDungeonRun: DungeonRunView | null = null;
   private seenRaidRun: RaidRunView | null = null;
   private seenBossKills: Readonly<Record<string, number>> | null = null;
+  /** When the soonest live lockout the last render read runs out (epoch ms),
+   *  so a page saved at render repaints as free once the reset passes. The
+   *  countdown itself reads as of the render, beside its absolute time. */
+  private lockoutLapseAtMs = Number.POSITIVE_INFINITY;
   /** Banner pictures held decoded once seen, so the innerHTML repaint of a
    *  tab, a tier or a pull finds them in memory and never blanks a frame. */
   private readonly heldBackdrops = new Map<string, HTMLImageElement>();
@@ -294,7 +298,8 @@ export class AdventureJournalWindow {
       room === this.seenRoom &&
       world.dungeonRun === this.seenDungeonRun &&
       world.raidRun === this.seenRaidRun &&
-      world.bossKills === this.seenBossKills
+      world.bossKills === this.seenBossKills &&
+      Date.now() < this.lockoutLapseAtMs
     ) {
       return;
     }
@@ -335,9 +340,14 @@ export class AdventureJournalWindow {
     const progress = this.progress();
     const currentId = journalInstanceForRoom(this.seenRoom)?.id ?? null;
     // The personal layer: kills per difficulty and the lockouts, on the tier
-    // being read (journal_progress_view.ts). The lockout clock is the same
-    // epoch the IWorld countdown subtracts from.
+    // being read (journal_progress_view.ts). The lockouts arrive as time left,
+    // so the reset's wall-clock time is that span from now.
     const lockouts = world.raidLockouts();
+    const nowMs = Date.now();
+    let soonest = Number.POSITIVE_INFINITY;
+    for (const row of lockouts)
+      if (row.msRemaining > 0) soonest = Math.min(soonest, row.msRemaining);
+    this.lockoutLapseAtMs = nowMs + soonest;
     const visible = this.visible();
     const savedPages = new Map(
       visible.map((entry) => [entry.id, journalSavedPages(entry, this.tier, lockouts)]),
@@ -356,7 +366,7 @@ export class AdventureJournalWindow {
       this.tier,
       world.bossKills,
       lockouts,
-      Date.now(),
+      nowMs,
     );
 
     const difficulty = journalTierDifficulty(this.tier);

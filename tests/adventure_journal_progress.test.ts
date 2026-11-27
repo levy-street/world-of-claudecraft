@@ -97,7 +97,8 @@ describe('journal progress: kills', () => {
     expect(journalPageKills(heart(), councilKey(), 'normal', tally)).toBe(4);
     expect(journalPageKills(heart(), councilKey(), 'heroic', tally)).toBe(1);
     expect(journalPageKills(heart(), councilKey(), 'mythic', tally)).toBe(0);
-    // A stray body count never reads as more kills than the lead keeps.
+    // A council page reads the highest of its bodies' counts, whichever member
+    // the tally keyed the kills under.
     expect(journalPageKills(heart(), councilKey(), 'normal', { [COUNCIL_SEAM_SINGER]: 2 })).toBe(2);
   });
 
@@ -200,7 +201,8 @@ describe('journal progress: markup', () => {
     });
     expect(html).toContain('Your kills');
     expect(html).toContain('aria-label="Your progress on this boss"');
-    expect(html).toContain('aria-label="Normal kills: 1,234"');
+    expect(html).toContain('<span class="visually-hidden">Normal kills: 1,234</span>');
+    expect(html).not.toContain('title=');
     expect(html).toContain('<b class="aj-kill-count" aria-hidden="true">1,234</b>');
     expect(html).toMatch(/class="aj-kill selected none"/);
     expect(html).toContain('Coming soon');

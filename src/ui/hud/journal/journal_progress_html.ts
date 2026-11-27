@@ -37,18 +37,22 @@ export function progressHtml(progress: JournalPageProgress): string {
   const cells = progress.kills
     .map((cell) => {
       const name = tierName(cell.tier);
+      // Mythic reads Coming soon, and is marked when it is the tier being read.
       if (cell.count === null) {
-        return `<li class="aj-kill aj-kill-soon"><span class="aj-kill-tier">${esc(name)}</span><span class="aj-kill-note">${esc(
+        return `<li class="aj-kill aj-kill-soon${cell.selected ? ' selected' : ''}"><span class="aj-kill-tier">${esc(name)}</span><span class="aj-kill-note">${esc(
           t('hudChrome.adventureJournal.comingSoon'),
         )}</span></li>`;
       }
       const count = formatNumber(cell.count);
       const label = t('hudChrome.adventureJournal.killsCell', { difficulty: name, count });
+      // The visible pair is for the eye; a screen reader reads the one phrase.
       return `<li class="aj-kill${cell.selected ? ' selected' : ''}${
         cell.count === 0 ? ' none' : ''
-      }" aria-label="${esc(label)}" title="${esc(label)}"><span class="aj-kill-tier" aria-hidden="true">${esc(
+      }"><span class="aj-kill-tier" aria-hidden="true">${esc(
         name,
-      )}</span><b class="aj-kill-count" aria-hidden="true">${esc(count)}</b></li>`;
+      )}</span><b class="aj-kill-count" aria-hidden="true">${esc(count)}</b><span class="visually-hidden">${esc(
+        label,
+      )}</span></li>`;
     })
     .join('');
   const lock = progress.lockout;
