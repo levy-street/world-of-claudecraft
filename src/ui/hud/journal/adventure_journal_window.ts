@@ -19,7 +19,6 @@ import type { DungeonRunView, RaidRunView } from '../../../world_api/dungeons';
 import { journalModelFor } from '../../boss_journal/journal_model_spec';
 import type { JournalBossView } from '../../boss_journal/journal_view';
 import { markDialogRoot } from '../../dialog_root';
-import { esc } from '../../esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, restoreFirstEnabled } from '../../focus_restore';
 import { t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -27,7 +26,6 @@ import { RaidBossGuideModelController } from '../../raid_boss_guide_model_contro
 import { bindRaidBossGuideScroll } from '../../raid_boss_guide_scroll';
 import { rovingTarget } from '../../roving_index';
 import { focusActiveTab, wireTabStrip } from '../../tab_strip_painter';
-import { svgIcon } from '../../ui_icons';
 import {
   type JournalInstance,
   type JournalTier,
@@ -54,19 +52,18 @@ import {
 } from './journal_nav_view';
 import {
   abilitiesHtml,
+  bannerHtml,
   comingSoonHtml,
-  difficultyHtml,
-  heroHtml,
-  instanceName,
+  headHtml,
   lootHtml,
   mechanicTooltipHtml,
+  mobileTopHtml,
   navHtml,
   overviewHtml,
   pageName,
   SECTION_TAB_ACTIVE,
   SECTION_TAB_CLASS,
-  sectionTabsHtml,
-  tierName,
+  tabBarHtml,
 } from './journal_page_html';
 
 export interface AdventureJournalDeps
@@ -317,18 +314,19 @@ export class AdventureJournalWindow {
     const keys = instance.source.bossKeys;
     const step = (dir: -1 | 1) => {
       const key = adjacentJournalBoss(instance, selection.bossKey, dir);
-      return key ? { key, members: journalPageBodies(instance.source, key) } : null;
+      if (!key) return null;
+      const nameKey = instance.source.view(key, 'normal').nameKey;
+      return {
+        key,
+        members: journalPageBodies(instance.source, key),
+        ...(nameKey ? { nameKey } : {}),
+      };
     };
     const state = journalPageState(instance, selection.bossKey, progress);
-    const bossName = pageName(members);
-    const crumbs = t('hudChrome.adventureJournal.crumbs', {
-      instance: instanceName(instance.id),
-      boss: bossName,
-      difficulty: tierName(this.tier),
-    });
+    const bossName = pageName(members, headerView.nameKey);
 
-    const page = view
-      ? `${sectionTabsHtml(this.tab, JOURNAL_TABS)}<div class="aj-panel" id="aj-panel" role="tabpanel" aria-labelledby="aj-tab-${this.tab}">${this.panelHtml(
+    const panel = view
+      ? `<div class="aj-panel" id="aj-panel" role="tabpanel" aria-labelledby="aj-tab-${this.tab}">${this.panelHtml(
           instance,
           view,
           members,
@@ -336,28 +334,20 @@ export class AdventureJournalWindow {
       : comingSoonHtml(instance);
 
     root.innerHTML =
-      `<div class="aj-head panel-title"><div class="aj-title-block"><span class="aj-title-sigil" aria-hidden="true">${svgIcon(
-        'journal',
-      )}</span><div><div id="aj-title">${esc(t('hudChrome.adventureJournal.title'))}</div><div class="aj-crumbs">${esc(
-        crumbs,
-      )}</div></div></div><div class="aj-head-actions"><button type="button" class="aj-browse" data-browse data-focus-key="browse" aria-expanded="${this.navOpen}" aria-controls="aj-nav">${svgIcon(
-        'more',
-      )}<span>${esc(t('hudChrome.adventureJournal.browse'))}</span></button><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(
-        t('hudChrome.adventureJournal.close'),
-      )}">${svgIcon('close')}</button></div></div>` +
-      `<div class="aj-shell rbg-shell${this.navOpen ? ' aj-nav-open' : ''}">${navHtml(groups)}<section class="aj-page rbg-journal" tabindex="0" data-focus-key="journal" aria-labelledby="aj-boss-name">${heroHtml(
-        {
-          instance,
-          members,
-          view: headerView,
-          overviewView: headerView,
-          state,
-          index: keys.indexOf(selection.bossKey),
-          total: keys.length,
-          prev: step(-1),
-          next: step(1),
-        },
-      )}${difficultyHtml(instance, this.tier)}${page}</section></div>`;
+      headHtml(instance) +
+      `<div class="aj-shell${this.navOpen ? ' aj-nav-open' : ''}">${navHtml(groups)}<section class="aj-page" tabindex="0" data-focus-key="journal" aria-labelledby="aj-boss-name">${mobileTopHtml(
+        groups,
+        this.navOpen,
+      )}${bannerHtml({
+        instance,
+        members,
+        view: headerView,
+        state,
+        index: keys.indexOf(selection.bossKey),
+        total: keys.length,
+        tier: this.tier,
+        modelButton: view !== null,
+      })}${tabBarHtml(this.tab, view ? JOURNAL_TABS : null, step(-1), step(1))}${panel}</section></div>`;
 
     const freshPage = root.querySelector<HTMLElement>('.aj-page');
     const freshNav = root.querySelector<HTMLElement>('.aj-nav');
@@ -367,8 +357,17 @@ export class AdventureJournalWindow {
     this.wire(root, instance, view);
     if (restoreKey) {
       const keyed = [...root.querySelectorAll<HTMLElement>(`[${FOCUS_KEY_ATTR}]`)];
+      const byKey = (key: string) => keyed.find((candidate) => candidate.dataset.focusKey === key);
+      // On a phone with the drawer shut, a list boss is hidden: its twin in
+      // the portrait row takes the focus instead.
+      const phone = this.doc.body?.classList.contains('mobile-touch') ?? false;
+      const stripTwin =
+        phone && !this.navOpen && restoreKey.startsWith('boss:')
+          ? byKey(`strip:${restoreKey.slice('boss:'.length)}`)
+          : undefined;
       restoreFirstEnabled([
-        keyed.find((candidate) => candidate.dataset.focusKey === restoreKey),
+        stripTwin,
+        byKey(restoreKey),
         root.querySelector<HTMLElement>('.aj-page'),
         root.querySelector<HTMLElement>('[data-close]'),
       ]);
@@ -387,7 +386,7 @@ export class AdventureJournalWindow {
         this.deps.itemIcon(item),
       );
     }
-    return abilitiesHtml(instance, view, this.closedPhases, this.expandedMechanic);
+    return abilitiesHtml(instance, view, this.closedPhases, this.expandedMechanic, this.tier);
   }
 
   private mountModel(
@@ -432,6 +431,15 @@ export class AdventureJournalWindow {
       nav.addEventListener('keydown', (event) => this.navKey(nav, event));
     }
     root.querySelector<HTMLElement>('[data-close]')?.addEventListener('click', () => this.close());
+    // The banner portrait's 3D button: the model lives on the Overview tab.
+    root.querySelector<HTMLElement>('[data-show-model]')?.addEventListener('click', () => {
+      this.deps.hideTooltip();
+      if (this.tab !== 'overview') {
+        this.tab = 'overview';
+        this.render('show-model');
+      }
+      root.querySelector<HTMLElement>('[data-model-slot]')?.scrollIntoView?.({ block: 'nearest' });
+    });
     // A tap on the dimmed page beside the phone drawer closes the drawer.
     const shell = root.querySelector<HTMLElement>('.aj-shell');
     shell?.addEventListener('click', (event) => {
@@ -533,9 +541,9 @@ export class AdventureJournalWindow {
           this.expandedMechanic = this.expandedMechanic === mechanic.id ? null : mechanic.id;
           this.render(`mechanic:${mechanic.id}`);
         });
-        // A phone shows the whole line inline already: a hover card there only
-        // covers the page it repeats.
-        if (!touch) {
+        // A phone shows the whole line inline already, and so does an opened
+        // row: a hover card there only covers the page it repeats.
+        if (!touch && mechanic.id !== this.expandedMechanic) {
           this.deps.attachTooltip(control, () =>
             mechanicTooltipHtml(instance, phase, mechanic, this.tier),
           );

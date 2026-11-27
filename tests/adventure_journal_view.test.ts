@@ -207,7 +207,10 @@ describe('journal navigation', () => {
       members: [COUNCIL_GUARDIAN, COUNCIL_SEAM_SINGER],
     });
     expect(raid.bosses.at(-1)?.rank).toBe('final');
+    // The next page standing is marked Next up; nothing else in the list is.
+    expect(raid.bosses.filter((b) => b.next).map((b) => b.key)).toEqual(['heart_breath_guardian']);
     const other = groups[0].instances[0];
+    expect(other.bosses.some((b) => b.next)).toBe(false);
     expect(other).toMatchObject({ expanded: false, current: false, holdsSelection: false });
     // A group with nothing visible is left out.
     expect(
@@ -215,6 +218,27 @@ describe('journal navigation', () => {
         (g) => g.kind,
       ),
     ).toEqual(['dungeon']);
+  });
+
+  it('marks no Next up while a pull is engaged, and none once every page is down', () => {
+    const nav = (progress: JournalProgress) =>
+      buildJournalNav(JOURNAL_INSTANCES, null, new Set(), progress, SMITH_HEART_DUNGEON)
+        .find((g) => g.kind === 'raid')
+        ?.instances.find((i) => i.id === SMITH_HEART_DUNGEON);
+    const engaged = nav(heartRun({ [HEAT_GUARDIAN]: { engaged: true } }));
+    expect(engaged?.bosses.some((b) => b.next)).toBe(false);
+    expect(engaged?.bosses.find((b) => b.key === HEAT_GUARDIAN)?.engaged).toBe(true);
+    const all = Object.fromEntries(
+      [
+        COUNCIL_GUARDIAN,
+        COUNCIL_SEAM_SINGER,
+        'heart_breath_guardian',
+        'heart_quench_guardian',
+        HEAT_GUARDIAN,
+        'heart_masterless_strength',
+      ].map((id) => [id, { defeated: true }]),
+    );
+    expect(nav(heartRun(all))?.bosses.some((b) => b.next)).toBe(false);
   });
 });
 

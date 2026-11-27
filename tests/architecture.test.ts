@@ -463,6 +463,8 @@ const UI_PURE_CORES = [
   // The Adventure Journal's navigation and loot models (hud/journal/).
   'src/ui/hud/journal/journal_nav_view.ts',
   'src/ui/hud/journal/journal_loot_view.ts',
+  // The journal page furniture: phase pills, fact chips, list status.
+  'src/ui/hud/journal/journal_banner_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',

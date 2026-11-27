@@ -7,6 +7,7 @@
 
 import type { DungeonDifficulty } from '../../../sim/types';
 import type { JournalDifficulty, JournalRank } from '../../boss_journal/journal_view';
+import type { TranslationKey } from '../../i18n';
 import type { JournalInstance, JournalInstanceKind, JournalTier } from './journal_catalog';
 import { journalPageBodies } from './journal_catalog';
 
@@ -119,11 +120,16 @@ export interface JournalNavBoss {
   mobId: string;
   /** Every body the page covers (two for a council). */
   members: readonly string[];
+  /** The page's own short title, when it has one. */
+  nameKey?: TranslationKey;
   portraitUrl: string;
   rank: JournalRank;
   selected: boolean;
   defeated: boolean;
   engaged: boolean;
+  /** The next page standing in the run the player is in (none while a pull
+   *  is engaged, and none outside the run's instance). */
+  next: boolean;
 }
 
 export interface JournalNavInstance {
@@ -162,18 +168,28 @@ export function buildJournalNav(
     const rows: JournalNavInstance[] = instances
       .filter((instance) => instance.kind === kind)
       .map((instance) => {
-        const bosses = instance.source.bossKeys.map((key): JournalNavBoss => {
+        const own = progress && progress.dungeonId === instance.id ? progress : null;
+        const states = instance.source.bossKeys.map((key) =>
+          journalPageState(instance, key, progress),
+        );
+        const nextKey =
+          own && !states.some((state) => state.engaged)
+            ? journalLandingBoss(instance, own, null)
+            : null;
+        const bosses = instance.source.bossKeys.map((key, index): JournalNavBoss => {
           const view = instance.source.view(key, 'normal');
-          const state = journalPageState(instance, key, progress);
+          const state = states[index];
           return {
             key,
             mobId: view.mobId,
             members: view.members ?? [view.mobId],
+            ...(view.nameKey ? { nameKey: view.nameKey } : {}),
             portraitUrl: view.portraitUrl,
             rank: view.rank ?? 'boss',
             selected: selection?.instanceId === instance.id && selection.bossKey === key,
             defeated: state.defeated,
             engaged: state.engaged,
+            next: key === nextKey && !state.defeated,
           };
         });
         return {

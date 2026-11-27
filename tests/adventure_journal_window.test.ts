@@ -23,7 +23,8 @@ import {
   type JournalWorld,
 } from '../src/ui/hud/journal/adventure_journal_window';
 import { journalInstance } from '../src/ui/hud/journal/journal_catalog';
-import { setLanguage } from '../src/ui/i18n';
+import { pageValues } from '../src/ui/hud/journal/journal_page_html';
+import { setLanguage, t } from '../src/ui/i18n';
 import { RaidBossGuideModelController } from '../src/ui/raid_boss_guide_model_controller';
 import type { DungeonRunView, RaidRunView } from '../src/world_api/dungeons';
 
@@ -199,16 +200,20 @@ describe('AdventureJournalWindow', () => {
         );
       });
     expect(changed, 'a mechanic whose damage moves with the tier').toBeTruthy();
-    const text = (id: string) =>
-      root.querySelector(`[data-ability="${id}"] .rbg-ability-summary`)?.textContent ?? '';
     const id = changed?.id ?? '';
-    const normalText = text(id);
-    expect(normalText).toContain(String(changed?.values?.min));
+    // The full text and its fact chips live in the opened row.
+    const text = () => {
+      root.querySelector<HTMLButtonElement>(`[data-mechanic="${id}"]`)?.click();
+      return root.querySelector(`[data-detail="${id}"]`)?.textContent ?? '';
+    };
+    const normalText = text();
+    expect(normalText.replace(/,/g, '')).toContain(String(changed?.values?.min));
     root.querySelector<HTMLButtonElement>('.rbg-segmented [data-difficulty="heroic"]')?.click();
     const heroicMin = heroic.phases.flatMap((p) => p.mechanics).find((m) => m.id === id)
       ?.values?.min;
-    expect(text(id)).not.toBe(normalText);
-    expect(text(id).replace(/,/g, '')).toContain(String(heroicMin));
+    const heroicText = text();
+    expect(heroicText).not.toBe(normalText);
+    expect(heroicText.replace(/,/g, '')).toContain(String(heroicMin));
   });
 
   it('collapses phases and expands abilities, with the role tags on each line', () => {
@@ -221,8 +226,23 @@ describe('AdventureJournalWindow', () => {
     expect(root.querySelector(`[data-mechanic="${id}"]`)?.getAttribute('aria-expanded')).toBe(
       'true',
     );
-    expect(root.querySelector(`[data-detail="${id}"]`)?.textContent).toContain('What to do:');
-    expect(root.querySelectorAll('.rbg-badge-role').length).toBeGreaterThan(0);
+    // The row says what to do; opening it adds the full text and the facts.
+    const mechanic = journalInstance(SMITH_HEART_DUNGEON)!
+      .source.view(HEAT_GUARDIAN, 'normal')
+      .phases.flatMap((p) => p.mechanics)
+      .find((m) => m.id === id)!;
+    expect(root.querySelector(`[data-ability="${id}"] .aj-ab-do`)?.textContent).toBe(
+      t(mechanic.responseKey, pageValues(journalInstance(SMITH_HEART_DUNGEON)!, mechanic.values)),
+    );
+    expect(root.querySelector(`[data-detail="${id}"] p`)?.textContent).toBe(
+      t(mechanic.summaryKey, pageValues(journalInstance(SMITH_HEART_DUNGEON)!, mechanic.values)),
+    );
+    expect(root.querySelector(`[data-detail="${id}"] .aj-fact`)).not.toBeNull();
+    expect(root.querySelectorAll('.aj-role-tag').length).toBeGreaterThan(0);
+    // Every Ignazhar phase header carries its health pill.
+    expect(root.querySelector('[data-phase="phase-one"] .aj-phase-range')?.textContent).toBe(
+      '100% to 70%',
+    );
     root.querySelector<HTMLButtonElement>('[data-phase-toggle]')?.click();
     expect(root.querySelector('[data-phase-toggle]')?.getAttribute('aria-expanded')).toBe('false');
   });
@@ -304,6 +324,55 @@ describe('AdventureJournalWindow', () => {
     expect(
       root.querySelector('[data-instance="gravewyrm_sanctum"]')?.getAttribute('aria-expanded'),
     ).toBe('false');
+  });
+
+  it('paints the banner with its summary, stat chips and the Mythic note', () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    expect(root.querySelector('.aj-kicker')?.textContent).toContain(
+      "The Smith's Heart, boss 4 of 5",
+    );
+    expect(root.querySelector('#aj-boss-name')?.textContent).toBe('Ignazhar, the Unquenchable');
+    expect(root.querySelector('.aj-tagline')?.textContent).toContain('First Wellspring');
+    expect(root.querySelectorAll('.aj-stat-chip')).toHaveLength(3);
+    expect(root.querySelector('.aj-soon-note')?.textContent).toBe('Mythic: coming soon');
+    root.querySelector<HTMLButtonElement>('.rbg-segmented [data-difficulty="heroic"]')?.click();
+    // Heroic adds the hard enrage chip.
+    expect(root.querySelectorAll('.aj-stat-chip')).toHaveLength(4);
+  });
+
+  it('marks the list with Defeated, Next up and Final boss from the run', () => {
+    world.player.pos.x = xOf(SMITH_HEART_DUNGEON);
+    world.raidRun = raidRun(null, [COUNCIL_GUARDIAN, COUNCIL_SEAM_SINGER]);
+    journal.toggle();
+    const status = (key: string) =>
+      root.querySelector(`.aj-nav [data-boss="${key}"] .aj-boss-status`)?.textContent;
+    expect(status(COUNCIL_GUARDIAN)).toBe('Defeated');
+    expect(status('heart_breath_guardian')).toBe('Next up');
+    expect(status('heart_masterless_strength')).toBe('Final boss');
+    expect(status('heart_quench_guardian')).toBeUndefined();
+  });
+
+  it('keeps the 3D model on the Overview, reached from the banner portrait', () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    expect(root.querySelector('[data-model-slot]')).toBeNull();
+    root.querySelector<HTMLButtonElement>('[data-show-model]')?.click();
+    expect(root.querySelector('.aj-tab.active')?.getAttribute('data-tab')).toBe('overview');
+    expect(root.querySelector('.aj-about [data-model-slot]')).not.toBeNull();
+    // Mythic has no page to show it on, so the portrait offers no 3D button.
+    root.querySelector<HTMLButtonElement>('.rbg-segmented [data-difficulty="mythic"]')?.click();
+    expect(root.querySelector('[data-show-model]')).toBeNull();
+  });
+
+  it("steps between the instance's bosses from the phone's portrait strip", () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    const strip = [...root.querySelectorAll<HTMLButtonElement>('.aj-strip-boss')];
+    expect(strip).toHaveLength(5);
+    expect(strip.filter((b) => b.classList.contains('active')).map((b) => b.dataset.boss)).toEqual([
+      HEAT_GUARDIAN,
+    ]);
+    expect(root.querySelector('.aj-crumb')?.textContent).toBe("Raids / The Smith's Heart");
+    strip[0].click();
+    expect(selected()).toBe(COUNCIL_GUARDIAN);
   });
 
   it('opens and closes the phone drawer with Browse, and picking a boss closes it', () => {

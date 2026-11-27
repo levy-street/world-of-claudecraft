@@ -28,6 +28,12 @@ book beside the target frame and the Dungeon Finder's boss list.
 - English only, in `src/ui/i18n.catalog/boss_journal.ts` (`bossJournal.<dungeon>.<boss>.*`),
   written per `docs/design/tooltip-writing.md`: action first, resolved numbers, every limit.
   A new wordy value also needs its five non-Latin fills (M16) in the same change.
+- Optional banner content on a boss: `taglineKey` (the one-line summary; without it the
+  banner shows the overview), `chips` (stat chips, values print bold, `availability:
+  'heroic'` for a Heroic-only chip), `nameKey` (a council's short title). A phase may set
+  `health` (its pill: `'whole'`, `{ from, to }` with `to: 0` for the end, or `{ at }`)
+  and `rangeOnly` when its summary only restates the band. Write them from the live
+  mechanics, numbers from the tuning (`tests/adventure_journal_banner.test.ts`).
 - Each mechanic `iconId` needs an explicit recipe in `src/ui/icons.ts` (`dgn_<dungeon>_*`).
 - `tests/boss_journal_view.test.ts` runs over EVERY registered journal (finder bosses present
   and in order, every key resolves with no placeholder left, cast names, kicks, heroic marks,

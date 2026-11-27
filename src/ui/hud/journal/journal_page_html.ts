@@ -1,11 +1,14 @@
-// Markup for the Adventure Journal (strings only, never DOM): the navigation
-// list, the boss page header, the difficulty and section tabs, the Overview
-// (Strategy by role), Abilities (collapsible phases and mechanics) and Loot
-// sections, and Mythic's Coming soon panel. Every label is a t() key, every
-// number goes through the locale formatters, every interpolation through
-// esc(). The window (adventure_journal_window.ts) owns the state, the DOM, the
-// events and the focus; the dungeon-only sections it shares with the old
-// guide come from boss_journal/journal_sections.ts.
+// Markup for the Adventure Journal (strings only, never DOM): the instance
+// list, the phone's breadcrumb and boss strip, the boss banner (portrait,
+// "raid, boss N of M", the one-line summary and stat chips, the difficulty
+// selector), the underline section tabs, the Overview (the encounter and its
+// 3D model, Strategy by role), the Abilities (phase headers with their health
+// pill, one row per ability that opens on its full text and fact chips), the
+// Loot and Mythic's Coming soon panel. Every label is a t() key, every number
+// goes through the locale formatters, every interpolation through esc(). The
+// window (adventure_journal_window.ts) owns the state, the DOM, the events and
+// the focus; the decisions (pill shape, fact chips, list status) are the pure
+// core's (journal_banner_view.ts).
 
 import { ITEMS } from '../../../sim/data';
 import type { ItemDef } from '../../../sim/types';
@@ -16,10 +19,10 @@ import {
   heroicNotesHtml,
   markChipsHtml,
   markLabels,
-  rankLabel,
 } from '../../boss_journal/journal_sections';
 import type {
   JournalBossView,
+  JournalChip,
   JournalFlag,
   JournalMechanic,
   JournalPhase,
@@ -35,21 +38,48 @@ import {
   type InterpolationValues,
   type TranslationKey,
   t,
-  tPlural,
 } from '../../i18n';
 import { iconDataUrl, QUALITY_COLOR } from '../../icons';
 import { targetPortraitUrl } from '../../target_portrait_view';
 import { svgIcon, type UiIconName } from '../../ui_icons';
 import { sourceQualifierBits } from '../loot_explorer';
+import {
+  englishTemplate,
+  type JournalDamageSchool,
+  type JournalNavStatus,
+  journalMechanicFacts,
+  journalNavStatus,
+  journalRangeLabel,
+} from './journal_banner_view';
 import type { JournalInstance, JournalTier } from './journal_catalog';
 import type { JournalLootRow } from './journal_loot_view';
-import type { JournalNavGroup, JournalPageState, JournalTab } from './journal_nav_view';
+import type {
+  JournalNavBoss,
+  JournalNavGroup,
+  JournalNavInstance,
+  JournalPageState,
+  JournalTab,
+} from './journal_nav_view';
 
-const ROLE_PRESENTATION: Readonly<Record<JournalRole, [TranslationKey, UiIconName]>> = {
+// Small line glyphs drawn for this window (a chevron, a back arrow, the people
+// of an everyone tag, a clock and a flame for the fact chips). Decorative:
+// every control that carries one has its own accessible name.
+const GLYPH_CHEVRON =
+  '<svg class="aj-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const GLYPH_BACK =
+  '<svg class="aj-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const GLYPH_PEOPLE =
+  '<svg class="aj-glyph" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="7" cy="6.5" r="2.8" fill="currentColor"/><circle cx="13.5" cy="7.5" r="2.3" fill="currentColor"/><path d="M1.8 16c.4-3 2.5-4.8 5.2-4.8s4.8 1.8 5.2 4.8zM12.6 16c-.2-1.6-.8-2.9-1.7-3.8.8-.5 1.6-.7 2.6-.7 2.2 0 3.9 1.5 4.3 4.5z" fill="currentColor"/></svg>';
+const GLYPH_CLOCK =
+  '<svg class="aj-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.8V8l2.2 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const GLYPH_FLAME =
+  '<svg class="aj-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8.6 1.5c.4 2.2-.6 3.4-1.7 4.6C5.7 7.4 4.5 8.7 4.5 10.6A3.5 3.5 0 008 14.5a3.5 3.5 0 003.5-3.6c0-1.5-.7-2.4-1.3-3.2-.1 1-.6 1.7-1.3 2 .4-2.4-.1-5.6-.3-8.2z" fill="currentColor"/></svg>';
+
+const ROLE_PRESENTATION: Readonly<Record<JournalRole, [TranslationKey, UiIconName | null]>> = {
   tank: ['hudChrome.raidBossGuide.roleTank', 'tank'],
   healer: ['hudChrome.raidBossGuide.roleHealer', 'healer'],
   damage: ['hudChrome.raidBossGuide.roleDamage', 'attack'],
-  all: ['hudChrome.raidBossGuide.roleAll', 'target'],
+  all: ['hudChrome.adventureJournal.roleEveryone', null],
 };
 
 const FLAG_PRESENTATION: Readonly<Record<JournalFlag, [TranslationKey, UiIconName]>> = {
@@ -58,6 +88,10 @@ const FLAG_PRESENTATION: Readonly<Record<JournalFlag, [TranslationKey, UiIconNam
   important: ['hudChrome.raidBossGuide.flagImportant', 'alert'],
   cleansable: ['hudChrome.raidBossGuide.flagCleansable', 'check'],
 };
+
+/** The flags a row marks beside the name. Important is on most lines and says
+ *  nothing a reader acts on, so it stays in the accessible label only. */
+const SHOWN_FLAGS: readonly JournalFlag[] = ['deadly', 'interruptible', 'cleansable'];
 
 const STRATEGY_ROLES: readonly JournalTipRole[] = ['tank', 'healer', 'damage'];
 
@@ -73,6 +107,15 @@ const TAB_KEYS: Readonly<Record<JournalTab, TranslationKey>> = {
   loot: 'hudChrome.adventureJournal.tabLoot',
 };
 
+const SCHOOL_KEYS: Readonly<Record<JournalDamageSchool, TranslationKey>> = {
+  arcane: 'hudChrome.adventureJournal.factDamageArcane',
+  fire: 'hudChrome.adventureJournal.factDamageFire',
+  frost: 'hudChrome.adventureJournal.factDamageFrost',
+  nature: 'hudChrome.adventureJournal.factDamageNature',
+  physical: 'hudChrome.adventureJournal.factDamagePhysical',
+  shadow: 'hudChrome.adventureJournal.factDamageShadow',
+};
+
 export function tierName(tier: JournalTier): string {
   return t(TIER_KEYS[tier]);
 }
@@ -85,9 +128,10 @@ export function instanceName(id: string): string {
   return tEntity({ kind: 'dungeon', id, field: 'name' });
 }
 
-/** A page's display name: a council names every member. */
-export function pageName(members: readonly string[]): string {
-  return formatList(members.map(mobName));
+/** A page's display name: its own short title (a council's), else every
+ *  body's name. */
+export function pageName(members: readonly string[], nameKey?: TranslationKey): string {
+  return nameKey ? t(nameKey) : formatList(members.map(mobName));
 }
 
 /** Placeholder values formatted the way the page's source authored them: the
@@ -111,12 +155,88 @@ export function pageValues(
   );
 }
 
+const percent = (value: number): string =>
+  formatNumber(value, { style: 'percent', maximumFractionDigits: 0 });
+
+/** A translated line whose placeholder values print bold. The values are
+ *  marked with private-use characters (no catalog string carries them)
+ *  before translation and the whole line is escaped afterwards, so neither
+ *  the template nor a value can inject markup. */
+export function boldValuesHtml(
+  key: TranslationKey,
+  values: InterpolationValues | undefined,
+): string {
+  if (!values) return esc(t(key));
+  const names = Object.keys(values);
+  const marked = Object.fromEntries(names.map((name, i) => [name, `${i}`]));
+  return esc(t(key, marked)).replace(
+    /(\d+)/g,
+    (_, i: string) => `<b>${esc(String(values[names[Number(i)]] ?? ''))}</b>`,
+  );
+}
+
+// ---- the window head -------------------------------------------------------------
+
+export function headHtml(instance: JournalInstance): string {
+  return `<div class="aj-head panel-title"><span class="aj-title-sigil" aria-hidden="true">${svgIcon(
+    'journal',
+  )}</span><span id="aj-title">${esc(t('hudChrome.adventureJournal.title'))}</span><span class="aj-head-crumb">${esc(
+    instanceName(instance.id),
+  )}</span><button type="button" class="x-btn aj-close" data-close data-focus-key="close" aria-label="${esc(
+    t('hudChrome.adventureJournal.close'),
+  )}">${svgIcon('close')}</button></div>`;
+}
+
 // ---- navigation -----------------------------------------------------------------
 
 const GROUP_KEYS: Readonly<Record<'dungeon' | 'raid', TranslationKey>> = {
   dungeon: 'hudChrome.adventureJournal.groupDungeons',
   raid: 'hudChrome.adventureJournal.groupRaids',
 };
+
+/** The words under a boss in the list (null when there is nothing to say). */
+export function navStatusText(status: JournalNavStatus): string | null {
+  switch (status) {
+    case 'engaged':
+      return t('hudChrome.adventureJournal.inCombat');
+    case 'defeated':
+      return t('hudChrome.raidBossGuide.defeated');
+    case 'next':
+      return t('hudChrome.adventureJournal.statusNext');
+    case 'final':
+      return t('hudChrome.raidBossGuide.rankFinal');
+    case 'miniboss':
+      return t('hudChrome.raidBossGuide.rankMiniboss');
+    default:
+      return null;
+  }
+}
+
+function navBossHtml(instance: JournalNavInstance, boss: JournalNavBoss): string {
+  const bossName = pageName(boss.members, boss.nameKey);
+  const status = journalNavStatus(boss);
+  const statusText = navStatusText(status);
+  const label = formatList([bossName, statusText].filter((part): part is string => !!part));
+  const mark =
+    status === 'defeated' ? svgIcon('check') : status === 'engaged' ? svgIcon('attack') : '';
+  return `<li><button type="button" class="aj-boss${boss.selected ? ' active' : ''}${
+    boss.defeated ? ' defeated' : ''
+  }${boss.engaged ? ' engaged' : ''}${boss.next ? ' next' : ''}" data-nav-item data-boss="${esc(
+    boss.key,
+  )}" data-boss-instance="${esc(instance.id)}" ${FOCUS_KEY_ATTR}="boss:${esc(instance.id)}:${esc(
+    boss.key,
+  )}"${boss.selected ? ' aria-current="page"' : ''} aria-label="${esc(
+    label,
+  )}"><span class="aj-boss-portrait"><img src="${esc(
+    boss.portraitUrl,
+  )}" alt="" aria-hidden="true"></span><span class="aj-boss-text"><span class="aj-boss-name">${esc(
+    bossName,
+  )}</span>${
+    statusText
+      ? `<span class="aj-boss-status aj-status-${status}">${mark}<span>${esc(statusText)}</span></span>`
+      : ''
+  }</span></button></li>`;
+}
 
 export function navHtml(groups: readonly JournalNavGroup[]): string {
   return `<nav class="aj-nav" id="aj-nav" aria-label="${esc(t('hudChrome.adventureJournal.navLabel'))}">${groups
@@ -128,50 +248,31 @@ export function navHtml(groups: readonly JournalNavGroup[]): string {
         .map((instance) => {
           const name = instanceName(instance.id);
           const listId = `aj-bosses-${instance.id}`;
-          const progress = t('hudChrome.adventureJournal.bossProgress', {
-            defeated: formatNumber(instance.defeatedCount),
-            total: formatNumber(instance.bosses.length),
-          });
-          const meta = [
-            instance.current ? t('hudChrome.adventureJournal.youAreHere') : null,
-            instance.defeatedCount > 0 ? progress : null,
-          ].filter((part): part is string => part !== null);
-          const toggleLabel = t(
-            instance.expanded
-              ? 'hudChrome.adventureJournal.collapseInstance'
-              : 'hudChrome.adventureJournal.expandInstance',
-            { instance: name },
+          const total = formatNumber(instance.bosses.length);
+          const defeated = formatNumber(instance.defeatedCount);
+          const toggleLabel = formatList(
+            [
+              t(
+                instance.expanded
+                  ? 'hudChrome.adventureJournal.collapseInstance'
+                  : 'hudChrome.adventureJournal.expandInstance',
+                { instance: name },
+              ),
+              instance.current ? t('hudChrome.adventureJournal.youAreHere') : null,
+              instance.defeatedCount > 0
+                ? t('hudChrome.adventureJournal.bossProgress', { defeated, total })
+                : null,
+            ].filter((part): part is string => part !== null),
           );
+          const count =
+            instance.defeatedCount > 0
+              ? `<span class="aj-instance-count" aria-hidden="true">${esc(
+                  t('hudChrome.adventureJournal.bossCount', { defeated, total }),
+                )}</span>`
+              : '';
           const bosses = instance.expanded
             ? `<ul class="aj-boss-list" id="${esc(listId)}">${instance.bosses
-                .map((boss) => {
-                  const bossName = pageName(boss.members);
-                  const rank = rankLabel(boss.rank);
-                  const status = boss.engaged
-                    ? t('hudChrome.adventureJournal.inCombat')
-                    : boss.defeated
-                      ? t('hudChrome.raidBossGuide.defeated')
-                      : null;
-                  const label = formatList(
-                    [bossName, rank, status].filter((part): part is string => !!part),
-                  );
-                  const statusIcon = boss.engaged
-                    ? `<span class="aj-boss-status aj-boss-status-engaged">${svgIcon('attack')}</span>`
-                    : boss.defeated
-                      ? `<span class="aj-boss-status aj-boss-status-defeated">${svgIcon('check')}</span>`
-                      : '';
-                  return `<li><button type="button" class="aj-boss${boss.selected ? ' active' : ''}${
-                    boss.defeated ? ' defeated' : ''
-                  }${boss.engaged ? ' engaged' : ''}" data-nav-item data-boss="${esc(boss.key)}" data-boss-instance="${esc(
-                    instance.id,
-                  )}" ${FOCUS_KEY_ATTR}="boss:${esc(instance.id)}:${esc(boss.key)}"${
-                    boss.selected ? ' aria-current="page"' : ''
-                  } aria-label="${esc(label)}"><span class="aj-boss-portrait${
-                    boss.members.length > 1 ? ' aj-boss-portrait-council' : ''
-                  }"><img src="${esc(boss.portraitUrl)}" alt="" aria-hidden="true"></span><span class="aj-boss-text"><span class="aj-boss-name">${esc(
-                    bossName,
-                  )}</span>${rank ? `<span class="aj-boss-rank">${esc(rank)}</span>` : ''}</span>${statusIcon}</button></li>`;
-                })
+                .map((boss) => navBossHtml(instance, boss))
                 .join('')}</ul>`
             : '';
           return `<div class="aj-instance${instance.expanded ? ' expanded' : ''}${
@@ -180,24 +281,54 @@ export function navHtml(groups: readonly JournalNavGroup[]): string {
             instance.id,
           )}" ${FOCUS_KEY_ATTR}="instance:${esc(instance.id)}" aria-expanded="${instance.expanded}"${
             instance.expanded ? ` aria-controls="${esc(listId)}"` : ''
-          } aria-label="${esc(toggleLabel)}"><span class="aj-chevron" aria-hidden="true">${svgIcon(
-            'next',
-          )}</span><span class="aj-instance-text"><span class="aj-instance-name">${esc(name)}</span>${
-            meta.length
-              ? `<span class="aj-instance-meta">${meta.map((m) => `<span>${esc(m)}</span>`).join('')}</span>`
-              : ''
-          }</span>${instance.current ? `<span class="aj-here-dot" aria-hidden="true"></span>` : ''}</button>${bosses}</div>`;
+          } aria-label="${esc(toggleLabel)}"><span class="aj-chevron" aria-hidden="true">${GLYPH_CHEVRON}</span><span class="aj-instance-name">${esc(
+            name,
+          )}</span>${instance.current ? '<span class="aj-here-dot" aria-hidden="true"></span>' : ''}${count}</button>${bosses}</div>`;
         })
         .join('')}</section>`;
     })
     .join('')}</nav>`;
 }
 
-// ---- the page header ------------------------------------------------------------
+/** The phone's top of page: a breadcrumb that opens the instance list, and a
+ *  row of the open instance's boss portraits. */
+export function mobileTopHtml(groups: readonly JournalNavGroup[], navOpen: boolean): string {
+  const group = groups.find((entry) => entry.instances.some((i) => i.holdsSelection));
+  const instance = group?.instances.find((entry) => entry.holdsSelection);
+  if (!group || !instance) return '';
+  const crumb = boldValuesHtml('hudChrome.adventureJournal.mobileCrumb', {
+    group: t(GROUP_KEYS[group.kind]),
+    instance: instanceName(instance.id),
+  });
+  const strip = instance.bosses
+    .map((boss) => {
+      const status = navStatusText(journalNavStatus(boss));
+      const label = formatList(
+        [
+          t('hudChrome.raidBossGuide.browseBoss', { boss: pageName(boss.members, boss.nameKey) }),
+          status,
+        ].filter((part): part is string => !!part),
+      );
+      return `<button type="button" class="aj-strip-boss${boss.selected ? ' active' : ''}${
+        boss.defeated ? ' defeated' : ''
+      }${boss.engaged ? ' engaged' : ''}" data-boss="${esc(boss.key)}" data-boss-instance="${esc(
+        instance.id,
+      )}" ${FOCUS_KEY_ATTR}="strip:${esc(instance.id)}:${esc(boss.key)}"${
+        boss.selected ? ' aria-current="page"' : ''
+      } aria-label="${esc(label)}"><img src="${esc(boss.portraitUrl)}" alt="" aria-hidden="true"></button>`;
+    })
+    .join('');
+  return `<div class="aj-mobile-top"><button type="button" class="aj-crumb" data-browse data-focus-key="browse" aria-expanded="${navOpen}" aria-controls="aj-nav" aria-label="${esc(
+    t('hudChrome.adventureJournal.openList'),
+  )}">${GLYPH_BACK}<span>${crumb}</span></button><div class="aj-strip">${strip}</div></div>`;
+}
+
+// ---- the boss banner ------------------------------------------------------------
 
 export interface JournalStepTarget {
   key: string;
   members: readonly string[];
+  nameKey?: TranslationKey;
 }
 
 export function stepButtonHtml(step: -1 | 1, target: JournalStepTarget | null): string {
@@ -207,9 +338,7 @@ export function stepButtonHtml(step: -1 | 1, target: JournalStepTarget | null): 
         step < 0
           ? 'hudChrome.adventureJournal.previousBoss'
           : 'hudChrome.adventureJournal.nextBoss',
-        {
-          boss: pageName(target.members),
-        },
+        { boss: pageName(target.members, target.nameKey) },
       )
     : t(
         step < 0
@@ -221,59 +350,16 @@ export function stepButtonHtml(step: -1 | 1, target: JournalStepTarget | null): 
   )}" title="${esc(label)}"${target ? '' : ' disabled'}>${svgIcon(icon)}</button>`;
 }
 
-export interface JournalHeroInput {
+export interface JournalBannerInput {
   instance: JournalInstance;
   members: readonly string[];
   view: JournalBossView;
-  overviewView: JournalBossView;
   state: JournalPageState;
   index: number;
   total: number;
-  prev: JournalStepTarget | null;
-  next: JournalStepTarget | null;
-}
-
-export function heroHtml(input: JournalHeroInput): string {
-  const { instance, members, view, overviewView, state } = input;
-  const kind = t(
-    instance.kind === 'raid'
-      ? 'hudChrome.adventureJournal.kindRaid'
-      : 'hudChrome.adventureJournal.kindDungeon',
-  );
-  const kicker = t('hudChrome.adventureJournal.pageKicker', {
-    instance: instanceName(instance.id),
-    kind,
-    index: formatNumber(input.index + 1),
-    total: formatNumber(input.total),
-  });
-  const rank = rankLabel(view.rank);
-  const status = state.engaged
-    ? `<span class="aj-chip aj-chip-engaged">${svgIcon('attack')}${esc(t('hudChrome.adventureJournal.inCombat'))}</span>`
-    : state.defeated
-      ? `<span class="aj-chip aj-chip-defeated">${svgIcon('check')}${esc(t('hudChrome.raidBossGuide.defeated'))}</span>`
-      : '';
-  const overview = t(
-    overviewView.overviewKey,
-    pageValues(instance, overviewView.overviewValues, overviewView.overviewPercentValues),
-  );
-  const council =
-    members.length > 1
-      ? `<ul class="aj-council" aria-label="${esc(t('hudChrome.adventureJournal.councilMembers'))}">${members
-          .map((mobId) => {
-            const portrait = mobPortrait(mobId, view);
-            return `<li class="aj-council-member"><img src="${esc(portrait)}" alt="" aria-hidden="true"><span>${esc(
-              mobName(mobId),
-            )}</span></li>`;
-          })
-          .join('')}</ul>`
-      : '';
-  return `<div class="aj-page-head">${stepButtonHtml(-1, input.prev)}<div class="aj-page-kicker">${esc(
-    kicker,
-  )}</div>${stepButtonHtml(1, input.next)}</div><div class="rbg-hero aj-hero"><div class="rbg-model-slot" data-model-slot></div><div class="rbg-overview"><h2 id="aj-boss-name">${esc(
-    pageName(members),
-  )}</h2><div class="aj-hero-chips">${rank ? `<span class="rbg-rank rbg-rank-${esc(view.rank ?? '')}">${esc(rank)}</span>` : ''}${status}</div>${council}<p>${esc(
-    overview,
-  )}</p></div></div>`;
+  tier: JournalTier;
+  /** The tier has a page to open the 3D model on (not Mythic's panel). */
+  modelButton: boolean;
 }
 
 /** A council member's portrait: the page's own art for its lead body, else
@@ -283,34 +369,104 @@ function mobPortrait(mobId: string, view: JournalBossView): string {
   return targetPortraitUrl(mobId, true) ?? view.portraitUrl;
 }
 
+function chipHtml(instance: JournalInstance, chip: JournalChip): string {
+  return `<li class="aj-stat-chip">${boldValuesHtml(
+    chip.key,
+    pageValues(instance, chip.values, chip.percentValues),
+  )}</li>`;
+}
+
+export function bannerHtml(input: JournalBannerInput): string {
+  const { instance, members, view, state } = input;
+  const kicker = t('hudChrome.adventureJournal.bannerKicker', {
+    instance: instanceName(instance.id),
+    index: formatNumber(input.index + 1),
+    total: formatNumber(input.total),
+  });
+  const status = state.engaged
+    ? `<span class="aj-chip-status aj-chip-engaged">${svgIcon('attack')}${esc(t('hudChrome.adventureJournal.inCombat'))}</span>`
+    : state.defeated
+      ? `<span class="aj-chip-status aj-chip-defeated">${svgIcon('check')}${esc(t('hudChrome.raidBossGuide.defeated'))}</span>`
+      : '';
+  const bossName = pageName(members, view.nameKey);
+  const portrait =
+    members.length > 1
+      ? `<ul class="aj-council" aria-label="${esc(t('hudChrome.adventureJournal.councilMembers'))}">${members
+          .map(
+            (mobId) =>
+              `<li class="aj-council-member" title="${esc(mobName(mobId))}"><img src="${esc(
+                mobPortrait(mobId, view),
+              )}" alt="${esc(mobName(mobId))}"></li>`,
+          )
+          .join('')}</ul>`
+      : `<div class="aj-portrait"><img src="${esc(view.portraitUrl)}" alt="" aria-hidden="true"></div>`;
+  const tagline = view.tagline
+    ? `<p class="aj-tagline">${esc(
+        t(view.tagline.key, pageValues(instance, view.tagline.values, view.tagline.percentValues)),
+      )}</p>`
+    : `<p class="aj-tagline aj-tagline-overview">${esc(
+        t(view.overviewKey, pageValues(instance, view.overviewValues, view.overviewPercentValues)),
+      )}</p>`;
+  const chips = view.chips?.length
+    ? `<ul class="aj-stat-chips">${view.chips.map((chip) => chipHtml(instance, chip)).join('')}</ul>`
+    : '';
+  const modelLabel = t('guide.viewer.view3d', { name: bossName });
+  const modelButton = input.modelButton
+    ? `<button type="button" class="aj-model-jump" data-show-model ${FOCUS_KEY_ATTR}="show-model" aria-label="${esc(
+        modelLabel,
+      )}" title="${esc(modelLabel)}">${svgIcon('eye')}</button>`
+    : '';
+  return `<header class="aj-banner"><div class="aj-portrait-wrap${members.length > 1 ? ' aj-portrait-wrap-council' : ''}">${portrait}${modelButton}</div><div class="aj-banner-text"><div class="aj-kicker"><span>${esc(
+    kicker,
+  )}</span>${status}</div><h2 class="aj-boss-title" id="aj-boss-name">${esc(bossName)}</h2>${tagline}${chips}</div>${difficultyHtml(
+    instance,
+    input.tier,
+  )}</header>`;
+}
+
 export function difficultyHtml(instance: JournalInstance, tier: JournalTier): string {
   const label = t('hudChrome.raidBossGuide.difficultyLabel');
-  return `<div class="rbg-difficulty aj-difficulty"><span>${esc(label)}</span><div class="rbg-segmented" role="group" aria-label="${esc(
+  const soon = instance.tiers.includes('mythic')
+    ? `<span class="aj-soon-note">${esc(t('hudChrome.adventureJournal.mythicSoon'))}</span>`
+    : '';
+  return `<div class="aj-diffbox"><div class="rbg-segmented aj-diff" role="group" aria-label="${esc(
     label,
   )}">${instance.tiers
     .map((entry) => {
       const selected = entry === tier;
       return `<button type="button" data-difficulty="${entry}" ${FOCUS_KEY_ATTR}="difficulty:${entry}" aria-pressed="${selected}" aria-label="${esc(
         t('hudChrome.raidBossGuide.chooseDifficulty', { difficulty: tierName(entry) }),
-      )}" class="${selected ? 'active' : ''}${entry === 'mythic' ? ' aj-tier-mythic' : ''}">${esc(
-        tierName(entry),
-      )}</button>`;
+      )}" class="${selected ? 'active' : ''}${entry === 'mythic' ? ' aj-tier-mythic' : ''}">${
+        entry === 'mythic' ? svgIcon('lock') : ''
+      }<span>${esc(tierName(entry))}</span></button>`;
     })
-    .join('')}</div></div>`;
+    .join('')}</div>${soon}</div>`;
 }
 
 export const SECTION_TAB_CLASS = 'aj-tab';
 export const SECTION_TAB_ACTIVE = 'active';
 
-export function sectionTabsHtml(tab: JournalTab, tabs: readonly JournalTab[]): string {
-  return `<div class="aj-tabs" role="tablist" aria-label="${esc(t('hudChrome.adventureJournal.sectionsLabel'))}">${tabs
-    .map((entry) => {
-      const selected = entry === tab;
-      return `<button type="button" class="${SECTION_TAB_CLASS}${selected ? ` ${SECTION_TAB_ACTIVE}` : ''}" role="tab" id="aj-tab-${entry}" data-tab="${entry}" ${FOCUS_KEY_ATTR}="tab:${entry}" aria-selected="${selected}" aria-controls="aj-panel" tabindex="${selected ? '0' : '-1'}">${esc(
-        t(TAB_KEYS[entry]),
-      )}</button>`;
-    })
-    .join('')}</div>`;
+/** The section tabs (absent on Mythic's panel) and the previous / next boss. */
+export function tabBarHtml(
+  tab: JournalTab,
+  tabs: readonly JournalTab[] | null,
+  prev: JournalStepTarget | null,
+  next: JournalStepTarget | null,
+): string {
+  const strip = tabs
+    ? `<div class="aj-tabs" role="tablist" aria-label="${esc(t('hudChrome.adventureJournal.sectionsLabel'))}">${tabs
+        .map((entry) => {
+          const selected = entry === tab;
+          return `<button type="button" class="${SECTION_TAB_CLASS}${selected ? ` ${SECTION_TAB_ACTIVE}` : ''}" role="tab" id="aj-tab-${entry}" data-tab="${entry}" ${FOCUS_KEY_ATTR}="tab:${entry}" aria-selected="${selected}" aria-controls="aj-panel" tabindex="${selected ? '0' : '-1'}">${esc(
+            t(TAB_KEYS[entry]),
+          )}</button>`;
+        })
+        .join('')}</div>`
+    : '<div class="aj-tabs-spacer"></div>';
+  return `<div class="aj-tabbar">${strip}<div class="aj-steps">${stepButtonHtml(-1, prev)}${stepButtonHtml(
+    1,
+    next,
+  )}</div></div>`;
 }
 
 // ---- Mythic ---------------------------------------------------------------------
@@ -326,13 +482,13 @@ export function comingSoonHtml(instance: JournalInstance): string {
     )
     .join('');
   return `<section class="aj-soon" aria-labelledby="aj-soon-title"><div class="aj-soon-sigil" aria-hidden="true">${svgIcon(
-    'journal',
+    'lock',
   )}</div><div class="aj-soon-kicker">${esc(tierName('mythic'))}</div><h3 id="aj-soon-title">${esc(
     t('hudChrome.adventureJournal.comingSoon'),
   )}</h3><p>${esc(t('hudChrome.adventureJournal.comingSoonBody'))}</p><div class="aj-soon-actions">${back}</div></section>`;
 }
 
-// ---- Overview: Strategy by role -------------------------------------------------
+// ---- Overview: the encounter, its model, Strategy by role -----------------------
 
 function roleMechanics(view: JournalBossView, role: JournalTipRole): JournalMechanic[] {
   const out: JournalMechanic[] = [];
@@ -345,9 +501,19 @@ function roleMechanics(view: JournalBossView, role: JournalTipRole): JournalMech
   return out;
 }
 
+function roleIcon(role: JournalRole): string {
+  const icon = ROLE_PRESENTATION[role][1];
+  return icon ? svgIcon(icon) : GLYPH_PEOPLE;
+}
+
 export function overviewHtml(instance: JournalInstance, view: JournalBossView): string {
+  const about = `<section class="aj-about" aria-labelledby="aj-about-title"><div class="aj-about-model" data-model-slot></div><div class="aj-about-text"><h3 class="aj-section-title" id="aj-about-title">${esc(
+    t('hudChrome.adventureJournal.aboutHeading'),
+  )}</h3><p>${esc(
+    t(view.overviewKey, pageValues(instance, view.overviewValues, view.overviewPercentValues)),
+  )}</p>${heroicNotesHtml(view.heroicNotes)}</div></section>`;
   const cards = STRATEGY_ROLES.map((role) => {
-    const [labelKey, icon] = ROLE_PRESENTATION[role];
+    const [labelKey] = ROLE_PRESENTATION[role];
     const tip = view.tips?.find((entry) => entry.role === role);
     const mechanics = roleMechanics(view, role);
     const watch = mechanics.length
@@ -374,38 +540,16 @@ export function overviewHtml(instance: JournalInstance, view: JournalBossView): 
       : mechanics.length
         ? ''
         : `<p class="aj-muted">${esc(t('hudChrome.adventureJournal.roleNothing'))}</p>`;
-    return `<article class="rbg-tip rbg-tip-${role} aj-role-card"><header><span class="rbg-badge rbg-badge-role rbg-badge-${role}" aria-hidden="true">${svgIcon(
-      icon,
-    )}</span><h3>${esc(t(labelKey))}</h3></header>${body}${watch}</article>`;
+    return `<article class="aj-role-card aj-role-card-${role}"><header><span class="aj-role-badge aj-role-${role}" aria-hidden="true">${roleIcon(
+      role,
+    )}</span><h4>${esc(t(labelKey))}</h4></header>${body}${watch}</article>`;
   }).join('');
-  return `${heroicNotesHtml(view.heroicNotes)}<section class="rbg-tips aj-strategy" aria-labelledby="aj-strategy-title"><div class="rbg-section-title" id="aj-strategy-title">${esc(
+  return `${about}<section class="aj-strategy" aria-labelledby="aj-strategy-title"><h3 class="aj-section-title" id="aj-strategy-title">${esc(
     t('hudChrome.adventureJournal.strategyHeading'),
-  )}</div><div class="rbg-tip-grid">${cards}</div></section>${choicesHtml(view.choices)}`;
+  )}</h3><div class="aj-role-grid">${cards}</div></section>${choicesHtml(view.choices)}`;
 }
 
 // ---- Abilities ------------------------------------------------------------------
-
-function badgeHtml(
-  kind: 'role' | 'flag',
-  id: string,
-  key: TranslationKey,
-  icon: UiIconName,
-): string {
-  const label = t(key);
-  return `<span class="rbg-badge rbg-badge-${kind} rbg-badge-${esc(id)}" title="${esc(label)}">${svgIcon(
-    icon,
-  )}<span>${esc(label)}</span></span>`;
-}
-
-function mechanicBadges(mechanic: JournalMechanic): string {
-  const roles = mechanic.roles
-    .map((role) => badgeHtml('role', role, ...ROLE_PRESENTATION[role]))
-    .join('');
-  const flags = mechanic.flags
-    .map((flag) => badgeHtml('flag', flag, ...FLAG_PRESENTATION[flag]))
-    .join('');
-  return `<span class="rbg-badges" aria-hidden="true"><span class="rbg-role-badges">${roles}</span><span class="rbg-flag-badges">${flags}</span></span>`;
-}
 
 export function mechanicTagLabels(mechanic: JournalMechanic): string[] {
   return [
@@ -415,15 +559,62 @@ export function mechanicTagLabels(mechanic: JournalMechanic): string[] {
   ];
 }
 
+function roleTagsHtml(mechanic: JournalMechanic): string {
+  return mechanic.roles
+    .map(
+      (role) =>
+        `<span class="aj-role-tag aj-role-${role}">${roleIcon(role)}<span>${esc(
+          t(ROLE_PRESENTATION[role][0]),
+        )}</span></span>`,
+    )
+    .join('');
+}
+
+function flagTagsHtml(mechanic: JournalMechanic): string {
+  return SHOWN_FLAGS.filter((flag) => mechanic.flags.includes(flag))
+    .map((flag) => {
+      const [key, icon] = FLAG_PRESENTATION[flag];
+      return `<span class="aj-flag aj-flag-${flag}">${svgIcon(icon)}<span>${esc(t(key))}</span></span>`;
+    })
+    .join('');
+}
+
+/** An opened ability's fact chips: its hit at this tier and its timer. */
+export function factsHtml(mechanic: JournalMechanic): string {
+  const facts = journalMechanicFacts(englishTemplate(mechanic.summaryKey), mechanic.values);
+  const parts: string[] = [];
+  if (facts.damage) {
+    const range = {
+      min: formatNumber(facts.damage.min, { maximumFractionDigits: 1 }),
+      max: formatNumber(facts.damage.max, { maximumFractionDigits: 1 }),
+    };
+    const key = facts.damage.school
+      ? SCHOOL_KEYS[facts.damage.school]
+      : 'hudChrome.adventureJournal.factDamage';
+    parts.push(`<span class="aj-fact">${GLYPH_FLAME}<span>${esc(t(key, range))}</span></span>`);
+  }
+  if (facts.every !== null) {
+    parts.push(
+      `<span class="aj-fact">${GLYPH_CLOCK}<span>${esc(
+        t('hudChrome.adventureJournal.factEvery', {
+          seconds: formatNumber(facts.every, { maximumFractionDigits: 1 }),
+        }),
+      )}</span></span>`,
+    );
+  }
+  return parts.length ? `<div class="aj-facts">${parts.join('')}</div>` : '';
+}
+
 function mechanicHtml(
   instance: JournalInstance,
   mechanic: JournalMechanic,
   expanded: boolean,
+  tier: JournalTier,
 ): string {
   const values = pageValues(instance, mechanic.values, mechanic.percentValues);
   const name = t(mechanic.nameKey, values);
   const detailId = `aj-detail-${mechanic.id}`;
-  const summaryId = `aj-summary-${mechanic.id}`;
+  const doId = `aj-do-${mechanic.id}`;
   const action = t(
     expanded ? 'hudChrome.raidBossGuide.collapseAbility' : 'hudChrome.raidBossGuide.expandAbility',
     { ability: name },
@@ -432,32 +623,53 @@ function mechanicHtml(
   const accessible = tags.length
     ? t('hudChrome.raidBossGuide.abilityControlLabel', { action, details: formatList(tags) })
     : action;
-  const summary = t(mechanic.summaryKey, values);
-  const response = t('hudChrome.raidBossGuide.whatToDoResponse', {
-    response: t(mechanic.responseKey, values),
-  });
-  const compare = mechanic.compare
-    ? `<p class="rbg-compare">${esc(damageCompareText(mechanic.compare))}</p>`
-    : '';
-  return `<article class="rbg-ability aj-ability${expanded ? ' expanded' : ''}" data-ability="${esc(
+  const deadly = mechanic.flags.includes('deadly');
+  const compare =
+    mechanic.compare && tier === 'heroic'
+      ? `<p class="aj-compare">${esc(damageCompareText(mechanic.compare))}</p>`
+      : '';
+  return `<article class="aj-ab${expanded ? ' open' : ''}${deadly ? ' deadly' : ''}" data-ability="${esc(
     mechanic.id,
-  )}"><button type="button" class="rbg-ability-toggle" data-mechanic="${esc(mechanic.id)}" ${FOCUS_KEY_ATTR}="mechanic:${esc(
+  )}"><button type="button" class="aj-ab-row" data-mechanic="${esc(mechanic.id)}" ${FOCUS_KEY_ATTR}="mechanic:${esc(
     mechanic.id,
   )}" aria-expanded="${expanded}"${expanded ? ` aria-controls="${esc(detailId)}"` : ''} aria-describedby="${esc(
-    summaryId,
-  )}" aria-label="${esc(accessible)}"><img src="${esc(iconDataUrl('ability', mechanic.iconId, 48))}" alt="" aria-hidden="true"><span class="rbg-ability-main"><span class="rbg-expand-mark" aria-hidden="true">${
-    expanded ? '−' : '+'
-  }</span><span class="rbg-ability-text"><span class="rbg-ability-name">${esc(name)}</span>${markChipsHtml(
-    mechanic.marks,
-  )}<span class="rbg-ability-summary" id="${esc(summaryId)}">${esc(summary)}</span></span></span>${mechanicBadges(
+    doId,
+  )}" aria-label="${esc(accessible)}"><img class="aj-ab-icon" src="${esc(
+    iconDataUrl('ability', mechanic.iconId, 48),
+  )}" alt="" aria-hidden="true"><span class="aj-ab-main"><span class="aj-ab-name"><span class="aj-ab-title">${esc(
+    name,
+  )}</span>${flagTagsHtml(mechanic)}${markChipsHtml(mechanic.marks)}</span><span class="aj-ab-do" id="${esc(
+    doId,
+  )}">${esc(t(mechanic.responseKey, values))}</span></span><span class="aj-ab-tags">${roleTagsHtml(
     mechanic,
-  )}</button>${
+  )}</span><span class="aj-ab-chev" aria-hidden="true">${GLYPH_CHEVRON}</span></button>${
     expanded
-      ? `<div class="rbg-ability-detail" id="${esc(detailId)}" data-detail="${esc(mechanic.id)}"><p>${esc(
-          response,
-        )}</p>${compare}</div>`
+      ? `<div class="aj-ab-detail" id="${esc(detailId)}" data-detail="${esc(mechanic.id)}"><p>${esc(
+          t(mechanic.summaryKey, values),
+        )}</p>${compare}${factsHtml(mechanic)}</div>`
       : ''
   }</article>`;
+}
+
+/** A phase pill's words, or null for a phase with no health band. */
+export function phaseRangeText(phase: JournalPhase): string | null {
+  const label = journalRangeLabel(phase.health);
+  if (!label) return null;
+  switch (label.kind) {
+    case 'whole':
+      return t('hudChrome.adventureJournal.phaseRangeWhole');
+    case 'band':
+      return t('hudChrome.adventureJournal.phaseRangeBand', {
+        from: percent(label.from),
+        to: percent(label.to),
+      });
+    case 'toEnd':
+      return t('hudChrome.adventureJournal.phaseRangeToEnd', { from: percent(label.from) });
+    case 'at':
+      return t('hudChrome.adventureJournal.phaseRangeAt', {
+        marks: formatList(label.at.map(percent)),
+      });
+  }
 }
 
 function phaseHtml(
@@ -465,22 +677,27 @@ function phaseHtml(
   phase: JournalPhase,
   open: boolean,
   expandedMechanic: string | null,
+  tier: JournalTier,
 ): string {
   const values = pageValues(instance, phase.values, phase.percentValues);
   const bodyId = `aj-phase-${phase.id}`;
-  const name = t(phase.nameKey);
-  return `<section class="rbg-phase aj-phase${open ? ' open' : ''}" data-phase="${esc(phase.id)}"><header><div class="rbg-phase-rule"></div><div class="aj-phase-head"><h3><button type="button" class="aj-phase-toggle" data-phase-toggle="${esc(
+  const range = phaseRangeText(phase);
+  const summary =
+    range && phase.rangeOnly
+      ? ''
+      : `<p class="aj-phase-summary">${esc(t(phase.summaryKey, values))}</p>`;
+  return `<section class="aj-phase${open ? ' open' : ''}" data-phase="${esc(phase.id)}"><h3 class="aj-phase-head"><button type="button" class="aj-phase-toggle" data-phase-toggle="${esc(
     phase.id,
-  )}" ${FOCUS_KEY_ATTR}="phase:${esc(phase.id)}" aria-expanded="${open}"${open ? ` aria-controls="${esc(bodyId)}"` : ''}><span class="aj-chevron" aria-hidden="true">${svgIcon(
-    'next',
-  )}</span><span>${esc(name)}</span><span class="aj-phase-count">${esc(
-    tPlural('hudChrome.adventureJournal.abilityCountPlural', phase.mechanics.length, {
-      count: formatNumber(phase.mechanics.length),
-    }),
-  )}</span></button></h3><p>${esc(t(phase.summaryKey, values))}</p></div></header>${
+  )}" ${FOCUS_KEY_ATTR}="phase:${esc(phase.id)}" aria-expanded="${open}"${
+    open ? ` aria-controls="${esc(bodyId)}"` : ''
+  }><span class="aj-phase-name">${esc(t(phase.nameKey))}</span>${
+    range ? `<span class="aj-phase-range">${esc(range)}</span>` : ''
+  }<span class="aj-chevron" aria-hidden="true">${GLYPH_CHEVRON}</span></button></h3>${
     open
-      ? `<div class="rbg-abilities" id="${esc(bodyId)}">${phase.mechanics
-          .map((mechanic) => mechanicHtml(instance, mechanic, mechanic.id === expandedMechanic))
+      ? `${summary}<div class="aj-abilities" id="${esc(bodyId)}">${phase.mechanics
+          .map((mechanic) =>
+            mechanicHtml(instance, mechanic, mechanic.id === expandedMechanic, tier),
+          )
           .join('')}</div>`
       : ''
   }</section>`;
@@ -491,9 +708,10 @@ export function abilitiesHtml(
   view: JournalBossView,
   closedPhases: ReadonlySet<string>,
   expandedMechanic: string | null,
+  tier: JournalTier,
 ): string {
-  return `<div class="rbg-phases">${view.phases
-    .map((phase) => phaseHtml(instance, phase, !closedPhases.has(phase.id), expandedMechanic))
+  return `<div class="aj-phases">${view.phases
+    .map((phase) => phaseHtml(instance, phase, !closedPhases.has(phase.id), expandedMechanic, tier))
     .join('')}</div>`;
 }
 

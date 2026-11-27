@@ -328,80 +328,52 @@
     --color-category-text: #bfeec6;
     --color-category-text-active: #d6f5da;
     --color-filter-chip-text: #e6dcc0;
-    /* Raid boss journal palette. These tokens keep its forged-fire treatment in one
-       themeable source while the component sheets own only layout and composition. */
-    --color-rbg-frame-border-base: #2e180d;
-    --color-rbg-frame-flare: #2a160de8;
-    --color-rbg-frame-start: #15100d;
-    --color-rbg-frame-end: #090807;
-    --color-rbg-divider: #8f6a294f;
-    --color-rbg-nav-start: #0b0908dd;
-    --color-rbg-nav-end: #17100ddd;
-    --color-rbg-nav-grid: #ffffff05;
-    --color-rbg-tab-border: #5d4825;
-    --color-rbg-tab-start: #1a1714;
-    --color-rbg-tab-end: #0d0c0b;
-    --color-rbg-portrait-start: #3b2316;
-    --color-rbg-tab-active-start: #4a2b13;
-    --color-rbg-tab-active-glow: #f18b2822;
-    --color-rbg-hero-border: #75562875;
-    --color-rbg-hero-flare: #d66b192e;
-    --color-rbg-hero-start: #20130e;
-    --color-rbg-hero-end: #0d0b0a;
-    --color-rbg-shadow-soft: #0009;
-    --color-rbg-shadow: #000;
+    /* Adventure Journal palette (#adventure-journal-window, the approved
+       "clean modern" look): a calm dark panel, ONE amber accent, light text
+       with strong contrast. Every journal rule in hud.css / hud.mobile.css
+       reads these; the role and status hues are text-on-panel tints. */
+    --font-aj: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+    --color-aj-win: #15171c;
+    --color-aj-win-border: #343a44;
+    --color-aj-head: #121419;
+    --color-aj-nav: #13151a;
+    --color-aj-panel: #1b1e24;
+    --color-aj-panel-hover: #21252c;
+    --color-aj-banner: #181a20;
+    --color-aj-tabbar: #16181d;
+    --color-aj-well: #101216;
+    --color-aj-line: #2c313a;
+    --color-aj-chip: #242830;
+    --color-aj-chip-border: #333944;
+    --color-aj-tag: #262a32;
+    --color-aj-ring: #3a404a;
+    --color-aj-icon-border: #444b56;
+    --color-aj-text: #f1f2f4;
+    --color-aj-bright: #fff;
+    --color-aj-soft: #c3c8d0;
+    --color-aj-mute: #9aa1ac;
+    --color-aj-accent: #f0a24a;
+    --color-aj-accent-hi: #ffcf8a;
+    --color-aj-accent-ink: #1b1206;
+    --color-aj-accent-wash: #f0a24a1a;
+    --color-aj-accent-line: #f0a24a40;
+    --color-aj-accent-glow: #f0a24a1f;
+    --color-aj-accent-strong: #f0a24a2e;
+    --color-aj-accent-faint: #f0a24a0a;
+    --color-aj-ember: #ff8c2829;
+    --color-aj-ember-faint: #ff8c280a;
+    --color-aj-portrait-glow: #ff781e40;
+    --color-aj-deadly: #ff7a6b;
+    --color-aj-done: #8fd19e;
+    --color-aj-tank: #7fb2ff;
+    --color-aj-healer: #7ee0a0;
+    --color-aj-damage: #ff8f7a;
+    --color-aj-everyone: #e8d7a8;
+    --color-aj-info: #8fc8ff;
+    --color-aj-shadow: #00000099;
+    --color-aj-scrim: #000000a6;
+    --color-aj-portrait-bg: #000;
     --color-store-promo-dot-shadow: #000;
-    --color-rbg-model-border: #8c6b31;
-    --color-rbg-model-start: #4b2814;
-    --color-rbg-model-end: #0d0907;
-    --color-rbg-model-glow: #e36f1824;
-    --color-rbg-model-inset: #d8a84135;
-    --color-rbg-button-border: #b1843b;
-    --color-rbg-button-start: #4f3218;
-    --color-rbg-button-end: #20140c;
-    --color-rbg-button-text: #ffe3a0;
-    --color-rbg-button-text-hover: #fff3ca;
-    --color-rbg-status-text: #efd18a;
-    --color-rbg-heading: #f2d58a;
-    --color-rbg-kicker: #c79745;
-    --color-rbg-segment-border: #5e4828;
-    --color-rbg-control-bg: #080706;
-    --color-rbg-segment-active-start: #66401d;
-    --color-rbg-segment-active-end: #38210f;
-    --color-rbg-segment-active-text: #ffe6a6;
-    --color-rbg-segment-active-border: #b68135;
-    --color-rbg-phase-start: #ffbd50;
-    --color-rbg-phase-end: #6e2b0d;
-    --color-rbg-phase-glow: #f27c2d55;
-    --color-rbg-phase-title: #efc66d;
-    --color-rbg-ability-border: #4d3c25;
-    --color-rbg-ability-start: #17130f;
-    --color-rbg-ability-inset: #ffffff08;
-    --color-rbg-ability-expanded-border: #8d672d;
-    --color-rbg-ability-expanded-start: #20170f;
-    --color-rbg-icon-border: #8b6935;
-    --color-rbg-expand-mark: #d7a949;
-    --color-rbg-badge-border: #56472f;
-    --color-rbg-badge-bg: #0b0a09;
-    --color-rbg-badge-text: #cbb889;
-    --color-rbg-role-icon: #fff;
-    --color-rbg-role-tank-bg: #2878c8;
-    --color-rbg-role-healer-bg: #278a45;
-    --color-rbg-role-damage-bg: #b93b36;
-    --color-rbg-deadly-border: #9f332d;
-    --color-rbg-deadly-text: #ff786d;
-    --color-rbg-important-border: #a97828;
-    --color-rbg-important-text: #ffd15f;
-    --color-rbg-cleansable-border: #3f769b;
-    --color-rbg-cleansable-text: #85d2ff;
-    --color-rbg-detail-border: #a77830;
-    --color-rbg-detail-bg: #080706a8;
-    /* The dungeon pages' extra sections (src/ui/boss_journal/): the trade-off
-       card's gain side, the Heroic callout's ember wash, and the summary prose. */
-    --color-rbg-gain-border: #3f8a52;
-    --color-rbg-gain-text: #9fe3ad;
-    --color-rbg-heroic-bg: #2a0e0bcc;
-    --color-rbg-summary-text: #cfc3a6;
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */

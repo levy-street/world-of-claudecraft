@@ -12379,13 +12379,17 @@
   #adventure-journal-window .aj-instance-toggle:focus-visible,
   #adventure-journal-window .aj-tab:focus-visible,
   #adventure-journal-window .aj-step:focus-visible,
-  #adventure-journal-window .aj-browse:focus-visible,
+  #adventure-journal-window .aj-crumb:focus-visible,
+  #adventure-journal-window .aj-strip-boss:focus-visible,
+  #adventure-journal-window .aj-close:focus-visible,
+  #adventure-journal-window .aj-model-jump:focus-visible,
+  #adventure-journal-window .aj-ab-row:focus-visible,
   #adventure-journal-window .aj-phase-toggle:focus-visible,
   #adventure-journal-window .aj-watch-link:focus-visible,
   #adventure-journal-window .aj-soon-tier:focus-visible,
   #adventure-journal-window .aj-loot-row:focus-visible,
   #tf-journal:focus-visible,
-  #adventure-journal-window .rbg-segmented button:focus-visible,
+  #adventure-journal-window .aj-diff button:focus-visible,
   #adventure-journal-window .rbg-model-load:focus-visible,
   #adventure-journal-window .rbg-model-stage > canvas:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -12831,108 +12835,802 @@
       outline: 2px solid Highlight;
     }
   }
+  /* The Adventure Journal (#adventure-journal-window, src/ui/hud/journal/): the
+     approved clean modern look. A calm dark panel with one amber accent, the
+     system sans at 15px and up with a 1.55 line height, Cinzel only for the
+     boss name, no letter-spaced capitals. Palette: the --color-aj-* tokens. */
   #adventure-journal-window {
-    top: calc(var(--app-vh, 100vh) * 0.08 / var(--window-scale, 1));
-    width: min(1060px, calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 24px));
-    max-height: min(calc(var(--app-vh, 100vh) * 0.86 / var(--window-scale, 1) - 24px), 820px);
+    --window-pad: 0px;
+    top: calc(var(--app-vh, 100vh) * 0.06 / var(--window-scale, 1));
+    width: min(1240px, calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 24px));
+    max-height: min(calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale, 1) - 16px), 860px);
+    padding: 0;
     overflow: hidden;
-    border-color: color-mix(in srgb, var(--gold) 54%, var(--color-rbg-frame-border-base));
-    background:
-      linear-gradient(135deg, var(--color-rbg-frame-flare), transparent 34%),
-      linear-gradient(180deg, var(--color-rbg-frame-start) 0%, var(--color-rbg-frame-end) 100%);
+    border: 1px solid var(--color-aj-win-border);
+    outline: 0;
+    border-radius: 14px;
+    background: var(--color-aj-win);
+    box-shadow: 0 30px 80px var(--color-aj-shadow);
+    color: var(--color-aj-text);
+    font: 15px / 1.55 var(--font-aj);
+    -webkit-font-smoothing: antialiased;
   }
-  #adventure-journal-window .rbg-head {
+  #adventure-journal-window button {
+    font-family: var(--font-aj);
+  }
+  #adventure-journal-window .aj-glyph {
+    display: block;
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+  #adventure-journal-window > .aj-head {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
+    align-items: center;
+    gap: 12px;
+    height: 52px;
+    margin: 0;
+    padding: 0 60px 0 18px;
+    border-bottom: 1px solid var(--color-aj-line);
+    border-radius: 0;
+    background: var(--color-aj-head);
+    color: var(--color-aj-text);
+    font: 600 16px / 1.2 var(--font-aj);
+    letter-spacing: 0.2px;
+    text-shadow: none;
   }
-  #adventure-journal-window .rbg-subtitle {
-    margin-top: 4px;
-    color: var(--color-text-muted);
-    font-family: var(--body-font);
-    font-size: 12px;
+  #adventure-journal-window .aj-title-sigil {
+    display: flex;
+    color: var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-title-sigil .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  #adventure-journal-window .aj-head-crumb {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--color-aj-mute);
+    font-size: 14px;
     font-weight: 400;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  #adventure-journal-window .rbg-shell {
+  #adventure-journal-window > .aj-head > .aj-close {
+    inset-inline-end: 12px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-aj-soft);
+  }
+  #adventure-journal-window > .aj-head > .aj-close:hover {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-close .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  #adventure-journal-window .aj-shell {
     position: relative;
     display: grid;
-    grid-template-columns: 256px minmax(0, 1fr);
-    height: min(
-      calc(var(--app-vh, 100vh) * 0.76 / var(--window-scale, 1)),
-      calc(var(--app-vh, 100vh) * 0.86 / var(--window-scale, 1) - 82px),
-      720px
-    );
+    grid-template-columns: 268px minmax(0, 1fr);
+    height: min(calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale, 1) - 70px), 806px);
     min-height: 0;
-    max-height: min(
-      calc(var(--app-vh, 100vh) * 0.76 / var(--window-scale, 1)),
-      calc(var(--app-vh, 100vh) * 0.86 / var(--window-scale, 1) - 82px),
-      720px
-    );
-    margin: 10px -10px -10px;
-    border-top: 1px solid var(--color-rbg-divider);
   }
-  #adventure-journal-window .rbg-journal {
+
+  /* the instance list */
+  #adventure-journal-window .aj-nav {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 14px 10px;
+    border-right: 1px solid var(--color-aj-line);
+    background: var(--color-aj-nav);
+  }
+  #adventure-journal-window .aj-group + .aj-group {
+    margin-top: 12px;
+  }
+  #adventure-journal-window .aj-group-title {
+    margin: 6px 10px;
+    color: var(--color-aj-mute);
+    font: 600 13px / 1.4 var(--font-aj);
+  }
+  #adventure-journal-window .aj-instance-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    font-size: 14.5px;
+    line-height: 1.4;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-instance-toggle:hover {
+    background: var(--color-aj-panel);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-instance.expanded .aj-instance-toggle {
+    color: var(--color-aj-text);
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-chevron {
+    display: flex;
+    flex: none;
+    color: var(--color-aj-mute);
+  }
+  #adventure-journal-window .aj-instance-toggle .aj-chevron .aj-glyph {
+    transform: rotate(-90deg);
+    transition: transform calc(150ms * var(--motion-scale, 1));
+  }
+  #adventure-journal-window .aj-instance.expanded .aj-instance-toggle .aj-chevron .aj-glyph {
+    transform: none;
+  }
+  #adventure-journal-window .aj-instance-name {
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-here-dot {
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-aj-accent);
+    box-shadow: 0 0 0 3px var(--color-aj-accent-glow);
+  }
+  #adventure-journal-window .aj-instance-count {
+    margin-left: auto;
+    color: var(--color-aj-mute);
+    font-size: 12.5px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  #adventure-journal-window .aj-boss-list {
+    margin: 4px 0 6px 10px;
+    padding: 0 0 0 8px;
+    border-left: 1px solid var(--color-aj-line);
+    list-style: none;
+  }
+  #adventure-journal-window .aj-boss {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-boss:hover {
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-boss-portrait {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    overflow: hidden;
+    border: 1px solid var(--color-aj-ring);
+    border-radius: 50%;
+    background: var(--color-aj-portrait-bg);
+  }
+  #adventure-journal-window .aj-boss-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  #adventure-journal-window .aj-boss.defeated .aj-boss-portrait img {
+    filter: saturate(0.5) brightness(0.8);
+  }
+  #adventure-journal-window .aj-boss-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-boss-name {
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  #adventure-journal-window .aj-boss-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-aj-mute);
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-boss-status .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #adventure-journal-window .aj-status-defeated {
+    color: var(--color-aj-done);
+  }
+  #adventure-journal-window .aj-status-next,
+  #adventure-journal-window .aj-status-engaged {
+    color: var(--color-aj-accent-hi);
+  }
+  #adventure-journal-window .aj-boss.active {
+    background: linear-gradient(90deg, var(--color-aj-accent-strong), var(--color-aj-accent-faint));
+    box-shadow: inset 3px 0 0 var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-boss.active .aj-boss-name {
+    color: var(--color-aj-text);
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-boss.active .aj-boss-portrait {
+    border-color: var(--color-aj-accent);
+  }
+
+  /* the page: the phone top (hidden here), the banner, the tabs */
+  #adventure-journal-window .aj-page {
     min-width: 0;
     min-height: 0;
-    max-height: 100%;
-    padding: 14px 16px 20px;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
   }
-  #adventure-journal-window .rbg-hero {
-    display: grid;
-    grid-template-columns: 190px minmax(0, 1fr);
-    gap: 18px;
-    align-items: stretch;
-    min-height: 190px;
-    padding: 8px;
-    border: 1px solid var(--color-rbg-hero-border);
-    background:
-      radial-gradient(circle at 13% 40%, var(--color-rbg-hero-flare), transparent 32%),
-      linear-gradient(100deg, var(--color-rbg-hero-start), var(--color-rbg-hero-end) 72%);
-    box-shadow: inset 0 0 24px var(--color-rbg-shadow-soft);
+  #adventure-journal-window .aj-mobile-top {
+    display: none;
   }
-  #adventure-journal-window .rbg-model-slot {
+  #adventure-journal-window .aj-banner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 22px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--color-aj-line);
+    background:
+      linear-gradient(
+        100deg,
+        var(--color-aj-ember) 0%,
+        var(--color-aj-ember-faint) 45%,
+        transparent 70%
+      ),
+      var(--color-aj-banner);
+  }
+  #adventure-journal-window .aj-portrait-wrap {
+    position: relative;
+    align-self: center;
+  }
+  #adventure-journal-window .aj-portrait,
+  #adventure-journal-window .aj-council-member {
+    width: 108px;
+    height: 108px;
+    overflow: hidden;
+    border: 2px solid var(--color-aj-accent);
+    border-radius: 50%;
+    background: var(--color-aj-portrait-bg);
+    box-shadow:
+      0 0 0 5px var(--color-aj-accent-glow),
+      0 8px 30px var(--color-aj-portrait-glow);
+  }
+  #adventure-journal-window .aj-portrait img,
+  #adventure-journal-window .aj-council-member img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.22);
+  }
+  #adventure-journal-window .aj-council {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  #adventure-journal-window .aj-council-member {
+    width: 92px;
+    height: 92px;
+  }
+  #adventure-journal-window .aj-council-member + .aj-council-member {
+    margin-left: -22px;
+  }
+  #adventure-journal-window .aj-model-jump {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 50%;
+    background: var(--color-aj-well);
+    color: var(--color-aj-accent-hi);
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-model-jump:hover {
+    border-color: var(--color-aj-accent);
+    background: var(--color-aj-accent);
+    color: var(--color-aj-accent-ink);
+  }
+  #adventure-journal-window .aj-model-jump .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  #adventure-journal-window .aj-banner-text {
     min-width: 0;
-    min-height: 190px;
+  }
+  #adventure-journal-window .aj-kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin-bottom: 2px;
+    color: var(--color-aj-accent-hi);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-chip-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 9px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-chip-status .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #adventure-journal-window .aj-chip-engaged {
+    color: var(--color-aj-deadly);
+  }
+  #adventure-journal-window .aj-chip-defeated {
+    color: var(--color-aj-done);
+  }
+  #adventure-journal-window .aj-boss-title {
+    margin: 0;
+    color: var(--color-aj-bright);
+    font: 700 30px / 1.15 var(--font-display);
+    letter-spacing: 0.3px;
+    overflow-wrap: anywhere;
+  }
+  #adventure-journal-window .aj-tagline {
+    max-width: 62ch;
+    margin: 8px 0 0;
+    color: var(--color-aj-soft);
+    font-size: 15.5px;
+  }
+  #adventure-journal-window .aj-tagline-overview {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  #adventure-journal-window .aj-stat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  #adventure-journal-window .aj-stat-chip {
+    padding: 4px 10px;
+    border: 1px solid var(--color-aj-chip-border);
+    border-radius: 999px;
+    background: var(--color-aj-chip);
+    color: var(--color-aj-soft);
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-stat-chip b {
+    color: var(--color-aj-text);
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-diffbox {
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  #adventure-journal-window .aj-diff {
+    display: flex;
+    padding: 3px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-well);
+  }
+  #adventure-journal-window .aj-diff button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-diff button:hover {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-diff button.active {
+    background: var(--color-aj-accent);
+    color: var(--color-aj-accent-ink);
+    font-weight: 700;
+  }
+  #adventure-journal-window .aj-diff .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #adventure-journal-window .aj-soon-note {
+    color: var(--color-aj-mute);
+    font-size: 13px;
+  }
+  #adventure-journal-window .aj-tabbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 20px 0 28px;
+    border-bottom: 1px solid var(--color-aj-line);
+    background: var(--color-aj-tabbar);
+  }
+  #adventure-journal-window .aj-tabs {
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-tabs-spacer {
+    min-height: 50px;
+  }
+  #adventure-journal-window .aj-tab {
+    margin-bottom: -1px;
+    padding: 12px 14px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-aj-mute);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-tab:hover {
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-tab.active {
+    border-bottom-color: var(--color-aj-accent);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-steps {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  #adventure-journal-window .aj-step {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-step:hover:not(:disabled) {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-step:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  #adventure-journal-window .aj-step .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  #adventure-journal-window .aj-panel {
+    padding: 18px 28px 28px;
+  }
+  #adventure-journal-window .aj-section-title,
+  #adventure-journal-window .rbg-section-title {
+    margin: 0 0 10px;
+    color: var(--color-aj-text);
+    font: 700 16.5px / 1.3 var(--font-aj);
+  }
+
+  /* Abilities: phase headers with a health pill, one row per ability */
+  #adventure-journal-window .aj-phase {
+    margin-bottom: 18px;
+  }
+  #adventure-journal-window .aj-phase-head {
+    margin: 0 0 8px;
+    font: inherit;
+  }
+  #adventure-journal-window .aj-phase-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-aj-text);
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-phase-name {
+    font-size: 16.5px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  #adventure-journal-window .aj-phase-range {
+    padding: 1px 9px;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 999px;
+    background: var(--color-aj-accent-wash);
+    color: var(--color-aj-accent-hi);
+    font-size: 13.5px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  #adventure-journal-window .aj-phase-toggle .aj-chevron {
+    margin-left: auto;
+  }
+  #adventure-journal-window .aj-phase-toggle:hover .aj-chevron {
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-phase:not(.open) .aj-phase-toggle .aj-glyph {
+    transform: rotate(-90deg);
+  }
+  #adventure-journal-window .aj-phase-summary {
+    max-width: 80ch;
+    margin: -2px 0 10px;
+    color: var(--color-aj-soft);
+    font-size: 14.5px;
+  }
+  #adventure-journal-window .aj-ab {
+    margin-bottom: 6px;
+    overflow: hidden;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-ab.deadly {
+    border-left: 3px solid var(--color-aj-deadly);
+  }
+  #adventure-journal-window .aj-ab-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto 20px;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 9px 14px 9px 10px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-ab-row:hover {
+    background: var(--color-aj-panel-hover);
+  }
+  #adventure-journal-window .aj-ab-icon {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-aj-icon-border);
+    border-radius: 8px;
+  }
+  #adventure-journal-window .aj-ab-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-ab-name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 8px;
+    color: var(--color-aj-text);
+    font-size: 15.5px;
+    font-weight: 650;
+  }
+  #adventure-journal-window .aj-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-flag .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #adventure-journal-window .aj-flag-deadly {
+    color: var(--color-aj-deadly);
+  }
+  #adventure-journal-window .aj-flag-interruptible {
+    color: var(--color-aj-info);
+  }
+  #adventure-journal-window .aj-flag-cleansable {
+    color: var(--color-aj-done);
+  }
+  #adventure-journal-window .rbg-marks {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  #adventure-journal-window .rbg-mark {
+    padding: 0 8px;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 999px;
+    background: var(--color-aj-accent-wash);
+    color: var(--color-aj-accent-hi);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-ab-do {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--color-aj-soft);
+    font-size: 14.5px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  #adventure-journal-window .aj-ab.open .aj-ab-do {
+    color: var(--color-aj-text);
+    font-weight: 500;
+    -webkit-line-clamp: unset;
+  }
+  #adventure-journal-window .aj-ab-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  #adventure-journal-window .aj-role-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px 3px 7px;
+    border-radius: 999px;
+    background: var(--color-aj-tag);
+    color: var(--color-aj-soft);
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  #adventure-journal-window .aj-role-tag :is(.ui-icon, .aj-glyph),
+  #adventure-journal-window .aj-role-badge :is(.ui-icon, .aj-glyph) {
+    width: 14px;
+    height: 14px;
+  }
+  #adventure-journal-window .aj-role-tank :is(.ui-icon, .aj-glyph) {
+    color: var(--color-aj-tank);
+  }
+  #adventure-journal-window .aj-role-healer :is(.ui-icon, .aj-glyph) {
+    color: var(--color-aj-healer);
+  }
+  #adventure-journal-window .aj-role-damage :is(.ui-icon, .aj-glyph) {
+    color: var(--color-aj-damage);
+  }
+  #adventure-journal-window .aj-role-all :is(.ui-icon, .aj-glyph) {
+    color: var(--color-aj-everyone);
+  }
+  #adventure-journal-window .aj-ab-chev {
+    display: grid;
+    place-items: center;
+    color: var(--color-aj-mute);
+  }
+  #adventure-journal-window .aj-ab-chev .aj-glyph {
+    transition: transform calc(150ms * var(--motion-scale, 1));
+  }
+  #adventure-journal-window .aj-ab.open .aj-ab-chev {
+    color: var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-ab.open .aj-ab-chev .aj-glyph {
+    transform: rotate(180deg);
+  }
+  #adventure-journal-window .aj-ab-detail {
+    padding: 2px 16px 14px 68px;
+    color: var(--color-aj-soft);
+  }
+  #adventure-journal-window .aj-ab-detail p {
+    max-width: 78ch;
+    margin: 0 0 10px;
+  }
+  #adventure-journal-window .aj-ab-detail .aj-compare {
+    color: var(--color-aj-mute);
+    font-size: 14px;
+  }
+  #adventure-journal-window .aj-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #adventure-journal-window .aj-fact {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 7px;
+    background: var(--color-aj-well);
+    color: var(--color-aj-text);
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-fact .aj-glyph {
+    width: 13px;
+    height: 13px;
+    color: var(--color-aj-accent);
+  }
+
+  /* Overview: the encounter beside its 3D model, the Heroic callout, Strategy
+     by role and the key choices */
+  #adventure-journal-window .aj-about {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 22px;
+    margin-bottom: 22px;
+    padding: 16px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 12px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-about-model {
+    min-width: 0;
+    min-height: 300px;
+  }
+  #adventure-journal-window .aj-about-text p {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--color-aj-soft);
   }
   #adventure-journal-window .rbg-model-viewer {
     height: 100%;
-    min-height: 190px;
+    min-height: 300px;
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
   }
   #adventure-journal-window .rbg-model-stage {
     position: relative;
-    min-height: 164px;
+    min-height: 270px;
     overflow: hidden;
-    border: 1px solid var(--color-rbg-model-border);
-    background: radial-gradient(
-      circle,
-      var(--color-rbg-model-start),
-      var(--color-rbg-model-end) 70%
-    );
-    box-shadow:
-      inset 0 0 22px var(--color-rbg-shadow),
-      0 0 12px var(--color-rbg-model-glow);
-  }
-  #adventure-journal-window .rbg-model-stage::after {
-    content: "";
-    position: absolute;
-    inset: 4px;
-    border: 1px solid var(--color-rbg-model-inset);
-    pointer-events: none;
-    z-index: 4;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background:
+      radial-gradient(circle at 50% 42%, var(--color-aj-accent-strong), transparent 62%),
+      var(--color-aj-well);
   }
   #adventure-journal-window .rbg-model-poster {
     position: absolute;
-    inset: 5px;
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
+    inset: 16px;
+    width: calc(100% - 32px);
+    height: calc(100% - 32px);
     object-fit: contain;
-    image-rendering: auto;
     pointer-events: none;
     z-index: 1;
   }
@@ -12959,16 +13657,15 @@
     position: absolute;
     left: 50%;
     bottom: 12px;
-    min-width: 104px;
     min-height: 34px;
     display: none;
-    padding: 6px 10px;
-    border: 1px solid var(--color-rbg-button-border);
-    border-radius: 3px;
-    background: linear-gradient(var(--color-rbg-button-start), var(--color-rbg-button-end));
-    color: var(--color-rbg-button-text);
-    font-family: var(--title-font);
-    font-size: 10px;
+    padding: 6px 14px;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 8px;
+    background: var(--color-aj-well);
+    color: var(--color-aj-accent-hi);
+    font-size: 14px;
+    font-weight: 600;
     cursor: var(--cursor-point);
     transform: translateX(-50%);
     z-index: 3;
@@ -12978,937 +13675,212 @@
     .rbg-model-load {
     display: block;
   }
-  #adventure-journal-window .rbg-model-load:hover,
-  #adventure-journal-window .rbg-model-load:focus-visible {
-    border-color: var(--gold);
-    color: var(--color-rbg-button-text-hover);
+  #adventure-journal-window .rbg-model-load:hover {
+    border-color: var(--color-aj-accent);
+    background: var(--color-aj-accent);
+    color: var(--color-aj-accent-ink);
   }
   #adventure-journal-window .rbg-model-status {
     position: absolute;
-    left: 8px;
-    right: 8px;
+    left: 10px;
+    right: 10px;
     top: 10px;
     margin: 0;
-    color: var(--color-rbg-status-text);
-    font-size: 10px;
-    line-height: 1.35;
+    color: var(--color-aj-soft);
+    font-size: 13.5px;
     text-align: center;
-    text-shadow: 0 1px 3px var(--color-rbg-shadow);
     z-index: 3;
   }
   #adventure-journal-window .rbg-model-hint {
     min-height: 22px;
     margin: 0;
-    padding: 5px 4px 0;
-    color: var(--color-text-muted);
-    font-size: 9px;
-    line-height: 1.25;
+    padding: 6px 4px 0;
+    color: var(--color-aj-mute);
+    font-size: 13px;
     text-align: center;
     visibility: hidden;
   }
   #adventure-journal-window .rbg-model-viewer[data-state="ready"] .rbg-model-hint {
     visibility: visible;
   }
-  #adventure-journal-window .rbg-overview {
-    padding: 8px 10px 6px 0;
-  }
-  #adventure-journal-window .rbg-overview h2 {
-    margin: 0 0 12px;
-    color: var(--color-rbg-heading);
-    font-family: var(--title-font);
-    font-size: 20px;
-    line-height: 1.15;
-    text-shadow: 0 2px 5px var(--color-rbg-shadow);
-  }
-  #adventure-journal-window .rbg-section-kicker,
-  #adventure-journal-window .rbg-section-title {
-    color: var(--color-rbg-kicker);
-    font-family: var(--title-font);
-    font-size: 10px;
-    letter-spacing: 0.9px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .rbg-overview p {
-    margin: 5px 0 0;
-    color: var(--color-text-light);
-    font-size: 12px;
-    line-height: 1.48;
-  }
-  #adventure-journal-window .rbg-difficulty {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 9px;
-    margin: 12px 0 14px;
-    color: var(--color-text-muted);
-    font-family: var(--title-font);
-    font-size: 10px;
-  }
-  #adventure-journal-window .rbg-segmented {
-    display: inline-flex;
-    padding: 2px;
-    border: 1px solid var(--color-rbg-segment-border);
-    border-radius: 4px;
-    background: var(--color-rbg-control-bg);
-  }
-  #adventure-journal-window .rbg-segmented button {
-    min-width: 72px;
-    min-height: 28px;
-    padding: 4px 10px;
-    border: 0;
-    border-radius: 2px;
-    background: transparent;
-    color: var(--color-text-muted);
-    font-family: var(--title-font);
-    font-size: 10px;
-    cursor: var(--cursor-point);
-  }
-  #adventure-journal-window .rbg-segmented button:hover,
-  #adventure-journal-window .rbg-segmented button:focus-visible {
-    color: var(--color-text-light);
-  }
-  #adventure-journal-window .rbg-segmented button.active {
-    background: linear-gradient(
-      var(--color-rbg-segment-active-start),
-      var(--color-rbg-segment-active-end)
-    );
-    color: var(--color-rbg-segment-active-text);
-    box-shadow: inset 0 0 0 1px var(--color-rbg-segment-active-border);
-  }
-  #adventure-journal-window .rbg-section-title {
-    margin: 0 0 4px;
-    font-size: 12px;
-  }
-  #adventure-journal-window .rbg-phase {
-    margin-top: 14px;
-  }
-  #adventure-journal-window .rbg-phase > header {
-    display: grid;
-    grid-template-columns: 4px minmax(0, 1fr);
-    gap: 9px;
-    margin-bottom: 6px;
-    padding: 3px 1px;
-  }
-  #adventure-journal-window .rbg-phase-rule {
-    border-radius: 3px;
-    background: linear-gradient(var(--color-rbg-phase-start), var(--color-rbg-phase-end));
-    box-shadow: 0 0 8px var(--color-rbg-phase-glow);
-  }
-  #adventure-journal-window .rbg-phase h3 {
-    margin: 0;
-    color: var(--color-rbg-phase-title);
-    font-family: var(--title-font);
-    font-size: 13px;
-  }
-  #adventure-journal-window .rbg-phase header p {
-    margin: 3px 0 0;
-    color: var(--color-text-muted);
-    font-size: 11px;
-    line-height: 1.35;
-  }
-  #adventure-journal-window .rbg-abilities {
-    display: grid;
-    gap: 4px;
-  }
-  #adventure-journal-window .rbg-ability {
-    border: 1px solid var(--color-rbg-ability-border);
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--color-rbg-ability-start), var(--color-rbg-tab-end));
-    box-shadow: inset 0 1px 0 var(--color-rbg-ability-inset);
-  }
-  #adventure-journal-window .rbg-ability.expanded {
-    border-color: var(--color-rbg-ability-expanded-border);
-    background: linear-gradient(
-      90deg,
-      var(--color-rbg-ability-expanded-start),
-      var(--color-rbg-tab-end)
-    );
-  }
-  #adventure-journal-window .rbg-ability-toggle {
-    width: 100%;
-    min-height: 56px;
-    display: grid;
-    grid-template-columns: 48px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 9px;
-    padding: 4px 8px 4px 4px;
-    border: 0;
-    background: transparent;
-    color: var(--color-text-light);
-    text-align: left;
-    cursor: var(--cursor-point);
-  }
-  #adventure-journal-window .rbg-ability-toggle > img {
-    width: 46px;
-    height: 46px;
-    border: 1px solid var(--color-rbg-icon-border);
-    border-radius: 3px;
-    background: var(--color-rbg-control-bg);
-    box-shadow: inset 0 0 5px var(--color-rbg-shadow);
-  }
-  #adventure-journal-window .rbg-ability-toggle:hover > img,
-  #adventure-journal-window .rbg-ability-toggle:focus-visible > img {
-    border-color: var(--gold);
-  }
-  #adventure-journal-window .rbg-ability-toggle:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 1px;
-  }
-  #adventure-journal-window .rbg-ability-main {
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-  #adventure-journal-window .rbg-expand-mark {
-    width: 13px;
-    color: var(--color-rbg-expand-mark);
-    font-size: 17px;
-    font-weight: 700;
-    text-align: center;
-  }
-  #adventure-journal-window .rbg-ability-name {
-    font-family: var(--title-font);
-    font-size: 12px;
-    line-height: 1.2;
-  }
-  #adventure-journal-window .rbg-badges,
-  #adventure-journal-window .rbg-role-badges,
-  #adventure-journal-window .rbg-flag-badges {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-  }
-  #adventure-journal-window .rbg-badges {
-    gap: 7px;
-  }
-  #adventure-journal-window .rbg-badge {
-    width: 23px;
-    height: 23px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--color-rbg-badge-border);
-    border-radius: 50%;
-    background: var(--color-rbg-badge-bg);
-    color: var(--color-rbg-badge-text);
-  }
-  #adventure-journal-window .rbg-badge-role {
-    border: 0;
-    color: var(--color-rbg-role-icon);
-  }
-  #adventure-journal-window .rbg-badge-tank {
-    background: var(--color-rbg-role-tank-bg);
-  }
-  #adventure-journal-window .rbg-badge-healer {
-    background: var(--color-rbg-role-healer-bg);
-  }
-  #adventure-journal-window .rbg-badge-damage {
-    background: var(--color-rbg-role-damage-bg);
-  }
-  #adventure-journal-window .rbg-badge .ui-icon {
-    width: 13px;
-    height: 13px;
-  }
-  #adventure-journal-window .rbg-badge > span {
-    display: none;
-  }
-  #adventure-journal-window .rbg-badge-deadly {
-    border-color: var(--color-rbg-deadly-border);
-    color: var(--color-rbg-deadly-text);
-  }
-  #adventure-journal-window .rbg-badge-important,
-  #adventure-journal-window .rbg-badge-interruptible {
-    border-color: var(--color-rbg-important-border);
-    color: var(--color-rbg-important-text);
-  }
-  #adventure-journal-window .rbg-badge-cleansable {
-    border-color: var(--color-rbg-cleansable-border);
-    color: var(--color-rbg-cleansable-text);
-  }
-  #adventure-journal-window .rbg-ability-detail {
-    margin: 0 9px 9px 61px;
-    padding: 8px 10px;
-    border-left: 2px solid var(--color-rbg-detail-border);
-    background: var(--color-rbg-detail-bg);
-  }
-  #adventure-journal-window .rbg-ability-detail p {
-    margin: 0;
-    color: var(--color-text-muted);
-    font-size: 11px;
-    line-height: 1.45;
-  }
-  #adventure-journal-window .rbg-ability-detail p + p {
-    margin-top: 7px;
-    color: var(--color-text-light);
-  }
-  /* The boss pages' shared sections (src/ui/boss_journal/): the rank chip, the
-     Heroic callout, role cards, trade-off cards, the always-visible ability
-     summary and the two-tier damage line. Every text block wraps; nothing in
-     the journal truncates. */
-  #adventure-journal-window .rbg-rank {
-    display: inline-block;
-    margin: -6px 0 10px;
-    padding: 2px 8px;
-    border: 1px solid var(--color-rbg-important-border);
-    border-radius: 999px;
-    color: var(--color-rbg-important-text);
-    font-family: var(--title-font);
-    font-size: 9px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .rbg-rank-final {
-    border-color: var(--color-rbg-deadly-border);
-    color: var(--color-rbg-deadly-text);
+  #adventure-journal-window .aj-ab-row:focus-visible,
+  #adventure-journal-window .aj-phase-toggle:focus-visible {
+    outline-offset: -2px;
   }
   #adventure-journal-window .rbg-heroic {
-    margin: 0 0 14px;
-    padding: 9px 12px 10px;
-    border: 1px solid var(--color-rbg-deadly-border);
-    border-left-width: 3px;
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--color-rbg-heroic-bg), var(--color-rbg-detail-bg));
+    margin: 16px 0 0;
+    padding: 14px 16px;
+    border: 1px solid var(--color-aj-line);
+    border-left: 3px solid var(--color-aj-deadly);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
   }
   #adventure-journal-window .rbg-heroic-head {
     display: flex;
     align-items: center;
-    gap: 6px;
-    color: var(--color-rbg-deadly-text);
-    font-family: var(--title-font);
-    font-size: 11px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: var(--color-aj-deadly);
+    font-size: 15.5px;
+    font-weight: 700;
   }
   #adventure-journal-window .rbg-heroic-head .ui-icon {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
   #adventure-journal-window .rbg-heroic ul {
-    margin: 6px 0 0;
-    padding-left: 18px;
-    color: var(--color-text-light);
-    font-size: 11px;
-    line-height: 1.45;
+    margin: 0;
+    padding-left: 20px;
+    color: var(--color-aj-soft);
   }
   #adventure-journal-window .rbg-heroic li + li {
-    margin-top: 3px;
+    margin-top: 4px;
   }
-  #adventure-journal-window .rbg-tips,
-  #adventure-journal-window .rbg-choices {
-    margin: 0 0 14px;
-  }
-  #adventure-journal-window .rbg-tip-grid {
+  #adventure-journal-window .aj-role-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    margin-top: 5px;
-  }
-  #adventure-journal-window .rbg-tip {
-    padding: 8px 9px 9px;
-    border: 1px solid var(--color-rbg-ability-border);
-    border-top-width: 2px;
-    border-radius: 3px;
-    background: linear-gradient(180deg, var(--color-rbg-ability-start), var(--color-rbg-tab-end));
-  }
-  #adventure-journal-window .rbg-tip-tank {
-    border-top-color: var(--color-rbg-role-tank-bg);
-  }
-  #adventure-journal-window .rbg-tip-healer {
-    border-top-color: var(--color-rbg-role-healer-bg);
-  }
-  #adventure-journal-window .rbg-tip-damage {
-    border-top-color: var(--color-rbg-role-damage-bg);
-  }
-  #adventure-journal-window .rbg-tip header,
-  #adventure-journal-window .rbg-choice header {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-  #adventure-journal-window .rbg-tip h3,
-  #adventure-journal-window .rbg-choice h3 {
-    margin: 0;
-    color: var(--color-rbg-phase-title);
-    font-family: var(--title-font);
-    font-size: 12px;
-    line-height: 1.2;
-  }
-  #adventure-journal-window .rbg-tip p,
-  #adventure-journal-window .rbg-choice p {
-    margin: 6px 0 0;
-    color: var(--color-text-light);
-    font-size: 11px;
-    line-height: 1.45;
-  }
-  #adventure-journal-window .rbg-choice {
-    margin-top: 5px;
-    padding: 8px 9px 9px;
-    border: 1px solid var(--color-rbg-important-border);
-    border-radius: 3px;
-    background: linear-gradient(
-      90deg,
-      var(--color-rbg-ability-expanded-start),
-      var(--color-rbg-tab-end)
-    );
-  }
-  #adventure-journal-window .rbg-choice header img {
-    width: 30px;
-    height: 30px;
-    border: 1px solid var(--color-rbg-icon-border);
-    border-radius: 3px;
-  }
-  #adventure-journal-window .rbg-choice-sides {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 7px;
-  }
-  #adventure-journal-window .rbg-choice-gain,
-  #adventure-journal-window .rbg-choice-risk {
-    padding: 6px 8px 7px;
-    border-left: 2px solid var(--color-rbg-gain-border);
-    background: var(--color-rbg-detail-bg);
-  }
-  #adventure-journal-window .rbg-choice-risk {
-    border-left-color: var(--color-rbg-deadly-border);
-  }
-  #adventure-journal-window .rbg-choice-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--color-rbg-gain-text);
-    font-family: var(--title-font);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .rbg-choice-risk .rbg-choice-label {
-    color: var(--color-rbg-deadly-text);
-  }
-  #adventure-journal-window .rbg-choice-label .ui-icon {
-    width: 12px;
-    height: 12px;
-  }
-  #adventure-journal-window .rbg-choice-sides p {
-    margin-top: 4px;
-  }
-  #adventure-journal-window .rbg-ability-text {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    padding: 4px 0;
-  }
-  #adventure-journal-window .rbg-ability-text .rbg-ability-name {
-    overflow-wrap: anywhere;
-  }
-  #adventure-journal-window .rbg-ability-summary {
-    color: var(--color-rbg-summary-text);
-    font-family: var(--body-font);
-    font-size: 11px;
-    line-height: 1.42;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-  #adventure-journal-window .rbg-marks {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  #adventure-journal-window .rbg-mark {
-    padding: 1px 6px;
-    border: 1px solid var(--color-rbg-important-border);
-    border-radius: 999px;
-    color: var(--color-rbg-important-text);
-    font-family: var(--title-font);
-    font-size: 9px;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .rbg-mark-heroicOnly {
-    border-color: var(--color-rbg-deadly-border);
-    color: var(--color-rbg-deadly-text);
-  }
-  #adventure-journal-window .rbg-ability-detail .rbg-compare {
-    color: var(--color-rbg-kicker);
-    font-family: var(--title-font);
-    font-size: 10px;
-  }
-  /* The Adventure Journal's chrome (src/ui/hud/journal/): the title sigil and
-     breadcrumb, the Dungeons and Raids list with its expandable instances and
-     boss rows, the previous and next arrows, the section tabs, the collapsible
-     phases, the role cards' ability links, the loot rows and Mythic's Coming
-     soon panel. The boss page sections reuse the rbg-* rules above. */
-  #adventure-journal-window .aj-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     gap: 12px;
   }
-  #adventure-journal-window .aj-title-block {
-    min-width: 0;
+  #adventure-journal-window .aj-role-card {
+    padding: 14px 16px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-role-card header {
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  #adventure-journal-window .aj-title-sigil {
-    width: 34px;
-    height: 34px;
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--gold-dim);
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 35% 30%,
-      var(--color-rbg-model-start),
-      var(--color-rbg-frame-end) 78%
-    );
-    box-shadow:
-      0 0 10px var(--color-rbg-model-glow),
-      inset 0 0 6px var(--color-rbg-shadow);
-    color: var(--gold);
-  }
-  #adventure-journal-window .aj-title-sigil .ui-icon {
-    width: 19px;
-    height: 19px;
-  }
-  #adventure-journal-window .aj-crumbs {
-    margin-top: 3px;
-    overflow: hidden;
-    color: var(--color-text-muted);
-    font-family: var(--body-font);
-    font-size: 12px;
-    font-weight: 400;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  #adventure-journal-window .aj-head-actions {
-    display: flex;
-    flex: none;
-    align-items: center;
-    gap: 8px;
-  }
-  #adventure-journal-window .aj-browse {
-    display: none;
-    align-items: center;
-    gap: 6px;
-    min-height: 32px;
-    padding: 0 12px;
-    border: 1px solid var(--color-rbg-button-border);
-    border-radius: 3px;
-    background: linear-gradient(var(--color-rbg-button-start), var(--color-rbg-button-end));
-    color: var(--color-rbg-button-text);
-    font-family: var(--title-font);
-    font-size: 11px;
-    cursor: var(--cursor-point);
-  }
-  #adventure-journal-window .aj-browse .ui-icon {
-    width: 14px;
-    height: 14px;
-  }
-  #adventure-journal-window .aj-nav {
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: 10px 8px 14px;
-    border-right: 1px solid var(--color-rbg-divider);
-    background:
-      linear-gradient(90deg, var(--color-rbg-nav-start), var(--color-rbg-nav-end)),
-      repeating-linear-gradient(0deg, transparent 0 19px, var(--color-rbg-nav-grid) 20px);
-  }
-  #adventure-journal-window .aj-group + .aj-group {
-    margin-top: 12px;
-  }
-  #adventure-journal-window .aj-group-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 2px 4px 7px;
-    color: var(--color-rbg-kicker);
-    font-family: var(--title-font);
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .aj-group-title::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--color-rbg-divider), transparent);
-  }
-  #adventure-journal-window .aj-instance + .aj-instance {
-    margin-top: 4px;
-  }
-  #adventure-journal-window .aj-instance-toggle {
-    width: 100%;
-    min-height: 40px;
-    display: grid;
-    grid-template-columns: 14px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 7px;
-    padding: 5px 8px 5px 6px;
-    border: 1px solid var(--color-rbg-tab-border);
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--color-rbg-tab-start), var(--color-rbg-tab-end));
-    color: var(--color-text-light);
-    font-family: var(--title-font);
-    font-size: 11px;
-    line-height: 1.2;
-    text-align: left;
-    cursor: var(--cursor-point);
-  }
-  #adventure-journal-window .aj-instance-toggle:hover,
-  #adventure-journal-window .aj-instance.holds-selection .aj-instance-toggle {
-    border-color: var(--gold-dim);
-  }
-  #adventure-journal-window .aj-instance.current .aj-instance-toggle {
-    box-shadow: inset 3px 0 0 var(--color-rbg-gain-border);
-  }
-  #adventure-journal-window .aj-chevron {
-    display: inline-flex;
-    color: var(--color-rbg-expand-mark);
-  }
-  #adventure-journal-window .aj-chevron .ui-icon {
-    width: 11px;
-    height: 11px;
-    transition: transform calc(var(--dur-frame) * var(--motion-scale)) ease-out;
-  }
-  #adventure-journal-window .aj-instance.expanded .aj-chevron .ui-icon,
-  #adventure-journal-window .aj-phase.open .aj-chevron .ui-icon {
-    transform: rotate(90deg);
-  }
-  #adventure-journal-window .aj-instance-text {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    overflow-wrap: anywhere;
-  }
-  #adventure-journal-window .aj-instance-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1px 8px;
-    color: var(--color-rbg-kicker);
-    font-family: var(--body-font);
-    font-size: 9px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .aj-here-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-rbg-gain-text);
-    box-shadow: 0 0 7px var(--color-rbg-gain-border);
-  }
-  #adventure-journal-window .aj-boss-list {
-    display: grid;
-    gap: 3px;
-    margin: 4px 0 6px 8px;
-    padding: 0 0 0 7px;
-    border-left: 1px solid var(--color-rbg-divider);
-    list-style: none;
-  }
-  #adventure-journal-window .aj-boss {
-    width: 100%;
-    min-height: 46px;
-    display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 8px;
-    padding: 3px 6px 3px 3px;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    background: transparent;
-    color: var(--color-text-muted);
-    text-align: left;
-    cursor: var(--cursor-point);
-  }
-  #adventure-journal-window .aj-boss:hover,
-  #adventure-journal-window .aj-boss:focus-visible {
-    border-color: var(--color-rbg-tab-border);
-    color: var(--color-text-light);
-  }
-  #adventure-journal-window .aj-boss.active {
-    border-color: var(--gold);
-    background: linear-gradient(
-      90deg,
-      var(--color-rbg-tab-active-start),
-      var(--color-rbg-frame-start)
-    );
-    box-shadow:
-      inset 3px 0 0 var(--gold),
-      inset 0 0 16px var(--color-rbg-tab-active-glow);
-    color: var(--color-text-light);
-  }
-  #adventure-journal-window .aj-boss-portrait {
-    width: 40px;
-    height: 40px;
-    display: block;
-  }
-  #adventure-journal-window .aj-boss-portrait img {
-    width: 40px;
-    height: 40px;
-    display: block;
-    padding: 2px;
-    border: 1px solid var(--color-rbg-tab-border);
-    border-radius: 2px;
-    background: radial-gradient(
-      circle,
-      var(--color-rbg-portrait-start),
-      var(--color-rbg-frame-end) 72%
-    );
-    object-fit: contain;
-    filter: saturate(0.72) brightness(0.72);
-  }
-  #adventure-journal-window .aj-boss-portrait-council img {
-    box-shadow: 3px -3px 0 -1px var(--color-rbg-tab-border);
-  }
-  #adventure-journal-window .aj-boss.active img,
-  #adventure-journal-window .aj-boss:hover img {
-    border-color: var(--gold);
-    filter: none;
-  }
-  #adventure-journal-window .aj-boss.defeated:not(.active) img {
-    filter: grayscale(1) brightness(0.55);
-  }
-  #adventure-journal-window .aj-boss-text {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    overflow-wrap: anywhere;
-  }
-  #adventure-journal-window .aj-boss-name {
-    font-family: var(--title-font);
-    font-size: 10.5px;
-    line-height: 1.2;
-  }
-  #adventure-journal-window .aj-boss-rank {
-    color: var(--color-rbg-kicker);
-    font-family: var(--body-font);
-    font-size: 8.5px;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .aj-boss-status {
-    display: inline-flex;
-  }
-  #adventure-journal-window .aj-boss-status .ui-icon {
-    width: 13px;
-    height: 13px;
-  }
-  #adventure-journal-window .aj-boss-status-defeated {
-    color: var(--color-rbg-gain-text);
-  }
-  #adventure-journal-window .aj-boss-status-engaged {
-    color: var(--color-rbg-deadly-text);
-  }
-  #adventure-journal-window .aj-page-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  #adventure-journal-window .aj-page-kicker {
-    flex: 1;
-    min-width: 0;
-    color: var(--color-rbg-kicker);
-    font-family: var(--title-font);
-    font-size: 10px;
-    letter-spacing: 0.8px;
-    text-align: center;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .aj-step {
-    width: 32px;
-    height: 32px;
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--color-rbg-segment-border);
-    border-radius: 50%;
-    background: var(--color-rbg-control-bg);
-    color: var(--gold);
-    cursor: var(--cursor-point);
-  }
-  #adventure-journal-window .aj-step:hover:not(:disabled) {
-    border-color: var(--gold);
-  }
-  #adventure-journal-window .aj-step:disabled {
-    opacity: 0.35;
-    cursor: default;
-  }
-  #adventure-journal-window .aj-step .ui-icon {
-    width: 14px;
-    height: 14px;
-  }
-  #adventure-journal-window .aj-hero-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: -4px 0 9px;
-  }
-  #adventure-journal-window .aj-hero-chips .rbg-rank {
-    margin: 0;
-  }
-  #adventure-journal-window .aj-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border: 1px solid var(--color-rbg-gain-border);
-    border-radius: 999px;
-    color: var(--color-rbg-gain-text);
-    font-family: var(--title-font);
-    font-size: 9px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .aj-chip .ui-icon {
-    width: 10px;
-    height: 10px;
-  }
-  #adventure-journal-window .aj-chip-engaged {
-    border-color: var(--color-rbg-deadly-border);
-    color: var(--color-rbg-deadly-text);
-  }
-  #adventure-journal-window .aj-council {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 14px;
-    margin: 0 0 10px;
-    padding: 0;
-    list-style: none;
-  }
-  #adventure-journal-window .aj-council-member {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--color-rbg-phase-title);
-    font-family: var(--title-font);
-    font-size: 11px;
-  }
-  #adventure-journal-window .aj-council-member img {
+  #adventure-journal-window .aj-role-badge {
     width: 30px;
     height: 30px;
-    border: 1px solid var(--color-rbg-icon-border);
+    display: grid;
+    place-items: center;
     border-radius: 50%;
-    background: var(--color-rbg-control-bg);
-    object-fit: cover;
+    background: var(--color-aj-tag);
   }
-  #adventure-journal-window .aj-tier-mythic {
-    font-style: italic;
+  #adventure-journal-window .aj-role-badge :is(.ui-icon, .aj-glyph) {
+    width: 16px;
+    height: 16px;
   }
-  #adventure-journal-window .aj-tabs {
-    display: flex;
-    gap: 2px;
-    margin: 0 0 12px;
-    border-bottom: 1px solid var(--color-rbg-divider);
-  }
-  #adventure-journal-window .aj-tab {
-    min-height: 34px;
-    padding: 0 16px;
-    border: 1px solid transparent;
-    border-bottom: 0;
-    border-radius: 4px 4px 0 0;
-    background: transparent;
-    color: var(--color-text-muted);
-    font-family: var(--title-font);
-    font-size: 11px;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    cursor: var(--cursor-point);
-  }
-  #adventure-journal-window .aj-tab:hover {
-    color: var(--color-text-light);
-  }
-  #adventure-journal-window .aj-tab.active {
-    border-color: var(--color-rbg-segment-border);
-    background: linear-gradient(180deg, var(--color-rbg-segment-active-start), transparent);
-    box-shadow: inset 0 2px 0 var(--gold);
-    color: var(--color-rbg-segment-active-text);
-  }
-  #adventure-journal-window .aj-phase-head {
-    min-width: 0;
-  }
-  #adventure-journal-window .aj-phase-head h3 {
+  #adventure-journal-window .aj-role-card h4 {
     margin: 0;
+    color: var(--color-aj-text);
+    font-size: 15.5px;
+    font-weight: 700;
   }
-  #adventure-journal-window .aj-phase-toggle {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 7px;
-    min-height: 28px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--color-rbg-phase-title);
-    font: inherit;
-    text-align: left;
-    cursor: var(--cursor-point);
+  #adventure-journal-window .aj-role-card p {
+    margin: 10px 0 0;
+    color: var(--color-aj-soft);
   }
-  #adventure-journal-window .aj-phase-count {
-    color: var(--color-rbg-kicker);
-    font-family: var(--body-font);
-    font-size: 9px;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-  }
-  #adventure-journal-window .aj-role-card .aj-muted {
-    color: var(--color-text-muted);
+  #adventure-journal-window .aj-muted {
+    color: var(--color-aj-mute);
   }
   #adventure-journal-window .aj-watch {
-    margin-top: 8px;
+    margin-top: 12px;
   }
   #adventure-journal-window .aj-watch-label {
-    color: var(--color-rbg-kicker);
-    font-family: var(--title-font);
-    font-size: 9px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-aj-mute);
+    font-size: 13.5px;
+    font-weight: 600;
   }
   #adventure-journal-window .aj-watch ul {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin: 5px 0 0;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
   #adventure-journal-window .aj-watch-link {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 5px;
-    min-height: 26px;
-    padding: 2px 9px 2px 2px;
-    border: 1px solid var(--color-rbg-ability-border);
-    border-radius: 999px;
-    background: var(--color-rbg-control-bg);
-    color: var(--color-text-light);
-    font-family: var(--body-font);
-    font-size: 10.5px;
+    gap: 8px;
+    width: 100%;
+    padding: 4px 6px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    line-height: 1.35;
     text-align: left;
     cursor: var(--cursor-point);
   }
   #adventure-journal-window .aj-watch-link:hover {
-    border-color: var(--gold-dim);
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
   }
   #adventure-journal-window .aj-watch-link img {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--color-aj-icon-border);
+    border-radius: 5px;
   }
+  #adventure-journal-window .rbg-choices {
+    margin-top: 22px;
+  }
+  #adventure-journal-window .rbg-choice {
+    margin-bottom: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .rbg-choice header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #adventure-journal-window .rbg-choice header img {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-aj-icon-border);
+    border-radius: 6px;
+  }
+  #adventure-journal-window .rbg-choice h3 {
+    margin: 0;
+    color: var(--color-aj-text);
+    font-size: 15.5px;
+    font-weight: 700;
+  }
+  #adventure-journal-window .rbg-choice-sides {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+  #adventure-journal-window .rbg-choice-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .rbg-choice-label .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #adventure-journal-window .rbg-choice-gain .rbg-choice-label {
+    color: var(--color-aj-done);
+  }
+  #adventure-journal-window .rbg-choice-risk .rbg-choice-label {
+    color: var(--color-aj-deadly);
+  }
+  #adventure-journal-window .rbg-choice p {
+    margin: 4px 0 0;
+    color: var(--color-aj-soft);
+  }
+
+  /* Loot, Mythic's Coming soon */
   #adventure-journal-window .aj-loot {
     display: grid;
-    gap: 4px;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -13917,30 +13889,33 @@
     display: grid;
     grid-template-columns: 40px minmax(0, 1fr);
     align-items: center;
-    gap: 10px;
-    padding: 5px 9px 5px 5px;
-    border: 1px solid var(--color-rbg-ability-border);
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--color-rbg-ability-start), var(--color-rbg-tab-end));
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-loot-row:hover {
+    background: var(--color-aj-panel-hover);
   }
   #adventure-journal-window .aj-loot-row > :first-child {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
   }
   #adventure-journal-window .aj-loot-text {
-    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-width: 0;
   }
   #adventure-journal-window .aj-loot-name {
-    font-family: var(--title-font);
-    font-size: 12px;
+    font-size: 15px;
+    font-weight: 600;
     overflow-wrap: anywhere;
   }
   #adventure-journal-window .aj-loot-detail {
-    color: var(--color-text-muted);
-    font-size: 10.5px;
+    color: var(--color-aj-mute);
+    font-size: 13.5px;
   }
   #adventure-journal-window .aj-soon,
   #adventure-journal-window .aj-loot-empty {
@@ -13948,64 +13923,48 @@
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    margin-top: 4px;
-    padding: 26px 18px 24px;
-    border: 1px solid var(--color-rbg-hero-border);
-    border-radius: 4px;
+    padding: 34px 20px 30px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 12px;
     background:
-      radial-gradient(circle at 50% 18%, var(--color-rbg-hero-flare), transparent 46%),
-      linear-gradient(180deg, var(--color-rbg-hero-start), var(--color-rbg-hero-end));
-    box-shadow: inset 0 0 24px var(--color-rbg-shadow-soft);
+      radial-gradient(circle at 50% 0%, var(--color-aj-accent-glow), transparent 60%),
+      var(--color-aj-panel);
     text-align: center;
   }
   #adventure-journal-window .aj-soon {
-    padding: 34px 20px 30px;
+    margin: 22px 28px 28px;
   }
   #adventure-journal-window .aj-soon-sigil {
-    width: 64px;
-    height: 64px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--gold-dim);
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-aj-accent-line);
     border-radius: 50%;
-    background: radial-gradient(
-      circle at 38% 32%,
-      var(--color-rbg-model-start),
-      var(--color-rbg-frame-end) 80%
-    );
-    box-shadow:
-      0 0 18px var(--color-rbg-model-glow),
-      inset 0 0 10px var(--color-rbg-shadow);
-    color: var(--gold);
+    background: var(--color-aj-well);
+    color: var(--color-aj-accent);
   }
   #adventure-journal-window .aj-soon-sigil .ui-icon {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
   }
   #adventure-journal-window .aj-soon-kicker {
     margin-top: 4px;
-    color: var(--color-rbg-kicker);
-    font-family: var(--title-font);
-    font-size: 11px;
-    letter-spacing: 2.4px;
-    text-transform: uppercase;
+    color: var(--color-aj-accent-hi);
+    font-size: 14px;
+    font-weight: 600;
   }
   #adventure-journal-window .aj-soon h3 {
     margin: 0;
-    color: var(--color-rbg-heading);
-    font-family: var(--title-font);
+    color: var(--color-aj-text);
     font-size: 22px;
-    font-weight: 400;
-    text-shadow: 0 2px 6px var(--color-rbg-shadow);
+    font-weight: 700;
   }
   #adventure-journal-window .aj-soon p,
   #adventure-journal-window .aj-loot-empty p {
-    max-width: 440px;
+    max-width: 460px;
     margin: 0;
-    color: var(--color-text-muted);
-    font-size: 12px;
-    line-height: 1.5;
+    color: var(--color-aj-soft);
   }
   #adventure-journal-window .aj-soon-actions {
     display: flex;
@@ -14015,21 +13974,25 @@
     margin-top: 8px;
   }
   #adventure-journal-window .aj-soon-tier {
-    min-height: 34px;
+    min-height: 36px;
     padding: 0 16px;
-    border: 1px solid var(--color-rbg-button-border);
-    border-radius: 3px;
-    background: linear-gradient(var(--color-rbg-button-start), var(--color-rbg-button-end));
-    color: var(--color-rbg-button-text);
-    font-family: var(--title-font);
-    font-size: 11px;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 8px;
+    background: var(--color-aj-well);
+    color: var(--color-aj-accent-hi);
+    font-size: 14px;
+    font-weight: 600;
     cursor: var(--cursor-point);
   }
   #adventure-journal-window .aj-soon-tier:hover {
-    color: var(--color-rbg-button-text-hover);
+    border-color: var(--color-aj-accent);
+    background: var(--color-aj-accent);
+    color: var(--color-aj-accent-ink);
   }
-  /* The book beside the target frame, shown while the target has a journal
-     page (#target-frame.has-journal). A 24px plate with a 40px hit area. */
+  #adventure-journal-window .aj-crumb,
+  #adventure-journal-window .aj-strip-boss {
+    font: inherit;
+  }
   #tf-journal {
     position: absolute;
     left: -10px;
@@ -14066,8 +14029,8 @@
   @media (forced-colors: active) {
     #adventure-journal-window .aj-boss.active,
     #adventure-journal-window .aj-tab.active,
-    #adventure-journal-window .rbg-ability.expanded,
-    #adventure-journal-window .rbg-segmented button.active {
+    #adventure-journal-window .aj-ab.open,
+    #adventure-journal-window .aj-diff button.active {
       outline: 2px solid Highlight;
       outline-offset: -2px;
     }
