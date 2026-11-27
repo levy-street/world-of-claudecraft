@@ -10164,6 +10164,7 @@ export const nl_NL: EnTranslations = {
       "immolate": "Steekt een doelwit in brand voor een openingsklap en een brand die blijft hangen.",
       "corruption": "Laat een doelwit wegrotten met schaduw die tikt terwijl jij andere dingen doet.",
       "life_tap": "Ruilt een deel van je eigen gezondheid terug om in mana wanneer je droog komt te staan.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Een natuurbout die van afstand op een doelwit wordt geworpen, je vertrouwde nuke.",
       "healing_touch": "Een grote enkeldoelsgenezing met een lange spreuktijd, om iemand aan te vullen.",
       "mark_of_the_wild": "Een blijvende zegening die je op jezelf of een bondgenoot legt voor een gevecht.",
@@ -18283,9 +18284,13 @@ export const nl_NL: EnTranslations = {
         "name": "Vonnis",
         "description": "Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Elke Draad verhoogt de schade met 6%. Extra effecten schalen op bij 20, 50, 80 en 100 Verdoemenis. De schaalvergroting van zijn schade vlakt af na niveau 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Zware Koop",
-        "description": "Zet {damage} levenskracht om in {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Wreed pact",
+        "description": "Offert 10% van je maximale levenskracht om {manaPct}% van je maximale mana te herstellen. Niet bruikbaar bij 20% levenskracht of minder."
       },
       "cursed_accomplice": {
         "name": "Vervloekte handlanger",

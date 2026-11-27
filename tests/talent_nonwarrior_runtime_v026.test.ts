@@ -199,10 +199,10 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.resource).toBe(0);
     expect(sim.player.gcdRemaining).toBe(0);
 
-    sim.player.hp = 100;
+    sim.player.hp = sim.player.maxHp;
     sim.castAbility('life_tap');
-    expect(sim.player.hp).toBe(15);
-    expect(sim.player.resource).toBe(128);
+    expect(sim.player.hp).toBe(sim.player.maxHp - Math.round(sim.player.maxHp * 0.1));
+    expect(sim.player.resource).toBe(Math.round(sim.player.maxResource * (0.2 * (1 + 0.5))));
     expect(sim.player.auras.some((entry) => entry.id === 'wlk_blood_credit')).toBe(false);
   });
 

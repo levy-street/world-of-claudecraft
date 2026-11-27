@@ -7982,8 +7982,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft.',
   'entities.abilities.lesser_heal.name': 'Viskad bön',
-  'entities.abilities.life_tap.description': 'Omvandlar {damage} hälsa till {damage} mana.',
-  'entities.abilities.life_tap.name': 'Hårt köpslag',
+  'entities.abilities.life_tap.description':
+    'Offrar 10% av din maximala hälsa för att återställa {manaPct}% av din maximala mana. Kan inte användas vid 20% hälsa eller lägre.',
+  'entities.abilities.hard_bargain.name': 'Hårt köpslag',
+  'entities.abilities.life_tap.name': 'Grym pakt',
   'entities.abilities.lightning_bolt.description':
     'Vållar {damage} Naturskada. Skadan ökar med Besvärjelsekraft. Elementär: en träff ger 1 Åska.',
   'entities.abilities.lightning_bolt.name': 'Bågblixt',

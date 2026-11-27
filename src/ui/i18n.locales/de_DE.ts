@@ -9683,8 +9683,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Schwarzfäule',
   'entities.abilities.corruption.description':
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
-  'entities.abilities.life_tap.name': 'Harter Handel',
-  'entities.abilities.life_tap.description': 'Wandelt {damage} Gesundheit in {damage} Mana um.',
+  'entities.abilities.life_tap.name': 'Grausamer Pakt',
+  'entities.abilities.life_tap.description':
+    'Opfert 10% Eurer maximalen Gesundheit, um {manaPct}% Eures maximalen Manas wiederherzustellen. Kann bei 20% Gesundheit oder weniger nicht eingesetzt werden.',
+  'entities.abilities.hard_bargain.name': 'Harter Handel',
   'entities.abilities.curse_of_agony.name': 'Fluch der Qual',
   'entities.abilities.curse_of_agony.description':
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',

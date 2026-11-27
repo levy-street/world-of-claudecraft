@@ -115,6 +115,8 @@ export function playerSpellHasteFrac(p: Entity | null | undefined): number {
 // cast / channel time exactly as the sim does, so a hasted caster's tooltips reflect the
 // real, faster cast.
 export function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
+  // A passive is never cast, so it reads Passive rather than a zero-time Instant.
+  if (known.def.passive) return t('abilityUi.tooltip.passive');
   const h = 1 + Math.max(0, spellHaste);
   if (known.def.channel) {
     return t('abilityUi.tooltip.channeledSeconds', {

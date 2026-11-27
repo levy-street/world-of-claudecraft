@@ -3301,6 +3301,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['glow', 'arcs'],
   ),
   life_tap: r('blood', 'shadowPurple', ['heart', { p: 'droplet', ...BR, pal: 'shadowPurple' }]),
+  hard_bargain: r('shadow', 'blood', ['droplet', { p: 'heart', ...BR }], ['glow']),
   curse_of_agony: r('shadow', 'shadowPurple', ['skull'], ['arcs']),
   drain_life: r('shadow', 'blood', [{ p: 'droplet', pal: 'blood' }], ['motion', 'drips']),
   umbral_anchor: r(
@@ -4875,6 +4876,9 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'summon_infernal',
   'summon_doomguard',
   'life_tap',
+  // Hard Bargain wears the original Hard Bargain painting (demon pack 44.png); life_tap
+  // (now Cruel Pact) wears the original Cruel Pact painting.
+  'hard_bargain',
   'searing_pain',
   // OpenAI-generated Warlock spell art. These complete the current ability catalog while
   // preserving the existing CraftPix-backed ids above.

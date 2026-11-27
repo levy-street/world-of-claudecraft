@@ -979,7 +979,7 @@ export function completeAfflictionDrain(
 }
 
 export function afflictionCastError(player: Entity, ability: AbilityDef): string | null {
-  if (ability.id === 'cruel_pact' && player.hp <= player.maxHp * 0.2) {
+  if (ability.id === 'life_tap' && player.hp <= player.maxHp * 0.2) {
     return 'Not enough health.';
   }
   return null;

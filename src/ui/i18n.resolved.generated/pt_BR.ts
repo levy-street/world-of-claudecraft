@@ -10164,6 +10164,7 @@ export const pt_BR: EnTranslations = {
       "immolate": "Põe fogo no alvo com um golpe de abertura e uma queimadura que persiste.",
       "corruption": "Apodrece o alvo com magia sombria que causa dano contínuo enquanto você faz outras coisas.",
       "life_tap": "Troca parte da sua própria vida por mana quando você fica sem.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Uma seta de natureza arremessada num alvo à distância, sua magia de ataque preferida.",
       "healing_touch": "Uma cura potente de alvo único com conjuração longa, para recuperar alguém por completo.",
       "mark_of_the_wild": "Uma bênção duradoura que você coloca em si mesmo ou num aliado antes da luta.",
@@ -18283,9 +18284,13 @@ export const pt_BR: EnTranslations = {
         "name": "Sentença",
         "description": "Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Cada Fio aumenta o dano em 6%. Efeitos adicionais escalam em 20, 50, 80 e 100 de Condenação. Sua escala de dano se estabiliza após o nível 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Barganha Amarga",
-        "description": "Converte {damage} de vida em {damage} de mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Pacto Cruel",
+        "description": "Sacrifica 10% da sua vida máxima para restaurar {manaPct}% da sua mana máxima. Não pode ser usado com 20% de vida ou menos."
       },
       "cursed_accomplice": {
         "name": "Cúmplice Amaldiçoado",

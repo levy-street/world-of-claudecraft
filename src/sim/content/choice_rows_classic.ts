@@ -1613,7 +1613,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r8_curse_of_exhaustion',
           name: 'Leaden Hex',
           description:
-            'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
+            'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. While your Blackrot or Hex of Anguish ticks on the target, the slow does not wear off. At 3 stacks, the next spell cast roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
           icon: 'wlk_r8_curse_of_exhaustion',
           effect: {
             global: { warlockLeadenHex: 0.1 },
@@ -1647,7 +1647,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r11_fel_concentration',
           name: 'Sanguine Covenant',
           description:
-            'Grants Sanguine Covenant: sacrifice 10% of your current health to absorb 30% of your maximum health for 8 sec.',
+            'Grants Sanguine Covenant: sacrifice 10% of your current health to absorb 30% of your maximum health for 30 sec. 30 sec cooldown.',
           icon: 'wlk_r11_fel_concentration',
           effect: { grant: { ability: 'dark_pact' } },
         },
@@ -1685,12 +1685,13 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r14_ruin',
           name: 'Blood Credit',
-          description: 'Hard Bargain and Cruel Pact restore 50% more mana for the same health.',
+          description:
+            'Cruel Pact and Hard Bargain each grant 50% more: Cruel Pact restores 30% of your maximum mana and Hard Bargain 30% of your maximum health, instead of 20%.',
           icon: 'wlk_r14_ruin',
           effect: {
             ability: [
               { ability: 'life_tap', buffPct: 0.5 },
-              { ability: 'cruel_pact', buffPct: 0.5 },
+              { ability: 'hard_bargain', buffPct: 0.5 },
             ],
           },
         },

@@ -9515,8 +9515,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Putrefacción Negra',
   'entities.abilities.corruption.description':
     'Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s.',
-  'entities.abilities.life_tap.name': 'Trato Amargo',
-  'entities.abilities.life_tap.description': 'Convierte {damage} de salud en {damage} de maná.',
+  'entities.abilities.life_tap.name': 'Pacto cruel',
+  'entities.abilities.life_tap.description':
+    'Sacrifica el 10% de tu salud máxima para restaurar el {manaPct}% de tu maná máximo. No se puede usar con el 20% de salud o menos.',
+  'entities.abilities.hard_bargain.name': 'Trato Amargo',
   'entities.abilities.curse_of_agony.name': 'Sortilegio de Angustia',
   'entities.abilities.curse_of_agony.description':
     'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',

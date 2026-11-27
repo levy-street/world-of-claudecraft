@@ -272,6 +272,7 @@ describe('Necromancy Warlock', () => {
       { level: 1, learned: 'demon_skin' },
       { level: 3, learned: 'umbral_anchor' },
       { level: 4, learned: 'life_tap' },
+      { level: 4, learned: 'hard_bargain' },
       { level: 9, learned: 'soul_lance' },
       { level: 10, learned: 'spell_lock' },
       { level: 12, learned: 'ossuary_mark' },
@@ -609,7 +610,8 @@ describe('Necromancy Warlock', () => {
     expect(sim.setSpec('affliction')).toBe(true);
     expect(knownAbilities(sim)).toContain('drain_life');
     expect(knownAbilities(sim)).not.toEqual(expect.arrayContaining(['immolate']));
-    expect(knownAbilities(sim)).not.toContain('life_tap');
+    // Cruel Pact (life_tap) is the one health-for-mana spell for every spec.
+    expect(knownAbilities(sim)).toContain('life_tap');
 
     expect(sim.setSpec(null)).toBe(true);
     expect(knownAbilities(sim)).toEqual(
@@ -621,7 +623,7 @@ describe('Necromancy Warlock', () => {
     sim.setPlayerLevel(13);
     expect(knownAbilities(sim)).toContain('life_tap');
     sim.setPlayerLevel(14);
-    expect(knownAbilities(sim)).not.toContain('life_tap');
+    expect(knownAbilities(sim)).toContain('life_tap');
   });
 
   it('spends fragments to make every undead reap the primary target in unison', () => {

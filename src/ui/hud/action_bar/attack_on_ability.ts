@@ -112,6 +112,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   selfDamagePctMax: 'other',
   selfDamagePctCurrent: 'other',
   selfHealPctMax: 'other',
+  hardBargain: 'other',
   selfAbsorbPctMax: 'other',
   gainSoulFragments: 'other',
   summonUndead: 'other',

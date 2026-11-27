@@ -10223,8 +10223,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Pourriture noire',
   'entities.abilities.corruption.description':
     "Corrompt la cible et inflige {damage} points de dégâts d'Ombre en 18 s.",
-  'entities.abilities.life_tap.name': 'Marché brutal',
-  'entities.abilities.life_tap.description': 'Convertit {damage} points de vie en {damage} mana.',
+  'entities.abilities.life_tap.name': 'Pacte cruel',
+  'entities.abilities.life_tap.description':
+    'Sacrifie 10% de vos points de vie maximum pour rendre {manaPct}% de votre mana maximum. Impossible à utiliser à 20% de points de vie ou moins.',
+  'entities.abilities.hard_bargain.name': 'Marché brutal',
   'entities.abilities.curse_of_agony.name': "Maléfice d'angoisse",
   'entities.abilities.curse_of_agony.description':
     "Maudit la cible d'agonie: {damage} points de dégâts d'Ombre en 24 s.",

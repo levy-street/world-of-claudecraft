@@ -6244,8 +6244,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': '검은 부패',
   'entities.abilities.corruption.description':
     '대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
-  'entities.abilities.life_tap.name': '가혹한 거래',
-  'entities.abilities.life_tap.description': '생명력 {damage}을 마나 {damage}으로 전환합니다.',
+  'entities.abilities.life_tap.name': '잔혹한 계약',
+  'entities.abilities.life_tap.description':
+    '최대 생명력의 10%를 희생하여 최대 마나의 {manaPct}%를 회복합니다. 생명력이 20% 이하일 때는 사용할 수 없습니다.',
+  'entities.abilities.hard_bargain.name': '가혹한 거래',
+  'entities.abilities.hard_bargain.description':
+    '최대 마나의 20%를 희생하여 최대 생명력의 {healPct}%를 회복합니다.',
+  'guide.abilityHook.hard_bargain': '부상을 입었을 때 마나의 20%를 생명력의 20%로 바꿉니다.',
   'entities.abilities.curse_of_agony.name': '고뇌의 저주',
   'entities.abilities.curse_of_agony.description':
     '대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',

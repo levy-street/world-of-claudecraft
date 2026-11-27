@@ -1725,6 +1725,19 @@ export function castAbility(
     ctx.error(p.id, 'Not enough health.');
     return;
   }
+  // Hard Bargain: refuse before the GCD when the mana is not there or there is
+  // nothing to heal, so a wasted press costs nothing.
+  const bargain = res.effects.find((effect) => effect.type === 'hardBargain');
+  if (bargain) {
+    if (p.resourceType !== 'mana' || p.resource < Math.round(p.maxResource * bargain.manaPctMax)) {
+      ctx.error(p.id, 'Not enough mana!');
+      return;
+    }
+    if (p.hp >= p.maxHp) {
+      ctx.error(p.id, 'You are already at full health.');
+      return;
+    }
+  }
   // Voidfeast (requiresDispellable): the devour is only castable when the
   // target actually carries something to eat, refused BEFORE billing mana or
   // arming the cooldown (the no-Seal precedent). It sits AFTER the whole

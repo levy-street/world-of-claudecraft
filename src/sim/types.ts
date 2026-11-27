@@ -4292,6 +4292,8 @@ export type AbilityEffect =
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'selfDamagePctCurrent'; pct: number }
   | { type: 'selfHealPctMax'; pct: number }
+  // Hard Bargain: spend a share of max mana to heal a share of max health.
+  | { type: 'hardBargain'; manaPctMax: number; healPctMax: number }
   | { type: 'selfAbsorbPctMax'; pct: number; duration: number }
   | { type: 'gainSoulFragments'; amount: number }
   | {
@@ -4346,7 +4348,13 @@ export type AbilityEffect =
       doom: number;
     }
   | { type: 'afflictionVicarious'; duration: number; maxDoom: number }
-  | { type: 'warlockUmbralAnchor'; duration: number; maxRange: number }
+  | {
+      type: 'warlockUmbralAnchor';
+      duration: number;
+      maxRange: number;
+      /** Share of the caster's max health healed on each recall teleport. */
+      recallHealPctMax?: number;
+    }
   | {
       type: 'afflictionCoven';
       duration: number;

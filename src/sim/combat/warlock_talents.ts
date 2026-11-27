@@ -35,6 +35,23 @@ const LEADEN_MAX_STACKS = 3;
 const LEADEN_DURATION = 5;
 const LEADEN_ROOT_DURATION = 3.5;
 const LEADEN_ROOT_LOCK = 15;
+// The warlock DoTs whose ticks hold an existing Leaden slow in place.
+const LEADEN_SUSTAINING_DOT_IDS = new Set(['corruption', 'curse_of_agony', 'siphon_life']);
+
+/**
+ * A tick of the warlock's Blackrot or Hex of Anguish keeps their Leaden Hex slow on the
+ * target from wearing off. It never adds a stack and never roots: stacks and the root
+ * still come only from a cast (applyLeadenHex).
+ */
+export function sustainLeadenHexFromDotTick(target: Entity, dot: Aura): void {
+  if (!LEADEN_SUSTAINING_DOT_IDS.has(dot.id) || dot.sourceId === undefined) return;
+  const slow = target.auras.find(
+    (aura) => aura.id === LEADEN_SLOW_ID && aura.sourceId === dot.sourceId,
+  );
+  if (!slow) return;
+  slow.remaining = Math.max(slow.remaining, LEADEN_DURATION);
+  slow.duration = LEADEN_DURATION;
+}
 
 const SHADOW_CREDIT_ID = 'wlk_shadow_credit';
 const SHADOW_CREDIT_GENERATORS = [...WARLOCK_GENERATOR_IDS];

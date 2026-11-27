@@ -4134,6 +4134,16 @@ export function runEffects(
         });
         break;
       }
+      case 'hardBargain': {
+        // Billing and the not-enough-mana / full-health refusals run before the GCD in
+        // casting_lifecycle (hardBargainCastError); this re-checks for direct calls.
+        const spend = Math.round(p.maxResource * eff.manaPctMax);
+        if (p.resourceType !== 'mana' || p.resource < spend) break;
+        p.resource -= spend;
+        // A flat share: no crit roll, so it draws no rng.
+        ctx.applyHeal(p, p, Math.round(p.maxHp * eff.healPctMax), ability.name, ability.id, false);
+        break;
+      }
       case 'selfHealPctMax': {
         // Emberfury 4pc: Bloodletting's self-heal rises to 8 percent of max
         // health for the wearer. The furious_mending FLOOR (max with 0.2)
@@ -4248,8 +4258,8 @@ export function runEffects(
         break;
       }
       case 'afflictionCruelPact': {
-        const manaPctMax = eff.manaPctMax * (1 + (mods.abilities[ability.id]?.buffPct ?? 0));
-        applyCruelPact(ctx, p, eff.healthPct, manaPctMax, eff.doom);
+        // Blood Credit is already folded into the resolved manaPctMax (classes.ts).
+        applyCruelPact(ctx, p, eff.healthPct, eff.manaPctMax, eff.doom);
         break;
       }
       case 'afflictionVicarious': {
@@ -4259,6 +4269,12 @@ export function runEffects(
       case 'warlockUmbralAnchor': {
         if (placeOrRecallUmbralAnchor(ctx, p, eff.duration, eff.maxRange)) {
           applyBlacktideReturnSpeed(ctx, p);
+          // Every spec: the return knits 10% of max health. A flat share, so no
+          // crit roll (and no rng draw).
+          if (eff.recallHealPctMax && !p.dead) {
+            const heal = Math.round(p.maxHp * eff.recallHealPctMax);
+            ctx.applyHeal(p, p, heal, ability.name, ability.id, false);
+          }
         }
         break;
       }

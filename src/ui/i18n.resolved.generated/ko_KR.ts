@@ -10164,6 +10164,7 @@ export const ko_KR: EnTranslations = {
       "immolate": "대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.",
       "corruption": "대상을 어둠으로 부식시켜, 다른 일을 하는 동안에도 피해가 들어갑니다.",
       "life_tap": "마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.",
+      "hard_bargain": "부상을 입었을 때 마나의 20%를 생명력의 20%로 바꿉니다.",
       "wrath": "원거리에서 대상에게 던지는 자연 화살로, 주력 공격기입니다.",
       "healing_touch": "시전 시간이 긴 강력한 단일 대상 치유로, 체력을 가득 채울 때 씁니다.",
       "mark_of_the_wild": "전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.",
@@ -18283,9 +18284,13 @@ export const ko_KR: EnTranslations = {
         "name": "선고",
         "description": "모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "가혹한 거래",
-        "description": "생명력 {damage}을 마나 {damage}으로 전환합니다."
+        "description": "최대 마나의 20%를 희생하여 최대 생명력의 {healPct}%를 회복합니다."
+      },
+      "life_tap": {
+        "name": "잔혹한 계약",
+        "description": "최대 생명력의 10%를 희생하여 최대 마나의 {manaPct}%를 회복합니다. 생명력이 20% 이하일 때는 사용할 수 없습니다."
       },
       "cursed_accomplice": {
         "name": "저주받은 공모자",

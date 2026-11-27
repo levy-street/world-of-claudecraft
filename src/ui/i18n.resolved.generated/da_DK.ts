@@ -10164,6 +10164,7 @@ export const da_DK: EnTranslations = {
       "immolate": "Sætter ild til et mål for et indledende slag og en brand der hænger ved.",
       "corruption": "Forrådner et mål med skygge der tikker mens du gør andre ting.",
       "life_tap": "Bytter noget af dit eget helbred tilbage til mana når du løber tør.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Et naturlyn kastet mod et mål på afstand, din foretrukne bombe.",
       "healing_touch": "En stor helbredelse på ét mål med lang besværgelsestid, til at fylde nogen op.",
       "mark_of_the_wild": "En vedvarende velsignelse du lægger på dig selv eller en allieret før en kamp.",
@@ -18283,9 +18284,13 @@ export const da_DK: EnTranslations = {
         "name": "Dom",
         "description": "Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Hver Tråd øger skaden med 6%. Ekstra effekter eskalerer ved 20, 50, 80 og 100 Fordømmelse. Dens skadesskalering flader ud efter niveau 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Hård Handel",
-        "description": "Omdanner {damage} helbred til {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Grusom pagt",
+        "description": "Ofrer 10% af dit maksimale helbred for at genoprette {manaPct}% af din maksimale mana. Kan ikke bruges ved 20% helbred eller derunder."
       },
       "cursed_accomplice": {
         "name": "Forbandet medskyldig",

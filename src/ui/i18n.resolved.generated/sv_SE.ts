@@ -10164,6 +10164,7 @@ export const sv_SE: EnTranslations = {
       "immolate": "Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.",
       "corruption": "Förmultnar ett mål med skugga som tickar medan du gör andra saker.",
       "life_tap": "Byter en del av din egen hälsa tillbaka till mana när du sinar.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "En naturpil kastad mot ett mål från avstånd, din förstavalskanon.",
       "healing_touch": "En stor enmålsläkning med lång kasttid, för att toppa upp någon.",
       "mark_of_the_wild": "En varaktig välsignelse du lägger på dig själv eller en allierad före en strid.",
@@ -18283,9 +18284,13 @@ export const sv_SE: EnTranslations = {
         "name": "Dom",
         "description": "Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Hårt köpslag",
-        "description": "Omvandlar {damage} hälsa till {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Grym pakt",
+        "description": "Offrar 10% av din maximala hälsa för att återställa {manaPct}% av din maximala mana. Kan inte användas vid 20% hälsa eller lägre."
       },
       "cursed_accomplice": {
         "name": "Förbannad medhjälpare",

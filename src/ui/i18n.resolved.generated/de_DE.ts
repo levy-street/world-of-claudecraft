@@ -10164,6 +10164,7 @@ export const de_DE: EnTranslations = {
       "immolate": "Setzt ein Ziel in Brand für einen Eröffnungstreffer und einen anhaltenden Brand.",
       "corruption": "Lässt ein Ziel mit Schatten verrotten, der tickt, während du anderes erledigst.",
       "life_tap": "Tauscht einen Teil deiner eigenen Gesundheit in Mana zurück, wenn du leerläufst.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Ein Naturblitz, den du aus der Distanz auf ein Ziel schleuderst, dein erster Schadenszauber.",
       "healing_touch": "Eine große Einzelzielheilung mit langer Zauberzeit, um jemanden wieder aufzufüllen.",
       "mark_of_the_wild": "Ein anhaltender Segen, den du vor einem Kampf auf dich oder einen Verbündeten legst.",
@@ -18283,9 +18284,13 @@ export const de_DE: EnTranslations = {
         "name": "Schuldspruch",
         "description": "Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Jeder Faden erhöht den Schaden um 6%. Zusätzliche Effekte eskalieren bei 20, 50, 80 und 100 Verdammnis. Seine Schadensskalierung flacht nach Stufe 16 ab."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Harter Handel",
-        "description": "Wandelt {damage} Gesundheit in {damage} Mana um."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Grausamer Pakt",
+        "description": "Opfert 10% Eurer maximalen Gesundheit, um {manaPct}% Eures maximalen Manas wiederherzustellen. Kann bei 20% Gesundheit oder weniger nicht eingesetzt werden."
       },
       "cursed_accomplice": {
         "name": "Verfluchter Komplize",

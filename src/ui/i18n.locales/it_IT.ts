@@ -9652,8 +9652,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Marciume Nero',
   'entities.abilities.corruption.description':
     'Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s.',
-  'entities.abilities.life_tap.name': 'Patto Amaro',
-  'entities.abilities.life_tap.description': 'Converte {damage} salute in {damage} mana.',
+  'entities.abilities.life_tap.name': 'Patto Crudele',
+  'entities.abilities.life_tap.description':
+    'Sacrifica il 10% della salute massima per ripristinare il {manaPct}% del mana massimo. Non utilizzabile con il 20% di salute o meno.',
+  'entities.abilities.hard_bargain.name': 'Patto Amaro',
   'entities.abilities.curse_of_agony.name': "Maleficio dell'Angoscia",
   'entities.abilities.curse_of_agony.description':
     'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',

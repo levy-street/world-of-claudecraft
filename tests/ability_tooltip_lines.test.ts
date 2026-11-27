@@ -58,6 +58,11 @@ describe('describeAbilitySummary', () => {
 });
 
 describe('abilityCastLine', () => {
+  it('renders Passive for a passive instead of Instant', () => {
+    expect(ABILITIES.maledict_gaze.passive).toBe(true);
+    expect(abilityCastLine(resolved(ABILITIES.maledict_gaze))).toBe('Passive');
+  });
+
   it('renders Instant for a zero cast time and the seconds for a timed cast', () => {
     expect(abilityCastLine(resolved(ABILITIES.fireball, { castTime: 0 }))).toBe('Instant');
     expect(abilityCastLine(resolved(ABILITIES.fireball))).toBe('1.5 sec cast');

@@ -10163,7 +10163,8 @@ export const en_CA: EnTranslations = {
       "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
       "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
       "corruption": "Rots a target with shadow that ticks while you do other things.",
-      "life_tap": "Trades some of your own health back into mana when you run dry.",
+      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "A nature bolt thrown at a target from range, your go-to nuke.",
       "healing_touch": "A big single-target heal with a long cast, for topping someone off.",
       "mark_of_the_wild": "A lasting blessing you put on yourself or an ally before a fight.",
@@ -18283,9 +18284,13 @@ export const en_CA: EnTranslations = {
         "name": "Sentence",
         "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Hard Bargain",
-        "description": "Converts {damage} health into {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Cruel Pact",
+        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
       },
       "cursed_accomplice": {
         "name": "Cursed Accomplice",

@@ -20,9 +20,11 @@ describe('isSelfOnlyAbility', () => {
     expect([...SELF_ONLY_EFFECT_TYPES].sort()).toEqual(
       [
         'absorb',
+        'afflictionCruelPact',
         'dismissPet',
         'gainResource',
         'grantDevotion',
+        'hardBargain',
         'imbue',
         'lifeTap',
         'selfBuff',
@@ -41,7 +43,7 @@ describe('isSelfOnlyAbility', () => {
     ['evasion', true], // selfBuff
     ['ice_barrier', true], // absorb
     ['instant_poison', true], // imbue
-    ['life_tap', true], // lifeTap
+    ['life_tap', true], // afflictionCruelPact (Cruel Pact)
     ['adrenaline_rush', true], // gainResource
     ['avenging_wrath', true], // selfBuff + grantDevotion
     ['bloodrage', true], // selfDamagePctMax + gainResource

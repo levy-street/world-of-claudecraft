@@ -10164,6 +10164,7 @@ export const id_ID: EnTranslations = {
       "immolate": "Membakar sasaran untuk hantaman pembuka dan kobaran yang terus membara.",
       "corruption": "Membusukkan sasaran dengan bayangan yang menggerogoti sementara kamu melakukan hal lain.",
       "life_tap": "Menukar sebagian nyawamu sendiri kembali menjadi mana saat kamu kehabisan.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Anak panah alam yang dilontarkan ke sasaran dari kejauhan, serangan andalanmu.",
       "healing_touch": "Penyembuhan besar sasaran tunggal dengan rapalan panjang, untuk memenuhi nyawa seseorang.",
       "mark_of_the_wild": "Berkah tahan lama yang kamu pasang pada dirimu atau sekutu sebelum pertarungan.",
@@ -18283,9 +18284,13 @@ export const id_ID: EnTranslations = {
         "name": "Vonis",
         "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Tawar Getir",
-        "description": "Mengubah {damage} kesehatan menjadi {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Perjanjian Kejam",
+        "description": "Mengorbankan 10% kesehatan maksimum Anda untuk memulihkan {manaPct}% mana maksimum Anda. Tidak dapat digunakan pada 20% kesehatan atau kurang."
       },
       "cursed_accomplice": {
         "name": "Sekutu Terkutuk",

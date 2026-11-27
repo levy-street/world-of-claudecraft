@@ -8189,8 +8189,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.lesser_heal.name': 'Szeptana modlitwa',
-  'entities.abilities.life_tap.description': 'Zamienia {damage} zdrowia na {damage} many.',
-  'entities.abilities.life_tap.name': 'Trudny targ',
+  'entities.abilities.life_tap.description':
+    'Poświęca 10% maksymalnego zdrowia, aby przywrócić {manaPct}% maksymalnej many. Nie można użyć przy 20% zdrowia lub mniej.',
+  'entities.abilities.hard_bargain.name': 'Trudny targ',
+  'entities.abilities.life_tap.name': 'Okrutny Pakt',
   'entities.abilities.lightning_bolt.description':
     'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: trafienie daje 1 Grom.',
   'entities.abilities.lightning_bolt.name': 'Łukowy pocisk',

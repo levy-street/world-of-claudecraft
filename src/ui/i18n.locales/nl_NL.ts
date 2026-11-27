@@ -8265,8 +8265,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht.',
   'entities.abilities.lesser_heal.name': 'Gefluisterd Gebed',
-  'entities.abilities.life_tap.description': 'Zet {damage} levenskracht om in {damage} mana.',
-  'entities.abilities.life_tap.name': 'Zware Koop',
+  'entities.abilities.life_tap.description':
+    'Offert 10% van je maximale levenskracht om {manaPct}% van je maximale mana te herstellen. Niet bruikbaar bij 20% levenskracht of minder.',
+  'entities.abilities.hard_bargain.name': 'Zware Koop',
+  'entities.abilities.life_tap.name': 'Wreed pact',
   'entities.abilities.lightning_bolt.description':
     'Brengt {damage} Natuurschade toe. De schade stijgt met de Spreukkracht. Elementair: een treffer verleent 1 Donder.',
   'entities.abilities.lightning_bolt.name': 'Boogbliksem',

@@ -10164,6 +10164,7 @@ export const ja_JP: EnTranslations = {
       "immolate": "標的に火を放ち、初撃を与えつつ燃焼を残します。",
       "corruption": "標的をシャドウで蝕み、他の行動をしている間も継続して効果が続きます。",
       "life_tap": "マナが尽きたとき、自分の体力を一部マナに変換します。",
+      "hard_bargain": "傷を負ったとき、マナの20%を体力の20%と引き換えます。",
       "wrath": "遠距離から標的に放つネイチャーのボルト。主力の火力です。",
       "healing_touch": "詠唱は長いものの回復量の大きい単体ヒールで、体力を満タンに戻します。",
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
@@ -18283,9 +18284,13 @@ export const ja_JP: EnTranslations = {
         "name": "宣告",
         "description": "断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。"
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "過酷な取引",
-        "description": "体力{damage}をマナ{damage}に変換します。"
+        "description": "最大マナの20%を捧げ、最大体力の{healPct}%を回復します。"
+      },
+      "life_tap": {
+        "name": "残酷な契約",
+        "description": "最大体力の10%を捧げ、最大マナの{manaPct}%を回復します。体力が20%以下のときは使用できません。"
       },
       "cursed_accomplice": {
         "name": "呪われた共犯者",

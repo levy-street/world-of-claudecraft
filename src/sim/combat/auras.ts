@@ -83,7 +83,11 @@ import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
-import { tickSacrilegiousMarch, tickWarlockTalentState } from './warlock_talents';
+import {
+  sustainLeadenHexFromDotTick,
+  tickSacrilegiousMarch,
+  tickWarlockTalentState,
+} from './warlock_talents';
 
 const SECOND_WIND_THRESHOLD = 0.35;
 
@@ -395,6 +399,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             school: a.school,
             fx: 'tick',
           });
+          // Leaden Hex: the warlock's DoT ticks hold its slow in place (no stack, no root).
+          sustainLeadenHexFromDotTick(e, a);
           const periodicHit =
             a.school === 'shadow' && !a.finalDamage
               ? shadowPeriodicHit(ctx, dotSource, a.id, tickDamage)

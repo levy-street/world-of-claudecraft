@@ -7963,8 +7963,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.lesser_heal.name': 'Hvisket Bøn',
-  'entities.abilities.life_tap.description': 'Omdanner {damage} helbred til {damage} mana.',
-  'entities.abilities.life_tap.name': 'Hård Handel',
+  'entities.abilities.life_tap.description':
+    'Ofrer 10% af dit maksimale helbred for at genoprette {manaPct}% af din maksimale mana. Kan ikke bruges ved 20% helbred eller derunder.',
+  'entities.abilities.hard_bargain.name': 'Hård Handel',
+  'entities.abilities.life_tap.name': 'Grusom pagt',
   'entities.abilities.lightning_bolt.description':
     'Volder {damage} Naturskade. Skaden stiger med Besværgelseskraft. Elementær: et træf giver 1 Torden.',
   'entities.abilities.lightning_bolt.name': 'Lysbuelyn',

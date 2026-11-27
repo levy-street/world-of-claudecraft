@@ -10164,6 +10164,7 @@ export const zh_TW: EnTranslations = {
       "immolate": "點燃目標，造成一記前置傷害並留下持續燃燒。",
       "corruption": "以暗影腐蝕目標，在你做其他事時持續造成傷害。",
       "life_tap": "在法力見底時，以部分自身生命換回法力。",
+      "hard_bargain": "受傷時以 20% 的法力值換取 20% 的生命值。",
       "wrath": "從遠處朝目標擲出一道自然箭矢，是你慣用的核彈。",
       "healing_touch": "施法時間較長的大型單體治療，用來把某人補滿。",
       "mark_of_the_wild": "戰鬥前替自己或友方施加的持久祝福。",
@@ -18283,9 +18284,13 @@ export const zh_TW: EnTranslations = {
         "name": "裁決",
         "description": "消耗全部譴罪與命運絲線裁決敵人。每條絲線使傷害提高6%，附加效果會在20、50、80和100點譴罪時提升。16級後傷害成長趨於平緩。"
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "苛刻交易",
-        "description": "將 {damage} 點生命值轉化為 {damage} 點法力值。"
+        "description": "犧牲最大法力值的 20%，恢復最大生命值的 {healPct}%。"
+      },
+      "life_tap": {
+        "name": "殘酷契約",
+        "description": "犧牲最大生命值的 10%，恢復最大法力值的 {manaPct}%。生命值不高於 20% 時無法使用。"
       },
       "cursed_accomplice": {
         "name": "受咒共犯",

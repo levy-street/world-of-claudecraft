@@ -6292,8 +6292,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': '黒腐れ',
   'entities.abilities.corruption.description':
     '対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。',
-  'entities.abilities.life_tap.name': '過酷な取引',
-  'entities.abilities.life_tap.description': '体力{damage}をマナ{damage}に変換します。',
+  'entities.abilities.life_tap.name': '残酷な契約',
+  'entities.abilities.life_tap.description':
+    '最大体力の10%を捧げ、最大マナの{manaPct}%を回復します。体力が20%以下のときは使用できません。',
+  'entities.abilities.hard_bargain.name': '過酷な取引',
+  'entities.abilities.hard_bargain.description':
+    '最大マナの20%を捧げ、最大体力の{healPct}%を回復します。',
+  'guide.abilityHook.hard_bargain': '傷を負ったとき、マナの20%を体力の20%と引き換えます。',
   'entities.abilities.curse_of_agony.name': '苦悶の呪い',
   'entities.abilities.curse_of_agony.description':
     '対象に苦痛の呪いをかけ、24秒間で {damage} の暗黒ダメージを与えます。',

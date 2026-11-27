@@ -142,7 +142,8 @@ describe('destruction progression', () => {
     expect(destructionKnownAt(20)).toEqual(
       expect.arrayContaining(['summon_imp', 'summon_voidwalker', 'soulwell']),
     );
-    expect(destructionKnownAt(20)).toHaveLength(18);
+    // 19: Hard Bargain is now learned by every Warlock spec.
+    expect(destructionKnownAt(20)).toHaveLength(19);
     expect(
       destructionKnownAt(20).filter((id) =>
         ABILITIES[id]?.effects.some(

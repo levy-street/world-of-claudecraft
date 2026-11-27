@@ -524,6 +524,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'needle_of_fate',
       'sentence',
       'life_tap',
+      'hard_bargain',
       'cursed_accomplice',
       'summon_voidwalker',
       'curse_of_agony',
@@ -4036,6 +4037,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     school: 'nature',
     scalesWith: 'ranged',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 20, duration: 15, interval: 3 }],
     ranks: [
@@ -4574,6 +4577,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'shadow',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 30, duration: 18, interval: 3 }],
     ranks: [
@@ -5470,6 +5475,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Cruel Pact',
     class: 'warlock',
     specs: ['affliction'],
+    // RETIRED: Hexcraft's own Cruel Pact folded into life_tap, which now carries the
+    // Cruel Pact name for every spec. The def stays, hidden, so persisted action bars
+    // can identify and discard it (the death_coil contract).
+    hiddenFromPlayer: true,
     learnLevel: 9,
     cost: 0,
     castTime: 0,
@@ -5708,6 +5717,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'shadow',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 40, duration: 18, interval: 3 }],
     ranks: [
@@ -5726,12 +5737,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'Corrupts the target, causing $d Shadow damage over 18 sec.',
   },
+  // The warlock's one health-for-mana spell for every spec (it replaced both the flat
+  // Hard Bargain and Hexcraft's separate Cruel Pact). The id stays life_tap so saved
+  // action bars and talents keep pointing at it.
   life_tap: {
     id: 'life_tap',
-    name: 'Hard Bargain',
+    name: 'Cruel Pact',
     class: 'warlock',
-    excludeSpecs: ['affliction'],
-    excludeSpecsAtLevel: 14,
     learnLevel: 4,
     cost: 0,
     castTime: 0,
@@ -5739,22 +5751,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'lifeTap', hp: 30, mana: 30 }],
-    ranks: [
+    effects: [
       {
-        rank: 2,
-        level: 14,
-        cost: 0,
-        effects: [{ type: 'lifeTap', hp: 55, mana: 55 }],
-      },
-      {
-        rank: 3,
-        level: 20,
-        cost: 0,
-        effects: [{ type: 'lifeTap', hp: 85, mana: 85 }],
+        type: 'afflictionCruelPact',
+        healthPct: 0.1,
+        manaPctMax: 0.2,
+        // No Condemnation: with no cooldown it would be unlimited Condemnation for health.
+        doom: 0,
       },
     ],
-    description: 'Converts $d health into $d mana.',
+    description:
+      'Sacrifices 10% of your maximum health to restore 20% of your maximum mana. Cannot be used at or below 20% health.',
+  },
+  // Cruel Pact's opposite: mana for health, for every spec, on the global cooldown.
+  hard_bargain: {
+    id: 'hard_bargain',
+    name: 'Hard Bargain',
+    class: 'warlock',
+    learnLevel: 4,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [{ type: 'hardBargain', manaPctMax: 0.2, healPctMax: 0.2 }],
+    description: 'Sacrifices 20% of your maximum mana to restore 20% of your maximum health.',
   },
   curse_of_agony: {
     id: 'curse_of_agony',
@@ -5767,6 +5789,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'shadow',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 36, duration: 24, interval: 3 }],
     ranks: [
@@ -5916,9 +5940,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'warlockUmbralAnchor', duration: 300, maxRange: 40 }],
+    effects: [{ type: 'warlockUmbralAnchor', duration: 300, maxRange: 40, recallHealPctMax: 0.1 }],
     description:
-      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown.',
   },
   soulwell: {
     id: 'soulwell',
@@ -7256,6 +7280,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'nature',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 48, duration: 12, interval: 3 }],
     description: 'The enemy is swarmed by insects, taking $d Nature damage over 12 sec.',
@@ -8133,6 +8159,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'shadow',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 60, duration: 30, interval: 3, leechPct: 1 }],
     description:
@@ -9459,21 +9487,28 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
                 // the same resolved rate the dispatch consumes.
                 e.type === 'absorbSpentResource'
                 ? { ...e, mult: Math.round(e.mult * mul) }
-                : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
-                  // shield's flat amount and its max-health fraction are both
-                  // buff-shaped, so the per-ability knob scales them and the
-                  // {damage} splice reads the same resolved fraction the
-                  // dispatch consumes.
-                  e.type === 'absorb'
-                  ? {
-                      ...e,
-                      amount: Math.round(e.amount * mul),
-                      casterMaxHpPct:
-                        e.casterMaxHpPct === undefined
-                          ? undefined
-                          : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
-                    }
-                  : e,
+                : // Blood Credit: Cruel Pact's mana and Hard Bargain's health,
+                  // resolved here so the {manaPct}/{healPct} tooltip splice and
+                  // the dispatch read the same share.
+                  e.type === 'afflictionCruelPact'
+                  ? { ...e, manaPctMax: Math.round(e.manaPctMax * mul * 10_000) / 10_000 }
+                  : e.type === 'hardBargain'
+                    ? { ...e, healPctMax: Math.round(e.healPctMax * mul * 10_000) / 10_000 }
+                    : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
+                      // shield's flat amount and its max-health fraction are both
+                      // buff-shaped, so the per-ability knob scales them and the
+                      // {damage} splice reads the same resolved fraction the
+                      // dispatch consumes.
+                      e.type === 'absorb'
+                      ? {
+                          ...e,
+                          amount: Math.round(e.amount * mul),
+                          casterMaxHpPct:
+                            e.casterMaxHpPct === undefined
+                              ? undefined
+                              : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
+                        }
+                      : e,
       );
     }
   }

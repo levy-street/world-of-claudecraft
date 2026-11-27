@@ -10164,6 +10164,7 @@ export const tr_TR: EnTranslations = {
       "immolate": "Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.",
       "corruption": "Bir hedefi gölgeyle çürütür ve sen başka işler yaparken hasar verir.",
       "life_tap": "Tükendiğinde kendi canının bir kısmını manaya çevirir.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Bir hedefe menzilden fırlatılan bir doğa oku; başvuru bomban.",
       "healing_touch": "Uzun süreli, birini tam dolduran büyük tek hedefli bir iyileştirme.",
       "mark_of_the_wild": "Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.",
@@ -18283,9 +18284,13 @@ export const tr_TR: EnTranslations = {
         "name": "Hüküm",
         "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Ağır Pazarlık",
-        "description": "{damage} canı {damage} manaya dönüştürür."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Zalim Ahit",
+        "description": "Azami canının %10'unu feda ederek azami mananın {manaPct}%'ini yeniler. Canın %20 veya altındayken kullanılamaz."
       },
       "cursed_accomplice": {
         "name": "Lanetli Suç Ortağı",

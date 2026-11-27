@@ -142,12 +142,15 @@ describe('Affliction Warlock', () => {
     expect(at(7)).not.toContain('searing_pain');
     expect(at(7)).not.toContain('litany_of_guilt');
     expect(at(8)).toContain('litany_of_guilt');
-    expect(at(9)).toContain('cruel_pact');
+    // Hexcraft's own Cruel Pact is retired: life_tap carries the name for every spec.
+    expect(at(9)).not.toContain('cruel_pact');
+    expect(at(4)).toContain('life_tap');
     expect(at(11)).toContain('litany_of_guilt');
     expect(at(12)).toContain('hex_of_violence');
     expect(at(13)).toContain('life_tap');
     expect(at(13)).toContain('possess_evil_eye');
-    expect(at(14)).not.toContain('life_tap');
+    expect(at(14)).toContain('life_tap');
+    expect(at(20)).toContain('life_tap');
     expect(at(14)).toContain('vicarious_suffering');
     expect(at(16)).not.toContain('coven');
     expect(at(17)).toContain('coven');
@@ -1685,24 +1688,22 @@ describe('Affliction Warlock', () => {
     expect(allyHp - ally.hp).toBe(93);
   });
 
-  it('replaces Hard Bargain with health-paid mana and Condemnation at level 14', () => {
+  it('gives Hexcraft the shared Cruel Pact: health for mana, no Condemnation, refused at 20% health', () => {
     const sim = makeAffliction();
     const fullHp = sim.player.hp;
     sim.player.resource = 0;
 
-    sim.castAbility('cruel_pact');
-    expect(sim.player.hp).toBe(fullHp - Math.round(sim.player.maxHp * 0.12));
-    expect(sim.player.resource).toBe(Math.round(sim.player.maxResource * 0.015));
-    expect(doomValue(sim.player)).toBe(20);
+    sim.castAbility('life_tap');
+    expect(sim.player.hp).toBe(fullHp - Math.round(sim.player.maxHp * 0.1));
+    expect(sim.player.resource).toBe(Math.round(sim.player.maxResource * 0.2));
+    expect(doomValue(sim.player)).toBe(0);
 
-    for (let i = 0; i < 20 * 20; i++) sim.tick();
+    sim.player.gcdRemaining = 0;
     sim.player.hp = Math.floor(sim.player.maxHp * 0.2);
     const mana = sim.player.resource;
-    const doom = doomValue(sim.player);
-    sim.castAbility('cruel_pact');
+    sim.castAbility('life_tap');
     expect(sim.player.hp).toBe(Math.floor(sim.player.maxHp * 0.2));
     expect(sim.player.resource).toBe(mana);
-    expect(doomValue(sim.player)).toBe(doom);
   });
 
   it('spends the full pool with Sentence and scales its damage at 20, 50, 80, and 100', () => {

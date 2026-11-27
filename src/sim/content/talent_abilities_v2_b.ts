@@ -76,16 +76,16 @@ export const TALENT_ABILITIES_V2_B = {
     learnLevel: 11,
     cost: 0,
     castTime: 0,
-    cooldown: 45,
+    cooldown: 30,
     range: 0,
     school: 'shadow',
     requiresTarget: false,
     effects: [
       { type: 'selfDamagePctCurrent', pct: 0.1 },
-      { type: 'selfAbsorbPctMax', pct: 0.3, duration: 8 },
+      { type: 'selfAbsorbPctMax', pct: 0.3, duration: 30 },
     ],
     description:
-      'Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec.',
+      'Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec.',
   },
   abyssal_rift: {
     id: 'abyssal_rift',

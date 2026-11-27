@@ -101,10 +101,10 @@
       "output": "summon_doomguard.webp"
     },
     {
-      "abilityId": "life_tap",
+      "abilityId": "hard_bargain",
       "sourcePack": "demon",
       "sourceFile": "44.png",
-      "output": "life_tap.webp"
+      "output": "hard_bargain.webp"
     },
     {
       "abilityId": "searing_pain",
@@ -519,6 +519,14 @@
         "hour_of_judgment",
         "cinderhide",
         "raise_gravewing"
+      ]
+    },
+    {
+      "name": "warlock-cruel-pact-art-on-life-tap",
+      "generator": "OpenAI image generation: the original Cruel Pact painting from the warlock-spell-completion batch (2026-08-01), byte-identical, copied onto life_tap when Hard Bargain was renamed Cruel Pact",
+      "artDirection": "A heart pouring blood into a blue mana crystal: health traded for mana",
+      "abilityIds": [
+        "life_tap"
       ]
     }
   ]

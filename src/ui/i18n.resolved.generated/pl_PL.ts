@@ -10164,6 +10164,7 @@ export const pl_PL: EnTranslations = {
       "immolate": "Podpala cel, zadając początkowy cios i pozostawiając utrzymujące się płomienie.",
       "corruption": "Skaża cel cieniem, który zadaje obrażenia, gdy zajmujesz się czymś innym.",
       "life_tap": "Zamienia część własnego zdrowia z powrotem na manę, gdy ci jej zabraknie.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.",
       "healing_touch": "Potężne leczenie pojedynczego celu o długim czasie rzucania, do uzupełnienia komuś zdrowia.",
       "mark_of_the_wild": "Trwałe błogosławieństwo, które nakładasz na siebie lub sojusznika przed walką.",
@@ -18283,9 +18284,13 @@ export const pl_PL: EnTranslations = {
         "name": "Wyrok",
         "description": "Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Każda Nić zwiększa obrażenia o 6%. Dodatkowe efekty eskalują przy 20, 50, 80 i 100 Potępienia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Trudny targ",
-        "description": "Zamienia {damage} zdrowia na {damage} many."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Okrutny Pakt",
+        "description": "Poświęca 10% maksymalnego zdrowia, aby przywrócić {manaPct}% maksymalnej many. Nie można użyć przy 20% zdrowia lub mniej."
       },
       "cursed_accomplice": {
         "name": "Przeklęty Wspólnik",

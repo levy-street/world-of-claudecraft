@@ -10164,6 +10164,7 @@ export const es: EnTranslations = {
       "immolate": "Prende fuego a un objetivo con un golpe inicial y una quemadura que perdura.",
       "corruption": "Pudre al objetivo con sombra que va dañando mientras haces otras cosas.",
       "life_tap": "Convierte parte de tu propia salud en maná cuando te quedas sin él.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Una descarga de naturaleza lanzada a un objetivo a distancia, tu hechizo de ataque habitual.",
       "healing_touch": "Una gran sanación de un solo objetivo con lanzamiento largo, para reponer a alguien por completo.",
       "mark_of_the_wild": "Una bendición duradera que pones sobre ti o un aliado antes de un combate.",
@@ -18283,9 +18284,13 @@ export const es: EnTranslations = {
         "name": "Sentencia",
         "description": "Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Trato Amargo",
-        "description": "Convierte {damage} de salud en {damage} de maná."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Pacto cruel",
+        "description": "Sacrifica el 10% de tu salud máxima para restaurar el {manaPct}% de tu maná máximo. No se puede usar con el 20% de salud o menos."
       },
       "cursed_accomplice": {
         "name": "Cómplice maldito",

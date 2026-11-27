@@ -1124,7 +1124,16 @@ const classAbilityNamesEn = {
         'Sentence',
         'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
       ],
-      ['life_tap', 'Hard Bargain', 'Converts {damage} health into {damage} mana.'],
+      [
+        'hard_bargain',
+        'Hard Bargain',
+        'Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health.',
+      ],
+      [
+        'life_tap',
+        'Cruel Pact',
+        'Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health.',
+      ],
       [
         'cursed_accomplice',
         'Cursed Accomplice',

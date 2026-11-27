@@ -53,6 +53,29 @@ describe('Warlock Umbral Anchor', () => {
     expect(sim.player.cooldowns.get('umbral_anchor')).toBe(45);
   });
 
+  it('heals 10% of maximum health on the recall teleport in every specialization', () => {
+    for (const spec of ['affliction', 'demonology', 'destruction'] as const) {
+      const sim = makeWarlock(spec);
+      const origin = { ...sim.player.pos };
+      sim.player.hp = Math.round(sim.player.maxHp / 2);
+
+      // Placing the anchor does not heal.
+      sim.castAbility('umbral_anchor');
+      expect(sim.player.hp, spec).toBe(Math.round(sim.player.maxHp / 2));
+
+      sim.player.gcdRemaining = 0;
+      sim.player.resource = sim.player.maxResource;
+      sim.player.pos = { x: origin.x + 20, y: origin.y, z: origin.z };
+      const before = sim.player.hp;
+      sim.castAbility('umbral_anchor');
+
+      expect(sim.player.pos, spec).toEqual(origin);
+      const healed = (sim.player.hp - before) / sim.player.maxHp;
+      expect(healed, spec).toBeGreaterThan(0.095);
+      expect(healed, spec).toBeLessThan(0.115);
+    }
+  });
+
   it('refuses an out-of-range recall before spending mana or cooldown', () => {
     const sim = makeWarlock();
     sim.castAbility('umbral_anchor');

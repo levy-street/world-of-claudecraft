@@ -1786,6 +1786,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "life_tap",
+        "name": "Cruel Pact"
+      },
+      {
+        "id": "hard_bargain",
         "name": "Hard Bargain"
       },
       {
@@ -1839,10 +1843,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "fear",
         "name": "Harrow"
-      },
-      {
-        "id": "cruel_pact",
-        "name": "Cruel Pact"
       },
       {
         "id": "shadowburn",

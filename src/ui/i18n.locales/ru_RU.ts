@@ -8116,8 +8116,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Чёрная гниль',
   'entities.abilities.corruption.description':
     'Поражает цель порчей, нанося {damage} ед. урона от темной магии за 18 сек.',
-  'entities.abilities.life_tap.name': 'Тяжёлая сделка',
-  'entities.abilities.life_tap.description': 'Преобразует {damage} здоровья в {damage} маны.',
+  'entities.abilities.life_tap.name': 'Жестокий договор',
+  'entities.abilities.life_tap.description': 'Жертвует 10% максимального запаса здоровья и восполняет {manaPct}% максимального запаса маны. Нельзя использовать при 20% здоровья или меньше.',
+  'entities.abilities.hard_bargain.name': 'Тяжёлая сделка',
+  'entities.abilities.hard_bargain.description': 'Жертвует 20% максимального запаса маны и восполняет {healPct}% максимального запаса здоровья.',
+  'guide.abilityHook.hard_bargain': 'Обменивает 20% маны на 20% здоровья, когда вы ранены.',
   'entities.abilities.curse_of_agony.name': 'Порча муки',
   'entities.abilities.curse_of_agony.description':
     'Проклинает цель агонией: {damage} ед. урона от темной магии за 24 сек.',

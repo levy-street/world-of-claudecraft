@@ -9579,8 +9579,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Podridão Negra',
   'entities.abilities.corruption.description':
     'Corrompe o alvo, causando {damage} de dano de Sombra ao longo de 18 s.',
-  'entities.abilities.life_tap.name': 'Barganha Amarga',
-  'entities.abilities.life_tap.description': 'Converte {damage} de vida em {damage} de mana.',
+  'entities.abilities.life_tap.name': 'Pacto Cruel',
+  'entities.abilities.life_tap.description':
+    'Sacrifica 10% da sua vida máxima para restaurar {manaPct}% da sua mana máxima. Não pode ser usado com 20% de vida ou menos.',
+  'entities.abilities.hard_bargain.name': 'Barganha Amarga',
   'entities.abilities.curse_of_agony.name': 'Praga da Angústia',
   'entities.abilities.curse_of_agony.description':
     'Amaldiçoa o alvo com agonia: {damage} de dano de Sombra ao longo de 24 s.',

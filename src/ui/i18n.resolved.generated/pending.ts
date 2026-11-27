@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "es_ES": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "fr_FR": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "fr_CA": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "de_DE": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "nl_NL": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "pl_PL": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "id_ID": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "tr_TR": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "sv_SE": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "vi_VN": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ],
+  "da_DK": [
+    "entities.abilities.hard_bargain.description",
+    "guide.abilityHook.hard_bargain"
+  ]
 };

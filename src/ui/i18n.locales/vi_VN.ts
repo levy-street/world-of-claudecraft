@@ -8164,8 +8164,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
   'entities.abilities.lesser_heal.name': 'Lời Nguyện Thì Thầm',
-  'entities.abilities.life_tap.description': 'Chuyển hóa {damage} máu thành {damage} mana.',
-  'entities.abilities.life_tap.name': 'Mặc Cả Nghiệt Ngã',
+  'entities.abilities.life_tap.description':
+    'Hiến tế 10% máu tối đa để hồi {manaPct}% mana tối đa. Không thể dùng khi máu từ 20% trở xuống.',
+  'entities.abilities.hard_bargain.name': 'Mặc Cả Nghiệt Ngã',
+  'entities.abilities.life_tap.name': 'Khế Ước Tàn Nhẫn',
   'entities.abilities.lightning_bolt.description':
     'Gây {damage} sát thương Tự Nhiên. Sát thương tăng theo Sức Mạnh Phép Thuật. Nguyên Tố: một cú trúng ban 1 Sấm.',
   'entities.abilities.lightning_bolt.name': 'Tia Hồ Quang',

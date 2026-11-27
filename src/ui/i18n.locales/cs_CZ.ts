@@ -10548,8 +10548,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel.',
   'entities.abilities.lesser_heal.name': 'Šeptaná modlitba',
-  'entities.abilities.life_tap.description': 'Převede {damage} zdraví na {damage} many.',
-  'entities.abilities.life_tap.name': 'Tvrdý obchod',
+  'entities.abilities.life_tap.description':
+    'Obětuje 10 % maximálního zdraví a obnoví {manaPct} % maximální many. Nelze použít při 20 % zdraví nebo méně.',
+  'entities.abilities.hard_bargain.name': 'Tvrdý obchod',
+  'entities.abilities.life_tap.name': 'Krutá dohoda',
   'entities.abilities.lightning_bolt.description':
     'Způsobí {damage} přírodního poškození. Poškození roste se silou kouzel. Volání hromu: zásah udělí 1 Hrom.',
   'entities.abilities.lightning_bolt.name': 'Bleskový šíp',

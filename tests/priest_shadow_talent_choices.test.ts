@@ -111,10 +111,12 @@ function damage(
 }
 
 describe('Shadow capstones have encounter-dependent payoffs', () => {
+  // Since Dirge of Decay lands on cast (no travel time), Twin Covenant also wins
+  // the two 5-target, 75 sec fights.
   it.each([
     { name: 'one sustained target', targets: 1, seconds: 75, winner: 'second_verse' },
     { name: 'two sustained targets', targets: 2, seconds: 75, winner: 'twin_covenant' },
-    { name: 'five stationary targets', targets: 5, seconds: 75, winner: 'incarnate_spirit' },
+    { name: 'five stationary targets', targets: 5, seconds: 75, winner: 'twin_covenant' },
     {
       name: 'a short pack with a carried bomb',
       targets: 5,
@@ -126,7 +128,7 @@ describe('Shadow capstones have encounter-dependent payoffs', () => {
       name: 'enemies leaving the bomb zone',
       targets: 5,
       seconds: 75,
-      winner: 'second_verse',
+      winner: 'twin_covenant',
       escape: true,
     },
   ])('$name rewards $winner with the same resource-limited rotation', (scenario) => {

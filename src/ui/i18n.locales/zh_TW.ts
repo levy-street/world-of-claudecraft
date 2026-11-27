@@ -7659,8 +7659,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '灼燒敵人，造成 {damage} 點火焰傷害，並在 15 秒內額外造成 {overTime}。',
   'entities.abilities.corruption.name': '黑腐術',
   'entities.abilities.corruption.description': '腐蝕目標，在 18 秒內造成 {damage} 點暗影傷害。',
-  'entities.abilities.life_tap.name': '苛刻交易',
-  'entities.abilities.life_tap.description': '將 {damage} 點生命值轉化為 {damage} 點法力值。',
+  'entities.abilities.life_tap.name': '殘酷契約',
+  'entities.abilities.life_tap.description':
+    '犧牲最大生命值的 10%，恢復最大法力值的 {manaPct}%。生命值不高於 20% 時無法使用。',
+  'entities.abilities.hard_bargain.name': '苛刻交易',
+  'entities.abilities.hard_bargain.description':
+    '犧牲最大法力值的 20%，恢復最大生命值的 {healPct}%。',
+  'guide.abilityHook.hard_bargain': '受傷時以 20% 的法力值換取 20% 的生命值。',
   'entities.abilities.curse_of_agony.name': '苦楚邪咒',
   'entities.abilities.curse_of_agony.description':
     '以痛苦詛咒目標：在 24 秒內造成 {damage} 點暗影傷害。',

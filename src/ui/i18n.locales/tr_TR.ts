@@ -8077,8 +8077,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar.',
   'entities.abilities.lesser_heal.name': 'Fısıldanan Dua',
-  'entities.abilities.life_tap.description': '{damage} canı {damage} manaya dönüştürür.',
-  'entities.abilities.life_tap.name': 'Ağır Pazarlık',
+  'entities.abilities.life_tap.description':
+    "Azami canının %10'unu feda ederek azami mananın {manaPct}%'ini yeniler. Canın %20 veya altındayken kullanılamaz.",
+  'entities.abilities.hard_bargain.name': 'Ağır Pazarlık',
+  'entities.abilities.life_tap.name': 'Zalim Ahit',
   'entities.abilities.lightning_bolt.description':
     '{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: isabet 1 Gök Gürültüsü verir.',
   'entities.abilities.lightning_bolt.name': 'Ark Oku',

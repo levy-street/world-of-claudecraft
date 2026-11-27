@@ -10164,6 +10164,7 @@ export const it_IT: EnTranslations = {
       "immolate": "Incendia un bersaglio per un colpo iniziale e un'ustione che perdura.",
       "corruption": "Marcisce il bersaglio con l'ombra, che continua a pulsare mentre fai altro.",
       "life_tap": "Converte parte della tua salute in mana quando resti a secco.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Un dardo di natura scagliato su un bersaglio dalla distanza, il tuo colpo di riferimento.",
       "healing_touch": "Una grande cura a bersaglio singolo dal lancio lungo, per rimettere in piedi qualcuno.",
       "mark_of_the_wild": "Una benedizione duratura che metti su di te o un alleato prima di uno scontro.",
@@ -18283,9 +18284,13 @@ export const it_IT: EnTranslations = {
         "name": "Sentenza",
         "description": "Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Patto Amaro",
-        "description": "Converte {damage} salute in {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Patto Crudele",
+        "description": "Sacrifica il 10% della salute massima per ripristinare il {manaPct}% del mana massimo. Non utilizzabile con il 20% di salute o meno."
       },
       "cursed_accomplice": {
         "name": "Complice Maledetto",

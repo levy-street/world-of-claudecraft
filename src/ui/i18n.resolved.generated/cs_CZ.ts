@@ -10164,6 +10164,7 @@ export const cs_CZ: EnTranslations = {
       "immolate": "Zapálí cíl úvodním zásahem a přetrvávajícím hořením.",
       "corruption": "Rozloží cíl stínem, který tiká, zatímco děláš jiné věci.",
       "life_tap": "Vymění část tvého zdraví zpět za manu, když vyschneš.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Přírodní střela hozená na cíl z dálky, tvoje základní ničivé kouzlo.",
       "healing_touch": "Velké léčení jednoho cíle s dlouhým sesláním, pro úplné doléčení.",
       "mark_of_the_wild": "Trvalé požehnání, které dáváš sobě nebo spojenci před bojem.",
@@ -18283,9 +18284,13 @@ export const cs_CZ: EnTranslations = {
         "name": "Rozsudek",
         "description": "Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Každá Nit zvýší poškození o 6 %. Přidané efekty eskalují při 20, 50, 80 a 100 Odsouzení. Škálování jeho poškození se po úrovni 16 zplošťuje."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Tvrdý obchod",
-        "description": "Převede {damage} zdraví na {damage} many."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Krutá dohoda",
+        "description": "Obětuje 10 % maximálního zdraví a obnoví {manaPct} % maximální many. Nelze použít při 20 % zdraví nebo méně."
       },
       "cursed_accomplice": {
         "name": "Prokletý spolupachatel",

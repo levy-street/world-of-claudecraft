@@ -8169,8 +8169,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.lesser_heal.name': 'Doa Berbisik',
-  'entities.abilities.life_tap.description': 'Mengubah {damage} kesehatan menjadi {damage} mana.',
-  'entities.abilities.life_tap.name': 'Tawar Getir',
+  'entities.abilities.life_tap.description':
+    'Mengorbankan 10% kesehatan maksimum Anda untuk memulihkan {manaPct}% mana maksimum Anda. Tidak dapat digunakan pada 20% kesehatan atau kurang.',
+  'entities.abilities.hard_bargain.name': 'Tawar Getir',
+  'entities.abilities.life_tap.name': 'Perjanjian Kejam',
   'entities.abilities.lightning_bolt.description':
     'Memberi {damage} kerusakan Alam. Kerusakan meningkat dengan Kekuatan Mantra. Elemental: pukulan telak memberi 1 Guntur.',
   'entities.abilities.lightning_bolt.name': 'Sambaran Busur',

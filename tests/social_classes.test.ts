@@ -161,8 +161,8 @@ describe('nine classes', () => {
     const hpBefore = p.hp;
     sim.castAbility('life_tap');
     sim.tick();
-    expect(p.hp).toBe(hpBefore - 30);
-    expect(p.resource).toBe(40);
+    expect(p.hp).toBe(hpBefore - Math.round(p.maxHp * 0.1));
+    expect(p.resource).toBe(Math.min(p.maxResource, 10 + Math.round(p.maxResource * 0.2)));
     // drain life channel heals
     const wolf = nearestMob(sim, 'forest_wolf');
     teleport(sim, p.id, wolf.pos.x + 10, wolf.pos.z);
