@@ -1,6 +1,7 @@
 // Character storage shares one load/save boundary with the weekly ledger.
 
-import { sanitizeBankState, savedBankState } from './bank';
+import { type BankState, sanitizeBankState, savedBankState } from './bank';
+import { type BossKillTallyState, sanitizeBossKills, savedBossKills } from './boss_kill_tally';
 import type { CharacterState } from './character_state';
 import { sanitizeCourierState, savedCourierState } from './courier';
 import { absorbLegacyHeroicMarkSlots, sanitizeHeroicMarks } from './heroic_marks';
@@ -32,6 +33,11 @@ export function restoreCharacterStorage(
   meta.heroicMarks = sanitizeHeroicMarks(s.heroicMarks);
   absorbLegacyHeroicMarkSlots(meta);
   restoreMembershipBag(meta, s);
+  // The lifetime boss kill tally (boss_kill_tally.ts): a save without one, or
+  // with a broken one, loads as no kills.
+  const bossKills = sanitizeBossKills(s.bossKills);
+  if (Object.keys(bossKills).length > 0) meta.bossKills = bossKills;
+  else delete meta.bossKills;
 }
 
 export function savedCharacterStorage(
@@ -47,6 +53,7 @@ export function savedCharacterStorage(
   | 'vendorBuyback'
   | 'courier'
   | 'membershipBag'
+  | 'bossKills'
 > {
   return {
     inventory: meta.inventory.map(savedMaterialSlot),
@@ -63,11 +70,17 @@ export function savedCharacterStorage(
       : {}),
     // Absent at zero, so a character that never earned a mark saves unchanged.
     ...(meta.heroicMarks > 0 ? { heroicMarks: meta.heroicMarks } : {}),
+    // Absent while empty, like the marks above (boss_kill_tally.ts).
+    ...savedBossKills(meta),
   };
 }
 
 /** Live storage owned by this load/save boundary. */
-export interface CharacterVaultStorageState {
+export interface CharacterVaultStorageState extends BossKillTallyState {
+  // The per-character bank: a second pooled item store with its own copper-bought
+  // slot budget. Capacity/move math lives in bank.ts. Persisted (inside the
+  // character save, exactly like inventory/bags).
+  bank: BankState;
   // The per-character Materials Vault: a count per material id with a gold-bought
   // per-material ceiling. Capacity and move math live in materials_vault.ts.
   // Persisted (inside the character save, exactly like inventory/bags/bank).

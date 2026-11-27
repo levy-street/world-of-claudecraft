@@ -1,3 +1,4 @@
+import { type BossKillTally, EMPTY_BOSS_KILLS } from '../sim/boss_kill_tally';
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
@@ -13,6 +14,7 @@ import type {
 import type { ActivityChoice } from '../sim/world_quest_activity';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
 import type { DungeonRunView, HoardBossCueView, RaidRunView } from '../world_api/dungeons';
+import { nextBossKills } from './boss_kills_wire';
 import { nextDungeonRun, nextRaidRun } from './dungeon_run_wire';
 import { HoardBossCueMirror } from './hoard_boss_cue_mirror';
 import { applyQuestSelfWire } from './quest_snapshot_wire';
@@ -72,6 +74,9 @@ export class QuestWorldWireState {
   /** The raid run the player stands in, mirrored from the `rdrun` self key
    *  (null outside a tracked raid); the same object until a row changes. */
   raidRun: RaidRunView | null = null;
+  /** The character's lifetime boss kills, mirrored from the `bkills` self key;
+   *  the same object until a count moves. */
+  bossKills: BossKillTally = EMPTY_BOSS_KILLS;
   /** The Allied Hearthstone's bound hub mirrored from the `ahs` self key (null when unbound). */
   alliedHearthstoneAttunement: FactionId | null = null;
   /** Client clock mirror of the authoritative Buried Hoard boss telegraphs;
@@ -114,6 +119,7 @@ export class QuestWorldWireState {
       vehicle?: unknown;
       dgrun?: unknown;
       rdrun?: unknown;
+      bkills?: unknown;
       hmarks?: unknown;
     },
     simTime?: unknown,
@@ -123,6 +129,7 @@ export class QuestWorldWireState {
     if (self.vehicle !== undefined) this.applyVehicleWire(self.vehicle);
     if (self.dgrun !== undefined) this.dungeonRun = nextDungeonRun(this.dungeonRun, self.dgrun);
     if (self.rdrun !== undefined) this.raidRun = nextRaidRun(this.raidRun, self.rdrun);
+    if (self.bkills !== undefined) this.bossKills = nextBossKills(this.bossKills, self.bkills);
     if (self.hmarks === undefined) return false;
     const marks = sanitizeHeroicMarks(self.hmarks);
     const moved = marks !== this.heroicMarks;
@@ -262,6 +269,7 @@ export class QuestWorldWireState {
     this.treasureMap = null;
     this.dungeonRun = null;
     this.raidRun = null;
+    this.bossKills = EMPTY_BOSS_KILLS;
     this.alliedHearthstoneAttunement = null;
     this.heroicMarks = 0;
     this.nearbyWorldQuestTraces = [];

@@ -40,8 +40,9 @@ import {
   migrationBagsFor,
 } from './bags';
 import * as bankMod from './bank';
-import { applyBankBonusStamp, type BankState, emptyBankState } from './bank';
+import { applyBankBonusStamp, emptyBankState } from './bank';
 import * as bankSocketsMod from './bank_sockets';
+import { type BossKillTally, EMPTY_BOSS_KILLS } from './boss_kill_tally';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import * as buddiesMod from './buddies';
 import { revealBuddiesOnJoin, updateBuddyReveals } from './buddy_drops';
@@ -1421,10 +1422,6 @@ export interface PlayerMeta
   // Four normal bags plus an active member bag; backpack space is implicit.
   bags: (string | null)[];
   membershipBag?: string;
-  // The per-character bank: a second pooled item store with its own copper-bought
-  // slot budget. Capacity/move math lives in bank.ts. Persisted (inside the
-  // character save, exactly like inventory/bags).
-  bank: BankState;
   // The per-source breakdown behind bank.bonusSlots, stamped by the host at join
   // alongside the total (addPlayer's bankBonus opt). Display-only session state:
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
@@ -11000,6 +10997,9 @@ export class Sim {
   }
   get raidRun(): import('../world_api/dungeons').RaidRunView | null {
     return raidRunForPlayer(this.ctx, this.primaryId);
+  }
+  get bossKills(): BossKillTally {
+    return this.players.get(this.primaryId)?.bossKills ?? EMPTY_BOSS_KILLS;
   }
 
   get delveRun(): DelveRunInfo | null {

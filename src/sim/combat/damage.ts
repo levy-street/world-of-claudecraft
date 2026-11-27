@@ -23,6 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { recordBossKillTally } from '../boss_kill_tally';
 import { rollBossBuddyDrops } from '../buddy_drops';
 import { MEMBERSHIP_XP_MULTIPLIER } from '../content/membership';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
@@ -2010,6 +2011,9 @@ export function handleDeath(
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     recordWeeklyBossKill(ctx, e, heroicRewardRecipients, claimedInst);
+    // The character's lifetime boss kill tally (the Adventure Journal's "Your
+    // kills"), on the same roster; draws no rng.
+    recordBossKillTally(ctx, e, heroicRewardRecipients, claimedInst);
     // Boss pets and their challenge looks (content/buddy_sources.ts): one
     // independent roll per credited player, never a corpse item, then the
     // speed/dps looks for the same roster. World bosses roll on the

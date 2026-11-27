@@ -5820,6 +5820,7 @@ const ALL_DELTA_KEYS = [
   'bags',
   'bank',
   'bg',
+  'bkills',
   'blk',
   'bpsl',
   'budOwn',
@@ -5990,6 +5991,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   atitle: 'activeTitle',
   bags: 'bags',
   bank: 'bankInfo',
+  bkills: 'bossKills',
   blk: 'blockChance',
   budOwn: 'ownedBuddies',
   budPend: 'pendingBuddies',
@@ -7661,8 +7663,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: the raid map's shared marks mmarks (server/self_social_wire.ts), for 137.
     // +1: the group's party pings (server/self_social_wire.ts), for 138.
     // +1: the Adventure Journal's raid run rdrun (server/dungeon_run_wire.ts), for 139.
-    expect(ALL_DELTA_KEYS).toHaveLength(139);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(139);
+    // +1: the journal's boss kill tally bkills (server/dungeon_run_wire.ts), for 140.
+    expect(ALL_DELTA_KEYS).toHaveLength(140);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(140);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7846,7 +7849,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The raid map's shared marks mmarks (self_social_wire.ts) make 137.
     // The party pings (self_social_wire.ts) make 138.
     // The raid run rdrun (dungeon_run_wire.ts) makes 139.
-    expect(scraped.size).toBe(139);
+    // The boss kill tally bkills (dungeon_run_wire.ts) makes 140.
+    expect(scraped.size).toBe(140);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

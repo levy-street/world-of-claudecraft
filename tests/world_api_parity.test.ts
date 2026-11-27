@@ -527,6 +527,7 @@ export const IWORLD_MEMBERS = [
   { name: 'answerDungeonGuide', kind: 'method' }, // a dungeon guide's offer answer (send-only)
   { name: 'dungeonRun', kind: 'data' }, // the group dungeon run stood in, with boss progress (null outside)
   { name: 'raidRun', kind: 'data' }, // the raid run stood in, boss defeated and engaged state (null outside)
+  { name: 'bossKills', kind: 'data' }, // lifetime boss kills per difficulty (the journal's Your kills)
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
@@ -1041,8 +1042,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // The raid's world markers add placeSharedWorldMark (method): 475/140/335.
     // The party pings add partyPings and sendPing (methods): 477/140/337.
     // The Adventure Journal's raidRun adds one data member: 478/141/337.
-    expect(IWORLD_MEMBERS.length).toBe(478);
-    expect(DATA_MEMBERS.length).toBe(141);
+    // The journal's boss kill tally bossKills adds one data member: 479/142/337.
+    expect(IWORLD_MEMBERS.length).toBe(479);
+    expect(DATA_MEMBERS.length).toBe(142);
     expect(METHOD_MEMBERS.length).toBe(337);
   });
   it('has no duplicate member names', () => {
@@ -1120,6 +1122,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'blockAdd',
       'blockRemove',
       'boostWorldQuestGlider',
+      'bossKills',
       'buyBackItem',
       'buyCrucibleVendorItem',
       'buyGuildCosmetic',
@@ -1569,6 +1572,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bankInfo',
       'bankPurchasedSlots',
       'bgInfo',
+      'bossKills',
       'cardMinigameInfo',
       'cfg',
       'civicServicePlacements',
@@ -2540,6 +2544,7 @@ const FACET_DUNGEONS = [
   'leaveDungeon',
   'dungeonRun',
   'raidRun',
+  'bossKills',
   'raidLockouts',
   'worldBossActive',
   'answerDungeonGuide',
@@ -2920,9 +2925,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
     // Plus the world markers' placeSharedWorldMark.
     // Plus the party pings' partyPings and sendPing.
-    // Plus the Adventure Journal's raidRun.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(478);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(478);
+    // Plus the Adventure Journal's raidRun, and its boss kill tally bossKills.
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(479);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(479);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

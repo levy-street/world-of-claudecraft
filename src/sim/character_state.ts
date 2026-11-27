@@ -305,6 +305,10 @@ export interface CharacterState extends ReferralRewardState {
   // absent at zero; a pre-currency save loads its `heroic_mark` bag and bank
   // stacks into it instead.
   heroicMarks?: number;
+  // Lifetime boss kills per difficulty (src/sim/boss_kill_tally.ts), keyed
+  // `<bossMobId>` or `<bossMobId>:heroic`. Optional and absent while empty, so
+  // an older save loads as no kills and an untouched row stays byte-equal.
+  bossKills?: Record<string, number>;
   // Masterwrought materials (phase 04): both optional so pre-materials saves
   // load with the fields at their fresh defaults, and both omitted from
   // serialization while at those defaults so untouched rows stay byte-equal.

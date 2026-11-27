@@ -135,6 +135,12 @@ export interface IWorldDungeons {
   // the Adventure Journal's landing read. Null outside a tracked raid. Online it
   // mirrors the self record's `rdrun` key.
   raidRun: RaidRunView | null;
+  // The local character's lifetime boss kills per difficulty, keyed
+  // `<bossMobId>` (Normal) or `<bossMobId>:heroic`; a council or a
+  // several-headed boss counts under its lead body (src/sim/boss_kill_tally.ts).
+  // Only the server's death hub ever raises a count. Frozen and the same object
+  // until a count moves. Online it mirrors the self record's `bkills` key.
+  readonly bossKills: Readonly<Record<string, number>>;
   // Still-locked raids for the local player (unlock countdown in ms), driving the
   // minimap raid-lockout badge + panel. Empty when nothing is locked.
   raidLockouts(): RaidLockout[];
