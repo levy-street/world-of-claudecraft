@@ -82,8 +82,8 @@ export interface AdventureJournalDeps
   /** Whether a dev-gated instance may be listed (the client offers dev tools). */
   showUnreleased(): boolean;
   modelTouchQueue?(): LinkedProgramTouchQueue | null;
-  /** The journal's sounds (the game's sampled UI cues by default, so the SFX
-   *  volume and the interface-sounds setting apply). */
+  /** The journal's sounds (the game's sampled UI cues by default, played like
+   *  the other window cues, bag open and click, so the SFX volume applies). */
   sounds?: JournalSounds;
 }
 
@@ -119,6 +119,9 @@ export class AdventureJournalWindow {
   private seenRoom: string | null | undefined = undefined;
   private seenDungeonRun: DungeonRunView | null = null;
   private seenRaidRun: RaidRunView | null = null;
+  /** Banner pictures held decoded once seen, so the innerHTML repaint of a
+   *  tab, a tier or a pull finds them in memory and never blanks a frame. */
+  private readonly heldBackdrops = new Map<string, HTMLImageElement>();
   /** The page the last render painted (instance:boss), for the scroll pair. */
   private renderedPage: string | null = null;
 
@@ -366,7 +369,7 @@ export class AdventureJournalWindow {
         total: keys.length,
         tier: this.tier,
         modelButton: view !== null,
-        backdropUrl: journalBackdropUrl(instance.id, selection.bossKey),
+        backdropUrl: this.holdBackdrop(journalBackdropUrl(instance.id, selection.bossKey)),
       })}${tabBarHtml(this.tab, view ? JOURNAL_TABS : null, step(-1), step(1))}${panel}</section></div>`;
 
     const freshPage = root.querySelector<HTMLElement>('.aj-page');
@@ -392,6 +395,16 @@ export class AdventureJournalWindow {
         root.querySelector<HTMLElement>('[data-close]'),
       ]);
     }
+  }
+
+  private holdBackdrop(url: string | null): string | null {
+    if (url && !this.heldBackdrops.has(url) && typeof Image !== 'undefined') {
+      const image = new Image();
+      image.src = url;
+      image.decode?.().catch(() => {});
+      this.heldBackdrops.set(url, image);
+    }
+    return url;
   }
 
   private panelHtml(

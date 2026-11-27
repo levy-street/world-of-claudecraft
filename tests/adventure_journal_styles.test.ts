@@ -216,8 +216,12 @@ describe('Adventure Journal styles', () => {
     const veil = rule(desktopCss, '#adventure-journal-window .aj-banner.has-art::before');
     expect(veil).toContain('var(--color-aj-banner-scrim)');
     expect(veil).toMatch(/z-index:\s*-1/);
-    expect(rule(desktopCss, '#adventure-journal-window .aj-banner')).toMatch(
-      /isolation:\s*isolate/,
+    const withArt = rule(desktopCss, '#adventure-journal-window .aj-banner.has-art');
+    expect(withArt).toMatch(/isolation:\s*isolate/);
+    expect(withArt).toMatch(/overflow:\s*hidden/);
+    // Forced colours drop the picture; the system backplate carries the words.
+    expect(desktopCss).toMatch(
+      /forced-colors: active\)\s*\{\s*#adventure-journal-window \.aj-banner-art\s*\{\s*display:\s*none/,
     );
     const scrim = tokensCss.match(/--color-aj-banner-scrim:\s*#([0-9a-f]{8})/i)?.[1] ?? '';
     expect(scrim).toHaveLength(8);

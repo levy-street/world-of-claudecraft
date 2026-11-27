@@ -13154,8 +13154,6 @@
   }
   #adventure-journal-window .aj-banner {
     position: relative;
-    isolation: isolate;
-    overflow: hidden;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
@@ -13176,6 +13174,8 @@
      words keep 4.5:1 over any pixel (the styles test pins the arithmetic).
      Cosmetic: a page without one keeps the plain banner above. */
   #adventure-journal-window .aj-banner.has-art {
+    isolation: isolate;
+    overflow: hidden;
     background: var(--color-aj-banner);
   }
   #adventure-journal-window .aj-banner-art {
@@ -14208,6 +14208,9 @@
     color: var(--gold);
   }
   @media (forced-colors: active) {
+    #adventure-journal-window .aj-banner-art {
+      display: none;
+    }
     #adventure-journal-window .aj-boss.active,
     #adventure-journal-window .aj-tab.active,
     #adventure-journal-window .aj-ab.open,
