@@ -189,9 +189,6 @@ const ZERO_LITERAL_SECTIONS = [
   'character preview loading silhouette',
   // tokenized as authored (the tab reads --gold, --color-gold-300 and --color-bg-dark)
   'character preview touch hint',
-  // tokenized as authored (every colour, texture and mask is a --color-aj-* /
-  // --tex-aj-* / --mask-aj-* token in tokens.css)
-  'adventure journal forge and parchment skin',
 ];
 
 // A section counts zero when it is tokenized AND when it is empty, so the zero pin
