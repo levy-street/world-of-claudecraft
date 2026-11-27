@@ -70,6 +70,7 @@ import type { TranslationKey } from '../../i18n';
 import type {
   DungeonJournalDef,
   JournalBossDef,
+  JournalChipDef,
   JournalDifficulty,
   JournalPhaseDef,
   JournalValues,
@@ -131,6 +132,15 @@ function forgeFury(boss: HeartEnrageBoss): JournalPhaseDef {
 const heroicMinutes = (boss: HeartEnrageBoss): number =>
   (HARD_ENRAGE_SECONDS[boss].heroic ?? 0) / 60;
 
+/** The banner chip naming the Heroic hard enrage (Heroic only). */
+function enrageChip(boss: HeartEnrageBoss): JournalChipDef {
+  return {
+    key: k('common.chipEnrage'),
+    values: { minutes: heroicMinutes(boss) },
+    availability: 'heroic',
+  };
+}
+
 // ---- the Hammer Council ------------------------------------------------------------------
 
 const CD = COUNCIL_DIFFICULTY;
@@ -145,7 +155,15 @@ const wrath = (value: number, tier: Tier): number =>
 const COUNCIL: JournalBossDef = {
   mobId: COUNCIL_GUARDIAN,
   members: [COUNCIL_GUARDIAN, COUNCIL_SEAM_SINGER],
+  nameKey: k('council.pageName'),
   rank: 'boss',
+  taglineKey: k('council.tagline'),
+  chips: [
+    { key: k('council.chipBosses'), values: { count: 2 } },
+    { key: k('council.chipTogether'), values: { arrive: CT.furyArrive } },
+    { key: k('common.chipTankSwap') },
+    enrageChip('council'),
+  ],
   overviewKey: k('council.overview'),
   phases: [
     {
@@ -463,10 +481,20 @@ const bdm = (t: Tier): number => BD[t].damageMult;
 const BREATH: JournalBossDef = {
   mobId: BREATH_GUARDIAN,
   rank: 'boss',
+  taglineKey: k('breath.tagline'),
+  taglineValues: { at: ISLE_TUNING.at },
+  taglinePercentValues: ['at'],
+  chips: [
+    { key: k('breath.chipEdge') },
+    { key: k('breath.chipIsles'), values: { at: ISLE_TUNING.at }, percentValues: ['at'] },
+    { key: k('common.chipTankSwap') },
+    enrageChip('breath'),
+  ],
   overviewKey: k('breath.overview'),
   phases: [
     {
       id: 'wind',
+      health: { from: 1, to: BT.stormAt },
       nameKey: k('breath.phaseWindName'),
       summaryKey: k('breath.phaseWindSummary'),
       values: { at: BT.stormAt },
@@ -641,6 +669,7 @@ const BREATH: JournalBossDef = {
     },
     {
       id: 'isles',
+      health: { at: [ISLE_TUNING.at] },
       nameKey: k('breath.phaseIslesName'),
       summaryKey: k('breath.phaseIslesSummary'),
       values: { at: ISLE_TUNING.at },
@@ -749,6 +778,7 @@ const BREATH: JournalBossDef = {
     },
     {
       id: 'storm',
+      health: { from: BT.stormAt, to: 0 },
       nameKey: k('breath.phaseStormName'),
       summaryKey: k('breath.phaseStormSummary'),
       values: { at: BT.stormAt },
@@ -922,10 +952,18 @@ const warmthShare = (t: Tier): number => 1 / QD[t].lifeWarmth / 100;
 const QUENCH: JournalBossDef = {
   mobId: QUENCH_GUARDIAN,
   rank: 'boss',
+  taglineKey: k('quench.tagline'),
+  chips: [
+    { key: k('quench.chipHuddle'), values: { group: QT.warmNeed + 1 } },
+    { key: k('quench.chipBlades'), values: { at: QT.wakeAt }, percentValues: ['at'] },
+    { key: k('common.chipTankSwap') },
+    enrageChip('quench'),
+  ],
   overviewKey: k('quench.overview'),
   phases: [
     {
       id: 'cold',
+      health: 'whole',
       nameKey: k('quench.phaseColdName'),
       summaryKey: k('quench.phaseColdSummary'),
       mechanics: [
@@ -1016,6 +1054,7 @@ const QUENCH: JournalBossDef = {
     },
     {
       id: 'lake',
+      health: { from: 1, to: QT.wakeAt },
       nameKey: k('quench.phaseLakeName'),
       summaryKey: k('quench.phaseLakeSummary'),
       values: { at: QT.wakeAt },
@@ -1085,6 +1124,7 @@ const QUENCH: JournalBossDef = {
     },
     {
       id: 'blades',
+      health: { from: QT.wakeAt, to: 0 },
       nameKey: k('quench.phaseBladesName'),
       summaryKey: k('quench.phaseBladesSummary'),
       values: { at: QT.wakeAt },
@@ -1150,12 +1190,24 @@ const hpm = (t: Tier): number => HD[t].punishMult;
 const HEAT: JournalBossDef = {
   mobId: HEAT_GUARDIAN,
   rank: 'boss',
+  taglineKey: k('heat.tagline'),
+  chips: [
+    {
+      key: k('heat.chipSinks'),
+      values: { one: HT.overflowOneAt, two: HT.overflowTwoAt },
+      percentValues: ['one', 'two'],
+    },
+    { key: k('common.chipTankSwap') },
+    { key: k('heat.chipPhases'), values: { phases: 3, overflows: 2 } },
+    enrageChip('heat'),
+  ],
   overviewKey: k('heat.overview'),
   overviewValues: { one: HT.overflowOneAt, two: HT.overflowTwoAt },
   overviewPercentValues: ['one', 'two'],
   phases: [
     {
       id: 'every-phase',
+      health: 'whole',
       nameKey: k('heat.phaseAllName'),
       summaryKey: k('heat.phaseAllSummary'),
       mechanics: [
@@ -1255,6 +1307,8 @@ const HEAT: JournalBossDef = {
     },
     {
       id: 'phase-one',
+      health: { from: 1, to: HT.overflowOneAt },
+      rangeOnly: true,
       nameKey: k('heat.phaseOneName'),
       summaryKey: k('heat.phaseOneSummary'),
       values: { one: HT.overflowOneAt },
@@ -1282,6 +1336,7 @@ const HEAT: JournalBossDef = {
     },
     {
       id: 'overflows',
+      health: { at: [HT.overflowOneAt, HT.overflowTwoAt] },
       nameKey: k('heat.phaseOverflowName'),
       summaryKey: k('heat.phaseOverflowSummary'),
       values: { one: HT.overflowOneAt, two: HT.overflowTwoAt },
@@ -1356,6 +1411,8 @@ const HEAT: JournalBossDef = {
     },
     {
       id: 'phase-two',
+      health: { from: HT.overflowOneAt, to: HT.overflowTwoAt },
+      rangeOnly: true,
       nameKey: k('heat.phaseTwoName'),
       summaryKey: k('heat.phaseTwoSummary'),
       values: { one: HT.overflowOneAt, two: HT.overflowTwoAt },
@@ -1404,6 +1461,8 @@ const HEAT: JournalBossDef = {
     },
     {
       id: 'phase-three',
+      health: { from: HT.overflowTwoAt, to: 0 },
+      rangeOnly: true,
       nameKey: k('heat.phaseThreeName'),
       summaryKey: k('heat.phaseThreeSummary'),
       values: { two: HT.overflowTwoAt },
@@ -1485,6 +1544,17 @@ const fullPulse = (t: Tier): number => Math.round(FO.pulseMax * pulseScale(1, FD
 const FINAL: JournalBossDef = {
   mobId: FINAL_BOSS,
   rank: 'final',
+  taglineKey: k('final.tagline'),
+  chips: [
+    { key: k('final.chipQuarters'), values: { count: 4 } },
+    {
+      key: k('final.chipSplinters'),
+      values: { first: FP.intermissionAt[0] ?? 0, second: FP.intermissionAt[1] ?? 0 },
+      percentValues: ['first', 'second'],
+    },
+    { key: k('final.chipFinal'), values: { final: FP.finalAt }, percentValues: ['final'] },
+    enrageChip('final'),
+  ],
   overviewKey: k('final.overview'),
   overviewValues: {
     first: FP.intermissionAt[0] ?? 0,
@@ -1543,6 +1613,7 @@ const FINAL: JournalBossDef = {
     },
     {
       id: 'own-strength',
+      health: 'whole',
       nameKey: k('final.phaseOwnName'),
       summaryKey: k('final.phaseOwnSummary'),
       mechanics: [
@@ -1977,6 +2048,7 @@ const FINAL: JournalBossDef = {
     },
     {
       id: 'call',
+      health: { at: [FP.intermissionAt[0] ?? 0, FP.intermissionAt[1] ?? 0] },
       nameKey: k('final.phaseCallName'),
       summaryKey: k('final.phaseCallSummary'),
       values: { first: FP.intermissionAt[0] ?? 0, second: FP.intermissionAt[1] ?? 0 },
@@ -2130,6 +2202,7 @@ const FINAL: JournalBossDef = {
     },
     {
       id: 'all-awake',
+      health: { from: FP.finalAt, to: 0 },
       nameKey: k('final.phaseFinalName'),
       summaryKey: k('final.phaseFinalSummary'),
       values: { final: FP.finalAt },

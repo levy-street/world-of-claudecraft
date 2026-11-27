@@ -26,8 +26,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'bossJournal.smithHeart.common.furyResponse': '시간이 다 되기 전에 우두머리를 쓰러뜨리세요.',
   'bossJournal.smithHeart.common.heroicFury':
     '용광로의 분노: 전투 시작 {minutes}분 후, 전투가 공격대를 불태워 없앱니다.',
+  'bossJournal.smithHeart.common.chipTankSwap': '방어 담당 교대 전투',
+  'bossJournal.smithHeart.common.chipEnrage': '{minutes}분 후 광폭화',
   'bossJournal.smithHeart.council.overview':
     '흐로스마르, 굴하지 않는 망치와 벨미라, 광맥의 노래꾼은 채석장에서 한 몸처럼 싸웁니다. 흐로스마르는 방어 담당이 맡는 우두머리로, 그의 산의 분노는 기둥 뒤에 숨지 않은 모두를 칩니다. 벨미라는 시전자로, 공격대가 숨을 기둥을 세우고 노래로 돌을 무너뜨립니다. 하나가 쓰러지면 다른 하나가 치유되고 빨라지며 그 능력을 이어받으니, 둘을 함께 쓰러뜨리세요.',
+  'bossJournal.smithHeart.council.pageName': '흐로스마르와 벨미라',
+  'bossJournal.smithHeart.council.tagline': '두 돌의 수호자가 채석장에서 한 몸처럼 싸웁니다: 기둥 뒤에 숨어 흐로스마르의 산의 분노를 피하고, 벨미라의 노래를 차단하고, 둘을 함께 쓰러뜨리세요.',
+  'bossJournal.smithHeart.council.chipBosses': '우두머리 {count}명, 하나의 전투',
+  'bossJournal.smithHeart.council.chipTogether': '{arrive}초 안에 둘 다 처치',
   'bossJournal.smithHeart.council.phaseHammerName': '흐로스마르, 굴하지 않는 망치',
   'bossJournal.smithHeart.council.phaseHammerSummary':
     '방어 담당이 맡는 우두머리입니다. 기력이 약 {fill}초에 걸쳐 0에서 {energy}까지 차며, 기력이 가득 차면 산의 분노를 시전합니다.',
@@ -119,6 +125,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '비탄의 분노가 살아남은 쪽을 즉시 {heal} 치유하고, 쓰러진 쪽의 두 번째 능력까지 이어받게 합니다.',
   'bossJournal.smithHeart.breath.overview':
     '에어윈, 속박 없는 돌풍은 벽이 없는 폭풍 절벽에서 싸웁니다: 모든 가장자리 너머는 공허로 떨어지는 낭떠러지입니다. 생명력이 절반이 될 때까지는 바람으로 싸우고, 절반이 되면 고치 속에 숨어 공격대를 떠 있는 섬들로 보냅니다. 그 뒤 폭풍이 터지고 끝까지 번개의 몸으로 싸웁니다. 테살리 대장이 곁에서 함께 싸우며 고요의 원을 펼칩니다.',
+  'bossJournal.smithHeart.breath.tagline': '공허 위로 벽 없이 튀어나온 절벽: 바람을 거슬러 걷고, 생명력 {at}에서 떠 있는 섬들을 정리한 뒤 폭풍을 버텨내세요.',
+  'bossJournal.smithHeart.breath.chipEdge': '가장자리에서 떨어지면 사망',
+  'bossJournal.smithHeart.breath.chipIsles': '{at}에서 떠 있는 섬으로',
   'bossJournal.smithHeart.breath.phaseWindName': '바람',
   'bossJournal.smithHeart.breath.phaseWindSummary':
     '전투 시작부터 생명력 {at}까지. 바람에 날리거나, 던져지거나, 걸어서 벼랑 가장자리 밖으로 나간 자는 공허로 떨어져 죽습니다.',
@@ -251,6 +260,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '천둥의 요람이 플레이어 {count}명을 한꺼번에 들어 올립니다: 공격대가 그들 사이로 나뉘어야 합니다.',
   'bossJournal.smithHeart.quench.overview':
     '오로라, 고요한 겨울이 얼어붙은 호수에서 솟아오릅니다. 모든 플레이어에게는 혼자 있으면 차오르고 무리 지어 있으면 내려가는 냉기 막대가 있지만, 가만히 서 있는 무리는 발밑의 얼음을 깨뜨립니다. 함께 있되, 절대 오래 머물지 마세요. 생명력이 절반이 되면 대장장이의 칼날 네 자루가 모두 깨어나고 냉기가 깊어집니다.',
+  'bossJournal.smithHeart.quench.tagline': '얼어붙은 호수에서는 모든 플레이어에게 냉기 막대가 있습니다: 무리 지어 몸을 녹이되, 계속 움직이지 않으면 발밑의 얼음이 깨집니다.',
+  'bossJournal.smithHeart.quench.chipHuddle': '{group}명 이상 무리 짓기',
+  'bossJournal.smithHeart.quench.chipBlades': '{at}에서 칼날 네 자루 모두 깨어남',
   'bossJournal.smithHeart.quench.phaseColdName': '냉기',
   'bossJournal.smithHeart.quench.phaseColdSummary': '전투 내내, 모든 플레이어에게.',
   'bossJournal.smithHeart.quench.coldName': '담금질의 냉기',
@@ -318,6 +330,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '생명의 온기가 절반으로 줄어듭니다: 치유받은 생명력 {heal}마다 냉기가 1씩 내려갑니다.',
   'bossJournal.smithHeart.heat.overview':
     '이그나자르, 꺼지지 않는 자는 최초의 샘에 허리까지 몸을 담근 채 결코 움직이지 않습니다: 공격대는 그 주위를 둘러싼 물가에서 싸웁니다. 생명력 {one}와 {two}에서 가라앉고 화로가 용암 고리로 넘쳐흐릅니다. 방어 담당은 잿불 손아귀와 샘의 낙인에 맞춰 교대합니다.',
+  'bossJournal.smithHeart.heat.tagline': '최초의 샘에 허리까지 잠긴 채 결코 움직이지 않습니다: 공격대는 그 주위의 물가에서 싸웁니다.',
+  'bossJournal.smithHeart.heat.chipSinks': '{one}와 {two}에서 가라앉음',
+  'bossJournal.smithHeart.heat.chipPhases': '{phases}단계와 {overflows}번의 넘침',
   'bossJournal.smithHeart.heat.phaseAllName': '모든 단계',
   'bossJournal.smithHeart.heat.phaseAllSummary':
     '전투 시작부터 끝까지. 단, 이그나자르가 넘침 속에 가라앉아 있는 동안은 제외합니다.',
@@ -415,6 +430,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '화로의 바퀴가 {warn}초만 경고하고 최대 위력으로 분출합니다.',
   'bossJournal.smithHeart.final.overview':
     '애시그랜드, 주인 없는 힘의 잔해는 열기, 담금질, 숨결, 망치의 네 구역으로 나뉜 세계의 모루에서 싸웁니다. 서 있는 구역의 힘을 마시므로, 방어 담당은 어느 막대도 터지기 전에 구역에서 구역으로 끌고 다닙니다. 생명력 {first}와 {second}에서 파편을 불러내고, {final}에서는 마지막을 위해 네 구역이 모두 깨어납니다.',
+  'bossJournal.smithHeart.final.tagline': '서 있는 구역의 힘을 마십니다: 방어 담당은 어느 과부하 막대도 터지기 전에 구역에서 구역으로 끌고 다닙니다.',
+  'bossJournal.smithHeart.final.chipQuarters': '원소 구역 {count}곳',
+  'bossJournal.smithHeart.final.chipSplinters': '{first}와 {second}에서 파편',
+  'bossJournal.smithHeart.final.chipFinal': '{final}에서 최후의 결전',
   'bossJournal.smithHeart.final.phaseQuartersName': '네 구역',
   'bossJournal.smithHeart.final.phaseQuartersSummary':
     '모루 중앙에 원이 있고 그 둘레에 네 구역이 있습니다. 각 구역 고유의 능력은 애시그랜드가 들어온 지 {delay}초 후에 시작됩니다.',
@@ -26995,4 +27014,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 우두머리는 {difficulty}에서 아이템을 떨어뜨리지 않습니다.',
   'hudChrome.adventureJournal.lootFrom': '획득처: {boss}',
   'hudChrome.adventureJournal.targetButton': '모험 일지에서 이 우두머리 열기',
+  'hudChrome.adventureJournal.bannerKicker': '{instance}, 우두머리 {index}/{total}',
+  'hudChrome.adventureJournal.bossCount': '{defeated}/{total}',
+  'hudChrome.adventureJournal.statusNext': '다음 차례',
+  'hudChrome.adventureJournal.mythicSoon': '신화: 출시 예정',
+  'hudChrome.adventureJournal.roleEveryone': '모두',
+  'hudChrome.adventureJournal.aboutHeading': '전투 소개',
+  'hudChrome.adventureJournal.openList': '모든 던전과 공격대 보기',
+  'hudChrome.adventureJournal.phaseRangeWhole': '전투 내내',
+  'hudChrome.adventureJournal.phaseRangeBand': '{from}~{to}',
+  'hudChrome.adventureJournal.phaseRangeToEnd': '{from}~끝까지',
+  'hudChrome.adventureJournal.phaseRangeAt': '{marks}에서',
+  'hudChrome.adventureJournal.factDamage': '{min}~{max}의 피해',
+  'hudChrome.adventureJournal.factDamageArcane': '{min}~{max}의 비전 피해',
+  'hudChrome.adventureJournal.factDamageFire': '{min}~{max}의 화염 피해',
+  'hudChrome.adventureJournal.factDamageFrost': '{min}~{max}의 냉기 피해',
+  'hudChrome.adventureJournal.factDamageNature': '{min}~{max}의 자연 피해',
+  'hudChrome.adventureJournal.factDamagePhysical': '{min}~{max}의 물리 피해',
+  'hudChrome.adventureJournal.factDamageShadow': '{min}~{max}의 암흑 피해',
+  'hudChrome.adventureJournal.factEvery': '{seconds}초마다',
 };

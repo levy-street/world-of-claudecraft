@@ -47,6 +47,13 @@ export interface JournalMechanic {
   compare?: JournalDamageCompare;
 }
 
+/** The boss health a phase covers, as fractions of 1: the whole fight, a band
+ *  (`to` 0 means to the end), or the health marks it happens at. */
+export type JournalHealthRange =
+  | 'whole'
+  | { readonly from: number; readonly to: number }
+  | { readonly at: readonly number[] };
+
 export interface JournalPhase {
   id: string;
   nameKey: TranslationKey;
@@ -54,6 +61,17 @@ export interface JournalPhase {
   values?: JournalValues;
   percentValues?: readonly string[];
   mechanics: readonly JournalMechanic[];
+  /** The health band the phase header's pill shows. */
+  health?: JournalHealthRange;
+  /** The summary only restates the band: the pill replaces it. */
+  rangeOnly?: boolean;
+}
+
+/** One stat chip under a boss page's one-line summary (values print bold). */
+export interface JournalChip {
+  key: TranslationKey;
+  values?: JournalValues;
+  percentValues?: readonly string[];
 }
 
 export interface JournalTip {
@@ -100,6 +118,13 @@ export interface JournalBossView {
    *  first): each gets its portrait and name in the header, and the page is
    *  defeated only once all of them are down. Absent for a single boss. */
   members?: readonly string[];
+  /** The page's own short title (a council's "A and B"); absent, the page
+   *  reads its bodies' names. */
+  nameKey?: TranslationKey;
+  /** The banner's one-line summary; a page without one shows its overview. */
+  tagline?: JournalNote;
+  /** The banner's stat chips (none when absent). */
+  chips?: readonly JournalChip[];
 }
 
 export interface JournalSource {
@@ -140,6 +165,13 @@ export interface JournalPhaseDef {
   values?: JournalValues;
   percentValues?: readonly string[];
   mechanics: readonly JournalMechanicDef[];
+  health?: JournalHealthRange;
+  rangeOnly?: boolean;
+}
+
+export interface JournalChipDef extends JournalChip {
+  /** A chip shown on Heroic only (the hard enrage). */
+  availability?: 'heroic';
 }
 
 export interface JournalChoiceDef {
@@ -168,6 +200,11 @@ export interface JournalBossDef {
   heroicNotePercentValues?: readonly string[];
   /** A council fought as one encounter: every body, `mobId` first. */
   members?: readonly string[];
+  nameKey?: TranslationKey;
+  taglineKey?: JournalText;
+  taglineValues?: JournalValues;
+  taglinePercentValues?: readonly string[];
+  chips?: readonly JournalChipDef[];
 }
 
 export interface DungeonJournalDef {
@@ -230,6 +267,8 @@ export function buildJournalPhases(
       summaryKey: pick(phase.summaryKey, difficulty),
       ...(phase.values ? { values: phase.values } : {}),
       ...(phase.percentValues ? { percentValues: phase.percentValues } : {}),
+      ...(phase.health !== undefined ? { health: phase.health } : {}),
+      ...(phase.rangeOnly ? { rangeOnly: true } : {}),
       mechanics: phase.mechanics
         .filter((m) => !m.availability || m.availability === difficulty)
         .map((m): JournalMechanic => {
@@ -299,6 +338,29 @@ export function dungeonJournalBossView(
           }))
         : [],
     ...(boss.members ? { members: boss.members } : {}),
+    ...(boss.nameKey ? { nameKey: boss.nameKey } : {}),
+    ...(boss.taglineKey
+      ? {
+          tagline: {
+            key: pick(boss.taglineKey, difficulty),
+            ...(boss.taglineValues ? { values: boss.taglineValues } : {}),
+            ...(boss.taglinePercentValues ? { percentValues: boss.taglinePercentValues } : {}),
+          },
+        }
+      : {}),
+    ...(boss.chips
+      ? {
+          chips: boss.chips
+            .filter((chip) => !chip.availability || chip.availability === difficulty)
+            .map(
+              ({ key, values, percentValues }): JournalChip => ({
+                key,
+                ...(values ? { values } : {}),
+                ...(percentValues ? { percentValues } : {}),
+              }),
+            ),
+        }
+      : {}),
   };
 }
 

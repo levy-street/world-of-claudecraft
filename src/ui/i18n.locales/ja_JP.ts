@@ -26,8 +26,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'bossJournal.smithHeart.common.furyResponse': '時間切れになる前にボスを倒すこと。',
   'bossJournal.smithHeart.common.heroicFury':
     '炉の怒り：戦闘開始から{minutes}分後、戦いがレイドを焼き尽くす。',
+  'bossJournal.smithHeart.common.chipTankSwap': 'タンク交代あり',
+  'bossJournal.smithHeart.common.chipEnrage': '{minutes}分でハードエンレージ',
   'bossJournal.smithHeart.council.overview':
     'フロスマール、不屈の槌とヴェルミラ、鉱脈の歌い手は採石場で一体となって戦う。フロスマールはタンク担当のボスで、その山の怒りは柱の陰に隠れていない全員を打つ。ヴェルミラは術者で、レイドが身を隠す柱を立て、歌で石を揺るがす。一方が倒れるともう一方が回復し、速くなり、その能力を引き継ぐ。2体は同時に倒すこと。',
+  'bossJournal.smithHeart.council.pageName': 'フロスマールとヴェルミラ',
+  'bossJournal.smithHeart.council.tagline': '二体の石の守護者が採石場で一体となって戦う：フロスマールの山の怒りは柱の陰でしのぎ、ヴェルミラの歌を妨害し、二体を同時に倒すこと。',
+  'bossJournal.smithHeart.council.chipBosses': 'ボス{count}体、一つの戦い',
+  'bossJournal.smithHeart.council.chipTogether': '{arrive}秒以内に両方を倒す',
   'bossJournal.smithHeart.council.phaseHammerName': 'フロスマール、不屈の槌',
   'bossJournal.smithHeart.council.phaseHammerSummary':
     'タンク担当のボス。エネルギーは約{fill}秒で0から{energy}まで溜まり、満タンになると山の怒りを詠唱する。',
@@ -120,6 +126,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '嘆きの憤怒は生き残った側の体力を即座に{heal}回復させ、倒れた側の2つ目の能力も引き継がせる。',
   'bossJournal.smithHeart.breath.overview':
     'エアウィン、解き放たれた疾風は、壁のない岩棚である嵐の岩棚で戦う：どの縁も虚空への落下に通じている。体力が半分になるまでは風で戦い、半分で繭に隠れてレイドを浮島へ送り出し、その後嵐が裂けて最後まで雷として戦う。テサリー隊長が共に戦い、凪の円を敷いてくれる。',
+  'bossJournal.smithHeart.breath.tagline': '虚空の上に張り出した壁のない岩棚：風に向かって歩き、体力{at}で浮島を制圧し、嵐を耐え抜け。',
+  'bossJournal.smithHeart.breath.chipEdge': '縁から落ちれば即死',
+  'bossJournal.smithHeart.breath.chipIsles': '{at}で浮島へ',
   'bossJournal.smithHeart.breath.phaseWindName': '風',
   'bossJournal.smithHeart.breath.phaseWindSummary':
     '戦闘開始から体力{at}まで。吹き飛ばされても、投げ飛ばされても、歩いてでも、岩棚の縁から出た者は虚空へ落ちて死ぬ。',
@@ -249,6 +258,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '雷のゆりかごは一度に{count}人を持ち上げる：レイドはそれぞれに分かれること。',
   'bossJournal.smithHeart.quench.overview':
     'オーロラ、静寂の冬が凍った湖から現れる。各プレイヤーは冷気バーを持ち、一人でいると溜まり、身を寄せ合うと下がる。だが立ち止まったままの集団は足元の氷を割ってしまう。固まっていても、長居はしないこと。体力が半分になると鍛冶師の四本の剣がすべて目覚め、冷気が深まる。',
+  'bossJournal.smithHeart.quench.tagline': '凍った湖では各プレイヤーが冷気バーを持つ：身を寄せ合って暖を取りつつ、集団は動き続けること。止まると足元の氷が割れる。',
+  'bossJournal.smithHeart.quench.chipHuddle': '{group}人以上で固まる',
+  'bossJournal.smithHeart.quench.chipBlades': '{at}で四本の剣がすべて目覚める',
   'bossJournal.smithHeart.quench.phaseColdName': '冷気',
   'bossJournal.smithHeart.quench.phaseColdSummary': '戦闘中ずっと、全プレイヤーに作用する。',
   'bossJournal.smithHeart.quench.coldName': '焼き入れの冷気',
@@ -316,6 +328,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '命の温もりが半減する：回復した体力{heal}ごとに冷気が1下がる。',
   'bossJournal.smithHeart.heat.overview':
     'イグナザール、消えざる者は最初の湧泉に腰まで沈んだまま決して動かず、レイドはその周囲の岸で戦う。体力{one}と{two}で沈み、炉床が溶岩の輪となってあふれ出す。タンクは燼の握りと湧泉の烙印で交代する。',
+  'bossJournal.smithHeart.heat.tagline': '最初の湧泉に腰まで沈み、決して動かない：レイドはその周囲の岸で戦う。',
+  'bossJournal.smithHeart.heat.chipSinks': '{one}と{two}で沈む',
+  'bossJournal.smithHeart.heat.chipPhases': '{phases}フェーズと{overflows}回の氾濫',
   'bossJournal.smithHeart.heat.phaseAllName': '全フェーズ',
   'bossJournal.smithHeart.heat.phaseAllSummary':
     '戦闘開始から最後まで。ただしイグナザールが氾濫で沈んでいる間は除く。',
@@ -411,6 +426,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'bossJournal.smithHeart.heat.heroicWheel': '炉床の輪の予告は{warn}秒しかなく、全力で噴き上がる。',
   'bossJournal.smithHeart.final.overview':
     'アッシュグランド、主なき剛力の残滓は世界の金床で戦う。金床は熱、焼き入れ、息吹、槌の四つの区画に分かれている。立っている区画の力を飲むため、タンクはどのバーも破裂する前に区画から区画へ引きずっていく。体力{first}と{second}で欠片を呼び出し、{final}で四つの区画すべてが目覚めて最終局面に入る。',
+  'bossJournal.smithHeart.final.tagline': '立っている区画の力を飲む：タンクはどの過負荷バーも破裂する前に、区画から区画へ引きずっていく。',
+  'bossJournal.smithHeart.final.chipQuarters': '{count}つの元素の区画',
+  'bossJournal.smithHeart.final.chipSplinters': '{first}と{second}で欠片',
+  'bossJournal.smithHeart.final.chipFinal': '{final}で最終局面',
   'bossJournal.smithHeart.final.phaseQuartersName': '四つの区画',
   'bossJournal.smithHeart.final.phaseQuartersSummary':
     '金床の中央に円環があり、その周りに四つの区画がある。各区画固有の能力は、アッシュグランドが入ってから{delay}秒後に始まる。',
@@ -26981,4 +27000,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureJournal.lootNone': 'このボスは{difficulty}ではアイテムを落とさない。',
   'hudChrome.adventureJournal.lootFrom': 'ドロップ元：{boss}',
   'hudChrome.adventureJournal.targetButton': 'このボスを冒険日誌で開く',
+  'hudChrome.adventureJournal.bannerKicker': '{instance}、ボス {index}/{total}',
+  'hudChrome.adventureJournal.bossCount': '{defeated}/{total}',
+  'hudChrome.adventureJournal.statusNext': '次の相手',
+  'hudChrome.adventureJournal.mythicSoon': 'ミシック：近日公開',
+  'hudChrome.adventureJournal.roleEveryone': '全員',
+  'hudChrome.adventureJournal.aboutHeading': 'この戦いについて',
+  'hudChrome.adventureJournal.openList': 'すべてのダンジョンとレイドを表示',
+  'hudChrome.adventureJournal.phaseRangeWhole': '戦闘全体',
+  'hudChrome.adventureJournal.phaseRangeBand': '{from}〜{to}',
+  'hudChrome.adventureJournal.phaseRangeToEnd': '{from}〜最後まで',
+  'hudChrome.adventureJournal.phaseRangeAt': '{marks}時点',
+  'hudChrome.adventureJournal.factDamage': '{min}〜{max}ダメージ',
+  'hudChrome.adventureJournal.factDamageArcane': '{min}〜{max}の秘術ダメージ',
+  'hudChrome.adventureJournal.factDamageFire': '{min}〜{max}の火炎ダメージ',
+  'hudChrome.adventureJournal.factDamageFrost': '{min}〜{max}の冷気ダメージ',
+  'hudChrome.adventureJournal.factDamageNature': '{min}〜{max}の自然ダメージ',
+  'hudChrome.adventureJournal.factDamagePhysical': '{min}〜{max}の物理ダメージ',
+  'hudChrome.adventureJournal.factDamageShadow': '{min}〜{max}の闇ダメージ',
+  'hudChrome.adventureJournal.factEvery': '{seconds}秒ごと',
 };
