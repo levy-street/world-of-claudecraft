@@ -37,7 +37,9 @@ describe('Affliction full-BiS five-minute inert-boss balance', () => {
     // pool survives the window. The corridor widens to 0.30 with the same
     // headroom the 0.12 line carried over its 0.096 measurement; the pool is
     // still finite (starvation still binds below).
-    expect(result.manaEndPct).toBeLessThan(0.3);
+    // 0.30 -> 0.40 for the shared Cruel Pact (20% of max mana per tap):
+    // seed 42 ends the window with 0.33 of the pool.
+    expect(result.manaEndPct).toBeLessThan(0.4);
     // And a floor under the measured 0.242, so the larger surviving pool is
     // pinned from both sides rather than left open below.
     expect(result.manaEndPct).toBeGreaterThan(0.18);
@@ -59,8 +61,13 @@ describe('Demonology full-BiS five-minute inert-boss balance', () => {
     const result = runWarlockBalanceProbe('demonology', 42, 300);
 
     expect(result.dps).toBeGreaterThanOrEqual(192);
-    expect(result.dps).toBeLessThanOrEqual(269);
-    expect(result.manaEndPct).toBeLessThan(0.12);
+    // Ceiling 269 -> 280 for the shared pacts (Cruel Pact restores 20% of max
+    // mana for every spec, plus Hard Bargain): seed 42 measures 271.5.
+    expect(result.dps).toBeLessThanOrEqual(280);
+    // 0.12 -> 0.55: the probe taps Cruel Pact under 30% mana and each tap now
+    // returns 20% of max mana, so the window ends higher in the tap cycle
+    // (seed 42 measures 0.496). starvedPct below still pins a finite economy.
+    expect(result.manaEndPct).toBeLessThan(0.55);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });
@@ -87,8 +94,12 @@ describe('Destruction full-BiS five-minute inert-boss balance', () => {
     const result = runWarlockBalanceProbe('destruction', 42, 300);
 
     expect(result.dps).toBeGreaterThanOrEqual(170);
-    expect(result.dps).toBeLessThanOrEqual(255);
-    expect(result.manaEndPct).toBeLessThan(0.3);
+    // Ceiling 255 -> 272 for the shared pacts (Cruel Pact restores 20% of max
+    // mana for every spec, plus Hard Bargain): seed 42 measures 263.3.
+    expect(result.dps).toBeLessThanOrEqual(272);
+    // 0.30 -> 0.47: each Cruel Pact tap now returns 20% of max mana, so the
+    // window ends higher in the tap cycle (seed 42 measures 0.413).
+    expect(result.manaEndPct).toBeLessThan(0.47);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });

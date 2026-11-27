@@ -38,7 +38,9 @@ describe('affliction 200 DPS anchors at 120 seconds', () => {
     // off-GCD Possess/Hour openers fire without a primary Eye target and the
     // heroic four-seed mean rises to 193.51, still below the old 200 target.
     expect(mean('dps')).toBeGreaterThanOrEqual(163);
-    expect(mean('dps')).toBeLessThanOrEqual(196);
+    // Ceiling 196 -> 203 for the shared Cruel Pact (20% of max mana per
+    // tap): the four-seed mean measures 196.8.
+    expect(mean('dps')).toBeLessThanOrEqual(203);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 
