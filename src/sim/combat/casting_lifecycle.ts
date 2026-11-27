@@ -1737,7 +1737,7 @@ export function castAbility(
   const bargain = res.effects.find((effect) => effect.type === 'hardBargain');
   if (bargain) {
     if (p.resourceType !== 'mana' || p.resource < Math.round(p.maxResource * bargain.manaPctMax)) {
-      ctx.error(p.id, 'Not enough mana.');
+      ctx.error(p.id, 'Not enough mana!');
       return;
     }
     if (p.hp >= p.maxHp) {
@@ -2402,7 +2402,15 @@ function armAbilityCooldownWithReflection(
   resolved: ResolvedAbility,
   togglingOff = false,
 ): void {
-  if (consumeForbiddenReflection(ctx, player, resolved.def.id)) return;
+  // A free-copy reflection (Festerhex, no cooldown) is a next_cast_free aura: only the
+  // cost step it actually pays for may spend it, so it is never stripped here when
+  // another free-cast buff paid instead.
+  if (
+    !forbiddenReflectionTakesWithoutCooldown(resolved.def.id) &&
+    consumeForbiddenReflection(ctx, player, resolved.def.id)
+  ) {
+    return;
+  }
   armAbilityCooldown(
     player,
     // cooldownId keeps transformed abilities (the rogue/druid engine swaps)

@@ -131,7 +131,6 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   afflictionCruelPact: 'other',
   afflictionVicarious: 'other',
   warlockUmbralAnchor: 'other',
-  afflictionCoven: 'other',
   afflictionContagion: 'other',
   afflictionPlagueBloom: 'damage',
   afflictionPossession: 'other',

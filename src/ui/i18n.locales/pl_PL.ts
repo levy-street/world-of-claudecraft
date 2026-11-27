@@ -8025,10 +8025,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Poświęca ziemię na 9 sek. i co sekundę zadaje {damage} obrażeń od Świętości. Strażnicy Wiary otrzymują w niej o 10% mniej obrażeń.',
   'entities.abilities.consecration.name': 'Święta ziemia',
+  'entities.abilities.corruption.description':
+    'Skaża cel, zadając {damage} obrażeń cienia przez 18 sek.',
   'entities.abilities.corruption.name': 'Czarna zgnilizna',
   'entities.abilities.crippling_poison.description':
     'Uderza cel ołowianym jadem, zadając {damage} obrażeń od Natury i spowalniając jego prędkość ruchu o 50% na 12 sek.',
   'entities.abilities.crippling_poison.name': 'Ołowiany jad',
+  'entities.abilities.curse_of_agony.description':
+    'Przeklina cel agonią: {damage} obrażeń od cienia w ciągu 24 sek.',
+  'entities.abilities.curse_of_agony.name': 'Urok udręki',
   'entities.abilities.dash.description':
     'Przyjmij Postać kota, jeśli jeszcze w niej nie jesteś, i sprintuj o 50% szybciej przez 15 s. Działa w każdej postaci. Natychmiastowe i nie uruchamia globalnego czasu odnowienia.',
   'entities.abilities.dash.name': 'Sus',
@@ -8054,6 +8059,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.divine_protection.description':
     'Święta tarcza pochłania {damage}% twojego maksymalnego zdrowia przez {duration} sek.',
   'entities.abilities.divine_protection.name': 'Osłona wiary',
+  'entities.abilities.drain_life.description':
+    'Pochłania witalność celu, zadając {damage} obrażeń od cienia co sekundę i przenosząc ci 70% z nich jako zdrowie. Udręka przenosi zamiast tego całość. Kanałowane na twoim głównym Złym Oku zużywa na starcie wszystkie Nici Przeznaczenia, a każda Nić generuje 1 dodatkowe Potępienie na tyknięcie.',
   'entities.abilities.drain_life.name': 'Pochłonięcie',
   'entities.abilities.earth_shock.description':
     'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: przy 5 Gromach zadaje o 125% więcej obrażeń i zużywa cały Grom. Skalne Wiązanie: zmusza cel do atakowania ciebie przez 3 s.',
@@ -8182,6 +8189,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.lesser_heal.name': 'Szeptana modlitwa',
+  'entities.abilities.life_tap.description': 'Zamienia {damage} zdrowia na {damage} many.',
+  'entities.abilities.life_tap.name': 'Trudny targ',
   'entities.abilities.lightning_bolt.description':
     'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: trafienie daje 1 Grom.',
   'entities.abilities.lightning_bolt.name': 'Łukowy pocisk',
@@ -8387,6 +8396,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     'Przez 12 s Łukowy pocisk daje 2 Gromy. Twój następny Łukowy pocisk albo Rozgałęziona Błyskawica jest natychmiastowy, a twoja następna pełna wypłata Gromu zadaje o 25% więcej obrażeń. (Znak Żywiołów)',
   'entities.abilities.siphon_life.name': 'Wyssanie życia',
+  'entities.abilities.siphon_life.description':
+    'Wysysa życie z wroga, zadając {damage} obrażeń od Cienia przez 30 sek. i lecząc cię za zadane obrażenia. (specjalizacja Udręka)',
   'entities.abilities.conflagrate.name': 'Pożoga',
   'entities.abilities.conflagrate.description':
     'Przyspiesza przyszłe tyknięcie twojego Płonącego paktu, a następnie podpala cel za {damage} obrażeń od ognia. Generuje 1 Spustoszenie i 1 Ruinę. Mieści {charges} ładunki. (Znak Zniszczenia)',
@@ -9949,6 +9960,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa twoją aktywną pieczęć, by uderzyć wroga z bliskiego dystansu.',
   'guide.abilityHook.lesser_heal':
     'Spokojny czar do uzupełnienia zdrowia sojusznika, gdy jest czas, by stać w miejscu.',
+  'guide.abilityHook.life_tap':
+    'Zamienia część własnego zdrowia z powrotem na manę, gdy ci jej zabraknie.',
   'guide.abilityHook.lightning_bolt':
     'Dystansowy czar zadający obrażenia od natury, twój podstawowy atak z oddali.',
   'guide.abilityHook.lightning_shield':
@@ -16568,12 +16581,24 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Poświęca najpierw Kościanego Maga, potem Szkieletowego Wojownika, a Grobowe Skrzydło tylko w ostateczności. Spośród duplikatów wybiera tego z najkrótszym pozostałym czasem trwania, a następnie najsłabszego, aby zadać {damage} obrażeń od Cienia w wybranym miejscu.',
   'entities.abilities.corpse_explosion.name': 'Wybuch Zwłok',
+  'entities.abilities.coven.description':
+    'Tworzy drugorzędne Złe Oko na maksymalnie 4 pobliskich wrogach na 15 sekund. Zasilają one wspólną pulę Potępienia w 50%, a Wyrok odbija się do nich za 35% obrażeń.',
+  'entities.abilities.coven.name': 'Sabat',
+  'entities.abilities.cruel_pact.description':
+    'Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić 1,5% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej.',
   'entities.abilities.cruel_pact.name': 'Okrutny Pakt',
+  'entities.abilities.cursed_accomplice.description':
+    'Wiąże twoje Oko Przekleństwa, gdy nie wybrano żadnego sojusznika, dzięki czemu jego Spojrzenie Przekleństwa generuje 2 Potępienia. Powiązanie jednego wybranego członka grupy sprawia, że zamiast tego tylko jego obrażenia zadane twojemu Złemu Oku generują 3. Nowe powiązanie zastępuje poprzednie i może się uruchomić nie częściej niż raz na 2 sekundy.',
   'entities.abilities.cursed_accomplice.name': 'Przeklęty Wspólnik',
+  'entities.abilities.dark_pact.description':
+    'Poświęca 10% twojego obecnego zdrowia, aby na 8 sekund pochłonąć obrażenia równe 30% twojego maksymalnego zdrowia.',
   'entities.abilities.dark_pact.name': 'Krwawe Przymierze',
   'entities.abilities.elemental_trance.description':
     'Wchodzisz w żywiołowy trans na 15 sekund, zmniejszając otrzymywane obrażenia o 30% i zamieniając 20% wszystkich zadawanych przez ciebie obrażeń w manę. (Sygnatura Ducha Wojny)',
   'entities.abilities.elemental_trance.name': 'Trans Żywiołów',
+  'entities.abilities.evil_eye.description':
+    'Oznacza jednego wroga jako ognisko twoich klątw. Przeniesienie oka zachowuje Potępienie, ale nie odświeża jego 20-sekundowego czasu wygaśnięcia.',
+  'entities.abilities.evil_eye.name': 'Złe Oko',
   'entities.abilities.eviscerate.description': 'Umiejętność kończąca, która zadaje {damage}.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Przy 6 Rytuale Jadu ten przycisk zmienia się w Jadowite rozdarcie: cios, który natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje krwawienia, zadaje świeżą jadowitą ranę i przywraca 20 energii.',
@@ -16597,9 +16622,19 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Uderza wroga za obrażenia broni plus {damage} i zwiększa twoją szansę na unik o 15% na 7 sekund. Przyznaje 1 punkt combo. (talent Łotrzyka)',
   'entities.abilities.hemorrhage.description':
     'Uderza wroga za obrażenia broni plus {damage}, zadaje obrażenia od krwawienia przez 12 sekund i zwiększa otrzymywane obrażenia od krwawienia o 40%. Przyznaje 1 punkt combo. Co drugie użycie dodaje 1 Mrok (maks. 3). (silnik Skulduggery)',
+  'entities.abilities.hex_of_violence.description':
+    'Rzuca urok na wroga na 8 sekund, zadając obrażenia od Cienia i generując 2 Potępienia co 2 sekundy. Jego następne 3 zadające obrażenia działania generują po 7 Potępienia i smagają go za 17 obrażeń od Cienia.',
+  'entities.abilities.hex_of_violence.name': 'Klątwa Przemocy',
+  'entities.abilities.hour_of_judgment.description':
+    'Przywołuje sąd nad twoim głównym Złym Okiem na 15 sekund, przyznając 40 Potępienia i 3 Nici Przeznaczenia, aktywując Opętanie, podwajając Potępienie generowane przez główne oko i zwiększając obrażenia Wyroku o 20%. Pierwsze użycie Wyroku zwraca 50 Potępienia.',
+  'entities.abilities.hour_of_judgment.name': 'Godzina Sądu',
   'entities.abilities.kidney_shot.description':
     'Umiejętność kończąca, która ogłusza cel na 2 sekundy plus 1 sekundę za punkt combo (5 punktów combo: 7 sekund).',
+  'entities.abilities.litany_of_guilt.description':
+    'Rzuca klątwę na twoje główne Złe Oko na 6 sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom w promieniu 8 m, najwyżej raz na sekundę. Ranga 2 wydłuża to do 8 sekund i 4 wrogów.',
   'entities.abilities.litany_of_guilt.name': 'Litania Winy',
+  'entities.abilities.maledict_gaze.description':
+    'Twoje Oko Przekleństwa atakuje wybrane główne Złe Oko co 2,5 sekundy, zadając obrażenia od Cienia. Opętaj Złe Oko podwaja jego szybkość ataku.',
   'entities.abilities.maledict_gaze.name': 'Spojrzenie Przekleństwa',
   'entities.abilities.maul.description':
     'Miażdżący atak, który zwiększa obrażenia w walce wręcz o {damage} i wzbudza wysokie zagrożenie. Aktywuje się przy twoim następnym zamachu. Tylko w Postaci Bruina.',
@@ -16609,9 +16644,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Podpala wroga księżycowym ogniem, zadając {damage} obrażeń od Arkanów plus obrażenia w czasie.',
   'entities.abilities.moonfire.specNote_balance':
     'Utrzymuj płomień: Księżycowe nasienie przedłuża go o 6 sekund.',
+  'entities.abilities.needle_of_fate.description':
+    'Przebija wroga za {damage} obrażeń od Cienia i generuje {needleDoom} Potępienia, jeśli nosi on twoje Złe Oko. Każde trafienie w twoje główne Złe Oko dodaje Nić Przeznaczenia na 12 sekund, maksymalnie do 3. Jeśli nie istnieje żadne Złe Oko, Igła najpierw oznacza swój cel.',
+  'entities.abilities.needle_of_fate.name': 'Igła Przeznaczenia',
   'entities.abilities.ossuary_mark.description':
     'Oznacza wroga na 15 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 jardów i tworzy 1 Odłamek Duszy.',
   'entities.abilities.ossuary_mark.name': 'Znak Ossuarium',
+  'entities.abilities.possess_evil_eye.description':
+    'Maledyktor opętuje twoje główne Złe Oko na 15 sekund i generuje 35 Potępienia. Igła Przeznaczenia rzuca się w 1 sekundę i generuje 2 dodatkowe Potępienia, Pochłonięcie można kanalizować podczas ruchu, a Wyrok zadaje o 25% więcej obrażeń i uwalnia opóźnione echo za 60% obrażeń, malejące do 30% między poziomem 17 a 20.',
+  'entities.abilities.possess_evil_eye.name': 'Opętaj Złe Oko',
   'entities.abilities.raise_bone_mage.description':
     'Zużywa 2 Odłamki Duszy, aby dodać trwałego dystansowego Kościanego Maga do twojej Władzy z 2 miejscami. Może ci służyć tylko jeden. Jego ataki wystawiają cel na 5% więcej obrażeń magicznych przez 6 sekund, a Rozkaz Żniw zwiększa tę słabość do 8%.',
   'entities.abilities.raise_bone_mage.name': 'Wskrześ Kościanego Maga',
@@ -16651,6 +16692,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Zwiększa szybkość poruszania się o 35%, ale poświęca 2% twojego maksymalnego zdrowia każdej sekundy. Rzuć ponownie, aby anulować. Wyłącza się przy 20% zdrowia.',
   'entities.abilities.sacrilegious_march.name': 'Świętokradczy Marsz',
+  'entities.abilities.sentence.description':
+    'Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Każda Nić zwiększa obrażenia o 6%. Dodatkowe efekty eskalują przy 20, 50, 80 i 100 Potępienia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie.',
+  'entities.abilities.sentence.name': 'Wyrok',
   'entities.abilities.sinister_strike.description':
     'Natychmiastowy cios za obrażenia broni plus {damage}. Przyznaje 1 punkt combo.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Dodaje 1 Rytuał Jadu (maks. 6).',
@@ -16680,12 +16724,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.description':
     'Zamaszyście przeczesz pazurami pobliskich wrogów, zadając {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w Postaci Bruina.',
   'entities.abilities.swipe.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.umbral_anchor.description':
+    'Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, zużywając kotwicę i rozpoczynając 45-sekundowy czas odnowienia.',
   'entities.abilities.umbral_anchor.name': 'Mroczna Kotwica',
   'entities.abilities.unholy_command.description':
     'Zużywa 3 Odłamki Duszy, rozkazując wszystkim twoim nieumarłym zadawać o 25% więcej obrażeń i działać o 20% szybciej przez 12 sekund.',
   'entities.abilities.unholy_command.name': 'Nieświęty Rozkaz',
   'entities.abilities.venom_dart.specNote_assassination':
     'Dodaje 1 Rytuał Jadu i przedłuża twoją jadowitą ranę o 6 sekund (rana nigdy nie przekracza 20 sekund).',
+  'entities.abilities.vicarious_suffering.description':
+    'Wiąże twoje cierpienie na 8 sekund i generuje do 15 Potępienia z wrogich trafień. Użyte na sobie, zmniejsza otrzymywane obrażenia o 20%. Użyte na sojuszniku, przekierowuje do 20% obrażeń na ciebie, nie obniżając twojego zdrowia poniżej 15%.',
   'entities.abilities.vicarious_suffering.name': 'Zastępcze Cierpienie',
   'entities.abilities.wrath.description':
     'Ciska pociskiem energii natury, zadając {damage} obrażeń od Natury.',
@@ -16700,6 +16748,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Kościany Mag',
   'entities.mobs.necromancy_gravewing.name': 'Grobowe Skrzydło',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Szkieletowy Wojownik',
+  'guide.abilityHook.evil_eye':
+    'Wskazuje wroga, którego działania i cierpienie będą zasilać twoje Potępienie.',
   'hud.pet.abyssalChain': 'Otchłanny łańcuch',
   'hud.pet.abyssalChainDesc':
     "Rozkazuje Duskmurk'owi przyciągnąć do siebie zwykłego wroga znajdującego się dalej niż 8 i nie dalej niż 20 metrów. Bossów nie można przyciągnąć. Czas odnowienia: 15 sekund. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby przełączyć automatyczne rzucanie.",
@@ -16712,6 +16762,26 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'Rozkazuje Emberkinowi wystrzelić w twój cel dodatkowy plugawy pocisk. Czas odnowienia: 8 sekund. Kliknij prawym przyciskiem myszy, dotknij i przytrzymaj lub naciśnij Shift+Enter, aby przełączyć automatyczne rzucanie.',
   'hud.pet.felboltTitle': 'Plugawy pocisk',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'Kwalifikujące się obrażenia przyznają {value} Potępienia, najwyżej raz na {interval} s',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Pochłonięcie zużywa {stacks} Nici Przeznaczenia, zyskując dodatkowe {doom} Potępienia na tik',
+  'hudChrome.auraEffect.afflictionEye':
+    'Spojrzenie Przekleństwa atakuje co {interval} s; efekty na tym oku generują {pct}% Potępienia',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Efekty na tym oku generują {doomPct}% Potępienia; Wyrok odbija się tutaj za {echoPct}% obrażeń',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Nici Przeznaczenia: Wyrok zadaje o {sentencePct}% więcej obrażeń, albo Pochłonięcie zyskuje dodatkowe {doom} Potępienia na tik',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'Główne oko generuje o {eyePct}% więcej Potępienia; Wyrok zadaje o {sentencePct}% więcej obrażeń, a pierwsze użycie zwraca {refund} Potępienia',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Zyski Potępienia zadają {damage} obrażeń od Cienia maksymalnie {targets} wrogom w promieniu {radius} m, raz na sekundę',
+  'hudChrome.auraEffect.afflictionPossession':
+    'Wzmacnia Igłę Przeznaczenia, Pochłonięcie, Spojrzenie Przekleństwa i Wyrok',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Przekierowuje lub zmniejsza {pct}% otrzymywanych obrażeń i może wygenerować do {max} Potępienia',
+  'hudChrome.auraEffect.afflictionViolence':
+    'Pozostało {charges} odwetów; atak wroga przyznaje {doom} Potępienia i zadaje mu {damage} obrażeń od Cienia',
   'hudChrome.auraEffect.aoeEcho':
     'Pozostało {charges} ech; zdolności jednocelowe zadają {pct}% obrażeń jeszcze {targets} pobliskim wrogom',
   'hudChrome.auraEffect.arcaneCharge':
@@ -16736,6 +16806,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zadawane obrażenia zwiększone o {damagePct}%, szybkość ataku o {hastePct}%, a szybkość poruszania się o {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     'Pozostało {charges} ładunków: Lodowa lanca traktuje cel jako zamrożony i zadaje {pct}% obrażeń zamrożonego trafienia',
+  'hudChrome.auraEffect.forbiddenReflectionLock':
+    'Zakazane Odbicie nie może zostać jeszcze ponownie przygotowane',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Możesz ponownie rzucić swoją następną kwalifikującą się umiejętność czarnoksiężnika, mimo że jest w odnowieniu',
   'hudChrome.auraEffect.formLich':
@@ -16796,6 +16868,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Ruina',
   'hudChrome.procOverlay.ruinStatus': '{value} z {max} Ruiny',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Odłamki Duszy',
+  'hudChrome.warlock.doomEmptyStatus': '{value} z {max} Potępienia.',
+  'hudChrome.warlock.doomLabel': 'Potępienie',
+  'hudChrome.warlock.doomStatus': '{value} z {max} Potępienia; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Trzy Nici Przeznaczenia: Pochłonięcie może wpleść je w dodatkowe Potępienie.',
+  'hudChrome.warlock.fateThreadsLabel': 'Nici Przeznaczenia',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Trzy Nici Przeznaczenia: Wyrok może je zużyć, zyskując 18% zwiększonych obrażeń.',
+  'hudChrome.warlock.fateThreadsStatus': '{value} z {max} Nici Przeznaczenia.',
   'itemUi.tooltip.useHealingPotionPct':
     'Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 2 min.',
   'guide.controls.reliquary': 'Relikwiarz',
@@ -17788,6 +17869,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności.',
   'entities.itemSets.grovespring.name': 'Strój Gajowego Źródła',
+  'entities.itemSets.hexthread.bonus2':
+    'Igła Losu zapewnia 2 dodatkowe punkty Potępienia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.hexthread.bonus4': 'Wykonanie Wyroku zwraca 10 punktów Potępienia.',
   'entities.itemSets.hexthread.name': 'Całun Klątwy',
   'entities.itemSets.moonscorch.bonus2':
     'Księżycowe Nasienie może dwukrotnie wydłużyć Księżycową Nawałnicę przy jednym nałożeniu, maksymalnie do 12 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',

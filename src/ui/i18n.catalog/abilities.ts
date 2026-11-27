@@ -1137,7 +1137,7 @@ const classAbilityNamesEn = {
       [
         'cursed_accomplice',
         'Cursed Accomplice',
-        "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one.",
+        "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own direct hits (not DoT ticks) on your Rotmark generate 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one.",
       ],
       [
         'curse_of_agony',

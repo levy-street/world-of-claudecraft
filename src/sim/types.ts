@@ -4360,12 +4360,6 @@ export type AbilityEffect =
       /** Share of the caster's max health healed on each recall teleport. */
       recallHealPctMax?: number;
     }
-  | {
-      type: 'afflictionCoven';
-      duration: number;
-      radius: number;
-      maxSecondary: number;
-    }
   | { type: 'afflictionPossession'; duration: number; doom: number }
   | { type: 'afflictionJudgment'; duration: number; doom: number; refund: number }
   | { type: 'afflictionContagion'; cost: number; maxTargets: number; radius: number }

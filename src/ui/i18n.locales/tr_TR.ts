@@ -7914,10 +7914,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Zemini 9 saniyeliğine kutsar ve her saniye {damage} Kutsal hasar verir. İnanç Muhafızları içerideyken %10 daha az hasar alır.',
   'entities.abilities.consecration.name': 'Kutsal Toprak',
+  'entities.abilities.corruption.description':
+    'Hedefi yozlaştırır, 18 saniye boyunca {damage} Gölge hasarı verir.',
   'entities.abilities.corruption.name': 'Kara Çürüme',
   'entities.abilities.crippling_poison.description':
     'Hedefe kurşun gibi ağır bir zehirle vurur, {damage} Doğa hasarı verir ve hareket hızını 12 saniye boyunca %50 yavaşlatır.',
   'entities.abilities.crippling_poison.name': 'Kurşuni Zehir',
+  'entities.abilities.curse_of_agony.description':
+    'Hedefi ızdırapla lanetler: 24 saniye boyunca {damage} Gölge hasarı.',
+  'entities.abilities.curse_of_agony.name': 'Izdırap Büyüsü',
   'entities.abilities.dash.description':
     'Henüz Kedi Formunda değilsen bu forma geç ve 15 sn boyunca %50 daha hızlı koş. Her formda kullanılabilir. Anlıktır ve genel bekleme süresini tetiklemez.',
   'entities.abilities.dash.name': 'Atılma',
@@ -7943,6 +7948,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.divine_protection.description':
     'Kutsal bir kalkan {duration} saniye boyunca azami canının %{damage} kadarını emer.',
   'entities.abilities.divine_protection.name': 'İnanç Siperi',
+  'entities.abilities.drain_life.description':
+    "Hedefin canlılığını tüketir, her saniye {damage} Gölge hasarı verir ve bunun %70'ini can olarak sana aktarır. Izdırap bunun yerine tamamını aktarır. Birincil Kem Göz'üne kanalize edildiğinde başlangıçta tüm Kader İpliklerini tüketir ve her İplik tık başına 1 fazladan Mahkûmiyet üretir.",
   'entities.abilities.drain_life.name': 'Tüketme',
   'entities.abilities.earth_shock.description':
     "{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: 5 Gök Gürültüsü'nde %125 daha fazla hasar verir ve tüm Gök Gürültüsü'nü tüketir. Taşa Bağlı: hedefi 3 sn boyunca sana saldırmaya zorlar.",
@@ -8070,6 +8077,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar.',
   'entities.abilities.lesser_heal.name': 'Fısıldanan Dua',
+  'entities.abilities.life_tap.description': '{damage} canı {damage} manaya dönüştürür.',
+  'entities.abilities.life_tap.name': 'Ağır Pazarlık',
   'entities.abilities.lightning_bolt.description':
     '{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: isabet 1 Gök Gürültüsü verir.',
   'entities.abilities.lightning_bolt.name': 'Ark Oku',
@@ -8274,6 +8283,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     "12 sn boyunca Ark Oku 2 Gök Gürültüsü verir. Bir sonraki Ark Oku ya da Çatallı Yıldırım'ın anındadır ve bir sonraki tam Gök Gürültüsü ödemen %25 daha fazla hasar verir. (Elementsel imzası)",
   'entities.abilities.siphon_life.name': 'Can Sömürüsü',
+  'entities.abilities.siphon_life.description':
+    'Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)',
   'entities.abilities.conflagrate.name': 'Tutuşturma',
   'entities.abilities.conflagrate.description':
     'Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. {charges} şarj tutar. (Yıkım imzası)',
@@ -10468,6 +10479,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.judgement': 'Aktif Mührünü harcayarak kısa menzilden bir düşmana vurur.',
   'guide.abilityHook.lesser_heal':
     'Sabit durmaya vakit olduğunda bir dostu doldurmak için istikrarlı bir okuma.',
+  'guide.abilityHook.life_tap': 'Tükendiğinde kendi canının bir kısmını manaya çevirir.',
   'guide.abilityHook.lightning_bolt': 'Menzilli bir Doğa hasarı okuması; uzaktan başvuru becerin.',
   'guide.abilityHook.lightning_shield':
     'Seni yükler, böylece sana vuran saldırganlar Doğa hasarı alır.',
@@ -16454,12 +16466,24 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Önce bir Kemik Büyücüyü, sonra bir İskelet Savaşçıyı, bir Mezar Kanadını ise yalnızca son çare olarak feda eder. Kopyalar arasında önce en az kalan süreye, sonra en zayıfa sahip olanı seçer ve seçilen konumda {damage} Gölge hasarı verir.',
   'entities.abilities.corpse_explosion.name': 'Ceset Patlaması',
+  'entities.abilities.coven.description':
+    'Yakındaki en fazla 4 düşman üzerinde 15 sn süreyle ikincil Kem Gözler oluşturur. Bunlar ortak Mahkûmiyet havuzunu %50 oranında besler ve Hüküm onlara %35 hasarla yankılanır.',
+  'entities.abilities.coven.name': 'Cadı Meclisi',
+  'entities.abilities.cruel_pact.description':
+    "Azami canının %12'sini feda ederek azami manasının %1,5'ini geri kazandırır ve 20 Mahkûmiyet üretir. Can %20 veya altındayken kullanılamaz.",
   'entities.abilities.cruel_pact.name': 'Zalim Ahit',
+  'entities.abilities.cursed_accomplice.description':
+    "Hiçbir müttefik seçili değilken Kem Gözünü bağlar, böylece onun Bakışı 2 Mahkûmiyet üretir. Seçili tek bir grup üyesini bağlamak yalnızca onların Kem Gözüne verdiği hasarın 3 üretmesini sağlar. Yeni bir bağ öncekinin yerini alır ve en fazla 2 sn'de bir tetiklenebilir.",
   'entities.abilities.cursed_accomplice.name': 'Lanetli Suç Ortağı',
+  'entities.abilities.dark_pact.description':
+    "Mevcut canının %10'unu feda ederek 8 sn boyunca azami canının %30'u kadar hasarı emer.",
   'entities.abilities.dark_pact.name': 'Kanlı Ahit',
   'entities.abilities.elemental_trance.description':
     "15 sn süren bir element transına gir, alınan hasarı %30 azalt ve verdiğin tüm hasarın %20'sini manaya dönüştür. (Warspirit motoru)",
   'entities.abilities.elemental_trance.name': 'Element Transı',
+  'entities.abilities.evil_eye.description':
+    "Bir düşmanı lanetlerinin odağı olarak işaretler. Gözü taşımak Mahkûmiyeti korur ama 20 sn'lik süresini yenilemez.",
+  'entities.abilities.evil_eye.name': 'Kem Göz',
   'entities.abilities.eviscerate.description': '{damage} veren bitirici hamle.',
   'entities.abilities.eviscerate.specNote_assassination':
     '6 Zehir Ayininde bu düğme Zehir Yarığına dönüşür: kanamalarının kalan tüm hasarını anında veren, taze bir zehir yarası açan ve 20 enerji geri kazandıran bir vuruş.',
@@ -16483,9 +16507,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmana silah hasarı artı {damage} ile vurur ve 7 sn boyunca kaçınma şansını %15 artırır. 1 kombo puanı kazandırır. (Haydut yeteneği)',
   'entities.abilities.hemorrhage.description':
     'Düşmana silah hasarı artı {damage} ile vurur, 12 sn boyunca kanama hasarı verir ve alınan kanama hasarını %40 artırır. 1 kombo puanı kazandırır. Her 2. kullanım 1 Alacakaranlık ekler (en fazla 3). (Skulduggery motoru)',
+  'entities.abilities.hex_of_violence.description':
+    "Düşmanı 8 sn boyunca büyüler, Gölge hasarı verir ve her 2 sn'de 2 Mahkûmiyet üretir. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 17 Gölge hasarı vurur.",
+  'entities.abilities.hex_of_violence.name': 'Şiddet Büyüsü',
+  'entities.abilities.hour_of_judgment.description':
+    'Birincil Kem Gözüne 15 sn süreyle yargı çağırır: 40 Mahkûmiyet ve 3 Kader İpliği kazandırır, Ele Geçirmeyi etkinleştirir, birincil Gözden üretilen Mahkûmiyeti ikiye katlar ve Hüküm hasarını %20 artırır. İlk Hüküm 50 Mahkûmiyet geri kazandırır.',
+  'entities.abilities.hour_of_judgment.name': 'Yargı Saati',
   'entities.abilities.kidney_shot.description':
     'Hedefi 2 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 7 sn).',
+  'entities.abilities.litany_of_guilt.description':
+    "Birincil Kem Gözünü 6 sn boyunca lanetler. Mahkûmiyet kazançları, 8 yarda içindeki en fazla 2 başka düşmana hasar veren bir dalga salar, en fazla saniyede bir. Kademe 2 bunu 8 sn'ye ve 4 düşmana çıkarır.",
   'entities.abilities.litany_of_guilt.name': 'Suç Yakarışı',
+  'entities.abilities.maledict_gaze.description':
+    "Kem Bakışın, seçili birincil Kem Gözüne her 2,5 sn'de bir Gölge hasarıyla saldırır. Kem Gözü Ele Geçir onun saldırı hızını ikiye katlar.",
   'entities.abilities.maledict_gaze.name': 'Kem Bakış',
   'entities.abilities.maul.description':
     'Yakın dövüş hasarını {damage} artıran ve yüksek miktarda tehdit yaratan bir parçalama saldırısı. Bir sonraki vuruşunda etkinleşir. Yalnızca Bruin Formu.',
@@ -16495,9 +16529,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmanı ay ateşiyle yakarak {damage} Gizemli hasar artı zamana yayılı hasar verir.',
   'entities.abilities.moonfire.specNote_balance':
     'Yanmaya devam ettir: Ay Tohumu süresini 6 sn uzatır.',
+  'entities.abilities.needle_of_fate.description':
+    'Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa {needleDoom} Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler.',
+  'entities.abilities.needle_of_fate.name': 'Kader İğnesi',
   'entities.abilities.ossuary_mark.description':
     "Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur.",
   'entities.abilities.ossuary_mark.name': 'Kemik Damgası',
+  'entities.abilities.possess_evil_eye.description':
+    "Lanetkâr, birincil Kem Gözünü 15 sn boyunca ele geçirir ve 35 Mahkûmiyet üretir. Kader İğnesi 1 sn'de okunur ve 2 ekstra Mahkûmiyet üretir, Tüketme hareket halindeyken kanalize edilebilir, Hüküm ise %25 daha fazla hasar verir ve %60 hasarla gecikmeli bir yankı salar, bu oran seviye 17-20 arasında %30'a geriler.",
+  'entities.abilities.possess_evil_eye.name': 'Kem Gözü Ele Geçir',
   'entities.abilities.raise_bone_mage.description':
     "2 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir menzilli Kemik Büyücü ekler. Sana yalnızca bir tanesi hizmet edebilir. Saldırıları hedefi 6 sn boyunca %5 daha fazla büyü hasarına açık bırakır ve Hasat Emri bu zayıflığı %8'e çıkarır.",
   'entities.abilities.raise_bone_mage.name': 'Kemik Büyücü Diriltme',
@@ -16537,6 +16577,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     "Hareket hızını %35 artırır, ama her saniye azami canının %2'sini feda eder. İptal etmek için tekrar oku. %20 canda kendiliğinden kapanır.",
   'entities.abilities.sacrilegious_march.name': 'Günahkâr Yürüyüş',
+  'entities.abilities.sentence.description':
+    "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir.",
+  'entities.abilities.sentence.name': 'Hüküm',
   'entities.abilities.sinister_strike.description':
     'Silah hasarı artı {damage} veren anlık bir vuruş. 1 kombo puanı kazandırır.',
   'entities.abilities.sinister_strike.specNote_assassination': '1 Zehir Ayini ekler (en fazla 6).',
@@ -16567,12 +16610,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Pençelerini yakındaki düşmanların arasından geçirerek {damage} hasar ver. Ekstra tehdit yaratır. Yalnızca Bruin Formu.',
   'entities.abilities.swipe.specNote_feral':
     'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
+  'entities.abilities.umbral_anchor.description':
+    'İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır.',
   'entities.abilities.umbral_anchor.name': 'Gölge Çapası',
   'entities.abilities.unholy_command.description':
     '3 Ruh Parçası harcayarak tüm ölülerine 12 sn boyunca %25 daha fazla hasar vermelerini ve %20 daha hızlı hareket etmelerini emreder.',
   'entities.abilities.unholy_command.name': 'Kutsuz Emir',
   'entities.abilities.venom_dart.specNote_assassination':
     "1 Zehir Ayini ekler ve zehir yaranı 6 sn uzatır (yara asla 20 sn'nin üzerine çıkmaz).",
+  'entities.abilities.vicarious_suffering.description':
+    "Istırabını 8 sn boyunca bağlar ve düşman vuruşlarından en fazla 15 Mahkûmiyet üretir. Kendi üzerinde, alınan hasarı %20 azaltır. Bir müttefik üzerinde, seni %15 canın altına düşürmeden hasarın en fazla %20'sini sana yönlendirir.",
   'entities.abilities.vicarious_suffering.name': 'Dolaylı Istırap',
   'entities.abilities.wrath.description':
     'Bir doğa enerjisi yıldırımı fırlatarak {damage} Doğa hasarı verir.',
@@ -16587,6 +16634,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Kemik Büyücü',
   'entities.mobs.necromancy_gravewing.name': 'Mezar Kanadı',
   'entities.mobs.necromancy_skeletal_warrior.name': 'İskelet Savaşçı',
+  'guide.abilityHook.evil_eye':
+    'Eylemleri ve ıstırabı Mahkûmiyetini besleyecek düşmanı adlandırır.',
   'hud.pet.abyssalChain': 'Uçurum Zinciri',
   'hud.pet.abyssalChainDesc':
     "Duskmurk'e, 8 yardadan fazla ve 20 yardaya kadar uzaktaki normal bir düşmanı kendine doğru çekmesini emret. Patronlar çekilemez. 15 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
@@ -16599,6 +16648,26 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     "Emberkin'e hedefine ekstra bir kül oku fırlatmasını emret. 8 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
   'hud.pet.felboltTitle': 'Kül Oku',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    "Uygun hasar {value} Mahkûmiyet kazandırır, en fazla {interval} sn'de bir",
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Tüketme, tur başına {doom} ekstra Mahkûmiyet için {stacks} Kader İpliğini tüketiyor',
+  'hudChrome.auraEffect.afflictionEye':
+    "Kem Bakış her {interval} sn'de bir saldırır; bu Göz'deki etkiler {pct}% Mahkûmiyet üretir",
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    "Bu Göz'deki etkiler {doomPct}% Mahkûmiyet üretir; Hüküm buraya {echoPct}% hasarla yankılanır",
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Kader İpliği: Hüküm {sentencePct}% daha fazla hasar verir, ya da Tüketme tur başına {doom} ekstra Mahkûmiyet kazanır',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'Birincil Göz {eyePct}% daha fazla Mahkûmiyet üretir; Hüküm {sentencePct}% daha fazla hasar verir ve ilki {refund} Mahkûmiyet geri kazandırır',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Mahkûmiyet kazançları, {radius} yarda içindeki en fazla {targets} düşmana saniyede bir {damage} Gölge hasarı verir',
+  'hudChrome.auraEffect.afflictionPossession':
+    "Kader İğnesi'ni, Tüketme'yi, Kem Bakış'ı ve Hüküm'ü güçlendirir",
+  'hudChrome.auraEffect.afflictionVicarious':
+    "Gelen hasarın {pct}%'ini yönlendirir ya da azaltır ve en fazla {max} Mahkûmiyet üretebilir",
+  'hudChrome.auraEffect.afflictionViolence':
+    '{charges} misilleme kaldı; bir düşman saldırısı {doom} Mahkûmiyet kazandırır ve karşılığında {damage} Gölge hasarı verir',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} yankı kaldı: tek hedefli yetenekler yakındaki en fazla {targets} düşmana {pct}% hasar verir',
   'hudChrome.auraEffect.arcaneCharge':
@@ -16622,6 +16691,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Verilen hasar {damagePct}%, saldırı hızı {hastePct}% ve hareket hızı {movePct}% artar',
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} yük: Buz Mızrağı hedefini donmuş sayar ve {pct}% donmuş hasarı verir',
+  'hudChrome.auraEffect.forbiddenReflectionLock': 'Yasak Yansıma henüz yeniden hazırlanamaz',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Uygun bir sonraki Karabüyücü bekleme süren yeniden kullanılabilir',
   'hudChrome.auraEffect.formLich':
@@ -16679,6 +16749,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Harabiyet',
   'hudChrome.procOverlay.ruinStatus': '{value} / {max} Harabiyet',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Ruh Parçaları',
+  'hudChrome.warlock.doomEmptyStatus': '{value} / {max} Mahkûmiyet.',
+  'hudChrome.warlock.doomLabel': 'Mahkûmiyet',
+  'hudChrome.warlock.doomStatus': '{value} / {max} Mahkûmiyet; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Üç Kader İpliği: Tüketme onları ek Mahkûmiyete dönüştürebilir.',
+  'hudChrome.warlock.fateThreadsLabel': 'Kader İplikleri',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Üç Kader İpliği: Hüküm onları %18 artan hasar için tüketebilir.',
+  'hudChrome.warlock.fateThreadsStatus': '{value} / {max} Kader İpliği.',
   'itemUi.tooltip.useHealingPotionPct':
     "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 2 dakika bekleme süresi.",
   'guide.controls.reliquary': 'Yadigârlık',
@@ -17648,6 +17727,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     "Aşırı Çiçeklenme kalan etkilerinin %75'ini hasat eder ve ardından 1 Yeşerme depolar.",
   'entities.itemSets.grovespring.name': 'Koruluk Pınarı Giysisi',
+  'entities.itemSets.hexthread.bonus2':
+    'Kader İğnesi 2 ek Mahkûmiyet kazandırır. Alınan hasar artık büyü yapmanı geciktirmez.',
+  'entities.itemSets.hexthread.bonus4': 'Geçen Hüküm 10 Mahkûmiyet iade eder.',
   'entities.itemSets.hexthread.name': 'Uğursuz İplik Örtüsü',
   'entities.itemSets.moonscorch.bonus2':
     'Ay Tohumu, Ay Fırtınasını her uygulamada iki kez, en fazla 12 saniyeye kadar uzatabilir. Alınan hasar artık büyü yapmanı geciktirmez.',

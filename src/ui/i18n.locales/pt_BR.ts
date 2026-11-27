@@ -9577,7 +9577,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     'Queima o inimigo com {damage} de dano de Fogo e mais {overTime} ao longo de 15 s.',
   'entities.abilities.corruption.name': 'Podridão Negra',
+  'entities.abilities.corruption.description':
+    'Corrompe o alvo, causando {damage} de dano de Sombra ao longo de 18 s.',
+  'entities.abilities.life_tap.name': 'Barganha Amarga',
+  'entities.abilities.life_tap.description': 'Converte {damage} de vida em {damage} de mana.',
+  'entities.abilities.curse_of_agony.name': 'Praga da Angústia',
+  'entities.abilities.curse_of_agony.description':
+    'Amaldiçoa o alvo com agonia: {damage} de dano de Sombra ao longo de 24 s.',
   'entities.abilities.drain_life.name': 'Consumir',
+  'entities.abilities.drain_life.description':
+    'Consome a vitalidade do alvo, causando {damage} de dano das Sombras a cada segundo e transferindo 70% disso como vida. Aflição transfere tudo em vez disso. Quando canalizado em vosso Olho Maligno principal, consome todos os Fios do Destino no início, e cada Fio gera 1 de Condenação extra por pulso.',
   'entities.abilities.fear.name': 'Atormentar',
   'entities.abilities.fear.description':
     'Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito.',
@@ -9737,6 +9746,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     'Por 12 s, Raio em Arco concede 2 de Trovão. Vosso próximo Raio em Arco ou Relâmpago Bifurcado é instantâneo, e vossa próxima descarga cheia de Trovão causa 25% mais dano. (Distintivo de Elemental)',
   'entities.abilities.siphon_life.name': 'Sifão de Vida',
+  'entities.abilities.siphon_life.description':
+    'Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)',
   'entities.abilities.conflagrate.name': 'Conflagrar',
   'entities.abilities.conflagrate.description':
     'Adianta um pulso futuro de vosso Pacto Ardente, e então incendeia o alvo causando {damage} de dano de Fogo. Gera 1 de Devastação e 1 de Ruína. Guarda {charges} cargas. (Distintivo de Destruição)',
@@ -11735,6 +11746,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.judgement': 'Gasta seu Selo ativo para atingir um inimigo a curta distância.',
   'guide.abilityHook.lesser_heal':
     'Uma conjuração firme para recuperar um aliado quando há tempo para ficar parado.',
+  'guide.abilityHook.life_tap': 'Troca parte da sua própria vida por mana quando você fica sem.',
   'guide.abilityHook.lightning_bolt':
     'Uma conjuração de dano de Natureza à distância, sua opção preferida de longe.',
   'guide.abilityHook.lightning_shield':
@@ -17279,12 +17291,24 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     'Sacrifica primeiro um Mago de Ossos, depois um Guerreiro Esquelético, e uma Asa Tumular apenas como último recurso. Entre duplicatas, escolhe a que tem menos duração restante e, em seguida, a mais fraca, para causar {damage} de dano das Sombras no local escolhido.',
   'entities.abilities.corpse_explosion.name': 'Explosão Cadavérica',
+  'entities.abilities.coven.description':
+    'Cria Olhos Malignos secundários em até 4 inimigos próximos por 15 s. Eles alimentam a reserva compartilhada de Condenação a 50%, e Sentença ecoa até eles por 35% de dano.',
+  'entities.abilities.coven.name': 'Conciliábulo',
+  'entities.abilities.cruel_pact.description':
+    'Sacrifica 12% da sua vida máxima para restaurar 1,5% da sua mana máxima e gerar 20 de Condenação. Não pode ser usada com 20% de vida ou menos.',
   'entities.abilities.cruel_pact.name': 'Pacto Cruel',
+  'entities.abilities.cursed_accomplice.description':
+    'Vincula seu Maledict Eye quando nenhum aliado está selecionado, fazendo seu Olhar Maldito gerar 2 de Condenação. Vincular um membro de grupo selecionado faz apenas o dano dele ao seu Olho Maligno gerar 3 em vez disso. Um novo vínculo substitui o anterior e pode ser acionado uma vez a cada 2 s.',
   'entities.abilities.cursed_accomplice.name': 'Cúmplice Amaldiçoado',
+  'entities.abilities.dark_pact.description':
+    'Sacrifica 10% da sua vida atual para absorver dano igual a 30% da sua vida máxima por 8 s.',
   'entities.abilities.dark_pact.name': 'Pacto Sanguíneo',
   'entities.abilities.elemental_trance.description':
     'Entra em transe elemental por 15 s, reduzindo o dano sofrido em 30% e convertendo 20% de todo o dano que você causa em mana. (assinatura de Espírito Guerreiro)',
   'entities.abilities.elemental_trance.name': 'Transe Elemental',
+  'entities.abilities.evil_eye.description':
+    'Marca um inimigo como o foco das suas maldições. Mover o Olho Maligno preserva a Condenação, mas não renova seu prazo de expiração de 20 s.',
+  'entities.abilities.evil_eye.name': 'Olho Maligno',
   'entities.abilities.eviscerate.description': 'Movimento finalizador que causa {damage}.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Em 6 de Ritual de Veneno, este botão se torna Rasgaveneno: um golpe que causa instantaneamente todo o dano que seus sangramentos ainda causariam, planta uma nova ferida envenenada e restaura 20 de energia.',
@@ -17308,9 +17332,19 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Golpeia o inimigo com dano da arma mais {damage} e aumenta sua chance de esquiva em 15% por 7 s. Concede 1 ponto de combo. (talento de Ladino)',
   'entities.abilities.hemorrhage.description':
     'Golpeia o inimigo com dano da arma mais {damage}, causa dano de sangramento ao longo de 12 s e aumenta o dano de sangramento sofrido em 40%. Concede 1 ponto de combo. A cada 2 usos, adiciona 1 Gloam (máx. 3). (assinatura de Skulduggery)',
+  'entities.abilities.hex_of_violence.description':
+    'Amaldiçoa o inimigo por 8 s, causando dano das Sombras e gerando 2 de Condenação a cada 2 s. Suas próximas 3 ações de dano geram 7 de Condenação cada uma e o açoitam com 17 de dano das Sombras.',
+  'entities.abilities.hex_of_violence.name': 'Maldição da Violência',
+  'entities.abilities.hour_of_judgment.description':
+    'Invoca o julgamento sobre seu Olho Maligno primário por 15 s, concedendo 40 de Condenação e 3 Fios do Destino, ativando a Possessão, dobrando a Condenação gerada pelo Olho primário e aumentando o dano de Sentença em 20%. A primeira Sentença reembolsa 50 de Condenação.',
+  'entities.abilities.hour_of_judgment.name': 'Hora do Julgamento',
   'entities.abilities.kidney_shot.description':
     'Movimento finalizador que atordoa o alvo por 2 s mais 1 s por ponto de combo (5 pontos de combo: 7 s).',
+  'entities.abilities.litany_of_guilt.description':
+    'Amaldiçoa seu Olho Maligno primário por 6 s. Ganhos de Condenação liberam uma onda que causa dano a até 2 outros inimigos num raio de 8 jardas, no máximo uma vez por segundo. O Grau 2 estende para 8 s e 4 inimigos.',
   'entities.abilities.litany_of_guilt.name': 'Litania da Culpa',
+  'entities.abilities.maledict_gaze.description':
+    'Seu Maledict Eye ataca seu Olho Maligno primário selecionado a cada 2,5 s causando dano das Sombras. Possuir o Olho Maligno dobra sua velocidade de ataque.',
   'entities.abilities.maledict_gaze.name': 'Olhar Maldito',
   'entities.abilities.maul.description':
     'Um ataque brutal que aumenta o dano corpo a corpo em {damage} e causa uma grande quantidade de ameaça. Ativa no seu próximo golpe. Apenas Forma de Bruin.',
@@ -17320,9 +17354,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Queima o inimigo com fogo lunar causando {damage} de dano Arcano mais dano ao longo do tempo.',
   'entities.abilities.moonfire.specNote_balance':
     'Mantenha-o queimando: Semente Lunar o estende em 6 s.',
+  'entities.abilities.needle_of_fate.description':
+    'Perfura o inimigo causando {damage} de dano das Sombras e gera {needleDoom} de Condenação se ele carregar seu Olho Maligno. Cada acerto no seu Olho Maligno primário adiciona um Fio do Destino por 12 s, até 3. Se não houver Olho Maligno, a Agulha do Destino primeiro marca seu alvo.',
+  'entities.abilities.needle_of_fate.name': 'Agulha do Destino',
   'entities.abilities.ossuary_mark.description':
     'Marca um inimigo por 15 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 jardas e cria 1 Fragmento de Alma.',
   'entities.abilities.ossuary_mark.name': 'Marca do Ossuário',
+  'entities.abilities.possess_evil_eye.description':
+    'O Maledictor possui seu Olho Maligno primário por 15 s e gera 35 de Condenação. Agulha do Destino é conjurada em 1 s e gera 2 de Condenação extra, Consumir pode ser canalizado em movimento, e Sentença causa 25% mais dano e libera um eco retardado por 60% de dano, diminuindo para 30% entre os níveis 17 e 20.',
+  'entities.abilities.possess_evil_eye.name': 'Possuir o Olho Maligno',
   'entities.abilities.raise_bone_mage.description':
     'Gasta 2 Fragmentos de Alma para adicionar um Mago de Ossos permanente à distância ao seu Domínio de 2 vagas. Apenas um pode servi-lo. Seus ataques expõem o alvo a 5% mais dano mágico por 6 s, e Comando Ceifador eleva essa fraqueza para 8%.',
   'entities.abilities.raise_bone_mage.name': 'Erguer Mago de Ossos',
@@ -17362,6 +17402,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacrilegious_march.description':
     'Aumenta a velocidade de movimento em 35%, mas sacrifica 2% da sua vida máxima a cada segundo. Lance de novo para cancelar. Desativa-se automaticamente com 20% de vida.',
   'entities.abilities.sacrilegious_march.name': 'Marcha Sacrílega',
+  'entities.abilities.sentence.description':
+    'Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Cada Fio aumenta o dano em 6%. Efeitos adicionais escalam em 20, 50, 80 e 100 de Condenação. Sua escala de dano se estabiliza após o nível 16.',
+  'entities.abilities.sentence.name': 'Sentença',
   'entities.abilities.sinister_strike.description':
     'Um golpe instantâneo por dano da arma mais {damage}. Concede 1 ponto de combo.',
   'entities.abilities.sinister_strike.specNote_assassination':
@@ -17392,12 +17435,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.description':
     'Varre com suas garras os inimigos próximos causando {damage} de dano. Causa ameaça extra. Apenas Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
+  'entities.abilities.umbral_anchor.description':
+    'Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, consumindo a âncora e iniciando uma recarga de 45 s.',
   'entities.abilities.umbral_anchor.name': 'Âncora Umbral',
   'entities.abilities.unholy_command.description':
     'Gasta 3 Fragmentos de Alma para comandar todos os seus mortos-vivos a causar 25% mais dano e agir 20% mais rápido por 12 s.',
   'entities.abilities.unholy_command.name': 'Comando Profano',
   'entities.abilities.venom_dart.specNote_assassination':
     'Adiciona 1 de Ritual de Veneno e estende sua ferida envenenada em 6 s (a ferida nunca ultrapassa 20 s).',
+  'entities.abilities.vicarious_suffering.description':
+    'Vincula seu sofrimento por 8 s e gera até 15 de Condenação a partir de acertos hostis. Em você mesmo, reduz o dano sofrido em 20%. Em um aliado, redireciona até 20% para você sem levá-lo abaixo de 15% de vida.',
   'entities.abilities.vicarious_suffering.name': 'Sofrimento Vicário',
   'entities.abilities.wrath.description':
     'Arremessa um raio de energia da natureza causando {damage} de dano de Natureza.',
@@ -17412,6 +17459,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_bone_mage.name': 'Mago de Ossos',
   'entities.mobs.necromancy_gravewing.name': 'Asa Tumular',
   'entities.mobs.necromancy_skeletal_warrior.name': 'Guerreiro Esquelético',
+  'guide.abilityHook.evil_eye':
+    'Nomeia o inimigo cujas ações e sofrimento alimentarão sua Condenação.',
   'hud.pet.abyssalChain': 'Corrente Abissal',
   'hud.pet.abyssalChainDesc':
     'Comande Duskmurk para puxar de volta a si um inimigo normal a mais de 8 e até 20 m de distância. Chefes não podem ser puxados. Recarga de 15 segundos. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para alternar o autolançamento.',
@@ -17424,6 +17473,26 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     'Comande Emberkin para lançar um projétil vil extra no seu alvo. Recarga de 8 segundos. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para alternar o autolançamento.',
   'hud.pet.felboltTitle': 'Descarga Vil',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'Dano qualificado concede {value} de Condenação, no máximo uma vez a cada {interval} s',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Consumir está consumindo {stacks} Fios do Destino para {doom} de Condenação extra por tique',
+  'hudChrome.auraEffect.afflictionEye':
+    'Olhar Maldito ataca a cada {interval} s; efeitos neste Olho geram {pct}% de Condenação',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Efeitos neste Olho geram {doomPct}% de Condenação; Sentença ecoa aqui por {echoPct}% de dano',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Fios do Destino: Sentença causa {sentencePct}% mais dano, ou Consumir ganha {doom} de Condenação extra por tique',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'O Olho primário gera {eyePct}% mais Condenação; Sentença causa {sentencePct}% mais dano e a primeira reembolsa {refund} de Condenação',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Ganhos de Condenação causam {damage} de dano das Sombras a até {targets} inimigos num raio de {radius} m, uma vez por segundo',
+  'hudChrome.auraEffect.afflictionPossession':
+    'Fortalece Agulha do Destino, Consumir, Olhar Maldito e Sentença',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Redireciona ou reduz {pct}% do dano recebido e pode gerar até {max} de Condenação',
+  'hudChrome.auraEffect.afflictionViolence':
+    'Restam {charges} represálias; um ataque inimigo concede {doom} de Condenação e causa {damage} de dano das Sombras de volta',
   'hudChrome.auraEffect.aoeEcho':
     'Restam {charges} ecos: habilidades de alvo único causam {pct}% de dano a até {targets} inimigos próximos',
   'hudChrome.auraEffect.arcaneCharge':
@@ -17446,6 +17515,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Dano causado aumentado em {damagePct}%, velocidade de ataque em {hastePct}% e velocidade de movimento em {movePct}%',
   'hudChrome.auraEffect.fingersOfFrost':
     '{charges} cargas: Lança de Gelo trata o alvo como congelado e causa {pct}% de dano de congelado',
+  'hudChrome.auraEffect.forbiddenReflectionLock':
+    'Reflexo Proibido ainda não pode ser preparado novamente',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Sua próxima recarga elegível de Bruxo pode ser conjurada novamente',
   'hudChrome.auraEffect.formLich':
@@ -17505,6 +17576,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinMeter': 'Ruína',
   'hudChrome.procOverlay.ruinStatus': 'Ruína {value} de {max}',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Fragmentos de Alma',
+  'hudChrome.warlock.doomEmptyStatus': 'Condenação {value} de {max}.',
+  'hudChrome.warlock.doomLabel': 'Condenação',
+  'hudChrome.warlock.doomStatus': 'Condenação {value} de {max}; {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Três Fios do Destino: Consumir pode tecê-los em Condenação adicional.',
+  'hudChrome.warlock.fateThreadsLabel': 'Fios do Destino',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Três Fios do Destino: Sentença pode consumi-los para 18% de dano aumentado.',
+  'hudChrome.warlock.fateThreadsStatus': 'Fios do Destino {value} de {max}.',
   'itemUi.tooltip.useHealingPotionPct':
     'Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 2 min.',
   'guide.controls.reliquary': 'O Relicário',
@@ -18448,6 +18528,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus4':
     'Florescência Excedente colhe 75% dos seus efeitos restantes e armazena 1 Verdância depois.',
   'entities.itemSets.grovespring.name': 'Paramento da Nascente do Bosque',
+  'entities.itemSets.hexthread.bonus2':
+    'Agulha do Destino concede 2 de Condenação adicionais. Dano recebido não atrasa mais suas conjurações.',
+  'entities.itemSets.hexthread.bonus4': 'Proferir Sentença devolve 10 de Condenação.',
   'entities.itemSets.moonscorch.bonus2':
     'Semente Lunar pode estender Tempestade Lunar duas vezes por aplicação, até o máximo de 12 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.moonscorch.bonus4': 'Surto Lunar e Despertar Solar causam 25% mais dano.',

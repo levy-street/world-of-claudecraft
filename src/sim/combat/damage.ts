@@ -1102,7 +1102,7 @@ export function dealDamage(
   shadowChoirDamage(ctx, source, target, craftedHpLoss, school, copiedHit);
   doctrineConvertDamage(ctx, source, preHp - target.hp, school, abilityId ?? null);
   vespersEchoDamage(ctx, source, target, preHp - target.hp, abilityId ?? null);
-  onAfflictionDamage(ctx, source, target, preHp - target.hp);
+  onAfflictionDamage(ctx, source, target, preHp - target.hp, direct);
   recordOssuaryMarkDamage(source, target, preHp - target.hp, abilityId);
   markFuneralHarvestDamage(ctx, source, target, preHp - target.hp);
 

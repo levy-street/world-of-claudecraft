@@ -1521,7 +1521,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wraith Strike': 'Golpe Espectral',
     'Wrathful Psalm': 'Furia divina',
     Zealwing: 'Ala de Venganza',
-    Sentence: 'Sentencia',
+    Putrefy: 'Sentencia',
   },
   es_ES: {
     'Adrenaline Junkie': 'Adicto a la adrenalina',
@@ -2034,10 +2034,10 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wraith Strike': 'Golpe Espectral',
     'Wrathful Psalm': 'Furia divina',
     Zealwing: 'Ala de Venganza',
-    Sentence: 'Sentencia',
+    Putrefy: 'Sentencia',
   },
   fr_FR: {
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Adrenaline Junkie': "Accro à l'adrénaline",
     Aetherwell: 'Puits d’éther',
     'Aspect Mastery': 'Maîtrise des aspects',
@@ -2550,7 +2550,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Zealwing: 'Aile vengeresse',
   },
   fr_CA: {
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Adrenaline Junkie': "Accro à l'adrénaline",
     Aetherwell: 'Puits d’éther',
     'Aspect Mastery': 'Maîtrise des aspects',
@@ -3063,7 +3063,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Zealwing: 'Aile vengeresse',
   },
   it_IT: {
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Adrenaline Junkie': "Dipendente dall'adrenalina",
     Aetherwell: 'Pozzo d’Etere',
     'Aspect Mastery': 'Maestria degli aspetti',
@@ -3576,7 +3576,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Zealwing: 'Alavendetta',
   },
   de_DE: {
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Adrenaline Junkie': 'Adrenalinrausch',
     Aetherwell: 'Ätherbrunnen',
     'Aspect Mastery': 'Aspektmeisterschaft',
@@ -6137,7 +6137,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Zealwing: '熱誠の翼',
   },
   pt_BR: {
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Adrenaline Junkie': 'Viciado em adrenalina',
     Aetherwell: 'Poço Etéreo',
     'Aspect Mastery': 'Maestria dos aspectos',
@@ -7163,7 +7163,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   cs_CZ: {
     ...TALENT_NEW_TITLE_OVERRIDES.cs_CZ,
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Aegis of Devotion': 'Egida oddanosti',
     'Aether Surge': 'Éterický příval',
     'Aetheric Aim': 'Éterická přesnost',
@@ -7595,7 +7595,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   nl_NL: {
     ...TALENT_NEW_TITLE_OVERRIDES.nl_NL,
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Aegis of Devotion': 'Egide van de toewijding',
     'Aether Surge': 'Arcane Kracht',
     'Aetheric Aim': 'Arcane Brandpunt',
@@ -8027,7 +8027,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   pl_PL: {
     ...TALENT_NEW_TITLE_OVERRIDES.pl_PL,
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Aegis of Devotion': 'Egida oddania',
     'Aether Surge': 'Arkaniczna moc',
     'Aetheric Aim': 'Arkaniczne skupienie',
@@ -8459,7 +8459,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
   id_ID: {
     ...TALENT_NEW_TITLE_OVERRIDES.id_ID,
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Aegis of Devotion': 'Egis Pengabdian',
     'Aether Surge': 'Kekuatan Arkana',
     'Aetheric Aim': 'Fokus Arkana',
@@ -9319,11 +9319,11 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wraith Strike': 'Hayalet Vuruş',
     'Wrathful Psalm': 'Kutsal Hiddet',
     Zealwing: 'İntikam Kanadı',
-    Sentence: 'Hüküm',
+    Putrefy: 'Hüküm',
   },
   sv_SE: {
     ...TALENT_NEW_TITLE_OVERRIDES.sv_SE,
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Aegis of Devotion': 'Hängivenhetens egid',
     'Aether Surge': 'Arkan kraft',
     'Aetheric Aim': 'Arkant fokus',
@@ -10183,11 +10183,11 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wraith Strike': 'Đòn Ma Ảnh',
     'Wrathful Psalm': 'Phẫn Nộ Thần Thánh',
     Zealwing: 'Cánh Báo Thù',
-    Sentence: 'Phán Quyết',
+    Putrefy: 'Phán Quyết',
   },
   da_DK: {
     ...TALENT_NEW_TITLE_OVERRIDES.da_DK,
-    Sentence: 'Sentence',
+    Putrefy: 'Sentence',
     'Aegis of Devotion': 'Hengivenhedens ægide',
     'Aether Surge': 'Arkan Kraft',
     'Aetheric Aim': 'Arkan Fokus',

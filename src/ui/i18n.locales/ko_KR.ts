@@ -6242,7 +6242,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.immolate.description':
     '적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다.',
   'entities.abilities.corruption.name': '검은 부패',
+  'entities.abilities.corruption.description':
+    '대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
+  'entities.abilities.life_tap.name': '가혹한 거래',
+  'entities.abilities.life_tap.description': '생명력 {damage}을 마나 {damage}으로 전환합니다.',
+  'entities.abilities.curse_of_agony.name': '고뇌의 저주',
+  'entities.abilities.curse_of_agony.description':
+    '대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.drain_life.name': '집어삼키기',
+  'entities.abilities.drain_life.description':
+    '대상의 생명력을 집어삼켜 매초 {damage}의 암흑 피해를 입히고 그중 70%를 생명력으로 당신에게 옮깁니다. 고통은 대신 전부를 옮깁니다. 주된 사안에 정신을 집중하면 시작할 때 운명의 실타래를 모두 소모하고, 실타래마다 매 주기 단죄를 1씩 더 만듭니다.',
   'entities.abilities.fear.name': '번민',
   'entities.abilities.fear.description':
     '적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다.',
@@ -6451,6 +6460,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_mastery.description':
     '12초 동안 전격 화살이 천둥을 2 줍니다. 다음 전격 화살이나 갈래 번개가 즉시 시전이 되고, 다음 온전한 천둥 지급은 피해량이 25% 늘어납니다. (정기 상징 기술)',
   'entities.abilities.siphon_life.name': '생명력 착취',
+  'entities.abilities.siphon_life.description':
+    '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
   'entities.abilities.conflagrate.name': '점화',
   'entities.abilities.conflagrate.description':
     '불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 {charges}회 담아 둡니다. (파괴 상징 기술)',
@@ -9895,6 +9906,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.judgement': '현재 활성화된 인장을 소모해 근거리에서 적을 강타합니다.',
   'guide.abilityHook.lesser_heal':
     '가만히 서 있을 여유가 있을 때 아군의 체력을 채우는 안정적인 치유입니다.',
+  'guide.abilityHook.life_tap': '마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.',
   'guide.abilityHook.lightning_bolt': '자연 피해를 주는 원거리 시전기로, 멀리서 쓰는 주력기입니다.',
   'guide.abilityHook.lightning_shield':
     '몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.',
@@ -11394,6 +11406,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.frostquench.bonus4':
     '겨울의 채찍이 혹한의 추위를 2중첩 대신 3중첩 부여합니다.',
   'entities.itemSets.hexthread.name': '주술실 장막',
+  'entities.itemSets.hexthread.bonus2':
+    '운명의 바늘이 단죄를 2 추가로 생성합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.hexthread.bonus4': '선고를 내리면 단죄 10을 돌려받습니다.',
   'entities.itemSets.gravebrand.name': '무덤낙인 예장',
   'entities.itemSets.gravebrand.bonus2':
     '수확의 명령의 재사용 대기시간이 2초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
@@ -17291,8 +17306,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.description':
     '뼈 마법사를 먼저, 해골 전사를 다음으로 희생하며 무덤날개는 최후의 수단으로만 선택합니다. 같은 유형이 여러 마리면 남은 지속시간이 가장 짧은 대상, 그다음 가장 약한 대상을 골라 지정한 위치의 적에게 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.corpse_explosion.name': '시체 폭발',
+  'entities.abilities.coven.description':
+    '주변 적 최대 4명에게 15초 동안 유지되는 보조 사안을 만듭니다. 공유 단죄를 50% 효율로 채우며 선고 피해의 35%를 메아리로 받습니다.',
+  'entities.abilities.coven.name': '마녀회',
+  'entities.abilities.cruel_pact.description':
+    '최대 생명력의 12%를 희생해 단죄를 20 생성합니다. 생명력이 15% 이하일 때는 사용할 수 없습니다.',
   'entities.abilities.cruel_pact.name': '잔혹한 계약',
+  'entities.abilities.cursed_accomplice.description':
+    '아군 플레이어를 선택하지 않았다면 저주의 눈과 연결해 응시가 단죄를 2 생성하게 합니다. 아군과 연결하면 그 아군이 사안 대상에게 피해를 줄 때 3을 생성합니다. 2초에 한 번만 발동합니다.',
   'entities.abilities.cursed_accomplice.name': '저주받은 공모자',
+  'entities.abilities.dark_pact.description':
+    '현재 생명력의 10%를 희생해 8초 동안 최대 생명력의 30%에 해당하는 피해를 흡수합니다.',
   'entities.abilities.dark_pact.name': '피의 서약',
   'entities.abilities.dawn_devotion.description':
     '30분 동안 자신과 파티원의 전투력을 40 증가시킵니다. 자신의 광휘 또는 은총의 헌신을 교체하지만, 다른 성기사의 헌신 및 전사의 외침과는 함께 유지됩니다.',
@@ -17312,6 +17336,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.elemental_trance.description':
     '15초 동안 정령의 무아지경에 들어가 받는 피해를 30% 줄이고, 입힌 모든 피해의 20%를 마나로 전환합니다. (전쟁정령 고유 능력)',
   'entities.abilities.elemental_trance.name': '정령의 무아지경',
+  'entities.abilities.evil_eye.description':
+    '적 하나를 저주의 중심으로 지정합니다. 사안을 옮겨도 단죄는 유지되지만 20초의 만료 시간은 갱신되지 않습니다.',
+  'entities.abilities.evil_eye.name': '사안',
   'entities.abilities.eviscerate.specNote_assassination':
     '맹독 의식 6단계에서 이 버튼이 맹독 찢기로 변합니다: 자신의 출혈 효과가 앞으로 입힐 남은 피해를 즉시 모두 입히고, 새로운 맹독 상처를 남기며, 기력 20을 회복하는 일격입니다.',
   'entities.abilities.eviscerate.specNote_combat':
@@ -17350,6 +17377,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_grace.description':
     '20미터 안의 적에게 성스러운 망치를 즉시 던져 {damage}의 피해를 주고, 마나를 70 회복하며, 준 피해의 50%만큼 자신의 생명력을 회복하고, 피해를 주면 헌신을 1 생성합니다. 태양의 응보가 활성화되면 은총의 망치는 재사용 대기시간을 무시하고 준 피해의 100%만큼 생명력을 회복합니다.',
   'entities.abilities.hammer_of_grace.name': '은총의 망치',
+  'entities.abilities.hex_of_violence.description':
+    '적을 8초 동안 저주해 암흑 피해를 입히고 2초마다 단죄를 2 생성합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 17의 암흑 피해를 되돌려 받습니다.',
+  'entities.abilities.hex_of_violence.name': '폭력의 주술',
+  'entities.abilities.hour_of_judgment.description':
+    '15초 동안 주 사안에 심판을 내려 단죄 40과 운명의 실 3개를 얻고 빙의를 활성화하며, 주 사안을 통해 생성되는 단죄를 두 배로 만들고 선고의 피해를 20% 증가시킵니다. 첫 번째 선고는 단죄 50을 돌려받습니다.',
+  'entities.abilities.hour_of_judgment.name': '심판의 시간',
   'entities.abilities.hunting_momentum.description':
     '지속 효과: 내장 가르기와 적에게 적중한 파편 폭약은 각각 사냥의 기세를 1중첩 부여합니다. 최대 3중첩이며 소모하거나 전투에서 벗어날 때까지 유지되고 중첩당 이동 속도가 15% 증가합니다. 3중첩에서 상처 가르기 타격 피해가 60% 증가하고 중첩을 소모합니다. (생존)',
   'entities.abilities.hunting_momentum.name': '사냥의 기세',
@@ -17365,7 +17398,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lifespring_weapon.description':
     '무기에 생명의 물을 불어넣어 치유의 물결 저장량을 20% 늘립니다.',
   'entities.abilities.lifespring_weapon.name': '생명의 샘 무기',
+  'entities.abilities.litany_of_guilt.description':
+    '주 사안을 8초 동안 저주합니다. 단죄를 얻을 때마다 파동을 일으켜 8미터 안의 다른 적 최대 4명에게 피해를 줍니다. 1초에 한 번만 발동합니다.',
   'entities.abilities.litany_of_guilt.name': '죄책의 연도',
+  'entities.abilities.maledict_gaze.description':
+    '저주의 눈이 선택한 주 사안 대상을 2.5초마다 공격해 암흑 피해를 줍니다. 사안 빙의 중에는 공격 속도가 두 배가 됩니다.',
   'entities.abilities.maledict_gaze.name': '저주의 응시',
   'entities.abilities.marrowbreak.description':
     '오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 최대 생명력의 18%를 회복하고 분노 15를 돌려받습니다.',
@@ -17389,6 +17426,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 {duration}초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
   'entities.abilities.moonseed.name': '달씨앗',
+  'entities.abilities.needle_of_fate.description':
+    '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 {needleDoom} 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
+  'entities.abilities.needle_of_fate.name': '운명의 바늘',
   'entities.abilities.oath_chain.description':
     '멀리 있는 적을 성스러운 사슬로 즉시 결박합니다. 적은 자신에게서 3미터 거리까지 초당 18미터의 속도로 끌려오며, 도착하면 4초 동안 이동 속도가 50% 감소합니다. 승천 중에는 주변의 두 번째 적도 결박합니다.',
   'entities.abilities.oath_chain.name': '맹세의 사슬',
@@ -17406,6 +17446,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pack_rally.description':
     '준마의 상을 취하고 주변 아군을 독려해 10초 동안 이동 속도를 30%, 공격 및 시전 속도를 10% 높입니다.',
   'entities.abilities.pack_rally.name': '무리 결집',
+  'entities.abilities.possess_evil_eye.description':
+    '저주술사가 주 사안에 15초 동안 빙의하고 단죄를 35 생성합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고, 선고는 피해가 25% 증가합니다. 지연 반향은 60%의 피해를 주며 17레벨부터 20레벨까지 30%로 감소합니다.',
+  'entities.abilities.possess_evil_eye.name': '사안 빙의',
   'entities.abilities.primal_exaltation.description':
     '12초 동안 전문화의 힘을 해방해 기본 순환을 강화합니다. (주술사 특성)',
   'entities.abilities.primal_exaltation.name': '원시적 승천',
@@ -17460,6 +17503,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scouring_mercy.description':
     '적에게 {damage}의 신성 피해를 입히거나 아군 대상을 {healing}만큼 치유합니다. 피해는 주문력에 비례해 증가하고, 치유는 치유력에 비례해 증가합니다. 교리는 이 피해를 유대를 통해 치유로 전환합니다. 30미터 이내에 유대가 맺어진 부상당한 파티원이 없으면, 30미터 이내에서 생명력이 가장 낮은 부상당한 파티원을 피해량의 15%만큼 치유합니다. 파티원을 치유하면 해당 대상으로부터 10미터 이내에 있고 시야가 확보된 다른 부상당한 파티원 최대 2명도 함께 치유하며, 각각 회복된 생명력의 50%만큼 치유합니다. 이 추가 치유는 치명타가 발생하지 않으며 교리 유대를 생성하지 않습니다. (교리 고유 능력)',
   'entities.abilities.scouring_mercy.name': '정화의 자비',
+  'entities.abilities.sentence.description':
+    '모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다.',
+  'entities.abilities.sentence.name': '선고',
   'entities.abilities.seraphic_vigil.description':
     '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {buff} 회복시킵니다. 축복 고유 능력입니다.',
   'entities.abilities.seraphic_vigil.name': '치천사의 수호',
@@ -17526,6 +17572,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trailbreak.description':
     '뒤로 25미터 도약하며 이동 불가 효과와 이동 속도 감소 효과를 해제합니다. 착지하면 3초 동안 이동 속도가 50% 증가합니다. 사냥의 기세가 있으면 이를 갱신하고 12초 동안 재진입 준비를 부여합니다.',
   'entities.abilities.trailbreak.name': '흔적 끊기',
+  'entities.abilities.umbral_anchor.description':
+    '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
   'entities.abilities.umbral_anchor.name': '암영 닻',
   'entities.abilities.unholy_command.description':
     '영혼 조각 3개를 소모해 모든 언데드에게 명령하고 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',
@@ -17558,6 +17606,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venomrend.description':
     '맹독 의식 6단계를 소모합니다: 100 더하기 연계 점수당 55의 피해를 입히고, 자신의 출혈 효과가 앞으로 입힐 남은 피해를 즉시 모두 입힌 뒤, 새로운 맹독 상처를 남깁니다(20초에 걸쳐 120의 피해). 기력 20을 회복합니다. (암살)',
   'entities.abilities.venomrend.name': '맹독 찢기',
+  'entities.abilities.vicarious_suffering.description':
+    '8초 동안 고통을 연결해 적의 공격으로 최대 15의 단죄를 생성합니다. 자신에게 사용하면 받는 피해가 20% 감소합니다. 아군에게 사용하면 피해의 최대 20%를 자신에게 옮기지만 생명력이 15% 아래로 내려가지는 않습니다.',
   'entities.abilities.vicarious_suffering.name': '고통 전이',
   'entities.abilities.vowkeeper_strike.description':
     '높은 위협 수준을 생성하는 공격을 가하고 헌신을 1 생성합니다. 적중하면 20% 확률로 8초 동안 태양의 응보를 얻고, 방패 막기에 성공할 때마다 25% 확률로 얻습니다. 태양의 응보는 다음 태양 수호 원반, 은총의 망치, 치유의 빛 중 하나를 강화합니다. 승천 중에는 작은 피해 흡수 보호막도 얻습니다.',
@@ -17601,6 +17651,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '한 대상을 공격하고 주변 적 두 명에게 튕기며, 전체 시전에서 천둥 한 개를 쌓습니다.',
   'guide.abilityHook.consecration':
     '주변 땅을 신성화하여 지속적인 신성 피해와 위협 수준을 생성합니다.',
+  'guide.abilityHook.evil_eye': '적 하나를 지정해 그 행동과 고통으로 단죄를 축적합니다.',
   'guide.abilityHook.galeheart_weapon':
     '쌍수 무기에 폭풍의 바람을 불어넣어 안정적인 공격 리듬을 보상합니다.',
   'guide.abilityHook.hammer_of_justice': '짧고 확실한 기절로 적 하나를 저지합니다.',
@@ -18486,6 +18537,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.felboltDesc':
     '불씨족에게 당신의 대상을 향해 지옥불 투사체를 하나 더 발사하도록 명령합니다. 재사용 대기시간은 8초입니다. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 자동 시전을 전환합니다.',
   'hud.pet.felboltTitle': '지옥불 화살',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    '조건을 만족하는 피해가 규탄을 {value} 생성합니다. {interval}초에 한 번만 발동합니다',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    '생명력 흡수가 운명의 실 {stacks}중첩을 소모해 매 틱 규탄을 {doom} 추가 생성합니다',
+  'hudChrome.auraEffect.afflictionEye':
+    '저주의 시선이 {interval}초마다 공격하며, 이 사안에서 발동한 효과는 규탄을 {pct}% 생성합니다',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    '이 사안의 효과는 규탄을 {doomPct}% 생성하며, 선고가 이곳에 {echoPct}% 피해로 메아리칩니다',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '운명의 실 {stacks}중첩: 선고 피해가 {sentencePct}% 증가하거나 생명력 흡수 매 틱이 규탄을 {doom} 추가 생성합니다',
+  'hudChrome.auraEffect.afflictionJudgment':
+    '주 사안의 규탄 생성량이 {eyePct}% 증가하고 선고 피해가 {sentencePct}% 증가하며 첫 선고가 규탄 {refund}을 돌려줍니다',
+  'hudChrome.auraEffect.afflictionLitany':
+    '규탄을 얻을 때 {radius}미터 내 최대 {targets}명에게 {damage}의 암흑 피해를 줍니다. 초당 한 번만 발동합니다',
+  'hudChrome.auraEffect.afflictionPossession':
+    '운명의 바늘, 생명력 흡수, 저주의 시선, 선고를 강화합니다',
+  'hudChrome.auraEffect.afflictionVicarious':
+    '받는 피해의 {pct}%를 이전하거나 감소시키고 규탄을 최대 {max} 생성합니다',
+  'hudChrome.auraEffect.afflictionViolence':
+    '보복 {charges}회 남음: 적의 공격이 규탄을 {doom} 생성하고 {damage}의 암흑 피해로 반격합니다',
   'hudChrome.auraEffect.aoeEcho':
     '메아리 {charges}회 남음: 단일 대상 기술이 주변 최대 {targets}명에게 {pct}% 피해를 줍니다',
   'hudChrome.auraEffect.arcaneCharge':
@@ -18510,6 +18581,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '공격력이 {damagePct}%, 공격 속도가 {hastePct}%, 이동 속도가 {movePct}% 증가합니다',
   'hudChrome.auraEffect.fingersOfFrost':
     '충전 {charges}회 남음: 얼음창이 대상을 빙결 상태로 간주하고 빙결 피해 {pct}%를 줍니다',
+  'hudChrome.auraEffect.forbiddenReflectionLock': '금지된 반영을 아직 다시 준비할 수 없습니다',
   'hudChrome.auraEffect.forbiddenReflectionReady':
     '다음 적용 가능한 흑마법사 재사용 기술을 다시 사용할 수 있습니다',
   'hudChrome.auraEffect.formLich': '영혼 창이 주변 최대 {targets}명에게도 {pct}% 피해를 줍니다',
@@ -18604,6 +18676,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.ruinStatus': '파멸 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '영혼 조각',
   'hudChrome.statInfo.effects.manaRegenCombat': '전투 중 5초마다 약 {value} 마나 회복',
+  'hudChrome.warlock.doomEmptyStatus': '단죄 {value}/{max}.',
+  'hudChrome.warlock.doomLabel': '단죄',
+  'hudChrome.warlock.doomStatus': '단죄 {value}/{max}, 남은 시간 {remaining}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    '운명의 실타래 3개: 집어삼키기로 추가 단죄를 자아낼 수 있습니다.',
+  'hudChrome.warlock.fateThreadsLabel': '운명의 실타래',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    '운명의 실타래 3개: 선고로 소모하면 피해가 18% 증가합니다.',
+  'hudChrome.warlock.fateThreadsStatus': '운명의 실타래 {value}/{max}.',
   'itemUi.tooltip.useHealingPotionPct':
     '사용: 즉시 최대 생명력의 {percent}%를 회복합니다. 전투 중 사용 가능. 재사용 대기시간 2분.',
   'guide.controls.clickMoveNote':

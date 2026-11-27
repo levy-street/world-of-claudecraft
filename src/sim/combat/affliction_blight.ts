@@ -71,8 +71,6 @@ export const PLAGUE_BLOOM_TICKS = 4;
 export const PLAGUE_BLOOM_MAX_TARGETS = 5;
 export const PLAGUE_BLOOM_RANGE = 30;
 
-/** Sentence: share of today's curve, refreshes the three DoTs on its target. */
-export const BLIGHT_SENTENCE_DAMAGE_MULT = 0.8;
 export const BLIGHT_SENTENCE_HEAL_PCT = 0.3;
 export const BLIGHT_SENTENCE_SPLASH_RADIUS = 12;
 
@@ -145,9 +143,10 @@ export interface BlightTickDeps {
 }
 
 /**
- * Runs after a Blight DoT tick landed: Condemnation, the Evil Eye echo and the
- * Hex of Violence double tick. `extra` marks the repeated tick (no second roll,
- * no echo of the echo).
+ * Runs after a Blight DoT tick landed: its Blight, the Hexthread 2pc Rot Splinter
+ * roll, the Rotmark echo and the Rotfever repeat roll. A tick that killed its target
+ * still pays its Blight, then stops. `extra` marks a Rotfever repeat: a real tick
+ * that echoes like any other, but never rolls another repeat.
  */
 export function blightOnDotTick(
   ctx: SimContext,
@@ -161,6 +160,9 @@ export function blightOnDotTick(
   if (!source || source.dead || !isBlightDot(aura)) return;
   const gain = tickDoomGain(ctx, source, target, aura);
   if (gain > 0) deps.gainDoom(ctx, source, gain);
+  // The tick killed its target: no Splinter roll, no echo, no repeat roll (and no
+  // rng drawn for any of them).
+  if (target.dead) return;
   if (
     deps.addStack &&
     hasPrimaryEye(target, source.id) &&

@@ -5441,7 +5441,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     partyPetTarget: true,
     effects: [{ type: 'afflictionAccomplice' }],
     description:
-      "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one.",
+      "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own direct hits (not DoT ticks) on your Rotmark generate 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one.",
   },
   hex_of_violence: {
     id: 'hex_of_violence',
@@ -5726,13 +5726,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'corruption',
     name: 'Blackrot',
     class: 'warlock',
-    specs: ['affliction'],
+    // Warlocks with no spec keep it as a starter DoT; Blightcaller keeps it too.
+    excludeSpecs: ['demonology', 'destruction'],
     learnLevel: 2,
     cost: 60,
     castTime: 0,
     cooldown: 0,
     range: 30,
     school: 'shadow',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     // Blight Coven: the long, weakest DoT. Stealth strips cannot remove it and
     // it jumps to the nearest enemy when its host dies (affliction_blight.ts).
@@ -5799,13 +5802,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'curse_of_agony',
     name: 'Festerhex',
     class: 'warlock',
-    specs: ['affliction'],
+    // Warlocks with no spec keep it as a starter DoT; Blightcaller keeps it too.
+    excludeSpecs: ['demonology', 'destruction'],
     learnLevel: 8,
     cost: 45,
     castTime: 0,
     cooldown: 0,
     range: 30,
     school: 'shadow',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 70, duration: 16, interval: 2, spCoeff: 0.59 }],
     ranks: [
@@ -8176,6 +8182,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'shadow',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 164, duration: 24, interval: 3, leechPct: 1, spCoeff: 1.17 }],
     description:

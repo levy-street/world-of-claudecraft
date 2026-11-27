@@ -344,6 +344,9 @@ const baseEnTable = {
   'error.nothingToDevour': 'Nothing to devour.',
   'error.recentKillRequired': 'You need a recent kill.',
   'error.burningPactRequired': 'Conflagrate requires Burning Pact on the target.',
+  // Blightcaller: Putrefy, Contagion and Litany of Guilt need your Rotmark on the
+  // target (combat/affliction.ts afflictionTargetCastError).
+  'error.noRotmark': 'Your target has no Rotmark.',
   'error.notEnoughRuin': 'Not enough Wrack!',
   'error.merchantUnavailable': 'That merchant is not available.',
   'error.notForSale': 'That item is not for sale.',

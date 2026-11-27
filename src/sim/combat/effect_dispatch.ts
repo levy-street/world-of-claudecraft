@@ -79,11 +79,9 @@ import {
   swingMissChance,
 } from '../types';
 import {
-  applyCoven,
   applyCruelPact,
   applyCursedAccomplice,
   applyEvilEyePossession,
-  applyHexOfViolence,
   applyHourOfJudgment,
   applyLitanyOfGuilt,
   applyVicariousSuffering,
@@ -4290,10 +4288,6 @@ export function runEffects(
             ctx.applyHeal(p, p, heal, ability.name, ability.id, false);
           }
         }
-        break;
-      }
-      case 'afflictionCoven': {
-        if (target) applyCoven(ctx, p, target, eff.duration, eff.radius, eff.maxSecondary);
         break;
       }
       case 'afflictionPossession': {

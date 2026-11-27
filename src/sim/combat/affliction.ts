@@ -22,13 +22,13 @@ export const FATE_THREAD_SENTENCE_DAMAGE_PER_STACK = 0.06;
 
 const EYE_DURATION = 3600;
 const ACCOMPLICE_INTERVAL = 2;
-const MALEDICT_GAZE_INTERVAL = 2.5;
-const POSSESSED_MALEDICT_GAZE_INTERVAL = 1.25;
+// The Rotmark keeps ticking (no damage) so auras.ts can re-check periodic harm and
+// prune it when the fight stops counting (a duel ends, a sanctuary).
+const ROTMARK_CHECK_INTERVAL = 2.5;
 // The doom-100 payoff against players and bosses. 1.2 shipped with the rework
 // and made capped Sentences the bulk of the spec's boss lead; 1.05 keeps the
 // overcap identity (a capped Sentence still hits hardest) at tuned size.
 const SENTENCE_DOOM_CAPPED_BONUS_MULT = 1.05;
-const MALEDICT_GAZE_RANGE = 30;
 const ENEMY_ACTION_GAIN = 2;
 // Rate cap on the enemy-action doom stream: one gain per eye per second. On the
 // single-target bench the enemy never acts, so this moves nothing there; live, a
@@ -405,8 +405,8 @@ export function moveEvilEye(ctx: SimContext, warlock: Entity, target: Entity): v
     remaining: EYE_DURATION,
     duration: EYE_DURATION,
     value: 1,
-    tickInterval: MALEDICT_GAZE_INTERVAL,
-    tickTimer: MALEDICT_GAZE_INTERVAL,
+    tickInterval: ROTMARK_CHECK_INTERVAL,
+    tickTimer: ROTMARK_CHECK_INTERVAL,
     sourceId: warlock.id,
     school: 'shadow',
     actionGainLockout: secondary?.actionGainLockout,
@@ -419,39 +419,6 @@ export function moveEvilEye(ctx: SimContext, warlock: Entity, target: Entity): v
   }
 }
 
-export function maledictGazeDamage(level: number): number {
-  if (level >= 20) return 10;
-  if (level >= 12) return 9;
-  return 5;
-}
-
-function canMaledictGaze(
-  ctx: SimContext,
-  target: Entity,
-  aura: Aura,
-): { warlock: Entity; interval: number } | null {
-  const warlock = ctx.entities.get(aura.sourceId);
-  if (!warlock || warlock.dead || !afflictionMeta(ctx, warlock)) return null;
-  const interval = hasAfflictionPossession(warlock)
-    ? POSSESSED_MALEDICT_GAZE_INTERVAL
-    : MALEDICT_GAZE_INTERVAL;
-  if (
-    target.dead ||
-    !warlock.inCombat ||
-    !target.inCombat ||
-    !ctx.isHostileTo(warlock, target) ||
-    Math.hypot(target.pos.x - warlock.pos.x, target.pos.z - warlock.pos.z) > MALEDICT_GAZE_RANGE ||
-    !ctx.hasLineOfSight(warlock, target)
-  ) {
-    return null;
-  }
-  return { warlock, interval };
-}
-
-/** Blight Coven retired the Maledict Eye's own timed attack; it now fires the
- *  warlock's wand auto-attack instead (maledictEyeFiresWand). */
-export const MALEDICT_GAZE_RETIRED = true;
-
 /** Combat-log name of a wand shot the Maledict Eye fires for a Blightcaller warlock. */
 export const MALEDICT_GAZE_LABEL = 'Maledict Gaze';
 
@@ -459,48 +426,6 @@ export const MALEDICT_GAZE_LABEL = 'Maledict Gaze';
  *  warlock's wand bolt. Damage, speed, range and timing stay the wand's. */
 export function maledictEyeFiresWand(ctx: SimContext, warlock: Entity): boolean {
   return afflictionMeta(ctx, warlock) !== null;
-}
-
-export function tickMaledictGaze(ctx: SimContext, target: Entity, aura: Aura): void {
-  if (aura.kind !== 'affliction_eye' || MALEDICT_GAZE_RETIRED) return;
-  const ready = canMaledictGaze(ctx, target, aura);
-  if (!ready) return;
-  const { warlock } = ready;
-  const hpBefore = target.hp;
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: warlock.id,
-    targetId: target.id,
-    school: 'shadow',
-    fx: 'evilEyeGaze',
-    duration: 0.28,
-    ability: 'maledict_gaze',
-  });
-  ctx.dealDamage(
-    warlock,
-    target,
-    maledictGazeDamage(warlock.level),
-    false,
-    'shadow',
-    'Maledict Gaze',
-    'hit',
-    false,
-    undefined,
-    false,
-    false,
-    false,
-    'maledict_gaze',
-  );
-  if (hpBefore <= target.hp) return;
-  const accomplice = warlock.auras.find(
-    (candidate) =>
-      candidate.kind === 'affliction_accomplice' &&
-      candidate.sourceId === warlock.id &&
-      (candidate.icd ?? 0) <= 0,
-  );
-  if (!accomplice) return;
-  gainDoom(ctx, warlock, eyeGeneration(aura, accomplice.value, warlock));
-  accomplice.icd = accomplice.icdMax ?? ACCOMPLICE_INTERVAL;
 }
 
 export function completeNeedleOfFateCast(ctx: SimContext, warlock: Entity, target: Entity): void {
@@ -559,37 +484,6 @@ export function applyCursedAccomplice(ctx: SimContext, warlock: Entity, target: 
     school: 'shadow',
     icd: 0,
     icdMax: ACCOMPLICE_INTERVAL,
-  });
-}
-
-export function applyHexOfViolence(
-  ctx: SimContext,
-  warlock: Entity,
-  target: Entity,
-  duration: number,
-  charges: number,
-  doomPerProc: number,
-  damage: number,
-  spellPowerBonus = 0,
-  interval = 2,
-  tickDoom = 2,
-): void {
-  const totalDamage = damage + spellPowerBonus;
-  ctx.applyAura(target, {
-    id: 'hex_of_violence',
-    name: 'Rotfever',
-    kind: 'affliction_violence',
-    remaining: duration,
-    duration,
-    value: doomPerProc,
-    value2: damage,
-    charges,
-    tickInterval: interval,
-    tickTimer: interval,
-    tickDamage: totalDamage,
-    tickDoom,
-    sourceId: warlock.id,
-    school: 'shadow',
   });
 }
 
@@ -688,43 +582,6 @@ export function mitigateVicariousSuffering(
     'vicarious_suffering_redirect',
   );
   return amount - redirected;
-}
-
-export function applyCoven(
-  ctx: SimContext,
-  warlock: Entity,
-  target: Entity,
-  duration: number,
-  radius: number,
-  maxSecondary: number,
-): void {
-  if (!primaryEye(ctx, warlock.id)) moveEvilEye(ctx, warlock, target);
-  const candidates = [...ctx.entities.values()]
-    .filter(
-      (entity) =>
-        entity.id !== target.id &&
-        !entity.dead &&
-        ctx.isHostileTo(warlock, entity) &&
-        Math.hypot(entity.pos.x - target.pos.x, entity.pos.z - target.pos.z) <= radius,
-    )
-    .sort((a, b) => {
-      const ad = (a.pos.x - target.pos.x) ** 2 + (a.pos.z - target.pos.z) ** 2;
-      const bd = (b.pos.x - target.pos.x) ** 2 + (b.pos.z - target.pos.z) ** 2;
-      return ad - bd || a.id - b.id;
-    })
-    .slice(0, maxSecondary);
-  for (const secondary of candidates) {
-    ctx.applyAura(secondary, {
-      id: 'coven',
-      name: 'Coven',
-      kind: 'affliction_eye_secondary',
-      remaining: duration,
-      duration,
-      value: 0.5,
-      sourceId: warlock.id,
-      school: 'shadow',
-    });
-  }
 }
 
 // 2026-08-09 120s band round: the 80 and 100 anchors step down (750 to 620,
@@ -1033,61 +890,18 @@ export function afflictionTargetCastError(
   return null;
 }
 
-export function tickAfflictionAura(ctx: SimContext, target: Entity, aura: Aura, dt: number): void {
+export function tickAfflictionAura(
+  _ctx: SimContext,
+  _target: Entity,
+  aura: Aura,
+  dt: number,
+): void {
   if (aura.kind === 'affliction_accomplice' && aura.icd && aura.icd > 0) {
     aura.icd = Math.max(0, aura.icd - dt);
   }
   if (aura.kind === 'affliction_litany' && aura.icd && aura.icd > 0) {
     aura.icd = Math.max(0, aura.icd - dt);
   }
-  if (aura.kind !== 'affliction_eye') return;
-  const warlock = ctx.entities.get(aura.sourceId);
-  const interval =
-    warlock && hasAfflictionPossession(warlock)
-      ? POSSESSED_MALEDICT_GAZE_INTERVAL
-      : MALEDICT_GAZE_INTERVAL;
-  if (aura.tickInterval !== interval) {
-    aura.tickInterval = interval;
-    aura.tickTimer = Math.min(aura.tickTimer ?? interval, interval);
-  }
-  if (!canMaledictGaze(ctx, target, aura)) {
-    // The companion never auto-pulls. While its owner is idle, out of range,
-    // or the marked enemy is not yet engaged, keep a full attack timer banked.
-    aura.tickTimer = interval + dt;
-  }
-}
-
-export function tickHexOfViolence(ctx: SimContext, target: Entity, aura: Aura): void {
-  if (target.dead) return;
-  const warlock = ctx.entities.get(aura.sourceId);
-  if (!warlock || warlock.dead) return;
-  const marked = eyeAura(target, warlock.id);
-  const doomGain = aura.tickDoom ?? 2;
-  gainDoom(ctx, warlock, marked ? eyeGeneration(marked, doomGain, warlock) : doomGain);
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: warlock.id,
-    targetId: target.id,
-    school: 'shadow',
-    fx: 'tick',
-    ability: 'hex_of_violence',
-  });
-  const tickDmg = aura.tickDamage ?? aura.value2 ?? 16;
-  ctx.dealDamage(
-    warlock,
-    target,
-    tickDmg,
-    false,
-    'shadow',
-    aura.name,
-    'hit',
-    true,
-    undefined,
-    false,
-    false,
-    false,
-    'hex_of_violence',
-  );
 }
 
 /**
@@ -1116,6 +930,8 @@ export function onAfflictionDamage(
   source: Entity | null,
   target: Entity,
   actualDamage: number,
+  // A direct hit (cast, wand shot, melee) rather than a DoT tick or an echo.
+  direct = true,
 ): void {
   if (!source || source.id === target.id || actualDamage <= 0) return;
   const sourceCanTrigger = source.auras.some((aura) =>
@@ -1134,37 +950,11 @@ export function onAfflictionDamage(
     }
   }
 
-  for (const violence of source.auras) {
-    if (violence.kind !== 'affliction_violence' || (violence.charges ?? 0) <= 0) continue;
-    const warlock = ctx.entities.get(violence.sourceId);
-    if (!warlock || warlock.dead) continue;
-    const marked = eyeAura(source, warlock.id);
-    gainDoom(
-      ctx,
-      warlock,
-      marked ? eyeGeneration(marked, violence.value, warlock) : violence.value,
-    );
-    violence.charges = Math.max(0, (violence.charges ?? 0) - 1);
-    ctx.dealDamage(
-      warlock,
-      source,
-      violence.value2 ?? 0,
-      false,
-      'shadow',
-      violence.name,
-      'hit',
-      true,
-      undefined,
-      false,
-      false,
-      false,
-      'hex_of_violence',
-    );
-  }
-
   for (const accomplice of source.auras) {
     if (accomplice.kind !== 'affliction_accomplice' || (accomplice.icd ?? 0) > 0) continue;
-    // Self-linked (solo): the warlock's own damage to the Rotmark counts too.
+    // Self-linked (solo): only the warlock's own DIRECT hits count, so DoT ticks never
+    // add Blight around the per-second tick cap (affliction_blight.ts).
+    if (source.id === accomplice.sourceId && !direct) continue;
     const warlock = ctx.entities.get(accomplice.sourceId);
     if (!warlock || !eyeAura(target, warlock.id)) continue;
     const marked = eyeAura(target, warlock.id);

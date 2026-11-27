@@ -1686,7 +1686,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r14_ruin',
           name: 'Blood Credit',
           description:
-            'Cruel Pact and Hard Bargain each grant 10% more: Cruel Pact restores 30% of your maximum mana and Hard Bargain 30% of your maximum health, instead of 20%.',
+            'Cruel Pact and Hard Bargain each grant 50% more: Cruel Pact restores 30% of your maximum mana and Hard Bargain 30% of your maximum health, instead of 20%.',
           icon: 'wlk_r14_ruin',
           effect: {
             ability: [
