@@ -773,7 +773,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1121,
-      "state": "ab109d0a",
+      "state": "732b40ff",
       "events": "47871878",
       "rng": {
         "draws": 69,
@@ -801,6 +801,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -1011,6 +1014,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -1215,6 +1221,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -1419,6 +1428,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -1623,6 +1635,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -2240,7 +2255,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1121,
-      "state": "ab109d0a",
+      "state": "732b40ff",
       "events": "741638a5",
       "rng": {
         "draws": 69,
@@ -2268,6 +2283,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -2478,6 +2496,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -2682,6 +2703,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -2886,6 +2910,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -3090,6 +3117,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "korzul_the_gravewyrm:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
