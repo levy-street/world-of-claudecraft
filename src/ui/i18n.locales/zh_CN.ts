@@ -31,7 +31,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'bossJournal.smithHeart.council.overview':
     '赫罗斯玛尔，不屈之锤，与维尔米拉，矿脉歌者，在采石场中并肩作战。赫罗斯玛尔是坦克首领：他的山岳之怒会击中所有未躲在石柱后的人。维尔米拉是施法者：她升起供团队躲藏的石柱，并以歌声震松岩石。其中一个倒下时，另一个会恢复生命值、速度变快并接过其技能，所以要将两者同时击杀。',
   'bossJournal.smithHeart.council.pageName': '赫罗斯玛尔与维尔米拉',
-  'bossJournal.smithHeart.council.tagline': '两位石之守护者在采石场中并肩作战：躲在石柱后避开赫罗斯玛尔的山岳之怒，打断维尔米拉的歌声，并将两者一同击倒。',
+  'bossJournal.smithHeart.council.tagline':
+    '两位石之守护者在采石场中并肩作战：躲在石柱后避开赫罗斯玛尔的山岳之怒，打断维尔米拉的歌声，并将两者一同击倒。',
   'bossJournal.smithHeart.council.chipBosses': '{count}名首领，一场战斗',
   'bossJournal.smithHeart.council.chipTogether': '在{arrive}秒内击杀两者',
   'bossJournal.smithHeart.council.phaseHammerName': '赫罗斯玛尔，不屈之锤',
@@ -125,7 +126,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '悲恸之怒使幸存者立即恢复{heal}的生命值，并且还会接过倒下者的第二个技能。',
   'bossJournal.smithHeart.breath.overview':
     '艾尔温，无羁狂风，在风暴崖檐上作战，这是一处没有围墙的岩架：每条边缘之外都是虚空。生命值降到一半之前，它以风作战；降到一半时，它躲进茧中，把团队送往浮空岛；随后风暴爆发，它化为闪电战斗到最后。瑟萨莉队长与你们并肩作战，并布下宁静之环。',
-  'bossJournal.smithHeart.breath.tagline': '虚空之上一处没有围墙的岩架：顶着风前行，在生命值{at}时清理浮空岛，然后撑过风暴。',
+  'bossJournal.smithHeart.breath.tagline':
+    '虚空之上一处没有围墙的岩架：顶着风前行，在生命值{at}时清理浮空岛，然后撑过风暴。',
   'bossJournal.smithHeart.breath.chipEdge': '从边缘坠落即死',
   'bossJournal.smithHeart.breath.chipIsles': '{at}时前往浮空岛',
   'bossJournal.smithHeart.breath.phaseWindName': '风',
@@ -250,7 +252,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '雷霆摇篮会同时举起{count}名玩家：团队需分散到他们下方。',
   'bossJournal.smithHeart.quench.overview':
     '奥萝拉，寂静之冬，从冰封湖中升起。每名玩家都有一条寒意条，独处时上涨，抱团时下降，但站着不动的人群会压碎脚下的冰面。要聚在一起，但绝不要久留一处。生命值降到一半时，铸匠的四把利刃全部苏醒，寒意也随之加深。',
-  'bossJournal.smithHeart.quench.tagline': '在冰封湖上，每名玩家都有一条寒意条：抱团取暖，但人群要不停移动，否则脚下的冰面会碎裂。',
+  'bossJournal.smithHeart.quench.tagline':
+    '在冰封湖上，每名玩家都有一条寒意条：抱团取暖，但人群要不停移动，否则脚下的冰面会碎裂。',
   'bossJournal.smithHeart.quench.chipHuddle': '{group}人或以上抱团',
   'bossJournal.smithHeart.quench.chipBlades': '{at}时四把利刃全部苏醒',
   'bossJournal.smithHeart.quench.phaseColdName': '寒意',
@@ -312,7 +315,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '生命之暖减半：治疗量每达到生命值的{heal}，寒意降低1。',
   'bossJournal.smithHeart.heat.overview':
     '伊格纳扎尔，不灭者，半身沉在原初涌泉之中，从不移动：团队在它四周的岸边作战。生命值{one}和{two}时它会沉下，炉心涌出一圈圈熔岩。它的坦克在余烬之握和涌泉烙印时换坦。',
-  'bossJournal.smithHeart.heat.tagline': '它半身沉在原初涌泉之中，从不移动：团队在它四周的岸边作战。',
+  'bossJournal.smithHeart.heat.tagline':
+    '它半身沉在原初涌泉之中，从不移动：团队在它四周的岸边作战。',
   'bossJournal.smithHeart.heat.chipSinks': '在{one}和{two}时沉下',
   'bossJournal.smithHeart.heat.chipPhases': '{phases}个阶段，{overflows}次满溢',
   'bossJournal.smithHeart.heat.phaseAllName': '所有阶段',
@@ -403,7 +407,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'bossJournal.smithHeart.heat.heroicWheel': '炉心之轮只预警{warn}秒，并以全部威力爆发。',
   'bossJournal.smithHeart.final.overview':
     '阿什格兰德，无主之力的残余，在世界之砧上作战，这里被分为四个区域：炽热、淬火、吐息和重锤。它所站的区域就是它吸取的力量，所以它的坦克要在任何过载条爆发前把它从一个区域拖到另一个区域。生命值{first}和{second}时，它会召出碎片；生命值{final}时，四个区域全部苏醒，迎来最后的决战。',
-  'bossJournal.smithHeart.final.tagline': '它会吸取所站区域的力量：它的坦克要在任何过载条爆发前，把它从一个区域拖到另一个区域。',
+  'bossJournal.smithHeart.final.tagline':
+    '它会吸取所站区域的力量：它的坦克要在任何过载条爆发前，把它从一个区域拖到另一个区域。',
   'bossJournal.smithHeart.final.chipQuarters': '{count}个元素区域',
   'bossJournal.smithHeart.final.chipSplinters': '{first}和{second}时召出碎片',
   'bossJournal.smithHeart.final.chipFinal': '{final}时最终决战',
