@@ -45,6 +45,9 @@ export interface JournalMechanic {
   percentValues?: readonly string[];
   marks?: readonly JournalMark[];
   compare?: JournalDamageCompare;
+  /** The sim's damage labels this mechanic hits players under (see
+   *  JournalMechanicDef.hits): the death recap's icon lookup. */
+  hits?: readonly string[];
 }
 
 /** The boss health a phase covers, as fractions of 1: the whole fight, a band
@@ -125,6 +128,9 @@ export interface JournalBossView {
   tagline?: JournalNote;
   /** The banner's stat chips (none when absent). */
   chips?: readonly JournalChip[];
+  /** Bodies besides the page's own whose hits its mechanics' `hits` name (a
+   *  boss's adds, its other heads): see JournalBossDef.hitSources. */
+  hitSources?: readonly string[];
 }
 
 export interface JournalSource {
@@ -156,6 +162,13 @@ export interface JournalMechanicDef {
   percentValues?: readonly string[];
   /** Print both tiers' range (from `difficultyValues[tier].min/max`). */
   compare?: boolean;
+  /** Every damage label the sim deals this mechanic under (the `ability` of
+   *  its `damage` events: a dealDamage label, a DoT aura's name, a template
+   *  kit's name), read from the encounter's own name tables where it has them.
+   *  The death recap shows a hit under one of these with this mechanic's icon
+   *  (hud/journal/journal_hit_icons.ts); tests/journal_hit_icons.test.ts pins
+   *  every label to the encounter code. */
+  hits?: readonly string[];
 }
 
 export interface JournalPhaseDef {
@@ -205,6 +218,11 @@ export interface JournalBossDef {
   taglineValues?: JournalValues;
   taglinePercentValues?: readonly string[];
   chips?: readonly JournalChipDef[];
+  /** Mob templates other than the page's bodies (`members`, else `mobId`) that
+   *  deal this page's mechanics: an add, another head. The death recap matches
+   *  a hit's label only against the page whose bodies or hitSources dealt it,
+   *  so a trash mob's ability that shares a name never borrows a boss icon. */
+  hitSources?: readonly string[];
 }
 
 export interface DungeonJournalDef {
@@ -291,6 +309,7 @@ export function buildJournalPhases(
             ...(m.percentValues ? { percentValues: m.percentValues } : {}),
             ...(marks.length > 0 ? { marks } : {}),
             ...(compare ? { compare } : {}),
+            ...(m.hits ? { hits: m.hits } : {}),
           };
         }),
     }))
@@ -338,6 +357,7 @@ export function dungeonJournalBossView(
           }))
         : [],
     ...(boss.members ? { members: boss.members } : {}),
+    ...(boss.hitSources ? { hitSources: boss.hitSources } : {}),
     ...(boss.nameKey ? { nameKey: boss.nameKey } : {}),
     ...(boss.taglineKey
       ? {
@@ -402,6 +422,7 @@ export const RAID_JOURNAL_SOURCE: JournalSource = {
       difficulty,
       portraitUrl: view.portraitUrl,
       overviewKey: view.overviewKey as TranslationKey,
+      ...(view.hitSources ? { hitSources: view.hitSources } : {}),
       phases: view.phases.map((phase) => ({
         ...phase,
         nameKey: phase.nameKey as TranslationKey,

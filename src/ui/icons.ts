@@ -3031,7 +3031,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   dgn_heart_wheel: r('fire', 'ember', ['gear', { p: 'flame', ...BR }], ['glow']),
   dgn_heart_basalt_fist: r('fire', 'earthBrown', ['fist', { p: 'flame', ...BR }], ['crack']),
   dgn_heart_cinder_grip: r('fire', 'ember', ['hand', { p: 'flame', ...BR }], ['drips']),
-  dgn_heart_wellspring_brand: r('fire', 'blood', ['sigil_rune', { p: 'flame', ...BR }], ['glow']),
+  dgn_heart_wellspring_brand: r('fire', 'gold', ['sigil_rune', { p: 'droplet', ...BR }], ['glow']),
   dgn_heart_live_coal: r('fire', 'ember', ['gem', { p: 'heart', ...BR }], ['glow']),
   dgn_heart_hearth_flare: r('fire', 'gold', ['flame', { p: 'sunburst', ...BIG }], ['glow']),
   dgn_heart_overflow: r('fire', 'ember', ['droplet', { p: 'flame', ...BR }], ['motion']),

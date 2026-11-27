@@ -18,8 +18,10 @@ import {
   BLOOM_SEED_RAIN,
   BLOOM_TUNING,
   BLOOM_VINE_LASH,
+  FANGLORD_JAGUAR_ID,
   GORGEBLOOM_ID,
   GREAT_SAURIAN_ID,
+  HOWDAH_HEXCALLER_ID,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
   SAURIAN_TUNING,
@@ -51,6 +53,8 @@ const ROAR = WILDHEART_MOBS[ZULGAR_ID]?.knockback;
 
 const GREAT_SAURIAN: JournalBossDef = {
   mobId: GREAT_SAURIAN_ID,
+  // Its howdah rider's Sunvenom Hex.
+  hitSources: [HOWDAH_HEXCALLER_ID],
   rank: 'miniboss',
   overviewKey: k('saurian.overview'),
   phases: [
@@ -62,6 +66,7 @@ const GREAT_SAURIAN: JournalBossDef = {
         {
           id: 'tail-swipe',
           iconId: 'dgn_wildheart_tail_swipe',
+          hits: ['Tail Swipe'],
           nameKey: cast(SAURIAN_TAIL_SWIPE),
           castId: SAURIAN_TAIL_SWIPE,
           summaryKey: k('saurian.tailSummary'),
@@ -81,6 +86,7 @@ const GREAT_SAURIAN: JournalBossDef = {
         {
           id: 'earthshaking-stomp',
           iconId: 'dgn_wildheart_stomp',
+          hits: ['Earthshaking Stomp'],
           nameKey: cast(SAURIAN_STOMP),
           castId: SAURIAN_STOMP,
           summaryKey: k('saurian.stompSummary'),
@@ -108,6 +114,7 @@ const GREAT_SAURIAN: JournalBossDef = {
         {
           id: 'howdah-rider',
           iconId: 'dgn_wildheart_howdah_rider',
+          hits: ['Sunvenom Hex'],
           nameKey: k('saurian.riderName'),
           summaryKey: k('saurian.riderSummary'),
           responseKey: k('saurian.riderResponse'),
@@ -177,6 +184,8 @@ const GREAT_SAURIAN: JournalBossDef = {
 
 const BEASTMASTER: JournalBossDef = {
   mobId: BEASTMASTER_ID,
+  // The Fanglord jaguar's Stalk bites.
+  hitSources: [FANGLORD_JAGUAR_ID],
   rank: 'boss',
   overviewKey: k('beast.overview'),
   phases: [
@@ -209,6 +218,7 @@ const BEASTMASTER: JournalBossDef = {
         {
           id: 'stalk',
           iconId: 'dgn_wildheart_stalk',
+          hits: ['Jaguar Bite', 'Rending Bite'],
           nameKey: k('beast.stalkName'),
           summaryKey: k('beast.stalkSummary'),
           responseKey: k('beast.stalkResponse'),
@@ -241,6 +251,7 @@ const BEASTMASTER: JournalBossDef = {
         {
           id: 'beast-pit-quake',
           iconId: 'dgn_wildheart_quake',
+          hits: ['Beast Pit Quake'],
           nameKey: cast(BEAST_PIT_QUAKE),
           castId: BEAST_PIT_QUAKE,
           summaryKey: k('beast.quakeSummary'),
@@ -370,6 +381,7 @@ const GORGEBLOOM: JournalBossDef = {
         {
           id: 'vine-lash',
           iconId: 'dgn_wildheart_vine_lash',
+          hits: ['Vine Lash'],
           nameKey: cast(BLOOM_VINE_LASH),
           castId: BLOOM_VINE_LASH,
           summaryKey: k('bloom.lashSummary'),
@@ -389,6 +401,7 @@ const GORGEBLOOM: JournalBossDef = {
         {
           id: 'gorge',
           iconId: 'dgn_wildheart_gorge',
+          hits: ['Gorge', 'Digesting'],
           nameKey: cast(BLOOM_GORGE),
           castId: BLOOM_GORGE,
           summaryKey: k('bloom.gorgeSummary'),
@@ -406,6 +419,7 @@ const GORGEBLOOM: JournalBossDef = {
         {
           id: 'bloom-spit',
           iconId: 'dgn_wildheart_spit',
+          hits: ['Bloom Spit'],
           nameKey: k('bloom.spitName'),
           summaryKey: k('bloom.spitSummary'),
           responseKey: k('bloom.spitResponse'),
@@ -454,6 +468,7 @@ const ZULGAR: JournalBossDef = {
         {
           id: 'wildheart-pulse',
           iconId: 'dgn_wildheart_pulse',
+          hits: ['Wildheart Pulse'],
           nameKey: cast(ZULGAR_PULSE),
           castId: ZULGAR_PULSE,
           summaryKey: k('zulgar.pulseSummaryRework'),
@@ -472,6 +487,7 @@ const ZULGAR: JournalBossDef = {
         {
           id: 'hunting-spear',
           iconId: 'dgn_wildheart_ambush',
+          hits: ['Hunting Spear'],
           nameKey: cast(ZULGAR_HUNTING_SPEAR),
           castId: ZULGAR_HUNTING_SPEAR,
           summaryKey: k('zulgar.spearSummary'),
@@ -511,6 +527,7 @@ const ZULGAR: JournalBossDef = {
         {
           id: 'spirit-of-the-hunt',
           iconId: 'dgn_wildheart_spirit_hunt',
+          hits: ['Mauled'],
           nameKey: cast(ZULGAR_SPIRIT_HUNT),
           castId: ZULGAR_SPIRIT_HUNT,
           summaryKey: {
@@ -556,6 +573,7 @@ const ZULGAR: JournalBossDef = {
         {
           id: 'ambush',
           iconId: 'dgn_wildheart_ambush',
+          hits: ['Ambush'],
           nameKey: k('zulgar.ambushName'),
           availability: 'heroic',
           summaryKey: k('zulgar.ambushSummary'),
@@ -596,6 +614,7 @@ const ZULGAR: JournalBossDef = {
         {
           id: 'idol-breath',
           iconId: 'dgn_wildheart_pulse',
+          hits: ["Idol's Breath"],
           nameKey: cast(ZULGAR_IDOLS_BREATH),
           castId: ZULGAR_IDOLS_BREATH,
           summaryKey: k('zulgar.breathSummary'),

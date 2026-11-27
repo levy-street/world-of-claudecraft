@@ -14,6 +14,7 @@ import {
   GHOST_CAPTAIN_BROADSIDE,
   GHOST_CAPTAIN_ID,
   GHOST_CAPTAIN_TUNING,
+  GHOST_SAILOR_ID,
 } from '../../../sim/encounters/sunken_bastion/ghost_captain_ids';
 import {
   anchorHits,
@@ -99,6 +100,8 @@ function perSecond(
 
 const CAPTAIN: JournalBossDef = {
   mobId: GHOST_CAPTAIN_ID,
+  // Its drowned sailors' Soul Release (the crawler's death burst).
+  hitSources: [GHOST_SAILOR_ID],
   rank: 'miniboss',
   overviewKey: k('captain.overview'),
   phases: [
@@ -111,6 +114,7 @@ const CAPTAIN: JournalBossDef = {
         {
           id: 'spectral-broadside',
           iconId: 'dgn_bastion_broadside',
+          hits: [GHOST_CAPTAIN_BROADSIDE],
           nameKey: cast(GHOST_CAPTAIN_BROADSIDE),
           castId: GHOST_CAPTAIN_BROADSIDE,
           summaryKey: k('captain.broadsideSummary'),
@@ -128,6 +132,7 @@ const CAPTAIN: JournalBossDef = {
         {
           id: 'cursed-anchor',
           iconId: 'dgn_bastion_cursed_anchor',
+          hits: [GHOST_CAPTAIN_ANCHOR],
           nameKey: cast(GHOST_CAPTAIN_ANCHOR),
           castId: GHOST_CAPTAIN_ANCHOR,
           summaryKey: k('captain.anchorSummary'),
@@ -141,6 +146,7 @@ const CAPTAIN: JournalBossDef = {
         {
           id: 'phantom-boarding',
           iconId: 'dgn_bastion_boarding',
+          hits: [GHOST_CAPTAIN_BOARDING],
           nameKey: cast(GHOST_CAPTAIN_BOARDING),
           castId: GHOST_CAPTAIN_BOARDING,
           summaryKey: k('captain.boardingSummary'),
@@ -154,6 +160,7 @@ const CAPTAIN: JournalBossDef = {
         {
           id: 'sailors',
           iconId: 'dgn_bastion_sailors',
+          hits: ['Soul Release'],
           nameKey: k('captain.sailorsName'),
           summaryKey: k('captain.sailorsSummary'),
           responseKey: k('captain.sailorsResponse'),
@@ -191,6 +198,7 @@ const OLEN: JournalBossDef = {
         {
           id: 'hallowed-brine',
           iconId: 'dgn_bastion_brine',
+          hits: ['Hallowed Brine'],
           nameKey: cast(OLEN_HALLOWED_BRINE),
           castId: OLEN_HALLOWED_BRINE,
           summaryKey: k('olen.brineSummary'),
@@ -212,6 +220,7 @@ const OLEN: JournalBossDef = {
         {
           id: 'rebounding-bulwark',
           iconId: 'dgn_bastion_bulwark',
+          hits: ['Rebounding Bulwark'],
           nameKey: cast(OLEN_REBOUNDING_BULWARK),
           castId: OLEN_REBOUNDING_BULWARK,
           summaryKey: k('olen.bulwarkSummary'),
@@ -228,6 +237,7 @@ const OLEN: JournalBossDef = {
         {
           id: 'sentence-of-the-tide',
           iconId: 'dgn_bastion_sentence',
+          hits: ['Sentence of the Tide'],
           nameKey: cast(OLEN_TIDE_SENTENCE),
           castId: OLEN_TIDE_SENTENCE,
           summaryKey: k('olen.sentenceSummary'),
@@ -244,6 +254,7 @@ const OLEN: JournalBossDef = {
         {
           id: 'reaping-arc',
           iconId: 'dgn_bastion_reaping_arc',
+          hits: ['Reaping Arc'],
           nameKey: k('olen.arcName'),
           summaryKey: k('olen.arcSummary'),
           responseKey: k('olen.arcResponse'),
@@ -322,6 +333,7 @@ const TURNKEY: JournalBossDef = {
         {
           id: 'iron-cage',
           iconId: 'dgn_bastion_cage',
+          hits: ['Crushing Irons', 'Brine Flood'],
           nameKey: cast(TURNKEY_IRON_CAGE),
           castId: TURNKEY_IRON_CAGE,
           summaryKey: { normal: k('turnkey.cageSummary'), heroic: k('turnkey.cageHeroicSummary') },
@@ -383,6 +395,7 @@ const OSSICK: JournalBossDef = {
         {
           id: 'drowned-anchor',
           iconId: 'dgn_bastion_anchor',
+          hits: ['Drowning Pit', 'Anchor Crash'],
           nameKey: cast(OSSICK_ANCHOR),
           castId: OSSICK_ANCHOR,
           summaryKey: {
@@ -412,6 +425,7 @@ const OSSICK: JournalBossDef = {
         {
           id: 'shackle-pair',
           iconId: 'dgn_bastion_shackle',
+          hits: ['Shackle Strain'],
           nameKey: cast(OSSICK_SHACKLE),
           castId: OSSICK_SHACKLE,
           summaryKey: k('ossick.shackleSummary'),
@@ -428,6 +442,7 @@ const OSSICK: JournalBossDef = {
         {
           id: 'gaolers-cudgel',
           iconId: 'dgn_bastion_cudgel',
+          hits: ["Gaoler's Cudgel"],
           nameKey: cast(OSSICK_CUDGEL),
           castId: OSSICK_CUDGEL,
           summaryKey: k('ossick.cudgelSummary'),
@@ -491,6 +506,7 @@ const VAEL: JournalBossDef = {
         {
           id: 'mist-surge',
           iconId: 'dgn_bastion_mist_surge',
+          hits: ['Mist Surge'],
           nameKey: cast(VAEL_MIST_SURGE),
           castId: VAEL_MIST_SURGE,
           summaryKey: k('vael.surgeSummary'),
@@ -511,6 +527,7 @@ const VAEL: JournalBossDef = {
         {
           id: 'shadow-crossing',
           iconId: 'dgn_bastion_shadow_crossing',
+          hits: ['Reaping Scythe'],
           nameKey: cast(VAEL_SHADOWSTEP),
           castId: VAEL_SHADOWSTEP,
           summaryKey: k('vael.crossingSummary'),
@@ -530,6 +547,7 @@ const VAEL: JournalBossDef = {
         {
           id: 'grave-shadow',
           iconId: 'dgn_bastion_grave_shadow',
+          hits: ['Grave Shadow'],
           nameKey: k('vael.graveName'),
           availability: 'heroic',
           summaryKey: k('vael.graveSummary'),
@@ -551,6 +569,7 @@ const VAEL: JournalBossDef = {
         {
           id: 'fog-veil',
           iconId: 'dgn_bastion_fog_veil',
+          hits: ['Drowning Hymn'],
           nameKey: cast(VAEL_VEIL_GATHER),
           castId: VAEL_VEIL_GATHER,
           summaryKey: { normal: k('vael.veilSummary'), heroic: k('vael.veilHeroicSummary') },
@@ -574,6 +593,7 @@ const VAEL: JournalBossDef = {
         {
           id: 'fogburst',
           iconId: 'dgn_bastion_fogburst',
+          hits: ['Fogburst'],
           nameKey: k('vael.fogburstName'),
           summaryKey: {
             normal: k('vael.fogburstSummary'),

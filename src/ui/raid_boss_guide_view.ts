@@ -3,6 +3,7 @@
 // encounter and choose Normal or Heroic without consulting mutable world state.
 
 import {
+  IGNIVAR_APOCALYPSE_ADD_ID,
   IGNIVAR_APOCALYPSE_HP_THRESHOLD,
   IGNIVAR_LAST_INFERNO_HP_THRESHOLD,
 } from '../sim/encounters/ignivar';
@@ -33,6 +34,7 @@ import {
 } from '../sim/encounters/varkhul';
 import { IGNIVAR_JUDGMENT_HP_THRESHOLD } from '../sim/ignivar_forge_judgment';
 import {
+  IGNIVAR_CRUCIBLE_WARDEN_ID,
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
@@ -153,6 +155,8 @@ export interface RaidBossGuideMechanic {
   flags: readonly RaidBossGuideFlag[];
   values?: Readonly<Record<string, number>>;
   percentValues?: readonly string[];
+  /** The encounter's damage labels for this mechanic (MechanicDefinition.hits). */
+  hits?: readonly string[];
 }
 
 export interface RaidBossGuidePhase {
@@ -171,6 +175,8 @@ export interface RaidBossGuideView {
   portraitUrl: string;
   overviewKey: RaidBossGuideTextKey;
   phases: readonly RaidBossGuidePhase[];
+  /** Adds whose hits the mechanics' `hits` also name (BOSS_HIT_SOURCES). */
+  hitSources?: readonly string[];
 }
 
 interface MechanicDefinition {
@@ -190,6 +196,10 @@ interface MechanicDefinition {
   enabled?: boolean;
   values?: Readonly<Record<string, number>>;
   percentValues?: readonly string[];
+  /** Every damage label the encounter deals this mechanic under (the `ability`
+   *  of its `damage` events): the death recap shows such a hit with this
+   *  mechanic's icon (hud/journal/journal_hit_icons.ts). */
+  hits?: readonly string[];
 }
 
 interface PhaseDefinition {
@@ -214,6 +224,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'forge-strike',
         iconId: 'raid_ignivar_forge_strike',
+        hits: ['Forge Strike'],
         nameKey: key('ignivar.forgeStrikeName'),
         summaryKey: key('ignivar.forgeStrikeSummary'),
         responseKey: key('ignivar.forgeStrikeResponse'),
@@ -224,6 +235,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'brand-of-the-pyre',
         iconId: 'raid_ignivar_brand',
+        hits: ['Brand of the Pyre', 'Cleansing Backlash'],
         nameKey: key('ignivar.brandName'),
         summaryKey: key('ignivar.brandSummary'),
         responseKey: {
@@ -236,6 +248,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'searing-torrent',
         iconId: 'raid_ignivar_searing_torrent',
+        hits: ['Searing Torrent'],
         nameKey: key('ignivar.searingTorrentName'),
         summaryKey: {
           normal: key('ignivar.searingTorrentSummary'),
@@ -248,6 +261,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'rain-of-cinders',
         iconId: 'raid_ignivar_rain_of_cinders',
+        hits: ['Rain of Cinders', 'Falling Cinders'],
         nameKey: key('ignivar.rainName'),
         summaryKey: {
           normal: key('ignivar.rainSummary'),
@@ -260,6 +274,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'revolving-inferno',
         iconId: 'raid_ignivar_revolving_inferno',
+        hits: ['Revolving Inferno'],
         nameKey: key('ignivar.raysName'),
         summaryKey: {
           normal: key('ignivar.raysSummary'),
@@ -272,6 +287,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'forge-wave',
         iconId: 'raid_ignivar_forge_wave',
+        hits: ['Forge Wave'],
         nameKey: key('ignivar.forgeWaveName'),
         summaryKey: {
           normal: key('ignivar.forgeWaveSummary'),
@@ -293,6 +309,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'apocalypse',
         iconId: 'raid_ignivar_apocalypse',
+        hits: ['Apocalypse'],
         nameKey: key('ignivar.apocalypseName'),
         summaryKey: key('ignivar.apocalypseSummary'),
         responseKey: key('ignivar.apocalypseResponse'),
@@ -314,6 +331,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'judgment-of-the-forge',
         iconId: 'raid_ignivar_judgment',
+        hits: ['Judgment of the Forge'],
         nameKey: key('ignivar.judgmentName'),
         summaryKey: {
           normal: key('ignivar.judgmentSummary'),
@@ -326,6 +344,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'chains-of-the-forge',
         iconId: 'raid_ignivar_chains',
+        hits: ['Chains of the Forge'],
         nameKey: key('ignivar.chainsName'),
         summaryKey: key('ignivar.chainsSummary'),
         responseKey: key('ignivar.chainsResponse'),
@@ -345,6 +364,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'last-inferno',
         iconId: 'raid_ignivar_last_inferno',
+        hits: ['Last Inferno'],
         nameKey: key('ignivar.lastInfernoName'),
         summaryKey: key('ignivar.lastInfernoSummary'),
         responseKey: key('ignivar.lastInfernoResponse'),
@@ -364,6 +384,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'makers-brand',
         iconId: 'raid_varkhul_makers_brand',
+        hits: ["Maker's Brand"],
         nameKey: key('varkhul.makersBrandName'),
         summaryKey: key('varkhul.makersBrandSummary'),
         responseKey: key('varkhul.makersBrandResponse'),
@@ -374,6 +395,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'forgefather-frontal',
         iconId: 'raid_varkhul_frontal',
+        hits: ["Forgefather's Sweep"],
         nameKey: key('varkhul.frontalName'),
         summaryKey: {
           normal: key('varkhul.frontalSummary'),
@@ -386,6 +408,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'cinder-orbs',
         iconId: 'raid_varkhul_cinder_orbs',
+        hits: ['Cinder Orbs', 'Red-hot Metal'],
         nameKey: key('varkhul.orbsName'),
         summaryKey: {
           normal: key('varkhul.orbsSummary'),
@@ -398,6 +421,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'shared-pyre',
         iconId: 'raid_varkhul_shared_pyre',
+        hits: ['Shared Pyre'],
         nameKey: key('varkhul.pyreName'),
         summaryKey: {
           normal: key('varkhul.pyreSummary'),
@@ -415,6 +439,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'forgestorm',
         iconId: 'raid_varkhul_forgestorm',
+        hits: ['Forgestorm'],
         nameKey: key('varkhul.forgestormName'),
         summaryKey: {
           normal: key('varkhul.forgestormSummary'),
@@ -428,6 +453,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'tempering-ray',
         iconId: 'raid_varkhul_tempering_ray',
+        hits: ['Tempering Ray'],
         nameKey: key('varkhul.rayName'),
         summaryKey: key('varkhul.raySummary'),
         responseKey: key('varkhul.rayResponse'),
@@ -437,6 +463,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'anvils-decree',
         iconId: 'raid_varkhul_anvils_decree',
+        hits: ["Anvil's Decree", 'Hammerfall Meteors'],
         nameKey: key('varkhul.anvilName'),
         summaryKey: {
           normal: key('varkhul.anvilSummary'),
@@ -462,6 +489,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'masters-assembly',
         iconId: 'raid_varkhul_masters_assembly',
+        hits: ['Forge Meltdown'],
         nameKey: key('varkhul.assemblyName'),
         summaryKey: key('varkhul.assemblySummary'),
         responseKey: key('varkhul.assemblyResponse'),
@@ -471,6 +499,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'crucible-beam',
         iconId: 'raid_varkhul_crucible_beam',
+        hits: ['Crucible Beam'],
         nameKey: key('varkhul.beamName'),
         summaryKey: {
           normal: key('varkhul.beamSummary'),
@@ -483,6 +512,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'forge-legion',
         iconId: 'raid_varkhul_forge_legion',
+        hits: ['Crucible Quake'],
         nameKey: key('varkhul.legionName'),
         summaryKey: key('varkhul.legionSummary'),
         responseKey: key('varkhul.legionResponse'),
@@ -504,6 +534,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'masterpiece-unbound',
         iconId: 'raid_varkhul_masterpiece_unbound',
+        hits: ['Living Forge', 'Masterpiece Unbound'],
         nameKey: key('varkhul.masterpieceName'),
         summaryKey: {
           normal: key('varkhul.masterpieceSummary'),
@@ -516,6 +547,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'worldfire',
         iconId: 'raid_varkhul_worldfire',
+        hits: ['Worldfire'],
         nameKey: key('varkhul.worldfireName'),
         summaryKey: key('varkhul.worldfireSummary'),
         responseKey: key('varkhul.worldfireResponse'),
@@ -540,6 +572,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'gravebreaker',
         iconId: 'raid_nythraxis_gravebreaker',
+        hits: ['Gravebreaker'],
         nameKey: key('nythraxis.gravebreakerName'),
         summaryKey: key('nythraxis.gravebreakerSummary'),
         responseKey: key('nythraxis.gravebreakerResponse'),
@@ -556,6 +589,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'dread-curse',
         iconId: 'raid_nythraxis_dread_curse',
+        hits: ['Dread Curse'],
         nameKey: key('nythraxis.dreadCurseName'),
         summaryKey: {
           normal: key('nythraxis.dreadCurseSummary'),
@@ -579,6 +613,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'bone-spike',
         iconId: 'raid_nythraxis_bone_spike',
+        hits: ['Bone Spike'],
         nameKey: key('nythraxis.boneSpikeName'),
         summaryKey: {
           normal: key('nythraxis.boneSpikeSummary'),
@@ -603,6 +638,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'grave-eruption',
         iconId: 'raid_nythraxis_grave_eruption',
+        hits: ['Grave Eruption', 'Grave Flame'],
         nameKey: key('nythraxis.graveEruptionName'),
         summaryKey: {
           normal: key('nythraxis.graveEruptionSummary'),
@@ -631,6 +667,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'binding-sigil',
         iconId: 'raid_nythraxis_binding_sigil',
+        hits: ['Unbound'],
         nameKey: key('nythraxis.bindingSigilName'),
         summaryKey: {
           normal: key('nythraxis.bindingSigilSummary'),
@@ -691,6 +728,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'soul-rend',
         iconId: 'raid_nythraxis_soul_rend',
+        hits: ['Soul Rend'],
         nameKey: key('nythraxis.soulRendName'),
         summaryKey: {
           normal: key('nythraxis.soulRendSummary'),
@@ -711,6 +749,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       {
         id: 'deathless-rage',
         iconId: 'raid_nythraxis_deathless_rage',
+        hits: ['Deathless Rage'],
         nameKey: key('nythraxis.deathlessRageName'),
         summaryKey: {
           normal: key('nythraxis.deathlessRageSummary'),
@@ -775,6 +814,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
         id: 'bone-storm',
         enabled: NYTHRAXIS_BONE_STORM_ENABLED,
         iconId: 'raid_nythraxis_bone_storm',
+        hits: ['Bone Storm', 'Bone Slam'],
         nameKey: key('nythraxis.boneStormName'),
         summaryKey: {
           normal: key('nythraxis.boneStormSummary'),
@@ -835,6 +875,14 @@ const BOSS_PHASES: Readonly<Record<RaidBossGuideBoss, readonly PhaseDefinition[]
   nythraxis: NYTHRAXIS_PHASES,
 };
 
+/** The adds whose hits a boss's mechanics name (the death recap's icon lookup):
+ *  Ignivar's Ashcaller deals the Apocalypse, Varkhul's Crucible Wardens the
+ *  Crucible Quake. */
+const BOSS_HIT_SOURCES: Readonly<Partial<Record<RaidBossGuideBoss, readonly string[]>>> = {
+  ignivar: [IGNIVAR_APOCALYPSE_ADD_ID],
+  varkhul: [IGNIVAR_CRUCIBLE_WARDEN_ID],
+};
+
 const BOSS_IDS: Readonly<Record<RaidBossGuideBoss, RaidBossGuideView['bossId']>> = {
   ignivar: IGNIVAR_BOSS_ID,
   varkhul: VARKHUL_BOSS_ID,
@@ -874,6 +922,7 @@ function buildPhases(
         flags: mechanic.flags ?? [],
         ...(mechanic.values ? { values: mechanic.values } : {}),
         ...(mechanic.percentValues ? { percentValues: mechanic.percentValues } : {}),
+        ...(mechanic.hits ? { hits: mechanic.hits } : {}),
       })),
   }));
 }
@@ -901,5 +950,6 @@ export function raidBossGuideView(
     portraitUrl: targetPortraitUrl(bossId, true) ?? '',
     overviewKey: key(`${boss}.overview`),
     phases: buildPhases(BOSS_PHASES[boss], difficulty),
+    ...(BOSS_HIT_SOURCES[boss] ? { hitSources: BOSS_HIT_SOURCES[boss] } : {}),
   };
 }

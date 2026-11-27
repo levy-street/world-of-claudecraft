@@ -35,6 +35,13 @@ book beside the target frame and the Dungeon Finder's boss list.
   and `rangeOnly` when its summary only restates the band. Write them from the live
   mechanics, numbers from the tuning (`tests/adventure_journal_banner.test.ts`).
 - Each mechanic `iconId` needs an explicit recipe in `src/ui/icons.ts` (`dgn_<dungeon>_*`).
+- A mechanic that deals damage lists `hits`: every label the sim deals it under (the
+  `ability` of its `damage` events: a dealDamage label, a DoT aura's name, a template
+  kit's name), read from the encounter's name tables where it has them. A boss whose
+  adds or other heads deal its mechanics names them in `hitSources`. The death recap
+  shows such a hit with the mechanic's icon (`hud/journal/journal_hit_icons.ts`);
+  `tests/journal_hit_icons.test.ts` pins every label to the sim, every dealer to a real
+  template, no label to two icons, and the encounters' own damage calls to a row.
 - `tests/boss_journal_view.test.ts` runs over EVERY registered journal (finder bosses present
   and in order, every key resolves with no placeholder left, cast names, kicks, heroic marks,
   the in-game model); add a per-dungeon facts block for the numbers players misread.

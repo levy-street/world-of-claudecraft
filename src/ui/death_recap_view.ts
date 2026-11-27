@@ -3,13 +3,16 @@
 // identification, and combat event cards for the death recap dialog.
 
 import { formatNumber } from './i18n';
-import type { DeathRecapRecord } from './meters_death_recap';
+import { type DeathRecapRecord, deathRecapJournalIcon } from './meters_death_recap';
 
 export interface DeathRecapCardModel {
   index: number;
   timeRel: string;
   ability: string;
   abilityId: string | null;
+  /** The ability icon the card paints: a boss hit's Adventure Journal icon,
+   *  else the ability's own, else the plain attack. */
+  iconId: string;
   sourceName: string;
   amount: number;
   amountStr: string;
@@ -96,6 +99,7 @@ export function buildDeathRecapCards(
       ability:
         ev.ability || (ev.type === 'damage' ? 'Attack' : ev.type === 'heal' ? 'Heal' : 'Shield'),
       abilityId: ev.abilityId ?? null,
+      iconId: deathRecapJournalIcon(ev) ?? (ev.abilityId || 'attack'),
       sourceName: ev.sourceName || 'Unknown',
       amount: ev.amount,
       amountStr,

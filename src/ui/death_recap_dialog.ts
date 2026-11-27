@@ -136,7 +136,7 @@ export class DeathRecapDialog {
       cardsHtml += `
         <div class="recap-card ${typeClass} ${lethalClass}" data-card-index="${card.index}">
           <div class="recap-card-left">
-            <div class="recap-icon-frame" style="background-image:url(${iconDataUrl('ability', card.abilityId || 'attack', 36)})" aria-hidden="true"></div>
+            <div class="recap-icon-frame" style="background-image:url(${iconDataUrl('ability', card.iconId, 36)})" aria-hidden="true"></div>
             <div class="recap-details">
               <div class="recap-name-row">
                 <span class="recap-ability">${esc(card.ability)}</span>

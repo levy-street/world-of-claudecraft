@@ -17,10 +17,12 @@ import {
   BREATH_DIFFICULTY,
   BREATH_GUARDIAN,
   BREATH_KNOT,
+  BREATH_NAMES,
   BREATH_TUNING,
 } from '../../../sim/encounters/smith_heart/breath_ids';
 import {
   ISLE_CASTS,
+  ISLE_NAMES,
   ISLE_TIERS,
   ISLE_TUNING,
 } from '../../../sim/encounters/smith_heart/breath_isle_ids';
@@ -28,27 +30,33 @@ import {
   COUNCIL_CASTS,
   COUNCIL_DIFFICULTY,
   COUNCIL_GUARDIAN,
+  COUNCIL_NAMES,
   COUNCIL_SEAM_SINGER,
   COUNCIL_TUNING,
 } from '../../../sim/encounters/smith_heart/council_ids';
 import {
   ELEMENT_DIFFICULTY,
+  ELEMENT_NAMES,
   ELEMENT_TUNING,
 } from '../../../sim/encounters/smith_heart/final_elements_ids';
 import {
   FINAL_BOSS,
   FINAL_CASTS,
   FINAL_DIFFICULTY,
+  FINAL_NAMES,
   FINAL_OVERLOAD,
   FINAL_TUNING,
   pulseScale,
 } from '../../../sim/encounters/smith_heart/final_ids';
 import {
+  FINAL_ADD_MOBS,
   FINAL_PHASE_CASTS,
   FINAL_PHASE_DIFFICULTY,
+  FINAL_PHASE_NAMES,
   FINAL_PHASES,
 } from '../../../sim/encounters/smith_heart/final_phase_ids';
 import {
+  HARD_ENRAGE_NAMES,
   HARD_ENRAGE_SECONDS,
   HARD_ENRAGE_TUNING,
   type HeartEnrageBoss,
@@ -57,12 +65,14 @@ import {
   HEAT_CASTS,
   HEAT_DIFFICULTY,
   HEAT_GUARDIAN,
+  HEAT_NAMES,
   HEAT_TUNING,
 } from '../../../sim/encounters/smith_heart/heat_ids';
 import {
   QUENCH_CASTS,
   QUENCH_DIFFICULTY,
   QUENCH_GUARDIAN,
+  QUENCH_NAMES,
   QUENCH_TUNING,
 } from '../../../sim/encounters/smith_heart/quench_ids';
 import { tierRange, tierValue } from '../../heart_tier_damage';
@@ -83,6 +93,12 @@ const cast = (id: string): TranslationKey => `abilityUi.cast.${id}` as Translati
 const buster = (key: string): TranslationKey => `hudChrome.tankBuster.${key}` as TranslationKey;
 
 type Tier = JournalDifficulty;
+
+/** A mechanic's damage labels (its `hits`) read off a boss template's own
+ *  fields, a field the template lacks dropped. */
+function named(...labels: readonly (string | undefined)[]): readonly string[] {
+  return labels.filter((label): label is string => label !== undefined);
+}
 
 /** One value set per tier. */
 function tiers(at: (tier: Tier) => JournalValues): Readonly<Record<Tier, JournalValues>> {
@@ -109,6 +125,7 @@ function forgeFury(boss: HeartEnrageBoss): JournalPhaseDef {
       {
         id: 'forge-fury',
         iconId: 'dgn_heart_forge_fury',
+        hits: [HARD_ENRAGE_NAMES.fury],
         nameKey: k('common.furyName'),
         summaryKey: k('common.furySummary'),
         responseKey: k('common.furyResponse'),
@@ -175,6 +192,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'mountains-wrath',
           iconId: 'dgn_heart_wrath',
+          hits: [COUNCIL_NAMES.wrath, COUNCIL_NAMES.echo],
           nameKey: cast(CC.wrath),
           castId: CC.wrath,
           summaryKey: {
@@ -233,6 +251,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'hammerfall',
           iconId: 'dgn_heart_hammerfall',
+          hits: named(HAMMERFALL?.name),
           nameKey: k('council.hammerfallName'),
           summaryKey: k('council.hammerfallSummary'),
           responseKey: k('council.hammerfallResponse'),
@@ -248,6 +267,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'mountains-rush',
           iconId: 'dgn_heart_rush',
+          hits: [COUNCIL_NAMES.rush, COUNCIL_NAMES.collapse],
           nameKey: cast(CC.rush),
           castId: CC.rush,
           summaryKey: k('council.rushSummary'),
@@ -269,6 +289,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'cursed-pillar',
           iconId: 'dgn_heart_cursed_pillar',
+          hits: [COUNCIL_NAMES.cursed],
           nameKey: k('council.cursedName'),
           summaryKey: k('council.cursedSummary'),
           responseKey: k('council.cursedResponse'),
@@ -289,6 +310,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'wake-the-stone',
           iconId: 'dgn_heart_wake_stone',
+          hits: [COUNCIL_NAMES.wake],
           nameKey: cast(CC.wake),
           castId: CC.wake,
           summaryKey: k('council.wakeSummary'),
@@ -311,6 +333,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'stone-thrum',
           iconId: 'dgn_heart_stone_thrum',
+          hits: [COUNCIL_NAMES.risenPulse],
           nameKey: k('council.thrumName'),
           summaryKey: k('council.thrumSummary'),
           responseKey: k('council.thrumResponse'),
@@ -324,6 +347,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'restless-stone',
           iconId: 'dgn_heart_restless_stone',
+          hits: [COUNCIL_NAMES.pulse],
           nameKey: k('council.restlessName'),
           summaryKey: k('council.restlessSummary'),
           responseKey: k('council.restlessResponse'),
@@ -338,6 +362,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'falling-rock',
           iconId: 'dgn_heart_falling_rock',
+          hits: [COUNCIL_NAMES.rock, COUNCIL_NAMES.rockTremor],
           nameKey: cast(CC.rock),
           castId: CC.rock,
           summaryKey: k('council.rockSummary'),
@@ -360,6 +385,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'seam-bolt',
           iconId: 'dgn_heart_seam_bolt',
+          hits: [COUNCIL_NAMES.bolt],
           nameKey: cast(CC.bolt),
           castId: CC.bolt,
           summaryKey: k('council.boltSummary'),
@@ -373,6 +399,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'song-of-the-seam',
           iconId: 'dgn_heart_song',
+          hits: [COUNCIL_NAMES.endlessSong],
           nameKey: cast(CC.song),
           castId: CC.song,
           summaryKey: {
@@ -393,6 +420,7 @@ const COUNCIL: JournalBossDef = {
         {
           id: 'resonance',
           iconId: 'dgn_heart_resonance',
+          hits: [COUNCIL_NAMES.resonance],
           nameKey: k('council.resonanceName'),
           summaryKey: k('council.resonanceSummary'),
           responseKey: {
@@ -503,6 +531,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'bellows-wind',
           iconId: 'dgn_heart_bellows_wind',
+          hits: [BREATH_NAMES.pinned],
           nameKey: k('breath.windName'),
           summaryKey: k('breath.windSummary'),
           responseKey: k('breath.windResponse'),
@@ -538,6 +567,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'indrawn-breath',
           iconId: 'dgn_heart_inhale',
+          hits: [BREATH_NAMES.vortex],
           nameKey: cast(BC.inhale),
           castId: BC.inhale,
           summaryKey: k('breath.inhaleSummary'),
@@ -554,6 +584,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'summit-roar',
           iconId: 'dgn_heart_summit_roar',
+          hits: [BREATH_NAMES.gust],
           nameKey: cast(BC.gust),
           castId: BC.gust,
           summaryKey: {
@@ -575,6 +606,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'storm-lance',
           iconId: 'dgn_heart_storm_lance',
+          hits: named(SMITH_HEART_MOBS[BREATH_GUARDIAN]?.trashKit?.line?.name),
           nameKey: cast(BC.lance),
           castId: BC.lance,
           summaryKey: k('breath.lanceSummary'),
@@ -609,6 +641,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'bellows-blow',
           iconId: 'heart_breath_blow_mark',
+          hits: [BREATH_NAMES.blow],
           nameKey: cast(BC.blow),
           castId: BC.blow,
           summaryKey: {
@@ -631,6 +664,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'loose-gales',
           iconId: 'dgn_heart_loose_gale',
+          hits: [BREATH_NAMES.gale],
           nameKey: k('breath.galeName'),
           summaryKey: k('breath.galeSummary'),
           responseKey: k('breath.galeResponse'),
@@ -646,6 +680,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'knotted-gale',
           iconId: 'dgn_heart_knotted_gale',
+          hits: [BREATH_NAMES.knot],
           nameKey: k('breath.knotName'),
           summaryKey: k('breath.knotSummary'),
           responseKey: k('breath.knotResponse'),
@@ -678,6 +713,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'skyrend-nova',
           iconId: 'dgn_heart_skyrend_nova',
+          hits: [ISLE_NAMES.nova],
           nameKey: cast(ISLE_CASTS.nova),
           castId: ISLE_CASTS.nova,
           summaryKey: k('breath.novaSummary'),
@@ -689,6 +725,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'closing-storm',
           iconId: 'dgn_heart_closing_storm',
+          hits: [ISLE_NAMES.reckoning],
           nameKey: k('breath.closingName'),
           summaryKey: k('breath.closingSummary'),
           responseKey: k('breath.closingResponse'),
@@ -704,6 +741,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'isle-lightning',
           iconId: 'dgn_heart_isle_lightning',
+          hits: [BREATH_NAMES.skyMark],
           nameKey: k('breath.isleBoltName'),
           summaryKey: k('breath.isleBoltSummary'),
           responseKey: k('breath.isleBoltResponse'),
@@ -787,6 +825,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'storm-breaks',
           iconId: 'dgn_heart_storm_breaks',
+          hits: [BREATH_NAMES.strike],
           nameKey: cast(BC.storm),
           castId: BC.storm,
           summaryKey: k('breath.breakSummary'),
@@ -804,6 +843,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'leaping-bolt',
           iconId: 'dgn_heart_leaping_bolt',
+          hits: [BREATH_NAMES.fork],
           nameKey: cast(BC.fork),
           castId: BC.fork,
           summaryKey: k('breath.forkSummary'),
@@ -816,6 +856,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'thunders-cradle',
           iconId: 'dgn_heart_cradle',
+          hits: [BREATH_NAMES.cradle, BREATH_NAMES.backlash],
           nameKey: cast(BC.cradle),
           castId: BC.cradle,
           summaryKey: {
@@ -846,6 +887,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'drawn-lightning',
           iconId: 'dgn_heart_drawn_lightning',
+          hits: [BREATH_NAMES.drawn, BREATH_NAMES.charged],
           nameKey: cast(BC.drawn),
           castId: BC.drawn,
           summaryKey: k('breath.drawnSummary'),
@@ -868,6 +910,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'thunder-lash',
           iconId: 'heart_breath_thunder_laden',
+          hits: [BREATH_NAMES.thunder],
           nameKey: cast(BC.thunder),
           castId: BC.thunder,
           summaryKey: k('breath.thunderSummary'),
@@ -891,6 +934,7 @@ const BREATH: JournalBossDef = {
         {
           id: 'swelling-storm',
           iconId: 'dgn_heart_swelling_storm',
+          hits: [BREATH_NAMES.swell],
           nameKey: k('breath.swellName'),
           summaryKey: k('breath.swellSummary'),
           responseKey: k('breath.swellResponse'),
@@ -988,6 +1032,7 @@ const QUENCH: JournalBossDef = {
         {
           id: 'encased-in-rime',
           iconId: 'dgn_heart_encased',
+          hits: [QUENCH_NAMES.shatter],
           nameKey: k('quench.frozenName'),
           summaryKey: k('quench.frozenSummary'),
           responseKey: k('quench.frozenResponse'),
@@ -1010,6 +1055,7 @@ const QUENCH: JournalBossDef = {
         {
           id: 'groaning-ice',
           iconId: 'dgn_heart_groaning_ice',
+          hits: [QUENCH_NAMES.water],
           nameKey: k('common.groaningIceName'),
           summaryKey: k('quench.iceSummary'),
           responseKey: k('quench.iceResponse'),
@@ -1063,6 +1109,7 @@ const QUENCH: JournalBossDef = {
         {
           id: 'quenching-breath',
           iconId: 'dgn_heart_quenching_breath',
+          hits: [QUENCH_NAMES.breath],
           nameKey: cast(QC.breath),
           castId: QC.breath,
           summaryKey: k('quench.breathSummary'),
@@ -1082,6 +1129,7 @@ const QUENCH: JournalBossDef = {
         {
           id: 'tempering-strike',
           iconId: 'heart_quench_tempered',
+          hits: named(SMITH_HEART_MOBS[QUENCH_GUARDIAN]?.arcCleave?.name),
           nameKey: buster('tempering'),
           summaryKey: {
             normal: k('quench.temperSummary'),
@@ -1107,6 +1155,7 @@ const QUENCH: JournalBossDef = {
         {
           id: 'crossing-blade',
           iconId: 'dgn_heart_crossing_blade',
+          hits: [QUENCH_NAMES.cross],
           nameKey: k('common.crossingBladeName'),
           summaryKey: k('quench.bladeSummary'),
           responseKey: k('quench.bladeResponse'),
@@ -1214,6 +1263,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'wheel-of-the-hearth',
           iconId: 'dgn_heart_wheel',
+          hits: [HEAT_NAMES.wheel],
           nameKey: k('heat.wheelName'),
           summaryKey: k('heat.wheelSummary'),
           responseKey: k('heat.wheelResponse'),
@@ -1231,6 +1281,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'basalt-fist',
           iconId: 'dgn_heart_basalt_fist',
+          hits: [HEAT_NAMES.fist, HEAT_NAMES.swell],
           nameKey: cast(HEAT_CASTS.fist),
           castId: HEAT_CASTS.fist,
           summaryKey: {
@@ -1256,6 +1307,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'cinder-grip',
           iconId: 'dgn_heart_cinder_grip',
+          hits: [HEAT_NAMES.grip],
           nameKey: k('heat.gripName'),
           summaryKey: k('heat.gripSummary'),
           responseKey: k('heat.gripResponse'),
@@ -1267,6 +1319,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'wellspring-brand',
           iconId: 'dgn_heart_wellspring_brand',
+          hits: [HEAT_NAMES.brand],
           nameKey: buster('brand'),
           summaryKey: k('heat.brandSummary'),
           responseKey: k('heat.brandResponse'),
@@ -1285,6 +1338,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'live-coal',
           iconId: 'dgn_heart_live_coal',
+          hits: [HEAT_NAMES.coal, HEAT_NAMES.coalBurst],
           nameKey: 'hudChrome.liveCoal.title' as TranslationKey,
           summaryKey: k('heat.coalSummary'),
           responseKey: k('heat.coalResponse'),
@@ -1317,6 +1371,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'hearth-flare',
           iconId: 'dgn_heart_hearth_flare',
+          hits: [HEAT_NAMES.flare],
           nameKey: k('heat.flareName'),
           summaryKey: k('heat.flareSummary'),
           responseKey: k('heat.flareResponse'),
@@ -1345,6 +1400,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'lava-waves',
           iconId: 'dgn_heart_overflow',
+          hits: [HEAT_NAMES.overflow],
           nameKey: k('heat.wavesName'),
           summaryKey: k('heat.wavesSummary'),
           responseKey: k('heat.wavesResponse'),
@@ -1360,6 +1416,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'falling-cinders',
           iconId: 'dgn_heart_falling_cinder',
+          hits: [HEAT_NAMES.bolt],
           nameKey: k('heat.boltName'),
           summaryKey: k('heat.boltSummary'),
           responseKey: k('heat.boltResponse'),
@@ -1374,6 +1431,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'wellspawn',
           iconId: 'dgn_heart_wellspawn',
+          hits: [HEAT_NAMES.feed],
           nameKey: k('heat.spawnName'),
           summaryKey: {
             normal: k('heat.spawnSummary'),
@@ -1393,6 +1451,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'wellkeepers',
           iconId: 'dgn_heart_wellkeeper',
+          hits: [HEAT_NAMES.trail],
           nameKey: k('heat.keeperName'),
           summaryKey: k('heat.keeperSummary'),
           responseKey: k('heat.keeperResponse'),
@@ -1421,6 +1480,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'hearthseeds',
           iconId: 'dgn_heart_hearthseed',
+          hits: [HEAT_NAMES.seed],
           nameKey: k('heat.seedName'),
           summaryKey: {
             normal: k('heat.seedSummary'),
@@ -1443,6 +1503,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'wakefire',
           iconId: 'dgn_heart_wakefire',
+          hits: [HEAT_NAMES.zone],
           nameKey: k('heat.zoneName'),
           summaryKey: k('heat.zoneSummary'),
           responseKey: k('heat.zoneResponse'),
@@ -1471,6 +1532,7 @@ const HEAT: JournalBossDef = {
         {
           id: 'rolling-cinders',
           iconId: 'dgn_heart_rolling_cinder',
+          hits: [HEAT_NAMES.cinder, HEAT_NAMES.cinderLand],
           nameKey: k('heat.cinderName'),
           summaryKey: k('heat.cinderSummary'),
           responseKey: k('heat.cinderResponse'),
@@ -1543,6 +1605,8 @@ const fullPulse = (t: Tier): number => Math.round(FO.pulseMax * pulseScale(1, FD
 
 const FINAL: JournalBossDef = {
   mobId: FINAL_BOSS,
+  // Its Splinters strike in their own names (final_adds.ts addHit).
+  hitSources: Object.values(FINAL_ADD_MOBS),
   rank: 'final',
   taglineKey: k('final.tagline'),
   chips: [
@@ -1572,6 +1636,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'overload',
           iconId: 'dgn_heart_overload',
+          hits: [FINAL_NAMES.burst, FINAL_NAMES.pulse],
           nameKey: k('final.overloadName'),
           summaryKey: k('final.overloadSummary'),
           responseKey: k('final.overloadResponse'),
@@ -1588,6 +1653,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'heart-unbound',
           iconId: 'dgn_heart_heart_unbound',
+          hits: [FINAL_NAMES.unbound],
           nameKey: k('final.unboundName'),
           summaryKey: k('final.unboundSummary'),
           responseKey: k('final.unboundResponse'),
@@ -1598,6 +1664,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'vein-shock',
           iconId: 'dgn_heart_vein_shock',
+          hits: [FINAL_NAMES.shock],
           nameKey: k('final.shockName'),
           summaryKey: k('final.shockSummary'),
           responseKey: k('final.shockResponse'),
@@ -1620,6 +1687,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'forge-fist',
           iconId: 'dgn_heart_forge_fist',
+          hits: named(SMITH_HEART_MOBS[FINAL_BOSS]?.arcCleave?.name, FINAL_NAMES.forgeFire),
           nameKey: k('final.forgeFistName'),
           summaryKey: k('final.forgeFistSummary'),
           responseKey: k('final.forgeFistResponse'),
@@ -1635,6 +1703,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'elemental-strike',
           iconId: 'dgn_heart_elemental_strike',
+          hits: [ELEMENT_NAMES.strike, ELEMENT_NAMES.heat, ELEMENT_NAMES.breath],
           nameKey: buster('strike'),
           summaryKey: k('final.strikeSummary'),
           responseKey: k('final.strikeResponse'),
@@ -1661,6 +1730,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'weight-of-the-anvil',
           iconId: 'dgn_heart_anvil',
+          hits: [FINAL_NAMES.anvil],
           nameKey: cast(FINAL_CASTS.anvil),
           castId: FINAL_CASTS.anvil,
           summaryKey: k('final.anvilSummary'),
@@ -1682,6 +1752,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'opposing-elements',
           iconId: 'dgn_heart_opposing',
+          hits: [ELEMENT_NAMES.clash, ELEMENT_NAMES.unbalanced],
           nameKey: k('final.opposingName'),
           summaryKey: {
             normal: k('final.opposingSummary'),
@@ -1709,6 +1780,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'elemental-fusion',
           iconId: 'dgn_heart_fusion',
+          hits: [ELEMENT_NAMES.residue],
           nameKey: cast('heart_final_fusion'),
           castId: 'heart_final_fusion',
           summaryKey: k('final.fusionSummary'),
@@ -1720,6 +1792,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'scalding-steam',
           iconId: 'dgn_heart_steam',
+          hits: [ELEMENT_NAMES.steam],
           nameKey: k('final.steamName'),
           summaryKey: k('final.steamSummary'),
           responseKey: k('final.steamResponse'),
@@ -1734,6 +1807,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'magma-rift',
           iconId: 'dgn_heart_magma',
+          hits: [ELEMENT_NAMES.magma, ELEMENT_NAMES.lava],
           nameKey: k('final.magmaName'),
           summaryKey: k('final.magmaSummary'),
           responseKey: k('final.magmaResponse'),
@@ -1749,6 +1823,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'firestorm',
           iconId: 'dgn_heart_firestorm',
+          hits: [ELEMENT_NAMES.firestorm],
           nameKey: k('final.firestormName'),
           summaryKey: k('final.firestormSummary'),
           responseKey: k('final.firestormResponse'),
@@ -1764,6 +1839,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'hailstorm',
           iconId: 'dgn_heart_hail',
+          hits: [ELEMENT_NAMES.hail],
           nameKey: k('final.hailName'),
           summaryKey: k('final.hailSummary'),
           responseKey: k('final.hailResponse'),
@@ -1783,6 +1859,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'avalanche',
           iconId: 'dgn_heart_avalanche',
+          hits: [ELEMENT_NAMES.avalanche],
           nameKey: k('final.avalancheName'),
           summaryKey: k('final.avalancheSummary'),
           responseKey: k('final.avalancheResponse'),
@@ -1797,6 +1874,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'storm-spires',
           iconId: 'dgn_heart_spires',
+          hits: [ELEMENT_NAMES.spire],
           nameKey: k('final.spiresName'),
           summaryKey: k('final.spiresSummary'),
           responseKey: k('final.spiresResponse'),
@@ -1820,6 +1898,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'star-pillars',
           iconId: 'dgn_heart_wake_stone',
+          hits: [FINAL_NAMES.wake, FINAL_NAMES.thrum],
           nameKey: cast(CC.wake),
           summaryKey: k('final.pillarsSummary'),
           responseKey: k('final.pillarsResponse'),
@@ -1836,6 +1915,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'storm-charged',
           iconId: 'dgn_heart_storm_charged',
+          hits: [FINAL_NAMES.charged, FINAL_NAMES.chargedZone, FINAL_NAMES.arc],
           nameKey: k('final.chargedName'),
           summaryKey: k('final.chargedSummary'),
           responseKey: k('final.chargedResponse'),
@@ -1857,6 +1937,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'star-sky',
           iconId: 'dgn_heart_sky_strike',
+          hits: [FINAL_NAMES.strike],
           nameKey: k('common.skyStrikeName'),
           summaryKey: k('final.skySummary'),
           responseKey: k('final.skyResponse'),
@@ -1872,6 +1953,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'star-blade',
           iconId: 'dgn_heart_crossing_blade',
+          hits: [FINAL_NAMES.blade],
           nameKey: k('common.crossingBladeName'),
           summaryKey: k('final.bladeSummary'),
           responseKey: k('final.bladeResponse'),
@@ -1887,6 +1969,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'fire-whirl',
           iconId: 'dgn_heart_fire_whirl',
+          hits: [FINAL_NAMES.whirl],
           nameKey: k('final.whirlName'),
           summaryKey: k('final.whirlSummary'),
           responseKey: k('final.whirlResponse'),
@@ -1914,6 +1997,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'final-basalt-fist',
           iconId: 'dgn_heart_basalt_fist',
+          hits: [FINAL_NAMES.fist, FINAL_NAMES.swell],
           nameKey: cast(FINAL_CASTS.fist),
           castId: FINAL_CASTS.fist,
           summaryKey: k('final.fistSummary'),
@@ -1931,6 +2015,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'final-leaping-bolt',
           iconId: 'dgn_heart_leaping_bolt',
+          hits: [FINAL_NAMES.bolt],
           nameKey: cast(FINAL_CASTS.bolt),
           castId: FINAL_CASTS.bolt,
           summaryKey: k('final.boltSummary'),
@@ -1949,6 +2034,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'dust-devils',
           iconId: 'dgn_heart_dust_devil',
+          hits: [FINAL_NAMES.devil],
           nameKey: k('final.devilName'),
           summaryKey: k('final.devilSummary'),
           responseKey: k('final.devilResponse'),
@@ -1968,6 +2054,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'tremor-cracks',
           iconId: 'dgn_heart_tremor',
+          hits: [FINAL_NAMES.tremor],
           nameKey: k('final.tremorName'),
           summaryKey: k('final.tremorSummary'),
           responseKey: k('final.tremorResponse'),
@@ -1982,6 +2069,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'ember-marks',
           iconId: 'dgn_heart_ember_mark',
+          hits: [FINAL_NAMES.embers],
           nameKey: k('final.emberName'),
           summaryKey: k('final.emberSummary'),
           responseKey: k('final.emberResponse'),
@@ -1999,6 +2087,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'final-groaning-ice',
           iconId: 'dgn_heart_groaning_ice',
+          hits: [FINAL_NAMES.underIce],
           nameKey: k('common.groaningIceName'),
           summaryKey: k('final.iceSummary'),
           responseKey: k('final.iceResponse'),
@@ -2016,6 +2105,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'final-drawn-lightning',
           iconId: 'dgn_heart_drawn_lightning',
+          hits: [FINAL_NAMES.drawn],
           nameKey: cast(BC.drawn),
           summaryKey: k('final.drawnSummary'),
           responseKey: k('final.drawnResponse'),
@@ -2069,6 +2159,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'splintered-strength',
           iconId: 'dgn_heart_splintered',
+          hits: [FINAL_PHASE_NAMES.splinter],
           nameKey: k('final.splinteredName'),
           summaryKey: k('final.splinteredSummary'),
           responseKey: k('final.splinteredResponse'),
@@ -2081,6 +2172,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'shearing-blow',
           iconId: 'dgn_heart_shearing_blow',
+          hits: [FINAL_PHASE_NAMES.shear],
           nameKey: cast(FPC.shear),
           castId: FPC.shear,
           summaryKey: k('final.shearSummary'),
@@ -2101,6 +2193,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'splinter-heat',
           iconId: 'dgn_heart_splinter_heat',
+          hits: [FINAL_PHASE_NAMES.trail, FINAL_PHASE_NAMES.coal],
           nameKey: k('final.heatSplinterName'),
           summaryKey: k('final.heatSplinterSummary'),
           responseKey: k('final.heatSplinterResponse'),
@@ -2122,6 +2215,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'rime-toll',
           iconId: 'dgn_heart_rime_toll',
+          hits: [FINAL_PHASE_NAMES.toll],
           nameKey: cast(FPC.toll),
           castId: FPC.toll,
           summaryKey: k('final.tollSummary'),
@@ -2135,6 +2229,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'quenching-ring',
           iconId: 'dgn_heart_quenching_ring',
+          hits: [FINAL_PHASE_NAMES.ring],
           nameKey: k('final.ringName'),
           summaryKey: k('final.ringSummary'),
           responseKey: k('final.ringResponse'),
@@ -2154,6 +2249,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'mounting-weight',
           iconId: 'dgn_heart_mounting_weight',
+          hits: [FINAL_PHASE_NAMES.weight],
           nameKey: k('final.weightName'),
           summaryKey: k('final.weightSummary'),
           responseKey: k('final.weightResponse'),
@@ -2166,6 +2262,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'gale-pounce',
           iconId: 'dgn_heart_gale_pounce',
+          hits: [FINAL_PHASE_NAMES.pounce, FINAL_PHASE_NAMES.buffet],
           nameKey: cast(FPC.pounce),
           castId: FPC.pounce,
           summaryKey: k('final.pounceSummary'),
@@ -2186,6 +2283,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'storm-orbs',
           iconId: 'dgn_heart_storm_orb',
+          hits: [FINAL_NAMES.orb],
           nameKey: k('final.orbName'),
           summaryKey: k('final.orbSummary'),
           responseKey: k('final.orbResponse'),
@@ -2221,6 +2319,7 @@ const FINAL: JournalBossDef = {
         {
           id: 'masterless-fury',
           iconId: 'dgn_heart_masterless_fury',
+          hits: [FINAL_PHASE_NAMES.fury],
           nameKey: k('final.furyName'),
           summaryKey: k('final.furySummary'),
           responseKey: k('final.furyResponse'),

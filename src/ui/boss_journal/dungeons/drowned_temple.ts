@@ -20,6 +20,8 @@ import {
   HYDRA_COMBO_TUNING,
   HYDRA_CRUSHING_TORRENT,
   HYDRA_FROSTLOCKED_TORRENT,
+  HYDRA_LEFT_ID,
+  HYDRA_RIGHT_ID,
   HYDRA_TIDE_BREATH,
   HYDRA_TOXIC_RIME,
   HYDRA_TSUNAMI,
@@ -95,6 +97,7 @@ const SELTHE: JournalBossDef = {
         {
           id: 'chorus',
           iconId: 'dgn_temple_chorus',
+          hits: ['Chorus'],
           nameKey: k('selthe.chorusName'),
           summaryKey: {
             normal: k('selthe.chorusSummary'),
@@ -117,6 +120,7 @@ const SELTHE: JournalBossDef = {
         {
           id: 'solo',
           iconId: 'dgn_temple_solo',
+          hits: ['Solo'],
           nameKey: k('selthe.soloName'),
           summaryKey: { normal: k('selthe.soloSummary'), heroic: k('selthe.soloHeroicSummary') },
           responseKey: k('selthe.soloResponse'),
@@ -133,6 +137,7 @@ const SELTHE: JournalBossDef = {
         {
           id: 'score',
           iconId: 'dgn_temple_chorus',
+          hits: ['Discord', 'False Note'],
           nameKey: cast(SELTHE_SCORE),
           castId: SELTHE_SCORE,
           summaryKey: k('selthe.scoreSummary'),
@@ -159,6 +164,7 @@ const SELTHE: JournalBossDef = {
         {
           id: 'moonwater-bolt',
           iconId: 'dgn_temple_moonwater_bolt',
+          hits: ['Moonwater Bolt'],
           nameKey: cast(SELTHE_MOONWATER_BOLT),
           summaryKey: k('selthe.boltSummaryRework'),
           responseKey: k('selthe.boltResponseRework'),
@@ -174,6 +180,7 @@ const SELTHE: JournalBossDef = {
         {
           id: 'drowning-aria',
           iconId: 'dgn_temple_aria',
+          hits: ['Drowning Aria'],
           nameKey: cast(SELTHE_DROWNING_ARIA),
           castId: SELTHE_DROWNING_ARIA,
           summaryKey: k('selthe.ariaSummary'),
@@ -192,6 +199,7 @@ const SELTHE: JournalBossDef = {
         {
           id: 'mere-surge',
           iconId: 'dgn_temple_mere_surge',
+          hits: ['Mere Surge'],
           nameKey: cast(SELTHE_MERE_SURGE),
           castId: SELTHE_MERE_SURGE,
           summaryKey: k('selthe.surgeSummary'),
@@ -236,6 +244,8 @@ const SELTHE: JournalBossDef = {
 
 const HYDRA: JournalBossDef = {
   mobId: HYDRA_CENTER_ID,
+  // Every element can pass to any living head, so any head deals any of them.
+  hitSources: [HYDRA_LEFT_ID, HYDRA_RIGHT_ID],
   rank: 'boss',
   overviewKey: k('hydra.overview'),
   overviewValues: { regrow: H.regrowAfter },
@@ -263,6 +273,7 @@ const HYDRA: JournalBossDef = {
         {
           id: 'freezing-breath',
           iconId: 'dgn_temple_freezing_breath',
+          hits: ['Freezing Breath'],
           nameKey: cast(HYDRA_TIDE_BREATH),
           castId: HYDRA_TIDE_BREATH,
           summaryKey: k('hydra.breathSummary'),
@@ -284,6 +295,7 @@ const HYDRA: JournalBossDef = {
         {
           id: 'venom-spit',
           iconId: 'dgn_temple_venom_spit',
+          hits: ['Venom Spit', 'Venom'],
           nameKey: k('hydra.spitName'),
           summaryKey: k('hydra.spitSummary'),
           responseKey: k('hydra.spitResponse'),
@@ -305,6 +317,7 @@ const HYDRA: JournalBossDef = {
         {
           id: 'crushing-torrent',
           iconId: 'dgn_temple_crushing_torrent',
+          hits: ['Crushing Torrent'],
           nameKey: cast(HYDRA_CRUSHING_TORRENT),
           castId: HYDRA_CRUSHING_TORRENT,
           summaryKey: k('hydra.torrentSummary'),
@@ -323,6 +336,7 @@ const HYDRA: JournalBossDef = {
         {
           id: 'tsunami',
           iconId: 'dgn_temple_tsunami',
+          hits: ['Tsunami'],
           nameKey: cast(HYDRA_TSUNAMI),
           castId: HYDRA_TSUNAMI,
           summaryKey: {
@@ -361,6 +375,7 @@ const HYDRA: JournalBossDef = {
         {
           id: 'frostlocked-torrent',
           iconId: 'dgn_temple_frostlocked',
+          hits: ['Frostlocked Torrent', 'Ice Shards'],
           nameKey: cast(HYDRA_FROSTLOCKED_TORRENT),
           castId: HYDRA_FROSTLOCKED_TORRENT,
           summaryKey: {
@@ -391,6 +406,7 @@ const HYDRA: JournalBossDef = {
         {
           id: 'venom-current',
           iconId: 'dgn_temple_venom_current',
+          hits: ['Venom Current'],
           nameKey: cast(HYDRA_VENOM_CURRENT),
           castId: HYDRA_VENOM_CURRENT,
           summaryKey: k('hydra.currentSummary'),
@@ -403,6 +419,7 @@ const HYDRA: JournalBossDef = {
         {
           id: 'toxic-rime',
           iconId: 'dgn_temple_toxic_rime',
+          hits: ['Toxic Rime'],
           nameKey: cast(HYDRA_TOXIC_RIME),
           castId: HYDRA_TOXIC_RIME,
           summaryKey: k('hydra.rimeSummary'),
@@ -454,6 +471,7 @@ const COLOSSUS: JournalBossDef = {
         {
           id: 'moonlight-lance',
           iconId: 'dgn_temple_lance',
+          hits: ['Moonlight Lance'],
           nameKey: cast(COLOSSUS_MOONLIGHT_LANCE),
           castId: COLOSSUS_MOONLIGHT_LANCE,
           summaryKey: k('colossus.lanceSummary'),
@@ -467,6 +485,7 @@ const COLOSSUS: JournalBossDef = {
         {
           id: 'resonant-slam',
           iconId: 'dgn_temple_slam',
+          hits: ['Resonant Slam'],
           nameKey: cast(COLOSSUS_RESONANT_SLAM),
           castId: COLOSSUS_RESONANT_SLAM,
           summaryKey: k('colossus.slamSummary'),
@@ -485,6 +504,7 @@ const COLOSSUS: JournalBossDef = {
         {
           id: 'tideglass-fracture',
           iconId: 'dgn_temple_fracture',
+          hits: ['Tideglass Fracture'],
           nameKey: cast(COLOSSUS_TIDEGLASS_FRACTURE),
           castId: COLOSSUS_TIDEGLASS_FRACTURE,
           summaryKey: k('colossus.fractureSummary'),
@@ -538,6 +558,7 @@ const COLOSSUS: JournalBossDef = {
         {
           id: 'shattering-glass',
           iconId: 'dgn_temple_shattering',
+          hits: ['Shattering Glass'],
           nameKey: k('colossus.shatterName'),
           availability: 'heroic',
           summaryKey: k('colossus.shatterSummary'),
@@ -598,6 +619,7 @@ const YSOLEI: JournalBossDef = {
         {
           id: 'lunar-tide',
           iconId: 'dgn_temple_lunar_tide',
+          hits: ['Lunar Tide'],
           nameKey: cast(YSOLEI_LUNAR_TIDE),
           castId: YSOLEI_LUNAR_TIDE,
           summaryKey: k('ysolei.lunarSummary'),
@@ -611,6 +633,7 @@ const YSOLEI: JournalBossDef = {
         {
           id: 'undertow',
           iconId: 'dgn_temple_undertow',
+          hits: ['Tidal Crash', 'Riptide'],
           nameKey: cast(YSOLEI_UNDERTOW),
           castId: YSOLEI_UNDERTOW,
           summaryKey: {
@@ -636,6 +659,7 @@ const YSOLEI: JournalBossDef = {
         {
           id: 'beckoning-moon',
           iconId: 'dgn_temple_tears',
+          hits: ['Moonlight Tear', 'Spilled Moonlight'],
           nameKey: cast(YSOLEI_BECKONING_MOON),
           castId: YSOLEI_BECKONING_MOON,
           summaryKey: { normal: k('ysolei.tearsSummary'), heroic: k('ysolei.tearsHeroicSummary') },
@@ -671,6 +695,7 @@ const YSOLEI: JournalBossDef = {
         {
           id: 'rising-tide',
           iconId: 'dgn_temple_rising_tide',
+          hits: ['Rising Tide'],
           nameKey: k('ysolei.tideName'),
           summaryKey: { normal: k('ysolei.tideSummary'), heroic: k('ysolei.tideHeroicSummary') },
           responseKey: k('ysolei.tideResponse'),
@@ -726,6 +751,7 @@ const YSOLEI: JournalBossDef = {
         {
           id: 'falling-moon',
           iconId: 'dgn_temple_falling_moon',
+          hits: ['Falling Moon'],
           nameKey: cast(YSOLEI_FALLING_MOON),
           castId: YSOLEI_FALLING_MOON,
           summaryKey: k('ysolei.moonSummary'),

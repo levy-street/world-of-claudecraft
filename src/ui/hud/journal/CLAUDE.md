@@ -29,6 +29,7 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 | `journal_banner_view.ts` | Pure core: the phase pill's shape, an opened ability's fact chips (read off the ENGLISH summary template, so a swing count never becomes a timer), the list's status line. |
 | `journal_loot_view.ts` | Pure core: a page's drops per difficulty, read off the Loot Explorer's index (the roller's own gate). Never a second loot table. |
 | `journal_backdrop_view.ts` | Pure core: which room picture a page's banner shows (per instance, or per boss), else null for the plain banner. The files are committed WebP under `public/ui/journal/`, pinned both ways by `tests/adventure_journal_backdrops.test.ts`. |
+| `journal_hit_icons.ts` | Pure: the death recap's icon lookup, one index over every catalog page (both tiers) of (dealer's mob template, damage label) to the mechanic's `iconId`, from the pages' `hits` and `hitSources`. A label matches only on the page whose body dealt it. |
 | `journal_page_html.ts` | Markup strings only (no DOM): head, nav, the phone's breadcrumb and strip, banner, tab bar, Overview, Abilities, Loot, Coming soon. |
 | `adventure_journal_window.ts` | The cold window (`UI_DOM_MODULES`): state, events, focus, tooltips, the 3D model slot. |
 | `journal_launchers.ts` | Binds the side rail button, the phone More-tray button and the target frame's book. |
