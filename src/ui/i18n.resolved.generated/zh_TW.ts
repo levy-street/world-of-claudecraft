@@ -7545,7 +7545,7 @@ export const zh_TW: EnTranslations = {
       "unbound": "脫縛 x{stacks}",
       "barAria": "{quarter}過載 百分之{pct}",
       "activeAria": "目前區域：{quarter}",
-      "groupAria": "無主之力：過載條",
+      "groupAria": "阿什格蘭德：過載條",
       "titleCall": "四角召喚",
       "titleFinal": "四角皆醒",
       "titleUnmade": "崩解的鐵砧",
@@ -27132,22 +27132,22 @@ export const zh_TW: EnTranslations = {
         "name": "熱脈召喚者"
       },
       "heart_hammer_guardian": {
-        "name": "重錘守護者"
+        "name": "赫羅斯瑪爾，不屈之錘"
       },
       "heart_seam_singer": {
-        "name": "礦脈歌者"
+        "name": "維爾米拉，礦脈歌者"
       },
       "heart_breath_guardian": {
-        "name": "吐息守護者"
+        "name": "艾爾溫，無羈狂風"
       },
       "heart_quench_guardian": {
-        "name": "淬火守護者"
+        "name": "奧蘿拉，寂靜之冬"
       },
       "heart_heat_guardian": {
-        "name": "熾熱守護者"
+        "name": "伊格納扎爾，不滅者"
       },
       "heart_masterless_strength": {
-        "name": "無主之力"
+        "name": "阿什格蘭德，無主之力的殘餘"
       },
       "heart_heat_wellspawn": {
         "name": "湧泉之子"

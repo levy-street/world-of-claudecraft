@@ -7545,7 +7545,7 @@ export const it_IT: EnTranslations = {
       "unbound": "Unbound x{stacks}",
       "barAria": "{quarter} Overload {pct} percent",
       "activeAria": "Active quarter: {quarter}",
-      "groupAria": "The Masterless Strength: Overload bars",
+      "groupAria": "Ashgrand: Overload bars",
       "titleCall": "Call of the Quarters",
       "titleFinal": "All quarters awake",
       "titleUnmade": "The Unmade Anvil",
@@ -27132,22 +27132,22 @@ export const it_IT: EnTranslations = {
         "name": "Heat Vein Caller"
       },
       "heart_hammer_guardian": {
-        "name": "Guardian of the Hammer"
+        "name": "Hrothmar, the Unyielding Hammer"
       },
       "heart_seam_singer": {
-        "name": "The Seam Singer"
+        "name": "Velmira, the Seam Singer"
       },
       "heart_breath_guardian": {
-        "name": "Guardian of the Breath"
+        "name": "Aerwyn, the Unbound Gale"
       },
       "heart_quench_guardian": {
-        "name": "Guardian of the Quench"
+        "name": "Aurora, the Silent Winter"
       },
       "heart_heat_guardian": {
-        "name": "Guardian of the Heat"
+        "name": "Ignazhar, the Unquenchable"
       },
       "heart_masterless_strength": {
-        "name": "The Masterless Strength"
+        "name": "Ashgrand, Remnant of the Masterless Strength"
       },
       "heart_heat_wellspawn": {
         "name": "Wellspawn"

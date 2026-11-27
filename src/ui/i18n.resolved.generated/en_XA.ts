@@ -7545,7 +7545,7 @@ export const en_XA: EnTranslations = {
       "unbound": "[Úñƀóúñð ẋ{stacks}]",
       "barAria": "[{quarter} Óʋéŕļóáð {pct} þéŕçéñţ]",
       "activeAria": "[Áçţíʋé ɋúáŕţéŕ: {quarter}]",
-      "groupAria": "[Ţĥé Ɱášţéŕļéšš Šţŕéñĝţĥ: Óʋéŕļóáð ƀáŕš]",
+      "groupAria": "[Ášĥĝŕáñð: Óʋéŕļóáð ƀáŕš]",
       "titleCall": "[Çáļļ óƒ ţĥé Ɋúáŕţéŕš]",
       "titleFinal": "[Áļļ ɋúáŕţéŕš áŵáķé]",
       "titleUnmade": "[Ţĥé Úñɱáðé Áñʋíļ]",
@@ -27132,22 +27132,22 @@ export const en_XA: EnTranslations = {
         "name": "[Ĥéáţ Ʋéíñ Çáļļéŕ]"
       },
       "heart_hammer_guardian": {
-        "name": "[Ĝúáŕðíáñ óƒ ţĥé Ĥáɱɱéŕ]"
+        "name": "[Ĥŕóţĥɱáŕ, ţĥé Úñýíéļðíñĝ Ĥáɱɱéŕ]"
       },
       "heart_seam_singer": {
-        "name": "[Ţĥé Šéáɱ Šíñĝéŕ]"
+        "name": "[Ʋéļɱíŕá, ţĥé Šéáɱ Šíñĝéŕ]"
       },
       "heart_breath_guardian": {
-        "name": "[Ĝúáŕðíáñ óƒ ţĥé Ɓŕéáţĥ]"
+        "name": "[Áéŕŵýñ, ţĥé Úñƀóúñð Ĝáļé]"
       },
       "heart_quench_guardian": {
-        "name": "[Ĝúáŕðíáñ óƒ ţĥé Ɋúéñçĥ]"
+        "name": "[Áúŕóŕá, ţĥé Šíļéñţ Ŵíñţéŕ]"
       },
       "heart_heat_guardian": {
-        "name": "[Ĝúáŕðíáñ óƒ ţĥé Ĥéáţ]"
+        "name": "[Íĝñážĥáŕ, ţĥé Úñɋúéñçĥáƀļé]"
       },
       "heart_masterless_strength": {
-        "name": "[Ţĥé Ɱášţéŕļéšš Šţŕéñĝţĥ]"
+        "name": "[Ášĥĝŕáñð, Ŕéɱñáñţ óƒ ţĥé Ɱášţéŕļéšš Šţŕéñĝţĥ]"
       },
       "heart_heat_wellspawn": {
         "name": "[Ŵéļļšþáŵñ]"

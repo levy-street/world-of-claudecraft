@@ -7545,7 +7545,7 @@ export const ja_JP: EnTranslations = {
       "unbound": "解放 x{stacks}",
       "barAria": "{quarter}の過負荷 {pct}パーセント",
       "activeAria": "現在の区画：{quarter}",
-      "groupAria": "主なき剛力：過負荷バー",
+      "groupAria": "アッシュグランド：過負荷バー",
       "titleCall": "四区画の呼び声",
       "titleFinal": "全区画覚醒",
       "titleUnmade": "崩れゆく金床",
@@ -27132,22 +27132,22 @@ export const ja_JP: EnTranslations = {
         "name": "熱脈の呼び手"
       },
       "heart_hammer_guardian": {
-        "name": "槌の守護者"
+        "name": "フロスマール、不屈の槌"
       },
       "heart_seam_singer": {
-        "name": "鉱脈の歌い手"
+        "name": "ヴェルミラ、鉱脈の歌い手"
       },
       "heart_breath_guardian": {
-        "name": "息吹の守護者"
+        "name": "エアウィン、解き放たれた疾風"
       },
       "heart_quench_guardian": {
-        "name": "焼き入れの守護者"
+        "name": "オーロラ、静寂の冬"
       },
       "heart_heat_guardian": {
-        "name": "熱の守護者"
+        "name": "イグナザール、消えざる者"
       },
       "heart_masterless_strength": {
-        "name": "主なき剛力"
+        "name": "アッシュグランド、主なき剛力の残滓"
       },
       "heart_heat_wellspawn": {
         "name": "湧泉の落とし子"

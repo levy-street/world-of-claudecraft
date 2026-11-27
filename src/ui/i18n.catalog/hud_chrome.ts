@@ -10612,7 +10612,7 @@ export const hudChromeStrings = {
     unbound: 'Unbound x{stacks}',
     barAria: '{quarter} Overload {pct} percent',
     activeAria: 'Active quarter: {quarter}',
-    groupAria: 'The Masterless Strength: Overload bars',
+    groupAria: 'Ashgrand: Overload bars',
     // Part 2: the intermission, the final phase, the poured elements.
     titleCall: 'Call of the Quarters',
     titleFinal: 'All quarters awake',

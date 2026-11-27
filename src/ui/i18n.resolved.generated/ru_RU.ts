@@ -7545,7 +7545,7 @@ export const ru_RU: EnTranslations = {
       "unbound": "Освобождение x{stacks}",
       "barAria": "Перегрузка: {quarter}, {pct} процентов",
       "activeAria": "Текущая четверть: {quarter}",
-      "groupAria": "Сила без хозяина: шкалы перегрузки",
+      "groupAria": "Эшгранд: шкалы перегрузки",
       "titleCall": "Зов четвертей",
       "titleFinal": "Все четверти пробуждены",
       "titleUnmade": "Рушащаяся Наковальня",
@@ -27132,22 +27132,22 @@ export const ru_RU: EnTranslations = {
         "name": "Призыватель Жилы Жара"
       },
       "heart_hammer_guardian": {
-        "name": "Страж Молота"
+        "name": "Хротмар, Несгибаемый Молот"
       },
       "heart_seam_singer": {
-        "name": "Певец Жилы"
+        "name": "Вельмира, Певица Жилы"
       },
       "heart_breath_guardian": {
-        "name": "Страж Дыхания"
+        "name": "Эйрвин, Вольный Шквал"
       },
       "heart_quench_guardian": {
-        "name": "Страж Закалки"
+        "name": "Аврора, Безмолвная Зима"
       },
       "heart_heat_guardian": {
-        "name": "Страж Жара"
+        "name": "Игназар, Неугасимый"
       },
       "heart_masterless_strength": {
-        "name": "Сила без хозяина"
+        "name": "Эшгранд, Остаток Силы без хозяина"
       },
       "heart_heat_wellspawn": {
         "name": "Порождение источника"

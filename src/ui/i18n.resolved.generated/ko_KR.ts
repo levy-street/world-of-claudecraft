@@ -7545,7 +7545,7 @@ export const ko_KR: EnTranslations = {
       "unbound": "풀려남 x{stacks}",
       "barAria": "{quarter} 과부하 {pct}퍼센트",
       "activeAria": "현재 구역: {quarter}",
-      "groupAria": "주인 없는 힘: 과부하 막대",
+      "groupAria": "애시그랜드: 과부하 막대",
       "titleCall": "네 구역의 부름",
       "titleFinal": "모든 구역 각성",
       "titleUnmade": "무너지는 모루",
@@ -27132,22 +27132,22 @@ export const ko_KR: EnTranslations = {
         "name": "열기 광맥 부름꾼"
       },
       "heart_hammer_guardian": {
-        "name": "망치의 수호자"
+        "name": "흐로스마르, 굴하지 않는 망치"
       },
       "heart_seam_singer": {
-        "name": "광맥의 노래꾼"
+        "name": "벨미라, 광맥의 노래꾼"
       },
       "heart_breath_guardian": {
-        "name": "숨결의 수호자"
+        "name": "에어윈, 속박 없는 돌풍"
       },
       "heart_quench_guardian": {
-        "name": "담금질의 수호자"
+        "name": "오로라, 고요한 겨울"
       },
       "heart_heat_guardian": {
-        "name": "열기의 수호자"
+        "name": "이그나자르, 꺼지지 않는 자"
       },
       "heart_masterless_strength": {
-        "name": "주인 없는 힘"
+        "name": "애시그랜드, 주인 없는 힘의 잔해"
       },
       "heart_heat_wellspawn": {
         "name": "샘의 자식"

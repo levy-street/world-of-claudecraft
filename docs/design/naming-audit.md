@@ -1120,6 +1120,25 @@ Wars 2).
 | Giant of the Wellspring | the Guardian of the Heat's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found. Chosen over a "first flame" phrasing to stay clear of Dark Souls' Kiln of the First Flame. |
 | The Four Veins Made One | the Masterless Strength's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found; plain English around the raid's own four veins. |
 
+### The Smith's Heart bosses' proper names (web-checked 2026-11-27)
+
+The owner gave the raid's six bosses proper names, in the "Name, Title" shape the other named
+bosses use (Varkhul, Ysolei, Zulgar, Nythraxis). The mob ids are frozen; only the display names
+move (`src/sim/content/smith_heart.ts`). The "Guardian of the X" phrasing stays where mechanic
+text and lore use it as the role. Each personal name and each new title was searched as an
+exact phrase on the open web and against the game wikis named in `src/sim/content/CLAUDE.md`
+"Naming originality".
+
+| Name | Where | Verdict |
+|---|---|---|
+| Hrothmar, the Unyielding Hammer | the Hammer Council's Guardian member | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Hrothmar" in any game; the nearest is "Hrothgar" (the Beowulf king, FFXIV's playable race, a God of War einherjar), a different name. No game uses "Unyielding Hammer" as a name or title (nearest: "Infernal Hammer", "Hammer of Virtue", different phrases). Plain English. |
+| Velmira, the Seam Singer | the Hammer Council's Singer member | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Velmira" in any game; the nearest are the indie titles built on "Velmora", a different token. The title is recorded above. |
+| Aerwyn, the Unbound Gale | the Breath boss | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Aerwyn" in any game wiki (nearest: "Aldwynn", "Edwyn", different names). No game uses "the Unbound Gale" (nearest: "A Space for the Unbound", "Unbound Saga", different phrases). Plain English. |
+| Aurora, the Silent Winter | the Quench boss (the ice queen) | KEEP (web-checked 2026-11-27), borderline noted: "Aurora" is a real given name and a common word, used across many unrelated properties (Etheria: Restart's boss Aurora, Guild Wars Factions' Luxon Aurora, League of Legends' champion), so it is shared vocabulary under bar 2. No game uses "the Silent Winter" (nearest: "The Forever Winter", "Looming Winter", different phrases). |
+| Ignazhar, the Unquenchable | the Heat boss | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Ignazhar"; the nearest are WoW's "Igyniar" (a proto-dragon) and "Ignara" (an Aberrus NPC) and King of Fighters' "Igniz", all different names. No game boss titled "the Unquenchable" (nearest: Arknights' "Unquenched", a different word and role); plain English. "The Primordial Flame" was considered and rejected: it is a Terraria Thorium boss title. |
+| Ashgrand, Remnant of the Masterless Strength | the final boss | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Ashgrand" in any game; the nearest are "Ashcrown" and "Crown of Ash", different tokens. The title reuses the raid's own boss name already recorded above. |
+| Calderra (first draft for the Heat boss) | none | WITHDRAWN before shipping (2026-11-27): replaced by Ignazhar on the owner's call, never shipped. Its check found no game hit (nearest: the word "caldera", "Great Houses of Calderia"). |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
