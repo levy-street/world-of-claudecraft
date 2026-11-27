@@ -1029,13 +1029,13 @@ export const vi_VN: EnTranslations = {
       "shotRules": "Nhắm vào bên trong vùng đánh dấu. Không tốn mana. Sát thương không tăng theo trang bị hoặc kỹ năng."
     },
     "warlock": {
-      "doomLabel": "Blight",
-      "fateThreadsLabel": "Rot Splinters",
-      "doomEmptyStatus": "{value} of {max} Blight.",
-      "doomStatus": "{value} of {max} Blight; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
-      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
-      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
+      "doomLabel": "Kết Án",
+      "fateThreadsLabel": "Sợi Định Mệnh",
+      "doomEmptyStatus": "{value} trên {max} Kết Án.",
+      "doomStatus": "{value} trên {max} Kết Án; {remaining}.",
+      "fateThreadsStatus": "{value} trên {max} Sợi Định Mệnh.",
+      "fateThreadsConsumeReady": "Ba Sợi Định Mệnh: Nuốt Chửng có thể dệt chúng thành Kết Án bổ sung.",
+      "fateThreadsSentenceReady": "Ba Sợi Định Mệnh: Phán Quyết có thể tiêu thụ chúng để tăng 18% sát thương."
     },
     "priest": {
       "gloomtitheLabel": "Thuế Bóng Tối",
@@ -4795,7 +4795,7 @@ export const vi_VN: EnTranslations = {
       "effigyLanternOut": "Đèn của Đốc Công Rơm đã tắt đối với bạn: đòn của bạn và thú nuôi bỏ qua Da Ván Gỗ và gây đủ sát thương",
       "leadenHexLock": "Bùa Trì Trệ chưa thể trói mục tiêu này lại",
       "forbiddenReflectionReady": "Kỹ năng hồi chiêu Thuật Sĩ Hắc Ám hợp lệ tiếp theo của bạn có thể được thi triển lại",
-      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
+      "forbiddenReflectionLock": "Phản Chiếu Cấm Kỵ chưa thể chuẩn bị lại",
       "internalCooldown": "Hiệu ứng này chưa thể kích hoạt lại cho đến khi hết thời gian chờ",
       "carriedFlag": "Bạn đang mang cờ địch. Hủy hiệu ứng này để thả nó xuống.",
       "carryingFreight": "Bạn đang vận chuyển hàng. Tốc độ di chuyển giảm {pct}%.",
@@ -4965,16 +4965,16 @@ export const vi_VN: EnTranslations = {
       "formShadow": "Hình Gloamveil: sát thương Bóng Tối tăng {pct}%",
       "resourceCount": "{value} trên {max}",
       "formLich": "Thương Linh Hồn cũng đánh trúng thêm tối đa {targets} kẻ địch gần đó với {pct}% sát thương",
-      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
-      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
-      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
-      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
-      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
-      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
-      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
+      "afflictionEye": "DoT của bạn gây thêm {dotPct}% sát thương tại đây và dội {echoPct}% mỗi nhịp sang kẻ địch gần đó đang chịu Hắc Hủ của bạn; hiệu ứng tại đây tạo ra {pct}% Kết Án",
+      "afflictionEyeSecondary": "Hiệu ứng tại Mắt Nguyền này tạo ra {doomPct}% Kết Án; Phán Quyết vọng lại đây với {echoPct}% sát thương",
+      "afflictionAccomplice": "Sát thương đủ điều kiện cấp {value} Kết Án, tối đa một lần mỗi {interval} giây",
+      "afflictionViolence": "Các nhịp DoT của bạn tại đây có {pct}% cơ hội tác động thêm một lần",
+      "afflictionVicarious": "Chuyển hướng hoặc giảm {pct}% sát thương phải nhận và có thể tạo ra tối đa {max} Kết Án",
+      "afflictionPossession": "Tăng cường Kim Định Mệnh, Nuốt Chửng, Ánh Nhìn Nguyền, và Phán Quyết",
+      "afflictionJudgment": "Mắt Nguyền chính tạo thêm {eyePct}% Kết Án; Phán Quyết gây thêm {sentencePct}% sát thương và lần đầu tiên hoàn lại {refund} Kết Án",
+      "afflictionLitany": "Mỗi lần nhận Kết Án gây {damage} sát thương Bóng Tối cho tối đa {targets} kẻ địch trong bán kính {radius} thước, một lần mỗi giây",
+      "afflictionFateThreads": "{stacks} Sợi Định Mệnh: Phán Quyết gây thêm {sentencePct}% sát thương, hoặc Nuốt Chửng nhận thêm {doom} Kết Án mỗi nhịp",
+      "afflictionConsumeThreads": "Nuốt Chửng đang tiêu thụ {stacks} Sợi Định Mệnh để nhận thêm {doom} Kết Án mỗi nhịp",
       "necromancyHarvestMark": "Cái chết có thể tạo 1 Mảnh Linh Hồn",
       "necromancyOssuaryMark": "Lưu trữ {storedPct}% sát thương của bạn và thuộc hạ Bất Tử của bạn, cộng thêm {lancePct}% sát thương của Thương Linh Hồn; thi triển lại để kích nổ. Khi chết sẽ nổ trong bán kính {radius} thước và tạo 1 Mảnh Linh Hồn",
       "necromancyDeathEcho": "Vọng Âm Tử Thần cũ; hiện không có kỹ năng nào tiêu thụ nó",
@@ -10084,7 +10084,7 @@ export const vi_VN: EnTranslations = {
       "none": "Không có lớp nào khớp mọi bộ lọc. Xóa bớt một cái để thấy thêm."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
+      "evil_eye": "Chỉ định kẻ địch mà hành động và sự thống khổ của nó sẽ nuôi dưỡng Kết Án của bạn.",
       "heroic_strike": "Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.",
       "revenge": "Quét trúng kẻ địch phía trước và có thể không tốn tài nguyên sau khi né hoặc đỡ đòn.",
       "hamstring": "Cản trở di chuyển của kẻ địch để chúng không thể chạy thoát.",
@@ -10163,7 +10163,7 @@ export const vi_VN: EnTranslations = {
       "demon_skin": "Một buff bản thân lâu dài giúp da bạn cứng cáp hơn và tăng giáp.",
       "immolate": "Thiêu cháy mục tiêu cho một đòn mở màn và một vệt cháy âm ỉ kéo dài.",
       "corruption": "Làm mục rữa mục tiêu bằng bóng tối, gây sát thương theo thời gian trong khi bạn làm việc khác.",
-      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "life_tap": "Đánh đổi một phần máu của chính bạn để lấy lại mana khi cạn kiệt.",
       "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Một tia tự nhiên ném vào mục tiêu từ xa, đòn chủ lực quen thuộc của bạn.",
       "healing_touch": "Một đòn trị liệu đơn mục tiêu lớn với thời gian niệm dài, dùng để hồi đầy cho ai đó.",
@@ -18266,47 +18266,47 @@ export const vi_VN: EnTranslations = {
       },
       "corruption": {
         "name": "Hắc Hủ",
-        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
+        "description": "Hủ hóa mục tiêu, gây {damage} sát thương Bóng Tối trong 18 giây."
       },
       "evil_eye": {
-        "name": "Rotmark",
-        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
+        "name": "Ác Nhãn",
+        "description": "Đánh dấu một kẻ địch làm tâm điểm của những lời nguyền của bạn. Di chuyển Ác Nhãn sẽ giữ nguyên Kết Án nhưng không làm mới thời hạn 20 giây của nó."
       },
       "maledict_gaze": {
         "name": "Ánh Nhìn Nguyền",
-        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
+        "description": "Mắt Nguyền của bạn tấn công Ác Nhãn chính đã chọn mỗi 2,5 giây bằng sát thương Bóng Tối. Chiếm Hữu Ác Nhãn nhân đôi tốc độ tấn công của nó."
       },
       "needle_of_fate": {
-        "name": "Carrion Dart",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
+        "name": "Kim Định Mệnh",
+        "description": "Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra {needleDoom} Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước."
       },
       "sentence": {
-        "name": "Putrefy",
-        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+        "name": "Phán Quyết",
+        "description": "Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Mỗi Sợi tăng 6% sát thương. Các hiệu ứng bổ sung leo thang ở 20, 50, 80, và 100 Kết Án. Mức tăng sát thương của nó chững lại sau cấp 16."
       },
       "hard_bargain": {
-        "name": "Hard Bargain",
+        "name": "Mặc Cả Nghiệt Ngã",
         "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Cruel Pact",
-        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
+        "name": "Khế Ước Tàn Nhẫn",
+        "description": "Hiến tế 10% máu tối đa để hồi {manaPct}% mana tối đa. Không thể dùng khi máu từ 20% trở xuống."
       },
       "cursed_accomplice": {
         "name": "Đồng Lõa Bị Nguyền",
-        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
+        "description": "Liên kết với Mắt Nguyền của bạn khi không có đồng minh nào được chọn, khiến Ánh Nhìn của nó tạo ra 2 Kết Án. Liên kết với một thành viên tổ đội đã chọn khiến chỉ sát thương của người đó lên Ác Nhãn của bạn mới tạo ra 3 thay vào đó. Một liên kết mới sẽ thay thế liên kết trước đó và chỉ có thể kích hoạt một lần mỗi 2 giây."
       },
       "curse_of_agony": {
-        "name": "Festerhex",
-        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
+        "name": "Tà Chú Thống Khổ",
+        "description": "Nguyền rủa mục tiêu bằng thống khổ: gây {damage} sát thương Bóng Tối trong 24 giây."
       },
       "drain_life": {
         "name": "Nuốt Chửng",
-        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
+        "description": "Rút cạn sinh khí của mục tiêu, gây {damage} sát thương Bóng Tối mỗi giây và chuyển 70% trong đó thành máu cho bạn. Thống Khổ chuyển toàn bộ thay vì vậy. Khi dồn lên Ác Nhãn chính của bạn, phép này tiêu hết Sợi Định Mệnh ngay từ đầu, và mỗi Sợi tạo thêm 1 Kết Án mỗi nhịp."
       },
       "litany_of_guilt": {
         "name": "Kinh Cầu Tội Lỗi",
-        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "Nguyền rủa Ác Nhãn chính của bạn trong 6 giây. Mỗi lần nhận Kết Án sẽ giải phóng một đợt sóng gây sát thương cho tối đa 2 kẻ địch khác trong bán kính 8 thước, tối đa một lần mỗi giây. Cấp 2 kéo dài hiệu ứng này lên 8 giây và 4 kẻ địch."
       },
       "cinderhide": {
         "name": "Da Than Hồng",
@@ -18314,35 +18314,35 @@ export const vi_VN: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Neo Bóng Tối",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
+        "description": "Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó, tiêu hao neo và bắt đầu thời gian hồi chiêu 45 giây."
       },
       "soulwell": {
         "name": "Giếng Linh Hồn",
         "description": "Triệu hồi một Giếng Linh Hồn trong 3 phút. Khi ngoài chiến đấu, thành viên tổ đội có thể nạp lại Đá Linh Hồn của họ tối đa 3 lần. Một Đá Linh Hồn hồi 25% máu tối đa và dùng chung thời gian hồi chiêu với thuốc."
       },
       "hex_of_violence": {
-        "name": "Rotfever",
-        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
+        "name": "Lời Nguyền Bạo Lực",
+        "description": "Nguyền rủa kẻ địch trong 8 giây, gây Sát Thương Bóng Tối và tạo ra 2 Án Phạt mỗi 2 giây. 3 hành động gây sát thương tiếp theo của nó mỗi lần tạo ra 7 Án Phạt và quật nó chịu 17 Sát Thương Bóng Tối."
       },
       "cruel_pact": {
         "name": "Khế Ước Tàn Nhẫn",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
+        "description": "Hy sinh 12% máu tối đa của bạn để hồi 1,5% mana tối đa và tạo ra 20 Kết Án. Không thể dùng khi máu ở mức 20% hoặc thấp hơn."
       },
       "vicarious_suffering": {
         "name": "Thống Khổ Sẻ Chia",
-        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
+        "description": "Liên kết nỗi đau khổ của bạn trong 8 giây và tạo ra tối đa 15 Kết Án từ các đòn tấn công thù địch. Lên chính bạn, giảm 20% sát thương phải nhận. Lên một đồng minh, chuyển hướng tối đa 20% sát thương về bạn mà không đưa máu bạn xuống dưới 15%."
       },
       "possess_evil_eye": {
-        "name": "Possess the Rotmark",
-        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "name": "Chiếm Hữu Ác Nhãn",
+        "description": "Kẻ Nguyền Rủa chiếm hữu Ác Nhãn chính của bạn trong 15 giây và tạo ra 35 Kết Án. Kim Định Mệnh thi triển trong 1 giây và tạo thêm 2 Kết Án, Nuốt Chửng có thể được dẫn phép khi đang di chuyển, và Phán Quyết gây thêm 25% sát thương và giải phóng một tiếng vọng trễ với 60% sát thương, giảm dần xuống 30% qua các cấp 17-20."
       },
       "hour_of_judgment": {
-        "name": "Hour of Rot",
-        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
+        "name": "Giờ Phán Xét",
+        "description": "Giáng sự phán xét lên Ác Nhãn chính của bạn trong 15 giây, cấp 40 Kết Án và 3 Sợi Định Mệnh, kích hoạt Chiếm Hữu, nhân đôi Kết Án tạo ra qua Mắt Nguyền chính, và tăng 20% sát thương của Phán Quyết. Phán Quyết đầu tiên hoàn lại 50 Kết Án."
       },
       "coven": {
-        "name": "Contagion",
-        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+        "name": "Hội Phù Thủy",
+        "description": "Tạo các Ác Nhãn phụ trên tối đa 4 kẻ địch gần đó trong 15 giây. Chúng nạp vào bể Kết Án chung ở mức 50%, và Phán Quyết vọng đến chúng với 35% sát thương."
       },
       "plague_bloom": {
         "name": "Plague Bloom",
@@ -18698,7 +18698,7 @@ export const vi_VN: EnTranslations = {
       },
       "siphon_life": {
         "name": "Hút Sự Sống",
-        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
+        "description": "Hút sự sống từ kẻ địch, gây {damage} sát thương Bóng Tối trong 30 giây và hồi cho bạn bằng lượng sát thương đã gây. (dấu ấn Đau Khổ)"
       },
       "conflagrate": {
         "name": "Bùng Cháy",
@@ -18953,7 +18953,7 @@ export const vi_VN: EnTranslations = {
       },
       "dark_pact": {
         "name": "Giao Ước Huyết Sắc",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
+        "description": "Hy sinh 10% máu hiện tại của bạn để hấp thụ sát thương bằng 30% máu tối đa trong 8 giây."
       },
       "cloak_of_shadows": {
         "name": "Áo Choàng Bóng",
@@ -30871,8 +30871,8 @@ export const vi_VN: EnTranslations = {
       },
       "hexthread": {
         "name": "Áo Choàng Sợi Yểm",
-        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
+        "bonus2": "Needle of Fate cho thêm 2 Condemnation. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Passing Sentence hoàn lại 10 Condemnation."
       },
       "moonscorch": {
         "name": "Phục Trang Thiêu Đốt Trăng",

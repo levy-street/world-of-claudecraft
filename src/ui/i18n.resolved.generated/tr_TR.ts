@@ -1029,13 +1029,13 @@ export const tr_TR: EnTranslations = {
       "shotRules": "İşaretli alan içine nişan al. Mana maliyeti yok. Hasar donanım veya yetenekle ölçeklenmez."
     },
     "warlock": {
-      "doomLabel": "Blight",
-      "fateThreadsLabel": "Rot Splinters",
-      "doomEmptyStatus": "{value} of {max} Blight.",
-      "doomStatus": "{value} of {max} Blight; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
-      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
-      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
+      "doomLabel": "Mahkûmiyet",
+      "fateThreadsLabel": "Kader İplikleri",
+      "doomEmptyStatus": "{value} / {max} Mahkûmiyet.",
+      "doomStatus": "{value} / {max} Mahkûmiyet; {remaining}.",
+      "fateThreadsStatus": "{value} / {max} Kader İpliği.",
+      "fateThreadsConsumeReady": "Üç Kader İpliği: Tüketme onları ek Mahkûmiyete dönüştürebilir.",
+      "fateThreadsSentenceReady": "Üç Kader İpliği: Hüküm onları %18 artan hasar için tüketebilir."
     },
     "priest": {
       "gloomtitheLabel": "Kasvet Öşrü",
@@ -4795,7 +4795,7 @@ export const tr_TR: EnTranslations = {
       "effigyLanternOut": "Saman Ustabaşının feneri senin için sönük: senin ve evcil hayvanının darbeleri Tahta Postunu yok sayıp tam vurur",
       "leadenHexLock": "Kurşun Büyüsü bu hedefi henüz yeniden kökleyemez",
       "forbiddenReflectionReady": "Uygun bir sonraki Karabüyücü bekleme süren yeniden kullanılabilir",
-      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
+      "forbiddenReflectionLock": "Yasak Yansıma henüz yeniden hazırlanamaz",
       "internalCooldown": "Bu etki, süre dolana kadar yeniden tetiklenemez",
       "carriedFlag": "Düşman sancağını taşıyorsun. Onu bırakmak için bu güçlendirmeyi iptal et.",
       "carryingFreight": "Kargo taşıyorsun. Hareket hızı {pct}% azalıyor.",
@@ -4965,16 +4965,16 @@ export const tr_TR: EnTranslations = {
       "formShadow": "Gölgeperde Formu: Gölge hasarı {pct}% artar",
       "resourceCount": "{value} / {max}",
       "formLich": "Ruh Mızrağı ayrıca yakındaki en fazla {targets} düşmana {pct}% hasarla vurur",
-      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
-      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
-      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
-      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
-      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
-      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
-      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
+      "afflictionEye": "DoT'ların burada {dotPct}% daha fazla hasar verir ve her tikin {echoPct}%'ini Kara Çürümen olan yakındaki düşmanlara yansıtır; buradaki etkiler {pct}% Mahkûmiyet üretir",
+      "afflictionEyeSecondary": "Bu Göz'deki etkiler {doomPct}% Mahkûmiyet üretir; Hüküm buraya {echoPct}% hasarla yankılanır",
+      "afflictionAccomplice": "Uygun hasar {value} Mahkûmiyet kazandırır, en fazla {interval} sn'de bir",
+      "afflictionViolence": "Buradaki DoT tiklerinin yeniden gerçekleşme şansı {pct}%",
+      "afflictionVicarious": "Gelen hasarın {pct}%'ini yönlendirir ya da azaltır ve en fazla {max} Mahkûmiyet üretebilir",
+      "afflictionPossession": "Kader İğnesi'ni, Tüketme'yi, Kem Bakış'ı ve Hüküm'ü güçlendirir",
+      "afflictionJudgment": "Birincil Göz {eyePct}% daha fazla Mahkûmiyet üretir; Hüküm {sentencePct}% daha fazla hasar verir ve ilki {refund} Mahkûmiyet geri kazandırır",
+      "afflictionLitany": "Mahkûmiyet kazançları, {radius} yarda içindeki en fazla {targets} düşmana saniyede bir {damage} Gölge hasarı verir",
+      "afflictionFateThreads": "{stacks} Kader İpliği: Hüküm {sentencePct}% daha fazla hasar verir, ya da Tüketme tur başına {doom} ekstra Mahkûmiyet kazanır",
+      "afflictionConsumeThreads": "Tüketme, tur başına {doom} ekstra Mahkûmiyet için {stacks} Kader İpliğini tüketiyor",
       "necromancyHarvestMark": "Ölüm 1 Ruh Parçası oluşturabilir",
       "necromancyOssuaryMark": "Senin ve ölülerinin hasarının {storedPct}%'ini, artı Ruh Mızrağı hasarının {lancePct}%'ini depolar; patlatmak için yeniden oku. Ölüm {radius} yarda içinde patlar ve 1 Ruh Parçası oluşturur",
       "necromancyDeathEcho": "Eski Ölüm Yankısı; hiçbir mevcut yetenek onu tüketmiyor",
@@ -10084,7 +10084,7 @@ export const tr_TR: EnTranslations = {
       "none": "Hiçbir sınıf her filtreye uymuyor. Daha fazlasını görmek için birini temizle."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
+      "evil_eye": "Eylemleri ve ıstırabı Mahkûmiyetini besleyecek düşmanı adlandırır.",
       "heroic_strike": "Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.",
       "revenge": "Önündeki düşmanları biçer ve bir kaçınma veya savuşturmadan sonra ücretsiz olabilir.",
       "hamstring": "Bir düşmanın hareketini sakatlayarak kaçmasını engeller.",
@@ -10163,7 +10163,7 @@ export const tr_TR: EnTranslations = {
       "demon_skin": "Derini sertleştirip zırh ekleyen kalıcı bir öz güçlendirmesi.",
       "immolate": "Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.",
       "corruption": "Bir hedefi gölgeyle çürütür ve sen başka işler yaparken hasar verir.",
-      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "life_tap": "Tükendiğinde kendi canının bir kısmını manaya çevirir.",
       "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Bir hedefe menzilden fırlatılan bir doğa oku; başvuru bomban.",
       "healing_touch": "Uzun süreli, birini tam dolduran büyük tek hedefli bir iyileştirme.",
@@ -18266,47 +18266,47 @@ export const tr_TR: EnTranslations = {
       },
       "corruption": {
         "name": "Kara Çürüme",
-        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
+        "description": "Hedefi yozlaştırır, 18 saniye boyunca {damage} Gölge hasarı verir."
       },
       "evil_eye": {
-        "name": "Rotmark",
-        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
+        "name": "Kem Göz",
+        "description": "Bir düşmanı lanetlerinin odağı olarak işaretler. Gözü taşımak Mahkûmiyeti korur ama 20 sn'lik süresini yenilemez."
       },
       "maledict_gaze": {
         "name": "Kem Bakış",
-        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
+        "description": "Kem Bakışın, seçili birincil Kem Gözüne her 2,5 sn'de bir Gölge hasarıyla saldırır. Kem Gözü Ele Geçir onun saldırı hızını ikiye katlar."
       },
       "needle_of_fate": {
-        "name": "Carrion Dart",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
+        "name": "Kader İğnesi",
+        "description": "Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa {needleDoom} Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler."
       },
       "sentence": {
-        "name": "Putrefy",
-        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+        "name": "Hüküm",
+        "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
       },
       "hard_bargain": {
-        "name": "Hard Bargain",
+        "name": "Ağır Pazarlık",
         "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Cruel Pact",
-        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
+        "name": "Zalim Ahit",
+        "description": "Azami canının %10'unu feda ederek azami mananın {manaPct}%'ini yeniler. Canın %20 veya altındayken kullanılamaz."
       },
       "cursed_accomplice": {
         "name": "Lanetli Suç Ortağı",
-        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
+        "description": "Hiçbir müttefik seçili değilken Kem Gözünü bağlar, böylece onun Bakışı 2 Mahkûmiyet üretir. Seçili tek bir grup üyesini bağlamak yalnızca onların Kem Gözüne verdiği hasarın 3 üretmesini sağlar. Yeni bir bağ öncekinin yerini alır ve en fazla 2 sn'de bir tetiklenebilir."
       },
       "curse_of_agony": {
-        "name": "Festerhex",
-        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
+        "name": "Izdırap Büyüsü",
+        "description": "Hedefi ızdırapla lanetler: 24 saniye boyunca {damage} Gölge hasarı."
       },
       "drain_life": {
         "name": "Tüketme",
-        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
+        "description": "Hedefin canlılığını tüketir, her saniye {damage} Gölge hasarı verir ve bunun %70'ini can olarak sana aktarır. Izdırap bunun yerine tamamını aktarır. Birincil Kem Göz'üne kanalize edildiğinde başlangıçta tüm Kader İpliklerini tüketir ve her İplik tık başına 1 fazladan Mahkûmiyet üretir."
       },
       "litany_of_guilt": {
         "name": "Suç Yakarışı",
-        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "Birincil Kem Gözünü 6 sn boyunca lanetler. Mahkûmiyet kazançları, 8 yarda içindeki en fazla 2 başka düşmana hasar veren bir dalga salar, en fazla saniyede bir. Kademe 2 bunu 8 sn'ye ve 4 düşmana çıkarır."
       },
       "cinderhide": {
         "name": "Kor Deri",
@@ -18314,35 +18314,35 @@ export const tr_TR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Gölge Çapası",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
+        "description": "İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır."
       },
       "soulwell": {
         "name": "Ruh Kuyusu",
         "description": "3 dakika süreyle bir Ruh Kuyusu çağırır. Dövüş dışındayken, grup üyeleri Ruh Taşlarını en fazla 3'e kadar doldurabilir. Bir Ruh Taşı azami canın %25'ini geri kazandırır ve iksir bekleme süresini paylaşır."
       },
       "hex_of_violence": {
-        "name": "Rotfever",
-        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
+        "name": "Şiddet Büyüsü",
+        "description": "Düşmanı 8 sn boyunca büyüler, Gölge hasarı verir ve her 2 sn'de 2 Mahkûmiyet üretir. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 17 Gölge hasarı vurur."
       },
       "cruel_pact": {
         "name": "Zalim Ahit",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
+        "description": "Azami canının %12'sini feda ederek azami manasının %1,5'ini geri kazandırır ve 20 Mahkûmiyet üretir. Can %20 veya altındayken kullanılamaz."
       },
       "vicarious_suffering": {
         "name": "Dolaylı Istırap",
-        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
+        "description": "Istırabını 8 sn boyunca bağlar ve düşman vuruşlarından en fazla 15 Mahkûmiyet üretir. Kendi üzerinde, alınan hasarı %20 azaltır. Bir müttefik üzerinde, seni %15 canın altına düşürmeden hasarın en fazla %20'sini sana yönlendirir."
       },
       "possess_evil_eye": {
-        "name": "Possess the Rotmark",
-        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "name": "Kem Gözü Ele Geçir",
+        "description": "Lanetkâr, birincil Kem Gözünü 15 sn boyunca ele geçirir ve 35 Mahkûmiyet üretir. Kader İğnesi 1 sn'de okunur ve 2 ekstra Mahkûmiyet üretir, Tüketme hareket halindeyken kanalize edilebilir, Hüküm ise %25 daha fazla hasar verir ve %60 hasarla gecikmeli bir yankı salar, bu oran seviye 17-20 arasında %30'a geriler."
       },
       "hour_of_judgment": {
-        "name": "Hour of Rot",
-        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
+        "name": "Yargı Saati",
+        "description": "Birincil Kem Gözüne 15 sn süreyle yargı çağırır: 40 Mahkûmiyet ve 3 Kader İpliği kazandırır, Ele Geçirmeyi etkinleştirir, birincil Gözden üretilen Mahkûmiyeti ikiye katlar ve Hüküm hasarını %20 artırır. İlk Hüküm 50 Mahkûmiyet geri kazandırır."
       },
       "coven": {
-        "name": "Contagion",
-        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+        "name": "Cadı Meclisi",
+        "description": "Yakındaki en fazla 4 düşman üzerinde 15 sn süreyle ikincil Kem Gözler oluşturur. Bunlar ortak Mahkûmiyet havuzunu %50 oranında besler ve Hüküm onlara %35 hasarla yankılanır."
       },
       "plague_bloom": {
         "name": "Plague Bloom",
@@ -18698,7 +18698,7 @@ export const tr_TR: EnTranslations = {
       },
       "siphon_life": {
         "name": "Can Sömürüsü",
-        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
+        "description": "Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)"
       },
       "conflagrate": {
         "name": "Tutuşturma",
@@ -18953,7 +18953,7 @@ export const tr_TR: EnTranslations = {
       },
       "dark_pact": {
         "name": "Kanlı Ahit",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
+        "description": "Mevcut canının %10'unu feda ederek 8 sn boyunca azami canının %30'u kadar hasarı emer."
       },
       "cloak_of_shadows": {
         "name": "Gölge Pelerini",
@@ -30871,8 +30871,8 @@ export const tr_TR: EnTranslations = {
       },
       "hexthread": {
         "name": "Uğursuz İplik Örtüsü",
-        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
+        "bonus2": "Kader İğnesi 2 ek Mahkûmiyet kazandırır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Geçen Hüküm 10 Mahkûmiyet iade eder."
       },
       "moonscorch": {
         "name": "Ay Yanığı Giysisi",

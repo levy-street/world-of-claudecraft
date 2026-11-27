@@ -7982,8 +7982,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft.',
   'entities.abilities.lesser_heal.name': 'Viskad bön',
-  'entities.abilities.life_tap.description': 'Omvandlar {damage} hälsa till {damage} mana.',
-  'entities.abilities.life_tap.name': 'Hårt köpslag',
+  'entities.abilities.life_tap.description':
+    'Offrar 10% av din maximala hälsa för att återställa {manaPct}% av din maximala mana. Kan inte användas vid 20% hälsa eller lägre.',
+  'entities.abilities.hard_bargain.name': 'Hårt köpslag',
+  'entities.abilities.life_tap.name': 'Grym pakt',
   'entities.abilities.lightning_bolt.description':
     'Vållar {damage} Naturskada. Skadan ökar med Besvärjelsekraft. Elementär: en träff ger 1 Åska.',
   'entities.abilities.lightning_bolt.name': 'Bågblixt',
@@ -16652,7 +16654,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Förtär förbrukar {stacks} Ödestrådar för {doom} extra Fördömelse per tillfälle',
   'hudChrome.auraEffect.afflictionEye':
-    'Förbannad blick attackerar var {interval}:e sek; effekter vid detta onda öga genererar {pct}% Fördömelse',
+    'Dina DoT-effekter gör {dotPct}% mer skada här och ekar {echoPct}% av varje tick till närliggande fiender med din Svartröta; effekter här genererar {pct}% Fördömelse',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Effekter vid detta onda öga genererar {doomPct}% Fördömelse; Dom ekar hit för {echoPct}% skada',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -16665,8 +16667,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förstärker Ödets nål, Förtär, Förbannad blick och Dom',
   'hudChrome.auraEffect.afflictionVicarious':
     'Omdirigerar eller minskar {pct}% av inkommande skada och kan generera upp till {max} Fördömelse',
-  'hudChrome.auraEffect.afflictionViolence':
-    '{charges} vedergällningar återstår; en fiendeattack ger {doom} Fördömelse och vållar {damage} skuggskada tillbaka',
+  'hudChrome.auraEffect.afflictionViolence': 'Dina DoT-tick här har {pct}% chans att ticka igen',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} ekon återstår: förmågor mot ett enda mål vållar {pct}% skada till upp till {targets} närliggande fiender',
   'hudChrome.auraEffect.arcaneCharge':

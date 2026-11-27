@@ -1029,13 +1029,13 @@ export const zh_TW: EnTranslations = {
       "shotRules": "在標記區域內瞄準。不消耗法力。傷害不隨裝備或天賦提升。"
     },
     "warlock": {
-      "doomLabel": "Blight",
-      "fateThreadsLabel": "Rot Splinters",
-      "doomEmptyStatus": "{value} of {max} Blight.",
-      "doomStatus": "{value} of {max} Blight; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
-      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
-      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
+      "doomLabel": "譴罪",
+      "fateThreadsLabel": "命運絲線",
+      "doomEmptyStatus": "{value}/{max} 譴罪。",
+      "doomStatus": "{value}/{max} 譴罪；剩餘 {remaining}。",
+      "fateThreadsStatus": "{value}/{max} 命運絲線。",
+      "fateThreadsConsumeReady": "三層命運絲線：吞噬可將其編織為額外的譴罪。",
+      "fateThreadsSentenceReady": "三層命運絲線：裁決可消耗它們以提高18%的傷害。"
     },
     "priest": {
       "gloomtitheLabel": "幽暗什一",
@@ -4795,7 +4795,7 @@ export const zh_TW: EnTranslations = {
       "effigyLanternOut": "對你而言，稻草工頭的燈籠已經熄滅：你和你寵物的攻擊無視其木板之皮，全額命中",
       "leadenHexLock": "鉛沉妖術暫時無法再次定身此目標",
       "forbiddenReflectionReady": "下一個符合條件的術士冷卻技能可再次施放",
-      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
+      "forbiddenReflectionLock": "禁忌映像暫時無法再次準備",
       "internalCooldown": "計時結束前此效果無法再次觸發",
       "carriedFlag": "你正攜帶敵方旗幟。取消該增益即可丟下旗幟。",
       "carryingFreight": "你正在搬運貨物。移動速度降低 {pct}%。",
@@ -4965,16 +4965,16 @@ export const zh_TW: EnTranslations = {
       "formShadow": "幽幕形態：暗影傷害提高 {pct}%",
       "resourceCount": "{value}/{max}",
       "formLich": "靈魂長槍還會對附近最多 {targets} 個敵人造成 {pct}% 傷害",
-      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
-      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
-      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
-      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
-      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
-      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
-      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
+      "afflictionEye": "你的持續傷害效果在此處造成的傷害提高 {dotPct}%，每次跳傷的 {echoPct}% 會傳導給附近帶有你黑腐術的敵人；此處的效果產生 {pct}% 的譴罪",
+      "afflictionEyeSecondary": "此邪眼上的效果產生 {doomPct}% 的定罪值；宣判在此迴響並造成 {echoPct}% 傷害",
+      "afflictionAccomplice": "符合條件的傷害產生 {value} 點定罪值，每 {interval} 秒最多一次",
+      "afflictionViolence": "你在此處的持續傷害跳傷有 {pct}% 的機率再跳一次",
+      "afflictionVicarious": "轉移或降低 {pct}% 的受到傷害，並可產生最多 {max} 點定罪值",
+      "afflictionPossession": "強化命運之針、汲取生命、惡咒凝視和宣判",
+      "afflictionJudgment": "主邪眼產生的定罪值提高 {eyePct}%；宣判傷害提高 {sentencePct}%，第一次返還 {refund} 點定罪值",
+      "afflictionLitany": "獲得定罪值時，對 {radius} 碼內最多 {targets} 個敵人造成 {damage} 點暗影傷害，每秒最多一次",
+      "afflictionFateThreads": "{stacks} 層命運絲線：宣判傷害提高 {sentencePct}%，或使汲取生命每次額外產生 {doom} 點定罪值",
+      "afflictionConsumeThreads": "汲取生命正在消耗 {stacks} 層命運絲線，每次額外產生 {doom} 點定罪值",
       "necromancyHarvestMark": "目標死亡時可產生 1 個靈魂碎片",
       "necromancyOssuaryMark": "儲存你和不死僕從造成傷害的 {storedPct}%，並額外儲存靈魂長槍傷害的 {lancePct}%；再次施放引爆。目標死亡時在 {radius} 碼內爆炸並產生 1 個靈魂碎片",
       "necromancyDeathEcho": "舊版本遺留的死亡迴響；目前沒有技能會消耗它",
@@ -10084,7 +10084,7 @@ export const zh_TW: EnTranslations = {
       "none": "沒有職業符合所有篩選條件。清除一項以查看更多。"
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
+      "evil_eye": "標記一名敵人，使其行動與承受的苦難為你累積譴罪。",
       "heroic_strike": "預備一記更沉重的揮擊，在你的下一擊消耗怒氣。",
       "revenge": "橫掃你前方的敵人，並可能在閃躲或招架後不消耗資源。",
       "hamstring": "妨礙敵人的移動，使其無法逃脫。",
@@ -10163,8 +10163,8 @@ export const zh_TW: EnTranslations = {
       "demon_skin": "持續的自我增益，強化皮膚並增加護甲。",
       "immolate": "點燃目標，造成一記前置傷害並留下持續燃燒。",
       "corruption": "以暗影腐蝕目標，在你做其他事時持續造成傷害。",
-      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
-      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
+      "life_tap": "在法力見底時，以部分自身生命換回法力。",
+      "hard_bargain": "受傷時以 20% 的法力值換取 20% 的生命值。",
       "wrath": "從遠處朝目標擲出一道自然箭矢，是你慣用的核彈。",
       "healing_touch": "施法時間較長的大型單體治療，用來把某人補滿。",
       "mark_of_the_wild": "戰鬥前替自己或友方施加的持久祝福。",
@@ -18266,47 +18266,47 @@ export const zh_TW: EnTranslations = {
       },
       "corruption": {
         "name": "黑腐術",
-        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
+        "description": "腐蝕目標，在 18 秒內造成 {damage} 點暗影傷害。"
       },
       "evil_eye": {
-        "name": "Rotmark",
-        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
+        "name": "邪眼",
+        "description": "將一名敵人標記為詛咒焦點。移動邪眼會保留譴罪，但不會刷新其20秒的持續時間。"
       },
       "maledict_gaze": {
         "name": "咒眼凝視",
-        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
+        "description": "你的咒眼每2.5秒攻擊所選的主要邪眼目標，造成暗影傷害。附身邪眼會使其攻擊速度加倍。"
       },
       "needle_of_fate": {
-        "name": "Carrion Dart",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
+        "name": "命運之針",
+        "description": "刺穿敵人，造成{damage}點暗影傷害。若目標帶有你的邪眼，則產生{needleDoom}點譴罪；若不存在邪眼，則先標記目標。"
       },
       "sentence": {
-        "name": "Putrefy",
-        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+        "name": "裁決",
+        "description": "消耗全部譴罪與命運絲線裁決敵人。每條絲線使傷害提高6%，附加效果會在20、50、80和100點譴罪時提升。16級後傷害成長趨於平緩。"
       },
       "hard_bargain": {
-        "name": "Hard Bargain",
-        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+        "name": "苛刻交易",
+        "description": "犧牲最大法力值的 20%，恢復最大生命值的 {healPct}%。"
       },
       "life_tap": {
-        "name": "Cruel Pact",
-        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
+        "name": "殘酷契約",
+        "description": "犧牲最大生命值的 10%，恢復最大法力值的 {manaPct}%。生命值不高於 20% 時無法使用。"
       },
       "cursed_accomplice": {
         "name": "受咒共犯",
-        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
+        "description": "未選擇友方玩家時連結你的咒眼，使其凝視產生2點譴罪；連結友方玩家時，該玩家對邪眼目標造成傷害會產生3點。每2秒最多觸發一次。"
       },
       "curse_of_agony": {
-        "name": "Festerhex",
-        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
+        "name": "苦楚邪咒",
+        "description": "以痛苦詛咒目標：在 24 秒內造成 {damage} 點暗影傷害。"
       },
       "drain_life": {
         "name": "吞噬",
-        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
+        "description": "吞噬目標的生命力，每秒造成 {damage} 點暗影傷害，並將其中的 70% 轉化為生命傳給你。痛苦則改為全部轉化。當引導在你的主邪眼之上時，它會在開始時消耗全部命運絲線，而每一根絲線都會讓每一跳額外產生 1 點譴罪。"
       },
       "litany_of_guilt": {
         "name": "罪責禱文",
-        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "詛咒你的主要邪眼8秒。每次獲得譴罪時會釋放衝擊波，對8碼內最多4名其他敵人造成傷害，每秒最多觸發一次。"
       },
       "cinderhide": {
         "name": "熔渣皮膚",
@@ -18314,39 +18314,39 @@ export const zh_TW: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "暗影錨",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
+        "description": "首次施放：在腳下錨定暗影，持續5分鐘。在40碼內再次施放可返回錨點，消耗錨點並觸發45秒冷卻。"
       },
       "soulwell": {
         "name": "靈魂之井",
         "description": "召喚一口靈魂之井，持續3分鐘。脫離戰鬥時，隊伍成員最多可補充3枚靈魂石。靈魂石可恢復最大生命值的25%，並與藥水共用冷卻。"
       },
       "hex_of_violence": {
-        "name": "Rotfever",
-        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
+        "name": "暴行咒",
+        "description": "詛咒敵人8秒，期間造成暗影傷害並每2秒產生2點譴罪。其接下來的3次傷害行動各產生7點譴罪，並反噬17點暗影傷害。"
       },
       "cruel_pact": {
         "name": "殘酷契約",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
+        "description": "犧牲最大生命值的12%以產生20點譴罪。生命值不高於15%時無法使用。"
       },
       "vicarious_suffering": {
         "name": "苦痛轉承",
-        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
+        "description": "連結苦痛8秒，受到敵對攻擊時最多產生15點譴罪。對自己使用時受到的傷害降低20%；對盟友使用時最多將20%的傷害轉移給你，但不會使你的生命值降至15%以下。"
       },
       "possess_evil_eye": {
-        "name": "Possess the Rotmark",
-        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "name": "附身邪眼",
+        "description": "咒術者附身你的主要邪眼15秒，並產生35點譴罪。命運之針施法時間變為1秒並額外產生2點譴罪；吞噬可在移動中引導；裁決造成的傷害提高25%。延遲迴響造成60%的傷害，並在17至20級間逐步降至30%。"
       },
       "hour_of_judgment": {
-        "name": "Hour of Rot",
-        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
+        "name": "審判時刻",
+        "description": "對你的主要邪眼降下持續15秒的審判，獲得40點譴罪和3層命運絲線，啟動附身，使透過主要邪眼產生的譴罪加倍，並使裁決傷害提高20%。第一次裁決返還50點譴罪。"
       },
       "coven": {
-        "name": "Contagion",
-        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+        "name": "巫契",
+        "description": "在最多4名附近敵人身上製造持續15秒的次級邪眼。它們以50%的效率補充共享譴罪池，並承受裁決35%的回響傷害。"
       },
       "plague_bloom": {
-        "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "name": "瘟疫綻放",
+        "description": "消耗 60 點譴罪：30 碼內最多 5 個帶有你黑腐術的敵人立即承受你在其身上所有持續傷害效果的 4 次跳傷。"
       },
       "fear": {
         "name": "折魂",
@@ -18698,7 +18698,7 @@ export const zh_TW: EnTranslations = {
       },
       "siphon_life": {
         "name": "生命虹吸",
-        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
+        "description": "虹吸敵人的生命，在30秒內造成{damage}點暗影傷害，並按造成的傷害治療你。（痛苦專精招牌）"
       },
       "conflagrate": {
         "name": "燃盡",
@@ -18953,7 +18953,7 @@ export const zh_TW: EnTranslations = {
       },
       "dark_pact": {
         "name": "血契",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
+        "description": "犧牲當前生命值的10%，在8秒內吸收相當於最大生命值30%的傷害。"
       },
       "cloak_of_shadows": {
         "name": "暗影斗篷",
@@ -30871,8 +30871,8 @@ export const zh_TW: EnTranslations = {
       },
       "hexthread": {
         "name": "咒線罩袍",
-        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
+        "bonus2": "命運之針額外產生 2 點譴罪。受到傷害不再延遲你的施法。",
+        "bonus4": "施放裁決後返還 10 點譴罪。"
       },
       "moonscorch": {
         "name": "月灼法衣",

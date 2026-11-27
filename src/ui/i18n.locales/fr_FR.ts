@@ -10223,8 +10223,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Pourriture noire',
   'entities.abilities.corruption.description':
     "Corrompt la cible et inflige {damage} points de dégâts d'Ombre en 18 s.",
-  'entities.abilities.life_tap.name': 'Marché brutal',
-  'entities.abilities.life_tap.description': 'Convertit {damage} points de vie en {damage} mana.',
+  'entities.abilities.life_tap.name': 'Pacte cruel',
+  'entities.abilities.life_tap.description':
+    'Sacrifie 10% de vos points de vie maximum pour rendre {manaPct}% de votre mana maximum. Impossible à utiliser à 20% de points de vie ou moins.',
+  'entities.abilities.hard_bargain.name': 'Marché brutal',
   'entities.abilities.curse_of_agony.name': "Maléfice d'angoisse",
   'entities.abilities.curse_of_agony.description':
     "Maudit la cible d'agonie: {damage} points de dégâts d'Ombre en 24 s.",
@@ -17251,7 +17253,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Consumer consomme {stacks} Fils du destin pour {doom} Condamnation supplémentaire par tick',
   'hudChrome.auraEffect.afflictionEye':
-    'Regard maudit attaque toutes les {interval} s ; les effets sur cet Œil génèrent {pct}% de Condamnation',
+    'Vos DoT infligent {dotPct}% de dégâts en plus ici et renvoient {echoPct}% de chaque tick aux ennemis proches affectés par votre Pourriture noire ; les effets ici génèrent {pct}% de Condamnation',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Les effets sur cet Œil génèrent {doomPct}% de Condamnation ; Sentence se répercute ici pour {echoPct}% de dégâts',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -17265,7 +17267,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     "Redirige ou réduit {pct}% des dégâts subis et peut générer jusqu'à {max} Condamnation",
   'hudChrome.auraEffect.afflictionViolence':
-    "{charges} représailles restantes ; une attaque ennemie accorde {doom} Condamnation et inflige {damage} points de dégâts d'Ombre en retour",
+    'Vos ticks de DoT ici ont {pct}% de chances de se répéter',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} échos restants : les capacités ciblées infligent {pct}% de dégâts à {targets} ennemis proches au plus',
   'hudChrome.auraEffect.arcaneCharge':

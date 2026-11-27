@@ -1029,13 +1029,13 @@ export const ja_JP: EnTranslations = {
       "shotRules": "印のついた範囲内を狙う。マナ消費なし。ダメージは装備やタレントの影響を受けない。"
     },
     "warlock": {
-      "doomLabel": "Blight",
-      "fateThreadsLabel": "Rot Splinters",
-      "doomEmptyStatus": "{value} of {max} Blight.",
-      "doomStatus": "{value} of {max} Blight; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
-      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
-      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
+      "doomLabel": "断罪",
+      "fateThreadsLabel": "運命の糸",
+      "doomEmptyStatus": "断罪 {value}/{max}。",
+      "doomStatus": "断罪 {value}/{max}、残り {remaining}。",
+      "fateThreadsStatus": "運命の糸 {value}/{max}。",
+      "fateThreadsConsumeReady": "運命の糸が3本: 喰らうで追加の断罪へ紡げます。",
+      "fateThreadsSentenceReady": "運命の糸が3本: 宣告で消費するとダメージが18%増加します。"
     },
     "priest": {
       "gloomtitheLabel": "闇の献納",
@@ -4795,7 +4795,7 @@ export const ja_JP: EnTranslations = {
       "effigyLanternOut": "あなたにとって藁の監督のランタンは消えている：あなたとペットの攻撃は板の皮を無視し、全力で通る",
       "leadenHexLock": "レドン・ヘックスはまだこの対象を再び移動不能にできない",
       "forbiddenReflectionReady": "次の対象となるウォーロックのクールダウンを再使用できる",
-      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
+      "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
       "internalCooldown": "タイマー終了までこの効果は再発動しない",
       "carriedFlag": "敵の旗を運搬中です。このバフを解除すると旗を落とします。",
       "carryingFreight": "荷物を運搬中です。移動速度が{pct}%低下します。",
@@ -4965,16 +4965,16 @@ export const ja_JP: EnTranslations = {
       "formShadow": "グロームヴェイル形態：影ダメージが{pct}%増加する",
       "resourceCount": "{value}/{max}",
       "formLich": "ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える",
-      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
-      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
-      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
-      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
-      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
-      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
-      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
+      "afflictionEye": "ここでは自分のDoTのダメージが{dotPct}%増加し、各ティックの{echoPct}%が自分の黒腐れを受けている近くの敵にも伝わる。ここでの効果は断罪を{pct}%生成する",
+      "afflictionEyeSecondary": "この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する",
+      "afflictionAccomplice": "対象となるダメージが断罪を{value}生成する。{interval}秒に1回まで",
+      "afflictionViolence": "ここでは自分のDoTのティックが{pct}%の確率でもう一度発生する",
+      "afflictionVicarious": "受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する",
+      "afflictionPossession": "ニードル・オブ・フェイト、ドレイン・ライフ、マレディクト・ゲイズ、センテンスを強化する",
+      "afflictionJudgment": "主邪眼の断罪生成が{eyePct}%増加し、センテンスのダメージが{sentencePct}%増加、最初の1回は断罪を{refund}返還する",
+      "afflictionLitany": "断罪獲得時、{radius}ヤード内の最大{targets}体に{damage}の影ダメージを与える。1秒に1回まで",
+      "afflictionFateThreads": "運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する",
+      "afflictionConsumeThreads": "ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する",
       "necromancyHarvestMark": "死亡時に魂の欠片を1個生成することがある",
       "necromancyOssuaryMark": "あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する",
       "necromancyDeathEcho": "旧仕様のデス・エコー。現在これを消費するアビリティはない",
@@ -10084,7 +10084,7 @@ export const ja_JP: EnTranslations = {
       "none": "すべての条件に合うクラスはありません。一つ解除するともっと表示されます。"
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
+      "evil_eye": "敵を一体指定し、その行動と苦痛から断罪を蓄積します。",
       "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
       "revenge": "前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。",
       "hamstring": "敵の移動を妨げ、逃走を阻止する。",
@@ -10163,8 +10163,8 @@ export const ja_JP: EnTranslations = {
       "demon_skin": "肌を硬化させてアーマーを上げる、持続する自己強化です。",
       "immolate": "標的に火を放ち、初撃を与えつつ燃焼を残します。",
       "corruption": "標的をシャドウで蝕み、他の行動をしている間も継続して効果が続きます。",
-      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
-      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
+      "life_tap": "マナが尽きたとき、自分の体力を一部マナに変換します。",
+      "hard_bargain": "傷を負ったとき、マナの20%を体力の20%と引き換えます。",
       "wrath": "遠距離から標的に放つネイチャーのボルト。主力の火力です。",
       "healing_touch": "詠唱は長いものの回復量の大きい単体ヒールで、体力を満タンに戻します。",
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
@@ -18266,47 +18266,47 @@ export const ja_JP: EnTranslations = {
       },
       "corruption": {
         "name": "黒腐れ",
-        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
+        "description": "対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。"
       },
       "evil_eye": {
-        "name": "Rotmark",
-        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
+        "name": "邪眼",
+        "description": "敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。"
       },
       "maledict_gaze": {
         "name": "呪眼の凝視",
-        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
+        "description": "呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。"
       },
       "needle_of_fate": {
-        "name": "Carrion Dart",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
+        "name": "運命の針",
+        "description": "敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を{needleDoom}生成し、邪眼がなければ先に対象を指定します。"
       },
       "sentence": {
-        "name": "Putrefy",
-        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+        "name": "宣告",
+        "description": "断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。"
       },
       "hard_bargain": {
-        "name": "Hard Bargain",
-        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+        "name": "過酷な取引",
+        "description": "最大マナの20%を捧げ、最大体力の{healPct}%を回復します。"
       },
       "life_tap": {
-        "name": "Cruel Pact",
-        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
+        "name": "残酷な契約",
+        "description": "最大体力の10%を捧げ、最大マナの{manaPct}%を回復します。体力が20%以下のときは使用できません。"
       },
       "cursed_accomplice": {
         "name": "呪われた共犯者",
-        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
+        "description": "味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。"
       },
       "curse_of_agony": {
-        "name": "Festerhex",
-        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
+        "name": "苦悶の呪い",
+        "description": "対象に苦痛の呪いをかけ、24秒間で {damage} の暗黒ダメージを与えます。"
       },
       "drain_life": {
         "name": "喰らう",
-        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
+        "description": "対象の生命力を貪り、毎秒{damage}の影ダメージを与え、その70%を体力としてあなたへ移します。苦痛はその全てを移します。主たる邪眼へ詠唱を維持すると、開始時に運命の糸をすべて消費し、糸1本ごとに刻みあたり追加で断罪が1得られます。"
       },
       "litany_of_guilt": {
         "name": "罪責の連祷",
-        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。"
       },
       "cinderhide": {
         "name": "燼皮",
@@ -18314,39 +18314,39 @@ export const ja_JP: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "影の錨",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
+        "description": "初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。"
       },
       "soulwell": {
         "name": "魂の泉",
         "description": "魂の泉を3分間召喚します。戦闘外であれば、グループメンバーは魂の石を3個まで補充できます。魂の石は最大体力の25%を回復し、ポーションとクールダウンを共有します。"
       },
       "hex_of_violence": {
-        "name": "Rotfever",
-        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
+        "name": "暴虐の呪い",
+        "description": "敵を8秒間呪い、2秒ごとに影ダメージを与えて断罪を2生成します。次の3回の攻撃行動ごとに断罪を7生成し、17の影ダメージで反撃します。"
       },
       "cruel_pact": {
         "name": "残酷な契約",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
+        "description": "最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。"
       },
       "vicarious_suffering": {
         "name": "苦痛の肩代わり",
-        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
+        "description": "8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。"
       },
       "possess_evil_eye": {
-        "name": "Possess the Rotmark",
-        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "name": "邪眼憑依",
+        "description": "呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えます。遅延反響は60%のダメージを与え、レベル17から20にかけて30%まで低下します。"
       },
       "hour_of_judgment": {
-        "name": "Hour of Rot",
-        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
+        "name": "審判の刻",
+        "description": "主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。"
       },
       "coven": {
-        "name": "Contagion",
-        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+        "name": "魔女盟約",
+        "description": "周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。"
       },
       "plague_bloom": {
-        "name": "Plague Bloom",
-        "description": "Spends 60 Blight: up to 5 enemies within 30 yd carrying your Blackrot instantly take 4 ticks of every DoT of yours on them."
+        "name": "疫病の開花",
+        "description": "断罪を60消費：自分の黒腐れを受けている30ヤード以内の敵最大5体が、自分のすべてのDoTの4ティック分のダメージを即座に受ける。"
       },
       "fear": {
         "name": "責め苦",
@@ -18698,7 +18698,7 @@ export const ja_JP: EnTranslations = {
       },
       "siphon_life": {
         "name": "サイフォンライフ",
-        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
+        "description": "敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）"
       },
       "conflagrate": {
         "name": "コンフラグレート",
@@ -18953,7 +18953,7 @@ export const ja_JP: EnTranslations = {
       },
       "dark_pact": {
         "name": "血の盟約",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
+        "description": "現在の体力の10%を捧げ、8秒間、最大体力の30%に相当するダメージを吸収します。"
       },
       "cloak_of_shadows": {
         "name": "影まとい",
@@ -30871,8 +30871,8 @@ export const ja_JP: EnTranslations = {
       },
       "hexthread": {
         "name": "ヘックススレッドの外套",
-        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
+        "bonus2": "運命の針が断罪を追加で2生成します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "宣告を下すたびに断罪を10返還します。"
       },
       "moonscorch": {
         "name": "ムーンスコーチの法衣",

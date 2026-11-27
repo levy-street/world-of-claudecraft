@@ -10548,8 +10548,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel.',
   'entities.abilities.lesser_heal.name': 'Šeptaná modlitba',
-  'entities.abilities.life_tap.description': 'Převede {damage} zdraví na {damage} many.',
-  'entities.abilities.life_tap.name': 'Tvrdý obchod',
+  'entities.abilities.life_tap.description':
+    'Obětuje 10 % maximálního zdraví a obnoví {manaPct} % maximální many. Nelze použít při 20 % zdraví nebo méně.',
+  'entities.abilities.hard_bargain.name': 'Tvrdý obchod',
+  'entities.abilities.life_tap.name': 'Krutá dohoda',
   'entities.abilities.lightning_bolt.description':
     'Způsobí {damage} přírodního poškození. Poškození roste se silou kouzel. Volání hromu: zásah udělí 1 Hrom.',
   'entities.abilities.lightning_bolt.name': 'Bleskový šíp',
@@ -16568,7 +16570,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Vysát spotřebovává {stacks} Nití osudu za {doom} Odsouzení navíc za tik',
   'hudChrome.auraEffect.afflictionEye':
-    'Proklínající pohled útočí každých {interval} s; efekty na tomto Oku generují {pct} % Odsouzení',
+    'Vaše DoTy zde způsobují o {dotPct} % vyšší poškození a {echoPct} % každého tiku přenesou na blízké nepřátele s vaší Černou hnilobou; efekty zde generují {pct} % Odsouzení',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Efekty na tomto Oku generují {doomPct} % Odsouzení; Rozsudek sem zasáhne ozvěnou za {echoPct} % poškození',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -16582,7 +16584,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Přesměruje nebo sníží {pct} % příchozího poškození a může vygenerovat až {max} Odsouzení',
   'hudChrome.auraEffect.afflictionViolence':
-    'Zbývá {charges} odplat: nepřátelský útok udělí {doom} Odsouzení a vrátí {damage} stínového poškození',
+    'Tiky vašich DoTů zde mají {pct}% šanci proběhnout znovu',
   'hudChrome.auraEffect.aoeEcho':
     'Zbývá {charges} ozvěn: schopnosti na jeden cíl zasáhnou i až {targets} blízké nepřátele za {pct} % poškození',
   'hudChrome.auraEffect.arcaneCharge':

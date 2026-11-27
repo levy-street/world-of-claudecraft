@@ -5917,13 +5917,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formLich':
     'Lanza de alma también golpea hasta a {targets} enemigos cercanos por un {pct}% de daño',
   'hudChrome.auraEffect.afflictionEye':
-    'Mirada maléfica ataca cada {interval} s; los efectos en este Ojo generan un {pct}% de Condena',
+    'Tus DoT infligen un {dotPct}% más aquí y reflejan un {echoPct}% de cada tic en enemigos cercanos con tu Putrefacción Negra; los efectos aquí generan un {pct}% de Condena',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Los efectos en este Ojo generan un {doomPct}% de Condena; Sentencia hace eco aquí por un {echoPct}% de daño',
   'hudChrome.auraEffect.afflictionAccomplice':
     'El daño válido genera {value} de Condena, como máximo una vez cada {interval} s',
   'hudChrome.auraEffect.afflictionViolence':
-    'Quedan {charges} represalias; un ataque enemigo genera {doom} de Condena y devuelve {damage} de daño de las Sombras',
+    'Tus tics de DoT aquí tienen un {pct}% de probabilidad de repetirse',
   'hudChrome.auraEffect.afflictionVicarious':
     'Redirige o reduce un {pct}% del daño recibido y puede generar hasta {max} de Condena',
   'hudChrome.auraEffect.afflictionPossession':
@@ -9515,8 +9515,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Putrefacción Negra',
   'entities.abilities.corruption.description':
     'Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s.',
-  'entities.abilities.life_tap.name': 'Trato Amargo',
-  'entities.abilities.life_tap.description': 'Convierte {damage} de salud en {damage} de maná.',
+  'entities.abilities.life_tap.name': 'Pacto cruel',
+  'entities.abilities.life_tap.description':
+    'Sacrifica el 10% de tu salud máxima para restaurar el {manaPct}% de tu maná máximo. No se puede usar con el 20% de salud o menos.',
+  'entities.abilities.hard_bargain.name': 'Trato Amargo',
   'entities.abilities.curse_of_agony.name': 'Sortilegio de Angustia',
   'entities.abilities.curse_of_agony.description':
     'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',

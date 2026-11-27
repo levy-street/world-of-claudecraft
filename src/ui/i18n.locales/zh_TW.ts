@@ -7659,8 +7659,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '灼燒敵人，造成 {damage} 點火焰傷害，並在 15 秒內額外造成 {overTime}。',
   'entities.abilities.corruption.name': '黑腐術',
   'entities.abilities.corruption.description': '腐蝕目標，在 18 秒內造成 {damage} 點暗影傷害。',
-  'entities.abilities.life_tap.name': '苛刻交易',
-  'entities.abilities.life_tap.description': '將 {damage} 點生命值轉化為 {damage} 點法力值。',
+  'entities.abilities.life_tap.name': '殘酷契約',
+  'entities.abilities.life_tap.description':
+    '犧牲最大生命值的 10%，恢復最大法力值的 {manaPct}%。生命值不高於 20% 時無法使用。',
+  'entities.abilities.hard_bargain.name': '苛刻交易',
+  'entities.abilities.hard_bargain.description':
+    '犧牲最大法力值的 20%，恢復最大生命值的 {healPct}%。',
+  'guide.abilityHook.hard_bargain': '受傷時以 20% 的法力值換取 20% 的生命值。',
+  'entities.abilities.plague_bloom.name': '瘟疫綻放',
+  'entities.abilities.plague_bloom.description':
+    '消耗 60 點譴罪：30 碼內最多 5 個帶有你黑腐術的敵人立即承受你在其身上所有持續傷害效果的 4 次跳傷。',
   'entities.abilities.curse_of_agony.name': '苦楚邪咒',
   'entities.abilities.curse_of_agony.description':
     '以痛苦詛咒目標：在 24 秒內造成 {damage} 點暗影傷害。',
@@ -19359,7 +19367,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     '汲取生命正在消耗 {stacks} 層命運絲線，每次額外產生 {doom} 點定罪值',
   'hudChrome.auraEffect.afflictionEye':
-    '惡咒凝視每 {interval} 秒攻擊一次；此邪眼上的效果產生 {pct}% 的定罪值',
+    '你的持續傷害效果在此處造成的傷害提高 {dotPct}%，每次跳傷的 {echoPct}% 會傳導給附近帶有你黑腐術的敵人；此處的效果產生 {pct}% 的譴罪',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     '此邪眼上的效果產生 {doomPct}% 的定罪值；宣判在此迴響並造成 {echoPct}% 傷害',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -19371,8 +19379,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionPossession': '強化命運之針、汲取生命、惡咒凝視和宣判',
   'hudChrome.auraEffect.afflictionVicarious':
     '轉移或降低 {pct}% 的受到傷害，並可產生最多 {max} 點定罪值',
-  'hudChrome.auraEffect.afflictionViolence':
-    '剩餘 {charges} 次報復；敵人攻擊會產生 {doom} 點定罪值並反擊 {damage} 點暗影傷害',
+  'hudChrome.auraEffect.afflictionViolence': '你在此處的持續傷害跳傷有 {pct}% 的機率再跳一次',
   'hudChrome.auraEffect.aoeEcho':
     '剩餘 {charges} 次迴響：單體技能對附近最多 {targets} 個敵人造成 {pct}% 傷害',
   'hudChrome.auraEffect.arcaneCharge':

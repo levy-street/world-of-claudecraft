@@ -8265,8 +8265,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht.',
   'entities.abilities.lesser_heal.name': 'Gefluisterd Gebed',
-  'entities.abilities.life_tap.description': 'Zet {damage} levenskracht om in {damage} mana.',
-  'entities.abilities.life_tap.name': 'Zware Koop',
+  'entities.abilities.life_tap.description':
+    'Offert 10% van je maximale levenskracht om {manaPct}% van je maximale mana te herstellen. Niet bruikbaar bij 20% levenskracht of minder.',
+  'entities.abilities.hard_bargain.name': 'Zware Koop',
+  'entities.abilities.life_tap.name': 'Wreed pact',
   'entities.abilities.lightning_bolt.description':
     'Brengt {damage} Natuurschade toe. De schade stijgt met de Spreukkracht. Elementair: een treffer verleent 1 Donder.',
   'entities.abilities.lightning_bolt.name': 'Boogbliksem',
@@ -16822,7 +16824,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Verteren verbruikt {stacks} Lotsdraden voor {doom} extra Verdoemenis per tik',
   'hudChrome.auraEffect.afflictionEye':
-    'Vloekblik valt elke {interval} sec aan; effecten bij dit Oog genereren {pct}% Verdoemenis',
+    'Jouw DoT-effecten doen hier {dotPct}% meer schade en kaatsen {echoPct}% van elke tik terug naar nabije vijanden met jouw Zwartrot; effecten hier genereren {pct}% Verdoemenis',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Effecten bij dit Oog genereren {doomPct}% Verdoemenis; Vonnis weerklinkt hier voor {echoPct}% schade',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -16836,7 +16838,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Leidt {pct}% van de inkomende schade om of vermindert die, en kan tot {max} Verdoemenis genereren',
   'hudChrome.auraEffect.afflictionViolence':
-    '{charges} vergeldingen resteren; een vijandelijke aanval kent {doom} Verdoemenis toe en brengt {damage} Schaduwschade terug toe',
+    'Jouw DoT-tikken hier hebben {pct}% kans om nogmaals te tikken',
   'hudChrome.auraEffect.aoeEcho':
     "{charges} echo's resteren: vaardigheden voor één doelwit brengen {pct}% schade toe aan tot {targets} nabije vijanden",
   'hudChrome.auraEffect.arcaneCharge':

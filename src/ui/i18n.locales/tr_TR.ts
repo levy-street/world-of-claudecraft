@@ -8077,8 +8077,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar.',
   'entities.abilities.lesser_heal.name': 'Fısıldanan Dua',
-  'entities.abilities.life_tap.description': '{damage} canı {damage} manaya dönüştürür.',
-  'entities.abilities.life_tap.name': 'Ağır Pazarlık',
+  'entities.abilities.life_tap.description':
+    "Azami canının %10'unu feda ederek azami mananın {manaPct}%'ini yeniler. Canın %20 veya altındayken kullanılamaz.",
+  'entities.abilities.hard_bargain.name': 'Ağır Pazarlık',
+  'entities.abilities.life_tap.name': 'Zalim Ahit',
   'entities.abilities.lightning_bolt.description':
     '{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: isabet 1 Gök Gürültüsü verir.',
   'entities.abilities.lightning_bolt.name': 'Ark Oku',
@@ -16653,7 +16655,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Tüketme, tur başına {doom} ekstra Mahkûmiyet için {stacks} Kader İpliğini tüketiyor',
   'hudChrome.auraEffect.afflictionEye':
-    "Kem Bakış her {interval} sn'de bir saldırır; bu Göz'deki etkiler {pct}% Mahkûmiyet üretir",
+    "DoT'ların burada {dotPct}% daha fazla hasar verir ve her tikin {echoPct}%'ini Kara Çürümen olan yakındaki düşmanlara yansıtır; buradaki etkiler {pct}% Mahkûmiyet üretir",
   'hudChrome.auraEffect.afflictionEyeSecondary':
     "Bu Göz'deki etkiler {doomPct}% Mahkûmiyet üretir; Hüküm buraya {echoPct}% hasarla yankılanır",
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -16667,7 +16669,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     "Gelen hasarın {pct}%'ini yönlendirir ya da azaltır ve en fazla {max} Mahkûmiyet üretebilir",
   'hudChrome.auraEffect.afflictionViolence':
-    '{charges} misilleme kaldı; bir düşman saldırısı {doom} Mahkûmiyet kazandırır ve karşılığında {damage} Gölge hasarı verir',
+    'Buradaki DoT tiklerinin yeniden gerçekleşme şansı {pct}%',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} yankı kaldı: tek hedefli yetenekler yakındaki en fazla {targets} düşmana {pct}% hasar verir',
   'hudChrome.auraEffect.arcaneCharge':

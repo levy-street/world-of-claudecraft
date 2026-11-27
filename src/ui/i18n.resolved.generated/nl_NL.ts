@@ -1029,13 +1029,13 @@ export const nl_NL: EnTranslations = {
       "shotRules": "Richt binnen het gemarkeerde veld. Geen mana-kosten. Schade tegen andere spelers telt niet mee. Niet geblokkeerd. Een Zilveren medaille en beter verslaat alle vijanden automatisch."
     },
     "warlock": {
-      "doomLabel": "Blight",
-      "fateThreadsLabel": "Rot Splinters",
-      "doomEmptyStatus": "{value} of {max} Blight.",
-      "doomStatus": "{value} of {max} Blight; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Rot Splinters.",
-      "fateThreadsConsumeReady": "Three Rot Splinters: Consume can draw them into additional Blight.",
-      "fateThreadsSentenceReady": "Three Rot Splinters: Putrefy can consume them for 18% increased damage."
+      "doomLabel": "Verdoemenis",
+      "fateThreadsLabel": "Lotsdraden",
+      "doomEmptyStatus": "{value} van {max} Verdoemenis.",
+      "doomStatus": "{value} van {max} Verdoemenis; {remaining}.",
+      "fateThreadsStatus": "{value} van {max} Lotsdraden.",
+      "fateThreadsConsumeReady": "Drie Lotsdraden: Verteren kan ze verweven tot extra Verdoemenis.",
+      "fateThreadsSentenceReady": "Drie Lotsdraden: Vonnis kan ze verbruiken voor 18% meer schade."
     },
     "priest": {
       "gloomtitheLabel": "Schemertiende",
@@ -4795,7 +4795,7 @@ export const nl_NL: EnTranslations = {
       "effigyLanternOut": "De lantaarn van de Strovoorman is voor jou uit: jouw slagen en die van je huisdier negeren zijn Plankenhuid en raken volledig",
       "leadenHexLock": "Loden vloek kan dit doelwit nog niet opnieuw vastwortelen",
       "forbiddenReflectionReady": "Je volgende in aanmerking komende Heksenmeester-afkoeltijd kan opnieuw worden ingezet",
-      "forbiddenReflectionLock": "Recharging: a new Forbidden Reflection can form when this timer ends (once every 60 sec)",
+      "forbiddenReflectionLock": "Verboden Weerspiegeling kan nog niet opnieuw worden voorbereid",
       "internalCooldown": "Dit effect kan niet opnieuw worden geactiveerd voordat de timer afloopt",
       "carriedFlag": "Je draagt de vlag van de vijand. Zeg deze buff op om hem te laten vallen.",
       "carryingFreight": "Je draagt vracht. Bewegingssnelheid is verminderd met {pct}%.",
@@ -4965,16 +4965,16 @@ export const nl_NL: EnTranslations = {
       "formShadow": "Schaduwvorm: Schaduwschade verhoogd met {pct}%",
       "resourceCount": "{value} van {max}",
       "formLich": "Zielenlans treft ook tot {targets} nabije vijanden voor {pct}% schade",
-      "afflictionEye": "Your DoTs deal {dotPct}% more here and echo {echoPct}% of each tick to nearby enemies with your Blackrot; effects here generate {pct}% Blight",
-      "afflictionEyeSecondary": "Effects at this Rotmark generate {doomPct}% Blight; Putrefy echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Blight, at most once every {interval} sec",
-      "afflictionViolence": "Your DoT ticks here have a {pct}% chance to tick again",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Blight",
-      "afflictionPossession": "Empowers Carrion Dart, Consume, and Putrefy",
-      "afflictionJudgment": "Primary Rotmark and DoT ticks generate {eyePct}% more Blight; Putrefy deals {sentencePct}% more damage and the first refunds {refund} Blight",
-      "afflictionLitany": "Blight gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Rot Splinters: Putrefy deals {sentencePct}% more damage, or Consume gains {doom} extra Blight per tick",
-      "afflictionConsumeThreads": "Consume is draining {stacks} Rot Splinters for {doom} extra Blight per tick",
+      "afflictionEye": "Jouw DoT-effecten doen hier {dotPct}% meer schade en kaatsen {echoPct}% van elke tik terug naar nabije vijanden met jouw Zwartrot; effecten hier genereren {pct}% Verdoemenis",
+      "afflictionEyeSecondary": "Effecten bij dit Oog genereren {doomPct}% Verdoemenis; Vonnis weerklinkt hier voor {echoPct}% schade",
+      "afflictionAccomplice": "Kwalificerende schade kent {value} Verdoemenis toe, hoogstens eenmaal per {interval} sec",
+      "afflictionViolence": "Jouw DoT-tikken hier hebben {pct}% kans om nogmaals te tikken",
+      "afflictionVicarious": "Leidt {pct}% van de inkomende schade om of vermindert die, en kan tot {max} Verdoemenis genereren",
+      "afflictionPossession": "Versterkt Naald van het lot, Verteren, Vloekblik en Vonnis",
+      "afflictionJudgment": "Primaire Oog genereert {eyePct}% meer Verdoemenis; Vonnis brengt {sentencePct}% meer schade toe en de eerste geeft {refund} Verdoemenis terug",
+      "afflictionLitany": "Verdoemenis-winsten brengen {damage} Schaduwschade toe aan tot {targets} vijanden binnen {radius} m, eenmaal per sec",
+      "afflictionFateThreads": "{stacks} Lotsdraden: Vonnis brengt {sentencePct}% meer schade toe, of Verteren krijgt {doom} extra Verdoemenis per tik",
+      "afflictionConsumeThreads": "Verteren verbruikt {stacks} Lotsdraden voor {doom} extra Verdoemenis per tik",
       "necromancyHarvestMark": "Dood kan 1 Zielfragment creëren",
       "necromancyOssuaryMark": "Slaat {storedPct}% van jouw en je ondode schade op, plus {lancePct}% van de schade van Zielenlans; werp opnieuw om te laten ontploffen. Dood ontploft binnen {radius} yard en creëert 1 Zielfragment",
       "necromancyDeathEcho": "Verouderde Death Echo; geen enkele huidige vaardigheid verbruikt hem",
@@ -10084,7 +10084,7 @@ export const nl_NL: EnTranslations = {
       "none": "Geen klasse voldoet aan elk filter. Wis er een om meer te zien."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Blight.",
+      "evil_eye": "Noemt de vijand wiens daden en lijden je Verdoemenis zullen voeden.",
       "heroic_strike": "Zet een zwaardere uithaal in de wachtrij die rage besteedt bij je volgende klap.",
       "revenge": "Raakt vijanden voor je en kan gratis worden na een ontwijking of parering.",
       "hamstring": "Belemmert de beweging van een vijand zodat die niet kan ontsnappen.",
@@ -10163,7 +10163,7 @@ export const nl_NL: EnTranslations = {
       "demon_skin": "Een blijvende zelfbuff die je huid verhardt en pantser toevoegt.",
       "immolate": "Steekt een doelwit in brand voor een openingsklap en een brand die blijft hangen.",
       "corruption": "Laat een doelwit wegrotten met schaduw die tikt terwijl jij andere dingen doet.",
-      "life_tap": "Trades 10% of your health for 20% of your mana when you run dry.",
+      "life_tap": "Ruilt een deel van je eigen gezondheid terug om in mana wanneer je droog komt te staan.",
       "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Een natuurbout die van afstand op een doelwit wordt geworpen, je vertrouwde nuke.",
       "healing_touch": "Een grote enkeldoelsgenezing met een lange spreuktijd, om iemand aan te vullen.",
@@ -18266,47 +18266,47 @@ export const nl_NL: EnTranslations = {
       },
       "corruption": {
         "name": "Zwartrot",
-        "description": "Rots the target for {damage} Shadow damage over 45 sec, each tick generating 1 Blight. If the target dies, Blackrot jumps to the nearest enemy within 10 yd. Stealth cannot remove it."
+        "description": "Bederft het doelwit en veroorzaakt {damage} Schaduwschade gedurende 18 sec."
       },
       "evil_eye": {
-        "name": "Rotmark",
-        "description": "Marks one enemy as the focus of your curses. Your Blackrot, Festerhex and Veinleech deal 20% more to it, and 15% of each of their ticks there also hits up to 4 other enemies carrying your Blackrot within 30 yd. Your DoT ticks generate full Blight on it and half on other enemies. Moving the Rotmark preserves Blight but does not refresh its 20 sec expiry."
+        "name": "Boze oog",
+        "description": "Markeert één vijand als het middelpunt van je vervloekingen. Het Oog verplaatsen behoudt de Verdoemenis, maar vernieuwt zijn vervaltijd van 20 sec niet."
       },
       "maledict_gaze": {
         "name": "Vloekblik",
-        "description": "Cosmetic: your Maledict Eye fires your ranged auto-attack in place of your wand. Damage, speed and range are unchanged."
+        "description": "Je Maledict Eye valt je geselecteerde primaire Boze oog elke 2,5 sec aan voor Schaduwschade. Neem het Boze oog over verdubbelt zijn aanvalssnelheid."
       },
       "needle_of_fate": {
-        "name": "Carrion Dart",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Blight on impact if it still bears your Rotmark. Completing a cast moves your primary Rotmark to the target and adds a Rot Splinter for 15 sec, up to 3. Rot Splinters stay with you when the Rotmark moves or its target dies."
+        "name": "Naald van het lot",
+        "description": "Doorboort de vijand voor {damage} Schaduwschade en genereert {needleDoom} Verdoemenis als het je Boze oog draagt. Elke treffer op je primaire Boze oog voegt een Lotsdraad toe voor 12 sec, tot 3. Als er geen Boze oog bestaat, markeert de Needle eerst zijn doelwit."
       },
       "sentence": {
-        "name": "Putrefy",
-        "description": "Consumes all Blight and Rot Splinters to putrefy the enemy and refresh your Blackrot, Festerhex and Veinleech on it. Needs at least 20 Blight; damage grows with the Blight consumed, and each Splinter adds 6%. At 50 Blight it also heals you for 30% of the damage dealt. At 80 Blight it also hits enemies within 12 yd of the target for 35% of its damage. At 100 Blight it deals 5% more to players and bosses and finishes off normal enemies below 20% health. Other enemies under your Rotmark take 35% of its damage. Its damage scaling flattens after level 16."
+        "name": "Vonnis",
+        "description": "Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Elke Draad verhoogt de schade met 6%. Extra effecten schalen op bij 20, 50, 80 en 100 Verdoemenis. De schaalvergroting van zijn schade vlakt af na niveau 16."
       },
       "hard_bargain": {
-        "name": "Hard Bargain",
+        "name": "Zware Koop",
         "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
       },
       "life_tap": {
-        "name": "Cruel Pact",
-        "description": "Sacrifices 10% of your maximum health to restore {manaPct}% of your maximum mana. Cannot be used at or below 20% health."
+        "name": "Wreed pact",
+        "description": "Offert 10% van je maximale levenskracht om {manaPct}% van je maximale mana te herstellen. Niet bruikbaar bij 20% levenskracht of minder."
       },
       "cursed_accomplice": {
         "name": "Vervloekte handlanger",
-        "description": "Links one group member or pet (yours or a group member's): their damage to your Rotmark generates 3 Blight. With no one else selected, it links you: your own damage to your Rotmark generates 2 Blight. A link can trigger once every 2 sec, and a new link replaces the previous one."
+        "description": "Verbindt je Maledict Eye wanneer geen bondgenoot is geselecteerd, waardoor de Gaze 2 Verdoemenis genereert. Het verbinden van één geselecteerd groepslid zorgt ervoor dat alleen hun schade aan je Boze oog in plaats daarvan 3 genereert. Een nieuwe verbinding vervangt de vorige en kan hoogstens eenmaal per 2 sec activeren."
       },
       "curse_of_agony": {
-        "name": "Festerhex",
-        "description": "Curses the target with festering rot: {damage} Shadow damage over 16 sec, each tick generating 2 Blight."
+        "name": "Ban van Kwelling",
+        "description": "Vervloekt het doelwit met pijn: {damage} Schaduwschade gedurende 24 sec."
       },
       "drain_life": {
         "name": "Verteren",
-        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Blightcaller transfers all of it instead. When channeled on your primary Rotmark, it consumes all Rot Splinters at the start, and each Splinter generates 1 extra Blight per tick."
+        "description": "Verteert de levenskracht van het doelwit, brengt elke seconde {damage} Schaduwschade toe en draagt daarvan 70% als gezondheid aan u over. Kwelling draagt in plaats daarvan alles over. Gekanaliseerd op uw voornaamste Boze oog verbruikt de spreuk bij aanvang alle Lotsdraden, en elke Draad wekt per tik 1 extra Verdoemenis op."
       },
       "litany_of_guilt": {
         "name": "Schuldlitanie",
-        "description": "Curses your primary Rotmark for 6 sec. Blight gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "description": "Vervloekt je primaire Boze oog gedurende 6 sec. Verdoemenis-winsten laten een golf los die tot 2 andere vijanden binnen 8 yard beschadigt, hoogstens eenmaal per seconde. Rang 2 verlengt dit tot 8 sec en 4 vijanden."
       },
       "cinderhide": {
         "name": "Sintelhuid",
@@ -18314,35 +18314,35 @@ export const nl_NL: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Schaduwanker",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, healing you for 10% of your maximum health, consuming the anchor and starting a 45 sec cooldown."
+        "description": "Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij het anker wordt verbruikt en een afkoeltijd van 45 sec begint."
       },
       "soulwell": {
         "name": "Zielenbron",
         "description": "Roept een Zielenbron op gedurende 3 min. Buiten gevecht kunnen groepsleden hun Zielstenen tot 3 keer bijvullen. Een Zielsteen herstelt 25% van de maximale gezondheid en deelt de afkoeltijd van drankjes."
       },
       "hex_of_violence": {
-        "name": "Rotfever",
-        "description": "Infects the enemy with rot fever for 8 sec: each of your DoT ticks on it has a 70% chance to tick again. Does not trigger the global cooldown."
+        "name": "Geweldsvloek",
+        "description": "Betovert de vijand gedurende 8 sec, waarbij Schaduwschade wordt toegebracht en elke 2 sec 2 Verdoemenis wordt gegenereerd. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 17 Schaduwschade."
       },
       "cruel_pact": {
         "name": "Wreed pact",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Blight. Cannot be used at or below 20% health."
+        "description": "Offert 12% van je maximale gezondheid op om 1,5% van je maximale mana te herstellen en 20 Verdoemenis te genereren. Kan niet worden gebruikt op of onder 20% gezondheid."
       },
       "vicarious_suffering": {
         "name": "Plaatsvervangend lijden",
-        "description": "Links your suffering for 8 sec and generates up to 15 Blight from hostile hits. On yourself, reduces damage taken by 40%. On an ally, redirects up to 40% to you without taking you below 15% health."
+        "description": "Verbindt je lijden gedurende 8 sec en genereert tot 15 Verdoemenis van vijandige treffers. Op jezelf vermindert het de opgelopen schade met 20%. Op een bondgenoot leidt het tot 20% naar jou om, zonder je onder 15% gezondheid te brengen."
       },
       "possess_evil_eye": {
-        "name": "Possess the Rotmark",
-        "description": "The Maledictor possesses your primary Rotmark for 15 sec and generates 35 Blight. Carrion Dart casts in 1 sec and generates 2 extra Blight, Consume can be channeled while moving, and Putrefy deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "name": "Neem het Boze oog over",
+        "description": "De Maledictor bezit je primaire Boze oog gedurende 15 sec en genereert 35 Verdoemenis. Naald van het lot wordt in 1 sec gespreukt en genereert 2 extra Verdoemenis, Verteren kan worden gekanaliseerd terwijl je beweegt, en Vonnis brengt 25% meer schade toe en laat een vertraagde echo los voor 60% schade, aflopend tot 30% over de niveaus 17-20."
       },
       "hour_of_judgment": {
-        "name": "Hour of Rot",
-        "description": "Brings the Hour of Rot upon your primary Rotmark for 15 sec, granting 40 Blight and 3 Rot Splinters, doubling the Blight generated through the primary Rotmark and by your DoT ticks, and increasing Putrefy damage by 20%. The first Putrefy refunds 50 Blight."
+        "name": "Uur van het oordeel",
+        "description": "Roept oordeel af over je primaire Boze oog gedurende 15 sec, wat 40 Verdoemenis en 3 Lotsdraden toekent, Possession activeert, de Verdoemenis die via het primaire Oog wordt gegenereerd verdubbelt, en de schade van Vonnis met 20% verhoogt. De eerste Vonnis geeft 50 Verdoemenis terug."
       },
       "coven": {
-        "name": "Contagion",
-        "description": "Spends 30 Blight to copy your Blackrot, Festerhex and Veinleech from the target onto up to 3 enemies within 12 yd."
+        "name": "Heksenkring",
+        "description": "Creëert secundaire Boze ogen op tot 4 nabije vijanden gedurende 15 sec. Ze voeden de gedeelde Verdoemenis-pool voor 50%, en Vonnis weerklinkt naar hen voor 35% schade."
       },
       "plague_bloom": {
         "name": "Plague Bloom",
@@ -18698,7 +18698,7 @@ export const nl_NL: EnTranslations = {
       },
       "siphon_life": {
         "name": "Levenshevel",
-        "description": "Siphons life from the enemy: {damage} Shadow damage over 24 sec, healing you for all of it. Healing past full health becomes a shield of up to 10% of your maximum health. Each tick generates 1 Blight."
+        "description": "Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)"
       },
       "conflagrate": {
         "name": "Ontvlamming",
@@ -18953,7 +18953,7 @@ export const nl_NL: EnTranslations = {
       },
       "dark_pact": {
         "name": "Bloedverbond",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 30 sec."
+        "description": "Offert 10% van je huidige gezondheid op om schade te absorberen gelijk aan 30% van je maximale gezondheid gedurende 8 sec."
       },
       "cloak_of_shadows": {
         "name": "Schaduwmantel",
@@ -30871,8 +30871,8 @@ export const nl_NL: EnTranslations = {
       },
       "hexthread": {
         "name": "Hexdraad-Sluier",
-        "bonus2": "Your DoT ticks on your Rotmark target have a 10% chance to add a Rot Splinter. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Putrefy refunds 10 Blight for each Rot Splinter it consumes."
+        "bonus2": "Naald van het lot verleent 2 extra Condemnation. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Passing Vonnis geeft 10 Condemnation terug."
       },
       "moonscorch": {
         "name": "Maanschroeisel-Kledij",

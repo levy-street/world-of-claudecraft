@@ -8164,8 +8164,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
   'entities.abilities.lesser_heal.name': 'Lời Nguyện Thì Thầm',
-  'entities.abilities.life_tap.description': 'Chuyển hóa {damage} máu thành {damage} mana.',
-  'entities.abilities.life_tap.name': 'Mặc Cả Nghiệt Ngã',
+  'entities.abilities.life_tap.description':
+    'Hiến tế 10% máu tối đa để hồi {manaPct}% mana tối đa. Không thể dùng khi máu từ 20% trở xuống.',
+  'entities.abilities.hard_bargain.name': 'Mặc Cả Nghiệt Ngã',
+  'entities.abilities.life_tap.name': 'Khế Ước Tàn Nhẫn',
   'entities.abilities.lightning_bolt.description':
     'Gây {damage} sát thương Tự Nhiên. Sát thương tăng theo Sức Mạnh Phép Thuật. Nguyên Tố: một cú trúng ban 1 Sấm.',
   'entities.abilities.lightning_bolt.name': 'Tia Hồ Quang',
@@ -16716,7 +16718,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Nuốt Chửng đang tiêu thụ {stacks} Sợi Định Mệnh để nhận thêm {doom} Kết Án mỗi nhịp',
   'hudChrome.auraEffect.afflictionEye':
-    'Ánh Nhìn Nguyền tấn công mỗi {interval} giây; hiệu ứng tại Mắt Nguyền này tạo ra {pct}% Kết Án',
+    'DoT của bạn gây thêm {dotPct}% sát thương tại đây và dội {echoPct}% mỗi nhịp sang kẻ địch gần đó đang chịu Hắc Hủ của bạn; hiệu ứng tại đây tạo ra {pct}% Kết Án',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Hiệu ứng tại Mắt Nguyền này tạo ra {doomPct}% Kết Án; Phán Quyết vọng lại đây với {echoPct}% sát thương',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -16730,7 +16732,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Chuyển hướng hoặc giảm {pct}% sát thương phải nhận và có thể tạo ra tối đa {max} Kết Án',
   'hudChrome.auraEffect.afflictionViolence':
-    'Còn lại {charges} lần báo thù; một đòn tấn công của địch cấp {doom} Kết Án và phản lại {damage} sát thương Bóng Tối',
+    'Các nhịp DoT của bạn tại đây có {pct}% cơ hội tác động thêm một lần',
   'hudChrome.auraEffect.aoeEcho':
     'Còn lại {charges} lần vọng: kỹ năng đơn mục tiêu gây {pct}% sát thương cho tối đa {targets} kẻ địch gần đó',
   'hudChrome.auraEffect.arcaneCharge':

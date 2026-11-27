@@ -9579,8 +9579,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Podridão Negra',
   'entities.abilities.corruption.description':
     'Corrompe o alvo, causando {damage} de dano de Sombra ao longo de 18 s.',
-  'entities.abilities.life_tap.name': 'Barganha Amarga',
-  'entities.abilities.life_tap.description': 'Converte {damage} de vida em {damage} de mana.',
+  'entities.abilities.life_tap.name': 'Pacto Cruel',
+  'entities.abilities.life_tap.description':
+    'Sacrifica 10% da sua vida máxima para restaurar {manaPct}% da sua mana máxima. Não pode ser usado com 20% de vida ou menos.',
+  'entities.abilities.hard_bargain.name': 'Barganha Amarga',
   'entities.abilities.curse_of_agony.name': 'Praga da Angústia',
   'entities.abilities.curse_of_agony.description':
     'Amaldiçoa o alvo com agonia: {damage} de dano de Sombra ao longo de 24 s.',
@@ -17478,7 +17480,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Consumir está consumindo {stacks} Fios do Destino para {doom} de Condenação extra por tique',
   'hudChrome.auraEffect.afflictionEye':
-    'Olhar Maldito ataca a cada {interval} s; efeitos neste Olho geram {pct}% de Condenação',
+    'Seus DoTs causam {dotPct}% a mais aqui e ecoam {echoPct}% de cada tique para inimigos próximos com sua Podridão Negra; efeitos aqui geram {pct}% de Condenação',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Efeitos neste Olho geram {doomPct}% de Condenação; Sentença ecoa aqui por {echoPct}% de dano',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -17492,7 +17494,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Redireciona ou reduz {pct}% do dano recebido e pode gerar até {max} de Condenação',
   'hudChrome.auraEffect.afflictionViolence':
-    'Restam {charges} represálias; um ataque inimigo concede {doom} de Condenação e causa {damage} de dano das Sombras de volta',
+    'Seus tiques de DoT aqui têm {pct}% de chance de ocorrer de novo',
   'hudChrome.auraEffect.aoeEcho':
     'Restam {charges} ecos: habilidades de alvo único causam {pct}% de dano a até {targets} inimigos próximos',
   'hudChrome.auraEffect.arcaneCharge':

@@ -8189,8 +8189,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.lesser_heal.name': 'Szeptana modlitwa',
-  'entities.abilities.life_tap.description': 'Zamienia {damage} zdrowia na {damage} many.',
-  'entities.abilities.life_tap.name': 'Trudny targ',
+  'entities.abilities.life_tap.description':
+    'Poświęca 10% maksymalnego zdrowia, aby przywrócić {manaPct}% maksymalnej many. Nie można użyć przy 20% zdrowia lub mniej.',
+  'entities.abilities.hard_bargain.name': 'Trudny targ',
+  'entities.abilities.life_tap.name': 'Okrutny Pakt',
   'entities.abilities.lightning_bolt.description':
     'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: trafienie daje 1 Grom.',
   'entities.abilities.lightning_bolt.name': 'Łukowy pocisk',
@@ -16767,7 +16769,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Pochłonięcie zużywa {stacks} Nici Przeznaczenia, zyskując dodatkowe {doom} Potępienia na tik',
   'hudChrome.auraEffect.afflictionEye':
-    'Spojrzenie Przekleństwa atakuje co {interval} s; efekty na tym oku generują {pct}% Potępienia',
+    'Twoje DoT zadają tu o {dotPct}% więcej obrażeń i przenoszą {echoPct}% każdego tyknięcia na pobliskich wrogów z twoją Czarną zgnilizną; efekty tutaj generują {pct}% Potępienia',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Efekty na tym oku generują {doomPct}% Potępienia; Wyrok odbija się tutaj za {echoPct}% obrażeń',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -16781,7 +16783,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Przekierowuje lub zmniejsza {pct}% otrzymywanych obrażeń i może wygenerować do {max} Potępienia',
   'hudChrome.auraEffect.afflictionViolence':
-    'Pozostało {charges} odwetów; atak wroga przyznaje {doom} Potępienia i zadaje mu {damage} obrażeń od Cienia',
+    'Tyknięcia twoich DoT mają tu {pct}% szans na powtórzenie',
   'hudChrome.auraEffect.aoeEcho':
     'Pozostało {charges} ech; zdolności jednocelowe zadają {pct}% obrażeń jeszcze {targets} pobliskim wrogom',
   'hudChrome.auraEffect.arcaneCharge':

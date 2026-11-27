@@ -8116,8 +8116,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Чёрная гниль',
   'entities.abilities.corruption.description':
     'Поражает цель порчей, нанося {damage} ед. урона от темной магии за 18 сек.',
-  'entities.abilities.life_tap.name': 'Тяжёлая сделка',
-  'entities.abilities.life_tap.description': 'Преобразует {damage} здоровья в {damage} маны.',
+  'entities.abilities.life_tap.name': 'Жестокий договор',
+  'entities.abilities.life_tap.description': 'Жертвует 10% максимального запаса здоровья и восполняет {manaPct}% максимального запаса маны. Нельзя использовать при 20% здоровья или меньше.',
+  'entities.abilities.hard_bargain.name': 'Тяжёлая сделка',
+  'entities.abilities.hard_bargain.description': 'Жертвует 20% максимального запаса маны и восполняет {healPct}% максимального запаса здоровья.',
+  'guide.abilityHook.hard_bargain': 'Обменивает 20% маны на 20% здоровья, когда вы ранены.',
+  'entities.abilities.plague_bloom.name': 'Чумной расцвет',
+  'entities.abilities.plague_bloom.description': 'Расходует 60 Осуждения: до 5 врагов в радиусе 30 ярдов под вашей Чёрной гнилью мгновенно получают урон, равный 4 тактам каждого вашего эффекта периодического урона на них.',
   'entities.abilities.curse_of_agony.name': 'Порча муки',
   'entities.abilities.curse_of_agony.description':
     'Проклинает цель агонией: {damage} ед. урона от темной магии за 24 сек.',
@@ -20662,7 +20667,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Похищение жизни поглощает {stacks} Нити судьбы и создаёт ещё {doom} Осуждения за тик',
   'hudChrome.auraEffect.afflictionEye':
-    'Проклятый взгляд атакует раз в {interval} сек.; эффекты на этом оке создают {pct}% Осуждения',
+    'Ваши эффекты периодического урона наносят здесь на {dotPct}% больше и передают {echoPct}% каждого такта ближайшим врагам под вашей Чёрной гнилью; эффекты здесь дают {pct}% Осуждения',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Эффекты на этом оке создают {doomPct}% Осуждения; Приговор отражается сюда с {echoPct}% урона',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -20676,7 +20681,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Перенаправляет или снижает {pct}% входящего урона и может создать до {max} Осуждения',
   'hudChrome.auraEffect.afflictionViolence':
-    'Осталось возмездий: {charges}. Атака врага создаёт {doom} Осуждения и наносит ему {damage} ед. урона от темной магии',
+    'Такты ваших эффектов периодического урона здесь с вероятностью {pct}% срабатывают ещё раз',
   'hudChrome.auraEffect.aoeEcho':
     'Осталось отражений: {charges}. Одиночные умения наносят {pct}% урона ещё до {targets} ближайшим врагам',
   'hudChrome.auraEffect.arcaneCharge':
