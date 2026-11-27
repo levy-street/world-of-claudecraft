@@ -494,7 +494,9 @@ export class HeatBody {
     } else if (
       ev.type === 'spellfx' &&
       ev.sourceId === this.entityId &&
-      (ev.ability === HEAT_CUES.flare || ev.ability === HEAT_CUES.ignite)
+      (ev.ability === HEAT_CUES.flare ||
+        ev.ability === HEAT_CUES.ignite ||
+        ev.ability === HEAT_CUES.brandGather)
     ) {
       this.castGesture();
     } else if (

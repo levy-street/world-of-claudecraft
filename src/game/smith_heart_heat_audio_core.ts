@@ -110,6 +110,15 @@ export const HEAT_CUE_SOUNDS: Readonly<Record<string, readonly HeatSound[]>> = {
     S('heart_council_wrath_blast', 0.35, 'point', 1.05, 0.3),
   ],
   [HEAT_CUES.settle]: [S('heart_heat_settle', 0.9, 'source', 1, 1)],
+  // Wellspring Brand (heat_brand.ts): the fire gathering in its hand (a
+  // WARNING, low and slow at its body), then the brand striking its tank (a
+  // flare's crack with a stone's weight under it). The tank's own warning is
+  // the tank buster's anvil (smith_heart_mark_audio.ts), off the marker.
+  [HEAT_CUES.brandGather]: [S('heart_heat_kindling', 0.6, 'source', 0.75, 1)],
+  [HEAT_CUES.brand]: [
+    S('heart_heat_flare', 0.9, 'target', 0.85, 0.5),
+    S('heart_council_rock_impact', 0.35, 'target', 1.1, 0.5),
+  ],
 };
 
 /** Is this event's ability one the fight's sound plays (the HUD's generic

@@ -678,6 +678,31 @@ export class HeatFightFx implements HeatFxHost {
       case HEAT_CUES.coalOut:
         this.coal.cue('out', dst);
         break;
+      case HEAT_CUES.brandGather:
+        // Wellspring Brand gathers: white-gold sparks boil up off the body
+        // and a hot ring spreads at its waist (the body's cast gesture plays
+        // with it, heat_body.ts).
+        if (src) {
+          this.particles.puff(fxAnchor(src).x, fxAnchor(src).y + 8, fxAnchor(src).z, 24, {
+            ...SPARK,
+            up: 6,
+            radius: 2.5,
+          });
+          this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, C.ringGold, 16, 0.7);
+        }
+        break;
+      case HEAT_CUES.brand:
+        // Hurled onto its tank: the flare's bolt, a burst of sparks and a
+        // small hot ring at their feet.
+        this.flareBolt(ev.sourceId, ev.targetId);
+        if (dst) {
+          this.particles.puff(fxAnchor(dst).x, fxAnchor(dst).y + 1.2, fxAnchor(dst).z, 22, {
+            ...SPARK,
+            speed: 9,
+          });
+          this.particles.shockRing(fxAnchor(dst).x, fxAnchor(dst).z, C.ringGold, 3.5, 0.5);
+        }
+        break;
       default:
         break;
     }
