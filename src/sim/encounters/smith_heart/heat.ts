@@ -16,9 +16,10 @@
 //                      and the Hearth overflows: rings of lava roll out of it,
 //                      each parting in two corridors the raid stands in as
 //                      it passes (heat_waves.ts), and Falling Cinders
-//                      (heat_overflow.ts); heroic's Wellspawn walk to the
-//                      wellspring, and at 40 its Wellkeepers mark players
-//                      who trail fire (heat_wellspawn.ts). Then it rises.
+//                      (heat_overflow.ts); the Wellspawn walk to the
+//                      wellspring (Normal two, slower, at 70 only), and on
+//                      heroic at 40 its Wellkeepers mark players who trail
+//                      fire (heat_wellspawn.ts). Then it rises.
 //   Phase 2 (70-40)    Hearthseeds (heat_seeds.ts; heroic hatches
 //                      Seedflames), Wakefire (heat_zones.ts), the fist.
 //   Phase 3 (40-0)     the Rolling Cinders (heat_cinders.ts), Wakefire, the
@@ -358,10 +359,9 @@ function stepOverflow(s: HeatScope): void {
     st.stage = 'under';
     st.stageLeft = 0;
     beginFlood(s, o);
-    if (s.rules.overflowAdds) {
-      raiseWellspawn(s);
-      if (o.n === 2) raiseKeepers(s);
-    }
+    const adds = s.rules.overflowAdds[o.n - 1];
+    if (adds.spawn > 0) raiseWellspawn(s, adds.spawn);
+    if (adds.keepers) raiseKeepers(s);
     return;
   }
   if (st.stage === 'under') {

@@ -93,7 +93,7 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `heat_grip.ts` | Cinder Grip per tier: the burn is the template's `stackPoison`; every tick sets each worn grip's burn to the tier's `gripPerTick` (`HEAT_DIFFICULTY`), its stacks kept. |
 | `heat_overflow.ts` | The overflows: their lava waves (heat_waves.ts) and Falling Cinders; an overflow lasts as long as its rings. |
 | `heat_waves.ts` | The overflows' lava waves (the rework of 2026-11-18, in place of the rivers): rings of lava rolling out of the wellspring, each parting in two corridors (`ringGaps`), the next ring's corridors glowing before it leaves the lip, one strike per ring outside a corridor; the tier's pace per overflow (HEAT_DIFFICULTY `waves`). |
-| `heat_wellspawn.ts` | Heroic's overflow adds: the Wellspawn walking to the wellspring (slowing with their health, feeding it), the Wellkeepers' Kindling Marks and Cinder Trails. |
+| `heat_wellspawn.ts` | The overflow adds (each tier's `HEAT_DIFFICULTY` `overflowAdds` and `spawnSpeedMult`: Heroic four Wellspawn in each overflow and the second's Wellkeepers, Normal two slower Wellspawn in the first only): the Wellspawn walking to the wellspring (slowing with their health, feeding it), the Wellkeepers' Kindling Marks and Cinder Trails. |
 | `heat_seeds.ts` | Phase 2's Hearthseeds and heroic's Seedflames. |
 | `heat_zones.ts` | Wakefire's runs of bands round the wellspring (phases 2 and 3). |
 | `heat_cinders.ts` | Phase 3's Rolling Cinders: the fall, the hunt, the knockback and Cooling Crust, the burst, and the fight's soft enrage (`cinderInterval`, `stepCinderClock`: the tier's quicker cadence late in phase 3). |

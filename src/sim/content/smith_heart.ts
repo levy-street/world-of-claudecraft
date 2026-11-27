@@ -579,7 +579,8 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     },
   },
   // The Guardian of the Heat's own adds (encounters/smith_heart/heat*.ts).
-  // The Wellspawn: heroic's children of the flame, walked to the wellspring
+  // The Wellspawn: the overflows' children of the flame (Heroic four in each,
+  // Normal two in the first, slower: HEAT_DIFFICULTY), walked to the wellspring
   // by the encounter (they never swing; every slow and control works on
   // them).
   [HEAT_MOBS.spawn]: {

@@ -1,9 +1,9 @@
 // The Guardian of the Heat (docs/design/raid/smith_heart.md section 7.4),
 // "the well of the first flame", over a REAL Sim: the guardian half sunk in
 // its wellspring and its Cinder Grip on the tank, Basalt Fist and its Molten
-// Swells, Hearth Flare, the overflows at 70 and 40 percent (normal without
-// adds; heroic's Wellspawn walking, slowing, feeding; the Wellkeepers' trails
-// healing them), the Hearthseeds and their Seedflames, Wakefire's bands,
+// Swells, Hearth Flare, the overflows at 70 and 40 percent (normal's two
+// slower Wellspawn in the first only; heroic's Wellspawn walking, slowing,
+// feeding; the Wellkeepers' trails healing them), the Hearthseeds and their Seedflames, Wakefire's bands,
 // the Rolling Cinders (the hunt, the knockback and its crust), no fourth
 // phase on any difficulty (it never leaves the wellspring),
 // the wipe, the fall lighting the Heat vein, and determinism.
@@ -399,7 +399,7 @@ describe('Guardian of the Heat: phase 1', () => {
 });
 
 describe('Guardian of the Heat: the overflows', () => {
-  it('normal: holds at 70 percent, sinks out of reach, overflows as long as its lava waves with no adds, rises into phase 2', () => {
+  it('normal: holds at 70 percent, sinks out of reach, overflows as long as its lava waves with its two Wellspawn, rises into phase 2', () => {
     const f = pulled(4);
     const b = f.boss();
     // A burst cannot skip the threshold.
@@ -416,7 +416,8 @@ describe('Guardian of the Heat: the overflows', () => {
     expect(f.objects(HEAT_OBJECTS.wellPrefix)[0].templateId).toBe(wellTemplate('over'));
     ev = f.tick(ticks(10));
     expect(st.stage).toBe('under');
-    expect(adds(f, HEAT_MOBS.spawn)).toEqual([]);
+    expect(adds(f, HEAT_MOBS.spawn).length).toBeLessThanOrEqual(2);
+    expect(adds(f, HEAT_MOBS.keeper)).toEqual([]);
     expect(cues(ev, HEAT_CUES.ring).length).toBeGreaterThan(0);
     expect(cues(ev, HEAT_CUES.bolt).length).toBeGreaterThanOrEqual(HEAT_DIFFICULTY.normal.bolts);
     // The guardian itself takes nothing while under.
@@ -461,6 +462,72 @@ describe('Guardian of the Heat: the overflows', () => {
     const hits = hitsOf(ev, HEAT_NAMES.overflow, inWall.id);
     expect(hits.length).toBe(1);
     expect(hits[0]).toBeGreaterThanOrEqual(T.ringMin);
+  });
+
+  it("pins the tiers' overflow adds: Heroic and Mythic four Wellspawn in each and the second's keepers, Normal two slower in the first only", () => {
+    for (const tier of ['heroic', 'mythic'] as const) {
+      expect(HEAT_DIFFICULTY[tier].overflowAdds).toEqual([
+        { spawn: 4, keepers: false },
+        { spawn: 4, keepers: true },
+      ]);
+      expect(HEAT_DIFFICULTY[tier].spawnSpeedMult).toBe(1);
+    }
+    expect(HEAT_DIFFICULTY.normal.overflowAdds).toEqual([
+      { spawn: 2, keepers: false },
+      { spawn: 0, keepers: false },
+    ]);
+    expect(HEAT_DIFFICULTY.normal.spawnSpeedMult).toBe(0.7);
+  });
+
+  it('normal: the first overflow raises exactly two Wellspawn, walking at 70 percent of Heroic', () => {
+    const f = pulled(3);
+    setHp(f, 0.69);
+    f.tick(ticks(T.sinkSeconds + 0.2));
+    expect(f.state()?.stage).toBe('under');
+    const kids = adds(f, HEAT_MOBS.spawn);
+    expect(kids.length).toBe(2);
+    expect(f.state()?.spawn.length).toBe(2);
+    expect(adds(f, HEAT_MOBS.keeper)).toEqual([]);
+    // From the first two posts.
+    const posts = kids.map((k) => f.local(k)).sort((a, b) => a.z - b.z);
+    for (let i = 0; i < 2; i++) {
+      const spot = [...WELLSPAWN_SPOTS.slice(0, 2)].sort((a, b) => a.z - b.z)[i];
+      expect(Math.hypot(posts[i].x - spot.x, posts[i].z - spot.z)).toBeLessThan(1);
+    }
+    const d0 = (e: Entity) => wellDistance(f.local(e).x, f.local(e).z);
+    const w0 = kids.map(d0);
+    f.tick(ticks(2));
+    kids.forEach((k, i) => {
+      const step = w0[i] - d0(k);
+      expect(step).toBeCloseTo(T.spawnSpeed * 0.7 * 2, 1);
+      expect(step).toBeLessThan(T.spawnSpeed * 2 * 0.8);
+    });
+  });
+
+  it('normal: the second overflow brings nothing: no Wellspawn, no Wellkeepers, no Cinder Trail', () => {
+    const f = pulled(4);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    setHp(f, 0.39);
+    f.tick(ticks(T.sinkSeconds + 0.2));
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.overflow?.n).toBe(2);
+    expect(st.stage).toBe('under');
+    expect(adds(f, HEAT_MOBS.spawn)).toEqual([]);
+    expect(adds(f, HEAT_MOBS.keeper)).toEqual([]);
+    for (let i = 0; i < ticks(15); i++) {
+      f.tick(1);
+      for (const p of f.players) p.hp = p.maxHp;
+    }
+    expect(st.spawn).toEqual([]);
+    expect(st.keepers).toEqual([]);
+    expect(st.marks).toEqual([]);
+    expect(f.objects(HEAT_OBJECTS.trailPrefix)).toEqual([]);
+    for (const p of f.players) {
+      expect(has(p, HEAT_AURAS.kindling)).toBe(false);
+      expect(has(p, HEAT_AURAS.trail)).toBe(false);
+    }
   });
 
   it('heroic: the Wellspawn walk to the wellspring, slowing as they lose health', () => {

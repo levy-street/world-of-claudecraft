@@ -1,8 +1,10 @@
-// The Guardian of the Heat's heroic overflow adds (docs/design/raid/
-// smith_heart.md section 7.4).
+// The Guardian of the Heat's overflow adds (docs/design/raid/
+// smith_heart.md section 7.4), each tier's HEAT_DIFFICULTY `overflowAdds`.
 //
-//   The Wellspawn    four children of the flame climb out at the room's edge
-//                    as the Hearth overflows and walk to the wellspring
+//   The Wellspawn    children of the flame climb out at the room's edge as
+//                    the Hearth overflows (Heroic four in each overflow;
+//                    Normal two, the first only, walking slower:
+//                    `spawnSpeedMult`) and walk to the wellspring
 //                    (walked by the encounter: the mob AI never moves them).
 //                    They slow as they lose health, crawling from half their
 //                    health down, and every slow, root, stun and control the
@@ -10,8 +12,8 @@
 //                    feeds the guardian (3 percent of its health) and blasts
 //                    the whole raid. When the overflow ends the survivors
 //                    dive in all the same.
-//   The Wellkeepers  at 40 percent two keepers rise by the wellspring: the mob
-//                    AI fights them (they must be tanked). Every 10 s each
+//   The Wellkeepers  Heroic only: at 40 percent two keepers rise by the
+//                    wellspring: the mob AI fights them (they must be tanked). Every 10 s each
 //                    puts a Kindling Mark on a player; 5 s later that player
 //                    trails fire for 8 s. A Wellspawn in a Cinder Trail heals
 //                    fast, so the marked player leaves the group and the
@@ -56,10 +58,11 @@ import { heatSay } from './heat_voice';
 
 // ---- the Wellspawn -----------------------------------------------------------------------
 
-/** The four Wellspawn climb out at the room's edge. */
-export function raiseWellspawn(s: HeatScope): Entity[] {
+/** `count` Wellspawn climb out at the room's edge, from the first of their
+ *  posts (the tier's overflowAdds). */
+export function raiseWellspawn(s: HeatScope, count: number): Entity[] {
   const out: Entity[] = [];
-  for (const spot of WELLSPAWN_SPOTS) {
+  for (const spot of WELLSPAWN_SPOTS.slice(0, count)) {
     const e = spawnHeatMob(s, HEAT_MOBS.spawn, spot.x, spot.z, facingTo(spot, HEARTH_WELL));
     if (!e) continue;
     e.inCombat = true;
@@ -95,7 +98,7 @@ function walkChild(s: HeatScope, e: Entity): void {
   e.swingTimer = Math.max(e.swingTimer, 0.6);
   if (s.ctx.isStunned(e) || s.ctx.isRooted(e)) return;
   const pace = spawnPace(e.hp / Math.max(1, e.maxHp));
-  const speed = T.spawnSpeed * pace * s.ctx.moveSpeedMult(e);
+  const speed = T.spawnSpeed * s.rules.spawnSpeedMult * pace * s.ctx.moveSpeedMult(e);
   const o = s.ctx.instanceOriginOf(s.inst);
   s.ctx.moveToward(e, s.ctx.groundPos(o.x + HEARTH_WELL.x, o.z + HEARTH_WELL.z), speed);
 }

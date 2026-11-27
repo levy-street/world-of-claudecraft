@@ -12,7 +12,8 @@
 //                    rings (about 22 to 25 s). Heroic: the Wellspawn climb
 //                    out at the room's edge and walk to the wellspring all
 //                    the while (and at 40 percent two Wellkeepers rise;
-//                    heat_wellspawn.ts); those still walking at the end dive
+//                    heat_wellspawn.ts); Normal: two slower Wellspawn in the
+//                    first overflow only. Those still walking at the end dive
 //                    in and feed it.
 //   It rises         3 s, still out of reach, then the next phase begins.
 //

@@ -296,7 +296,8 @@ export function wavesSeconds(rule: HeatWaveRule): number {
 
 // ---- the posts ------------------------------------------------------------------------
 
-/** Where the Wellspawn climb out at the room's edge (heroic's overflows):
+/** Where the Wellspawn climb out at the room's edge (the overflows; Normal
+ *  raises only the first two):
  *  kept on the floor's edge; the well's middle moved 4 yd toward them in
  *  pass 4, so their feeding reach is measured from the grown lip and the
  *  walk stays within a few yards of the first pass's. */

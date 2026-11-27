@@ -1,5 +1,5 @@
 // The Guardian of the Heat's overflow for the raid bots (scripts/lib/heart_raid_heat.mjs):
-// the lava waves' corridors planned against the clock, and the Heroic Wellspawn
+// the lava waves' corridors planned against the clock, and the Wellspawn
 // burned while the raid stands in them.
 //
 // The bot pass of 2026-11-24 (BiS Heroic raids wiped at the 70 percent overflow, the

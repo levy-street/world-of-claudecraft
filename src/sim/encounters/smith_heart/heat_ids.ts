@@ -253,8 +253,13 @@ export interface HeatDifficultyRules {
   /** The boss's health pool against the template's, set at the pull
    *  (tier_health.ts). */
   healthMult: number;
-  /** The overflows bring the Wellspawn (and the second, two Wellkeepers). */
-  overflowAdds: boolean;
+  /** Each overflow's adds, the first then the second (heat_wellspawn.ts):
+   *  how many Wellspawn climb out and whether two Wellkeepers rise (their
+   *  Kindling Marks are what lay the Cinder Trails). */
+  overflowAdds: readonly [HeatOverflowAdds, HeatOverflowAdds];
+  /** The Wellspawn's walk against HEAT_TUNING.spawnSpeed (before their
+   *  health's pace and every slow on them). */
+  spawnSpeedMult: number;
   /** A Hearthseed's burst hatches a Seedflame. */
   seedHatch: boolean;
   /** Live Coals (heat_coal.ts) through every fighting phase. */
@@ -278,6 +283,21 @@ export interface HeatDifficultyRules {
    *  the second (40 percent, quicker and narrower). */
   waves: readonly [HeatWaveRule, HeatWaveRule];
 }
+
+/** One overflow's adds (heat_wellspawn.ts). */
+export interface HeatOverflowAdds {
+  /** Wellspawn raised, from the first of WELLSPAWN_SPOTS (0: none). */
+  spawn: number;
+  /** Two Wellkeepers rise by the wellspring. */
+  keepers: boolean;
+}
+
+/** Heroic's (and Mythic's) overflow adds: four Wellspawn in each overflow,
+ *  the second's two Wellkeepers as well. */
+const HEROIC_ADDS: HeatDifficultyRules['overflowAdds'] = [
+  { spawn: 4, keepers: false },
+  { spawn: 4, keepers: true },
+];
 
 /** One overflow's lava waves (seconds, yards; heat_waves.ts). */
 export interface HeatWaveRule {
@@ -345,7 +365,21 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1,
-    overflowAdds: false,
+    // The owner's call of 2026-11-27 (the testers: "Heroic has adds when he
+    // hides; undecided whether to add them to Normal"): two Wellspawn in the
+    // first overflow only (the first two posts), no Wellkeepers and so no
+    // Cinder Trails in the second, which brings nothing.
+    overflowAdds: [
+      { spawn: 2, keepers: false },
+      { spawn: 0, keepers: false },
+    ],
+    // 70 percent of Heroic's walk (2.4 to 1.68 yd a second): an untouched
+    // child takes about 21 s from its post to the lip, nearly the whole of
+    // Normal's first overflow (its waves last about 22.4 s), against about
+    // 15 s on Heroic. A Normal raid walking the corridors has the overflow
+    // to burn two before either feeds the guardian, and one under half
+    // health still crawls (spawnPace).
+    spawnSpeedMult: 0.7,
     seedHatch: false,
     liveCoal: false,
     bolts: 2,
@@ -384,7 +418,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     // The owner's call of 2026-11-17: the Council's and the Quench's pool.
     healthMult: 1.47,
-    overflowAdds: true,
+    overflowAdds: HEROIC_ADDS,
+    spawnSpeedMult: 1,
     seedHatch: true,
     liveCoal: true,
     bolts: 3,
@@ -409,7 +444,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     // The owner's call of 2026-11-17: the Council's and the Quench's pool.
     healthMult: 2.06,
-    overflowAdds: true,
+    overflowAdds: HEROIC_ADDS,
+    spawnSpeedMult: 1,
     seedHatch: true,
     liveCoal: true,
     bolts: 3,

@@ -119,12 +119,14 @@ describe('Guardian of the Heat: the lava waves (pure)', () => {
     // Wellspawn, keeps each child within 29 yd of a corridor standing point for
     // at least 70 percent of its walk from its post to the lip.
     const REACH = 29;
-    const tiers = (['normal', 'heroic', 'mythic'] as const).filter(
-      (t) => HEAT_DIFFICULTY[t].overflowAdds,
+    const tiers = (['normal', 'heroic', 'mythic'] as const).filter((t) =>
+      HEAT_DIFFICULTY[t].overflowAdds.some((a) => a.spawn > 0),
     );
-    expect(tiers.length).toBeGreaterThan(0);
+    expect(tiers.length).toBe(3);
     for (const tier of tiers) {
       HEAT_DIFFICULTY[tier].waves.forEach((rule, i) => {
+        // Only the overflows that raise Wellspawn (Normal's second has none).
+        if (HEAT_DIFFICULTY[tier].overflowAdds[i].spawn === 0) return;
         const n = i + 1;
         for (let k = 0; k < rule.count; k++) {
           const gaps = ringGaps(n, k, rule.gaps, rule.gapSpread);
