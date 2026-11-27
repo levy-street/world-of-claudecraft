@@ -92,7 +92,9 @@ export const SMITH_HEART_AURA_IMAGE_IDS: readonly string[] = [
  * the wind, and a Stillstone's shared charge is Thessaly's calm stilling it.
  * The Hammer Council survivor's Grieving Fury wears the Masterless Fury's roaring
  * stone head, and the Heat's Heroic Live Coal (a burning crust that eats healing
- * and leaps on) wears its Wellkeepers' Kindling Mark, the same ember on a player.
+ * and leaps on) wears its Wellkeepers' Kindling Mark, the same ember on a player,
+ * and its Wellspring Brand the seared plate of Flare-Scorched (the same burn,
+ * the same vulnerability).
  * Forge-Fury, the raid's hard enrage on every boss (and its gathering), wears
  * the Masterless Fury's roaring stone head too.
  */
@@ -117,6 +119,7 @@ export const SMITH_HEART_AURA_ICON_SOURCES: readonly (readonly [string, string])
   ['heart_forge_fury', 'heart_final_fury'],
   ['heart_forge_fury_gathering', 'heart_final_fury'],
   ['heart_grieving_fury', 'heart_final_fury'],
+  ['heart_heat_brand', 'heart_heat_scorched'],
   ['heart_heat_intro', 'heart_council_intro'],
   ['heart_heat_live_coal', 'heart_heat_kindling'],
   ['heart_quench_intro', 'heart_council_intro'],

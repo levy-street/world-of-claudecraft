@@ -4768,7 +4768,7 @@ export const zh_CN: EnTranslations = {
       },
       "breathGuardian": {
         "intro": "沉睡中：在风暴将它放下之前，无法被攻击或伤害。",
-        "skyMark": "{warn}秒后，闪电会劈向此效果施加时你所站的位置：{radius}码内造成{min}到{max}点伤害。走出圆圈。英雄和史诗：{heroicMin}到{heroicMax}点伤害。",
+        "skyMark": "{warn}秒后，闪电会劈向此效果施加时你所站的位置：{radius}码内造成{min}到{max}点伤害。走出圆圈。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "portalA": "效果结束时，传送门A会在你所站的位置打开。站在结风附近。本轮你无法携带它。",
         "portalB": "效果结束时，传送门B会在你所站的位置打开。站在崖台边缘。本轮你无法携带结风。",
         "portalC": "效果结束时，传送门C会在你所站的位置打开。它只与传送门D相连。站在另一团结风附近。本轮你无法携带它。",
@@ -4828,6 +4828,7 @@ export const zh_CN: EnTranslations = {
         "trail": "你正在留下余烬足迹：宽{radius}码的火焰燃烧{life}秒，每秒对其中的友方造成{min}到{max}点火焰伤害，并为其中的涌泉之子每秒恢复{heal}%生命值。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "hunted": "一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。",
         "crust": "已冷却变硬：此效果结束前，击打无法将它打退。",
+        "brand": "涌泉烙印：{seconds}秒内，你受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%，余烬之握的灼烧也包括在内。守护者每{every}秒向它的坦克掷出一枚烙印，即使它正在施法、处于自身的施法条中或够不到你：造成{min}到{max}点火焰伤害并附加此印记。另一名坦克必须在下一枚落下前嘲讽。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "coal": "吸收你受到的接下来{absorb}点治疗，并每秒对你造成{burnMin}到{burnMax}点火焰伤害。用治疗打穿吸收即可将其熄灭。任何靠近你{leap}码以内的玩家都会带着剩余的吸收量接过它，并受到{leapMin}到{leapMax}点火焰伤害；它落到某人身上后{grace}秒内不会再转移。若{seconds}秒内未被治疗打穿，它会爆裂，对包括你在内{radius}码内的所有人造成{burstMin}到{burstMax}点火焰伤害。"
       },
       "finalBoss": {
@@ -7466,6 +7467,7 @@ export const zh_CN: EnTranslations = {
       "tempering": "淬火打击",
       "strike": "元素打击",
       "shear": "劈裂重击",
+      "brand": "涌泉烙印",
       "onYou": "目标是你",
       "seconds": "{seconds}秒",
       "timeAria": "{name}将在{seconds}秒后击中你"

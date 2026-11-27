@@ -99,11 +99,12 @@ function world(
 }
 
 describe("the Smith's Heart's swap table (the sim's data)", () => {
-  it('names every boss once (the Breath twice: its two halves) and only swap debuffs', () => {
+  it('names every boss once (the Breath twice: its two halves; the Heat twice: Cinder Grip and Wellspring Brand) and only swap debuffs', () => {
     expect(HEART_TANK_SWAPS.map((s) => s.boss)).toEqual([
       'council',
       'breath',
       'breath',
+      'heat',
       'heat',
       'quench',
       'final',
@@ -112,6 +113,8 @@ describe("the Smith's Heart's swap table (the sim's data)", () => {
     expect(heartTankSwapOf(BREATH_AURAS.battered)?.boss).toBe('breath');
     expect(heartTankSwapOf(BREATH_AURAS.thunderLaden)?.boss).toBe('breath');
     expect(heartTankSwapOf(HEAT_AURAS.grip)?.boss).toBe('heat');
+    expect(heartTankSwapOf(HEAT_AURAS.brand)?.boss).toBe('heat');
+    expect(heartTankSwapOf(HEAT_AURAS.brand)?.swapAt).toBe(1);
     expect(heartTankSwapOf(QUENCH_AURAS.tempered)?.boss).toBe('quench');
     for (const id of Object.values(STRIKE_AURAS)) expect(heartTankSwapOf(id)?.boss).toBe('final');
     // The Elemental Strike's four debuffs are ONE family (a strike re-forges them).

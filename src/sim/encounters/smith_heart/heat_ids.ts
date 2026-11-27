@@ -69,6 +69,11 @@ export const HEAT_AURAS = {
    *  a `heal_absorb` (combat/heal.ts consumeHealAbsorb), the absorb left in
    *  `value`, its whole in `value2`, the fuse in `remaining` and `duration`. */
   coal: 'heart_heat_live_coal',
+  /** Wellspring Brand (heat_brand.ts): the brand the guardian hurls at its
+   *  tank, a `spellvuln` (`value` the extra share of Fire and other magic
+   *  damage taken), `value2` the tier's seconds between brands (the tooltip's),
+   *  `value3` the swap count (1: the bots' generic swap reader). */
+  brand: 'heart_heat_brand',
 } as const;
 
 /** The guardian's stages (its state aura's `value2`). */
@@ -175,6 +180,12 @@ export const HEAT_CUES = {
   coalBurst: 'heart_heat_coal_burst',
   /** The fight is over: the wellspring settles (spellfx 'nova'). */
   settle: 'heart_heat_settle',
+  /** Wellspring Brand gathers in the guardian's hand (spellfx 'nova' on it),
+   *  the tier's `brand.lead` before it is hurled. */
+  brandGather: 'heart_heat_brand_gather',
+  /** Wellspring Brand is hurled onto its tank (spellfx 'beam', guardian to
+   *  them). */
+  brand: 'heart_heat_brand',
 } as const;
 
 /** The fight's own mob templates (content/smith_heart.ts). */
@@ -219,6 +230,7 @@ export const HEAT_NAMES = {
   crust: 'Cooling Crust',
   coal: 'Live Coal',
   coalBurst: 'Coal Burst',
+  brand: 'Wellspring Brand',
 } as const;
 
 // ---- difficulty -----------------------------------------------------------------------
@@ -282,6 +294,28 @@ export interface HeatDifficultyRules {
   /** The overflows' lava waves (heat_waves.ts): the first (70 percent), then
    *  the second (40 percent, quicker and narrower). */
   waves: readonly [HeatWaveRule, HeatWaveRule];
+  /** Wellspring Brand (heat_brand.ts), the owner's call of 2026-11-27: the
+   *  ranged tank hit that keeps the swap going while the guardian casts or
+   *  lands no swing. */
+  brand: HeatBrandRules;
+}
+
+/** One tier's Wellspring Brand (seconds; heat_brand.ts). Its hit is
+ *  HEAT_TUNING brandMin to brandMax times the tier's damageMult, like every
+ *  other mechanic's. */
+export interface HeatBrandRules {
+  /** The first brand this long into the fight, then every `every`: both on
+   *  the fight's present clock (it stands still while the guardian is sunk). */
+  first: number;
+  every: number;
+  /** The tank is told (the tank buster marker, the gathering cue) this long
+   *  before the brand lands. */
+  lead: number;
+  /** The brand's mark on the tank: how long, and the extra share of Fire and
+   *  other magic damage taken (1: +100 percent). Longer than `every`, so the
+   *  next brand finds the marked tank still burning unless the other taunts. */
+  seconds: number;
+  taken: number;
 }
 
 /** One overflow's adds (heat_wellspawn.ts). */
@@ -390,6 +424,11 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // raid running well past the 4 to 5 minute target feels it.
     cinderLateAfter: 180,
     cinderLateEvery: 20,
+    // Wellspring Brand (the owner's call of 2026-11-27): every 25 s, the tank
+    // told 2 s ahead, its mark +100 percent for 30 s. Like Hammer's Weight
+    // (18 s apart, 25 s long, +100 percent): the mark outlasts the gap, so
+    // each brand asks for a swap, and the 5 s overlap is the taunt's window.
+    brand: { first: 15, every: 25, lead: 2, seconds: 30, taken: 1 },
     // The rework of 2026-11-18: slow rings, wide corridors, the longest
     // warning; the second overflow a little quicker and narrower.
     waves: [
@@ -428,6 +467,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     cinderLateAfter: 240,
     cinderLateEvery: 20,
     waves: HEROIC_WAVES,
+    // Quicker than Normal's (22 s, 8 s of overlap), the same mark.
+    brand: { first: 12, every: 22, lead: 2, seconds: 30, taken: 1 },
   },
   // Heroic whole, its Wheel quicker and a round longer.
   mythic: {
@@ -455,6 +496,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     cinderLateAfter: 240,
     cinderLateEvery: 20,
     waves: MYTHIC_WAVES,
+    // The quickest (20 s) and the shortest warning; the same mark.
+    brand: { first: 12, every: 20, lead: 1.5, seconds: 30, taken: 1 },
   },
 };
 
@@ -718,6 +761,15 @@ export const HEAT_TUNING = {
   /** A coal is never set this near a Wheel of the Hearth's start (a run on
    *  the floor, or one due this soon), and a Wheel waits this long after one. */
   coalWheelGap: 3,
+  // Wellspring Brand (heat_brand.ts; its clock and mark per tier, the
+  // HEAT_DIFFICULTY `brand` rows): Fire to its tank, times the tier's
+  // damageMult (572 to 650 on Normal, 633 to 719 on Heroic and Mythic), a
+  // Hearth Flare and a little more: heavy on one tank, about double on a tank
+  // still marked by the last one, so the other tank taunts first.
+  brandMin: 440,
+  brandMax: 500,
+  /** The tanks swap at this many brands (one: the mark itself is the swap). */
+  brandSwap: 1,
 } as const;
 
 // ---- pure helpers ---------------------------------------------------------------------

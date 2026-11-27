@@ -13,9 +13,11 @@
 //                          Storm): their 1.5 s bars at the tank.
 //   Guardian of the Quench Tempering Strike: her cleaving swing, told
 //                          `strikeWindup` seconds out (quench_strike_windup.ts).
-//   Guardian of the Heat   none: its tank's pressure is Cinder Grip on every
-//                          swing, called by the tank swap alert (no single
-//                          heavy hit to warn of).
+//   Guardian of the Heat   Wellspring Brand (heat_brand.ts): hurled at the
+//                          tank on its own clock, told HEAT_DIFFICULTY
+//                          `brand.lead` seconds out (the owner's call of
+//                          2026-11-27); Cinder Grip on every swing stays the
+//                          tank swap alert's background count.
 //   Masterless Strength    Elemental Strike (every 8 s, told `ELEMENT_TUNING
 //                          strikeLead` seconds out) and a Splinter's Shearing
 //                          Blow (its 2 s bar at the Splinter's tank).
@@ -25,11 +27,19 @@
 import { BREATH_CASTS } from './breath_ids';
 import { COUNCIL_CASTS } from './council_ids';
 import { FINAL_PHASE_CASTS } from './final_phase_ids';
+import { HEAT_NAMES } from './heat_ids';
 
 /** The one marker every buster lays on its tank. */
 export const TANK_BUSTER_AURA = 'heart_tank_buster';
 
-export type HeartBusterKey = 'weight' | 'blow' | 'thunder' | 'tempering' | 'strike' | 'shear';
+export type HeartBusterKey =
+  | 'weight'
+  | 'blow'
+  | 'thunder'
+  | 'tempering'
+  | 'strike'
+  | 'shear'
+  | 'brand';
 
 export interface HeartTankBuster {
   key: HeartBusterKey;
@@ -49,6 +59,7 @@ export const HEART_TANK_BUSTERS: readonly HeartTankBuster[] = [
   { key: 'tempering', code: 4, name: 'Tempering Strike', cast: null },
   { key: 'strike', code: 5, name: 'Elemental Strike', cast: null },
   { key: 'shear', code: 6, name: 'Shearing Blow', cast: FINAL_PHASE_CASTS.shear },
+  { key: 'brand', code: 7, name: HEAT_NAMES.brand, cast: null },
 ];
 
 /** The buster `key` names. */

@@ -10,7 +10,9 @@
 //                            the aura's `value3` (BREATH_DIFFICULTY blowSwap,
 //                            thunderSwap).
 //   Guardian of the Heat     Cinder Grip (the template's stackPoison): the
-//                            HEAT_TUNING `gripSwap` stacks, every tier.
+//                            HEAT_TUNING `gripSwap` stacks, every tier; and
+//                            Wellspring Brand (heat_brand.ts): one brand is
+//                            the swap (HEAT_TUNING `brandSwap`).
 //   Guardian of the Quench   Rime-Tempered (quench_temper.ts): the tier's
 //                            count rides the aura's `value3`
 //                            (QUENCH_DIFFICULTY temperSwap).
@@ -42,6 +44,7 @@ export const HEART_TANK_SWAPS: readonly HeartTankSwap[] = [
   { boss: 'breath', auras: [BREATH_AURAS.battered], swapAt: null },
   { boss: 'breath', auras: [BREATH_AURAS.thunderLaden], swapAt: null },
   { boss: 'heat', auras: [HEAT_AURAS.grip], swapAt: HEAT_TUNING.gripSwap },
+  { boss: 'heat', auras: [HEAT_AURAS.brand], swapAt: HEAT_TUNING.brandSwap },
   { boss: 'quench', auras: [QUENCH_AURAS.tempered], swapAt: null },
   { boss: 'final', auras: Object.values(STRIKE_AURAS), swapAt: ELEMENT_TUNING.swapAt },
 ];

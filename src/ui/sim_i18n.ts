@@ -1717,6 +1717,7 @@ const baseEnTable = {
   'aura.heartCoolingCrust': 'Cooling Crust',
   'aura.heartLiveCoal': 'Live Coal',
   'mechanic.heartCoalBurst': 'Coal Burst',
+  'aura.heartWellspringBrand': 'Wellspring Brand',
   // The Masterless Strength (encounters/smith_heart/final_ids.ts FINAL_NAMES):
   // its new damage and aura names (the reused ones keep the guardians' keys,
   // Crushed the Buried Hoard's). EXACT through the mechanic reverse map.
@@ -27294,6 +27295,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Cooling Crust': 'aura.heartCoolingCrust',
   'Live Coal': 'aura.heartLiveCoal',
   'Coal Burst': 'mechanic.heartCoalBurst',
+  'Wellspring Brand': 'aura.heartWellspringBrand',
   // The Masterless Strength (encounters/smith_heart/final_ids.ts FINAL_NAMES).
   'The Masterless Strength': 'aura.heartMasterlessStrength',
   'Overload': 'aura.heartOverload',

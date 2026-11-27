@@ -23087,6 +23087,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.hunted':
     '一團滾動餘燼或籽焰正在追你。被滾動餘燼追上你會死亡，{radius}碼內的所有人都會被灼燒：保持距離，讓隊友擊打它，每次擊打都會把它打退{knock}碼（之後{crust}秒內無法再次打退）。',
   'hudChrome.auraEffect.heatGuardian.crust': '已冷卻變硬：此效果結束前，擊打無法將它打退。',
+  'hudChrome.auraEffect.heatGuardian.brand':
+    '湧泉烙印：{seconds}秒內，你受到的火焰、冰霜、自然、暗影和祕法傷害提高{pct}%，餘燼之握的灼燒也包括在內。守護者每{every}秒向它的坦克擲出一枚烙印，即使它正在施法、處於自身的施法條中或搆不到你：造成{min}到{max}點火焰傷害並附加此印記。另一名坦克必須在下一枚落下前嘲諷。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.heatGuardian.coal':
     '吸收你受到的接下來{absorb}點治療，並每秒對你造成{burnMin}到{burnMax}點火焰傷害。用治療打穿吸收即可將其熄滅。任何靠近你{leap}碼以內的玩家都會帶著剩餘的吸收量接過它，並受到{leapMin}到{leapMax}點火焰傷害；它落到某人身上後{grace}秒內不會再轉移。若{seconds}秒內未被治療打穿，它會爆裂，對包括你在內{radius}碼內的所有人造成{burstMin}到{burstMax}點火焰傷害。',
   'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成為它的一部分。',
@@ -24873,6 +24875,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tankBuster.tempering': '淬火打擊',
   'hudChrome.tankBuster.strike': '元素打擊',
   'hudChrome.tankBuster.shear': '劈裂重擊',
+  'hudChrome.tankBuster.brand': '湧泉烙印',
   'hudChrome.tankBuster.onYou': '目標是你',
   'hudChrome.tankBuster.seconds': '{seconds}秒',
   'hudChrome.tankBuster.timeAria': '{name}將在{seconds}秒後擊中你',

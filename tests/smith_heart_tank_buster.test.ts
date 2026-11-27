@@ -71,6 +71,7 @@ describe('the tank buster table (the sim data)', () => {
       ['tempering', 4, null],
       ['strike', 5, null],
       ['shear', 6, FINAL_PHASE_CASTS.shear],
+      ['brand', 7, null],
     ]);
     for (const b of HEART_TANK_BUSTERS) expect(heartTankBusterByCode(b.code)).toBe(b);
     expect(heartTankBusterByCode(0)).toBeNull();

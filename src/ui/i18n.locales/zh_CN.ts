@@ -23071,6 +23071,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.hunted':
     '一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。',
   'hudChrome.auraEffect.heatGuardian.crust': '已冷却变硬：此效果结束前，击打无法将它打退。',
+  'hudChrome.auraEffect.heatGuardian.brand':
+    '涌泉烙印：{seconds}秒内，你受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%，余烬之握的灼烧也包括在内。守护者每{every}秒向它的坦克掷出一枚烙印，即使它正在施法、处于自身的施法条中或够不到你：造成{min}到{max}点火焰伤害并附加此印记。另一名坦克必须在下一枚落下前嘲讽。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
   'hudChrome.auraEffect.heatGuardian.coal':
     '吸收你受到的接下来{absorb}点治疗，并每秒对你造成{burnMin}到{burnMax}点火焰伤害。用治疗打穿吸收即可将其熄灭。任何靠近你{leap}码以内的玩家都会带着剩余的吸收量接过它，并受到{leapMin}到{leapMax}点火焰伤害；它落到某人身上后{grace}秒内不会再转移。若{seconds}秒内未被治疗打穿，它会爆裂，对包括你在内{radius}码内的所有人造成{burstMin}到{burstMax}点火焰伤害。',
   'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成为它的一部分。',
@@ -23176,7 +23178,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.spent':
     '你的锚定已经耗尽：在此效果结束前，瑟萨莉队长的宁静之环无法再次锚定你。',
   'hudChrome.auraEffect.breathGuardian.skyMark':
-    '{warn}秒后，闪电会劈向此效果施加时你所站的位置：{radius}码内造成{min}到{max}点伤害。走出圆圈。英雄和史诗：{heroicMin}到{heroicMax}点伤害。',
+    '{warn}秒后，闪电会劈向此效果施加时你所站的位置：{radius}码内造成{min}到{max}点伤害。走出圆圈。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
   'hudChrome.auraEffect.breathGuardian.drawn':
     '每{every}秒会有一道闪电落在你所站之处：{warn}秒后对{radius}码内的所有人造成{min}到{max}点伤害，并留下带电的地面，在{charged}秒内每秒造成{cmin}到{cmax}点伤害。保持移动，把落雷引向远离团队的边缘。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicCMin}到{heroicCMax}点伤害。',
   'hudChrome.auraEffect.breathGuardian.cradled':
@@ -24854,6 +24856,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tankBuster.tempering': '淬火打击',
   'hudChrome.tankBuster.strike': '元素打击',
   'hudChrome.tankBuster.shear': '劈裂重击',
+  'hudChrome.tankBuster.brand': '涌泉烙印',
   'hudChrome.tankBuster.onYou': '目标是你',
   'hudChrome.tankBuster.seconds': '{seconds}秒',
   'hudChrome.tankBuster.timeAria': '{name}将在{seconds}秒后击中你',

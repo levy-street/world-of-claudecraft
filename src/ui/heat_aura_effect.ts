@@ -112,6 +112,23 @@ export function heatAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescript
       };
     case HEAT_AURAS.crust:
       return { key: `${KEY}.crust`, nums: {} };
+    // Wellspring Brand (heat_brand.ts): the mark's share and length ride the
+    // aura, the tier's gap between brands its `value2`; the hit is Normal's
+    // with Heroic's (Mythic's damage factor is Heroic's) beside it.
+    case HEAT_AURAS.brand: {
+      const N = HEAT_DIFFICULTY.normal.brand;
+      return {
+        key: `${KEY}.brand`,
+        nums: {
+          pct: pct(a.value ?? N.taken),
+          seconds: N.seconds,
+          every: Math.round(a.value2 ?? N.every),
+          min: tierValue(T.brandMin, NM),
+          max: tierValue(T.brandMax, NM),
+          ...tierRange('heroic', T.brandMin, T.brandMax, HEAT_DIFFICULTY.heroic.damageMult),
+        },
+      };
+    }
     // Heroic and Mythic only (heat_coal.ts), so their resolved numbers; the
     // absorb is what is left on the aura now.
     case HEAT_AURAS.coal: {

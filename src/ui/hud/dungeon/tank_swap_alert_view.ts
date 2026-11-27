@@ -24,8 +24,8 @@
 // in the screen's middle, the hit's name and a short countdown to it.
 //  - Buster: the local player carries the marker. A bar buster (Hammer's
 //    Weight, Bellows Blow, Thunder Lash, Shearing Blow) shows while its boss
-//    still casts it; a told one (Tempering Strike, Elemental Strike) while its
-//    boss is still on them.
+//    still casts it; a told one (Tempering Strike, Elemental Strike,
+//    Wellspring Brand) while its boss is still on them.
 //  - Hidden otherwise, and while dead.
 
 import {
@@ -169,6 +169,8 @@ function busterName(key: HeartBusterKey): string {
       return t('hudChrome.tankBuster.strike');
     case 'shear':
       return t('hudChrome.tankBuster.shear');
+    case 'brand':
+      return t('hudChrome.tankBuster.brand');
   }
 }
 

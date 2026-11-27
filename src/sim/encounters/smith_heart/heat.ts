@@ -12,6 +12,10 @@
 //                      Hearth Flare on everyone out of its reach
 //                      (heat_flare.ts), Cinder Grip on the tank (the
 //                      template's own stacking burn).
+//   The tanks          every fighting phase: Cinder Grip on every swing,
+//                      held still while it is sunk (heat_grip.ts holdGrip),
+//                      and Wellspring Brand on its own clock, casting or
+//                      not (heat_brand.ts): each brand asks for a swap.
 //   The overflows      at 70 and at 40 percent it sinks into the wellspring
 //                      and the Hearth overflows: rings of lava roll out of it,
 //                      each parting in two corridors the raid stands in as
@@ -55,6 +59,7 @@ import { settleSmithHeartFeat } from './feats';
 import { dropFightObject } from './fight_kit';
 import { clearHardEnrage, hardEnrageOf, stepHardEnrage } from './hard_enrage';
 import { hardEnrageSeconds } from './hard_enrage_ids';
+import { clearBrand, stepBrand } from './heat_brand';
 import {
   callCinder,
   clearCinders,
@@ -66,7 +71,7 @@ import {
 import { clearCoals, coalHoldsWheel, setCoals, stepCoals } from './heat_coal';
 import { clearFist, FIST_SPAN, floorHoldsFist, landFist, startFist, stepSwells } from './heat_fist';
 import { flare, keepOffLip, stepFlare, stepWellFire } from './heat_flare';
-import { stepGrip } from './heat_grip';
+import { holdGrip, stepGrip } from './heat_grip';
 import {
   HEAT_AURAS,
   HEAT_CASTS,
@@ -218,6 +223,9 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     coalOuts: 0,
     coalLeaps: 0,
     coalBursts: 0,
+    brandTimer: HEAT_DIFFICULTY[difficulty].brand.first,
+    brandTold: null,
+    brands: 0,
     feeds: 0,
     casts: 0,
     said: {},
@@ -506,6 +514,7 @@ const PLAYER_MARKS = [
   HEAT_AURAS.trail,
   HEAT_AURAS.hunted,
   HEAT_AURAS.coal,
+  HEAT_AURAS.brand,
 ] as const;
 
 /** Everything the fight put on the floor goes. */
@@ -522,6 +531,7 @@ function clearFight(
     clearSeeds(s);
     clearCinders(s);
     clearCoals(s);
+    clearBrand(s);
     clearOverflowAdds(s);
     clearFlood(s, st.overflow);
   }
@@ -614,6 +624,7 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepSwells(s);
   stepWellFire(s);
   stepGrip(s);
+  stepBrand(s);
   stepSeeds(s);
   stepZones(s);
   stepWheel(s);
@@ -635,6 +646,9 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
     hardEnrageOf(st),
     hardEnrageSeconds('heat', st.difficulty),
   );
+  // Last in the pass: a hidden guardian's grips stand still through the next
+  // tick's aura aging (heat_grip.ts).
+  if (st.stage !== 'fight') holdGrip(s, hearthListeners(ctx, inst));
 }
 
 // ---- dev ----------------------------------------------------------------------------------
@@ -739,6 +753,11 @@ export function heatDevTrigger(
     return startFist(s, spot, twin) ? 'Basalt Fist: it comes down where you stand in 3 s.' : null;
   }
   if (verb === 'flare') return `Hearth Flare (${flare(s).length} struck).`;
+  if (verb === 'brand') {
+    if (s.st.stage !== 'fight') return 'No Wellspring Brand while the guardian is under.';
+    s.st.brandTimer = Math.min(s.st.brandTimer, s.rules.brand.lead + DT);
+    return `Wellspring Brand: hurled at the guardian's tank in ${s.rules.brand.lead} s.`;
+  }
   if (verb === 'seeds') return `${dropSeeds(s)} Hearthseeds fall.`;
   if (verb === 'wheel') {
     startWheel(s);
@@ -766,5 +785,5 @@ export function heatReadout(ctx: SimContext, inst: InstanceSlot, pid: number): s
   const me = ctx.entities.get(pid);
   const grip = me ? (auraOf(me, HEAT_AURAS.grip)?.stacks ?? 0) : 0;
   const over = st.overflow ? `, overflow ${st.overflow.n} (${st.overflow.clock.toFixed(0)} s)` : '';
-  return `${head}; phase ${st.phase} (${st.stage}${over}), next fist in ${Math.max(0, st.fistTimer).toFixed(0)} s${st.fistHeld > 0 ? ' (held by Wakefire)' : ''}, seeds ${st.seeds.length}, zones ${st.zones.length}, cinders ${st.cinders.length}, Wellspawn ${st.spawn.length}, keepers ${st.keepers.length}, fed ${st.feeds}, coals ${st.coals.length} (out ${st.coalOuts}, leaps ${st.coalLeaps}, bursts ${st.coalBursts}), your Cinder Grip ${grip}.`;
+  return `${head}; phase ${st.phase} (${st.stage}${over}), next fist in ${Math.max(0, st.fistTimer).toFixed(0)} s${st.fistHeld > 0 ? ' (held by Wakefire)' : ''}, seeds ${st.seeds.length}, zones ${st.zones.length}, cinders ${st.cinders.length}, Wellspawn ${st.spawn.length}, keepers ${st.keepers.length}, fed ${st.feeds}, coals ${st.coals.length} (out ${st.coalOuts}, leaps ${st.coalLeaps}, bursts ${st.coalBursts}), next brand in ${Math.max(0, st.brandTimer).toFixed(0)} s (${st.brands} landed), your Cinder Grip ${grip}.`;
 }

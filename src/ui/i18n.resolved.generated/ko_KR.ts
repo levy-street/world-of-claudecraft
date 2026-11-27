@@ -4828,6 +4828,7 @@ export const ko_KR: EnTranslations = {
         "trail": "잉걸불 자취를 남기고 있습니다: 폭 {radius}미터의 불이 {life}초 동안 타며, 그 안의 아군에게 매초 {min}~{max}의 화염 피해를 주고 그 안의 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
         "hunted": "구르는 잉걸불이나 씨불이 당신을 쫓고 있습니다. 구르는 잉걸불에 붙잡히면 죽고 {radius}미터 안의 모두가 불탑니다: 거리를 두고 아군이 때리게 하십시오. 한 번 칠 때마다 {knock}미터 밀려납니다(그 뒤 {crust}초 동안은 밀려나지 않습니다).",
         "crust": "단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다.",
+        "brand": "샘의 낙인: {seconds}초 동안 받는 화염, 냉기, 자연, 암흑, 비전 피해가 {pct}% 증가합니다(잿불 손아귀의 화상 포함). 수호자는 {every}초마다 자신의 방어 전담에게 낙인을 던집니다. 시전 중이거나, 자신의 시전 막대가 진행 중이거나, 당신에게 닿지 않아도 던집니다: 화염 피해 {min}~{max}와 이 낙인. 다음 낙인이 떨어지기 전에 다른 방어 전담이 도발해야 합니다. 영웅·신화: 피해 {heroicMin}~{heroicMax}.",
         "coal": "다음에 받는 치유 {absorb}를 흡수하고 매초 {burnMin}~{burnMax}의 화염 피해를 줍니다. 치유로 흡수량을 모두 깎으면 꺼집니다. {leap}미터 안으로 다가온 플레이어에게 남은 흡수량과 함께 옮겨 가며 {leapMin}~{leapMax}의 화염 피해를 줍니다. 누군가에게 옮겨 간 뒤 {grace}초 동안은 다시 옮겨 가지 않습니다. {seconds}초 안에 꺼지지 않으면 폭발해 당신을 포함한 {radius}미터 안의 모두에게 {burstMin}~{burstMax}의 화염 피해를 줍니다."
       },
       "finalBoss": {
@@ -7466,6 +7467,7 @@ export const ko_KR: EnTranslations = {
       "tempering": "담금질 일격",
       "strike": "원소 일격",
       "shear": "베어 가르는 일격",
+      "brand": "샘의 낙인",
       "onYou": "당신에게",
       "seconds": "{seconds}초",
       "timeAria": "{name}이(가) {seconds}초 후 당신을 칩니다"

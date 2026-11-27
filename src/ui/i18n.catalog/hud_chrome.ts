@@ -6068,6 +6068,8 @@ export const hudChromeStrings = {
       hunted:
         'A Rolling Cinder or a Seedflame is after you. A Rolling Cinder that reaches you kills you and burns everyone within {radius} yd: keep away, and let allies strike it, each strike knocks it {knock} yd back (then not again for {crust} sec).',
       crust: 'Cooled hard: strikes cannot knock it back until this ends.',
+      brand:
+        'Wellspring Brand: you take {pct}% more Fire, Frost, Nature, Shadow and Arcane damage for {seconds} sec, Cinder Grip included. Every {every} sec the guardian hurls a brand at its tank, even while it casts, stands under its own bar or cannot reach you: {min} to {max} Fire damage and this mark. The other tank must taunt before the next one lands. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
       coal: 'Absorbs the next {absorb} healing you receive and burns you for {burnMin} to {burnMax} Fire damage every second. Heal through it to put it out. Any player who comes within {leap} yd of you takes it, with the absorb it has left, and {leapMin} to {leapMax} Fire damage; it cannot leap for {grace} sec after it lands on someone. Not healed through in {seconds} sec, it bursts for {burstMin} to {burstMax} Fire damage on everyone within {radius} yd, you included.',
     },
     // The Masterless Strength (src/ui/final_aura_effect.ts; the numbers are
@@ -10509,6 +10511,7 @@ export const hudChromeStrings = {
     tempering: 'Tempering Strike',
     strike: 'Elemental Strike',
     shear: 'Shearing Blow',
+    brand: 'Wellspring Brand',
     onYou: 'On you',
     seconds: '{seconds} sec',
     timeAria: '{name} hits you in {seconds} seconds',

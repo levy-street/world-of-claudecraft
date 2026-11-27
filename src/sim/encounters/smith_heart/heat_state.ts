@@ -273,6 +273,12 @@ export interface HeatFightState {
   coalOuts: number;
   coalLeaps: number;
   coalBursts: number;
+  /** Wellspring Brand (heat_brand.ts): seconds to the next brand (the
+   *  present clock only: it stands still while the guardian is sunk), the
+   *  tank told of it (null: none yet), and how many landed this pull. */
+  brandTimer: number;
+  brandTold: number | null;
+  brands: number;
   /** Wellspawn that reached the wellspring, and the hits they dealt. */
   feeds: number;
   /** Mechanic casts started (the hashed picks' salt). */
