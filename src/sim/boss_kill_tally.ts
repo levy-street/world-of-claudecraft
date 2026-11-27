@@ -95,6 +95,11 @@ function buildEncounters(): ReadonlyMap<string, BossKillEncounter> {
   const byBody = new Map<string, BossKillEncounter>();
   const add = (mobId: string, bodyIds: readonly string[]) => {
     if (bodyIds.some((body) => byBody.has(body))) return;
+    // The key a kill writes must survive the load sanitizer, or a count would
+    // show, save, and vanish on the next login: refuse such an id at build.
+    if (!KEY_RE.test(bossKillKey(mobId, 'heroic'))) {
+      throw new Error(`boss_kill_tally: mob id ${mobId} cannot be a tally key`);
+    }
     const encounter: BossKillEncounter = Object.freeze({
       mobId,
       bodyIds: Object.freeze([...bodyIds]),
@@ -151,6 +156,27 @@ export function addBossKill(
   meta.bossKills = Object.freeze({ ...held, [key]: next });
 }
 
+// The encounters already counted per live claim (slot record -> claim id and
+// encounter keys), so no claim ever credits one fight twice: a body that dies
+// again after its encounter was counted, or a sibling felled inside the same
+// death, finds its key here. A derived per-world guard keyed by the slot
+// record (the raid_run.ts WeakMap idiom); the claim id resets it when the
+// pooled slot is claimed again. Never persisted, draws no rng.
+const countedByClaim = new WeakMap<InstanceSlot, { claimId: number; keys: Set<string> }>();
+
+/** True the first time this claim completes this encounter, false after. */
+function firstCountInClaim(inst: InstanceSlot, encounterId: string): boolean {
+  const claimId = inst.exitId ?? -1;
+  let held = countedByClaim.get(inst);
+  if (!held || held.claimId !== claimId) {
+    held = { claimId, keys: new Set() };
+    countedByClaim.set(inst, held);
+  }
+  if (held.keys.has(encounterId)) return false;
+  held.keys.add(encounterId);
+  return true;
+}
+
 /**
  * Credit one boss death to everyone who took part (see the header). The death
  * hub calls it for every death with the claim the dying mob belongs to (null
@@ -169,6 +195,7 @@ export function recordBossKillTally(
   // it arrives with no recipients; the claim's roster is then the credit list.
   // Any other death with nobody to credit stays uncredited.
   if (recipients.length === 0 && !(encounter.bodyIds.length > 1 && boss.regrown === true)) return;
+  if (!firstCountInClaim(inst, encounter.mobId)) return;
   const credited = new Map<number, PlayerMeta>();
   for (const meta of recipients) credited.set(meta.entityId, meta);
   for (const meta of instanceLockoutMetas(ctx, inst)) {

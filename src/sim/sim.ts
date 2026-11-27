@@ -1422,7 +1422,7 @@ export interface PlayerMeta
   // Four normal bags plus an active member bag; backpack space is implicit.
   bags: (string | null)[];
   membershipBag?: string;
-  // The per-source breakdown behind bank.bonusSlots, stamped by the host at join
+  // The per-source breakdown behind bank.bonusSlots (character_storage.ts), stamped at join
   // alongside the total (addPlayer's bankBonus opt). Display-only session state:
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
   // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).

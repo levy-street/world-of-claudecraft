@@ -12,10 +12,11 @@ import {
   BOSS_KILL_ENCOUNTERS,
   bossKillCount,
   EMPTY_BOSS_KILLS,
+  recordBossKillTally,
   sanitizeBossKills,
   savedBossKills,
 } from '../src/sim/boss_kill_tally';
-import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
+import { FINDER_ACTIVITIES, finderEncounterBodyIds } from '../src/sim/content/dungeon_finder';
 import {
   SMITH_HEART_COUNCIL,
   SMITH_HEART_DUNGEON,
@@ -70,6 +71,15 @@ describe('boss kill tally: the tracked encounters', () => {
         );
       }
     }
+    // Every body of every Finder encounter maps to that encounter (a body
+    // first listed alone would drop a later several-bodied boss silently).
+    for (const activity of FINDER_ACTIVITIES) {
+      for (const encounter of activity.encounters) {
+        for (const body of finderEncounterBodyIds(encounter)) {
+          expect(BOSS_KILL_ENCOUNTERS.get(body)?.mobId, body).toBe(encounter.mobId);
+        }
+      }
+    }
     const council = BOSS_KILL_ENCOUNTERS.get(COUNCIL_SEAM_SINGER);
     expect(council?.mobId).toBe(COUNCIL_GUARDIAN);
     expect(council?.bodyIds).toEqual(SMITH_HEART_COUNCIL);
@@ -81,6 +91,13 @@ describe('boss kill tally: the tracked encounters', () => {
       SMITH_HEART_FINAL_BOSS,
     ]) {
       expect(BOSS_KILL_ENCOUNTERS.get(id)?.bodyIds).toEqual([id]);
+    }
+  });
+
+  it('writes only keys the load sanitizer keeps, so no count vanishes on login', () => {
+    for (const { mobId } of BOSS_KILL_ENCOUNTERS.values()) {
+      const tally = { [mobId]: 2, [`${mobId}:heroic`]: 1 };
+      expect(sanitizeBossKills(tally), mobId).toEqual(tally);
     }
   });
 
@@ -117,6 +134,35 @@ describe('boss kill tally: the kill point (death hub)', () => {
     expect(sim.bossKills).toBe(EMPTY_BOSS_KILLS);
     kill(sim, inst, pid, COUNCIL_GUARDIAN);
     expect(sim.bossKills).toEqual({ [COUNCIL_GUARDIAN]: 1 });
+  });
+
+  it('credits a grown-back last body through the claim roster, once per claim', () => {
+    const { sim, inst, pid } = raid();
+    kill(sim, inst, pid, COUNCIL_SEAM_SINGER);
+    const guardian = body(sim, inst, COUNCIL_GUARDIAN);
+    // A last body that grew back pays no kill credit of its own: no recipients.
+    guardian.dead = true;
+    guardian.regrown = true;
+    recordBossKillTally(sim.ctx, guardian, [], inst);
+    expect(sim.bossKills).toEqual({ [COUNCIL_GUARDIAN]: 1 });
+    // The same claim never credits the same fight twice.
+    recordBossKillTally(sim.ctx, guardian, [sim.meta(pid) as never], inst);
+    kill(sim, inst, pid, COUNCIL_SEAM_SINGER);
+    expect(sim.bossKills).toEqual({ [COUNCIL_GUARDIAN]: 1 });
+    // An uncredited single-body death with nobody to credit counts nothing.
+    const heat = body(sim, inst, SMITH_HEART_GUARDIANS.heat);
+    heat.dead = true;
+    recordBossKillTally(sim.ctx, heat, [], inst);
+    expect(bossKillCount(sim.bossKills, SMITH_HEART_GUARDIANS.heat, 'normal')).toBe(0);
+  });
+
+  it('skips a character on its way out (its final save is already taken)', () => {
+    const { sim, inst, pid } = raid();
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('meta');
+    meta.leaving = true;
+    kill(sim, inst, pid, SMITH_HEART_GUARDIANS.quench);
+    expect(meta.bossKills).toBeUndefined();
   });
 
   it('keys a Heroic kill apart from Normal and adds across runs', () => {
