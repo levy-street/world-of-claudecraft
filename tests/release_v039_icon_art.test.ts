@@ -496,13 +496,14 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       liveAbilityIds.length,
     );
     // Integration 45 paints the four previously parked abilities.
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(423);
+    // The Warlock rework adds Hard Bargain (painted).
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(424);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',
     ).toEqual([]);
     // Fieldcraft and druid reworks expand the painted production census by eight.
-    expect(paintedAbilityIds.size).toBe(423);
+    expect(paintedAbilityIds.size).toBe(424);
     expect(aggregate.runtimeClosure.abilities).toEqual({ live: 416, painted: 416 });
 
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(

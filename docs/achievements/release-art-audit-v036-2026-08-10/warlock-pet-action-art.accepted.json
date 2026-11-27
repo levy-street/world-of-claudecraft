@@ -6,8 +6,8 @@
   "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
   "mapping": {
     "path": "public/ui/skills/warlock/mapping.json",
-    "bytes": 32579,
-    "sha256": "b0cbac8be01ab327b7439d2d0202b4db143422f5955dcdc67cef42fa5e674c66",
+    "bytes": 33009,
+    "sha256": "6416052ff50019e19b46d3e3f735e36678cd4ee2dc7a3d8810e4cb074849ec83",
     "recordFields": [
       "abilityId",
       "generatedResultPath",
