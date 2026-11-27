@@ -396,7 +396,12 @@ export class AdventureJournalWindow {
     bossName: string,
   ): void {
     const slot = root.querySelector<HTMLElement>('[data-model-slot]');
-    if (!slot) return;
+    // Only the Overview holds the model: any other tab (and Mythic's panel)
+    // releases the viewer and its WebGL context.
+    if (!slot) {
+      this.modelController.destroy();
+      return;
+    }
     const model = instance.legacyFormat ? undefined : journalModelFor(view.mobId);
     this.modelController.mount(slot, {
       boss: view.key,

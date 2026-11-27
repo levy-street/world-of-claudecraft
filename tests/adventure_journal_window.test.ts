@@ -358,6 +358,11 @@ describe('AdventureJournalWindow', () => {
     root.querySelector<HTMLButtonElement>('[data-show-model]')?.click();
     expect(root.querySelector('.aj-tab.active')?.getAttribute('data-tab')).toBe('overview');
     expect(root.querySelector('.aj-about [data-model-slot]')).not.toBeNull();
+    // Leaving the Overview releases the viewer and its WebGL context.
+    const destroy = vi.spyOn(RaidBossGuideModelController.prototype, 'destroy');
+    root.querySelector<HTMLButtonElement>('[data-tab="abilities"]')?.click();
+    expect(destroy).toHaveBeenCalled();
+    root.querySelector<HTMLButtonElement>('[data-tab="overview"]')?.click();
     // Mythic has no page to show it on, so the portrait offers no 3D button.
     root.querySelector<HTMLButtonElement>('.rbg-segmented [data-difficulty="mythic"]')?.click();
     expect(root.querySelector('[data-show-model]')).toBeNull();

@@ -95,6 +95,23 @@ describe('journal banner core', () => {
         two: '40%',
       }),
     ).toBe('Sinks at <b>&lt;70%&gt;</b> and <b>40%</b>');
+    // A template's own digits and apostrophes (escaped to &#39;) stay text.
+    expect(
+      boldValuesHtml('bossJournal.smithHeart.heat.chipPhases' as TranslationKey, {
+        phases: 3,
+        overflows: "2'",
+      }),
+    ).toBe('<b>3</b> phases and <b>2&#39;</b> overflows');
+    expect(
+      boldValuesHtml(
+        'hudChrome.adventureJournal.mobileCrumb' as TranslationKey,
+        {
+          group: 'Raids',
+          instance: "The Smith's Heart",
+        },
+        ['group'],
+      ),
+    ).toBe('Raids / <b>The Smith&#39;s Heart</b>');
   });
 });
 

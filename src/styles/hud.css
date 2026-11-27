@@ -13491,6 +13491,12 @@
     font-size: 12.5px;
     font-weight: 600;
   }
+  /* A mechanic Heroic adds reads apart from one Heroic only retunes. */
+  #adventure-journal-window .rbg-mark-heroicOnly {
+    border-color: var(--color-aj-deadly);
+    background: transparent;
+    color: var(--color-aj-deadly);
+  }
   #adventure-journal-window .aj-ab-do {
     display: -webkit-box;
     overflow: hidden;

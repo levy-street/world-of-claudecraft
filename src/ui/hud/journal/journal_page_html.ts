@@ -39,7 +39,8 @@ import {
   type TranslationKey,
   t,
 } from '../../i18n';
-import { iconDataUrl, QUALITY_COLOR } from '../../icons';
+import { iconDataUrl } from '../../icons';
+import { marketNameColor } from '../../market_name_color';
 import { targetPortraitUrl } from '../../target_portrait_view';
 import { svgIcon, type UiIconName } from '../../ui_icons';
 import { sourceQualifierBits } from '../loot_explorer';
@@ -158,6 +159,12 @@ export function pageValues(
 const percent = (value: number): string =>
   formatNumber(value, { style: 'percent', maximumFractionDigits: 0 });
 
+// Private-use characters no catalog string carries: they mark a value's
+// place through t() and esc() (neither touches them), then turn into <b>.
+const MARK_OPEN = String.fromCharCode(0xe000);
+const MARK_CLOSE = String.fromCharCode(0xe001);
+const MARKED_VALUE = new RegExp(`${MARK_OPEN}([0-9]+)${MARK_CLOSE}`, 'g');
+
 /** A translated line whose placeholder values print bold. The values are
  *  marked with private-use characters (no catalog string carries them)
  *  before translation and the whole line is escaped afterwards, so neither
@@ -165,14 +172,18 @@ const percent = (value: number): string =>
 export function boldValuesHtml(
   key: TranslationKey,
   values: InterpolationValues | undefined,
+  plain: readonly string[] = [],
 ): string {
   if (!values) return esc(t(key));
   const names = Object.keys(values);
-  const marked = Object.fromEntries(names.map((name, i) => [name, `${i}`]));
-  return esc(t(key, marked)).replace(
-    /(\d+)/g,
-    (_, i: string) => `<b>${esc(String(values[names[Number(i)]] ?? ''))}</b>`,
+  const marked = Object.fromEntries(
+    names.map((name, i) => [name, `${MARK_OPEN}${i}${MARK_CLOSE}`]),
   );
+  return esc(t(key, marked)).replace(MARKED_VALUE, (_, i: string) => {
+    const name = names[Number(i)];
+    const text = esc(String(values[name] ?? ''));
+    return plain.includes(name) ? text : `<b>${text}</b>`;
+  });
 }
 
 // ---- the window head -------------------------------------------------------------
@@ -296,10 +307,14 @@ export function mobileTopHtml(groups: readonly JournalNavGroup[], navOpen: boole
   const group = groups.find((entry) => entry.instances.some((i) => i.holdsSelection));
   const instance = group?.instances.find((entry) => entry.holdsSelection);
   if (!group || !instance) return '';
-  const crumb = boldValuesHtml('hudChrome.adventureJournal.mobileCrumb', {
-    group: t(GROUP_KEYS[group.kind]),
-    instance: instanceName(instance.id),
-  });
+  const crumb = boldValuesHtml(
+    'hudChrome.adventureJournal.mobileCrumb',
+    {
+      group: t(GROUP_KEYS[group.kind]),
+      instance: instanceName(instance.id),
+    },
+    ['group'],
+  );
   const strip = instance.bosses
     .map((boss) => {
       const status = navStatusText(journalNavStatus(boss));
@@ -318,7 +333,7 @@ export function mobileTopHtml(groups: readonly JournalNavGroup[], navOpen: boole
       } aria-label="${esc(label)}"><img src="${esc(boss.portraitUrl)}" alt="" aria-hidden="true"></button>`;
     })
     .join('');
-  return `<div class="aj-mobile-top"><button type="button" class="aj-crumb" data-browse data-focus-key="browse" aria-expanded="${navOpen}" aria-controls="aj-nav" aria-label="${esc(
+  return `<div class="aj-mobile-top"><button type="button" class="aj-crumb" data-browse data-focus-key="browse" aria-expanded="${navOpen}" aria-controls="aj-nav" title="${esc(
     t('hudChrome.adventureJournal.openList'),
   )}">${GLYPH_BACK}<span>${crumb}</span></button><div class="aj-strip">${strip}</div></div>`;
 }
@@ -767,7 +782,9 @@ export function lootHtml(
       if (members.length > 1) {
         bits.push(t('hudChrome.adventureJournal.lootFrom', { boss: mobName(row.dropsFrom) }));
       }
-      const color = QUALITY_COLOR[row.quality] ?? QUALITY_COLOR.common;
+      // The AA-lifted name palette (rare and epic read 3.8:1 in the raw
+      // quality hues on this panel).
+      const color = marketNameColor(row.quality);
       return `<li class="aj-loot-row aj-quality-${esc(row.quality)}" tabindex="0" data-item-id="${esc(
         row.itemId,
       )}" ${FOCUS_KEY_ATTR}="loot:${esc(row.itemId)}">${itemIcon(def)}<span class="aj-loot-text"><span class="aj-loot-name" style="color:${color}">${esc(
