@@ -1,6 +1,6 @@
 // Pure encounter-journal core shared by the raid guide and the five-player
 // dungeon guides. A journal SOURCE lists its bosses in route order and builds
-// one boss page per difficulty; the window (raid_boss_guide_window.ts) paints
+// one boss page per difficulty; the Adventure Journal (hud/journal/) paints
 // whatever source the room context or the Dungeon Finder hands it. The raid
 // source wraps raid_boss_guide_view.ts unchanged; each dungeon is one
 // data-as-code module under ./dungeons/ whose numbers come from the sim's own
@@ -96,6 +96,10 @@ export interface JournalBossView {
   choices?: readonly JournalChoice[];
   /** What changes on Heroic, shown as a callout on the Heroic tab. */
   heroicNotes?: readonly JournalNote[];
+  /** Every body of a council page, in roster order (the page's `mobId` is the
+   *  first): each gets its portrait and name in the header, and the page is
+   *  defeated only once all of them are down. Absent for a single boss. */
+  members?: readonly string[];
 }
 
 export interface JournalSource {
@@ -162,9 +166,12 @@ export interface JournalBossDef {
   heroicNotes: readonly TranslationKey[];
   heroicNoteValues?: JournalValues;
   heroicNotePercentValues?: readonly string[];
+  /** A council fought as one encounter: every body, `mobId` first. */
+  members?: readonly string[];
 }
 
 export interface DungeonJournalDef {
+  /** The instance id (a five-player dungeon, or a raid such as the Smith's Heart). */
   dungeonId: string;
   bosses: readonly JournalBossDef[];
 }
@@ -291,15 +298,20 @@ export function dungeonJournalBossView(
               : {}),
           }))
         : [],
+    ...(boss.members ? { members: boss.members } : {}),
   };
 }
 
-/** A dungeon journal as a window source. */
-export function dungeonJournalSource(def: DungeonJournalDef): JournalSource {
+/** A data-as-code journal (a dungeon's, or a raid authored the same way) as a
+ *  window source. */
+export function dungeonJournalSource(
+  def: DungeonJournalDef,
+  kind: JournalSource['kind'] = 'dungeon',
+): JournalSource {
   const byKey = new Map(def.bosses.map((boss) => [boss.mobId, boss]));
   return {
     id: def.dungeonId,
-    kind: 'dungeon',
+    kind,
     bossKeys: def.bosses.map((boss) => boss.mobId),
     view(bossKey, difficulty) {
       const boss = byKey.get(bossKey) ?? def.bosses[0];

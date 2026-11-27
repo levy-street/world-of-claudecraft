@@ -145,14 +145,17 @@ describe('ability icons', () => {
     // 633: plus the Quench and Breath tank-swap glyphs (heart_quench_tempered,
     // heart_breath_wind_battered, heart_breath_thunder_laden, heart_breath_blow_mark,
     // heart_breath_blow_thrown; quench_temper.ts, breath_blow.ts).
-    expect(ids).toHaveLength(633);
+    // 722: plus the Smith's Heart raid-journal recipes (dgn_heart_*,
+    // src/ui/boss_journal/raids/smith_heart.ts).
+    expect(ids).toHaveLength(722);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
     // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier;
     // then + the five-player dungeon boss guide recipes, plus release ability recipes).
-    // Re-minted for the Living Rime pair, then for the five tank-swap glyphs.
-    expect(hash).toBe('2a119154cb3db4d5d6c6376d35ecce93d8232327c601266b18d3003b54eab19f');
+    // Re-minted for the Living Rime pair, then for the five tank-swap glyphs, then for
+    // the Smith's Heart raid-journal recipes.
+    expect(hash).toBe('d7837c43157ed7a7bf14208490c1f8f3e458c53fb15111b0373d5e6ac6f71e07');
   });
 });

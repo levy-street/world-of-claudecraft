@@ -13,6 +13,594 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'bossJournal.smithHeart.common.softEnrageName': 'ソフトエンレージ',
+  'bossJournal.smithHeart.common.skyStrikeName': '天の一撃',
+  'bossJournal.smithHeart.common.crossingBladeName': '交差する刃',
+  'bossJournal.smithHeart.common.groaningIceName': '軋む氷',
+  'bossJournal.smithHeart.common.furyPhaseName': '炉の怒り',
+  'bossJournal.smithHeart.common.furyPhaseSummary':
+    'ヒロイックのみ：戦闘開始から{minutes}分後に訪れるハードエンレージ。',
+  'bossJournal.smithHeart.common.furyName': '炉の怒り',
+  'bossJournal.smithHeart.common.furySummary':
+    '集う炉の怒りが{warn}秒前に警告する。戦闘開始から{minutes}分後、{every}秒ごとに戦闘中の全員を焼く：最初は最大体力の{share}、次に{share2}、そして{kill}回目はどんなシールドがあっても全員を殺す。この時計は中断時間も含めて戦闘のすべての秒を数え、ボスがダメージを受けない間は怒りが待機する。',
+  'bossJournal.smithHeart.common.furyResponse': '時間切れになる前にボスを倒すこと。',
+  'bossJournal.smithHeart.common.heroicFury':
+    '炉の怒り：戦闘開始から{minutes}分後、戦いがレイドを焼き尽くす。',
+  'bossJournal.smithHeart.council.overview':
+    'フロスマール、不屈の槌とヴェルミラ、鉱脈の歌い手は採石場で一体となって戦う。フロスマールはタンク担当のボスで、その山の怒りは柱の陰に隠れていない全員を打つ。ヴェルミラは術者で、レイドが身を隠す柱を立て、歌で石を揺るがす。一方が倒れるともう一方が回復し、速くなり、その能力を引き継ぐ。2体は同時に倒すこと。',
+  'bossJournal.smithHeart.council.phaseHammerName': 'フロスマール、不屈の槌',
+  'bossJournal.smithHeart.council.phaseHammerSummary':
+    'タンク担当のボス。エネルギーは約{fill}秒で0から{energy}まで溜まり、満タンになると山の怒りを詠唱する。',
+  'bossJournal.smithHeart.council.wrathSummary':
+    'エネルギーが満タンになると{cast}秒の詠唱の後、柱の陰の外にいる採石場の全員が{min}～{max}のダメージを受け、柱はすべて砕ける。最初の山の怒りは、5本の彫刻された石柱も戦闘終了まで破壊する。',
+  'bossJournal.smithHeart.council.wrathHeroicSummary':
+    'エネルギーが満タンになると{cast}秒の詠唱の後、柱の陰の外にいる採石場の全員が{min}～{max}のダメージを受ける：耐えられるのは強力な防御スキルを使ったタンクだけ。その後柱はすべて砕け、最初の山の怒りは5本の彫刻された石柱も破壊する。',
+  'bossJournal.smithHeart.council.wrathResponse':
+    '術者から見て柱の反対側、柱の陰に隠れること。1本の柱が守れるのは最大{limit}人まで：それより多く隠れると、各自が爆発の{share}を受ける。最初の山の怒りの後は、石の目覚めで立った柱だけが遮蔽物になる。',
+  'bossJournal.smithHeart.council.enrageSummary':
+    '山の怒りが{wraths}回命中すると、エネルギーの溜まる速さが{mult}倍になる：約{cycle}秒ごとに山の怒りが来る。',
+  'bossJournal.smithHeart.council.enrageResponse': 'それまでに評議会を倒しきる計画を立てること。',
+  'bossJournal.smithHeart.council.weightSummary':
+    '{every}秒ごとに、タンクへ{cast}秒の詠唱：通常攻撃の{mult}倍の一撃を与え、その後{seconds}秒間タンクの受ける物理ダメージが{taken}増加する。',
+  'bossJournal.smithHeart.council.weightResponse':
+    '命中したらすぐにもう一人のタンクが挑発する。同じタンクが2回続けて受けてはならない。',
+  'bossJournal.smithHeart.council.hammerfallName': '槌落とし',
+  'bossJournal.smithHeart.council.hammerfallSummary':
+    '{every}回の攻撃ごとに、その一撃が前方{arc}度、{range}ヤードまでを薙ぎ払い、範囲内の全員に通常攻撃の{share}を与える。',
+  'bossJournal.smithHeart.council.hammerfallResponse':
+    'フロスマールの正面にはタンクだけが立つこと。',
+  'bossJournal.smithHeart.council.rushSummary':
+    '{every}秒ごとに、{cast}秒の詠唱でタンク以外のプレイヤー1人に印を付け、呪われた柱を立てる。その後、自身からそのプレイヤーを通って採石場の端まで一直線に突進し、行く手の最初の柱で止まる。ぶつかった全員は{min}～{max}のダメージを受け、{knock}ヤード吹き飛ばされる。',
+  'bossJournal.smithHeart.council.rushResponse':
+    '印を受けたら：自分とフロスマールの間に呪われた柱を挟み、線から外れること。柱を砕くとフロスマールは{stun}秒間スタンし、{exposedSeconds}秒間受けるダメージが{exposed}増加する。行く手に遮蔽用の柱があれば、代わりにそれが壊される。',
+  'bossJournal.smithHeart.council.cursedName': '呪われた柱',
+  'bossJournal.smithHeart.council.cursedSummary':
+    '呪われた柱は立っている間、{every}秒ごとにレイド全体へ{min}～{max}のダメージを与える。山の怒りから誰も守らず、砕けるのは山の突進か山の怒りだけ。',
+  'bossJournal.smithHeart.council.cursedResponse': 'できるだけ早く山の突進で砕くこと。',
+  'bossJournal.smithHeart.council.phaseSingerName': 'ヴェルミラ、鉱脈の歌い手',
+  'bossJournal.smithHeart.council.phaseSingerSummary':
+    '術者。鉱脈の矢、鉱脈の歌、石の目覚めはすべて詠唱妨害できる。',
+  'bossJournal.smithHeart.council.wakeSummary':
+    '{every}秒ごと、および山の怒りが命中するたびにその{after}秒後、{cast}秒の詠唱で{marks}人のプレイヤーに{mark}秒間の印を付ける。印が切れると各自の立つ場所から柱が突き出し、{radius}ヤード以内の全員に{min}～{max}のダメージを与えて吹き飛ばす。詠唱を妨害すれば何も立たない。',
+  'bossJournal.smithHeart.council.wakeResponse':
+    '次の山の怒りに必要な詠唱だけを通し、残りは妨害すること。印を受けた者は、レイドが遮蔽物を置きたい場所に互いに離れて立つ。',
+  'bossJournal.smithHeart.council.thrumName': '石の唸り',
+  'bossJournal.smithHeart.council.thrumSummary':
+    '石の目覚めで立ち、まだ残っている柱は、それぞれ{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、柱の数だけ重なる。彫刻された石柱は決して鳴らない。',
+  'bossJournal.smithHeart.council.thrumResponse':
+    '次の山の怒りに必要な柱だけを残すこと：余分な柱は1本ごとに回復の負担になる。',
+  'bossJournal.smithHeart.council.restlessName': 'ざわめく石',
+  'bossJournal.smithHeart.council.restlessSummary':
+    '{every}秒ごとに、立っている柱はすべて{reach}ヤード以内の者に{min}～{max}のダメージを与える。',
+  'bossJournal.smithHeart.council.restlessResponse': '山の怒りが来るまでは石から離れていること。',
+  'bossJournal.smithHeart.council.rockSummary':
+    '{every}秒ごとに、プレイヤー1人に{mark}秒間の印を付け、その後岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}多く受け、レイド全体が{tremorMin}～{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠ける。',
+  'bossJournal.smithHeart.council.rockResponse':
+    'まだ必要な柱から離れた金色の円に、{soakers}人以上で集まること。',
+  'bossJournal.smithHeart.council.boltSummary':
+    '{every}秒ごとに、視界内のランダムなプレイヤーへ{cast}秒の詠唱：{min}～{max}の自然ダメージ。視界外のプレイヤーには当たらない。',
+  'bossJournal.smithHeart.council.boltResponse': '詠唱妨害すること。',
+  'bossJournal.smithHeart.council.songSummary':
+    '山の怒りが命中するたびにその{after}秒後に始まる{cast}秒の詠唱。歌いきると{marks}人に共鳴を付与し、妨害されると{kicked}人に付与する。',
+  'bossJournal.smithHeart.council.songHeroicSummary':
+    '{every}秒ごと、独自の周期で{cast}秒の詠唱を行うため、共鳴が山の怒りと重なることがある。歌いきると{marks}人に共鳴を付与し、妨害されると{kicked}人に付与する。',
+  'bossJournal.smithHeart.council.songResponse': '毎回詠唱妨害すること。',
+  'bossJournal.smithHeart.council.resonanceName': '共鳴',
+  'bossJournal.smithHeart.council.resonanceSummary':
+    '{seconds}秒間、印を受けたプレイヤーは{every}秒ごとに鳴り響き、自分の{radius}ヤード以内の味方全員に{min}～{max}の自然ダメージを与える。',
+  'bossJournal.smithHeart.council.resonanceResponse':
+    '印を受けたら：効果が切れるまで全員から{radius}ヤード離れること。',
+  'bossJournal.smithHeart.council.resonanceHeroicResponse':
+    '印を受けたら：効果が切れるまで全員から{radius}ヤード離れること。山の怒りが来るなら、自分専用の柱の陰に入ること。',
+  'bossJournal.smithHeart.council.phaseFallName': '一方が倒れたとき',
+  'bossJournal.smithHeart.council.phaseFallSummary': '戦闘は2体とも倒れたときにだけ終わる。',
+  'bossJournal.smithHeart.council.furyName': '嘆きの憤怒',
+  'bossJournal.smithHeart.council.furySummary':
+    '一方が倒れると、その魂が{arrive}秒後にもう一方へ届く。生き残った側は即座に体力の{heal}を回復し、与えるダメージが{damage}増加し、戦闘終了まで攻撃、詠唱、すべての能力が{haste}速くなる。',
+  'bossJournal.smithHeart.council.furyResponse':
+    '2体の体力を一緒に削り、1体目が倒れてから{arrive}秒以内に2体目を倒すこと：そうすれば魂は間に合わない。',
+  'bossJournal.smithHeart.council.inheritName': '受け継がれた能力',
+  'bossJournal.smithHeart.council.inheritSummary':
+    '魂と共に、生き残った側は倒れた側の能力を全力で引き継ぐ。フロスマールが倒れた場合：ヴェルミラが彼のエネルギーを溜め、山の怒りを詠唱する。ヴェルミラが倒れた場合：フロスマールが石の目覚めと鉱脈の歌を詠唱する。山の突進と落石は使い手と共に消える。',
+  'bossJournal.smithHeart.council.inheritHeroicSummary':
+    '魂と共に、生き残った側は倒れた側の能力を全力で引き継ぐ。フロスマールが倒れた場合：ヴェルミラが彼のエネルギーを溜め、山の怒りと槌の重みを使う。ヴェルミラが倒れた場合：フロスマールが石の目覚め、鉱脈の歌、鉱脈の矢を詠唱する。山の突進と落石は使い手と共に消える。',
+  'bossJournal.smithHeart.council.inheritResponse':
+    'どちらが生き残っても作戦は同じ：山の怒りには柱、歌には詠唱妨害、槌の重みにはタンク交代。',
+  'bossJournal.smithHeart.council.tipTank':
+    '槌の重みのたびに交代すること。フロスマールとヴェルミラを近くに寄せ、レイドが2体を同時に倒せるようにする。ヒロイックでは、遮蔽物の外で山の怒りを受けるタンクは強力な防御スキルが必要。',
+  'bossJournal.smithHeart.council.tipHealer':
+    '山の怒りの前には毎回全員を満タンにすること。石の唸りと呪われた柱は石が残っている限りレイド全体を打ち、落石を受けた者は着弾後に回復が必要になる。',
+  'bossJournal.smithHeart.council.tipDamage':
+    '鉱脈の矢と鉱脈の歌はすべて詠唱妨害すること。山の怒りの前に石の目覚めを1回だけ通し、残りは妨害する。両方の体力バーを見て、1体目から{arrive}秒以内に2体目を倒すこと。',
+  'bossJournal.smithHeart.council.heroicWrath':
+    '山の怒りは柱の陰の外にいる者を殺す。1本の柱が守れるのは{limit}人だけで、混み合った柱は爆発の{share}を通してしまう。',
+  'bossJournal.smithHeart.council.heroicOverlap':
+    '石の目覚めは{marks}人に印を付け、その印、山の突進、共鳴が山の怒りの詠唱中にも来るようになる。',
+  'bossJournal.smithHeart.council.heroicFury':
+    '嘆きの憤怒は生き残った側の体力を即座に{heal}回復させ、倒れた側の2つ目の能力も引き継がせる。',
+  'bossJournal.smithHeart.breath.overview':
+    'エアウィン、解き放たれた疾風は、壁のない岩棚である嵐の岩棚で戦う：どの縁も虚空への落下に通じている。体力が半分になるまでは風で戦い、半分で繭に隠れてレイドを浮島へ送り出し、その後嵐が裂けて最後まで雷として戦う。テサリー隊長が共に戦い、凪の円を敷いてくれる。',
+  'bossJournal.smithHeart.breath.phaseWindName': '風',
+  'bossJournal.smithHeart.breath.phaseWindSummary':
+    '戦闘開始から体力{at}まで。吹き飛ばされても、投げ飛ばされても、歩いてでも、岩棚の縁から出た者は虚空へ落ちて死ぬ。',
+  'bossJournal.smithHeart.breath.windName': 'ふいごの風',
+  'bossJournal.smithHeart.breath.windSummary':
+    '何度も繰り返し、来る風が{gather}秒間床に示され、その後{blow}秒間岩棚を吹き抜けて、立ち止まっている者を毎秒{speed}ヤード運ぶ。風と風の間は{calmMin}～{calmMax}秒間凪になる。',
+  'bossJournal.smithHeart.breath.windResponse':
+    '風が吹く前に風上側へ移動し、吹いている間は風に向かって歩くこと。縁の近くで決して立ち止まらないこと。',
+  'bossJournal.smithHeart.breath.calmName': '凪の円',
+  'bossJournal.smithHeart.breath.calmSummary':
+    '{every}秒ごとに、テサリー隊長が床に円を示す。{land}秒後に円が降りて{hold}秒間続く。中にいる最大{seats}人は{anchor}秒間錨で固定され、風にも吸引にも吹き飛ばしにも動かされない。',
+  'bossJournal.smithHeart.breath.calmHeroicSummary':
+    '{every}秒ごとに、テサリー隊長が床に円を示す。{land}秒後に円が降りて{hold}秒間続く。中にいる最大{seats}人は{anchor}秒間錨で固定され、風にも吸引にも吹き飛ばしにも動かされない。錨が切れたプレイヤーは{spent}秒間再び固定されない。',
+  'bossJournal.smithHeart.breath.calmResponse':
+    '風や吸い込む息が来るときは、ヒーラーと遠隔が錨を取ること。',
+  'bossJournal.smithHeart.breath.inhaleSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、全員をエアウィンの方へ毎秒{pull}ヤード引き寄せる。口の前の渦は、そこにいる者に{tick}秒ごとに{min}～{max}のダメージを与える。',
+  'bossJournal.smithHeart.breath.inhaleResponse':
+    '口からまっすぐ離れる方向へ歩き続けるか、凪の円に立つこと。',
+  'bossJournal.smithHeart.breath.roarSummary':
+    '吸い込みが終わると{cast}秒の詠唱：岩棚の全員に{min}～{max}の自然ダメージを与え、各自をエアウィンからまっすぐ{throw}ヤード吹き飛ばし、その後{gust}秒間毎秒{gustSpeed}ヤードで押し流す。ノーマルでは必ず縁の手前で止まる。',
+  'bossJournal.smithHeart.breath.roarHeroicSummary':
+    '吸い込みが終わると{cast}秒の詠唱：岩棚の全員に{min}～{max}の自然ダメージを与え、各自をエアウィンからまっすぐ{throw}ヤード吹き飛ばし、その後{gust}秒間毎秒{gustSpeed}ヤードで押し流す。縁まで届いた吹き飛ばしは岩棚の外へ運び出す。',
+  'bossJournal.smithHeart.breath.roarResponse':
+    '咆哮のときはエアウィンの近くに立ち、突風の間はまっすぐエアウィンの方へ歩いて戻るか、凪の円に立つこと。',
+  'bossJournal.smithHeart.breath.lanceSummary':
+    '{every}秒ごとに、プレイヤー1人へ{cast}秒の詠唱：長さ{length}ヤード、幅{width}ヤードの直線上の全員に{min}～{max}の自然ダメージ。',
+  'bossJournal.smithHeart.breath.lanceResponse':
+    '印を受けたら：直線をレイドから逸らすこと。他の全員は直線から出る。',
+  'bossJournal.smithHeart.breath.skySummary':
+    '風と嵐のフェーズでは、{every}秒ごとに雷が{marks}人のプレイヤーとさらに{spots}か所に印を付ける。{warn}秒後、{radius}ヤード以内に{min}～{max}のダメージを与える。',
+  'bossJournal.smithHeart.breath.skyResponse': '自分の円から出て、円をレイドから離すこと。',
+  'bossJournal.smithHeart.breath.blowSummary':
+    '{every}秒ごとに、タンクへ{cast}秒の詠唱：{min}～{max}の自然ダメージを与え、タンクをエアウィンからまっすぐ吹き飛ばす。最初は{first}ヤード、風に打たれたのスタックごとに遠くなり、最大{last}ヤード。タンクを岩棚の外へ飛ばすことはない。スタックは{seconds}秒続く。',
+  'bossJournal.smithHeart.breath.blowHeroicSummary':
+    '{every}秒ごとに、タンクへ{cast}秒の詠唱：{min}～{max}の自然ダメージを与え、タンクをエアウィンからまっすぐ吹き飛ばす。最初は{first}ヤード、風に打たれたのスタックごとに遠くなる。{ruin}スタック時の一撃はタンクを岩棚の外へ飛ばす。スタックは{seconds}秒続く。',
+  'bossJournal.smithHeart.breath.blowResponse': '{swap}スタックでタンクを交代すること。',
+  'bossJournal.smithHeart.breath.galeName': '吹きすさぶ旋風',
+  'bossJournal.smithHeart.breath.galeSummary':
+    '吸い込む息のたびに、その後{count}個の吹きすさぶ旋風が{seconds}秒間岩棚をさまよう。触れると{min}～{max}のダメージを受け、{toss}ヤード放り投げられる。',
+  'bossJournal.smithHeart.breath.galeResponse':
+    '風と戦いながら旋風から目を離さず、決して縁の方へ押されないこと。',
+  'bossJournal.smithHeart.breath.knotName': '結ばれた疾風',
+  'bossJournal.smithHeart.breath.knotSummary':
+    '風のフェーズでは{every}秒ごと（最大{runs}回）、嵐のフェーズでは{stormEvery}秒ごとに、結ばれた疾風が導火時間{fuse}秒で岩棚に落ちる。{mark}秒後、印を受けた2人の足元にポータルAとBが開く：一方に入るともう一方から出る。運ぶ者の移動速度は{walk}になり、どの縁でもインタラクトで虚空へ投げ込める。破裂すると{core}ヤード以内の全員が死に、それより遠い者は距離に応じて軽くなり、{far}ヤードで体力の{floor}まで下がる。',
+  'bossJournal.smithHeart.breath.knotResponse':
+    '1人が拾い、ポータルを近道にして最寄りの縁から投げ捨てること。印を受けた者は運べない。他の全員は遠く離れている。',
+  'bossJournal.smithHeart.breath.phaseIslesName': '風の浮島',
+  'bossJournal.smithHeart.breath.phaseIslesSummary':
+    '体力{at}でエアウィンはダメージを受けなくなり、レイドは2つの浮島の連なりに分かれる。両方の静風石を鎮めると全員が運び戻され、嵐が裂ける。',
+  'bossJournal.smithHeart.breath.novaSummary':
+    '疾風の繭の中ではエアウィンはダメージを受けず、{nova}秒間スカイレンド・ノヴァを詠唱し続ける。詠唱が終わると、ノヴァはどんなシールドがあっても全員を殺す。',
+  'bossJournal.smithHeart.breath.novaResponse':
+    'テサリー隊長の上昇気流に乗って東と西の浮島へ渡り、詠唱が終わる前に両方の静風石を鎮めること。',
+  'bossJournal.smithHeart.breath.closingName': '閉じゆく嵐',
+  'bossJournal.smithHeart.breath.closingSummary':
+    '浮島に最初に降り立った時から、その島の嵐が{closing}秒かけて閉じていく。時間切れになると、天の清算がその島のプレイヤー全員を{every}秒ごとに打ち、最大体力の{share}のダメージを与える。',
+  'bossJournal.smithHeart.breath.closingResponse': '嵐が閉じる前に各浮島を片付けること。',
+  'bossJournal.smithHeart.breath.isleBoltName': '浮島の雷',
+  'bossJournal.smithHeart.breath.isleBoltSummary':
+    '浮島の敵が残っている間、{every}秒ごとに雷がその島のプレイヤー1人と1か所に印を付ける。{warn}秒後、最大体力の{share}のダメージを与える。',
+  'bossJournal.smithHeart.breath.isleBoltResponse': '円から出ること。',
+  'bossJournal.smithHeart.breath.mendSummary':
+    '1つ目の浮島の疾風の癒し手：{every}秒ごとに{cast}秒の詠唱を続け、その島の敵それぞれの体力を{share}回復する。',
+  'bossJournal.smithHeart.breath.mendResponse': '毎回詠唱妨害すること。',
+  'bossJournal.smithHeart.breath.shoveSummary':
+    '2つ目の浮島の突風の先触れ：{every}秒ごとに、プレイヤーへ向かう直線に{cast}秒の詠唱。直線上の全員は島の縁の方へ{yards}ヤード滑るが、縁の手前で止まる。',
+  'bossJournal.smithHeart.breath.shoveHeroicSummary':
+    '2つ目の浮島の突風の先触れ：{every}秒ごとに、プレイヤーへ向かう直線に{cast}秒の詠唱。直線上の全員は島の縁の方へ{yards}ヤード滑り、縁が近ければ外へ落ちる。',
+  'bossJournal.smithHeart.breath.shoveResponse': '直線から出て、縁を背にして戦わないこと。',
+  'bossJournal.smithHeart.breath.squallName': '裂けたスコール',
+  'bossJournal.smithHeart.breath.squallSummary':
+    '2つ目の浮島では、裂けたスコールが倒れる際に2体のスコールの欠片に分かれる。',
+  'bossJournal.smithHeart.breath.squallResponse': '2体の欠片のために火力を残しておくこと。',
+  'bossJournal.smithHeart.breath.wardName': 'スコールの護り',
+  'bossJournal.smithHeart.breath.wardSummary':
+    '3つ目の浮島のスコールの盾持ちは、正面{arc}度以内からの攻撃のダメージを{cut}そらす。',
+  'bossJournal.smithHeart.breath.wardResponse': 'タンクが正面を逸らし、全員で背後を攻撃すること。',
+  'bossJournal.smithHeart.breath.stoneName': '静風石',
+  'bossJournal.smithHeart.breath.stoneSummary':
+    'その島の敵が倒れると静風石が目覚める。島にいる全員が同時に詠唱でき、1人なら{solo}秒かかり、人数が多いほど早く溜まる。攻撃を受けると自分の詠唱は途切れるが、石の進行は失われない。',
+  'bossJournal.smithHeart.breath.stoneResponse': '島にいる全員で一緒に詠唱すること。',
+  'bossJournal.smithHeart.breath.phaseStormName': '嵐',
+  'bossJournal.smithHeart.breath.phaseStormSummary':
+    '体力{at}から最後まで、エアウィンは雷の体となって戦う。',
+  'bossJournal.smithHeart.breath.breakSummary':
+    'レイドが戻ってくると{cast}秒の詠唱、その後{seconds}秒間の雷の連撃：{every}秒ごとに印の付いた場所へ落雷し、それぞれ{radius}ヤード以内に{min}～{max}のダメージを与える。',
+  'bossJournal.smithHeart.breath.breakResponse': '円と円の間を動き続けること。',
+  'bossJournal.smithHeart.breath.forkSummary':
+    '{every}秒ごとに、プレイヤー1人へ{cast}秒の詠唱：{min}～{max}の自然ダメージを与え、その後{jump}ヤード以内の最も近いプレイヤーへ何度も跳ぶ。',
+  'bossJournal.smithHeart.breath.forkResponse': '{jump}ヤードずつ離れて散開すること。',
+  'bossJournal.smithHeart.breath.cradleSummary':
+    '{every}秒ごとに{cast}秒の詠唱でプレイヤーを嵐の中へ持ち上げ（一度に{count}人）、{hold}秒間拘束する。その間エアウィンは詠唱を続け、他に何も唱えない。その後の放電は{total}のダメージで、真下{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}多く受け、岩棚の全員が{bMin}～{bMax}を受ける。',
+  'bossJournal.smithHeart.breath.cradleHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱で{count}人のプレイヤーを嵐の中へ持ち上げ、{hold}秒間拘束する。その間エアウィンは詠唱を続け、他に何も唱えない。その後、各放電は{total}のダメージで、そのプレイヤーの真下{radius}ヤード以内の全員で分け合う。どこかで{soakers}人未満だと、そこにいる各自が{penalty}多く受け、岩棚の全員が{bMin}～{bMax}を受ける。',
+  'bossJournal.smithHeart.breath.cradleResponse':
+    '持ち上げられたプレイヤーの金色の円の下に、{soakers}人以上で集まること。',
+  'bossJournal.smithHeart.breath.cradleHeroicResponse':
+    'レイドを円ごとに分け、それぞれ{soakers}人以上を配置すること。',
+  'bossJournal.smithHeart.breath.drawnSummary':
+    '{every}秒ごとに、プレイヤー1人に{seconds}秒間の印を付ける。{strike}秒ごとにその足元へ落雷が落ちる：{warn}秒後に{radius}ヤード以内へ{min}～{max}のダメージを与え、{charged}秒間毎秒{cMin}～{cMax}のダメージを与える帯電した地面を残す。',
+  'bossJournal.smithHeart.breath.drawnResponse':
+    '印を受けたら：動き続け、落雷をレイドから離れた縁へ導くこと。',
+  'bossJournal.smithHeart.breath.thunderSummary':
+    '{every}秒ごとに、タンクへ{cast}秒の詠唱：{min}～{max}の自然ダメージを与え、{seconds}秒間の雷を帯びたを1スタック付与する。スタックごとにタンクの受ける自然ダメージとその他の魔法ダメージが{per}増加する。{draw}スタック以上では、跳ねる雷撃がすべてそのタンクにも跳ぶ。',
+  'bossJournal.smithHeart.breath.thunderResponse': '{swap}スタックでタンクを交代すること。',
+  'bossJournal.smithHeart.breath.swellName': '膨れ上がる嵐',
+  'bossJournal.smithHeart.breath.swellSummary':
+    '{every}秒ごとに岩棚の全員へ{min}～{max}のダメージを与え、それまでの脈動1回ごとに{growth}ずつ強くなり、終わることはない。',
+  'bossJournal.smithHeart.breath.swellResponse':
+    'これが戦闘の制限時間：クールダウンは終盤に取っておき、倒しきること。',
+  'bossJournal.smithHeart.breath.gustName': '嵐の突風',
+  'bossJournal.smithHeart.breath.gustSummary':
+    '嵐のフェーズでは、{every}秒ごとに風が戻ってくる：{gather}秒間床に示され、その後{seconds}秒間毎秒{speed}ヤードで吹く。',
+  'bossJournal.smithHeart.breath.gustResponse': '縁から離れる方向へ、風に向かって歩くこと。',
+  'bossJournal.smithHeart.breath.tipTank':
+    '風に打たれたと雷を帯びたのスタック数で交代すること。エアウィンをレイドから背けさせ、口を縁に向けないようにして、吸い込む息がレイドを内側へ引き寄せるようにする。',
+  'bossJournal.smithHeart.breath.tipHealer':
+    '立ち止まって詠唱したいときはテサリーの錨を取ること。頂の咆哮と雷のゆりかごのたびに回復で耐え、膨れ上がる嵐が強まるにつれて回復量を上げていく。',
+  'bossJournal.smithHeart.breath.tipDamage':
+    '縁の近くで決して立ち止まらないこと。浮島では癒しの疾風を詠唱妨害し、盾持ちの背後を攻撃し、静風石が目覚めたら即座に全員で詠唱すること。',
+  'bossJournal.smithHeart.breath.heroicEdge':
+    '頂の咆哮、突き飛ばす疾風、{ruin}スタック時のふいごの一撃が、プレイヤーを縁の外へ運び出すようになる。',
+  'bossJournal.smithHeart.breath.heroicKnot':
+    '結ばれた疾風は前半と後半の両方で虚空へ投げ込む必要があり、吸い込む息のたびに吹きすさぶ旋風がさまよう。',
+  'bossJournal.smithHeart.breath.heroicCradle':
+    '雷のゆりかごは一度に{count}人を持ち上げる：レイドはそれぞれに分かれること。',
+  'bossJournal.smithHeart.quench.overview':
+    'オーロラ、静寂の冬が凍った湖から現れる。各プレイヤーは冷気バーを持ち、一人でいると溜まり、身を寄せ合うと下がる。だが立ち止まったままの集団は足元の氷を割ってしまう。固まっていても、長居はしないこと。体力が半分になると鍛冶師の四本の剣がすべて目覚め、冷気が深まる。',
+  'bossJournal.smithHeart.quench.phaseColdName': '冷気',
+  'bossJournal.smithHeart.quench.phaseColdSummary': '戦闘中ずっと、全プレイヤーに作用する。',
+  'bossJournal.smithHeart.quench.coldName': '焼き入れの冷気',
+  'bossJournal.smithHeart.quench.coldSummary':
+    '一人でいると、冷気は約{fill}秒で0から{max}まで溜まる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。受けた回復は、最大体力の{heal}ごとに冷気を1下げる。',
+  'bossJournal.smithHeart.quench.coldResponse':
+    '3人以上の集団で身を寄せ合い、集団を動かし続けること。',
+  'bossJournal.smithHeart.quench.frozenName': '霜に閉ざされる',
+  'bossJournal.smithHeart.quench.frozenSummary':
+    '冷気が満タンになると{freeze}秒間凍りつき、受けるダメージが{frozen}増加する。その後氷が砕け、{min}～{max}の冷気ダメージを受け、{brittleSeconds}秒間受けるダメージが{brittle}増加し、{radius}ヤード以内の全員の冷気が{cold}上がる。',
+  'bossJournal.smithHeart.quench.frozenResponse':
+    'バーを決して満タンにしないこと。氷が砕ける前に、凍ったプレイヤーから離れること。',
+  'bossJournal.smithHeart.quench.iceSummary':
+    '同じ場所に{linger}秒とどまった集団の下では氷にひびが入り、{warn}秒後に凍てつく水の穴が開いて戦闘終了まで残る。落ちると{pMin}～{pMax}の冷気ダメージを受け、冷気が{plunge}上がり、{trap}秒間抜け出せず、毎秒{tMin}～{tMax}のダメージを受ける。水だけで死ぬことはない。',
+  'bossJournal.smithHeart.quench.iceResponse':
+    '氷にひびが入る前に集団を移動させ、開いた水には決して入らないこと。',
+  'bossJournal.smithHeart.quench.rimeName': '生ける霧氷',
+  'bossJournal.smithHeart.quench.rimeSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー（一度に{targets}人）を氷の殻が覆う：次に受ける回復を{absorb}吸収し、移動速度を{slow}下げ、冷気の上昇を{mult}倍にする。{seconds}秒以内に回復で砕かないと即座に凍りつき、{radius}ヤード以内の全員に冷気が弾けて冷気が{cold}上がる。',
+  'bossJournal.smithHeart.quench.rimeHeroicSummary':
+    '{every}秒ごとに、タンク以外の{targets}人のプレイヤーを氷の殻が覆う：次に受ける回復を{absorb}吸収し、移動速度を{slow}下げ、冷気の上昇を{mult}倍にする。{seconds}秒以内に回復で砕かないと即座に凍りつき、{radius}ヤード以内の全員に冷気が弾けて冷気が{cold}上がり、その後最も近い別のプレイヤーへ新たな殻となって跳ぶ。',
+  'bossJournal.smithHeart.quench.rimeResponse':
+    'ヒーラーは真っ先に殻を砕くこと。付与された者は砕けるまで集団から離れる。',
+  'bossJournal.smithHeart.quench.phaseLakeName': '湖',
+  'bossJournal.smithHeart.quench.phaseLakeSummary':
+    '戦闘開始から体力{at}まで、鍛冶師の四本の剣のうち二本が目覚めている。',
+  'bossJournal.smithHeart.quench.breathSummary':
+    '{every}秒ごとに{cast}秒の詠唱：前方{arc}度、{range}ヤードまでの扇状範囲に{min}～{max}の冷気ダメージを与え、冷気を{cold}上げる。',
+  'bossJournal.smithHeart.quench.breathResponse':
+    'タンクはオーロラをレイドから背けさせること。他の者は正面に立たない。',
+  'bossJournal.smithHeart.quench.temperSummary':
+    '攻撃が{every}回命中するごとに、拳で前方{arc}度、{range}ヤードまでを叩きつける。タンクに当たる焼き入れの一撃ごとに、{seconds}秒間の霧氷の焼き入れを1スタック付与する：スタックごとにタンクの冷気は{cold}より下がらなくなり、受ける冷気ダメージが{frost}増加する。スタックは{most}で止まる。',
+  'bossJournal.smithHeart.quench.temperHeroicSummary':
+    '攻撃が{every}回命中するごとに、拳で前方{arc}度、{range}ヤードまでを叩きつける。タンクに当たる焼き入れの一撃ごとに、{seconds}秒間の霧氷の焼き入れを1スタック付与する：スタックごとにタンクの冷気は{cold}より下がらなくなり、受ける冷気ダメージが{frost}増加する。{most}スタックでタンクは凍りつく。',
+  'bossJournal.smithHeart.quench.temperResponse': '{swap}スタックでタンクを交代すること。',
+  'bossJournal.smithHeart.quench.bladeSummary':
+    '{every}秒ごとに、目覚めた剣がプレイヤーに順番に印を付ける（1巡に{marks}人）。剣はそれぞれを貫く線に沿って湖を横切って飛び、飛ぶ{lock}秒前に固定されるまで対象を追う。線上の者は{min}～{max}の冷気ダメージを受け、冷気が{cold}上がる。オーロラが弱るほど巡は速くなる。',
+  'bossJournal.smithHeart.quench.bladeResponse':
+    '印を受けたら：線をレイドから離し、固定されたら線から外れること。',
+  'bossJournal.smithHeart.quench.phaseBladesName': '剣の目覚め',
+  'bossJournal.smithHeart.quench.phaseBladesSummary':
+    '体力{at}から最後まで、四本の剣すべてが目覚めている。',
+  'bossJournal.smithHeart.quench.wakeSummary':
+    '体力{at}で{cast}秒の詠唱：残りの二本の剣が引き抜かれる。以降、交差する刃は{every}秒ごとに1巡{marks}人に印を付ける。',
+  'bossJournal.smithHeart.quench.wakeResponse':
+    '印を受けた者を散らし、その線が集団を横切らないようにすること。',
+  'bossJournal.smithHeart.quench.deepenName': '深まる冷気',
+  'bossJournal.smithHeart.quench.deepenSummary':
+    '剣が目覚めてから{every}秒ごとに、全員の冷気の上昇が{step}速くなり、終わることはない。',
+  'bossJournal.smithHeart.quench.deepenResponse':
+    'これが戦闘の制限時間：より固く身を寄せ、より多く回復し、倒しきること。',
+  'bossJournal.smithHeart.quench.tipTank':
+    '焼き入れの息吹をレイドから背けておくこと。霧氷の焼き入れのスタック数で交代し、手が空いたらレイドと身を寄せ合うこと。',
+  'bossJournal.smithHeart.quench.tipHealer':
+    'あなたの回復は温める：体力を回復すると同時に冷気も下げる。生ける霧氷の殻は弾ける前にすべて砕き、氷が砕ける前に凍った者の体力を満たしておくこと。',
+  'bossJournal.smithHeart.quench.tipDamage':
+    '足元の氷が割れないよう集団を動かし続けること。剣に印を付けられたら、線を全員から離し、固定されたら線から外れること。',
+  'bossJournal.smithHeart.quench.heroicShatter':
+    '氷が砕けると{radius}ヤードに飛び散り、範囲内の全員の冷気を{cold}上げる。',
+  'bossJournal.smithHeart.quench.heroicRime':
+    '生ける霧氷は{targets}人にかかり、その破裂は最も近い別のプレイヤーへ跳ぶ。',
+  'bossJournal.smithHeart.quench.heroicTemper':
+    '霧氷の焼き入れが{most}スタックになるとタンクは凍りつく：{swap}で交代すること。',
+  'bossJournal.smithHeart.quench.heroicWarmth':
+    '命の温もりが半減する：回復した体力{heal}ごとに冷気が1下がる。',
+  'bossJournal.smithHeart.heat.overview':
+    'イグナザール、消えざる者は最初の湧泉に腰まで沈んだまま決して動かず、レイドはその周囲の岸で戦う。体力{one}と{two}で沈み、炉床が溶岩の輪となってあふれ出す。タンクは燼の握りと湧泉の烙印で交代する。',
+  'bossJournal.smithHeart.heat.phaseAllName': '全フェーズ',
+  'bossJournal.smithHeart.heat.phaseAllSummary':
+    '戦闘開始から最後まで。ただしイグナザールが氾濫で沈んでいる間は除く。',
+  'bossJournal.smithHeart.heat.wheelName': '炉床の輪',
+  'bossJournal.smithHeart.heat.wheelSummary':
+    '{every}秒ごとに、岸がイグナザールの前方で四つ、後方で四つの区画に切り分けられる。それぞれの側で三つが赤く光り、{warn}秒後に噴き上がって{min}～{max}の火炎ダメージを与え、さらに{burn}秒燃え続ける。一つは暗く安全なまま残る。{rounds}巡が続けて起こり、各側の安全な区画は前回から一つか二つずれる。',
+  'bossJournal.smithHeart.heat.wheelResponse':
+    '自分の側の暗い区画に立ち、炎が消えたらすぐに次の安全な区画へ移ること。',
+  'bossJournal.smithHeart.heat.fistSummary':
+    '{every}秒ごとに、印を受けたプレイヤー（一度に{marks}人）が立っていた場所へ{cast}秒の詠唱：叩きつけた時に{radius}ヤード以内にいた者は{min}～{max}の火炎ダメージを受ける。その後、各地点から3本の溶岩のうねりが湧泉と反対方向と左右へ{length}ヤード広がり、通過した全員に{wMin}～{wMax}を与える。',
+  'bossJournal.smithHeart.heat.fistHeroicSummary':
+    '{every}秒ごとに、印を受けた{marks}人のプレイヤーが立っていた場所へ{cast}秒の詠唱：叩きつけた時に{radius}ヤード以内にいた者は{min}～{max}の火炎ダメージを受ける。その後、各地点から3本の溶岩のうねりが湧泉と反対方向と左右へ{length}ヤード広がり、通過した全員に{wMin}～{wMax}を与える。',
+  'bossJournal.smithHeart.heat.fistResponse':
+    '印を受けたら：その場を離れること。全員がうねりの通り道の隙間に立つ。イグナザール側は常に安全。',
+  'bossJournal.smithHeart.heat.gripName': '燼の握り',
+  'bossJournal.smithHeart.heat.gripSummary':
+    'イグナザールの攻撃が命中するたびに、タンクに1スタック付与する：{seconds}秒間、スタックごとに毎秒{per}の火炎ダメージ、最大{most}スタック。イグナザールが沈んでいる間スタックは保持され、燃えることも減ることもない。',
+  'bossJournal.smithHeart.heat.gripResponse': '{swap}スタックでタンクを交代すること。',
+  'bossJournal.smithHeart.heat.brandSummary':
+    '{every}秒ごとに、イグナザールは何をしていてもタンクへ烙印を投げつけ、{lead}秒前に予告される：{min}～{max}の火炎ダメージを与え、{seconds}秒間タンクの受ける火炎ダメージとその他の魔法ダメージが{taken}増加する。イグナザールが沈んでいる間は来ない。',
+  'bossJournal.smithHeart.heat.brandResponse':
+    '烙印のたびにもう一人のタンクが挑発すること：印の持続は次の烙印までの間隔より長い。',
+  'bossJournal.smithHeart.heat.coalSummary':
+    '{every}秒ごとに、タンク以外の{count}人のプレイヤーが生きた熾火を抱える：次に受ける回復を{absorb}吸収し、毎秒{bMin}～{bMax}の火炎ダメージを与える。{leap}ヤード以内に近づいた者は熾火を引き取り、{lMin}～{lMax}のダメージを受ける。{seconds}秒以内に回復で消せないと破裂し、{radius}ヤード以内の全員に{xMin}～{xMax}を与える。',
+  'bossJournal.smithHeart.heat.coalResponse':
+    'ヒーラーが吸収を削りきること。抱えた者は全員から{leap}ヤード離れる。',
+  'bossJournal.smithHeart.heat.phaseOneName': 'フェーズ1',
+  'bossJournal.smithHeart.heat.phaseOneSummary': '戦闘開始から体力{one}まで。',
+  'bossJournal.smithHeart.heat.flareName': '炉床の閃火',
+  'bossJournal.smithHeart.heat.flareSummary':
+    '{every}秒ごとに、湧泉の中心から{reach}ヤードより遠くにいる全員が{min}～{max}の火炎ダメージを受け、閃火の焦熱を受ける：{seconds}秒間、受ける火炎ダメージとその他の魔法ダメージが{pct}増加する。後のフェーズではタンクだけを、しかも範囲外にいるときだけ打つ。',
+  'bossJournal.smithHeart.heat.flareResponse': '全員が湧泉の近くで戦うこと。',
+  'bossJournal.smithHeart.heat.phaseOverflowName': '氾濫',
+  'bossJournal.smithHeart.heat.phaseOverflowSummary':
+    '体力{one}と{two}で、イグナザールは湧泉に沈み、最後の溶岩の輪が通り過ぎるまでダメージを受けない。',
+  'bossJournal.smithHeart.heat.wavesName': '湧泉の氾濫',
+  'bossJournal.smithHeart.heat.wavesSummary':
+    '溶岩の輪が次々と湧泉から広がる：1回目の氾濫で{first}個、2回目で{second}個、より速く、より隙間が狭くなる。どの輪にも隙間が二つあり、次の輪の隙間は輪が来る前に床の上で光る。隙間の外にいる者は輪から{min}～{max}の火炎ダメージを受ける。',
+  'bossJournal.smithHeart.heat.wavesResponse': '輪が来る前に光る隙間へ歩いていくこと。',
+  'bossJournal.smithHeart.heat.boltName': '降り注ぐ燃え殻',
+  'bossJournal.smithHeart.heat.boltSummary':
+    '氾濫中は{every}秒ごとに、ランダムな{bolts}人のプレイヤーが{min}～{max}の火炎ダメージを受ける。',
+  'bossJournal.smithHeart.heat.boltResponse': '氾濫の間、レイドの体力を満たしておくこと。',
+  'bossJournal.smithHeart.heat.spawnName': '湧泉の落とし子',
+  'bossJournal.smithHeart.heat.spawnSummary':
+    '1回目の氾濫でのみ、{spawn}体の湧泉の落とし子が部屋の端から這い出し、ゆっくりと湧泉へ歩いていく。体力が減るほど遅くなり、{slowAt}を下回ると這うようになる。湧泉に辿り着いた個体はイグナザールの体力を{heal}回復させ、レイド全体に{min}～{max}の火炎ダメージを与える。',
+  'bossJournal.smithHeart.heat.spawnHeroicSummary':
+    '氾濫のたびに、{spawn}体の湧泉の落とし子が部屋の端から這い出し、湧泉へ歩いていく。体力が減るほど遅くなり、{slowAt}を下回ると這うようになる。湧泉に辿り着いた個体はイグナザールの体力を{heal}回復させ、レイド全体に{min}～{max}の火炎ダメージを与える。',
+  'bossJournal.smithHeart.heat.spawnResponse':
+    '縁に辿り着く前に、スロウやスタンをかけて倒しきること。',
+  'bossJournal.smithHeart.heat.keeperName': '湧泉の守り手',
+  'bossJournal.smithHeart.heat.keeperSummary':
+    '2回目の氾濫では、2体の湧泉の守り手が湧泉のそばに現れ、タンクする必要がある。それぞれ{every}秒ごとにプレイヤー1人へ点火の印を付ける：{mark}秒後、そのプレイヤーは{trail}秒間炎の跡を残す。跡の一つひとつが毎秒{min}～{max}の火炎ダメージを与え、その上に立つ湧泉の落とし子の体力を毎秒{heal}回復させる。',
+  'bossJournal.smithHeart.heat.keeperResponse':
+    'タンクが湧泉の守り手を受け持つこと。印を受けた者は跡をレイドと湧泉の落とし子の通り道から離して引く。',
+  'bossJournal.smithHeart.heat.phaseTwoName': 'フェーズ2',
+  'bossJournal.smithHeart.heat.phaseTwoSummary': '体力{one}から{two}まで。',
+  'bossJournal.smithHeart.heat.seedName': '炉床の種',
+  'bossJournal.smithHeart.heat.seedSummary':
+    '{every}秒ごとに、イグナザールは全プレイヤーの立つ場所へ炎の種を投げつける（最大{cap}個）。それぞれ投げてから{life}秒後に弾け、最大{max}の火炎ダメージを与える。遠くにいるほど軽くなり、{reach}ヤードより外には届かない。',
+  'bossJournal.smithHeart.heat.seedHeroicSummary':
+    '{every}秒ごとに、イグナザールは全プレイヤーの立つ場所へ炎の種を投げつける（最大{cap}個）。それぞれ投げてから{life}秒後に弾け、最大{max}の火炎ダメージを与える。遠くにいるほど軽くなり、{reach}ヤードより外には届かない。弾けるたびに種火の精が生まれ、プレイヤー1人を追う。',
+  'bossJournal.smithHeart.heat.seedResponse':
+    '種はレイドから離れた場所にまとめて落とし、すぐに走って離れること。',
+  'bossJournal.smithHeart.heat.seedHeroicResponse':
+    '種はレイドから離れた場所にまとめて落とし、すぐに走って離れること。種火の精は全員で集中して倒すこと。',
+  'bossJournal.smithHeart.heat.zoneName': '目覚めの炎',
+  'bossJournal.smithHeart.heat.zoneSummary':
+    'フェーズ2と3では、{every}秒ごとに湧泉を囲む3本の帯がイグナザールから外側へ順に燃え上がる。それぞれ{warn}秒の予告の後、中にいる全員に{min}～{max}の火炎ダメージを与え、さらに{burn}秒燃え続ける。次の帯は前の帯の{step}秒後に予告を始める。',
+  'bossJournal.smithHeart.heat.zoneResponse': '燃え終わったばかりの帯へ移ること。',
+  'bossJournal.smithHeart.heat.phaseThreeName': 'フェーズ3',
+  'bossJournal.smithHeart.heat.phaseThreeSummary': '体力{two}から最後まで。',
+  'bossJournal.smithHeart.heat.cinderName': '転がる燃え殻',
+  'bossJournal.smithHeart.heat.cinderSummary':
+    '{every}秒ごとに、巨大な火球が岸に落ちて{land}ヤード以内に{lMin}～{lMax}を与え、プレイヤー1人を毎秒{speed}ヤードで追う。追いつかれるとそのプレイヤーは死に、{splash}ヤード以内の全員が{sMin}～{sMax}を受ける。打つたびに{knock}ヤード押し返され、その後{crust}秒間は押し返せない。倒すことはできない。',
+  'bossJournal.smithHeart.heat.cinderResponse':
+    '追われているプレイヤーが引き回し、担当のプレイヤーが交代で打ち返すこと。',
+  'bossJournal.smithHeart.heat.lateSummary':
+    'フェーズ3が{after}秒続くと、転がる燃え殻は代わりに{late}秒ごとに落ちてくる。',
+  'bossJournal.smithHeart.heat.lateResponse':
+    '燃え殻が増えすぎる前に、火力を上げてイグナザールを倒しきること。',
+  'bossJournal.smithHeart.heat.tipTank':
+    '燼の握りのスタック数と、湧泉の烙印のたびに交代すること。イグナザールが沈んでいる間もスタックは保持されるので、浮上した時にもまだ交代が必要。',
+  'bossJournal.smithHeart.heat.tipHealer':
+    '氾濫は全員を同時に傷つける：溶岩の輪、降り注ぐ燃え殻、そして湧泉に辿り着いた湧泉の落とし子。ヒロイックでは、生きた熾火の吸収を破裂前にすべて削りきること。',
+  'bossJournal.smithHeart.heat.tipDamage':
+    '湧泉の落とし子は湧泉に辿り着く前に倒すこと。フェーズ3では、自分の番に転がる燃え殻を打ち返し、固まっている間は待つこと。',
+  'bossJournal.smithHeart.heat.heroicFist':
+    '玄武岩の拳は一度に{marks}人に印を付け、それぞれの場所を叩きつける。',
+  'bossJournal.smithHeart.heat.heroicAdds':
+    '氾濫のたびに湧泉の落とし子が{spawn}体現れ、2回目では湧泉の守り手も2体現れる。炉床の種から種火の精が生まれる。',
+  'bossJournal.smithHeart.heat.heroicCoal': '生きた熾火は戦闘フェーズを通して一度に2人を焼く。',
+  'bossJournal.smithHeart.heat.heroicWheel': '炉床の輪の予告は{warn}秒しかなく、全力で噴き上がる。',
+  'bossJournal.smithHeart.final.overview':
+    'アッシュグランド、主なき剛力の残滓は世界の金床で戦う。金床は熱、焼き入れ、息吹、槌の四つの区画に分かれている。立っている区画の力を飲むため、タンクはどのバーも破裂する前に区画から区画へ引きずっていく。体力{first}と{second}で欠片を呼び出し、{final}で四つの区画すべてが目覚めて最終局面に入る。',
+  'bossJournal.smithHeart.final.phaseQuartersName': '四つの区画',
+  'bossJournal.smithHeart.final.phaseQuartersSummary':
+    '金床の中央に円環があり、その周りに四つの区画がある。各区画固有の能力は、アッシュグランドが入ってから{delay}秒後に始まる。',
+  'bossJournal.smithHeart.final.overloadName': '過負荷',
+  'bossJournal.smithHeart.final.overloadSummary':
+    '各区画には過負荷バーがあり、アッシュグランドがその区画に立つ間に溜まり（空から満タンまで{fill}秒）、それ以外の時はその3分の1の速さで減る。溜まっているバーは{every}秒ごとにレイドへ脈動ダメージを与え、空で{min}、満タンで{max}。満タンになったバーはレイド全体に{bMin}～{bMax}を与えて破裂し、空になる。',
+  'bossJournal.smithHeart.final.overloadResponse':
+    'タンクは3つか4つの区画を順番に引きずること。2つの区画を行き来してはならない。',
+  'bossJournal.smithHeart.final.unboundName': '解き放たれし心',
+  'bossJournal.smithHeart.final.unboundSummary':
+    'アッシュグランドが中央の円環に立つと、{delay}秒後から毎秒スタックが1つ増え、毎秒スタック1つにつき{per}のダメージをレイド全体に与える。',
+  'bossJournal.smithHeart.final.unboundResponse': 'すぐに円環から引きずり出すこと。',
+  'bossJournal.smithHeart.final.shockName': '鉱脈の衝撃',
+  'bossJournal.smithHeart.final.shockSummary':
+    '区画を切り替えるたびにレイドへ{min}～{max}のダメージを与え、{seconds}秒間鉱脈の揺らぎを残す：揺らぎ中に切り替えると{mult}倍のダメージになる。',
+  'bossJournal.smithHeart.final.shockResponse':
+    '区画の切り替えはレイドの体力が十分な時だけにし、2回続けて切り替えないこと。',
+  'bossJournal.smithHeart.final.phaseOwnName': '己が力',
+  'bossJournal.smithHeart.final.phaseOwnSummary':
+    '戦闘中ずっと、アッシュグランドがどこに立っていても使う。',
+  'bossJournal.smithHeart.final.forgeFistName': '炉の拳',
+  'bossJournal.smithHeart.final.forgeFistSummary':
+    '{every}回の攻撃ごとに、拳で前方{arc}度、{range}ヤードまでを薙ぎ払い、範囲内の全員に通常攻撃の{share}を与える。',
+  'bossJournal.smithHeart.final.forgeFistResponse':
+    'アッシュグランドの正面にはタンクだけが立つこと。',
+  'bossJournal.smithHeart.final.strikeSummary':
+    '{every}秒ごとに、タンクは1スタック時{min}～{max}のダメージを受け（スタックごとに{growth}増加）、立っている区画の元素のスタックを{seconds}秒間受ける：灼熱の火傷（スタックごとに毎秒{burn}の火炎ダメージ）、刺すような霜（スタックごとに{slow}遅くなり、{freeze}スタック以上では中に残った者を凍らせる輪を置く）、静電気（{arc}スタック以上で{reach}ヤード以内の味方へ雷が走る）、砕けた鎧（スタックごとにアーマーが{armor}低下）。',
+  'bossJournal.smithHeart.final.strikeResponse':
+    '{swap}スタックでタンクを交代すること。近接は静電気を持つタンクから{reach}ヤード離れること。',
+  'bossJournal.smithHeart.final.anvilSummary':
+    '{every}秒ごとに{cast}秒の詠唱でプレイヤー1人に印を付ける。{radius}ヤードの円がそのプレイヤーを追い、落ちる{lock}秒前に固定される。{total}の物理ダメージを中の全員で分け合い、{fewer}人未満だとそれぞれ1.5倍を受ける。誰も入っていなければ、レイド全体が{missMin}～{missMax}を受ける。',
+  'bossJournal.smithHeart.final.anvilResponse':
+    '円が固定される前に、レイド全員が印を受けたプレイヤーのもとへ集まること。',
+  'bossJournal.smithHeart.final.opposingName': '対立する元素',
+  'bossJournal.smithHeart.final.opposingSummary':
+    '{every}秒ごとに、タンク以外の{marks}人のプレイヤーが{seconds}秒間、火、氷、大地、雷のいずれかの印を対になる組で受ける。対立する2人が{meet}ヤード以内に入ると両方の印が消える。それ以外の組み合わせで触れると爆発し、二人に{min}～{max}の秘術ダメージを与える。時間内に消せなかった印はそのプレイヤーに{lMin}～{lMax}を与える。',
+  'bossJournal.smithHeart.final.opposingHeroicSummary':
+    '{every}秒ごとに、タンク以外の全プレイヤーが{seconds}秒間、火、氷、大地、雷のいずれかの印を対になる組で受ける。対立する2人が{meet}ヤード以内に入ると両方の印が消える。それ以外の組み合わせで触れると爆発し、二人に{min}～{max}の秘術ダメージを与える。時間内に消せなかった組ごとに、レイド全体へ{lMin}～{lMax}を与える。',
+  'bossJournal.smithHeart.final.opposingResponse':
+    '自分の対（火と氷、大地と雷）を見つけて合流し、他の印には近づかないこと。',
+  'bossJournal.smithHeart.final.phaseFusionName': 'エレメンタル・フュージョン',
+  'bossJournal.smithHeart.final.phaseFusionSummary':
+    'アッシュグランドが新しい区画に入るたびに（最初の区画を除く）、その場に留まって{cast}秒の詠唱を行い、離れた区画の元素と入った区画の元素を、入った区画の中で融合させる。',
+  'bossJournal.smithHeart.final.fusionSummary':
+    '新しい区画に移るたびに行う{cast}秒の詠唱。詠唱中は区画固有の能力が待機し、詠唱が終わると組み合わせ技が発動する。',
+  'bossJournal.smithHeart.final.fusionResponse':
+    'どの2つの区画が組み合わさったかを把握し、その組み合わせ技に備えること。',
+  'bossJournal.smithHeart.final.steamName': '灼熱の蒸気',
+  'bossJournal.smithHeart.final.steamSummary':
+    '熱と焼き入れ：蒸気の雲（一度に{clouds}個）が{warn}秒後に立ち昇り、{life}秒間区画内を漂い、中にいる者に毎秒{min}～{max}のダメージを与える。',
+  'bossJournal.smithHeart.final.steamResponse': '雲に入らないこと。',
+  'bossJournal.smithHeart.final.magmaName': 'マグマの裂け目',
+  'bossJournal.smithHeart.final.magmaSummary':
+    '熱と槌：プレイヤーに印が付き（一度に{marks}人）、{mark}秒後にそれぞれの足元で裂け目が噴き出して{radius}ヤード以内に{min}～{max}の火炎ダメージを与え、{life}秒間燃える溶岩を残す（毎秒{pMin}～{pMax}）。',
+  'bossJournal.smithHeart.final.magmaResponse': '印を受けたら：噴き出す前にレイドから離れること。',
+  'bossJournal.smithHeart.final.firestormName': '炎嵐',
+  'bossJournal.smithHeart.final.firestormSummary':
+    '熱と息吹：幅{width}ヤードの通り道が部屋を横切って示され（一度に{lanes}本）、{warn}秒後に炎の壁がそれぞれに沿って薙ぎ払い、{min}～{max}の火炎ダメージを与える。',
+  'bossJournal.smithHeart.final.firestormResponse': '炎が来る前に通り道から出ること。',
+  'bossJournal.smithHeart.final.hailName': '雹嵐',
+  'bossJournal.smithHeart.final.hailSummary':
+    '焼き入れと息吹：{seconds}秒間、区画に雹が降る（{every}秒ごとに{per}個、半分はプレイヤーを狙う）。それぞれ{radius}ヤードの円を示し、{warn}秒後に落ちて{min}～{max}の冷気ダメージを与える。',
+  'bossJournal.smithHeart.final.hailResponse': '動き続けて円から出ること。',
+  'bossJournal.smithHeart.final.avalancheName': '雪崩',
+  'bossJournal.smithHeart.final.avalancheSummary':
+    '焼き入れと槌：氷と岩の棘が壁から中心へ通り道に沿って走り（一度に{lanes}本）、示されてから{warn}秒後に、通り道にいる者に{min}～{max}のダメージを与える。',
+  'bossJournal.smithHeart.final.avalancheResponse': '通り道と通り道の間の隙間に立つこと。',
+  'bossJournal.smithHeart.final.spiresName': '嵐の尖塔',
+  'bossJournal.smithHeart.final.spiresSummary':
+    '息吹と槌：嵐の尖塔がそびえ（一度に{spires}本）、{charge}秒間充電した後、尖塔同士を結ぶすべての線に沿って雷が跳び、{min}～{max}の自然ダメージを与える。',
+  'bossJournal.smithHeart.final.spiresResponse': '二つの尖塔の間に決して立たないこと。',
+  'bossJournal.smithHeart.final.phaseStarsName': '目覚めた星',
+  'bossJournal.smithHeart.final.phaseStarsSummary':
+    'アッシュグランドが初めて区画に入ると、その区画の星が目覚め、戦闘終了まで続く。星はアッシュグランドがその区画に立つ間は全速で、それ以外では{pace}の速さで動く。',
+  'bossJournal.smithHeart.final.pillarsSummary':
+    '槌の星：{every}秒ごとに、{warn}秒後にプレイヤーの足元から柱が突き出す（一度に{count}本）。{knock}ヤード以内の者は{min}～{max}を受けて吹き飛ばされる。柱は残り続け、最大{cap}本。上限に達している時の一斉発動は、代わりにレイドへ{tMin}～{tMax}を与える。',
+  'bossJournal.smithHeart.final.pillarsResponse':
+    '柱を天の一撃への対策に使い、増えすぎる前に交差する刃で砕くこと。',
+  'bossJournal.smithHeart.final.chargedName': '嵐の帯電',
+  'bossJournal.smithHeart.final.chargedSummary':
+    '柱から{arcReach}ヤード以内に落ちた天の一撃は柱の周りに弧を描き（{arcR}ヤード以内に{aMin}～{aMax}）、柱を帯電させる。帯電した柱はそれぞれ{every}秒ごとにレイド全体へ{min}～{max}を与え、柱から{zone}ヤード以内の者は毎秒{zMin}～{zMax}を受ける。',
+  'bossJournal.smithHeart.final.chargedResponse': '帯電した柱は交差する刃ですばやく砕くこと。',
+  'bossJournal.smithHeart.final.skySummary':
+    '息吹の星：{every}秒ごとに、雷がプレイヤー（一度に{marks}人）と柱のそばの地点（一度に{spots}か所）に印を付ける。{warn}秒後、{radius}ヤード以内に{min}～{max}の自然ダメージを与える。',
+  'bossJournal.smithHeart.final.skyResponse':
+    '自分の円から出ること。柱のそばに落ちた雷は柱を帯電させる。',
+  'bossJournal.smithHeart.final.bladeSummary':
+    '焼き入れの星：{every}秒ごとに、縁に剣が浮かび、印を受けたプレイヤーを貫く線を狙い（1巡に{marks}人）、飛ぶ{lock}秒前に固定されるまで対象を追う。線上の全員は{min}～{max}の冷気ダメージを受け、線上の柱はすべて砕ける。',
+  'bossJournal.smithHeart.final.bladeResponse':
+    '印を受けたら：砕きたい柱に線を通し、それから線から外れること。',
+  'bossJournal.smithHeart.final.whirlName': '炎の旋風',
+  'bossJournal.smithHeart.final.whirlSummary':
+    '熱の星：{every}秒ごとに、{warn}秒後に炎の旋風が立ち昇り（一度に{count}個）、{life}秒間毎秒{speed}ヤードで床をさまよい、触れた者に{min}～{max}の火炎ダメージを与える。',
+  'bossJournal.smithHeart.final.whirlResponse': '横へ走って振り切ること。',
+  'bossJournal.smithHeart.final.phaseKitsName': '区画の技',
+  'bossJournal.smithHeart.final.phaseKitsSummary':
+    'アッシュグランドが区画に立つ間、その区画固有の能力が、入ってから{delay}秒後に始まる。',
+  'bossJournal.smithHeart.final.fistSummary':
+    '熱：{every}秒ごとに、プレイヤーの立つ場所へ{cast}秒の詠唱：{radius}ヤード以内に{min}～{max}の火炎ダメージを与え、そこから3本の溶岩のうねりが広がり、通過した全員に{wMin}～{wMax}を与える。',
+  'bossJournal.smithHeart.final.fistResponse':
+    '印を受けたら：その場を離れ、うねりの間の隙間に立つこと。',
+  'bossJournal.smithHeart.final.boltSummary':
+    '息吹：{every}秒ごとに、プレイヤー1人へ{cast}秒の詠唱：{min}～{max}の自然ダメージを与え、その後当たった者の{jump}ヤード以内にいるすべてのプレイヤーへ跳び、跳ぶたびに{growth}強くなる。',
+  'bossJournal.smithHeart.final.boltResponse': '{jump}ヤードずつ離れて散開すること。',
+  'bossJournal.smithHeart.final.devilName': 'ダストデビル',
+  'bossJournal.smithHeart.final.devilSummary':
+    '息吹：{every}秒ごとに、{warn}秒後にプレイヤーのそばにダストデビルが立ち昇り（一度に{count}個）、{life}秒間さまよう。触れると{min}～{max}の自然ダメージを受け、{throw}ヤード投げ飛ばされる。',
+  'bossJournal.smithHeart.final.devilResponse': 'どこをさまようか見て、近づかないこと。',
+  'bossJournal.smithHeart.final.tremorName': '震えの亀裂',
+  'bossJournal.smithHeart.final.tremorSummary':
+    '槌：{every}秒ごとに、プレイヤーの足元に亀裂が開く（一度に{count}か所）。{warn}秒後、それぞれ噴き出して{radius}ヤード以内に{min}～{max}のダメージを与える。',
+  'bossJournal.smithHeart.final.tremorResponse': '噴き出す前に自分の亀裂から離れること。',
+  'bossJournal.smithHeart.final.emberName': '燠火の印',
+  'bossJournal.smithHeart.final.emberSummary':
+    '熱：{every}秒ごとに、遠隔のプレイヤー{marks}人に印が付く。{seconds}秒後、その足元に燠火が落ち、半径{radius}ヤードの溜まりとして{life}秒間くすぶり、毎秒{min}～{max}の火炎ダメージを与える。',
+  'bossJournal.smithHeart.final.emberResponse':
+    '印を受けたら：区画の端にまとめて溜まりを落とし、それから離れること。',
+  'bossJournal.smithHeart.final.iceSummary':
+    '焼き入れ：{every}秒ごとに、{marks}人のプレイヤーの足元の氷が軋む。{warn}秒後、{radius}ヤード以内の氷が割れる：{min}～{max}の冷気ダメージと{stun}秒間のスタン。',
+  'bossJournal.smithHeart.final.iceResponse': '割れる前に軋む氷から離れること。',
+  'bossJournal.smithHeart.final.drawnSummary':
+    '息吹：{every}秒ごとに、{marks}人のプレイヤーに{seconds}秒間の印が付く。毎秒、それぞれから{reach}ヤード以内の他のすべてのプレイヤーへ雷が走り、{min}～{max}の自然ダメージを与える。',
+  'bossJournal.smithHeart.final.drawnResponse': '印を受けたら：全員から{reach}ヤード離れること。',
+  'bossJournal.smithHeart.final.shellName': '石の殻',
+  'bossJournal.smithHeart.final.shellSummary':
+    '槌：{every}秒ごとに、{marks}人のプレイヤーが最大{seconds}秒間殻に包まれ、次に受ける回復を{absorb}吸収する。',
+  'bossJournal.smithHeart.final.shellResponse': 'ヒーラーは他の回復より先に殻を砕くこと。',
+  'bossJournal.smithHeart.final.phaseCallName': '四区画の呼び声',
+  'bossJournal.smithHeart.final.phaseCallSummary':
+    '体力{first}と{second}で、アッシュグランドは守られたまま中央へ踏み込み、最も満ちた区画から欠片を呼び出す。',
+  'bossJournal.smithHeart.final.callSummary':
+    'アッシュグランドが{seconds}秒間詠唱する間、集めし剛力がその身を守り、最も満ちた区画から欠片が現れる（毎回{adds}体、体力はそれぞれ{health}）。すべて倒せば障壁は早く砕ける。詠唱が終わった時に生き残っている欠片は、その元素をアッシュグランドに注ぎ込む：戦闘終了まで、どこに立っていてもその区画の星が全速で動く。',
+  'bossJournal.smithHeart.final.callResponse': '詠唱が終わる前に欠片をすべて倒すこと。',
+  'bossJournal.smithHeart.final.splinteredName': '砕けた剛力',
+  'bossJournal.smithHeart.final.splinteredSummary':
+    '{every}秒ごとに、生きている欠片はそれぞれレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}ずつ強くなる。',
+  'bossJournal.smithHeart.final.splinteredResponse':
+    '欠片は生きている時間が長いほど強く打つ：すばやく倒すこと。',
+  'bossJournal.smithHeart.final.shearSummary':
+    'すべての欠片が{every}秒ごとに使う：{cast}秒の詠唱で、対象に向けて{arc}度、長さ{range}ヤードの扇状範囲を放つ。対象は{tMin}～{tMax}を受け、範囲内の他の者は{oMin}～{oMax}を受ける。',
+  'bossJournal.smithHeart.final.shearResponse':
+    '各欠片のタンクがそれを背けさせ、他の者は正面に立たないこと。',
+  'bossJournal.smithHeart.final.heatSplinterName': '熱の欠片',
+  'bossJournal.smithHeart.final.heatSplinterSummary':
+    '引きずられた場所に燃え殻の跡を残す：{step}ヤードごとに半径{radius}ヤードの炎が{life}秒間燃える（毎秒{tMin}～{tMax}）。{every}秒ごとにプレイヤー1人が{seconds}秒間弾ける炭を抱え、その後弾けて{reach}ヤード以内の他の全員に{min}～{max}を与える。',
+  'bossJournal.smithHeart.final.heatSplinterResponse':
+    'レイドから離れた場所へ引きずること。炭を抱えた者は集団から離れる。',
+  'bossJournal.smithHeart.final.tollSummary':
+    '焼き入れの欠片：{every}秒ごとに{cast}秒の詠唱を行い、鳴り終えるとレイド全体に{min}～{max}の冷気ダメージを与える。',
+  'bossJournal.smithHeart.final.tollResponse': '毎回詠唱妨害すること。',
+  'bossJournal.smithHeart.final.ringName': '焼き入れの環',
+  'bossJournal.smithHeart.final.ringSummary':
+    '{every}秒ごとに、隙間が{gaps}つある霜の環が焼き入れの欠片から広がる。隙間以外で越えると{min}～{max}の冷気ダメージを受け、{slowSeconds}秒間移動速度が{slow}低下する。',
+  'bossJournal.smithHeart.final.ringResponse': '環が通り過ぎる時に隙間を通り抜けること。',
+  'bossJournal.smithHeart.final.weightName': '積み重なる重み',
+  'bossJournal.smithHeart.final.weightSummary':
+    '槌の欠片：攻撃が命中するたびに対象へ1スタック付与し（{seconds}秒間、スタックごとに毎秒{per}のダメージ）、スタックごとにその攻撃が{step}重くなる。',
+  'bossJournal.smithHeart.final.weightResponse': '{swap}スタックでタンクを交代すること。',
+  'bossJournal.smithHeart.final.pounceSummary':
+    '息吹の欠片：{every}秒ごとに、タンク以外のプレイヤーへ{cast}秒の詠唱。そのプレイヤーに飛びかかって{min}～{max}を与え、{seconds}秒間追い回す。その打ちつける疾風は、{reach}ヤード以内の他の全員に毎秒{bMin}～{bMax}を与える。',
+  'bossJournal.smithHeart.final.pounceResponse': '狙われた者は欠片を集団から引き離すこと。',
+  'bossJournal.smithHeart.final.orbName': '嵐の宝珠',
+  'bossJournal.smithHeart.final.orbSummary':
+    '{every}秒ごとに、息吹の欠片の周りに嵐の宝珠が生まれる（一度に{count}個）。一人で踏めば{min}～{max}を受け、2人以上で踏むとそれぞれが2倍を受ける。誰も踏まなかった宝珠は{life}秒後に破裂し、レイド全体に{bMin}～{bMax}を与える。',
+  'bossJournal.smithHeart.final.orbResponse': '宝珠1つにつき1人が踏むこと。',
+  'bossJournal.smithHeart.final.phaseFinalName': '全区画の目覚め',
+  'bossJournal.smithHeart.final.phaseFinalSummary':
+    '体力{final}で、アッシュグランドは最終局面のため中央の円環へ踏み込む。過負荷バーは止まる。',
+  'bossJournal.smithHeart.final.awakeName': 'すべての星の目覚め',
+  'bossJournal.smithHeart.final.awakeSummary':
+    '四つの星すべてが{pace}の速さで同時に動く：柱、雷、刃、旋風が一斉に襲う。金床の重みは独自の周期で続く。',
+  'bossJournal.smithHeart.final.awakeResponse':
+    '担当を守ること：床は慌ただしくなるが、新しいものは何も来ない。',
+  'bossJournal.smithHeart.final.furyName': '主なき憤怒',
+  'bossJournal.smithHeart.final.furySummary':
+    '最終フェーズに入って{after}秒後から、{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}ずつ強くなり、終わることはない。',
+  'bossJournal.smithHeart.final.furyResponse': '残りのクールダウンをすべて使って倒しきること。',
+  'bossJournal.smithHeart.final.tipTank':
+    'どの過負荷バーも満ちないようアッシュグランドを区画から区画へ順に引きずり、中央の円環からはすぐに出すこと。元素の一撃が{swap}スタックになったら交代すること。呼び声のたびに欠片を受け持つこと。',
+  'bossJournal.smithHeart.final.tipHealer':
+    '過負荷の脈動、金床の重み、砕けた剛力はすべてレイド全体を打つ。クールダウンは各呼び声と、主なき憤怒が止まらない最終フェーズのために取っておくこと。',
+  'bossJournal.smithHeart.final.tipDamage':
+    '対立する元素では自分の対を見つけ、金床の重みのたびに円の下へ集まり、呼び声が終わる前に欠片をすべて倒すこと。霧氷の鐘はすべて詠唱妨害する。',
+  'bossJournal.smithHeart.final.heroicBurst':
+    '満タンの過負荷バーは{bMin}～{bMax}で破裂する：体力を回復し、防御スキルを使うこと。',
+  'bossJournal.smithHeart.final.heroicKits':
+    '区画を切り替えるたびに鉱脈の衝撃が起こり、燠火の印、軋む氷、招雷、石の殻が区画の技に加わる。',
+  'bossJournal.smithHeart.final.heroicOpposing':
+    '対立する元素はタンク以外の全プレイヤーに印を付け、消されずに残った組ごとにレイド全体が打たれる。',
+  'bossJournal.smithHeart.final.heroicCall': '四区画の呼び声のたびに欠片が{adds}体現れる。',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '{every}秒ごとに{cast}秒詠唱し、{radius}ヤード以内の全員に{min}から{max}ダメージ。串刺しのプレイヤーは距離に関係なく{pinMult}倍のダメージを受ける。',
   'bossJournal.wildheart.zulgar.spearSummary':
@@ -18193,7 +18781,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '経験値バーの上には、アビリティスロットが11個並んだ列が3段あり、1段目の先頭には攻撃専用のボタンが付いています。最初から出ているのは1段目だけで、2段目と3段目は場所が欲しくなったときにオプションで有効にします（3段目には2段目が必要です）。キーボード上部の数字列が1段目を発動し、追加のバーは初期設定でテンキーに割り当てられています。\n\nアビリティはスペルブック（P）から持ってきます。本からスロットへドラッグするか、各行のトグルで空いている最初のスロットへ置きましょう。アイテムも同じように扱えるので、ポーションの束や包帯をスロットに置いて、キーひとつで使うこともできます。\n\nバーを好みの並びに整えたら、固定できます。固定するとドラッグ、ドロップ、消去を受け付けなくなりますが、アビリティ自体はこれまでどおり使えるので、戦闘中に手元が滑ってもボタンの配置が崩れることはありません。\n\n条件がそろうと、小さなバーが2つ加わります。攻撃、停止、挑発、防御、攻撃的をCtrl+1から5に並べたペットバーと、スタンスやフォームを切り替えるクラスのためのスタンスバーです。',
   'guide.interfacePage.actionBarsTitle': 'アクションバー',
   'guide.interfacePage.aurasBody':
-    '自分のバフは、ミニマップの脇、画面右上に小さなアイコンの列として並び、それぞれ残り時間を刻んでいきます。デバフはそのすぐ下の列に並びます。自分のバフを右クリックすれば解除できます。\n\nオプションでバフの列を自分のユニットフレームへ移すこともでき、そうすれば右上の一角はすべてデバフのものになります。\n\nターゲットのバフとデバフは、そのフレームの下に一本の帯としてまとまって表示されます。もっと広く見たいときは、Shift+Jで「ターゲットのバフとデバフ」ウィンドウが別に開きます。移動でき、バフだけ・デバフだけに絞り込め、開いたままにしておけます。',
+    '自分のバフは、ミニマップの脇、画面右上に小さなアイコンの列として並び、それぞれ残り時間を刻んでいきます。デバフはそのすぐ下の列に並びます。自分のバフを右クリックすれば解除できます。\n\nオプションでバフの列を自分のユニットフレームへ移すこともでき、そうすれば右上の一角はすべてデバフのものになります。\n\nターゲットのバフとデバフは、そのフレームの下に一本の帯としてまとまって表示されます。もっと広く見たいときは、Shift+Bで「ターゲットのバフとデバフ」ウィンドウが別に開きます。移動でき、バフだけ・デバフだけに絞り込め、開いたままにしておけます。',
   'guide.interfacePage.aurasTitle': 'バフとデバフ',
   'guide.interfacePage.barsBody':
     '詠唱やチャネルを行うと、画面中央、アクションバーのすぐ上にキャストバーが現れ、呪文の名前と残り時間を伝えます。ターゲットにもそのフレーム上に専用のキャストバーが出るので、何が来るのかを見て応じられます。\n\nキャストバーの下には細いスイングバーがあり、武器を振るたびに満ちていきます。近接や遠隔で戦う人は、次の自動攻撃がいつ当たるのかを見て取れます。\n\n経験値バーはアクションバーの下を画面幅いっぱいに走り、区切りが刻まれ、明るく伸びた部分が蓄えている休息経験値を示します。\n\n水中を泳ぐと、画面上部に青い息バーが現れます。頭が沈んでいる間は減り続け、尽きて溺れ始めると赤く点滅し、水面に出た瞬間に素早く戻ります。スペースで浮上し、初期設定でCtrlの「潜水」キーを押せばさらに深く潜れます。\n\nダメージと回復は、当たった相手の上に小さな数字となって浮かび上がるので、文字を読まなくても戦いの流れがつかめます。書かれた記録はすべて、チャットボックスの「戦闘」タブに残ります。',
@@ -26352,4 +26940,45 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathWind.turning': '風向きが変わる',
   'hudChrome.auraEffect.breathGuardian.gust':
     'サミットロアの突風が、投げ飛ばされた方向へあなたを数秒間押し流す（毎秒{speed}ヤード）。ガーディアンの方へまっすぐ歩いて踏みとどまるか、セサリーの錨に立つこと。さもなければコーニスの縁へ運ばれる。',
+  'hudChrome.mobile.journal': '日誌',
+  'hudChrome.adventureJournal.title': '冒険日誌',
+  'hudChrome.adventureJournal.close': '冒険日誌を閉じる',
+  'hudChrome.adventureJournal.crumbs': '{instance} | {boss} | {difficulty}',
+  'hudChrome.adventureJournal.browse': '一覧',
+  'hudChrome.adventureJournal.navLabel': 'ダンジョンとレイド',
+  'hudChrome.adventureJournal.groupDungeons': 'ダンジョン',
+  'hudChrome.adventureJournal.groupRaids': 'レイド',
+  'hudChrome.adventureJournal.expandInstance': '{instance}のボスを表示',
+  'hudChrome.adventureJournal.collapseInstance': '{instance}のボスを隠す',
+  'hudChrome.adventureJournal.bossProgress': '撃破 {defeated}/{total}',
+  'hudChrome.adventureJournal.youAreHere': '現在地',
+  'hudChrome.adventureJournal.inCombat': '戦闘中',
+  'hudChrome.adventureJournal.kindRaid': 'レイド',
+  'hudChrome.adventureJournal.kindDungeon': 'ダンジョン',
+  'hudChrome.adventureJournal.pageKicker': '{instance} | {kind} | ボス {index}/{total}',
+  'hudChrome.adventureJournal.previousBoss': '前のボス：{boss}',
+  'hudChrome.adventureJournal.nextBoss': '次のボス：{boss}',
+  'hudChrome.adventureJournal.noPreviousBoss': '最初のボスです',
+  'hudChrome.adventureJournal.noNextBoss': '最後のボスです',
+  'hudChrome.adventureJournal.councilMembers': '評議会の面々',
+  'hudChrome.adventureJournal.mythic': 'ミシック',
+  'hudChrome.adventureJournal.sectionsLabel': '日誌の項目',
+  'hudChrome.adventureJournal.tabOverview': '概要',
+  'hudChrome.adventureJournal.tabAbilities': '能力',
+  'hudChrome.adventureJournal.tabLoot': '戦利品',
+  'hudChrome.adventureJournal.comingSoon': '近日公開',
+  'hudChrome.adventureJournal.comingSoonBody':
+    'ミシック難易度はまだ鍛造中。開放されたら、その能力、数値、報酬がここに記される。',
+  'hudChrome.adventureJournal.readTier': '{difficulty}を読む',
+  'hudChrome.adventureJournal.strategyHeading': 'ロール別の戦略',
+  'hudChrome.adventureJournal.watchFor': '注意する能力',
+  'hudChrome.adventureJournal.jumpToAbility': '能力欄で{ability}を表示',
+  'hudChrome.adventureJournal.roleNothing':
+    'このロールだけに求められる能力はない。全ロール共通の項目に従うこと。',
+  'hudChrome.adventureJournal.abilityCountPlural.one': '能力{count}件',
+  'hudChrome.adventureJournal.abilityCountPlural.other': '能力{count}件',
+  'hudChrome.adventureJournal.lootLabel': '{difficulty}の戦利品',
+  'hudChrome.adventureJournal.lootNone': 'このボスは{difficulty}ではアイテムを落とさない。',
+  'hudChrome.adventureJournal.lootFrom': 'ドロップ元：{boss}',
+  'hudChrome.adventureJournal.targetButton': 'このボスを冒険日誌で開く',
 };
