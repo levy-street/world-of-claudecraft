@@ -22666,7 +22666,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.blast':
     'サミットロアの突風があなたをガーディアンから吹き飛ばす：口元では毎秒{speed}ヤード、離れるほど弱まり、合計{seconds}秒続く。すぐに風に逆らってまっすぐ戻るか、セサリーの錨に立つこと。さもなければコーニスから吹き落とされる。',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、頂の咆哮が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、守護者から{throw}ヤード（ヒロイックでは{heroicThrow}ヤード）吹き飛ばす：守護者が縁の近くにいれば、レイドは岩棚の外へ放り出される。ヒロイック・ミシック：それぞれ{heroicMin}から{heroicMax}、{heroicGustMin}から{heroicGustMax}のダメージ。',
+    '守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、頂の咆哮が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、守護者から真っすぐ{throw}ヤード吹き飛ばす（ヒロイックとミシックでは{heroicThrow}ヤード。縁まで飛ばされると岩棚の外へ落ちる）。続いて突風が数秒間、同じ向きに毎秒{gustSpeed}ヤード（ヒロイックとミシックでは{heroicGustSpeed}ヤード）押し流す：守護者に向かって真っすぐ歩いて戻らなければ縁まで運ばれる。咆哮の時は守護者の近くか、テサリーの錨の中に立つこと。ヒロイック・ミシック：それぞれ{heroicMin}から{heroicMax}、{heroicGustMin}から{heroicGustMax}のダメージ。',
   'hudChrome.auraEffect.breathGuardian.pinned':
     '風で縁の壁に押しつけられている：風が凪ぐか壁から離れるまで、毎秒{min}から{max}のダメージ。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
   'hudChrome.auraEffect.breathGuardian.anchor':

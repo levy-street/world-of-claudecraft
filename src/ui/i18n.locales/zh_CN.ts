@@ -23170,7 +23170,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.blast':
     '巅峰咆哮的狂风将你吹离守护者：在其口前每秒{speed}码，越远越弱，共持续{seconds}秒。立刻逆风直奔回去，或站进塞萨莉的锚点，否则会被吹下飞檐。',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '守护者深吸一口气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后巅峰咆哮对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们从守护者身边吹飞{throw}码（英雄难度为{heroicThrow}码）：守护者靠近边缘时，团队会被吹出崖台。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicGustMin}到{heroicGustMax}点伤害。',
+    '守护者深吸一口气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后巅峰咆哮对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们径直吹离守护者{throw}码（英雄和史诗难度为{heroicThrow}码，被吹到边缘会让你飞出崖台），随后一阵狂风继续沿该方向吹送他们数秒，每秒{gustSpeed}码（英雄和史诗难度为{heroicGustSpeed}码）：径直走回守护者身边，否则狂风会把你吹到边缘。守护者咆哮时站在它附近，或待在瑟萨莉的锚点中。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicGustMin}到{heroicGustMax}点伤害。',
   'hudChrome.auraEffect.breathGuardian.pinned':
     '被风压在边缘的墙上：在风停歇或你离开墙边之前，每秒受到{min}到{max}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
   'hudChrome.auraEffect.breathGuardian.anchor':

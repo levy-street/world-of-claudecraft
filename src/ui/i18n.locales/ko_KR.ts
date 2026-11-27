@@ -22642,7 +22642,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.blast':
     '정상의 포효의 돌풍이 당신을 수호자에게서 밀어냅니다: 입 앞에서는 초당 {speed}미터, 멀어질수록 약해지며 모두 {seconds}초 동안 지속됩니다. 즉시 바람을 거슬러 곧장 돌아가거나 세살리의 닻에 서세요. 그러지 않으면 처마 밖으로 날려갑니다.',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 {throw}야드(영웅 난이도는 {heroicThrow}야드) 날려 보냅니다: 수호자가 가장자리 가까이 있으면 공격대가 벼랑 밖으로 날아갑니다. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicGustMin}에서 {heroicGustMax}의 피해.',
+    '수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 정반대로 {throw}야드 날려 보냅니다(영웅·신화는 {heroicThrow}야드이며, 가장자리까지 날아가면 벼랑 밖으로 떨어집니다). 그 뒤 돌풍이 몇 초 동안 같은 방향으로 초당 {gustSpeed}야드(영웅·신화는 {heroicGustSpeed}야드) 밀어냅니다: 수호자를 향해 곧장 걸어 돌아오지 않으면 가장자리까지 밀려납니다. 포효할 때 수호자 가까이 있거나 테살리의 닻 안에 서십시오. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicGustMin}에서 {heroicGustMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.pinned':
     '바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.anchor':
