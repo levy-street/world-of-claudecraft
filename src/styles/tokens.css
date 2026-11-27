@@ -402,6 +402,74 @@
     --color-rbg-gain-text: #9fe3ad;
     --color-rbg-heroic-bg: #2a0e0bcc;
     --color-rbg-summary-text: #cfc3a6;
+    /* The Adventure Journal's forge-and-parchment skin (hud.css, "adventure
+       journal forge and parchment skin"): a wrought-iron frame with brass trim
+       and an ember gem, aged parchment pages, ink for every word on them,
+       leather bookmark tabs, forged difficulty plates and a wax seal. The ink
+       values are tuned for AA contrast on the darkest parchment stop. */
+    --color-aj-iron-hi: #5f5850;
+    --color-aj-iron: #34302b;
+    --color-aj-iron-lo: #1a1816;
+    --color-aj-iron-deep: #0b0a09;
+    --color-aj-iron-glint: #9a8f80;
+    --color-aj-rivet-hi: #d9cdb6;
+    --color-aj-rivet: #7d7264;
+    --color-aj-rivet-lo: #241f1a;
+    --color-aj-brass-hi: #f4d38a;
+    --color-aj-brass: #b98a3e;
+    --color-aj-brass-lo: #5e3f16;
+    --color-aj-engrave: #e9cf93;
+    --color-aj-gem-hi: #ffe2a0;
+    --color-aj-gem: #e8641c;
+    --color-aj-gem-mid: #9c2a0c;
+    --color-aj-gem-lo: #3a0904;
+    --color-aj-gem-glow: #ff7a2a66;
+    --color-aj-parch-hi: #f3e6c6;
+    --color-aj-parch: #e6d3a6;
+    --color-aj-parch-lo: #d4b982;
+    --color-aj-parch-shade: #b99358;
+    --color-aj-parch-burn: #7a4b1e;
+    --color-aj-parch-burn-soft: #7a4b1e40;
+    --color-aj-parch-edge: #3b220d;
+    --color-aj-card: #f6ecd3d9;
+    --color-aj-card-hi: #fbf4e2;
+    --color-aj-wash: #8a5a2a1c;
+    --color-aj-wash-strong: #8a5a2a33;
+    --color-aj-ink: #24160b;
+    --color-aj-ink-soft: #46301b;
+    --color-aj-ink-faint: #5a3f22;
+    --color-aj-ink-rule: #6b4d2e8c;
+    --color-aj-ink-rule-soft: #6b4d2e47;
+    --color-aj-rubric: #7e170c;
+    --color-aj-rubric-soft: #7e170c26;
+    --color-aj-umber: #663c04;
+    --color-aj-ink-blue: #1a4669;
+    --color-aj-ink-green: #24501f;
+    --color-aj-leather-hi: #8a6040;
+    --color-aj-leather: #5c3a20;
+    --color-aj-leather-lo: #2f1c0e;
+    --color-aj-ribbon-hi: #c2473a;
+    --color-aj-ribbon: #8e2318;
+    --color-aj-ribbon-lo: #4a0c07;
+    --color-aj-wax-hi: #e0574a;
+    --color-aj-wax: #a3241a;
+    --color-aj-wax-lo: #4e0b07;
+    --color-aj-plate-text: #f8eccd;
+    --color-aj-shadow: #000000b3;
+    --color-aj-shadow-soft: #00000059;
+    --color-aj-sheen: #ffffff2e;
+    --color-aj-sheen-soft: #ffffff12;
+    /* The journal skin's procedural art: hammered iron and parchment fibre
+       noise (feTurbulence, alpha only, so the colour comes from the tokens
+       painted beneath), the four forged corner plates and the engraved
+       divider, all used as masks over token gradients. */
+    --tex-aj-iron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='a' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.055' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.32 0 0 0 -0.07'/%3E%3C/filter%3E%3Cfilter id='b' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0 0 0 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
+    --tex-aj-parchment: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.36 0 0 0 -0.15'/%3E%3C/filter%3E%3Cfilter id='d' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04 0.16' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.34 0 0 0 -0.15'/%3E%3C/filter%3E%3Cfilter id='e' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='1' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0 0 0 -0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3Crect width='100%25' height='100%25' filter='url(%23d)'/%3E%3Crect width='100%25' height='100%25' filter='url(%23e)'/%3E%3C/svg%3E");
+    --mask-aj-corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M0 0H58L64 4L58 8H12Q8 8 8 12V58L4 64L0 58Z M8 8L31 13L21 21L13 31Z M34 8L39 14L44 8Z M8 34L14 39L8 44Z'/%3E%3C/svg%3E");
+    --mask-aj-corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg transform='matrix(-1 0 0 1 64 0)'%3E%3Cpath d='M0 0H58L64 4L58 8H12Q8 8 8 12V58L4 64L0 58Z M8 8L31 13L21 21L13 31Z M34 8L39 14L44 8Z M8 34L14 39L8 44Z'/%3E%3C/g%3E%3C/svg%3E");
+    --mask-aj-corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg transform='matrix(1 0 0 -1 0 64)'%3E%3Cpath d='M0 0H58L64 4L58 8H12Q8 8 8 12V58L4 64L0 58Z M8 8L31 13L21 21L13 31Z M34 8L39 14L44 8Z M8 34L14 39L8 44Z'/%3E%3C/g%3E%3C/svg%3E");
+    --mask-aj-corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg transform='matrix(-1 0 0 -1 64 64)'%3E%3Cpath d='M0 0H58L64 4L58 8H12Q8 8 8 12V58L4 64L0 58Z M8 8L31 13L21 21L13 31Z M34 8L39 14L44 8Z M8 34L14 39L8 44Z'/%3E%3C/g%3E%3C/svg%3E");
+    --mask-aj-flourish: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='14' viewBox='0 0 56 14'%3E%3Cpath fill-rule='evenodd' d='M28 0.5L35 7L28 13.5L21 7Z M28 3.6L31.6 7L28 10.4L24.4 7Z'/%3E%3Cpath d='M28 5.4L29.6 7L28 8.6L26.4 7Z M10 7a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0Z M41.6 7a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0Z M16 6.4H20V7.6H16Z M36 6.4H40V7.6H36Z'/%3E%3C/svg%3E");
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */

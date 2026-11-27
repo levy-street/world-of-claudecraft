@@ -3749,6 +3749,7 @@
     min-height: 40px;
   }
   body.mobile-touch #adventure-journal-window {
+    --window-pad: 10px;
     left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
     right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
     top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));
@@ -3769,7 +3770,7 @@
     height: calc(
       var(--app-vh, 100dvh) /
       var(--window-scale, 1) -
-      82px -
+      104px -
       (max(10px, env(safe-area-inset-top)) / var(--window-scale, 1)) -
       (max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1))
     );
@@ -3777,7 +3778,7 @@
     max-height: calc(
       var(--app-vh, 100dvh) /
       var(--window-scale, 1) -
-      82px -
+      104px -
       (max(10px, env(safe-area-inset-top)) / var(--window-scale, 1)) -
       (max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1))
     );
@@ -3935,8 +3936,18 @@
     width: 26px;
     height: 26px;
   }
+  /* The drawer is its own leaf of parchment (the journal skin in hud.css),
+     opaque so the page under it does not read through. */
   body.mobile-touch #adventure-journal-window .aj-nav {
-    background-color: var(--color-rbg-frame-end);
+    border-right-color: var(--color-aj-iron);
+    background:
+      linear-gradient(270deg, var(--color-aj-parch-shade) 0, transparent 24px),
+      var(--tex-aj-parchment),
+      linear-gradient(170deg, var(--color-aj-parch-hi), var(--color-aj-parch-lo));
+    background-size:
+      100% 100%,
+      320px 320px,
+      100% 100%;
   }
   /* A landscape phone is short: the header keeps a small portrait so the
      tabs and the page start above the fold. */
