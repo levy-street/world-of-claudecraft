@@ -39,6 +39,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // The Soul Stone heal fraction is SOUL_STONE_HEAL_PCT_MAX (src/sim/soulwell.ts),
   // an engine constant, not an effects-array value.
   soulwell: [25],
+  // Blackrot's death jump radius is BLACKROT_JUMP_RANGE (combat/affliction_blight.ts),
+  // an engine constant the jump site reads, not an effect field.
+  corruption: [10],
   // Pact Deepened's magic reduction lives in the talent stat resolver.
   demon_skin: [5],
   // Flash of Light's Devotion comes from the Paladin generation table, not its heal effect.

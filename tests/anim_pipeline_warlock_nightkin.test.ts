@@ -70,7 +70,8 @@ describe('warlock ability-specific spellcasts (issue #2889)', () => {
     expect(abilityEnd).toBeGreaterThan(abilityStart);
     const block = warlockBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_]+)',$/gm)];
-    expect(rows.length).toBe(12); // catches a wholesale accidental deletion
+    // 13 since Hard Bargain (hard_bargain) joined life_tap on the Burst cast.
+    expect(rows.length).toBe(13); // catches a wholesale accidental deletion
     for (const [, abilityId, clip] of rows) {
       const ability = ABILITIES[abilityId];
       expect(ability, `attackByAbility key '${abilityId}' is not a real ability id`).toBeTruthy();

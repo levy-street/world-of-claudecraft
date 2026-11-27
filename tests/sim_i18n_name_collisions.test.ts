@@ -104,7 +104,18 @@ const EXPECTED: readonly {
     resolved: 'arcane_surge',
   },
   { kind: 'ability', name: 'Patch Up', ids: ['mend_pet', 'revive_pet'], resolved: 'revive_pet' },
+  // The shared Warlock pacts: life_tap now carries the Cruel Pact name for every
+  // spec, and Hexcraft's own cruel_pact is retired and hidden (saved bars drop
+  // it). The live life_tap must win, so a learned line reads the reachable spell.
+  { kind: 'ability', name: 'Cruel Pact', ids: ['cruel_pact', 'life_tap'], resolved: 'life_tap' },
 ];
+
+// Ability collisions whose two records render the SAME name in every locale, so a
+// player cannot observe which id the map picked. Cruel Pact: life_tap took each
+// language's existing Cruel Pact name when the retired cruel_pact handed it over.
+// The decisive arm below proves they stay identical (an entry here that starts to
+// differ shows up as an unexpected observable name).
+const RENDERS_IDENTICALLY: ReadonlySet<string> = new Set(['Cruel Pact']);
 
 // The residue: a collision no rule at this seam can resolve, because BOTH records
 // are live content a player meets and the sim line carrying the name ("Raised
@@ -209,7 +220,9 @@ describe('reverse-map name collisions are resolved on purpose', () => {
     expect(names.sort(), 'a collision players can see must be a reviewed residue').toEqual(
       [
         ...UNRESOLVABLE.map((u) => u.name),
-        ...EXPECTED.filter((e) => e.kind === 'ability').map((e) => e.name),
+        ...EXPECTED.filter((e) => e.kind === 'ability' && !RENDERS_IDENTICALLY.has(e.name)).map(
+          (e) => e.name,
+        ),
       ].sort(),
     );
     // The ability half is observable only because the two records genuinely differ;
