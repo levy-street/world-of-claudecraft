@@ -6,9 +6,11 @@
 // Weight, Bellows Blow, Thunder Lash, Tempering Strike, Elemental Strike), the
 // pure view (tank_swap_alert_view.ts buildTankBusterAlertView: the tank it is
 // aimed at sees the name and the countdown, nobody else), the composer's mount
-// in the screen's middle on every hints setting, the aura strips never showing
+// as a compact line in the tank corner on every hints setting (the owner's call
+// of 2026-11-27: out of the screen's middle), the aura strips never showing
 // the marker, and the sound in the tank's ear.
 
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { BREATH_MARK_ALARM } from '../src/game/smith_heart_breath_audio_core';
 import { RUSH_MARK_ALARM } from '../src/game/smith_heart_council_audio_core';
@@ -40,6 +42,10 @@ import type { Entity } from '../src/sim/types';
 import { DungeonPrompts, type DungeonPromptsFrame } from '../src/ui/hud/dungeon/dungeon_prompts';
 import {
   buildTankBusterAlertView,
+  TANK_BUSTER_ALERT_KINDS,
+  TANK_BUSTER_ALERT_LOOK,
+  TANK_BUSTER_LAST_SECONDS,
+  TANK_BUSTER_PLACEMENT_CLASS,
   type TankSwapBody,
 } from '../src/ui/hud/dungeon/tank_swap_alert_view';
 import { setLanguage, t } from '../src/ui/i18n';
@@ -98,7 +104,8 @@ describe('each fight warns only its tank as the buster begins', () => {
     expect(m?.remaining).toBeCloseTo(g.castRemaining, 6);
     const v = viewFor(tank, f.sim.ctx.entities);
     expect(v.visible && v.title).toBe("Hammer's Weight");
-    expect(v.visible && v.line).toBe('On you');
+    // One compact line: the name and the countdown, no sentence under it.
+    expect(v.visible && v.line).toBe('');
     for (const p of f.players)
       if (p !== tank) expect(viewFor(p, f.sim.ctx.entities).visible).toBe(false);
     // The bar cut: the warning goes with it.
@@ -218,6 +225,28 @@ describe('the alert: who sees it, and the sound in the tank ear', () => {
     );
   });
 
+  it('turns busterLast in its last second (the second pulse), buster before it', () => {
+    const at = (remaining: number) =>
+      buildTankBusterAlertView({
+        self: {
+          id: 1,
+          auras: [{ id: TANK_BUSTER_AURA, value: 1, remaining, duration: 1.5 }],
+        },
+        entity: () => undefined,
+      });
+    expect(TANK_BUSTER_LAST_SECONDS).toBe(1);
+    expect(TANK_BUSTER_ALERT_KINDS).toEqual(['buster', 'busterLast']);
+    const early = at(1.4);
+    expect(early.visible && early.kind).toBe('buster');
+    expect(early.visible && early.barLabel).toBe('1.4 sec');
+    const last = at(1);
+    expect(last.visible && last.kind).toBe('busterLast');
+    const lastest = at(0.2);
+    expect(lastest.visible && lastest.kind).toBe('busterLast');
+    expect(lastest.visible && lastest.title).toBe("Hammer's Weight");
+    expect(lastest.visible && lastest.barLabel).toBe('0.2 sec');
+  });
+
   it("every fight with a buster plays the anvil in the tank's ear as the marker lands", () => {
     expect(HEART_TANK_BUSTER_SOUND.key).toBe('ui_aura_anvil_strike');
     for (const table of [RUSH_MARK_ALARM, BREATH_MARK_ALARM, QUENCH_MARK_ALARM, FINAL_MARK_SOUNDS])
@@ -225,7 +254,60 @@ describe('the alert: who sees it, and the sound in the tank ear', () => {
   });
 });
 
-describe('DungeonPrompts: the tank buster alert mounts in the middle on every hints setting', () => {
+describe('the tank buster placement: a compact line in the tank corner, never the middle', () => {
+  it('the view core names its mount: its own id, the compact chip, the corner class', () => {
+    expect(TANK_BUSTER_PLACEMENT_CLASS).toBe('tank-corner');
+    expect(TANK_BUSTER_ALERT_LOOK.id).toBe('heart-tank-buster');
+    expect(TANK_BUSTER_ALERT_LOOK.className.split(' ')).toEqual([
+      'ui-panel-strong',
+      'encounter-alert',
+      'heart-tank-buster',
+      'tank-corner',
+    ]);
+    expect(TANK_BUSTER_ALERT_LOOK.kinds).toBe(TANK_BUSTER_ALERT_KINDS);
+  });
+
+  it('the sheet seats it above the swap chip (desktop) and beside it (touch)', () => {
+    const css = readFileSync('src/styles/components.css', 'utf8').replace(/\r\n/g, '\n');
+    const rule = (selector: string) => {
+      const at = css.indexOf(`${selector} {`);
+      expect(at, selector).toBeGreaterThanOrEqual(0);
+      return css.slice(at, css.indexOf('}', at));
+    };
+    const base = rule('  #heart-tank-buster');
+    // No middle-of-screen banner: no centring, no translate, a calm 1px edge.
+    expect(base).not.toMatch(/left:\s*50%/);
+    expect(base).not.toMatch(/transform/);
+    expect(base).toMatch(/border: 1px solid var\(--color-hostile\)/);
+    const corner = rule('  #heart-tank-buster.tank-corner');
+    // The swap chip's own left edge, its bottom 6px over the chip's seat.
+    expect(corner).toMatch(/left: calc\(50% \+ var\(--action-rail-w\) \/ 2 \+ 14px\)/);
+    expect(corner).toMatch(/var\(--unit-frame-seat-offset\) \+/);
+    expect(corner).toMatch(/6px\s*\)/);
+    expect(corner).toMatch(/flex-flow: row wrap/);
+    const swap = rule('  #heart-tank-swap');
+    expect(swap).toMatch(/left: calc\(50% \+ var\(--action-rail-w\) \/ 2 \+ 14px\)/);
+    // Touch: on the swap chip's row, right of its widest box (180px).
+    const touch = rule('  body.mobile-touch #heart-tank-buster.tank-corner');
+    expect(touch).toMatch(/calc\(12px \+ 180px \+ 8px\)/);
+    expect(touch).toMatch(/env\(safe-area-inset-right\)/);
+    expect(touch).toMatch(/--tank-buster-tracker-w: 190px/);
+    expect(rule('  body.mobile-touch.hud-mobile-tablet #heart-tank-buster.tank-corner')).toMatch(
+      /--tank-buster-tracker-w: 220px/,
+    );
+    // The target frame's lifts ride along (Target of Target never climbs in).
+    expect(corner).toMatch(/var\(--tank-buster-bar-lift, 0px\)/);
+    expect(corner).toMatch(/var\(--target-aura-band-lift, 0px\)/);
+    expect(touch).toMatch(/top: 34%/);
+    expect(rule('  body.mobile-touch #heart-tank-swap')).toMatch(/top: 34%/);
+    expect(rule('  #heart-tank-swap')).toMatch(/max-width: 180px/);
+    // The last second: a glow that survives reduced motion, and its own pulse.
+    expect(rule('  #heart-tank-buster.is-busterLast')).toMatch(/box-shadow/);
+    expect(css).toMatch(/animation: heart-tank-buster-last /);
+  });
+});
+
+describe('DungeonPrompts: the tank buster alert mounts in the tank corner on every hints setting', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -258,7 +340,7 @@ describe('DungeonPrompts: the tank buster alert mounts in the middle on every hi
   }
 
   for (const hints of [true, false]) {
-    it(`hints ${hints ? 'on' : 'off'}: the name, "On you" and the countdown`, () => {
+    it(`hints ${hints ? 'on' : 'off'}: the name and the countdown, in the corner`, () => {
       const layer = rig(
         [{ id: TANK_BUSTER_AURA, value: 5, remaining: 1.2, duration: 1.5, sourceId: 900 }],
         hints,
@@ -267,8 +349,11 @@ describe('DungeonPrompts: the tank buster alert mounts in the middle on every hi
       expect(el).not.toBeNull();
       expect(el?.style.display).toBe('flex');
       expect(el?.classList.contains('is-buster')).toBe(true);
+      expect(el?.classList.contains('is-busterLast')).toBe(false);
+      expect(el?.classList.contains('tank-corner')).toBe(true);
       expect(el?.querySelector('.fa-title')?.textContent).toBe('Elemental Strike');
-      expect(el?.querySelector('.fa-line')?.textContent).toBe('On you');
+      expect(el?.querySelector('.fa-line')?.textContent).toBe('');
+      expect(el?.querySelector<HTMLElement>('.fa-line')?.style.display).toBe('none');
       expect(el?.querySelector('.fa-bar-label')?.textContent).toBe('1.2 sec');
       // Its own panel: the swap chip stays unmounted.
       expect(layer.querySelector('#heart-tank-swap')).toBeNull();

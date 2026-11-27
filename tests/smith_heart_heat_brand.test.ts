@@ -419,7 +419,9 @@ describe('Wellspring Brand on the HUD', () => {
     const entity = (id: number) => f.sim.ctx.entities.get(id) as unknown as TankSwapBody;
     const buster = buildTankBusterAlertView({ self: body(tank), entity });
     expect(buster.visible && buster.title).toBe('Wellspring Brand');
-    expect(buster.visible && buster.line).toBe(t('hudChrome.tankBuster.onYou'));
+    // One compact line: the name and its countdown, no sentence under it.
+    expect(buster.visible && buster.line).toBe('');
+    expect(buster.visible && buster.barLabel).toMatch(/ sec$/);
     expect(buildTankBusterAlertView({ self: body(f.players[1]), entity }).visible).toBe(false);
     f.tick(ticks(2));
     expect(aura(tank, HEAT_AURAS.brand)).toBeDefined();

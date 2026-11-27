@@ -10501,8 +10501,10 @@ export const hudChromeStrings = {
     timeAria: '{seconds} seconds left on the debuff',
   },
   // The Smith's Heart's tank buster alert (tank_swap_alert_view.ts, the swap's
-  // family): a boss's heavy hit on the tank it is aimed at, its name, two words
-  // under it and its countdown (the team's feedback of 2026-11-25). Wordy
+  // family): a boss's heavy hit on the tank it is aimed at, its name and its
+  // countdown on one compact line (the team's feedback of 2026-11-25; the
+  // owner's call of 2026-11-27 moved it out of the screen's middle). `onYou`
+  // is RETIRED with that move, kept for the overlays' reviewed rows. Wordy
   // (M16): non-Latin fills in the overlays.
   tankBuster: {
     weight: "Hammer's Weight",

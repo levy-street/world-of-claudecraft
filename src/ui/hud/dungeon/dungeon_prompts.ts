@@ -32,8 +32,8 @@
 // swap debuff at its count, its stacks; nobody else), small beside the
 // target frame, on every tier and whatever the hints setting; it never holds
 // the slot. Its sibling, the tank buster alert (the same view module: a boss's
-// heavy hit and its countdown for the tank it is aimed at), sits in the
-// screen's middle under the same rules. Its mirror on the action bar's other side is the Live Coal chip
+// heavy hit and its countdown for the tank it is aimed at), is a compact line
+// just above it in the same tank corner, under the same rules. Its mirror on the action bar's other side is the Live Coal chip
 // (coal_alert_view.ts: its bearer's absorb left and fuse), the same rules.
 //
 // Beside the slot it paints the Masterless Strength's raid HUD, its phase
@@ -104,7 +104,7 @@ import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view
 import {
   buildTankBusterAlertView,
   buildTankSwapAlertView,
-  TANK_BUSTER_ALERT_KINDS,
+  TANK_BUSTER_ALERT_LOOK,
   TANK_SWAP_ALERT_KINDS,
   type TankSwapBody,
 } from './tank_swap_alert_view';
@@ -272,12 +272,9 @@ export class DungeonPrompts {
       className: 'ui-panel-strong encounter-alert heart-tank-swap',
       kinds: TANK_SWAP_ALERT_KINDS,
     });
-    // The tank buster alert: the swap's family, in the screen's middle.
-    this.tankBuster = new EncounterAlert(deps, {
-      id: 'heart-tank-buster',
-      className: 'ui-panel-strong encounter-alert heart-tank-buster',
-      kinds: TANK_BUSTER_ALERT_KINDS,
-    });
+    // The tank buster alert: the swap's family, a compact line in the tank
+    // corner (its look and placement class are the view core's).
+    this.tankBuster = new EncounterAlert(deps, TANK_BUSTER_ALERT_LOOK);
     this.liveCoal = new EncounterAlert(deps, {
       id: 'heart-live-coal',
       className: 'ui-panel-strong encounter-alert heart-live-coal',

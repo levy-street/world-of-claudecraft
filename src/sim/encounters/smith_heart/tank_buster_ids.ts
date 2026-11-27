@@ -6,7 +6,7 @@
 // the hit in `remaining`, the boss in `sourceId`); the HUD's tank buster alert
 // (src/ui/hud/dungeon/tank_swap_alert_view.ts, the tank swap's family) reads
 // that marker on the local player only, so nobody but the targeted tank is
-// ever shown it.
+// ever shown it (a compact line in the tank corner, beside the boss's frame).
 //
 //   Hammer Council         Hammer's Weight: its 1.5 s bar at the tank.
 //   Guardian of the Breath Bellows Blow (the Wind) and Thunder Lash (the

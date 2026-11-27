@@ -20,12 +20,17 @@
 // The family's second member, the tank buster alert (the team's feedback of
 // 2026-11-25: "show tank busters on screen, not only as a debuff"): a boss's
 // heavy hit on its tank (encounters/smith_heart/tank_buster_ids.ts) lays a
-// marker on that tank as it begins, and only the player carrying it is shown,
-// in the screen's middle, the hit's name and a short countdown to it.
+// marker on that tank as it begins, and only the player carrying it is shown
+// the hit's name and a short countdown to it. The owner's call of 2026-11-27:
+// no banner in the screen's middle, a compact line in the tank corner (just
+// above the swap chip, beside the boss's frame; TANK_BUSTER_ALERT_LOOK below
+// names the placement class the sheet seats it by).
 //  - Buster: the local player carries the marker. A bar buster (Hammer's
 //    Weight, Bellows Blow, Thunder Lash, Shearing Blow) shows while its boss
 //    still casts it; a told one (Tempering Strike, Elemental Strike,
 //    Wellspring Brand) while its boss is still on them.
+//  - BusterLast: the same line in its last second (the sheet pulses it once
+//    more as the kind turns).
 //  - Hidden otherwise, and while dead.
 
 import {
@@ -146,10 +151,28 @@ export function buildTankSwapAlertView(input: TankSwapAlertInput): TankSwapAlert
 
 // ---- the tank buster alert ------------------------------------------------------------------
 
-export type TankBusterAlertKind = 'buster';
+export type TankBusterAlertKind = 'buster' | 'busterLast';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
-export const TANK_BUSTER_ALERT_KINDS: readonly TankBusterAlertKind[] = ['buster'];
+export const TANK_BUSTER_ALERT_KINDS: readonly TankBusterAlertKind[] = ['buster', 'busterLast'];
+
+/** Seconds before the hit at which the line turns `busterLast` (its second pulse). */
+export const TANK_BUSTER_LAST_SECONDS = 1;
+
+/** The CSS class that seats the alert in the tank corner (components.css
+ *  `#heart-tank-buster.tank-corner`: desktop just above the tank swap chip,
+ *  right of the action bar beside the boss's frame; touch beside the swap
+ *  chip, under the minimap), never the screen's middle. */
+export const TANK_BUSTER_PLACEMENT_CLASS = 'tank-corner';
+
+/** The alert's mount (the shared encounter alert painter's look): its root
+ *  id, its root classes (the compact chip, seated by the placement class) and
+ *  its kind classes. */
+export const TANK_BUSTER_ALERT_LOOK = {
+  id: 'heart-tank-buster',
+  className: `ui-panel-strong encounter-alert heart-tank-buster ${TANK_BUSTER_PLACEMENT_CLASS}`,
+  kinds: TANK_BUSTER_ALERT_KINDS,
+} as const;
 
 export type TankBusterAlertLive = Omit<EncounterAlertLive, 'kind'> & { kind: TankBusterAlertKind };
 export type TankBusterAlertView = TankBusterAlertLive | EncounterAlertHidden;
@@ -204,11 +227,13 @@ export function buildTankBusterAlertView(input: TankSwapAlertInput): TankBusterA
   const total = Math.max(1e-6, mark.duration ?? left);
   const title = busterName(buster.key);
   const seconds = tenths(left);
+  // One compact line: the name and the countdown (no "On you" under it; the
+  // owner's call of 2026-11-27).
   return {
     visible: true,
-    kind: 'buster',
+    kind: left <= TANK_BUSTER_LAST_SECONDS ? 'busterLast' : 'buster',
     title,
-    line: t('hudChrome.tankBuster.onYou'),
+    line: '',
     hint: '',
     key: '',
     progress: Math.max(0, Math.min(1, left / total)),

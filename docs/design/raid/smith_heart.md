@@ -1985,8 +1985,10 @@ begins (`encounters/smith_heart/tank_buster.ts`, the table `tank_buster_ids.ts`)
 Weight's bar, Bellows Blow's and Thunder Lash's bars, Tempering Strike told with the Quench's
 wind-up (`strikeWindup`, 1 s), Elemental Strike told 1.5 s out (`ELEMENT_TUNING.strikeLead`) and a
 Splinter's Shearing Blow bar, and the Guardian of the Heat's Wellspring Brand told
-`HEAT_DIFFICULTY` `brand.lead` out (2 s; 1.5 s on Mythic). Only the tank carrying it sees, in the screen's middle, the hit's
-name, "On you", a bar and a countdown, on every graphics preset and whatever the hints setting
+`HEAT_DIFFICULTY` `brand.lead` out (2 s; 1.5 s on Mythic). Only the tank carrying it sees the hit's name and its countdown on
+one compact line with a thin bar under it (the owner's call of 2026-11-27: no banner in the
+screen's middle), seated in the tank corner just above the tank swap chip beside the boss's
+frame (beside the swap chip on touch), pulsing once as it lands and once in its last second, on every graphics preset and whatever the hints setting
 (the tank swap alert's family, `src/ui/hud/dungeon/tank_swap_alert_view.ts`), with the anvil
 struck in their ear (`HEART_TANK_BUSTER_SOUND`); the aura strips never show the marker. Pinned
 by `tests/smith_heart_tank_buster.test.ts`.

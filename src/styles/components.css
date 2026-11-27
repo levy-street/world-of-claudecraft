@@ -20170,97 +20170,176 @@
     top: 34%;
   }
 
-  /* The tank swap's sibling, the tank buster alert. Self-mounted by the shared encounter alert painter from
-     src/ui/hud/dungeon/tank_swap_alert_view.ts (the tank swap's family): a
-     boss's heavy hit on the local tank (the team's feedback of 2026-11-25).
-     Only the tank it is aimed at ever sees it, for the second or two the hit
-     takes to come. In the screen's middle, above the character and clear of
-     the floor's telegraphs: the hit's name large in the hostile tone, "On
-     you" under it, a bar running down to the hit and its countdown in
-     steady-width digits. It lands with one firm pulse and leaves; nothing
-     flashes while it stays. Every tier, never hidden by the hints setting; it
-     never takes the pointer. */
+  /* The tank swap's sibling, the tank buster alert. Self-mounted by the shared
+     encounter alert painter from src/ui/hud/dungeon/tank_swap_alert_view.ts
+     (TANK_BUSTER_ALERT_LOOK): a boss's heavy hit on the local tank (the team's
+     feedback of 2026-11-25). Only the tank it is aimed at ever sees it, for
+     the second or two the hit takes to come. The owner's call of 2026-11-27:
+     no banner in the screen's middle. One compact line in the tank corner,
+     seated by the view core's placement class (.tank-corner): on desktop just
+     above the tank swap chip (same left edge, its bottom 6px over the chip's
+     seat), right of the action bar and beside the boss's frame, so the tank
+     reads both cues where the boss already is, clear of the raid frames (top
+     left), the target's aura strip (inside the action bar's width) and the
+     player frame's docked bars. The hit's name and its countdown share one
+     row in the hostile tone, a thin bar under them runs down to the hit. It
+     lands with one short pulse and pulses once more in its last second
+     (.is-busterLast); nothing flashes while it stays. Every tier, never
+     hidden by the hints setting; it never takes the pointer. */
   #heart-tank-buster {
-    position: absolute;
-    left: 50%;
-    top: 24%;
-    transform: translateX(-50%);
     display: none;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 3px;
-    z-index: 8;
-    min-width: 200px;
-    max-width: min(360px, calc(100vw - 32px));
-    padding: 8px 20px 7px;
+    z-index: 7;
+    min-width: 132px;
+    max-width: 240px;
+    padding: 4px 10px 5px;
     pointer-events: none;
     user-select: none;
-    text-align: center;
     font: inherit;
     color: var(--color-text-light);
-    border: 2px solid var(--color-hostile);
-    box-shadow: var(--shadow-raid-warning-glow);
+    border: 1px solid var(--color-hostile);
+    opacity: 0.94;
+  }
+  /* The root is a flex column (the painter writes display: flex); the row is
+     a wrap: the title and the countdown on the first line, the bar a full
+     line under them. */
+  #heart-tank-buster.tank-corner {
+    position: absolute;
+    left: calc(50% + var(--action-rail-w) / 2 + 14px);
+    top: auto;
+    /* The target frame's own lifts ride along (an extra action row each, the
+       target aura band below the frame), so a raised Target of Target beside
+       the frame never climbs into the line. */
+    bottom: calc(
+      var(--unit-frame-seat-offset) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--tank-buster-bar-lift, 0px) +
+      var(--target-aura-band-lift, 0px) +
+      6px
+    );
+    flex-flow: row wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    column-gap: 10px;
+    row-gap: 3px;
+    text-align: left;
   }
   #heart-tank-buster .fa-title {
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 1.1;
+    /* A zero basis keeps the name and the countdown on one line: a long name
+       ellipsizes, it never wraps the countdown under it. */
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
     letter-spacing: 0.03em;
     white-space: nowrap;
+    text-overflow: ellipsis;
     color: var(--color-hostile);
-    text-shadow: var(--art-shadow-lg);
   }
-  #heart-tank-buster .fa-line {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-gold-300);
-  }
+  #heart-tank-buster .fa-line,
   #heart-tank-buster .fa-hint {
     display: none;
   }
+  #heart-tank-buster .fa-bar-label {
+    flex: 0 0 auto;
+    order: 1;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
   #heart-tank-buster .fa-bar {
-    --bar-h: 6px;
+    --bar-h: 3px;
     --bar-color: var(--color-hostile);
+    flex: 1 0 100%;
+    order: 2;
     width: 100%;
-    margin-top: 3px;
   }
   #heart-tank-buster .fa-fill {
     width: 0;
     transition: width 60ms linear;
   }
-  #heart-tank-buster .fa-bar-label {
-    font-size: 15px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
+  body.show-actionbar2,
+  body.show-actionbar3 {
+    --tank-buster-bar-lift: calc(var(--socket-size) + var(--socket-row-gap));
+  }
+  body.show-actionbar2.show-actionbar3 {
+    --tank-buster-bar-lift: calc(2 * (var(--socket-size) + var(--socket-row-gap)));
+  }
+  /* The last second: a hostile edge glow that stays (the cue survives reduced
+     motion), plus one more pulse below. */
+  #heart-tank-buster.is-busterLast {
+    box-shadow: 0 0 8px 1px var(--color-hostile);
+  }
+  /* Forced colours drop the glow: a system-colour outline keeps the cue. */
+  @media (forced-colors: active) {
+    #heart-tank-buster.is-busterLast {
+      outline: 2px solid Highlight;
+    }
   }
   @media (prefers-reduced-motion: no-preference) {
     #heart-tank-buster {
-      animation: heart-tank-buster-in 0.35s ease-out 1;
+      animation: heart-tank-buster-in 0.4s ease-out 1;
+    }
+    #heart-tank-buster.is-busterLast {
+      animation: heart-tank-buster-last 0.45s ease-out 1;
     }
   }
   @keyframes heart-tank-buster-in {
     0% {
-      scale: 1.25;
+      scale: 1.12;
       opacity: 0;
     }
     50% {
-      scale: 0.97;
+      scale: 0.98;
       opacity: 1;
     }
     100% {
       scale: 1;
     }
   }
-  /* Touch: a little higher and narrower, clear of the action ring. */
-  body.mobile-touch #heart-tank-buster {
-    top: 18%;
-    min-width: 160px;
-    padding: 6px 14px 6px;
+  @keyframes heart-tank-buster-last {
+    0% {
+      scale: 1.1;
+    }
+    45% {
+      scale: 0.98;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  /* Touch: the unit frames sit at the top and the swap chip waits under the
+     minimap (right: 12px; top: 34%), the action ring right below it. The line
+     sits on the chip's row to its left, its right edge past the chip's widest
+     box (180px) so a long localized swap title never runs under it, and past
+     the right tracker stack's column (hud.mobile.css #right-tracker-stack,
+     wider on tablets) and the safe-area inset. */
+  body.mobile-touch #heart-tank-buster.tank-corner {
+    --tank-buster-tracker-w: 190px;
+    left: auto;
+    right: max(
+      calc(12px + 180px + 8px),
+      calc(
+        max(10px, env(safe-area-inset-right)) +
+        var(--tank-buster-tracker-w) *
+        var(--mobile-chrome-scale, 1) +
+        8px
+      )
+    );
+    top: 34%;
+    bottom: auto;
+    transform: none;
+    min-width: 120px;
+    max-width: 200px;
+  }
+  body.mobile-touch.hud-mobile-tablet #heart-tank-buster.tank-corner {
+    --tank-buster-tracker-w: 220px;
   }
   body.mobile-touch #heart-tank-buster .fa-title {
-    font-size: 20px;
+    font-size: 13px;
   }
 
   /* ---------- The Smith's Heart's Live Coal chip ---------- */
