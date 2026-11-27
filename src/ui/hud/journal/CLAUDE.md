@@ -34,4 +34,6 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 - Numbers come from the sources, which resolve them from live tuning. Never type a number here.
 - The 3D model lives on the Overview tab (the encounter card); the banner portrait's eye
   button opens it. Abilities and Loot hold no WebGL context.
+- The Raids list reads in catalog order (`RAID_INSTANCES`): Nythraxis, the Crucible, the
+  Smith's Heart (pinned by `tests/adventure_journal_view.test.ts`).
 - A new instance is a source plus one catalog row; Mythic is a tier entry, never content.

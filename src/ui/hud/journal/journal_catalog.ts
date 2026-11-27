@@ -55,19 +55,22 @@ const DUNGEON_INSTANCES: readonly JournalInstance[] = DUNGEON_JOURNALS.map((def)
   legacyFormat: false,
 }));
 
+// The Raids list reads top to bottom in this order (the owner's call): the
+// Nythraxis Raid Arena above the Crucible of the Last Spring, then the
+// Smith's Heart. Pinned by tests/adventure_journal_view.test.ts.
 const RAID_INSTANCES: readonly JournalInstance[] = [
   {
-    id: IGNIVAR_RAID_ARENA_ID,
+    id: NYTHRAXIS_BOSS_ARENA_ID,
     kind: 'raid',
-    source: raidGuideSlice(IGNIVAR_RAID_ARENA_ID, ['ignivar', 'varkhul']),
+    source: raidGuideSlice(NYTHRAXIS_BOSS_ARENA_ID, ['nythraxis']),
     tiers: LIVE_TIERS,
     released: true,
     legacyFormat: true,
   },
   {
-    id: NYTHRAXIS_BOSS_ARENA_ID,
+    id: IGNIVAR_RAID_ARENA_ID,
     kind: 'raid',
-    source: raidGuideSlice(NYTHRAXIS_BOSS_ARENA_ID, ['nythraxis']),
+    source: raidGuideSlice(IGNIVAR_RAID_ARENA_ID, ['ignivar', 'varkhul']),
     tiers: LIVE_TIERS,
     released: true,
     legacyFormat: true,

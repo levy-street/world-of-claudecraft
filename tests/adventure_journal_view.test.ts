@@ -58,7 +58,7 @@ function heartRun(
 }
 
 describe('journal catalog', () => {
-  it('lists the five dungeons, then the three raid instances', () => {
+  it('lists the five dungeons, then the three raids with Nythraxis above the Crucible', () => {
     expect(JOURNAL_INSTANCES.filter((i) => i.kind === 'dungeon').map((i) => i.id)).toEqual([
       'hollow_crypt',
       'sunken_bastion',
@@ -66,10 +66,19 @@ describe('journal catalog', () => {
       'gravewyrm_sanctum',
       'wildheart_basin',
     ]);
+    // The owner's order: the Nythraxis Raid Arena reads above the Crucible of
+    // the Last Spring (Varkhul's raid), and the list paints in catalog order.
     expect(JOURNAL_INSTANCES.filter((i) => i.kind === 'raid').map((i) => i.id)).toEqual([
-      IGNIVAR_RAID_ARENA_ID,
       'nythraxis_boss_arena',
+      IGNIVAR_RAID_ARENA_ID,
       SMITH_HEART_DUNGEON,
+    ]);
+    const raids = buildJournalNav(JOURNAL_INSTANCES, null, new Set(), null, null).find(
+      (g) => g.kind === 'raid',
+    );
+    expect(raids?.instances.map((i) => i.id).slice(0, 2)).toEqual([
+      'nythraxis_boss_arena',
+      IGNIVAR_RAID_ARENA_ID,
     ]);
     expect(journalInstance(IGNIVAR_RAID_ARENA_ID)?.source.bossKeys).toEqual(['ignivar', 'varkhul']);
   });
