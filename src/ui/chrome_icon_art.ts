@@ -45,6 +45,7 @@ export const CHROME_ART_IDS: ReadonlySet<UiIconName> = new Set<UiIconName>([
   'donate',
   'emote',
   'harvest-journal',
+  'journal',
   'leaderboard',
   'map',
   'perfecting',

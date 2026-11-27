@@ -24,6 +24,11 @@
       "motif": "Green leather harvest journal with a gilt crop-field and sprout emblem",
       "source": "OpenAI built-in image generation; exact prompt and source lineage in docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/special-ui-deeds.json"
     },
+    {
+      "icon": "journal",
+      "motif": "Oxblood field journal with a gilded horned-skull medallion, a ribbon marker and a sword slung behind (the Adventure Journal)",
+      "source": "Authored in-repo as layered SVG to the shared art direction (scripts/assets/chrome_journal/journal.svg, rendered onto the key by scripts/assets/chrome_journal/render_source.mjs), then keyed and encoded by the same converter"
+    },
     { "icon": "leaderboard", "motif": "Three-step podium under a crown" },
     { "icon": "map", "motif": "Rolled parchment map with a drawn compass" },
     {
