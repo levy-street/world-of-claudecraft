@@ -1329,7 +1329,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11410 -> 11398 by the party pings: the dead partyIncomingHeals (the party
     // frames read party_frame_info.ts partyFrameIncomingHeals) went, paying for the
     // three ping delegates over social/party_pings.ts. wc -l, exact count.
-    ceiling: 11398,
+    // LOWERED 11398 -> 11391 by the Adventure Journal's raidRun: the rift
+    // lockpick resolver and the death-zone read moved to rift/runs.ts
+    // (riftInstanceForPid, riftBossDeathZonesFor), paying for the raidRun
+    // getter over instances/raid_run.ts. wc -l, exact count.
+    ceiling: 11391,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

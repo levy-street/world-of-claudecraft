@@ -195,6 +195,26 @@ export function riftInstanceAtPos(ctx: SimContext, pos: Vec3): RiftInstance | nu
   return null;
 }
 
+/** The rift instance the acting player (`pid`, the primary when omitted)
+ *  stands in, or null. Lockpick ops route to the rift-cache driver when in a
+ *  rift, else the delve controller (a player is never in both). */
+export function riftInstanceForPid(ctx: SimContext, pid?: number): RiftInstance | null {
+  const r = ctx.resolve(pid);
+  return r ? riftInstanceAtPos(ctx, r.e.pos) : null;
+}
+
+/** The live boss death zones of the rift `pid` stands in (IWorld.riftBossDeathZones). */
+export function riftBossDeathZonesFor(
+  ctx: SimContext,
+  pid: number,
+): import('../../world_api/dungeons').RiftBossDeathZoneView[] {
+  const p = ctx.entities.get(pid);
+  if (!p) return [];
+  const inst = riftInstanceAtPos(ctx, p.pos);
+  if (!inst || inst.partyKey === null) return [];
+  return inst.bossDeathZones;
+}
+
 function riftHazardTierAt(
   hazards: import('../types').DelveHazardZone[],
   localX: number,

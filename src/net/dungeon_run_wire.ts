@@ -12,7 +12,12 @@
 
 import { DUNGEONS, MOBS } from '../sim/data';
 import { isDungeonDifficulty } from '../sim/types';
-import type { DungeonRunBossView, DungeonRunView } from '../world_api/dungeons';
+import type {
+  DungeonRunBossView,
+  DungeonRunView,
+  RaidRunBossView,
+  RaidRunView,
+} from '../world_api/dungeons';
 
 /** Far above any authored boss list; a longer one is not a frame of ours. */
 const MAX_BOSS_ROWS = 16;
@@ -58,6 +63,45 @@ export function decodeDungeonRun(value: unknown): DungeonRunView | null {
     if (typeof mobId !== 'string' || !Object.hasOwn(MOBS, mobId)) return null;
     if (typeof defeated !== 'boolean') return null;
     rows.push(Object.freeze({ mobId, defeated }));
+  }
+  return Object.freeze({ dungeonId, difficulty, bosses: Object.freeze(rows) });
+}
+
+// ---- the raid run (`rdrun`, IWorld.raidRun) ----------------------------------------
+
+/** Do two raid runs say the same thing, row for row? */
+export function sameRaidRun(a: RaidRunView, b: RaidRunView): boolean {
+  if (a.dungeonId !== b.dungeonId || a.difficulty !== b.difficulty) return false;
+  if (a.bosses.length !== b.bosses.length) return false;
+  for (let i = 0; i < a.bosses.length; i++) {
+    const x = a.bosses[i];
+    const y = b.bosses[i];
+    if (x.mobId !== y.mobId || x.defeated !== y.defeated || x.engaged !== y.engaged) return false;
+  }
+  return true;
+}
+
+/** The mirror after one `rdrun` frame, reference-stable like `nextDungeonRun`. */
+export function nextRaidRun(held: RaidRunView | null, value: unknown): RaidRunView | null {
+  const decoded = decodeRaidRun(value);
+  return held && decoded && sameRaidRun(held, decoded) ? held : decoded;
+}
+
+/** The decoded raid run, or null for an absent, cleared or malformed frame. A
+ *  run this bundle cannot name is dropped whole, like a dungeon run. */
+export function decodeRaidRun(value: unknown): RaidRunView | null {
+  if (!record(value)) return null;
+  const { dungeonId, difficulty, bosses } = value;
+  if (typeof dungeonId !== 'string' || !Object.hasOwn(DUNGEONS, dungeonId)) return null;
+  if (!isDungeonDifficulty(difficulty)) return null;
+  if (!Array.isArray(bosses) || bosses.length === 0 || bosses.length > MAX_BOSS_ROWS) return null;
+  const rows: RaidRunBossView[] = [];
+  for (const boss of bosses) {
+    if (!record(boss)) return null;
+    const { mobId, defeated, engaged } = boss;
+    if (typeof mobId !== 'string' || !Object.hasOwn(MOBS, mobId)) return null;
+    if (typeof defeated !== 'boolean' || typeof engaged !== 'boolean') return null;
+    rows.push(Object.freeze({ mobId, defeated, engaged }));
   }
   return Object.freeze({ dungeonId, difficulty, bosses: Object.freeze(rows) });
 }

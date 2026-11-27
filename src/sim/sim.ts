@@ -776,6 +776,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { raidRunForPlayer } from './instances/raid_run';
 import { updatePortalTriggers } from './portals';
 import { interactNpcForQuests } from './quest_npc_interaction';
 import * as questCommands from './quests/quest_commands';
@@ -810,7 +811,8 @@ import {
   hoardBossCueViewsForPlayer,
   leaveRift as leaveRiftImpl,
   liftRiftEntities as liftRiftEntitiesImpl,
-  riftInstanceAtPos,
+  riftBossDeathZonesFor,
+  riftInstanceForPid,
   riftOpenTreasure as riftOpenTreasureImpl,
   tickRiftBossDeathZones as tickRiftBossDeathZonesImpl,
   tickRiftLockpicks as tickRiftLockpicksImpl,
@@ -10873,17 +10875,9 @@ export class Sim {
   // never serialized, only visibleCells() inside the fog window is emitted.
   // -------------------------------------------------------------------------
 
-  /** The rift instance the acting player is standing in, or null. Lockpick ops
-   * route to the rift-cache driver when in a rift, else the delve controller (a
-   * player is never in both), so the shared engine/HUD/commands serve both. */
-  private riftInstForPid(pid?: number) {
-    const r = this.ctx.resolve(pid);
-    return r ? riftInstanceAtPos(this.ctx, r.e.pos) : null;
-  }
-
   /** Start a lockpicking attempt: commit an ante (1/2/3 lives = loot tier). */
   lockpickEngage(objectId: number, ante: Ante, pid?: number): void {
-    const inst = this.riftInstForPid(pid);
+    const inst = riftInstanceForPid(this.ctx, pid);
     if (inst) {
       riftLockpickEngageImpl(this.ctx, inst, objectId, ante, pid);
       return;
@@ -10893,7 +10887,7 @@ export class Sim {
 
   /** Submit one pick action on the player's active attempt (server-authoritative). */
   lockpickAction(action: PickAction, pid?: number, sessionId?: string): void {
-    const inst = this.riftInstForPid(pid);
+    const inst = riftInstanceForPid(this.ctx, pid);
     if (inst) {
       riftLockpickActionImpl(this.ctx, inst, action, pid, sessionId);
       return;
@@ -10902,7 +10896,7 @@ export class Sim {
   }
 
   lockpickAbort(pid?: number, sessionId?: string): void {
-    const inst = this.riftInstForPid(pid);
+    const inst = riftInstanceForPid(this.ctx, pid);
     if (inst) {
       riftLockpickAbortImpl(this.ctx, inst, pid, sessionId);
       return;
@@ -10922,7 +10916,7 @@ export class Sim {
 
   /** Read-only projection of the active lockpick attempt for IWorld (offline). */
   lockpickViewFor(pid?: number): LockpickView | null {
-    const inst = this.riftInstForPid(pid);
+    const inst = riftInstanceForPid(this.ctx, pid);
     if (inst) return riftLockpickViewForImpl(this.ctx, inst, pid);
     return lockpickMod.lockpickViewFor(this.ctx, pid);
   }
@@ -10992,11 +10986,7 @@ export class Sim {
   private riftFloorViewTick = -1;
   private riftFloorView: import('../world_api/dungeons').RiftFloorView | null = null;
   riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
-    const p = this.entities.get(this.primaryId);
-    if (!p) return [];
-    const inst = riftInstanceAtPos(this.ctx, p.pos);
-    if (!inst || inst.partyKey === null) return [];
-    return inst.bossDeathZones;
+    return riftBossDeathZonesFor(this.ctx, this.primaryId);
   }
   hoardBossCues(): import('../world_api/dungeons').HoardBossCueView[] {
     return hoardBossCueViewsForPlayer(this.ctx, this.primaryId);
@@ -11004,9 +10994,12 @@ export class Sim {
   riftEventMsRemaining(): number | null {
     return riftEventMsRemainingFor(this.ctx, this.riftFloor);
   }
-  // The group dungeon run the primary player stands in (instances/dungeon_run.ts).
+  // The dungeon and raid runs the primary player stands in (instances/*_run.ts).
   get dungeonRun(): import('../world_api/dungeons').DungeonRunView | null {
     return dungeonRunForPlayer(this.ctx, this.primaryId);
+  }
+  get raidRun(): import('../world_api/dungeons').RaidRunView | null {
+    return raidRunForPlayer(this.ctx, this.primaryId);
   }
 
   get delveRun(): DelveRunInfo | null {

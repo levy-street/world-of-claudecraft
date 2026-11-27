@@ -5912,6 +5912,7 @@ const ALL_DELTA_KEYS = [
   'pvrw',
   'qdone',
   'qlog',
+  'rdrun',
   'reliq',
   'renown',
   'rxp',
@@ -6068,6 +6069,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   pvrw: 'pvpResurrectWait',
   qdone: 'questsDone',
   qlog: 'questLog',
+  rdrun: 'raidRun',
   res: 'resource',
   rtype: 'resourceType',
   rxp: 'restedXp',
@@ -6730,8 +6732,9 @@ describe('full self-state snapshot delta fixture', () => {
       // fixture's first value is the explicit null. Its non-null arrival is
       // pinned in tests/shared_map_marks_wire.test.ts. pings (the group's party
       // pings) is null until someone pings; its arrival is pinned in
-      // tests/party_pings_wire.test.ts.
-      const gatedNull = ['cvault', 'dgrun', 'udiff', 'mmarks', 'pings'];
+      // tests/party_pings_wire.test.ts. rdrun (the raid run) is null outside a
+      // tracked raid, like dgrun; its arrival is pinned in tests/raid_run.test.ts.
+      const gatedNull = ['cvault', 'dgrun', 'rdrun', 'udiff', 'mmarks', 'pings'];
       if (gatedNull.includes(key)) {
         expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();
         continue;
@@ -7657,8 +7660,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
     // +1: the raid map's shared marks mmarks (server/self_social_wire.ts), for 137.
     // +1: the group's party pings (server/self_social_wire.ts), for 138.
-    expect(ALL_DELTA_KEYS).toHaveLength(138);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(138);
+    // +1: the Adventure Journal's raid run rdrun (server/dungeon_run_wire.ts), for 139.
+    expect(ALL_DELTA_KEYS).toHaveLength(139);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(139);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7841,7 +7845,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
     // The raid map's shared marks mmarks (self_social_wire.ts) make 137.
     // The party pings (self_social_wire.ts) make 138.
-    expect(scraped.size).toBe(138);
+    // The raid run rdrun (dungeon_run_wire.ts) makes 139.
+    expect(scraped.size).toBe(139);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

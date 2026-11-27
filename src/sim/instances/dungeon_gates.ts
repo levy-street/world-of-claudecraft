@@ -190,6 +190,26 @@ export function dungeonPlacedBossDead(
   return indices !== undefined && allDead(ctx, inst, indices);
 }
 
+/**
+ * Is any placed body of `templateId` alive and fighting in this claim (in
+ * combat and not walking home)? The raid run's engaged read (raid_run.ts).
+ * False for a template the dungeon never places.
+ */
+export function dungeonPlacedBossFighting(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  templateId: string,
+): boolean {
+  const dungeon = DUNGEONS[inst.dungeonId];
+  const indices = dungeon ? indexFor(dungeon).byTemplate.get(templateId) : undefined;
+  if (!indices) return false;
+  for (const i of indices) {
+    const mob = rosterMob(ctx, inst, i);
+    if (mob && isFighting(mob)) return true;
+  }
+  return false;
+}
+
 /** Engaged in the old, broad sense a landed seal holds on: alive and either
  *  in combat or anywhere but idle (so a boss walking home keeps it shut). */
 function isEngaged(mob: Entity): boolean {
