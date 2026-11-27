@@ -465,6 +465,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/journal/journal_loot_view.ts',
   // The journal page furniture: phase pills, fact chips, list status.
   'src/ui/hud/journal/journal_banner_view.ts',
+  // The banner backdrops: which room picture a page shows, if any.
+  'src/ui/hud/journal/journal_backdrop_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',

@@ -10,6 +10,14 @@ for Overview (the encounter beside its 3D model, Strategy by role), Abilities (p
 headers with a health pill; each row shows what to do and opens on the full text plus
 damage and timer chips) and Loot. On a phone the list is a drawer behind a breadcrumb,
 with a row of the instance's boss portraits.
+A light MMO layer sits on top of that look, never a redesign: a thin bronze frame with
+corner marks and a lozenge emblem in the title bar (desktop only; the phone sheet has no
+edge to frame), a darkened picture of the boss's room behind the banner, ability icons in
+the action bar's own `.ui-socket`, drops as `.ui-socket--bag` slots rimmed in their
+quality colour (hover or long-press opens the real item tooltip), danger skulls over each
+difficulty (1, 2, 3), a page turn on opening and a soft click on a new tab or difficulty
+(the game's sampled UI cues through `GameAudio`, so the SFX volume applies). No open or
+close animation (the owner's call).
 The PAGES are not here: they are journal sources in `src/ui/boss_journal/` (the
 dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 (`raid_boss_guide_view.ts`). This directory only arranges and paints them.
@@ -20,6 +28,7 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 | `journal_nav_view.ts` | Pure core (`UI_PURE_CORES`): the grouped list, page state from `IWorld.dungeonRun` / `IWorld.raidRun`, the landing page (engaged boss, else next standing), the Next up mark, neighbours, tier clamping. |
 | `journal_banner_view.ts` | Pure core: the phase pill's shape, an opened ability's fact chips (read off the ENGLISH summary template, so a swing count never becomes a timer), the list's status line. |
 | `journal_loot_view.ts` | Pure core: a page's drops per difficulty, read off the Loot Explorer's index (the roller's own gate). Never a second loot table. |
+| `journal_backdrop_view.ts` | Pure core: which room picture a page's banner shows (per instance, or per boss), else null for the plain banner. The files are committed WebP under `public/ui/journal/`, pinned both ways by `tests/adventure_journal_backdrops.test.ts`. |
 | `journal_page_html.ts` | Markup strings only (no DOM): head, nav, the phone's breadcrumb and strip, banner, tab bar, Overview, Abilities, Loot, Coming soon. |
 | `adventure_journal_window.ts` | The cold window (`UI_DOM_MODULES`): state, events, focus, tooltips, the 3D model slot. |
 | `journal_launchers.ts` | Binds the side rail button, the phone More-tray button and the target frame's book. |
@@ -37,3 +46,12 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 - The Raids list reads in catalog order (`RAID_INSTANCES`): Nythraxis, the Crucible, the
   Smith's Heart (pinned by `tests/adventure_journal_view.test.ts`).
 - A new instance is a source plus one catalog row; Mythic is a tier entry, never content.
+- A banner picture is a REAL in-game frame of the arena (offline world on a dev Vite,
+  `/dev heart enter` and the boss's floor, UI and nameplates hidden, the player's body
+  scaled away, real GPU), cropped to about 1240x480 with the boss in the right third
+  (the portrait and the words sit left), scaled to 1280x496 and encoded as WebP at
+  roughly 50 to 90 KB. One row in `journal_backdrop_view.ts`; never painted or generated art.
+- The banner words keep 4.5:1 over any pixel of a picture: the picture's brightness
+  filter and the `--color-aj-banner-scrim` veil are pinned together by
+  `tests/adventure_journal_styles.test.ts`; the two dimmer inks (In combat, Mythic:
+  coming soon) sit on the well. A picture is cosmetic and carries nothing a player acts on.

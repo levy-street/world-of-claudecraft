@@ -186,7 +186,22 @@ export function boldValuesHtml(
   });
 }
 
-// ---- the window head -------------------------------------------------------------
+// ---- the window head and its frame ------------------------------------------------
+
+// One corner ornament of the window's thin metal frame: a bracket that follows
+// the rounded corner with a small diamond rivet. Drawn top-left; the other
+// three are the same mark mirrored by CSS. Decorative, never hit-tested.
+const FRAME_CORNER =
+  '<svg viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M1.5 26V10A8.5 8.5 0 0110 1.5h16" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 26V12a6.5 6.5 0 016.5-6.5h14" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.55"/><path d="M10 1.5l2.4 2.4L10 6.3 7.6 3.9z" fill="currentColor"/></svg>';
+
+/** The four corner ornaments of the window's metal frame. */
+export function frameCornersHtml(): string {
+  return ['tl', 'tr', 'bl', 'br']
+    .map(
+      (at) => `<span class="aj-corner aj-corner-${at}" aria-hidden="true">${FRAME_CORNER}</span>`,
+    )
+    .join('');
+}
 
 export function headHtml(instance: JournalInstance): string {
   return `<div class="aj-head panel-title"><span class="aj-title-sigil" aria-hidden="true">${svgIcon(
@@ -375,6 +390,9 @@ export interface JournalBannerInput {
   tier: JournalTier;
   /** The tier has a page to open the 3D model on (not Mythic's panel). */
   modelButton: boolean;
+  /** The darkened picture of the boss's room behind the banner, or null for
+   *  the plain banner (journal_backdrop_view.ts). Cosmetic only. */
+  backdropUrl?: string | null;
 }
 
 /** A council member's portrait: the page's own art for its lead body, else
@@ -431,12 +449,27 @@ export function bannerHtml(input: JournalBannerInput): string {
         modelLabel,
       )}" title="${esc(modelLabel)}">${svgIcon('eye')}</button>`
     : '';
-  return `<header class="aj-banner"><div class="aj-portrait-wrap${members.length > 1 ? ' aj-portrait-wrap-council' : ''}">${portrait}${modelButton}</div><div class="aj-banner-text"><div class="aj-kicker"><span>${esc(
+  const art = input.backdropUrl
+    ? `<img class="aj-banner-art" src="${esc(input.backdropUrl)}" alt="" aria-hidden="true">`
+    : '';
+  return `<header class="aj-banner${art ? ' has-art' : ''}">${art}<div class="aj-portrait-wrap${members.length > 1 ? ' aj-portrait-wrap-council' : ''}">${portrait}${modelButton}</div><div class="aj-banner-text"><div class="aj-kicker"><span>${esc(
     kicker,
   )}</span>${status}</div><h2 class="aj-boss-title" id="aj-boss-name">${esc(bossName)}</h2>${tagline}${chips}</div>${difficultyHtml(
     instance,
     input.tier,
   )}</header>`;
+}
+
+/** How many skulls each difficulty wears beside its name (Normal 1, Heroic 2,
+ *  Mythic 3): the classic danger mark, decorative (the name says it). */
+export const TIER_SKULLS: Readonly<Record<JournalTier, number>> = {
+  normal: 1,
+  heroic: 2,
+  mythic: 3,
+};
+
+function skullsHtml(tier: JournalTier): string {
+  return `<span class="aj-skulls" aria-hidden="true">${svgIcon('skull').repeat(TIER_SKULLS[tier])}</span>`;
 }
 
 export function difficultyHtml(instance: JournalInstance, tier: JournalTier): string {
@@ -451,9 +484,11 @@ export function difficultyHtml(instance: JournalInstance, tier: JournalTier): st
       const selected = entry === tier;
       return `<button type="button" data-difficulty="${entry}" ${FOCUS_KEY_ATTR}="difficulty:${entry}" aria-pressed="${selected}" aria-label="${esc(
         t('hudChrome.raidBossGuide.chooseDifficulty', { difficulty: tierName(entry) }),
-      )}" class="${selected ? 'active' : ''}${entry === 'mythic' ? ' aj-tier-mythic' : ''}">${
+      )}" class="${selected ? 'active' : ''}${entry === 'mythic' ? ' aj-tier-mythic' : ''}">${skullsHtml(
+        entry,
+      )}<span class="aj-tier-name">${
         entry === 'mythic' ? svgIcon('lock') : ''
-      }<span>${esc(tierName(entry))}</span></button>`;
+      }<span>${esc(tierName(entry))}</span></span></button>`;
     })
     .join('')}</div>${soon}</div>`;
 }
@@ -649,9 +684,9 @@ function mechanicHtml(
     mechanic.id,
   )}" aria-expanded="${expanded}"${expanded ? ` aria-controls="${esc(detailId)}"` : ''} aria-describedby="${esc(
     doId,
-  )}" aria-label="${esc(accessible)}"><img class="aj-ab-icon" src="${esc(
+  )}" aria-label="${esc(accessible)}"><span class="ui-socket aj-ab-socket" aria-hidden="true"><img class="aj-ab-icon" src="${esc(
     iconDataUrl('ability', mechanic.iconId, 48),
-  )}" alt="" aria-hidden="true"><span class="aj-ab-main"><span class="aj-ab-name"><span class="aj-ab-title">${esc(
+  )}" alt=""></span><span class="aj-ab-main"><span class="aj-ab-name"><span class="aj-ab-title">${esc(
     name,
   )}</span>${flagTagsHtml(mechanic)}${markChipsHtml(mechanic.marks)}</span><span class="aj-ab-do" id="${esc(
     doId,
@@ -787,7 +822,9 @@ export function lootHtml(
       const color = marketNameColor(row.quality);
       return `<li class="aj-loot-row aj-quality-${esc(row.quality)}" tabindex="0" data-item-id="${esc(
         row.itemId,
-      )}" ${FOCUS_KEY_ATTR}="loot:${esc(row.itemId)}">${itemIcon(def)}<span class="aj-loot-text"><span class="aj-loot-name" style="color:${color}">${esc(
+      )}" ${FOCUS_KEY_ATTR}="loot:${esc(row.itemId)}"><span class="ui-socket ui-socket--bag aj-loot-slot">${itemIcon(
+        def,
+      )}</span><span class="aj-loot-text"><span class="aj-loot-name" style="color:${color}">${esc(
         itemDisplayName(def),
       )}</span><span class="aj-loot-detail">${esc(bits.join(' · '))}</span></span></li>`;
     })

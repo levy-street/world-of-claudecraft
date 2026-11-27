@@ -12,6 +12,7 @@
 // reference-stable IWorld.dungeonRun / IWorld.raidRun and the room id, so an
 // unchanged tick does nothing at all).
 
+import { audio } from '../../../game/audio';
 import type { LinkedProgramTouchQueue } from '../../../render/linked_program_touch_lane';
 import { dungeonAt, ITEMS } from '../../../sim/data';
 import type { DungeonDifficulty, ItemDef } from '../../../sim/types';
@@ -26,6 +27,7 @@ import { RaidBossGuideModelController } from '../../raid_boss_guide_model_contro
 import { bindRaidBossGuideScroll } from '../../raid_boss_guide_scroll';
 import { rovingTarget } from '../../roving_index';
 import { focusActiveTab, wireTabStrip } from '../../tab_strip_painter';
+import { journalBackdropUrl } from './journal_backdrop_view';
 import {
   type JournalInstance,
   type JournalTier,
@@ -54,6 +56,7 @@ import {
   abilitiesHtml,
   bannerHtml,
   comingSoonHtml,
+  frameCornersHtml,
   headHtml,
   lootHtml,
   mechanicTooltipHtml,
@@ -79,6 +82,16 @@ export interface AdventureJournalDeps
   /** Whether a dev-gated instance may be listed (the client offers dev tools). */
   showUnreleased(): boolean;
   modelTouchQueue?(): LinkedProgramTouchQueue | null;
+  /** The journal's sounds (the game's sampled UI cues by default, so the SFX
+   *  volume and the interface-sounds setting apply). */
+  sounds?: JournalSounds;
+}
+
+/** The two cues the journal plays: a page turn when it opens, a soft click
+ *  on a section tab or a difficulty change. */
+export interface JournalSounds {
+  pageTurn(): void;
+  click(): void;
 }
 
 export interface JournalWorld extends JournalLauncherWorld {
@@ -234,7 +247,12 @@ export class AdventureJournalWindow {
     }
   }
 
+  private get sounds(): JournalSounds {
+    return this.deps.sounds ?? audio;
+  }
+
   private show(): void {
+    this.sounds.pageTurn();
     this.deps.closeOthers();
     this.openerFocus = this.deps.captureFocus() ?? this.contextFallback();
     const root = this.deps.root();
@@ -334,6 +352,7 @@ export class AdventureJournalWindow {
       : comingSoonHtml(instance);
 
     root.innerHTML =
+      frameCornersHtml() +
       headHtml(instance) +
       `<div class="aj-shell${this.navOpen ? ' aj-nav-open' : ''}">${navHtml(groups)}<section class="aj-page" tabindex="0" data-focus-key="journal" aria-labelledby="aj-boss-name">${mobileTopHtml(
         groups,
@@ -347,6 +366,7 @@ export class AdventureJournalWindow {
         total: keys.length,
         tier: this.tier,
         modelButton: view !== null,
+        backdropUrl: journalBackdropUrl(instance.id, selection.bossKey),
       })}${tabBarHtml(this.tab, view ? JOURNAL_TABS : null, step(-1), step(1))}${panel}</section></div>`;
 
     const freshPage = root.querySelector<HTMLElement>('.aj-page');
@@ -505,6 +525,7 @@ export class AdventureJournalWindow {
           return;
         }
         this.deps.hideTooltip();
+        this.sounds.click();
         this.tab = id as JournalTab;
         this.render(`tab:${id}`);
         if (focusFollow) {
@@ -574,6 +595,7 @@ export class AdventureJournalWindow {
     const instance = selection ? journalInstance(selection.instanceId) : null;
     if (!instance || !value || !instance.tiers.includes(value as JournalTier)) return;
     if (value === this.tier) return;
+    this.sounds.click();
     this.deps.hideTooltip();
     this.tier = value as JournalTier;
     this.expandedMechanic = null;

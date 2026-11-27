@@ -66,6 +66,10 @@ export const UI_CUES = {
   cardReveal: 'ui_card_reveal',
   cardRoundPush: 'ui_card_round_push',
   cardShuffle: 'ui_card_shuffle',
+  // The Adventure Journal opening: a page turned. No book recording exists, so it
+  // borrows the Card Duel's reveal, a short dry paper flip (three takes the
+  // no-repeat picker rotates), rather than adding new audio.
+  pageTurn: 'ui_card_reveal',
   // Gathering rhythm (Professions 2.0 Phase 12b, issue #2208): fishCast/
   // fishBite/fishReel are real, shipped fishing cues. gatherCast branches by
   // node type (gatherCastByNodeType below); this flat cue is only the
@@ -422,6 +426,10 @@ export class GameAudio {
 
   cardReveal(): void {
     this.play(UI_CUES.cardReveal);
+  }
+
+  pageTurn(): void {
+    this.play(UI_CUES.pageTurn);
   }
 
   cardRoundPush(): void {

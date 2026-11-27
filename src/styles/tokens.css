@@ -373,6 +373,18 @@
     --color-aj-shadow: #00000099;
     --color-aj-scrim: #000000a6;
     --color-aj-portrait-bg: #000;
+    /* The journal's light MMO frame: a thin bronze edge, its corner marks and the
+       title emblem (high, mid and low of one metal). */
+    --color-aj-metal: #8c7049;
+    --color-aj-metal-hi: #d9b97c;
+    --color-aj-metal-lo: #3a2e1f;
+    /* The veil over a banner's room picture: the banner colour at 69 percent,
+       so every banner word keeps 4.5:1 over even a white pixel of the picture
+       (pinned by tests/adventure_journal_styles.test.ts with the picture's
+       brightness filter; the two small status inks sit on their own well).
+       The mask fades the picture's edges. */
+    --color-aj-banner-scrim: #181a20b0;
+    --color-aj-mask: #000;
     --color-store-promo-dot-shadow: #000;
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no

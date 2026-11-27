@@ -206,6 +206,90 @@ describe('Adventure Journal styles', () => {
     ).toBeGreaterThanOrEqual(7);
   });
 
+  it('veils a banner picture so every banner word keeps AA over any pixel', () => {
+    const art = rule(desktopCss, '#adventure-journal-window .aj-banner-art');
+    const bright = Number(art.match(/brightness\(([\d.]+)\)/)?.[1]);
+    expect(bright).toBeGreaterThan(0);
+    expect(bright).toBeLessThanOrEqual(0.7);
+    expect(art).toMatch(/z-index:\s*-2/);
+    expect(art).toMatch(/pointer-events:\s*none/);
+    const veil = rule(desktopCss, '#adventure-journal-window .aj-banner.has-art::before');
+    expect(veil).toContain('var(--color-aj-banner-scrim)');
+    expect(veil).toMatch(/z-index:\s*-1/);
+    expect(rule(desktopCss, '#adventure-journal-window .aj-banner')).toMatch(
+      /isolation:\s*isolate/,
+    );
+    const scrim = tokensCss.match(/--color-aj-banner-scrim:\s*#([0-9a-f]{8})/i)?.[1] ?? '';
+    expect(scrim).toHaveLength(8);
+    const alpha = Number.parseInt(scrim.slice(6), 16) / 255;
+    // The veil is the banner colour itself (only its alpha is added).
+    expect(`#${scrim.slice(0, 6)}`.toLowerCase()).toBe(token('--color-aj-banner').toLowerCase());
+    // Worst case: a pure white pixel, dimmed by the filter, under the veil.
+    const ground = token('--color-aj-banner');
+    const worst = `#${[1, 3, 5]
+      .map((i) => {
+        const g = Number.parseInt(ground.slice(i, i + 2), 16) / 255;
+        const v = alpha * g + (1 - alpha) * bright;
+        return Math.round(v * 255)
+          .toString(16)
+          .padStart(2, '0');
+      })
+      .join('')}`;
+    for (const ink of [
+      '--color-aj-text',
+      '--color-aj-bright',
+      '--color-aj-soft',
+      '--color-aj-accent',
+      '--color-aj-accent-hi',
+      '--color-aj-done',
+    ]) {
+      expect(contrast(token(ink), worst), `${ink} over a lit picture`).toBeGreaterThanOrEqual(4.5);
+    }
+    // The two dimmer inks (In combat, Mythic: coming soon) ride on the well.
+    const backed = rule(
+      desktopCss,
+      '#adventure-journal-window .aj-banner.has-art .aj-chip-status,\n' +
+        '  #adventure-journal-window .aj-banner.has-art .aj-soon-note',
+    );
+    expect(backed).toContain('background: var(--color-aj-well)');
+    for (const ink of ['--color-aj-deadly', '--color-aj-mute', '--color-aj-done']) {
+      expect(contrast(token(ink), token('--color-aj-well')), ink).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it('draws a light metal frame from tokens, never in the way of a click', () => {
+    const windowRule = rule(desktopCss, '#adventure-journal-window');
+    for (const name of ['--color-aj-metal-hi', '--color-aj-metal', '--color-aj-metal-lo']) {
+      expect(windowRule).toContain(`var(${name})`);
+    }
+    expect(windowRule).toMatch(/border:\s*2px solid transparent/);
+    const corner = rule(desktopCss, '#adventure-journal-window .aj-corner');
+    expect(corner).toMatch(/pointer-events:\s*none/);
+    expect(Number(corner.match(/width:\s*(\d+)px/)?.[1])).toBeLessThanOrEqual(24);
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-corner')).toMatch(
+      /display:\s*none/,
+    );
+    expect(rule(desktopCss, '#adventure-journal-window .aj-title-sigil')).toContain(
+      'var(--color-aj-metal)',
+    );
+  });
+
+  it('seats icons in the library sockets, setting only their size', () => {
+    for (const selector of ['.aj-ab-socket', '.aj-loot-slot']) {
+      const body = rule(desktopCss, `#adventure-journal-window ${selector}`);
+      expect(body, selector).toMatch(/--ui-socket-size:\s*44px/);
+      // The primitive owns the look: a later layer re-declaring it would
+      // defeat the socket's own states.
+      expect(body, selector).not.toMatch(/(?:^|\s)(?:border|background|border-radius):/);
+    }
+    expect(desktopCss).not.toMatch(/#adventure-journal-window \.aj-ab-icon\s*\{/);
+    for (const quality of ['uncommon', 'rare', 'epic', 'legendary']) {
+      expect(rule(desktopCss, `#adventure-journal-window .aj-quality-${quality}`)).toContain(
+        `var(--color-quality-${quality})`,
+      );
+    }
+  });
+
   it('keeps the journal palette in shared tokens', () => {
     const desktop = journalRules(desktopCss)
       .map((r) => r.body)

@@ -12846,11 +12846,25 @@
     max-height: min(calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale, 1) - 16px), 860px);
     padding: 0;
     overflow: hidden;
-    border: 1px solid var(--color-aj-win-border);
+    /* The light metal frame: a thin bronze edge drawn as a border-box
+       gradient under the panel, plus the corner marks (.aj-corner). */
+    border: 2px solid transparent;
     outline: 0;
     border-radius: 14px;
-    background: var(--color-aj-win);
-    box-shadow: 0 30px 80px var(--color-aj-shadow);
+    background:
+      linear-gradient(var(--color-aj-win), var(--color-aj-win)) padding-box,
+      linear-gradient(
+        155deg,
+        var(--color-aj-metal-hi),
+        var(--color-aj-metal-lo) 26%,
+        var(--color-aj-metal) 50%,
+        var(--color-aj-metal-lo) 76%,
+        var(--color-aj-metal-hi)
+      )
+      border-box;
+    box-shadow:
+      0 0 0 1px var(--color-aj-shadow),
+      0 30px 80px var(--color-aj-shadow);
     color: var(--color-aj-text);
     font: 15px / 1.55 var(--font-aj);
     -webkit-font-smoothing: antialiased;
@@ -12879,13 +12893,65 @@
     letter-spacing: 0.2px;
     text-shadow: none;
   }
+  /* The frame's corner marks: one bracket drawn top-left, mirrored. */
+  #adventure-journal-window .aj-corner {
+    position: absolute;
+    /* Above the window's sticky head (z-index 6 in layout.css). */
+    z-index: 7;
+    width: 22px;
+    height: 22px;
+    color: var(--color-aj-metal-hi);
+    pointer-events: none;
+  }
+  #adventure-journal-window .aj-corner svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #adventure-journal-window .aj-corner-tl {
+    top: 2px;
+    left: 2px;
+  }
+  #adventure-journal-window .aj-corner-tr {
+    top: 2px;
+    right: 2px;
+    transform: scaleX(-1);
+  }
+  #adventure-journal-window .aj-corner-bl {
+    bottom: 2px;
+    left: 2px;
+    transform: scaleY(-1);
+  }
+  #adventure-journal-window .aj-corner-br {
+    right: 2px;
+    bottom: 2px;
+    transform: scale(-1);
+  }
+  /* The title emblem: a small bronze lozenge holding the journal glyph. */
   #adventure-journal-window .aj-title-sigil {
-    display: flex;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    margin: 0 4px 0 2px;
+    border: 1px solid var(--color-aj-metal);
+    border-radius: 5px;
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-aj-metal-lo),
+      var(--color-aj-well) 80%
+    );
+    box-shadow:
+      0 0 0 2px var(--color-aj-head),
+      0 0 0 3px var(--color-aj-metal-lo);
     color: var(--color-aj-accent);
+    transform: rotate(45deg);
   }
   #adventure-journal-window .aj-title-sigil .ui-icon {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
+    transform: rotate(-45deg);
   }
   #adventure-journal-window .aj-head-crumb {
     min-width: 0;
@@ -13087,6 +13153,9 @@
     display: none;
   }
   #adventure-journal-window .aj-banner {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
@@ -13101,6 +13170,57 @@
         transparent 70%
       ),
       var(--color-aj-banner);
+  }
+  /* The room picture behind the banner (journal_backdrop_view.ts): darkened by
+     a filter, faded at its edges by a mask and veiled by the scrim, so the
+     words keep 4.5:1 over any pixel (the styles test pins the arithmetic).
+     Cosmetic: a page without one keeps the plain banner above. */
+  #adventure-journal-window .aj-banner.has-art {
+    background: var(--color-aj-banner);
+  }
+  #adventure-journal-window .aj-banner-art {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+    filter: brightness(0.65) saturate(0.9);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-aj-mask) 18%,
+      var(--color-aj-mask) 82%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-aj-mask) 18%,
+      var(--color-aj-mask) 82%,
+      transparent
+    );
+  }
+  #adventure-journal-window .aj-banner.has-art::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, transparent 55%, var(--color-aj-banner)), var(--color-aj-banner-scrim);
+    pointer-events: none;
+  }
+  /* Over a picture the two small status inks (In combat, Mythic: coming
+     soon) sit on the well, so they never ride on a lit pixel. */
+  #adventure-journal-window .aj-banner.has-art .aj-chip-status,
+  #adventure-journal-window .aj-banner.has-art .aj-soon-note {
+    background: var(--color-aj-well);
+  }
+  #adventure-journal-window .aj-banner.has-art .aj-soon-note {
+    padding: 0 8px;
+    border-radius: 999px;
   }
   #adventure-journal-window .aj-portrait-wrap {
     position: relative;
@@ -13252,10 +13372,11 @@
   }
   #adventure-journal-window .aj-diff button {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 7px 14px;
+    gap: 1px;
+    padding: 5px 14px 6px;
     border: 0;
     border-radius: 7px;
     background: transparent;
@@ -13277,6 +13398,22 @@
   #adventure-journal-window .aj-diff .ui-icon {
     width: 12px;
     height: 12px;
+  }
+  /* The danger skulls over each difficulty's name (1, 2, 3): decorative, in
+     the button's own ink so the selected one reads dark on amber. */
+  #adventure-journal-window .aj-skulls {
+    display: inline-flex;
+    gap: 2px;
+    opacity: 0.85;
+  }
+  #adventure-journal-window .aj-diff .aj-skulls .ui-icon {
+    width: 15px;
+    height: 15px;
+  }
+  #adventure-journal-window .aj-tier-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
   #adventure-journal-window .aj-soon-note {
     color: var(--color-aj-mute);
@@ -13437,11 +13574,15 @@
   #adventure-journal-window .aj-ab-row:hover {
     background: var(--color-aj-panel-hover);
   }
-  #adventure-journal-window .aj-ab-icon {
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--color-aj-icon-border);
-    border-radius: 8px;
+  /* The ability icon sits in the action bar's own forged socket
+     (library .ui-socket); only its size is set here. */
+  #adventure-journal-window .aj-ab-socket {
+    --ui-socket-size: 44px;
+    display: block;
+  }
+  #adventure-journal-window .aj-ab-row:hover .aj-ab-socket,
+  #adventure-journal-window .aj-ab.open .aj-ab-socket {
+    border-color: var(--gold-dim);
   }
   #adventure-journal-window .aj-ab-main {
     display: flex;
@@ -13893,7 +14034,7 @@
   }
   #adventure-journal-window .aj-loot-row {
     display: grid;
-    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-columns: 44px minmax(0, 1fr);
     align-items: center;
     gap: 12px;
     padding: 10px 12px;
@@ -13904,9 +14045,43 @@
   #adventure-journal-window .aj-loot-row:hover {
     background: var(--color-aj-panel-hover);
   }
-  #adventure-journal-window .aj-loot-row > :first-child {
-    width: 40px;
-    height: 40px;
+  /* Each drop is a bag slot (library .ui-socket--bag) rimmed in its
+     quality colour, the bags' own read; hovering it opens the real item
+     tooltip. Poor and common keep the neutral rim, as the bags do. */
+  #adventure-journal-window .aj-loot-slot {
+    --ui-socket-size: 44px;
+    display: block;
+  }
+  /* The item art fills the slot as the bag cell's does: the slot's rim is the
+     quality ring, so the icon's own border and glow step aside. */
+  #adventure-journal-window .aj-loot-slot > .item-icon {
+    position: absolute;
+    inset: var(--socket-art-inset);
+    width: calc(100% - 2 * var(--socket-art-inset));
+    height: calc(100% - 2 * var(--socket-art-inset));
+    border: 0;
+    border-radius: calc(var(--radius-socket) - 2px);
+    box-shadow: none;
+  }
+  #adventure-journal-window .aj-quality-uncommon {
+    --aj-quality: var(--color-quality-uncommon);
+  }
+  #adventure-journal-window .aj-quality-rare {
+    --aj-quality: var(--color-quality-rare);
+  }
+  #adventure-journal-window .aj-quality-epic {
+    --aj-quality: var(--color-quality-epic);
+  }
+  #adventure-journal-window .aj-quality-legendary {
+    --aj-quality: var(--color-quality-legendary);
+  }
+  #adventure-journal-window
+    .aj-loot-row:is(.aj-quality-uncommon, .aj-quality-rare, .aj-quality-epic, .aj-quality-legendary)
+    .aj-loot-slot {
+    border-color: var(--aj-quality);
+    box-shadow:
+      var(--shadow-socket),
+      0 0 6px color-mix(in srgb, var(--aj-quality) 45%, transparent);
   }
   #adventure-journal-window .aj-loot-text {
     display: flex;

@@ -4019,9 +4019,12 @@
     gap: 6px 12px;
     min-height: 56px;
   }
-  body.mobile-touch #adventure-journal-window .aj-ab-icon {
-    width: 40px;
-    height: 40px;
+  body.mobile-touch #adventure-journal-window .aj-ab-socket {
+    --ui-socket-size: 40px;
+  }
+  /* A phone sheet has no window edge to frame: no corner marks. */
+  body.mobile-touch #adventure-journal-window .aj-corner {
+    display: none;
   }
   body.mobile-touch #adventure-journal-window .aj-ab-chev {
     grid-column: 3;

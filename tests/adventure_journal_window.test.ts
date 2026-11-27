@@ -8,7 +8,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { BIND_ACTIONS } from '../src/game/keybinds';
 import { SMITH_HEART_DUNGEON } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -62,8 +62,10 @@ describe('AdventureJournalWindow', () => {
   let journal: AdventureJournalWindow;
   let unreleased: boolean;
   let targetTemplate: string | null;
+  let sounds: { pageTurn: Mock<() => void>; click: Mock<() => void> };
 
   beforeEach(() => {
+    sounds = { pageTurn: vi.fn<() => void>(), click: vi.fn<() => void>() };
     setLanguage('en');
     unreleased = true;
     targetTemplate = null;
@@ -101,6 +103,7 @@ describe('AdventureJournalWindow', () => {
         itemTooltip: () => '',
         world: () => world,
         showUnreleased: () => unreleased,
+        sounds,
       },
       document,
       controller,
@@ -272,6 +275,79 @@ describe('AdventureJournalWindow', () => {
     const rows = root.querySelectorAll('.aj-loot-row');
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0].textContent).toMatch(/chance|Guaranteed/);
+  });
+
+  it('turns a page when it opens and clicks on a new tab or difficulty only', () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    expect(sounds.pageTurn).toHaveBeenCalledTimes(1);
+    expect(sounds.click).not.toHaveBeenCalled();
+    // Already open: a new page is not a new opening.
+    journal.openJournal(SMITH_HEART_DUNGEON, COUNCIL_GUARDIAN, 'normal');
+    expect(sounds.pageTurn).toHaveBeenCalledTimes(1);
+    root.querySelector<HTMLButtonElement>('[data-tab="loot"]')?.click();
+    expect(sounds.click).toHaveBeenCalledTimes(1);
+    root.querySelector<HTMLButtonElement>('[data-tab="loot"]')?.click();
+    expect(sounds.click).toHaveBeenCalledTimes(1);
+    root.querySelector<HTMLButtonElement>('.rbg-segmented [data-difficulty="heroic"]')?.click();
+    expect(sounds.click).toHaveBeenCalledTimes(2);
+    root.querySelector<HTMLButtonElement>('.rbg-segmented [data-difficulty="heroic"]')?.click();
+    expect(sounds.click).toHaveBeenCalledTimes(2);
+    journal.close();
+    journal.toggle();
+    expect(sounds.pageTurn).toHaveBeenCalledTimes(2);
+  });
+
+  it('frames the window and marks each difficulty with its skulls', () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    expect(root.querySelectorAll('.aj-corner[aria-hidden="true"]')).toHaveLength(4);
+    const skulls = (tier: string) =>
+      root.querySelectorAll(`.rbg-segmented [data-difficulty="${tier}"] .aj-skulls .ui-icon`)
+        .length;
+    expect([skulls('normal'), skulls('heroic'), skulls('mythic')]).toEqual([1, 2, 3]);
+    // Mythic keeps its lock and its Coming soon note.
+    expect(
+      root.querySelector('[data-difficulty="mythic"] .aj-skulls')?.getAttribute('aria-hidden'),
+    ).toBe('true');
+    expect(root.querySelector('.aj-soon-note')).not.toBeNull();
+    expect(
+      root.querySelector('.rbg-segmented [data-difficulty="mythic"]')?.getAttribute('aria-label'),
+    ).toBe(t('hudChrome.raidBossGuide.chooseDifficulty', { difficulty: 'Mythic' }));
+  });
+
+  it("paints the boss's room behind the banner only where a picture exists", () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    const banner = root.querySelector('.aj-banner');
+    expect(banner?.classList.contains('has-art')).toBe(true);
+    const art = banner?.querySelector<HTMLImageElement>('.aj-banner-art');
+    expect(art?.getAttribute('src')).toBe('/ui/journal/smith_heart_heat.webp');
+    expect(art?.getAttribute('alt')).toBe('');
+    expect(art?.getAttribute('aria-hidden')).toBe('true');
+    const sanctum = journalInstance('gravewyrm_sanctum')!;
+    journal.openJournal('gravewyrm_sanctum', sanctum.source.bossKeys[0], 'normal');
+    expect(root.querySelector('.aj-banner')?.classList.contains('has-art')).toBe(false);
+    expect(root.querySelector('.aj-banner-art')).toBeNull();
+  });
+
+  it('seats ability icons in action sockets and drops in quality-rimmed bag slots', () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    root.querySelector<HTMLButtonElement>('[data-tab="abilities"]')?.click();
+    const icons = root.querySelectorAll('.aj-ab-row .aj-ab-icon');
+    expect(icons.length).toBeGreaterThan(0);
+    for (const icon of icons) {
+      expect(icon.parentElement?.classList.contains('ui-socket')).toBe(true);
+    }
+    const sanctum = journalInstance('gravewyrm_sanctum')!;
+    journal.openJournal('gravewyrm_sanctum', sanctum.source.bossKeys.at(-1)!, 'normal');
+    root.querySelector<HTMLButtonElement>('[data-tab="loot"]')?.click();
+    const rows = [...root.querySelectorAll<HTMLElement>('.aj-loot-row')];
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      const slot = row.querySelector('.aj-loot-slot');
+      expect(slot?.classList.contains('ui-socket')).toBe(true);
+      expect(slot?.classList.contains('ui-socket--bag')).toBe(true);
+      expect(slot?.querySelector('img')).not.toBeNull();
+      expect([...row.classList].some((c) => c.startsWith('aj-quality-'))).toBe(true);
+    }
   });
 
   it('steps to the previous and next boss and shows a council with both members', () => {
