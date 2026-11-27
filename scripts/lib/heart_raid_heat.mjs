@@ -1,7 +1,7 @@
 // The Guardian of the Heat's mechanic AI for the raid bots (scripts/heart_raid.mjs
 // BOSS=heat; the plumbing is scripts/lib/heart_raid_bots.mjs). The guardian
 // never leaves its wellspring: the tanks hold it from the lip and swap on
-// Cinder Grip, the raid stands within Hearth Flare's reach on the shore, out of
+// Cinder Grip and on each Wellspring Brand, the raid stands within Hearth Flare's reach on the shore, out of
 // Basalt Fist's spot and its Molten Swells' lanes, walks the overflows' lava
 // waves' corridors (the corridor of the next wall to reach it, close to the
 // wellspring once a wall has passed), heals through the Falling Cinders, drops the
@@ -89,7 +89,10 @@ export const heat = {
   title: 'Guardian of the Heat',
   tids: { guardian: 'heart_heat_guardian' },
   tp: '/dev heart tp heatboss',
-  swapAura: 'stackpoison_heart_heat_guardian',
+  // Cinder Grip at 5 stacks, or one Wellspring Brand (heat_brand.ts: the
+  // brand carries its swap count, 1, in `value3`, which the generic tank plan
+  // reads before swapStacks): either hands the guardian to the clear tank.
+  swapAura: ['stackpoison_heart_heat_guardian', HEAT_AURAS.brand],
   swapStacks: 5,
   // The giant's girth: the sim measures a short taunt (the warrior's) to its
   // body's edge (player_attack_reach.ts), so it reaches from past the lip wall.
