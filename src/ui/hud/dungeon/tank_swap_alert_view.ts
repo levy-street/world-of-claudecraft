@@ -30,7 +30,8 @@
 //    still casts it; a told one (Tempering Strike, Elemental Strike,
 //    Wellspring Brand) while its boss is still on them.
 //  - BusterLast: the same line in its last second (the sheet pulses it once
-//    more as the kind turns).
+//    more as the kind turns). TankBusterLatch keeps it there for the rest of
+//    that alert and plays each pulse once (no entry pulse on a short hit).
 //  - Hidden otherwise, and while dead.
 
 import {
@@ -151,13 +152,77 @@ export function buildTankSwapAlertView(input: TankSwapAlertInput): TankSwapAlert
 
 // ---- the tank buster alert ------------------------------------------------------------------
 
-export type TankBusterAlertKind = 'buster' | 'busterLast';
+/** The line's states, each a class the sheet keys its pulses on:
+ *  - busterEnter: just landed, the entry pulse plays (never on a short hit);
+ *  - buster: steady, no motion;
+ *  - busterLast: the last second has just begun, the last-second pulse plays;
+ *  - busterLastHold: the rest of the last second, a steady glow, no motion.
+ *  Only the two pulsing kinds carry an animation, each for its pulse's length,
+ *  so re-showing the panel in a steady kind never replays a pulse. */
+export type TankBusterAlertKind = 'busterEnter' | 'buster' | 'busterLast' | 'busterLastHold';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
-export const TANK_BUSTER_ALERT_KINDS: readonly TankBusterAlertKind[] = ['buster', 'busterLast'];
+export const TANK_BUSTER_ALERT_KINDS: readonly TankBusterAlertKind[] = [
+  'busterEnter',
+  'buster',
+  'busterLast',
+  'busterLastHold',
+];
 
 /** Seconds before the hit at which the line turns `busterLast` (its second pulse). */
 export const TANK_BUSTER_LAST_SECONDS = 1;
+
+/** The entry pulse's and the last-second pulse's lengths (seconds; the sheet's
+ *  heart-tank-buster-in and heart-tank-buster-last animations run as long). */
+export const TANK_BUSTER_ENTER_PULSE_SECONDS = 0.4;
+export const TANK_BUSTER_LAST_PULSE_SECONDS = 0.45;
+
+/** A hit told this short (its marker's whole countdown, seconds) skips the
+ *  entry pulse: the last-second pulse alone, never two pulses stacked. */
+export const TANK_BUSTER_SHORT_SECONDS = 1.5;
+
+/** How long a vanished marker still counts as the same alert (seconds): a late
+ *  snapshot that drops and re-lays it is one alert, not a new one. */
+export const TANK_BUSTER_GRACE_SECONDS = 0.5;
+
+/**
+ * The alert's per-instance memory (pure: the caller hands it the UI clock).
+ * An instance is one marker: its buster, its boss and its countdown's length.
+ * Once an instance enters its last second it stays there until it ends, even
+ * if a snapshot pushes the countdown back above the line, and each pulse plays
+ * at most once per instance.
+ */
+export class TankBusterLatch {
+  private key: string | null = null;
+  private startAt = 0;
+  private seenAt = Number.NEGATIVE_INFINITY;
+  private lastAt: number | null = null;
+  private short = false;
+
+  /** The kind for instance `key` at `left` seconds out of `total`, at `now`. */
+  kind(key: string, left: number, total: number, now: number): TankBusterAlertKind {
+    if (key !== this.key || now - this.seenAt > TANK_BUSTER_GRACE_SECONDS) {
+      this.key = key;
+      this.startAt = now;
+      this.lastAt = null;
+      this.short = total <= TANK_BUSTER_SHORT_SECONDS + 1e-6;
+    }
+    this.seenAt = now;
+    if (this.lastAt === null && left <= TANK_BUSTER_LAST_SECONDS) this.lastAt = now;
+    if (this.lastAt !== null)
+      return now - this.lastAt < TANK_BUSTER_LAST_PULSE_SECONDS ? 'busterLast' : 'busterLastHold';
+    if (!this.short && now - this.startAt < TANK_BUSTER_ENTER_PULSE_SECONDS) return 'busterEnter';
+    return 'buster';
+  }
+}
+
+/** The tank buster alert's input: the swap's, plus the latch and the UI clock
+ *  (seconds) when the caller keeps one (the HUD does; without it the kind is
+ *  read from the countdown alone). */
+export interface TankBusterAlertInput extends TankSwapAlertInput {
+  latch?: TankBusterLatch;
+  now?: number;
+}
 
 /** The CSS class that seats the alert in the tank corner (components.css
  *  `#heart-tank-buster.tank-corner`: desktop just above the tank swap chip,
@@ -203,7 +268,7 @@ const tenths = (v: number) =>
     maximumFractionDigits: 1,
   });
 
-export function buildTankBusterAlertView(input: TankSwapAlertInput): TankBusterAlertView {
+export function buildTankBusterAlertView(input: TankBusterAlertInput): TankBusterAlertView {
   const self = input.self;
   if (self.dead) return HIDDEN;
   let mark: TankSwapAura | null = null;
@@ -229,9 +294,20 @@ export function buildTankBusterAlertView(input: TankSwapAlertInput): TankBusterA
   const seconds = tenths(left);
   // One compact line: the name and the countdown (no "On you" under it; the
   // owner's call of 2026-11-27).
+  const kind: TankBusterAlertKind =
+    input.latch && input.now !== undefined
+      ? input.latch.kind(
+          `${buster.code}:${mark.sourceId ?? -1}:${Math.round(total * 10)}`,
+          left,
+          total,
+          input.now,
+        )
+      : left <= TANK_BUSTER_LAST_SECONDS
+        ? 'busterLast'
+        : 'buster';
   return {
     visible: true,
-    kind: left <= TANK_BUSTER_LAST_SECONDS ? 'busterLast' : 'buster',
+    kind,
     title,
     line: '',
     hint: '',

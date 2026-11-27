@@ -44,8 +44,14 @@ import {
   buildTankBusterAlertView,
   TANK_BUSTER_ALERT_KINDS,
   TANK_BUSTER_ALERT_LOOK,
+  TANK_BUSTER_ENTER_PULSE_SECONDS,
+  TANK_BUSTER_GRACE_SECONDS,
+  TANK_BUSTER_LAST_PULSE_SECONDS,
   TANK_BUSTER_LAST_SECONDS,
   TANK_BUSTER_PLACEMENT_CLASS,
+  TANK_BUSTER_SHORT_SECONDS,
+  TankBusterLatch,
+  type TankSwapAura,
   type TankSwapBody,
 } from '../src/ui/hud/dungeon/tank_swap_alert_view';
 import { setLanguage, t } from '../src/ui/i18n';
@@ -235,7 +241,12 @@ describe('the alert: who sees it, and the sound in the tank ear', () => {
         entity: () => undefined,
       });
     expect(TANK_BUSTER_LAST_SECONDS).toBe(1);
-    expect(TANK_BUSTER_ALERT_KINDS).toEqual(['buster', 'busterLast']);
+    expect(TANK_BUSTER_ALERT_KINDS).toEqual([
+      'busterEnter',
+      'buster',
+      'busterLast',
+      'busterLastHold',
+    ]);
     const early = at(1.4);
     expect(early.visible && early.kind).toBe('buster');
     expect(early.visible && early.barLabel).toBe('1.4 sec');
@@ -245,6 +256,107 @@ describe('the alert: who sees it, and the sound in the tank ear', () => {
     expect(lastest.visible && lastest.kind).toBe('busterLast');
     expect(lastest.visible && lastest.title).toBe("Hammer's Weight");
     expect(lastest.visible && lastest.barLabel).toBe('0.2 sec');
+  });
+
+  describe('the latch: one alert instance, each pulse once, the last second held', () => {
+    const mark = (remaining: number, over: Partial<TankSwapAura> = {}): TankSwapAura => ({
+      id: TANK_BUSTER_AURA,
+      value: 5,
+      remaining,
+      duration: 3,
+      sourceId: 9,
+      ...over,
+    });
+    const kindAt = (latch: TankBusterLatch, now: number, aura: TankSwapAura | null) => {
+      const v = buildTankBusterAlertView({
+        self: { id: 1, auras: aura ? [aura] : [] },
+        entity: () => undefined,
+        latch,
+        now,
+      });
+      return v.visible ? v.kind : 'hidden';
+    };
+    /** The HUD's frames (every 50 ms) from `from` up to `to`, the marker's
+     *  countdown running down with the clock from `left` at `from`; the kind at
+     *  `to`. */
+    const frames = (
+      latch: TankBusterLatch,
+      from: number,
+      to: number,
+      left: number,
+      over: Partial<TankSwapAura> = {},
+    ) => {
+      let k = '';
+      for (let now = from; now <= to + 1e-9; now += 0.05)
+        k = kindAt(latch, now, mark(left - (now - from), over));
+      return k;
+    };
+
+    it('pins the pulse lengths and the short-hit and grace bounds', () => {
+      expect(TANK_BUSTER_ENTER_PULSE_SECONDS).toBe(0.4);
+      expect(TANK_BUSTER_LAST_PULSE_SECONDS).toBe(0.45);
+      expect(TANK_BUSTER_SHORT_SECONDS).toBe(1.5);
+      expect(TANK_BUSTER_GRACE_SECONDS).toBe(0.5);
+    });
+
+    it('a long hit: the entry pulse once, steady, then the last-second pulse and its hold', () => {
+      const latch = new TankBusterLatch();
+      expect(kindAt(latch, 10, mark(3))).toBe('busterEnter');
+      expect(frames(latch, 10.05, 10.3, 2.95)).toBe('busterEnter');
+      expect(frames(latch, 10.35, 10.5, 2.65)).toBe('buster');
+      expect(frames(latch, 10.55, 11.95, 2.45)).toBe('buster');
+      expect(frames(latch, 12, 12.4, 1)).toBe('busterLast');
+      expect(frames(latch, 12.45, 12.5, 0.55)).toBe('busterLastHold');
+    });
+
+    it('a snapshot pushing the countdown back above 1 s never leaves the last second', () => {
+      const latch = new TankBusterLatch();
+      frames(latch, 10, 11.95, 3);
+      expect(kindAt(latch, 12, mark(0.95))).toBe('busterLast');
+      // The server's countdown lands a little higher than the local one.
+      expect(frames(latch, 12.05, 12.1, 1.2)).toBe('busterLast');
+      expect(frames(latch, 12.15, 12.6, 1.15)).toBe('busterLastHold');
+      expect(kindAt(latch, 12.65, mark(0.4))).toBe('busterLastHold');
+    });
+
+    it('a snapshot that drops and re-lays the same marker never replays a pulse', () => {
+      const latch = new TankBusterLatch();
+      expect(kindAt(latch, 10, mark(3))).toBe('busterEnter');
+      expect(frames(latch, 10.05, 10.6, 2.95)).toBe('buster');
+      expect(kindAt(latch, 10.7, null)).toBe('hidden');
+      // Back inside the grace: the same alert, still steady.
+      expect(frames(latch, 10.9, 11.95, 2.1)).toBe('buster');
+      // Its last second, then dropped and back: the hold, not a new pulse.
+      expect(frames(latch, 12, 12.6, 1)).toBe('busterLastHold');
+      expect(kindAt(latch, 12.7, null)).toBe('hidden');
+      expect(kindAt(latch, 12.8, mark(0.3))).toBe('busterLastHold');
+    });
+
+    it('a new alert (another buster, another boss, or after the grace) starts fresh', () => {
+      const latch = new TankBusterLatch();
+      frames(latch, 10, 12.5, 3);
+      expect(kindAt(latch, 12.5, mark(0.5))).toBe('busterLastHold');
+      // The next hit from the same boss, well after the last one ended.
+      expect(kindAt(latch, 20, mark(3))).toBe('busterEnter');
+      // Another boss's hit replaces it at once.
+      expect(kindAt(latch, 20.05, mark(3, { sourceId: 10 }))).toBe('busterEnter');
+      // Another buster from the same boss too.
+      expect(kindAt(latch, 20.1, mark(3, { value: 2 }))).toBe('busterEnter');
+    });
+
+    it('a short hit (1.5 s or less) skips the entry pulse: only the last-second pulse', () => {
+      const latch = new TankBusterLatch();
+      const bar = { value: 1, duration: 1.5 };
+      expect(kindAt(latch, 10, mark(1.5, bar))).toBe('buster');
+      expect(frames(latch, 10.05, 10.45, 1.45, bar)).toBe('buster');
+      expect(kindAt(latch, 10.5, mark(1, bar))).toBe('busterLast');
+      expect(frames(latch, 10.55, 11, 0.95, bar)).toBe('busterLastHold');
+      // A 1 s wind-up (Tempering Strike) is in its last second from the start.
+      const tempering = new TankBusterLatch();
+      const wind = { value: 4, duration: 1 };
+      expect(kindAt(tempering, 10, mark(1, wind))).toBe('busterLast');
+      expect(frames(tempering, 10.05, 10.5, 0.95, wind)).toBe('busterLastHold');
+    });
   });
 
   it("every fight with a buster plays the anvil in the tank's ear as the marker lands", () => {
@@ -302,8 +414,13 @@ describe('the tank buster placement: a compact line in the tank corner, never th
     expect(rule('  body.mobile-touch #heart-tank-swap')).toMatch(/top: 34%/);
     expect(rule('  #heart-tank-swap')).toMatch(/max-width: 180px/);
     // The last second: a glow that survives reduced motion, and its own pulse.
-    expect(rule('  #heart-tank-buster.is-busterLast')).toMatch(/box-shadow/);
-    expect(css).toMatch(/animation: heart-tank-buster-last /);
+    expect(css).toMatch(/is-busterLast,\s*#heart-tank-buster\.is-busterLastHold \{\s*box-shadow/);
+    // Each pulse rides only its own short-lived kind, as long as the core's.
+    expect(css).toMatch(/is-busterEnter \{\s*animation: heart-tank-buster-in 0\.4s /);
+    expect(css).toMatch(/is-busterLast \{\s*animation: heart-tank-buster-last 0\.45s /);
+    expect(base).not.toMatch(/animation/);
+    expect(css).not.toMatch(/is-buster(LastHold)? \{\s*animation/);
+    expect(css).toMatch(/is-busterLastHold \{\s*box-shadow/);
   });
 });
 

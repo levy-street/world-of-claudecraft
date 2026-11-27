@@ -106,6 +106,7 @@ import {
   buildTankSwapAlertView,
   TANK_BUSTER_ALERT_LOOK,
   TANK_SWAP_ALERT_KINDS,
+  TankBusterLatch,
   type TankSwapBody,
 } from './tank_swap_alert_view';
 import { TempleAlertSceneScan, type TempleSceneEntity } from './temple_alert_scene_core';
@@ -190,6 +191,9 @@ export class DungeonPrompts {
   private readonly knot: EncounterAlert;
   private readonly tankSwap: EncounterAlert;
   private readonly tankBuster: EncounterAlert;
+  /** The tank buster alert's per-instance memory (its pulses and its latched
+   *  last second). */
+  private readonly tankBusterLatch = new TankBusterLatch();
   private readonly liveCoal: EncounterAlert;
   private readonly finalPhase: HeartFinalPhasePanel;
   private readonly finalPhaseView = makeFinalPhaseView();
@@ -398,10 +402,11 @@ export class DungeonPrompts {
         : HINT_HIDDEN,
     );
     // A boss's heavy hit on the local tank (an action prompt, off the slot):
-    // only the tank it is aimed at carries its marker.
+    // only the tank it is aimed at carries its marker. The latch holds each
+    // alert's pulses and its last second across snapshots (the UI clock).
     this.tankBuster.paint(
       dungeonPromptEnabled('tankBuster', hints)
-        ? buildTankBusterAlertView({ self: p, entity })
+        ? buildTankBusterAlertView({ self: p, entity, latch: this.tankBusterLatch, now })
         : HINT_HIDDEN,
     );
     // The Live Coal's bearer's own chip (an action readout, off the slot).

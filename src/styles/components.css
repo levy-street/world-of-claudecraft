@@ -20269,18 +20269,23 @@
     --tank-buster-bar-lift: calc(2 * (var(--socket-size) + var(--socket-row-gap)));
   }
   /* The last second: a hostile edge glow that stays (the cue survives reduced
-     motion), plus one more pulse below. */
-  #heart-tank-buster.is-busterLast {
+     motion), plus one more pulse below. The view core's TankBusterLatch picks
+     the kind: each pulse is its own short-lived kind (busterEnter,
+     busterLast) lasting exactly its animation, the steady kinds (buster,
+     busterLastHold) carry none, so a re-shown panel never replays a pulse. */
+  #heart-tank-buster.is-busterLast,
+  #heart-tank-buster.is-busterLastHold {
     box-shadow: 0 0 8px 1px var(--color-hostile);
   }
   /* Forced colours drop the glow: a system-colour outline keeps the cue. */
   @media (forced-colors: active) {
-    #heart-tank-buster.is-busterLast {
+    #heart-tank-buster.is-busterLast,
+    #heart-tank-buster.is-busterLastHold {
       outline: 2px solid Highlight;
     }
   }
   @media (prefers-reduced-motion: no-preference) {
-    #heart-tank-buster {
+    #heart-tank-buster.is-busterEnter {
       animation: heart-tank-buster-in 0.4s ease-out 1;
     }
     #heart-tank-buster.is-busterLast {
