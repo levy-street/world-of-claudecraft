@@ -163,7 +163,7 @@ const FANOUT_ARMS: readonly string[] = [
   // the roster itself is player names plus icons and the static title/close
   // chrome rides data-i18n on the page shell.
   'this.readyCheckLeaderWindow.relocalize|',
-  'this.raidBossGuideWindow.relocalize|',
+  'this.journal.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
   'this.riftPainter.relocalize|',

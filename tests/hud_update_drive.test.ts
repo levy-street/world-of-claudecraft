@@ -598,9 +598,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     call: 'this.toggleClass',
     band: 'frame',
     gate: "target && target.kind !== 'object'",
-    sites: 3,
+    sites: 4,
     surface: 'chrome',
-    why: 'the target elite class, the boss class, and the forced-colors hostile cue',
+    why: 'the target elite class, the boss class, the Adventure Journal book (has-journal, an allocation-free lookup), and the forced-colors hostile cue',
   },
   {
     call: 'this.setText',

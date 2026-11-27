@@ -127,7 +127,7 @@ export class PartyFramesPainter {
   // listeners stay attached and read the live slot, so a recycled row is safe.
   private readonly free: PartyRow[] = [];
   // The member-rows wrapper: every pooled row nests one level under #party-frames inside
-  // this element, so the chip, rows, boss guide, and master-loot control stack as a
+  // this element, so the chip, rows, marker control, and master-loot control stack as a
   // simple column (the chip alone on its own line). On mobile the wrapper carries the
   // 2-column auto-flow grid the container used to; on desktop it is display:contents
   // (transparent), so the rows lay out in the #party-frames flex column exactly as before.
@@ -153,11 +153,10 @@ export class PartyFramesPainter {
   // after the member rows, and persists across member-frame
   // rebuilds so its checkbox / dropdowns are never churned under the cursor.
   private masterControl: HTMLElement | null = null;
-  // Contextual raid-boss guide opener, owned by the Hud window controller and
-  // seated between member rows and the leader-only loot control.
-  private guideControl: HTMLElement | null = null;
   // The world-marker button and flyout (src/ui/hud/world_markers/), owned by its
-  // controller and seated just above the boss guide.
+  // controller and seated between the member rows and the leader-only loot control.
+  // (The old boss-guide opener that sat here is gone: the Adventure Journal opens
+  // from the side rail, Shift+J and the target frame's book, src/ui/hud/journal/.)
   private markerControl: HTMLElement | null = null;
   // The last synced raid flag, so relocalize() can re-emit each pooled row's group
   // label in the new language after an in-game language switch (a switch does not flip
@@ -280,21 +279,13 @@ export class PartyFramesPainter {
     if (el) this.container.appendChild(el);
   }
 
-  /** Set or clear the contextual raid-boss guide opener. Unlike member rows this
-   *  is cold UI, but it keeps one stable node so keyboard focus is never churned. */
-  setGuideControl(el: HTMLElement | null): void {
-    if (this.guideControl === el) return;
-    this.guideControl?.remove();
-    this.guideControl = el;
-    if (el) this.container.insertBefore(el, this.masterControl);
-  }
-
-  /** Set or clear the world-marker control (one stable node, like the guide). */
+  /** Set or clear the world-marker control. Unlike member rows this is cold UI,
+   *  but it keeps one stable node so keyboard focus is never churned. */
   setWorldMarkerControl(el: HTMLElement | null): void {
     if (this.markerControl === el) return;
     this.markerControl?.remove();
     this.markerControl = el;
-    if (el) this.container.insertBefore(el, this.guideControl ?? this.masterControl);
+    if (el) this.container.insertBefore(el, this.masterControl);
   }
 
   /** Reconcile the pool to `members` and repaint each in place. Called only when the
@@ -370,9 +361,9 @@ export class PartyFramesPainter {
   // Two passes: (1) order the member rows INSIDE the rows wrapper (their own element,
   // so no member frame ever flows beside the container-level chip), then (2) order the
   // container's own direct children: the mobile chip first (when present, the collapse
-  // header above the stack), the rows wrapper, the contextual boss guide, and the
+  // header above the stack), the rows wrapper, the world-marker control, and the
   // leader-only master-loot control last. On desktop the chip is null and the wrapper is
-  // display:contents, so the sequence renders as wrapper's rows, [guide, master], exactly
+  // display:contents, so the sequence renders as wrapper's rows, [marker, master], exactly
   // the pre-wrapper order. A steady-state rebuild moves nothing in EITHER pass.
   private reconcileOrder(rows: PartyRow[]): void {
     const wrapper = this.ensureRowsWrapper();
@@ -398,7 +389,6 @@ export class PartyFramesPainter {
     if (this.chip && this.chip.el.parentNode === this.container) place(this.chip.el);
     place(wrapper);
     if (this.markerControl) place(this.markerControl);
-    if (this.guideControl) place(this.guideControl);
     if (this.masterControl) place(this.masterControl);
   }
 
@@ -445,8 +435,6 @@ export class PartyFramesPainter {
     }
     this.masterControl?.remove();
     this.masterControl = null;
-    this.guideControl?.remove();
-    this.guideControl = null;
     this.markerControl?.remove();
     this.markerControl = null;
     // Detach the (now empty) rows wrapper too, so a no-party container is truly empty and

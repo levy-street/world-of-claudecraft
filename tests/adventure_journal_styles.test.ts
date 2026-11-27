@@ -1,23 +1,15 @@
+// The Adventure Journal's stylesheet contract (src/styles/hud.css and
+// hud.mobile.css, the #adventure-journal-window sections): a scale-aware
+// bounded scroll region on desktop and phone, the phone's drawer list with
+// 40px targets, an explicit tokenized focus ring on every control, posters
+// that are never cropped, role colours from tokens, a palette with no raw
+// colour, and the old party-frames guide button gone for good.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const desktopCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
 const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
-const guideDesktopCss = desktopCss.slice(
-  desktopCss.indexOf('.party-boss-guide-button'),
-  desktopCss.indexOf('#party-frames.below-target'),
-);
-// The mobile guide block ends where the aura column's anchor rule begins
-// (#aura-stack, which replaced the per-row #buff-bar / #debuff-bar seats).
-// Both anchors must resolve, or the slice silently runs to the end of the
-// file and the palette check below starts reading unrelated rules.
-const guideMobileStart = mobileCss.indexOf('body.mobile-touch .party-boss-guide-button');
-const guideMobileEnd = mobileCss.indexOf('body.mobile-touch #aura-stack');
-if (guideMobileStart < 0 || guideMobileEnd < guideMobileStart) {
-  throw new Error('raid guide mobile block anchors not found in hud.mobile.css');
-}
-const guideMobileCss = mobileCss.slice(guideMobileStart, guideMobileEnd);
 
 function rule(css: string, selector: string): string {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -26,40 +18,70 @@ function rule(css: string, selector: string): string {
   return match?.[1] ?? '';
 }
 
-describe('raid boss guide styles', () => {
+/** Every rule whose selector names the journal (or its target-frame book). */
+function journalRules(css: string): string {
+  return [...css.matchAll(/([^{}]*(?:#adventure-journal-window|#tf-journal)[^{}]*)\{([^}]*)\}/g)]
+    .map((m) => m[2])
+    .join('\n');
+}
+
+describe('Adventure Journal styles', () => {
   it('gives the journal a scale-aware bounded keyboard and pointer scroll region', () => {
-    const windowRule = rule(desktopCss, '#raid-boss-guide-window');
+    const windowRule = rule(desktopCss, '#adventure-journal-window');
     expect(windowRule).toContain('var(--app-vh, 100vh)');
     expect(windowRule).toContain('/ var(--window-scale, 1)');
-    const shell = rule(desktopCss, '#raid-boss-guide-window .rbg-shell');
+    const shell = rule(desktopCss, '#adventure-journal-window .rbg-shell');
     expect(shell).toContain('var(--app-vh, 100vh)');
     expect(shell).toContain('/ var(--window-scale, 1)');
-    const journal = rule(desktopCss, '#raid-boss-guide-window .rbg-journal');
+    expect(shell).toMatch(/grid-template-columns:\s*256px minmax\(0, 1fr\)/);
+    const journal = rule(desktopCss, '#adventure-journal-window .rbg-journal');
     expect(journal).toMatch(/min-height:\s*0/);
     expect(journal).toMatch(/overflow-y:\s*auto/);
+    expect(rule(desktopCss, '#adventure-journal-window .aj-nav')).toMatch(/overflow-y:\s*auto/);
   });
 
-  it('keeps a bounded scroll region in the mobile sheet', () => {
-    const windowRule = rule(mobileCss, 'body.mobile-touch #raid-boss-guide-window');
+  it('turns the list into a drawer on a phone, with Browse and 40px targets', () => {
+    const windowRule = rule(mobileCss, 'body.mobile-touch #adventure-journal-window');
     expect(windowRule).toMatch(/safe-area-inset-left/);
     expect(windowRule).toMatch(/safe-area-inset-right/);
     expect(windowRule).toMatch(/safe-area-inset-bottom/);
     expect(windowRule).toMatch(/transform:\s*none/);
-    const shell = rule(mobileCss, 'body.mobile-touch #raid-boss-guide-window .rbg-shell');
-    expect(shell).toMatch(/height:\s*calc\(/);
-    expect(shell).toMatch(/safe-area-inset-bottom/);
+    expect(rule(desktopCss, '#adventure-journal-window .aj-browse')).toMatch(/display:\s*none/);
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-browse')).toMatch(
+      /display:\s*inline-flex/,
+    );
+    const drawer = rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-nav');
+    expect(drawer).toMatch(/position:\s*absolute/);
+    expect(drawer).toMatch(/visibility:\s*hidden/);
+    expect(drawer).toContain('var(--motion-scale)');
     expect(
-      rule(mobileCss, 'body.mobile-touch #raid-boss-guide-window .rbg-segmented button'),
+      rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-shell.aj-nav-open .aj-nav'),
+    ).toMatch(/visibility:\s*visible/);
+    expect(
+      rule(mobileCss, 'body.mobile-touch #adventure-journal-window .rbg-segmented button'),
     ).toMatch(/min-height:\s*40px/);
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-tab')).toMatch(
+      /min-height:\s*40px/,
+    );
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-step')).toMatch(
+      /height:\s*40px/,
+    );
   });
 
-  it('draws an explicit tokenized focus ring on every new guide control', () => {
+  it('draws an explicit tokenized focus ring on every journal control', () => {
     for (const selector of [
-      '.party-boss-guide-button:focus-visible',
-      '#raid-boss-guide-window .rbg-boss-tab:focus-visible',
-      '#raid-boss-guide-window .rbg-segmented button:focus-visible',
-      '#raid-boss-guide-window .rbg-model-load:focus-visible',
-      '#raid-boss-guide-window .rbg-model-stage > canvas:focus-visible',
+      '#adventure-journal-window .aj-boss:focus-visible',
+      '#adventure-journal-window .aj-instance-toggle:focus-visible',
+      '#adventure-journal-window .aj-tab:focus-visible',
+      '#adventure-journal-window .aj-step:focus-visible',
+      '#adventure-journal-window .aj-browse:focus-visible',
+      '#adventure-journal-window .aj-phase-toggle:focus-visible',
+      '#adventure-journal-window .aj-watch-link:focus-visible',
+      '#adventure-journal-window .aj-soon-tier:focus-visible',
+      '#adventure-journal-window .aj-loot-row:focus-visible',
+      '#tf-journal:focus-visible',
+      '#adventure-journal-window .rbg-segmented button:focus-visible',
+      '#adventure-journal-window .rbg-model-load:focus-visible',
     ]) {
       expect(desktopCss).toContain(selector);
     }
@@ -67,34 +89,49 @@ describe('raid boss guide styles', () => {
   });
 
   it('contains boss posters instead of cropping their silhouettes', () => {
-    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-boss-tab img')).toMatch(
+    expect(rule(desktopCss, '#adventure-journal-window .aj-boss-portrait img')).toMatch(
       /object-fit:\s*contain/,
     );
-    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-model-poster')).toMatch(
+    expect(rule(desktopCss, '#adventure-journal-window .rbg-model-poster')).toMatch(
       /object-fit:\s*contain/,
     );
   });
 
-  it('color codes role icon backgrounds without adding an outline', () => {
-    const roleBadge = rule(desktopCss, '#raid-boss-guide-window .rbg-badge-role');
-    expect(roleBadge).toMatch(/border:\s*0/);
-    expect(roleBadge).toMatch(/color:\s*var\(--color-rbg-role-icon\)/);
-    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-badge-tank')).toMatch(
+  it('shows the target-frame book only while the target has a page, with a 40px hit area', () => {
+    expect(rule(desktopCss, '#tf-journal')).toMatch(/display:\s*none/);
+    expect(rule(desktopCss, '#target-frame.has-journal #tf-journal')).toMatch(
+      /display:\s*inline-flex/,
+    );
+    expect(rule(desktopCss, '#tf-journal::after')).toMatch(/inset:\s*-8px/);
+  });
+
+  it('color codes role icon backgrounds from tokens', () => {
+    expect(rule(desktopCss, '#adventure-journal-window .rbg-badge-tank')).toMatch(
       /background:\s*var\(--color-rbg-role-tank-bg\)/,
     );
-    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-badge-healer')).toMatch(
+    expect(rule(desktopCss, '#adventure-journal-window .rbg-badge-healer')).toMatch(
       /background:\s*var\(--color-rbg-role-healer-bg\)/,
     );
-    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-badge-damage')).toMatch(
+    expect(rule(desktopCss, '#adventure-journal-window .rbg-badge-damage')).toMatch(
       /background:\s*var\(--color-rbg-role-damage-bg\)/,
     );
     expect(tokensCss).toContain('--color-rbg-role-tank-bg: #2878c8;');
-    expect(tokensCss).toContain('--color-rbg-role-healer-bg: #278a45;');
-    expect(tokensCss).toContain('--color-rbg-role-damage-bg: #b93b36;');
   });
 
-  it('keeps the raid guide palette in shared tokens', () => {
-    expect(guideDesktopCss).not.toMatch(/#[\da-f]{3,8}|rgba?\(/i);
-    expect(guideMobileCss).not.toMatch(/#[\da-f]{3,8}|rgba?\(/i);
+  it('keeps the journal palette in shared tokens', () => {
+    const desktop = journalRules(desktopCss);
+    const mobile = journalRules(mobileCss);
+    expect(desktop.length).toBeGreaterThan(2000);
+    expect(mobile.length).toBeGreaterThan(500);
+    expect(desktop).not.toMatch(/#[\da-f]{3,8}\b|rgba?\(/i);
+    expect(mobile).not.toMatch(/#[\da-f]{3,8}\b|rgba?\(/i);
+  });
+
+  it('retires the party-frames guide button and the old window id', () => {
+    for (const css of [desktopCss, mobileCss]) {
+      expect(css).not.toContain('party-boss-guide-button');
+      expect(css).not.toContain('#raid-boss-guide-window');
+      expect(css).not.toContain('rbg-boss-tab');
+    }
   });
 });

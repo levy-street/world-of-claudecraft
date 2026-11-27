@@ -132,6 +132,7 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
       toggleHarvestJournal() {},
       togglePerfecting() {},
       toggleLootExplorer() {},
+      toggleAdventureJournal() {},
     };
     const petWorld = {
       setPetMode() {},

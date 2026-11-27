@@ -149,6 +149,15 @@ describe('registry', () => {
       label: 'Target Buffs and Debuffs',
       category: 'Interface',
       kind: 'edge',
+      defaults: ['Shift+KeyB'],
+    });
+    // The Adventure Journal owns Shift+J (the classic encounter-journal key),
+    // a rebindable Interface toggle like every collection window.
+    const adventureJournal = BIND_ACTIONS.find((a) => a.id === 'adventureJournal');
+    expect(adventureJournal).toMatchObject({
+      label: 'Adventure Journal',
+      category: 'Interface',
+      kind: 'edge',
       defaults: ['Shift+KeyJ'],
     });
     // The Book of Deeds is a rebindable Interface toggle on the shifted layer of
@@ -173,7 +182,7 @@ describe('registry', () => {
     expect(hideUi?.defaults).toEqual(['Alt+KeyZ']);
     // The Harvest Journal is a rebindable Interface toggle on the shifted layer
     // of KeyK (Shift+H and Shift+J, its own initials, are Damage Meters and
-    // Target Buffs/Debuffs); bare KeyK stays the Leaderboard, so the two share
+    // the Adventure Journal); bare KeyK stays the Leaderboard, so the two share
     // the physical key across layers and never collide.
     const journal = BIND_ACTIONS.find((a) => a.id === 'harvestJournal');
     expect(journal?.category).toBe('Interface');

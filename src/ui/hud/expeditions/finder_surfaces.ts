@@ -6,6 +6,7 @@ import { DungeonFinderWindow } from '../../dungeon_finder_window';
 import type { InspectRemoteProfile } from '../../inspect_window';
 import type { PainterHostPresentation, PainterHostWriters } from '../../painter_host';
 import type { WindowFocusBridge } from '../../window_focus';
+import { journalHasPage } from '../journal';
 import { ExpeditionController } from './expedition_controller';
 
 interface FinderSurfaceHost {
@@ -35,7 +36,7 @@ export function createFinderSurfaces(host: FinderSurfaceHost) {
     showOnMap: host.showOnMap,
     maskPlayerText: host.maskPlayerText,
     inspectPlayer: host.inspectPlayer,
-    hasBossGuide: host.hasBossGuide,
+    hasBossGuide: host.hasBossGuide ?? journalHasPage,
     openBossGuide: host.openBossGuide,
     ...host.focus('#dungeon-finder-window'),
   });

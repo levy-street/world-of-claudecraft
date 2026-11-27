@@ -1671,7 +1671,8 @@ describe('Guide controls reference completeness', () => {
       titleKey: 'guide.nav.controls',
     });
     expect(html).toContain('<kbd>Shift+P</kbd></td><td>Professions</td>');
-    expect(html).toContain('<kbd>Shift+J</kbd></td><td>Target buffs and debuffs</td>');
+    expect(html).toContain('<kbd>Shift+B</kbd></td><td>Target buffs and debuffs</td>');
+    expect(html).toContain('<kbd>Shift+J</kbd></td><td>Adventure Journal</td>');
     expect(html).toContain('<kbd>Shift+I</kbd></td><td>Dungeon Finder</td>');
     expect(html).toContain('<kbd>`</kbd></td><td>Mount / Dismount</td>');
     expect(html).toContain('<kbd>Z</kbd></td><td>Sheathe/Unsheathe Weapon</td>');
@@ -1756,7 +1757,8 @@ describe('Guide controls reference completeness', () => {
   it('keeps those five binds in step with the game defaults', () => {
     const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
     expect(defaults.get('professions')).toEqual(['Shift+KeyP']);
-    expect(defaults.get('targetAuras')).toEqual(['Shift+KeyJ']);
+    expect(defaults.get('targetAuras')).toEqual(['Shift+KeyB']);
+    expect(defaults.get('adventureJournal')).toEqual(['Shift+KeyJ']);
     expect(defaults.get('dungeonFinder')).toEqual(['Shift+KeyI']);
     expect(defaults.get('mount')).toEqual(['Backquote']);
     expect(defaults.get('sheathe')).toEqual(['KeyZ']);

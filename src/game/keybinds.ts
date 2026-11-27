@@ -358,12 +358,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyH'],
   },
+  // Target Buffs and Debuffs moved from Shift+J to Shift+B (B for Buffs) when
+  // the Adventure Journal took Shift+J, the classic MMO key for the encounter
+  // journal. A player who rebound either keeps their own binding.
   {
     id: 'targetAuras',
     label: 'Target Buffs and Debuffs',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyJ'],
+    defaults: ['Shift+KeyB'],
   },
   {
     id: 'social',
@@ -446,8 +449,8 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['Shift+KeyX'],
   },
   // The Harvest Journal parks on Shift+K. Its own initials are both spoken
-  // for on the shifted layer (Shift+H is Damage Meters, Shift+J is Target
-  // Buffs and Debuffs), and K is the free key next to them; bare KeyK stays
+  // for on the shifted layer (Shift+H is Damage Meters, Shift+J is the
+  // Adventure Journal), and K is the free key next to them; bare KeyK stays
   // the Leaderboard. Rebindable like any action.
   {
     id: 'harvestJournal',
@@ -476,6 +479,15 @@ export const BIND_ACTIONS: BindAction[] = [
     category: 'Interface',
     kind: 'edge',
     defaults: ['Shift+KeyO'],
+  },
+  // The Adventure Journal (every dungeon and raid boss page) sits on Shift+J,
+  // the classic MMO key for the encounter journal. Rebindable like any action.
+  {
+    id: 'adventureJournal',
+    label: 'Adventure Journal',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyJ'],
   },
   // Cosmetics uses Shift+Y; Shift+K belongs to the Harvest Journal.
   {

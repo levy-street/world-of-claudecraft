@@ -460,6 +460,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_boss_guide_view.ts',
   'src/ui/boss_journal/journal_view.ts',
+  // The Adventure Journal's navigation and loot models (hud/journal/).
+  'src/ui/hud/journal/journal_nav_view.ts',
+  'src/ui/hud/journal/journal_loot_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',
@@ -3695,7 +3698,7 @@ const UI_DOM_MODULES = [
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/hud/professions/professions_window.ts',
-  'src/ui/raid_boss_guide_window.ts',
+  'src/ui/hud/journal/adventure_journal_window.ts',
   'src/ui/raid_boss_guide_model_controller.ts',
   'src/ui/hud/chat/ready_check_leader_window.ts',
   // The binder that gives a purchase-intent ledger a durable half. It reaches

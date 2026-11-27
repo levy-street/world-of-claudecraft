@@ -16,4 +16,8 @@ export {
   type RiftRank,
   resetLootExplorerIndexCache,
 } from './loot_explorer_view';
-export { LootExplorerWindow, type LootExplorerWindowDeps } from './loot_explorer_window';
+export {
+  LootExplorerWindow,
+  type LootExplorerWindowDeps,
+  sourceQualifierBits,
+} from './loot_explorer_window';

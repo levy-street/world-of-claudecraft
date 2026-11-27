@@ -1440,7 +1440,20 @@ describe('Input Discord keybind', () => {
 });
 
 describe('Input target buffs and debuffs keybind', () => {
-  it("dispatches onUiKey('targetAuras') for the default Shift+J chord", () => {
+  it("dispatches onUiKey('targetAuras') for the default Shift+B chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({
+      code: 'KeyB',
+      repeat: false,
+      shiftKey: true,
+    });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('targetAuras');
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('bags');
+  });
+
+  it("dispatches onUiKey('adventureJournal') for the default Shift+J chord", () => {
     const { cb, windowListeners } = makeInput();
 
     windowListeners.get('keydown')!({
@@ -1449,7 +1462,8 @@ describe('Input target buffs and debuffs keybind', () => {
       shiftKey: true,
     });
 
-    expect(cb.onUiKey).toHaveBeenCalledWith('targetAuras');
+    expect(cb.onUiKey).toHaveBeenCalledWith('adventureJournal');
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('targetAuras');
     expect(cb.onCycleFriendly).not.toHaveBeenCalled();
   });
 

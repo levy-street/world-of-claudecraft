@@ -97,7 +97,7 @@ export interface DungeonFinderWindowDeps extends PainterHostPresentation {
   // (the activity entrance). Never teleports.
   showOnMap(x: number, z: number): void;
   // The dungeon's boss guide page for one encounter, when the dungeon ships one
-  // (raid_boss_guide_window.ts openJournal). Absent: no guide buttons.
+  // (the Adventure Journal's openJournal). Absent: no guide buttons.
   hasBossGuide?(dungeonId: string, mobId: string): boolean;
   openBossGuide?(dungeonId: string, mobId: string, difficulty: DungeonDifficulty): void;
   // Open Player Info for a group applicant: the live card when they are in

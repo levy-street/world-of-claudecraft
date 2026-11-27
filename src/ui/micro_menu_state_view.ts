@@ -29,6 +29,7 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-deeds', windowId: 'deeds-window' },
   { selector: '#mm-reliquary', windowId: 'reliquary-window' },
   { selector: '#mm-loot-explorer', windowId: 'loot-explorer-window' },
+  { selector: '#mm-journal', windowId: 'adventure-journal-window' },
   { selector: '#mm-cosmetics', windowId: 'cosmetics-window' },
   { selector: '#mm-professions', windowId: 'professions-window' },
   { selector: '#mm-harvest-journal', windowId: 'harvest-journal-window' },

@@ -500,6 +500,7 @@ import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
 import { GuildHallWindow } from './hud/guild_hall';
 import { buildHillBarView, HillBar } from './hud/hill';
+import { AdventureJournalWindow } from './hud/journal';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
@@ -864,7 +865,6 @@ import {
   questItemTooltipModel,
   questItemTooltipRelatedKey,
 } from './quest_item_tooltip_view';
-import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
@@ -3701,8 +3701,8 @@ export class Hud {
       case 'dungeon-finder-window':
         this.dungeonFinderWindow.close();
         break;
-      case 'raid-boss-guide-window':
-        this.raidBossGuideWindow.close();
+      case 'adventure-journal-window':
+        this.journal.close();
         break;
       case 'card-duel-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -5613,8 +5613,7 @@ export class Hud {
     closeOthers: (selector) => this.closeOtherWindows(selector),
     hideTooltip: () => this.hideTooltip(),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
-    hasBossGuide: RaidBossGuideWindow.hasJournal,
-    openBossGuide: (d, m, diff) => this.raidBossGuideWindow.openJournal(d, m, diff),
+    openBossGuide: (d, m, diff) => this.journal.openJournal(d, m, diff),
     openFinder: () => this.toggleDungeonFinder(),
     maskPlayerText: (note) => this.maskChat(note),
     // An applicant in view gets the live card; anyone else their finder snapshot.
@@ -5625,15 +5624,15 @@ export class Hud {
   });
   private readonly dungeonFinderWindow = this.finderSurfaces.window;
 
-  private readonly raidBossGuideWindow = new RaidBossGuideWindow({
-    root: () => $('#raid-boss-guide-window'),
-    closeOthers: () => this.closeOtherWindows('#raid-boss-guide-window'),
-    contextFallback: () => raidBossGuideContextFallback(document, this.isMobileLayout()),
-    attachTooltip: (element, html) => this.attachTooltip(element, html),
+  private readonly journal = new AdventureJournalWindow({
+    ...this.presentationBag,
+    root: () => $('#adventure-journal-window'),
+    closeOthers: () => this.closeOtherWindows('#adventure-journal-window'),
     hideTooltip: () => this.hideTooltip(),
+    world: () => this.sim,
+    showUnreleased: () => this.devCommandsAvailable,
     modelTouchQueue: () => previewTouchQueueOf(this.renderer),
-    dungeonRun: () => this.sim.dungeonRun,
-    ...this.windowFocus('#raid-boss-guide-window'),
+    ...this.windowFocus('#adventure-journal-window'),
   });
 
   private readonly dungeonFinderProposalPopup = this.finderSurfaces.proposal;
@@ -6810,7 +6809,7 @@ export class Hud {
     this.partyFramesPainter.relocalize();
     this.worldMarkerHost?.controller.relocalize();
     this.readyCheckLeaderWindow.relocalize();
-    this.raidBossGuideWindow.relocalize();
+    this.journal.relocalize();
     // The world map rasterizes its labels into sprites keyed on the RESOLVED
     // string, so a switch can never draw the old language; clearing is about not
     // carrying dead rasters in the sprite budget.
@@ -8771,6 +8770,7 @@ export class Hud {
       // original writers cannot express, hence the toggleClass / setStyleProp).
       this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));
       this.toggleClass(this.targetFrameEl, 'boss', targetRank === 'boss');
+      this.toggleClass(this.targetFrameEl, 'has-journal', this.journal.covers(target.templateId));
       this.setText(
         this.targetEliteTagEl,
         targetRank === 'boss' ? t('hud.core.boss') : t('hud.core.elite'),
@@ -15498,6 +15498,7 @@ export class Hud {
     this.lootExplorerWindow.toggle();
   }
 
+  readonly toggleAdventureJournal = (): void => this.journal.toggle();
   toggleCosmetics(): void {
     this.cosmeticsWindow.toggle();
   }
@@ -15829,7 +15830,7 @@ export class Hud {
     this.charPreview = null;
     this.charPreviewCanvas = null;
     this.dailyRewardsWindow.resetArmoryPreviewForGraphicsRebuild();
-    this.raidBossGuideWindow.resetGraphicsPreviewContext();
+    this.journal.resetGraphicsPreviewContext();
   }
 
   /** Restore preview surfaces that were visible across the renderer swap. */
@@ -15837,7 +15838,7 @@ export class Hud {
     if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
     this.restoreCharPreviewAfterGraphicsRebuild = false;
     this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
-    this.raidBossGuideWindow.restoreGraphicsPreviewContext();
+    this.journal.restoreGraphicsPreviewContext();
     // Fresh contexts start cold; re-run the paced schedule so the portrait
     // caches stay covered after a rebuild exactly like they are after boot.
     // (The armory is not in that schedule: it warms per inspected card.)
@@ -16696,8 +16697,7 @@ export class Hud {
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
     const info = this.sim.partyInfo;
-    const dungeonId = info ? (dungeonAt(this.sim.player.pos.x)?.id ?? null) : null;
-    this.partyFramesPainter.setGuideControl(this.raidBossGuideWindow.syncAvailability(dungeonId));
+    this.journal.syncRun();
     this.partyFramesPainter.setWorldMarkerControl(this.worldMarkers.controller.sync());
     // Re-seat below the target only when its measured stack overlaps this column.
     const targetShown = !!target && target.kind !== 'object';
