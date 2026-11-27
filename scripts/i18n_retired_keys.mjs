@@ -227,6 +227,7 @@ export const RETIRED_KEYS = [
   'guide.abilityHook.earth_shock',
   'guide.abilityHook.flame_shock',
   'guide.abilityHook.hammer_of_wrath',
+  'guide.abilityHook.hard_bargain', // new with the shared pacts; outside the Warlock six
   'guide.abilityHook.healing_wave',
   'guide.abilityHook.life_tap',
   'guide.abilityHook.lifespring_weapon',

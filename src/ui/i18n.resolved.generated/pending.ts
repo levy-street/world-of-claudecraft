@@ -10,69 +10,54 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "es_ES": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "fr_FR": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "fr_CA": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "de_DE": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "nl_NL": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "pl_PL": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "id_ID": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "tr_TR": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "sv_SE": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "vi_VN": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ],
   "da_DK": [
-    "entities.abilities.hard_bargain.description",
-    "guide.abilityHook.hard_bargain"
+    "entities.abilities.hard_bargain.description"
   ]
 };
