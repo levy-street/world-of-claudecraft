@@ -13356,6 +13356,91 @@
     color: var(--color-aj-text);
     font-weight: 600;
   }
+  /* The personal progress strip under the chips: this character's kills per
+     difficulty (the one being read underlined in amber, Mythic as coming
+     soon) and, when saved, the instance's lockout line. Every count sits in
+     a well-backed cell, so it reads the same over a banner picture. */
+  #adventure-journal-window .aj-progress {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    max-width: 62ch;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-aj-line);
+  }
+  #adventure-journal-window .aj-progress-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-aj-soft);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-progress-label .ui-icon {
+    width: 13px;
+    height: 13px;
+    color: var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-kills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  #adventure-journal-window .aj-kill {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 3px 11px 4px;
+    border: 1px solid var(--color-aj-chip-border);
+    border-radius: 8px;
+    background: var(--color-aj-well);
+    color: var(--color-aj-soft);
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-kill-count {
+    color: var(--color-aj-bright);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  #adventure-journal-window .aj-kill.none .aj-kill-count {
+    color: var(--color-aj-mute);
+  }
+  #adventure-journal-window .aj-kill.selected {
+    border-color: var(--color-aj-accent-line);
+    box-shadow: inset 0 -2px 0 var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-kill-soon {
+    color: var(--color-aj-mute);
+  }
+  #adventure-journal-window .aj-kill-note {
+    font-size: 13px;
+  }
+  #adventure-journal-window .aj-lockout {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin: 0;
+    color: var(--color-aj-done);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-lockout .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #adventure-journal-window .aj-lockout-reset {
+    color: var(--color-aj-soft);
+    font-weight: 500;
+  }
   #adventure-journal-window .aj-diffbox {
     align-self: start;
     display: flex;

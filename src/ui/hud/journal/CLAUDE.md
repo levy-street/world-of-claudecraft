@@ -30,6 +30,8 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 | `journal_loot_view.ts` | Pure core: a page's drops per difficulty, read off the Loot Explorer's index (the roller's own gate). Never a second loot table. |
 | `journal_backdrop_view.ts` | Pure core: which room picture a page's banner shows (per instance, or per boss), else null for the plain banner. The files are committed WebP under `public/ui/journal/`, pinned both ways by `tests/adventure_journal_backdrops.test.ts`. |
 | `journal_hit_icons.ts` | Pure: the death recap's icon lookup, one index over every catalog page (both tiers) of (dealer's mob template, damage label) to the mechanic's `iconId`, from the pages' `hits` and `hitSources`. A label matches only on the page whose body dealt it. |
+| `journal_progress_view.ts` | Pure core: the personal layer of a page. Kills per difficulty from `IWorld.bossKills` (a council reads the member the sim keys it under), and the lockout from `IWorld.raidLockouts` with the sim's own ids: each instance's rooms are its Finder activity's, each room's lock belongs to the page holding that room's final boss, the boundary is the room's (weekly or the realm day). An instance whose rooms the sim never locks (the Smith's Heart today) shows kills only. |
+| `journal_progress_html.ts` | Markup strings only: the "Your kills" strip under the banner chips, the lockout line ("Saved on Heroic: 1 of 2 bosses", resets in, and when) and the kicker's "Defeated this week" chip. |
 | `journal_page_html.ts` | Markup strings only (no DOM): head, nav, the phone's breadcrumb and strip, banner, tab bar, Overview, Abilities, Loot, Coming soon. |
 | `adventure_journal_window.ts` | The cold window (`UI_DOM_MODULES`): state, events, focus, tooltips, the 3D model slot. |
 | `journal_launchers.ts` | Binds the side rail button, the phone More-tray button and the target frame's book. |
@@ -42,6 +44,11 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 - `syncRun()` runs from the party-frames tick and must stay a no-op on an unchanged room
   and run: both run views are reference-stable (pinned by `tests/adventure_journal_window.test.ts`).
 - Numbers come from the sources, which resolve them from live tuning. Never type a number here.
+- The kill counts and lockouts are the character's, read through `IWorld` only; the sim
+  raises a count at the real kill (`src/sim/boss_kill_tally.ts`) and stamps the lockouts.
+  `syncRun()` also repaints when the reference-stable `bossKills` record moves. A saved
+  page reads Defeated in the list on the difficulty being read; never invent a lockout
+  for an instance the sim does not lock.
 - The 3D model lives on the Overview tab (the encounter card); the banner portrait's eye
   button opens it. Abilities and Loot hold no WebGL context.
 - The Raids list reads in catalog order (`RAID_INSTANCES`): Nythraxis, the Crucible, the

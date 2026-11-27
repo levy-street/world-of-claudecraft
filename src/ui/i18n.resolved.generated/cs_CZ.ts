@@ -4522,7 +4522,15 @@ export const cs_CZ: EnTranslations = {
       "factDamageNature": "{min} to {max} Nature damage",
       "factDamagePhysical": "{min} to {max} Physical damage",
       "factDamageShadow": "{min} to {max} Shadow damage",
-      "factEvery": "Every {seconds} sec"
+      "factEvery": "Every {seconds} sec",
+      "progressLabel": "Your progress on this boss",
+      "killsLabel": "Your kills",
+      "killsCell": "{difficulty} kills: {count}",
+      "savedBosses": "Saved on {difficulty}: {saved} of {total} bosses",
+      "savedInstance": "Saved on {difficulty}",
+      "resetsIn": "Resets in {time}, {when}",
+      "defeatedThisWeek": "Defeated this week",
+      "defeatedToday": "Defeated today"
     },
     "raidBossGuide": {
       "title": "Průvodce bossem",

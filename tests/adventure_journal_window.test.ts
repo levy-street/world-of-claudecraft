@@ -26,7 +26,7 @@ import { journalInstance } from '../src/ui/hud/journal/journal_catalog';
 import { pageValues } from '../src/ui/hud/journal/journal_page_html';
 import { setLanguage, t } from '../src/ui/i18n';
 import { RaidBossGuideModelController } from '../src/ui/raid_boss_guide_model_controller';
-import type { DungeonRunView, RaidRunView } from '../src/world_api/dungeons';
+import type { DungeonRunView, RaidLockout, RaidRunView } from '../src/world_api/dungeons';
 
 vi.mock('../src/ui/icons', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../src/ui/icons')>()),
@@ -38,6 +38,8 @@ const xOf = (dungeonId: string) => instanceOrigin(DUNGEONS[dungeonId].index, 0).
 interface FakeWorld extends JournalWorld {
   dungeonRun: DungeonRunView | null;
   raidRun: RaidRunView | null;
+  bossKills: Readonly<Record<string, number>>;
+  lockouts: RaidLockout[];
   player: { pos: { x: number }; targetId: number | null };
 }
 
@@ -77,6 +79,11 @@ describe('AdventureJournalWindow', () => {
     world = {
       dungeonRun: null,
       raidRun: null,
+      bossKills: {},
+      lockouts: [],
+      raidLockouts() {
+        return this.lockouts;
+      },
       player: { pos: { x: 0 }, targetId: null },
       entities: {
         get: (id: number) =>
@@ -513,6 +520,46 @@ describe('AdventureJournalWindow', () => {
     world.raidRun = raidRun(HEAT_GUARDIAN);
     journal.syncRun();
     expect(root.innerHTML).toBe(closed);
+  });
+
+  it('shows the character kills per difficulty and repaints when a count moves', () => {
+    world.bossKills = { [HEAT_GUARDIAN]: 7 };
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+    const cells = () =>
+      [...root.querySelectorAll<HTMLElement>('.aj-banner .aj-kill')].map((cell) =>
+        cell.textContent?.trim(),
+      );
+    expect(root.querySelector('.aj-progress-label')?.textContent).toBe('Your kills');
+    expect(cells()).toEqual(['Normal7', 'Heroic0', 'MythicComing soon']);
+    expect(root.querySelector('.aj-kill.selected')?.getAttribute('aria-label')).toBe(
+      'Normal kills: 7',
+    );
+    // The Smith's Heart has no lockout: no saved line, no saved chip.
+    expect(root.querySelector('.aj-lockout')).toBeNull();
+    expect(root.querySelector('.aj-chip-saved')).toBeNull();
+    const page = root.querySelector('.aj-page');
+    journal.syncRun();
+    expect(root.querySelector('.aj-page')).toBe(page);
+    world.bossKills = { [HEAT_GUARDIAN]: 7, [`${HEAT_GUARDIAN}:heroic`]: 1 };
+    journal.syncRun();
+    expect(root.querySelector('.aj-page')).not.toBe(page);
+    expect(cells()).toEqual(['Normal7', 'Heroic1', 'MythicComing soon']);
+  });
+
+  it('shows a saved raid room as Defeated this week, with the instance lockout line', () => {
+    world.lockouts = [{ id: 'ignivar_raid_arena:heroic', msRemaining: 2 * 86_400_000 + 3_600_000 }];
+    journal.openJournal('ignivar_raid_arena', 'ignivar_herald_of_the_last_flame', 'heroic');
+    expect(root.querySelector('.aj-kicker .aj-chip-saved')?.textContent).toBe('Defeated this week');
+    expect(root.querySelector('.aj-lockout-saved')?.textContent).toBe(
+      'Saved on Heroic: 1 of 2 bosses',
+    );
+    expect(root.querySelector('.aj-lockout-reset')?.textContent).toMatch(/^Resets in 2d 1h, /);
+    expect(root.querySelector('.aj-boss.active')?.classList.contains('defeated')).toBe(true);
+    // On Normal the same character is not saved.
+    root.querySelector<HTMLButtonElement>('[data-difficulty="normal"]')?.click();
+    expect(root.querySelector('.aj-chip-saved')).toBeNull();
+    expect(root.querySelector('.aj-lockout')).toBeNull();
+    expect(root.querySelector('.aj-boss.active')?.classList.contains('defeated')).toBe(false);
   });
 });
 

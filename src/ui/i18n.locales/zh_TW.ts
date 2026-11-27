@@ -25658,4 +25658,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureJournal.factDamagePhysical': '{min}到{max}點物理傷害',
   'hudChrome.adventureJournal.factDamageShadow': '{min}到{max}點暗影傷害',
   'hudChrome.adventureJournal.factEvery': '每{seconds}秒',
+  'hudChrome.adventureJournal.progressLabel': '你在此首領上的進度',
+  'hudChrome.adventureJournal.killsLabel': '你的擊殺',
+  'hudChrome.adventureJournal.killsCell': '{difficulty}擊殺：{count}',
+  'hudChrome.adventureJournal.savedBosses': '{difficulty}已鎖定：首領 {saved}/{total}',
+  'hudChrome.adventureJournal.savedInstance': '{difficulty}已鎖定',
+  'hudChrome.adventureJournal.resetsIn': '{time}後重置，{when}',
+  'hudChrome.adventureJournal.defeatedThisWeek': '本週已擊敗',
+  'hudChrome.adventureJournal.defeatedToday': '今日已擊敗',
 };

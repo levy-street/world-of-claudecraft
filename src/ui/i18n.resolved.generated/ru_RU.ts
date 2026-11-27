@@ -4522,7 +4522,15 @@ export const ru_RU: EnTranslations = {
       "factDamageNature": "от {min} до {max} ед. урона от сил природы",
       "factDamagePhysical": "от {min} до {max} ед. физического урона",
       "factDamageShadow": "от {min} до {max} ед. урона от темной магии",
-      "factEvery": "Каждые {seconds} сек."
+      "factEvery": "Каждые {seconds} сек.",
+      "progressLabel": "Ваш прогресс по этому боссу",
+      "killsLabel": "Ваши победы",
+      "killsCell": "{difficulty}, побед: {count}",
+      "savedBosses": "Сохранение ({difficulty}): боссов {saved} из {total}",
+      "savedInstance": "Сохранение ({difficulty})",
+      "resetsIn": "Сброс через {time}, {when}",
+      "defeatedThisWeek": "Побеждён на этой неделе",
+      "defeatedToday": "Побеждён сегодня"
     },
     "raidBossGuide": {
       "title": "Тактика на босса",

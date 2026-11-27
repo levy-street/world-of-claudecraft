@@ -4522,7 +4522,15 @@ export const en_XA: EnTranslations = {
       "factDamageNature": "[{min} ţó {max} Ñáţúŕé ðáɱáĝé]",
       "factDamagePhysical": "[{min} ţó {max} Þĥýšíçáļ ðáɱáĝé]",
       "factDamageShadow": "[{min} ţó {max} Šĥáðóŵ ðáɱáĝé]",
-      "factEvery": "[Éʋéŕý {seconds} šéç]"
+      "factEvery": "[Éʋéŕý {seconds} šéç]",
+      "progressLabel": "[Ýóúŕ þŕóĝŕéšš óñ ţĥíš ƀóšš]",
+      "killsLabel": "[Ýóúŕ ķíļļš]",
+      "killsCell": "[{difficulty} ķíļļš: {count}]",
+      "savedBosses": "[Šáʋéð óñ {difficulty}: {saved} óƒ {total} ƀóššéš]",
+      "savedInstance": "[Šáʋéð óñ {difficulty}]",
+      "resetsIn": "[Ŕéšéţš íñ {time}, {when}]",
+      "defeatedThisWeek": "[Ðéƒéáţéð ţĥíš ŵééķ]",
+      "defeatedToday": "[Ðéƒéáţéð ţóðáý]"
     },
     "raidBossGuide": {
       "title": "[Ɓóšš Ĝúíðé]",

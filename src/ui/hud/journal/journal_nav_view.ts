@@ -155,13 +155,16 @@ export interface JournalSelection {
 }
 
 /** The navigation list: Dungeons then Raids (a group with nothing to show is
- *  left out), each instance with its boss rows in route order. */
+ *  left out), each instance with its boss rows in route order. A page the
+ *  character is saved on (`savedPages`: instance id to its saved page keys on
+ *  the difficulty being read, journal_progress_view.ts) reads Defeated too. */
 export function buildJournalNav(
   instances: readonly JournalInstance[],
   selection: JournalSelection | null,
   expanded: ReadonlySet<string>,
   progress: JournalProgress | null,
   currentInstanceId: string | null,
+  savedPages: ReadonlyMap<string, ReadonlySet<string>> = new Map(),
 ): JournalNavGroup[] {
   const groups: JournalNavGroup[] = [];
   for (const kind of ['dungeon', 'raid'] as const) {
@@ -179,6 +182,7 @@ export function buildJournalNav(
         const bosses = instance.source.bossKeys.map((key, index): JournalNavBoss => {
           const view = instance.source.view(key, 'normal');
           const state = states[index];
+          const defeated = state.defeated || (savedPages.get(instance.id)?.has(key) ?? false);
           return {
             key,
             mobId: view.mobId,
@@ -187,9 +191,9 @@ export function buildJournalNav(
             portraitUrl: view.portraitUrl,
             rank: view.rank ?? 'boss',
             selected: selection?.instanceId === instance.id && selection.bossKey === key,
-            defeated: state.defeated,
+            defeated,
             engaged: state.engaged,
-            next: key === nextKey && !state.defeated,
+            next: key === nextKey && !defeated,
           };
         });
         return {

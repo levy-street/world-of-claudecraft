@@ -393,6 +393,11 @@ export interface JournalBannerInput {
   /** The darkened picture of the boss's room behind the banner, or null for
    *  the plain banner (journal_backdrop_view.ts). Cosmetic only. */
   backdropUrl?: string | null;
+  /** The personal progress strip under the chips (journal_progress_html.ts). */
+  progressHtml?: string;
+  /** The kicker's chip for a page the character is saved on, shown when the
+   *  run the player stands in says nothing about this page. */
+  savedChipHtml?: string;
 }
 
 /** A council member's portrait: the page's own art for its lead body, else
@@ -420,7 +425,7 @@ export function bannerHtml(input: JournalBannerInput): string {
     ? `<span class="aj-chip-status aj-chip-engaged">${svgIcon('attack')}${esc(t('hudChrome.adventureJournal.inCombat'))}</span>`
     : state.defeated
       ? `<span class="aj-chip-status aj-chip-defeated">${svgIcon('check')}${esc(t('hudChrome.raidBossGuide.defeated'))}</span>`
-      : '';
+      : (input.savedChipHtml ?? '');
   const bossName = pageName(members, view.nameKey);
   const portrait =
     members.length > 1
@@ -454,7 +459,7 @@ export function bannerHtml(input: JournalBannerInput): string {
     : '';
   return `<header class="aj-banner${art ? ' has-art' : ''}">${art}<div class="aj-portrait-wrap${members.length > 1 ? ' aj-portrait-wrap-council' : ''}">${portrait}${modelButton}</div><div class="aj-banner-text"><div class="aj-kicker"><span>${esc(
     kicker,
-  )}</span>${status}</div><h2 class="aj-boss-title" id="aj-boss-name">${esc(bossName)}</h2>${tagline}${chips}</div>${difficultyHtml(
+  )}</span>${status}</div><h2 class="aj-boss-title" id="aj-boss-name">${esc(bossName)}</h2>${tagline}${chips}${input.progressHtml ?? ''}</div>${difficultyHtml(
     instance,
     input.tier,
   )}</header>`;

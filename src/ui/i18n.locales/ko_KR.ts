@@ -27033,4 +27033,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureJournal.factDamagePhysical': '{min}~{max}의 물리 피해',
   'hudChrome.adventureJournal.factDamageShadow': '{min}~{max}의 암흑 피해',
   'hudChrome.adventureJournal.factEvery': '{seconds}초마다',
+  'hudChrome.adventureJournal.progressLabel': '이 우두머리에 대한 내 진행도',
+  'hudChrome.adventureJournal.killsLabel': '내 처치 횟수',
+  'hudChrome.adventureJournal.killsCell': '{difficulty} 처치: {count}',
+  'hudChrome.adventureJournal.savedBosses': '{difficulty} 귀속: 우두머리 {saved}/{total}',
+  'hudChrome.adventureJournal.savedInstance': '{difficulty} 귀속',
+  'hudChrome.adventureJournal.resetsIn': '{time} 후 초기화, {when}',
+  'hudChrome.adventureJournal.defeatedThisWeek': '이번 주 처치함',
+  'hudChrome.adventureJournal.defeatedToday': '오늘 처치함',
 };

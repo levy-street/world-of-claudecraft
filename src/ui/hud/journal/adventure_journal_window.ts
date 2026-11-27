@@ -16,7 +16,7 @@ import { audio } from '../../../game/audio';
 import type { LinkedProgramTouchQueue } from '../../../render/linked_program_touch_lane';
 import { dungeonAt, ITEMS } from '../../../sim/data';
 import type { DungeonDifficulty, ItemDef } from '../../../sim/types';
-import type { DungeonRunView, RaidRunView } from '../../../world_api/dungeons';
+import type { DungeonRunView, RaidLockout, RaidRunView } from '../../../world_api/dungeons';
 import { journalModelFor } from '../../boss_journal/journal_model_spec';
 import type { JournalBossView } from '../../boss_journal/journal_view';
 import { markDialogRoot } from '../../dialog_root';
@@ -68,6 +68,8 @@ import {
   SECTION_TAB_CLASS,
   tabBarHtml,
 } from './journal_page_html';
+import { progressHtml, savedChipHtml } from './journal_progress_html';
+import { journalPageProgress, journalSavedPages } from './journal_progress_view';
 
 export interface AdventureJournalDeps
   extends Pick<PainterHostPresentation, 'itemIcon' | 'itemTooltip' | 'attachTooltip'> {
@@ -97,6 +99,10 @@ export interface JournalSounds {
 export interface JournalWorld extends JournalLauncherWorld {
   readonly dungeonRun: DungeonRunView | null;
   readonly raidRun: RaidRunView | null;
+  /** The character's lifetime boss kills (IWorld.bossKills), reference-stable. */
+  readonly bossKills: Readonly<Record<string, number>>;
+  /** The still-running lockouts (IWorld.raidLockouts), read once per render. */
+  raidLockouts(): RaidLockout[];
   readonly player: JournalLauncherWorld['player'] & { readonly pos: { readonly x: number } };
 }
 
@@ -119,6 +125,7 @@ export class AdventureJournalWindow {
   private seenRoom: string | null | undefined = undefined;
   private seenDungeonRun: DungeonRunView | null = null;
   private seenRaidRun: RaidRunView | null = null;
+  private seenBossKills: Readonly<Record<string, number>> | null = null;
   /** Banner pictures held decoded once seen, so the innerHTML repaint of a
    *  tab, a tier or a pull finds them in memory and never blanks a frame. */
   private readonly heldBackdrops = new Map<string, HTMLImageElement>();
@@ -286,7 +293,8 @@ export class AdventureJournalWindow {
     if (
       room === this.seenRoom &&
       world.dungeonRun === this.seenDungeonRun &&
-      world.raidRun === this.seenRaidRun
+      world.raidRun === this.seenRaidRun &&
+      world.bossKills === this.seenBossKills
     ) {
       return;
     }
@@ -323,9 +331,33 @@ export class AdventureJournalWindow {
     this.seenRoom = this.room();
     this.seenDungeonRun = world.dungeonRun;
     this.seenRaidRun = world.raidRun;
+    this.seenBossKills = world.bossKills;
     const progress = this.progress();
     const currentId = journalInstanceForRoom(this.seenRoom)?.id ?? null;
-    const groups = buildJournalNav(this.visible(), selection, this.expanded, progress, currentId);
+    // The personal layer: kills per difficulty and the lockouts, on the tier
+    // being read (journal_progress_view.ts). The lockout clock is the same
+    // epoch the IWorld countdown subtracts from.
+    const lockouts = world.raidLockouts();
+    const visible = this.visible();
+    const savedPages = new Map(
+      visible.map((entry) => [entry.id, journalSavedPages(entry, this.tier, lockouts)]),
+    );
+    const groups = buildJournalNav(
+      visible,
+      selection,
+      this.expanded,
+      progress,
+      currentId,
+      savedPages,
+    );
+    const personal = journalPageProgress(
+      instance,
+      selection.bossKey,
+      this.tier,
+      world.bossKills,
+      lockouts,
+      Date.now(),
+    );
 
     const difficulty = journalTierDifficulty(this.tier);
     // Mythic has no numbers yet: the header still reads the Heroic page.
@@ -370,6 +402,8 @@ export class AdventureJournalWindow {
         tier: this.tier,
         modelButton: view !== null,
         backdropUrl: this.holdBackdrop(journalBackdropUrl(instance.id, selection.bossKey)),
+        progressHtml: progressHtml(personal),
+        savedChipHtml: savedChipHtml(personal.pageSaved),
       })}${tabBarHtml(this.tab, view ? JOURNAL_TABS : null, step(-1), step(1))}${panel}</section></div>`;
 
     const freshPage = root.querySelector<HTMLElement>('.aj-page');

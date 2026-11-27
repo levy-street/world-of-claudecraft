@@ -4522,7 +4522,15 @@ export const zh_TW: EnTranslations = {
       "factDamageNature": "{min}到{max}點自然傷害",
       "factDamagePhysical": "{min}到{max}點物理傷害",
       "factDamageShadow": "{min}到{max}點暗影傷害",
-      "factEvery": "每{seconds}秒"
+      "factEvery": "每{seconds}秒",
+      "progressLabel": "你在此首領上的進度",
+      "killsLabel": "你的擊殺",
+      "killsCell": "{difficulty}擊殺：{count}",
+      "savedBosses": "{difficulty}已鎖定：首領 {saved}/{total}",
+      "savedInstance": "{difficulty}已鎖定",
+      "resetsIn": "{time}後重置，{when}",
+      "defeatedThisWeek": "本週已擊敗",
+      "defeatedToday": "今日已擊敗"
     },
     "raidBossGuide": {
       "title": "首領指南",

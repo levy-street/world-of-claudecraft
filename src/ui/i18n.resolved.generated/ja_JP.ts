@@ -4522,7 +4522,15 @@ export const ja_JP: EnTranslations = {
       "factDamageNature": "{min}〜{max}の自然ダメージ",
       "factDamagePhysical": "{min}〜{max}の物理ダメージ",
       "factDamageShadow": "{min}〜{max}の闇ダメージ",
-      "factEvery": "{seconds}秒ごと"
+      "factEvery": "{seconds}秒ごと",
+      "progressLabel": "このボスでのあなたの進捗",
+      "killsLabel": "あなたの撃破数",
+      "killsCell": "{difficulty}の撃破数: {count}",
+      "savedBosses": "{difficulty}でロック中: ボス {saved}/{total}",
+      "savedInstance": "{difficulty}でロック中",
+      "resetsIn": "リセットまで {time}（{when}）",
+      "defeatedThisWeek": "今週撃破済み",
+      "defeatedToday": "本日撃破済み"
     },
     "raidBossGuide": {
       "title": "ボス攻略",

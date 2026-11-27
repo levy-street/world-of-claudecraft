@@ -27019,4 +27019,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureJournal.factDamagePhysical': '{min}〜{max}の物理ダメージ',
   'hudChrome.adventureJournal.factDamageShadow': '{min}〜{max}の闇ダメージ',
   'hudChrome.adventureJournal.factEvery': '{seconds}秒ごと',
+  'hudChrome.adventureJournal.progressLabel': 'このボスでのあなたの進捗',
+  'hudChrome.adventureJournal.killsLabel': 'あなたの撃破数',
+  'hudChrome.adventureJournal.killsCell': '{difficulty}の撃破数: {count}',
+  'hudChrome.adventureJournal.savedBosses': '{difficulty}でロック中: ボス {saved}/{total}',
+  'hudChrome.adventureJournal.savedInstance': '{difficulty}でロック中',
+  'hudChrome.adventureJournal.resetsIn': 'リセットまで {time}（{when}）',
+  'hudChrome.adventureJournal.defeatedThisWeek': '今週撃破済み',
+  'hudChrome.adventureJournal.defeatedToday': '本日撃破済み',
 };

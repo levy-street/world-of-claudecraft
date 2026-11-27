@@ -4522,7 +4522,15 @@ export const ko_KR: EnTranslations = {
       "factDamageNature": "{min}~{max}의 자연 피해",
       "factDamagePhysical": "{min}~{max}의 물리 피해",
       "factDamageShadow": "{min}~{max}의 암흑 피해",
-      "factEvery": "{seconds}초마다"
+      "factEvery": "{seconds}초마다",
+      "progressLabel": "이 우두머리에 대한 내 진행도",
+      "killsLabel": "내 처치 횟수",
+      "killsCell": "{difficulty} 처치: {count}",
+      "savedBosses": "{difficulty} 귀속: 우두머리 {saved}/{total}",
+      "savedInstance": "{difficulty} 귀속",
+      "resetsIn": "{time} 후 초기화, {when}",
+      "defeatedThisWeek": "이번 주 처치함",
+      "defeatedToday": "오늘 처치함"
     },
     "raidBossGuide": {
       "title": "우두머리 공략",

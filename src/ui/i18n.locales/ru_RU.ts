@@ -27219,4 +27219,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureJournal.factDamagePhysical': 'от {min} до {max} ед. физического урона',
   'hudChrome.adventureJournal.factDamageShadow': 'от {min} до {max} ед. урона от темной магии',
   'hudChrome.adventureJournal.factEvery': 'Каждые {seconds} сек.',
+  'hudChrome.adventureJournal.progressLabel': 'Ваш прогресс по этому боссу',
+  'hudChrome.adventureJournal.killsLabel': 'Ваши победы',
+  'hudChrome.adventureJournal.killsCell': '{difficulty}, побед: {count}',
+  'hudChrome.adventureJournal.savedBosses': 'Сохранение ({difficulty}): боссов {saved} из {total}',
+  'hudChrome.adventureJournal.savedInstance': 'Сохранение ({difficulty})',
+  'hudChrome.adventureJournal.resetsIn': 'Сброс через {time}, {when}',
+  'hudChrome.adventureJournal.defeatedThisWeek': 'Побеждён на этой неделе',
+  'hudChrome.adventureJournal.defeatedToday': 'Побеждён сегодня',
 };

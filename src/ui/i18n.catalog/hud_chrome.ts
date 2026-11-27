@@ -5528,6 +5528,20 @@ export const hudChromeStrings = {
     factDamagePhysical: '{min} to {max} Physical damage',
     factDamageShadow: '{min} to {max} Shadow damage',
     factEvery: 'Every {seconds} sec',
+    // The personal progress strip on a boss page ({difficulty} = Normal or
+    // Heroic, {count} = a formatted number of kills).
+    progressLabel: 'Your progress on this boss',
+    killsLabel: 'Your kills',
+    killsCell: '{difficulty} kills: {count}',
+    // The lockout line when the character is saved on the difficulty read.
+    savedBosses: 'Saved on {difficulty}: {saved} of {total} bosses',
+    savedInstance: 'Saved on {difficulty}',
+    // {time} = the lockout countdown (2d 4h), {when} = the reset's weekday and time.
+    resetsIn: 'Resets in {time}, {when}',
+    // The banner chip of a boss the character is saved on (weekly raid rooms,
+    // and the realm-day lockouts of the rest).
+    defeatedThisWeek: 'Defeated this week',
+    defeatedToday: 'Defeated today',
   },
   raidBossGuide: {
     title: 'Boss Guide',
