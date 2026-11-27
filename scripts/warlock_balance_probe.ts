@@ -220,7 +220,8 @@ function tryAffliction(sim: Sim, target: Entity): boolean {
   if (!possessed && cooldownReady(player, 'possess_evil_eye')) {
     return cast(sim, 'possess_evil_eye', target);
   }
-  if (cooldownReady(player, 'cruel_pact')) return cast(sim, 'cruel_pact', target);
+  // Cruel Pact has no cooldown now: tap only when mana is short.
+  if (player.resource < player.maxResource * 0.3 && cast(sim, 'life_tap', target)) return true;
   const doom = player.auras.find((aura) => aura.kind === 'affliction_doom')?.stacks ?? 0;
   const nextNeedle = possessed ? 9 : 7;
   if (doom + nextNeedle > 100) return cast(sim, 'sentence', target);
