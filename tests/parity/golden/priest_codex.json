@@ -9,8 +9,8 @@
     "class:priest Vespers Effigy, deterministic echo, Gloomtithe, and Tithefiend",
     "Priest respec cleanup removes links, bank, and guardian"
   ],
-  "draws": 3401,
-  "drawDigest": "75c27cb1",
+  "draws": 3435,
+  "drawDigest": "f326ff95",
   "frames": [
     {
       "tick": 0,
@@ -1178,8 +1178,8 @@
       "tick": 140,
       "time": 7,
       "nextId": 1020,
-      "state": "f2d3dd99",
-      "events": "0ccfbef3",
+      "state": "0223afbb",
+      "events": "16adfb09",
       "rng": {
         "draws": 944,
         "digest": "6eb7b332"
@@ -1189,99 +1189,99 @@
       "tick": 160,
       "time": 8,
       "nextId": 1020,
-      "state": "c0d93dcc",
-      "events": "5e56f4b3",
+      "state": "81a268c1",
+      "events": "f42922b9",
       "rng": {
-        "draws": 1167,
-        "digest": "88825937"
+        "draws": 1170,
+        "digest": "4e488d74"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1020,
-      "state": "2d7d103d",
+      "state": "20f41d44",
       "events": "741638a5",
       "rng": {
-        "draws": 1413,
-        "digest": "77cb1437"
+        "draws": 1419,
+        "digest": "179c2efc"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 1020,
-      "state": "c46217de",
-      "events": "8d14eb2c",
+      "state": "82e954eb",
+      "events": "24076efe",
       "rng": {
-        "draws": 1711,
-        "digest": "cb867e7a"
+        "draws": 1724,
+        "digest": "dcc77baf"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 1020,
-      "state": "c1a31215",
-      "events": "b1702cae",
+      "state": "b5687412",
+      "events": "2ff97f52",
       "rng": {
-        "draws": 1870,
-        "digest": "894237fd"
+        "draws": 1878,
+        "digest": "40552366"
       }
     },
     {
       "tick": 240,
       "time": 12,
       "nextId": 1020,
-      "state": "7ab74f8e",
+      "state": "44b4dad5",
       "events": "741638a5",
       "rng": {
-        "draws": 2022,
-        "digest": "fdf50fcf"
+        "draws": 2037,
+        "digest": "dc8e9b0c"
       }
     },
     {
       "tick": 260,
       "time": 13,
       "nextId": 1020,
-      "state": "79e2c054",
-      "events": "db1a3e79",
+      "state": "0f6d2044",
+      "events": "eb8dfaa1",
       "rng": {
-        "draws": 2197,
-        "digest": "395c508b"
+        "draws": 2179,
+        "digest": "b3783eec"
       }
     },
     {
       "tick": 280,
       "time": 14,
       "nextId": 1020,
-      "state": "42cd8db7",
-      "events": "e0659506",
+      "state": "99144b8b",
+      "events": "70e7d5ae",
       "rng": {
-        "draws": 2358,
-        "digest": "e3bb0e81"
+        "draws": 2335,
+        "digest": "651e7d74"
       }
     },
     {
       "tick": 300,
       "time": 15,
       "nextId": 1020,
-      "state": "8db022f1",
+      "state": "49673995",
       "events": "741638a5",
       "rng": {
-        "draws": 2515,
-        "digest": "dce474dd"
+        "draws": 2531,
+        "digest": "fc7c51b5"
       }
     },
     {
       "tick": 301,
       "time": 15.05,
       "nextId": 1020,
-      "state": "1a260d88",
-      "events": "741638a5",
+      "state": "29710adb",
+      "events": "841884e1",
       "rng": {
-        "draws": 2518,
-        "digest": "3792eace"
+        "draws": 2538,
+        "digest": "08e4c72d"
       },
       "label": "effigy-banked",
       "players": [
@@ -1799,13 +1799,13 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 465
+            "damageDealt": 560
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 465
+              "dummyDamage": 560
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1901,7 +1901,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castTotal": 2.5,
-          "combatTimer": 1.15,
+          "combatTimer": 1.5,
           "comboUntil": -1,
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
@@ -2178,7 +2178,7 @@
               "remaining": 1,
               "school": "shadow",
               "sourceId": 1015,
-              "stacks": 1,
+              "stacks": 2,
               "undispellable": true
             },
             {
@@ -2189,11 +2189,10 @@
               "remaining": 15,
               "school": "shadow",
               "sourceId": 1015,
-              "stacks": 1
+              "stacks": 2
             }
           ],
           "castTotal": 1.5,
-          "combatTimer": 1.2,
           "comboUntil": -1,
           "cooldowns": [
             [
@@ -2254,28 +2253,28 @@
           "auras": [
             {
               "duration": 18,
+              "gloomtitheTick": 301,
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 9.3,
+              "remaining": 9,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 0.3,
+              "tickTimer": 3,
               "value": 38
             },
             {
-              "duration": 10.5,
+              "duration": 10.2,
               "id": "priest_effigy",
               "kind": "hex",
               "name": "Effigy",
-              "remaining": 9.3,
+              "remaining": 9,
               "school": "shadow",
               "sourceId": 1015,
               "value": 0.3
             }
           ],
-          "combatTimer": 1.2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2283,7 +2282,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49593,
+          "hp": 49555,
           "id": 1016,
           "inCombat": true,
           "kind": "mob",
@@ -2323,7 +2322,7 @@
             ],
             [
               1015,
-              255
+              293
             ]
           ],
           "weapon": {
@@ -2338,11 +2337,11 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 10.8,
+              "remaining": 10.5,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 1.8,
+              "tickTimer": 1.5,
               "value": 38
             }
           ],
@@ -2354,7 +2353,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49841,
+          "hp": 49822,
           "id": 1017,
           "inCombat": true,
           "kind": "mob",
@@ -2390,7 +2389,7 @@
             ],
             [
               1015,
-              124
+              143
             ]
           ],
           "weapon": {
@@ -2405,15 +2404,14 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 12.45,
+              "remaining": 12,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 0.45,
+              "tickTimer": 3,
               "value": 38
             }
           ],
-          "combatTimer": 1.2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2421,7 +2419,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49914,
+          "hp": 49876,
           "id": 1018,
           "inCombat": true,
           "kind": "mob",
@@ -2453,7 +2451,7 @@
           "threat": [
             [
               1015,
-              86
+              124
             ]
           ],
           "weapon": {
@@ -2468,15 +2466,15 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 13.85,
+              "remaining": 13.5,
               "school": "shadow",
               "sourceId": 1011,
               "tickInterval": 3,
-              "tickTimer": 1.85,
+              "tickTimer": 1.5,
               "value": 26
             }
           ],
-          "combatTimer": 1.15,
+          "combatTimer": 1.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2529,30 +2527,30 @@
       "tick": 320,
       "time": 16,
       "nextId": 1021,
-      "state": "dbb5e12d",
-      "events": "66c1004c",
+      "state": "5fdc57d9",
+      "events": "8f5eb734",
       "rng": {
-        "draws": 2687,
-        "digest": "8bff1d38"
+        "draws": 2688,
+        "digest": "4c723e8f"
       }
     },
     {
       "tick": 340,
       "time": 17,
       "nextId": 1021,
-      "state": "566bb0e0",
-      "events": "c3d4321c",
+      "state": "4a421837",
+      "events": "c40c765a",
       "rng": {
-        "draws": 2910,
-        "digest": "8fba7aca"
+        "draws": 2895,
+        "digest": "d03a2877"
       }
     },
     {
       "tick": 360,
       "time": 18,
       "nextId": 1021,
-      "state": "070af754",
-      "events": "00ed8b41",
+      "state": "46dcd232",
+      "events": "b20c2a0c",
       "rng": {
         "draws": 3111,
         "digest": "14a1a62e"
@@ -2562,22 +2560,22 @@
       "tick": 380,
       "time": 19,
       "nextId": 1021,
-      "state": "aac24bcd",
-      "events": "841884e1",
+      "state": "779f562e",
+      "events": "0218554f",
       "rng": {
-        "draws": 3292,
-        "digest": "6db84787"
+        "draws": 3310,
+        "digest": "dc352a66"
       }
     },
     {
       "tick": 393,
       "time": 19.65,
       "nextId": 1021,
-      "state": "6c9230cf",
-      "events": "8293afd0",
+      "state": "e8c5aec2",
+      "events": "99b665d1",
       "rng": {
-        "draws": 3401,
-        "digest": "75c27cb1"
+        "draws": 3435,
+        "digest": "f326ff95"
       },
       "label": "respec-cleanup",
       "players": [
@@ -2607,13 +2605,13 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 170
+            "damageDealt": 196
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 170,
+              "dummyDamage": 196,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -3095,13 +3093,13 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 698
+            "damageDealt": 744
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 698
+              "dummyDamage": 744
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3197,7 +3195,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castTotal": 2.5,
-          "combatTimer": 2.75,
+          "combatTimer": 0.1,
           "comboUntil": -1,
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
@@ -3525,15 +3523,15 @@
           "auras": [
             {
               "duration": 18,
-              "gloomtitheTick": 367,
+              "gloomtitheTick": 361,
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 4.7,
+              "remaining": 4.4,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 1.7,
+              "tickTimer": 1.4,
               "value": 38
             }
           ],
@@ -3545,7 +3543,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49434,
+          "hp": 49408,
           "id": 1016,
           "inCombat": true,
           "kind": "mob",
@@ -3589,7 +3587,7 @@
             ],
             [
               1020,
-              83
+              109
             ]
           ],
           "weapon": {
@@ -3604,11 +3602,11 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 6.2,
+              "remaining": 5.9,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 0.2,
+              "tickTimer": 2.9,
               "value": 38
             }
           ],
@@ -3620,7 +3618,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49772,
+          "hp": 49730,
           "id": 1017,
           "inCombat": true,
           "kind": "mob",
@@ -3656,7 +3654,7 @@
             ],
             [
               1015,
-              193
+              235
             ]
           ],
           "weapon": {
@@ -3671,11 +3669,11 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 7.85,
+              "remaining": 7.4,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 1.85,
+              "tickTimer": 1.4,
               "value": 38
             }
           ],
@@ -3687,7 +3685,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49826,
+          "hp": 49822,
           "id": 1018,
           "inCombat": true,
           "kind": "mob",
@@ -3719,7 +3717,7 @@
           "threat": [
             [
               1015,
-              174
+              178
             ]
           ],
           "weapon": {
@@ -3734,15 +3732,15 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 9.25,
+              "remaining": 8.9,
               "school": "shadow",
               "sourceId": 1011,
               "tickInterval": 3,
-              "tickTimer": 0.25,
+              "tickTimer": 2.9,
               "value": 26
             }
           ],
-          "combatTimer": 2.75,
+          "combatTimer": 0.1,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3750,7 +3748,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49948,
+          "hp": 49922,
           "id": 1019,
           "inCombat": true,
           "kind": "mob",
@@ -3782,7 +3780,7 @@
           "threat": [
             [
               1011,
-              52
+              78
             ]
           ],
           "weapon": {
@@ -3795,11 +3793,11 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 1021,
-      "state": "6c9230cf",
+      "state": "e8c5aec2",
       "events": "741638a5",
       "rng": {
-        "draws": 3401,
-        "digest": "75c27cb1"
+        "draws": 3435,
+        "digest": "f326ff95"
       },
       "label": "final",
       "players": [
@@ -3829,13 +3827,13 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 170
+            "damageDealt": 196
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 170,
+              "dummyDamage": 196,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -4317,13 +4315,13 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 698
+            "damageDealt": 744
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 698
+              "dummyDamage": 744
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -4419,7 +4417,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castTotal": 2.5,
-          "combatTimer": 2.75,
+          "combatTimer": 0.1,
           "comboUntil": -1,
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
@@ -4747,15 +4745,15 @@
           "auras": [
             {
               "duration": 18,
-              "gloomtitheTick": 367,
+              "gloomtitheTick": 361,
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 4.7,
+              "remaining": 4.4,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 1.7,
+              "tickTimer": 1.4,
               "value": 38
             }
           ],
@@ -4767,7 +4765,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49434,
+          "hp": 49408,
           "id": 1016,
           "inCombat": true,
           "kind": "mob",
@@ -4811,7 +4809,7 @@
             ],
             [
               1020,
-              83
+              109
             ]
           ],
           "weapon": {
@@ -4826,11 +4824,11 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 6.2,
+              "remaining": 5.9,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 0.2,
+              "tickTimer": 2.9,
               "value": 38
             }
           ],
@@ -4842,7 +4840,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49772,
+          "hp": 49730,
           "id": 1017,
           "inCombat": true,
           "kind": "mob",
@@ -4878,7 +4876,7 @@
             ],
             [
               1015,
-              193
+              235
             ]
           ],
           "weapon": {
@@ -4893,11 +4891,11 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 7.85,
+              "remaining": 7.4,
               "school": "shadow",
               "sourceId": 1015,
               "tickInterval": 3,
-              "tickTimer": 1.85,
+              "tickTimer": 1.4,
               "value": 38
             }
           ],
@@ -4909,7 +4907,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49826,
+          "hp": 49822,
           "id": 1018,
           "inCombat": true,
           "kind": "mob",
@@ -4941,7 +4939,7 @@
           "threat": [
             [
               1015,
-              174
+              178
             ]
           ],
           "weapon": {
@@ -4956,15 +4954,15 @@
               "id": "shadow_word_pain",
               "kind": "dot",
               "name": "Dirge of Decay",
-              "remaining": 9.25,
+              "remaining": 8.9,
               "school": "shadow",
               "sourceId": 1011,
               "tickInterval": 3,
-              "tickTimer": 0.25,
+              "tickTimer": 2.9,
               "value": 26
             }
           ],
-          "combatTimer": 2.75,
+          "combatTimer": 0.1,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4972,7 +4970,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49948,
+          "hp": 49922,
           "id": 1019,
           "inCombat": true,
           "kind": "mob",
@@ -5004,7 +5002,7 @@
           "threat": [
             [
               1011,
-              52
+              78
             ]
           ],
           "weapon": {
