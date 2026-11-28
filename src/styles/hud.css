@@ -12390,6 +12390,8 @@
   #adventure-journal-window .aj-loot-row:focus-visible,
   #tf-journal:focus-visible,
   #adventure-journal-window .aj-diff button:focus-visible,
+  #adventure-journal-window .aj-loot-scope-btn:focus-visible,
+  #adventure-journal-window .aj-search-clear:focus-visible,
   #adventure-journal-window .rbg-model-load:focus-visible,
   #adventure-journal-window .rbg-model-stage > canvas:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -12999,6 +13001,112 @@
     border-right: 1px solid var(--color-aj-line);
     background: var(--color-aj-nav);
   }
+  /* The boss search at the top of the list: the library's input with a
+     magnifier, and its results (portrait, name, instance) in place of the
+     list while a query narrows it. */
+  #adventure-journal-window .aj-search {
+    margin: 0 0 12px;
+  }
+  #adventure-journal-window .aj-search-field {
+    position: relative;
+    display: block;
+  }
+  #adventure-journal-window .aj-search-glyph {
+    position: absolute;
+    top: 50%;
+    left: 11px;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    color: var(--color-aj-mute);
+    pointer-events: none;
+  }
+  #adventure-journal-window .aj-search-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 36px 0 34px;
+    font-family: var(--font-aj);
+    font-size: 14.5px;
+  }
+  /* The field's own clear button stands in for the browser's (off palette),
+     shown only while there is something to clear. */
+  #adventure-journal-window .aj-search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  #adventure-journal-window .aj-search-clear {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-aj-mute);
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-search-clear:hover {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-search-clear .aj-glyph {
+    width: 14px;
+    height: 14px;
+  }
+  #adventure-journal-window .aj-search-input:placeholder-shown + .aj-search-clear {
+    display: none;
+  }
+  #adventure-journal-window .aj-nav.aj-searching .aj-group {
+    display: none;
+  }
+  #adventure-journal-window .aj-search-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  #adventure-journal-window .aj-search-hit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-search-hit:hover {
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-search-hit.active {
+    background: linear-gradient(90deg, var(--color-aj-accent-strong), var(--color-aj-accent-faint));
+    box-shadow: inset 3px 0 0 var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-search-name {
+    color: var(--color-aj-text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  #adventure-journal-window .aj-search-instance {
+    color: var(--color-aj-mute);
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-search-empty {
+    margin: 10px 2px 0;
+    padding: 16px 12px;
+    border: 1px dashed var(--color-aj-line);
+    border-radius: 10px;
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    text-align: center;
+  }
   #adventure-journal-window .aj-group + .aj-group {
     margin-top: 12px;
   }
@@ -13448,57 +13556,197 @@
     align-items: flex-end;
     gap: 6px;
   }
+  /* The difficulty crests: a row of small plates in a dark well, each with
+     a shield crest wearing its skulls and its name under it. Every tier has
+     its own colour identity (--aj-tier-*: Normal a steady steel, Heroic a
+     forge fire, Mythic an arcane violet); a resting crest is dimmed, the
+     selected one is lit (its plate washed in its colour, a lit rim, a glow
+     round the crest, a lit bar under the name, a 1px lift). */
   #adventure-journal-window .aj-diff {
     display: flex;
-    padding: 3px;
+    gap: 4px;
+    padding: 4px;
     border: 1px solid var(--color-aj-line);
-    border-radius: 10px;
+    border-radius: 12px;
     background: var(--color-aj-well);
+    box-shadow: inset 0 1px 3px var(--color-aj-shadow);
+  }
+  #adventure-journal-window .aj-tier-normal {
+    --aj-tier: var(--color-aj-tier-normal);
+    --aj-tier-mid: var(--color-aj-tier-normal-mid);
+    --aj-tier-deep: var(--color-aj-tier-normal-deep);
+    --aj-tier-glow: var(--color-aj-tier-normal-glow);
+    --aj-tier-wash: var(--color-aj-tier-normal-wash);
+  }
+  #adventure-journal-window .aj-tier-heroic {
+    --aj-tier: var(--color-aj-tier-heroic);
+    --aj-tier-mid: var(--color-aj-tier-heroic-mid);
+    --aj-tier-deep: var(--color-aj-tier-heroic-deep);
+    --aj-tier-glow: var(--color-aj-tier-heroic-glow);
+    --aj-tier-wash: var(--color-aj-tier-heroic-wash);
+  }
+  #adventure-journal-window .aj-tier-mythic {
+    --aj-tier: var(--color-aj-tier-mythic);
+    --aj-tier-mid: var(--color-aj-tier-mythic-mid);
+    --aj-tier-deep: var(--color-aj-tier-mythic-deep);
+    --aj-tier-glow: var(--color-aj-tier-mythic-glow);
+    --aj-tier-wash: var(--color-aj-tier-mythic-wash);
   }
   #adventure-journal-window .aj-diff button {
+    position: relative;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1px;
-    padding: 5px 14px 6px;
-    border: 0;
-    border-radius: 7px;
+    gap: 5px;
+    min-width: 76px;
+    padding: 8px 10px 9px;
+    border: 1px solid transparent;
+    border-radius: 9px;
     background: transparent;
     color: var(--color-aj-soft);
     font-size: 14px;
-    font-weight: 500;
-    line-height: 1.4;
+    font-weight: 600;
+    line-height: 1.2;
     cursor: var(--cursor-point);
+    transition:
+      background-color calc(var(--dur-panel) * var(--motion-scale)) ease-out,
+      border-color calc(var(--dur-panel) * var(--motion-scale)) ease-out,
+      translate calc(var(--dur-panel) * var(--motion-scale)) ease-out;
   }
   #adventure-journal-window .aj-diff button:hover {
+    border-color: var(--color-aj-line);
     background: var(--color-aj-panel-hover);
     color: var(--color-aj-text);
   }
   #adventure-journal-window .aj-diff button.active {
-    background: var(--color-aj-accent);
-    color: var(--color-aj-accent-ink);
+    border-color: var(--aj-tier-mid);
+    background:
+      linear-gradient(180deg, var(--aj-tier-wash), transparent 85%), var(--color-aj-panel);
+    box-shadow:
+      0 0 0 1px var(--aj-tier-wash),
+      0 4px 14px var(--aj-tier-wash);
+    color: var(--aj-tier);
     font-weight: 700;
+    translate: 0 -1px;
   }
-  #adventure-journal-window .aj-diff .ui-icon {
+  /* The lit bar under the selected name. */
+  #adventure-journal-window .aj-diff button.active::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: -1px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--aj-tier);
+    box-shadow: 0 0 8px var(--aj-tier-glow);
+  }
+  /* The crest: a shield cut by clip-path, a metal rim in the tier's colours
+     around a face that shades from its light to its deep, with a sheen on
+     top. The wrap carries the glow (a clipped box cannot cast one). */
+  #adventure-journal-window .aj-crest-wrap {
+    position: relative;
+    display: block;
+    width: 36px;
+    height: 40px;
+    filter: saturate(0.6) brightness(0.8) drop-shadow(0 2px 2px var(--color-aj-crest-shade));
+    transition: filter calc(var(--dur-panel) * var(--motion-scale)) ease-out;
+  }
+  #adventure-journal-window .aj-diff button:hover .aj-crest-wrap {
+    filter: saturate(0.85) brightness(0.95) drop-shadow(0 2px 2px var(--color-aj-crest-shade));
+  }
+  #adventure-journal-window .aj-diff button.active .aj-crest-wrap {
+    filter: drop-shadow(0 0 7px var(--aj-tier-glow))
+      drop-shadow(0 2px 2px var(--color-aj-crest-shade));
+  }
+  #adventure-journal-window .aj-crest,
+  #adventure-journal-window .aj-crest::before,
+  #adventure-journal-window .aj-crest-face {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(50% 0, 100% 12%, 100% 56%, 50% 100%, 0 56%, 0 12%);
+  }
+  #adventure-journal-window .aj-crest {
+    inset: 0;
+    background: linear-gradient(
+      165deg,
+      var(--aj-tier),
+      var(--aj-tier-mid) 48%,
+      var(--aj-tier-deep)
+    );
+  }
+  /* A dark keyline between the rim and the face, as on a struck badge. */
+  #adventure-journal-window .aj-crest::before {
+    content: "";
+    inset: 2px;
+    background: var(--aj-tier-deep);
+  }
+  #adventure-journal-window .aj-crest-face {
+    inset: 3px;
+    padding-bottom: 5px;
+    background:
+      linear-gradient(180deg, var(--color-aj-crest-sheen), transparent 42%),
+      radial-gradient(circle at 50% 32%, var(--aj-tier-mid), var(--aj-tier-deep) 78%);
+  }
+  /* The skulls on the face: one, two in a row, or the heraldic two over one. */
+  #adventure-journal-window .aj-skulls {
+    display: grid;
+    grid-auto-flow: column;
+    justify-items: center;
+    gap: 1px 2px;
+    color: var(--color-aj-bright);
+    filter: drop-shadow(0 1px 1px var(--color-aj-crest-shade));
+  }
+  #adventure-journal-window .aj-diff .aj-skulls .ui-icon {
     width: 12px;
     height: 12px;
   }
-  /* The danger skulls over each difficulty's name (1, 2, 3): decorative, in
-     the button's own ink so the selected one reads dark on amber. */
-  #adventure-journal-window .aj-skulls {
-    display: inline-flex;
-    gap: 2px;
-    opacity: 0.85;
+  #adventure-journal-window .aj-diff .aj-skulls-1 .ui-icon {
+    width: 17px;
+    height: 17px;
   }
-  #adventure-journal-window .aj-diff .aj-skulls .ui-icon {
-    width: 15px;
-    height: 15px;
+  #adventure-journal-window .aj-diff .aj-skulls-2 .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #adventure-journal-window .aj-skulls-3 {
+    grid-template-columns: repeat(2, auto);
+    grid-auto-flow: row;
+    gap: 0 3px;
+    margin-bottom: -2px;
+  }
+  #adventure-journal-window .aj-diff .aj-skulls-3 .ui-icon {
+    width: 11px;
+    height: 11px;
+  }
+  #adventure-journal-window .aj-skulls-3 .ui-icon:last-child {
+    grid-column: 1 / -1;
+  }
+  /* Mythic's lock: a small sealed disc on the crest's lower corner. */
+  #adventure-journal-window .aj-crest-lock {
+    position: absolute;
+    right: -6px;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--aj-tier-mid);
+    border-radius: 50%;
+    background: var(--color-aj-well);
+    color: var(--aj-tier);
+  }
+  #adventure-journal-window .aj-diff .aj-crest-lock .ui-icon {
+    width: 11px;
+    height: 11px;
   }
   #adventure-journal-window .aj-tier-name {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    display: block;
+    white-space: nowrap;
   }
   #adventure-journal-window .aj-soon-note {
     color: var(--color-aj-mute);
@@ -14117,6 +14365,82 @@
     padding: 0;
     list-style: none;
   }
+  /* The Loot tab's bar: This boss / All bosses, then the Adventure Guide's
+     own class and specialization pickers (dungeon_catalogue_chrome.ts), set
+     in the journal's type. */
+  #adventure-journal-window .aj-loot-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 20px;
+    margin: 0 0 14px;
+    padding: 0 0 14px;
+    border-bottom: 1px solid var(--color-aj-line);
+  }
+  #adventure-journal-window .aj-loot-scope {
+    display: flex;
+    padding: 3px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-well);
+  }
+  #adventure-journal-window .aj-loot-scope-btn {
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-loot-scope-btn:hover {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-loot-scope-btn.active {
+    background: var(--color-aj-chip);
+    box-shadow: inset 0 0 0 1px var(--color-aj-accent-line);
+    color: var(--color-aj-accent-hi);
+    font-weight: 600;
+  }
+  #adventure-journal-window .df-loot-filter {
+    flex: 1 1 340px;
+    max-width: 480px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  #adventure-journal-window .df-loot-selects label {
+    gap: 4px;
+    color: var(--color-aj-mute);
+    font-size: 13px;
+  }
+  #adventure-journal-window .df-loot-selects select {
+    height: 36px;
+    font-family: var(--font-aj);
+    font-size: 14.5px;
+  }
+  #adventure-journal-window .aj-loot-hidden {
+    margin: -4px 0 12px;
+    color: var(--color-aj-mute);
+    font-size: 13.5px;
+  }
+  #adventure-journal-window .aj-loot-section + .aj-loot-section {
+    margin-top: 20px;
+  }
+  #adventure-journal-window .aj-loot-boss {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 10px;
+    color: var(--color-aj-text);
+    font-size: 15.5px;
+    font-weight: 700;
+  }
   #adventure-journal-window .aj-loot-row {
     display: grid;
     grid-template-columns: 44px minmax(0, 1fr);
@@ -14300,6 +14624,8 @@
     #adventure-journal-window .aj-tab.active,
     #adventure-journal-window .aj-ab.open,
     #adventure-journal-window .aj-diff button.active,
+    #adventure-journal-window .aj-loot-scope-btn.active,
+    #adventure-journal-window .aj-search-hit.active,
     #adventure-journal-window .aj-kill.selected {
       outline: 2px solid Highlight;
       outline-offset: -2px;

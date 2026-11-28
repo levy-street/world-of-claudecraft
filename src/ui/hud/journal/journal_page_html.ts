@@ -1,17 +1,16 @@
 // Markup for the Adventure Journal (strings only, never DOM): the instance
 // list, the phone's breadcrumb and boss strip, the boss banner (portrait,
-// "raid, boss N of M", the one-line summary and stat chips, the difficulty
-// selector), the underline section tabs, the Overview (the encounter and its
-// 3D model, Strategy by role), the Abilities (phase headers with their health
-// pill, one row per ability that opens on its full text and fact chips), the
-// Loot and Mythic's Coming soon panel. Every label is a t() key, every number
+// "raid, boss N of M", the one-line summary and stat chips; the difficulty
+// crests are journal_difficulty_html.ts), the underline section tabs, the
+// Overview (the encounter and its 3D model, Strategy by role), the Abilities
+// (phase headers with their health pill, one row per ability that opens on its
+// full text and fact chips) and Mythic's Coming soon panel (the Loot tab is
+// journal_loot_html.ts, the search journal_search_html.ts). Every label is a t() key, every number
 // goes through the locale formatters, every interpolation through esc(). The
 // window (adventure_journal_window.ts) owns the state, the DOM, the events and
 // the focus; the decisions (pill shape, fact chips, list status) are the pure
 // core's (journal_banner_view.ts).
 
-import { ITEMS } from '../../../sim/data';
-import type { ItemDef } from '../../../sim/types';
 import {
   choicesHtml,
   damageCompareText,
@@ -29,7 +28,7 @@ import type {
   JournalRole,
   JournalTipRole,
 } from '../../boss_journal/journal_view';
-import { itemDisplayName, tEntity } from '../../entity_i18n';
+import { tEntity } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { FOCUS_KEY_ATTR } from '../../focus_restore';
 import {
@@ -40,10 +39,8 @@ import {
   t,
 } from '../../i18n';
 import { iconDataUrl } from '../../icons';
-import { marketNameColor } from '../../market_name_color';
 import { targetPortraitUrl } from '../../target_portrait_view';
 import { svgIcon, type UiIconName } from '../../ui_icons';
-import { sourceQualifierBits } from '../loot_explorer';
 import {
   englishTemplate,
   type JournalDamageSchool,
@@ -53,7 +50,7 @@ import {
   journalRangeLabel,
 } from './journal_banner_view';
 import type { JournalInstance, JournalTier } from './journal_catalog';
-import type { JournalLootRow } from './journal_loot_view';
+import { difficultyHtml, tierName } from './journal_difficulty_html';
 import type {
   JournalNavBoss,
   JournalNavGroup,
@@ -96,12 +93,6 @@ const SHOWN_FLAGS: readonly JournalFlag[] = ['deadly', 'interruptible', 'cleansa
 
 const STRATEGY_ROLES: readonly JournalTipRole[] = ['tank', 'healer', 'damage'];
 
-const TIER_KEYS: Readonly<Record<JournalTier, TranslationKey>> = {
-  normal: 'hudChrome.raidBossGuide.normal',
-  heroic: 'hudChrome.raidBossGuide.heroic',
-  mythic: 'hudChrome.adventureJournal.mythic',
-};
-
 const TAB_KEYS: Readonly<Record<JournalTab, TranslationKey>> = {
   overview: 'hudChrome.adventureJournal.tabOverview',
   abilities: 'hudChrome.adventureJournal.tabAbilities',
@@ -116,10 +107,6 @@ const SCHOOL_KEYS: Readonly<Record<JournalDamageSchool, TranslationKey>> = {
   physical: 'hudChrome.adventureJournal.factDamagePhysical',
   shadow: 'hudChrome.adventureJournal.factDamageShadow',
 };
-
-export function tierName(tier: JournalTier): string {
-  return t(TIER_KEYS[tier]);
-}
 
 export function mobName(mobId: string): string {
   return tEntity({ kind: 'mob', id: mobId, field: 'name' });
@@ -185,6 +172,8 @@ export function boldValuesHtml(
     return plain.includes(name) ? text : `<b>${text}</b>`;
   });
 }
+
+export { difficultyHtml, TIER_SKULLS, tierName } from './journal_difficulty_html';
 
 // ---- the window head and its frame ------------------------------------------------
 
@@ -264,8 +253,10 @@ function navBossHtml(instance: JournalNavInstance, boss: JournalNavBoss): string
   }</span></button></li>`;
 }
 
-export function navHtml(groups: readonly JournalNavGroup[]): string {
-  return `<nav class="aj-nav" id="aj-nav" aria-label="${esc(t('hudChrome.adventureJournal.navLabel'))}">${groups
+/** The list. `top` is the markup above the groups (the boss search), and
+ *  `searching` hides the groups while a query shows its results instead. */
+export function navHtml(groups: readonly JournalNavGroup[], top = '', searching = false): string {
+  return `<nav class="aj-nav${searching ? ' aj-searching' : ''}" id="aj-nav" aria-label="${esc(t('hudChrome.adventureJournal.navLabel'))}">${top}${groups
     .map((group) => {
       const titleId = `aj-group-${group.kind}`;
       return `<section class="aj-group" aria-labelledby="${titleId}"><h3 class="aj-group-title" id="${titleId}">${esc(
@@ -463,39 +454,6 @@ export function bannerHtml(input: JournalBannerInput): string {
     instance,
     input.tier,
   )}</header>`;
-}
-
-/** How many skulls each difficulty wears beside its name (Normal 1, Heroic 2,
- *  Mythic 3): the classic danger mark, decorative (the name says it). */
-export const TIER_SKULLS: Readonly<Record<JournalTier, number>> = {
-  normal: 1,
-  heroic: 2,
-  mythic: 3,
-};
-
-function skullsHtml(tier: JournalTier): string {
-  return `<span class="aj-skulls" aria-hidden="true">${svgIcon('skull').repeat(TIER_SKULLS[tier])}</span>`;
-}
-
-export function difficultyHtml(instance: JournalInstance, tier: JournalTier): string {
-  const label = t('hudChrome.raidBossGuide.difficultyLabel');
-  const soon = instance.tiers.includes('mythic')
-    ? `<span class="aj-soon-note">${esc(t('hudChrome.adventureJournal.mythicSoon'))}</span>`
-    : '';
-  return `<div class="aj-diffbox"><div class="rbg-segmented aj-diff" role="group" aria-label="${esc(
-    label,
-  )}">${instance.tiers
-    .map((entry) => {
-      const selected = entry === tier;
-      return `<button type="button" data-difficulty="${entry}" ${FOCUS_KEY_ATTR}="difficulty:${entry}" aria-pressed="${selected}" aria-label="${esc(
-        t('hudChrome.raidBossGuide.chooseDifficulty', { difficulty: tierName(entry) }),
-      )}" class="${selected ? 'active' : ''}${entry === 'mythic' ? ' aj-tier-mythic' : ''}">${skullsHtml(
-        entry,
-      )}<span class="aj-tier-name">${
-        entry === 'mythic' ? svgIcon('lock') : ''
-      }<span>${esc(tierName(entry))}</span></span></button>`;
-    })
-    .join('')}</div>${soon}</div>`;
 }
 
 export const SECTION_TAB_CLASS = 'aj-tab';
@@ -792,46 +750,4 @@ export function mechanicTooltipHtml(
   )}</div><div class="tt-desc">${esc(t(mechanic.summaryKey, values))}</div><div class="tt-desc">${esc(
     response,
   )}</div>${compare}`;
-}
-
-// ---- Loot -----------------------------------------------------------------------
-
-export function lootHtml(
-  rows: readonly JournalLootRow[],
-  members: readonly string[],
-  tier: JournalTier,
-  itemIcon: (item: ItemDef) => string,
-): string {
-  if (rows.length === 0) {
-    return `<section class="aj-loot-empty"><div class="aj-soon-sigil" aria-hidden="true">${svgIcon(
-      'chest',
-    )}</div><p>${esc(t('hudChrome.adventureJournal.lootNone', { difficulty: tierName(tier) }))}</p></section>`;
-  }
-  return `<ul class="aj-loot" aria-label="${esc(
-    t('hudChrome.adventureJournal.lootLabel', { difficulty: tierName(tier) }),
-  )}">${rows
-    .map((row) => {
-      const def = ITEMS[row.itemId];
-      if (!def) return '';
-      const bits = sourceQualifierBits({
-        category: 'raid',
-        chance: row.chance,
-        restrictedToClass: row.restrictedToClass,
-        gatedByQuestId: row.gatedByQuestId,
-      });
-      if (members.length > 1) {
-        bits.push(t('hudChrome.adventureJournal.lootFrom', { boss: mobName(row.dropsFrom) }));
-      }
-      // The AA-lifted name palette (rare and epic read 3.8:1 in the raw
-      // quality hues on this panel).
-      const color = marketNameColor(row.quality);
-      return `<li class="aj-loot-row aj-quality-${esc(row.quality)}" tabindex="0" data-item-id="${esc(
-        row.itemId,
-      )}" ${FOCUS_KEY_ATTR}="loot:${esc(row.itemId)}"><span class="ui-socket ui-socket--bag aj-loot-slot">${itemIcon(
-        def,
-      )}</span><span class="aj-loot-text"><span class="aj-loot-name" style="color:${color}">${esc(
-        itemDisplayName(def),
-      )}</span><span class="aj-loot-detail">${esc(bits.join(' · '))}</span></span></li>`;
-    })
-    .join('')}</ul>`;
 }

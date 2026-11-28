@@ -41,6 +41,7 @@ export const hudChromeStrings = {
     lootClass: 'Class',
     lootSpec: 'Specialization',
     allSpecs: 'All specializations',
+    allClasses: 'All classes',
     lootHint:
       "Usable gear with the selected specialization's stat affinity. General rewards remain visible. Drop chances use the full loot table.",
     lootEmpty: 'No equipment matches this class and specialization.',
@@ -5551,6 +5552,24 @@ export const hudChromeStrings = {
     // and the realm-day lockouts of the rest).
     defeatedThisWeek: 'Defeated this week',
     defeatedToday: 'Defeated today',
+    // The boss search at the top of the list ({count} = a formatted number).
+    searchLabel: 'Search bosses',
+    searchPlaceholder: 'Search bosses or instances',
+    searchResults: 'Bosses found',
+    searchEmpty: 'No bosses found',
+    searchClear: 'Clear the search',
+    searchCount: { one: '{count} boss found', other: '{count} bosses found' },
+    // The Loot tab's scope and filter ({instance} = a dungeon or raid name,
+    // {difficulty} = Normal or Heroic, {count} = a formatted number).
+    lootScopeLabel: 'Loot to show',
+    lootScopeBoss: 'This boss',
+    lootScopeInstance: 'All bosses',
+    lootNoneInstance: 'No boss in {instance} drops items on {difficulty}.',
+    lootShowAll: 'Show every class',
+    lootHiddenPlural: {
+      one: '{count} more drop is for another class or specialization.',
+      other: '{count} more drops are for other classes or specializations.',
+    },
   },
   raidBossGuide: {
     title: 'Boss Guide',

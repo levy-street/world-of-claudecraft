@@ -532,6 +532,7 @@ export const ko_KR: EnTranslations = {
       "lootClass": "직업",
       "lootSpec": "전문화",
       "allSpecs": "모든 전문화",
+      "allClasses": "모든 직업",
       "lootHint": "선택한 전문화에 적합한 능력치를 가진 착용 가능한 장비를 표시합니다. 공통 보상도 표시됩니다. 드롭 확률은 전체 전리품 목록을 기준으로 합니다.",
       "lootEmpty": "이 직업과 전문화에 맞는 장비가 없습니다.",
       "fullTableRoll": "전체 전리품 목록에서 아이템 1개",
@@ -4533,7 +4534,25 @@ export const ko_KR: EnTranslations = {
       "savedInstance": "{difficulty} 귀속",
       "resetsIn": "{time} 후 초기화, {when}",
       "defeatedThisWeek": "이번 주 처치함",
-      "defeatedToday": "오늘 처치함"
+      "defeatedToday": "오늘 처치함",
+      "searchLabel": "우두머리 검색",
+      "searchPlaceholder": "우두머리 또는 인스턴스 검색",
+      "searchResults": "찾은 우두머리",
+      "searchEmpty": "우두머리를 찾을 수 없습니다",
+      "searchClear": "검색 지우기",
+      "searchCount": {
+        "one": "우두머리 {count}명을 찾았습니다",
+        "other": "우두머리 {count}명을 찾았습니다"
+      },
+      "lootScopeLabel": "표시할 전리품",
+      "lootScopeBoss": "이 우두머리",
+      "lootScopeInstance": "모든 우두머리",
+      "lootNoneInstance": "{instance}의 우두머리는 {difficulty} 난이도에서 아이템을 떨어뜨리지 않습니다.",
+      "lootShowAll": "모든 직업 보기",
+      "lootHiddenPlural": {
+        "one": "다른 직업이나 전문화용 전리품이 {count}개 더 있습니다.",
+        "other": "다른 직업이나 전문화용 전리품이 {count}개 더 있습니다."
+      }
     },
     "raidBossGuide": {
       "title": "우두머리 공략",

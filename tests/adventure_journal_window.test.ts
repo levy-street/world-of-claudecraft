@@ -17,12 +17,14 @@ import {
   COUNCIL_SEAM_SINGER,
 } from '../src/sim/encounters/smith_heart/council_ids';
 import { HEAT_GUARDIAN } from '../src/sim/encounters/smith_heart/heat_ids';
+import type { PlayerClass } from '../src/sim/types';
 import { dispatchCollectionAction } from '../src/ui/collection_actions_core';
 import {
   AdventureJournalWindow,
   type JournalWorld,
 } from '../src/ui/hud/journal/adventure_journal_window';
 import { journalInstance } from '../src/ui/hud/journal/journal_catalog';
+import { journalLootView } from '../src/ui/hud/journal/journal_loot_filter_view';
 import { pageValues } from '../src/ui/hud/journal/journal_page_html';
 import { setLanguage, t } from '../src/ui/i18n';
 import { RaidBossGuideModelController } from '../src/ui/raid_boss_guide_model_controller';
@@ -41,6 +43,8 @@ interface FakeWorld extends JournalWorld {
   bossKills: Readonly<Record<string, number>>;
   lockouts: RaidLockout[];
   player: { pos: { x: number }; targetId: number | null };
+  cfg: { playerClass: PlayerClass };
+  talentSpec: string | null;
 }
 
 function raidRun(engaged: string | null, defeated: string[] = []): RaidRunView {
@@ -85,6 +89,8 @@ describe('AdventureJournalWindow', () => {
         return this.lockouts;
       },
       player: { pos: { x: 0 }, targetId: null },
+      cfg: { playerClass: 'paladin' },
+      talentSpec: 'holy',
       entities: {
         get: (id: number) =>
           id === 7 && targetTemplate ? { templateId: targetTemplate } : undefined,
@@ -585,6 +591,246 @@ describe('AdventureJournalWindow', () => {
     expect(root.querySelector('.aj-chip-saved')).toBeNull();
     expect(root.querySelector('.aj-lockout')).toBeNull();
     expect(root.querySelector('.aj-boss.active')?.classList.contains('defeated')).toBe(false);
+  });
+
+  it('draws each difficulty as its own crest, Mythic locked', () => {
+    journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'heroic');
+    for (const entry of ['normal', 'heroic', 'mythic']) {
+      const button = root.querySelector(`.rbg-segmented [data-difficulty="${entry}"]`);
+      expect(button?.classList.contains(`aj-tier-${entry}`)).toBe(true);
+      expect(button?.querySelector('.aj-crest-wrap')?.getAttribute('aria-hidden')).toBe('true');
+      // The name is real text, the crest decorative.
+      expect(button?.querySelector('.aj-tier-name')?.textContent).toBe(
+        entry === 'mythic' ? 'Mythic' : entry === 'heroic' ? 'Heroic' : 'Normal',
+      );
+    }
+    expect(root.querySelectorAll('.aj-crest-lock')).toHaveLength(1);
+    expect(root.querySelector('[data-difficulty="mythic"] .aj-crest-lock')).not.toBeNull();
+    expect(root.querySelector('.rbg-segmented .active')?.classList.contains('aj-tier-heroic')).toBe(
+      true,
+    );
+    // The arrow keys still rove the crests.
+    const heroic = root.querySelector<HTMLButtonElement>('[data-difficulty="heroic"]');
+    heroic?.focus();
+    heroic?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(tier()).toBe('mythic');
+    expect(document.activeElement?.getAttribute('data-difficulty')).toBe('mythic');
+  });
+
+  describe('the boss search', () => {
+    const field = () => root.querySelector('.aj-search-input') as HTMLInputElement;
+    const type = (text: string) => {
+      field().value = text;
+      field().dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const key = (k: string) =>
+      field().dispatchEvent(
+        new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }),
+      );
+    const hits = () =>
+      [...root.querySelectorAll<HTMLElement>('.aj-search-hit')].map(
+        (hit) => hit.querySelector('.aj-search-name')?.textContent,
+      );
+    const sanctumKeys = () => journalInstance('gravewyrm_sanctum')?.source.bossKeys ?? [];
+
+    it('sits at the top of the list as a plain text input, so no game key fires while typing', () => {
+      journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+      const input = root.querySelector('.aj-nav .aj-search .aj-search-input');
+      // src/game/input.ts drops every keydown while an INPUT holds the focus.
+      expect(input?.tagName).toBe('INPUT');
+      expect(input?.getAttribute('type')).toBe('search');
+      expect(input?.getAttribute('aria-label')).toBe('Search bosses');
+      expect(input?.getAttribute('role')).toBe('combobox');
+    });
+
+    it('lists matching bosses with portrait and instance, accent and case blind', () => {
+      journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+      type('IGNÁZ');
+      expect(root.querySelector('.aj-nav')?.classList.contains('aj-searching')).toBe(true);
+      expect(hits()).toEqual(['Ignazhar, the Unquenchable']);
+      const hit = root.querySelector('.aj-search-hit');
+      expect(hit?.querySelector('.aj-search-instance')?.textContent).toBe("The Smith's Heart");
+      expect(hit?.querySelector('.aj-boss-portrait img')?.getAttribute('src')).toBeTruthy();
+      expect(hit?.getAttribute('role')).toBe('option');
+      // An instance's name lists every boss in it.
+      type('sanctum');
+      expect(hits()).toHaveLength(sanctumKeys().length);
+    });
+
+    it('says when nothing matches', () => {
+      journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+      type('zzqx');
+      expect(root.querySelector('.aj-search-empty')?.textContent).toBe('No bosses found');
+      expect(root.querySelector('.aj-search-hit')).toBeNull();
+      expect(field().getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('walks the results with the arrows and opens one with Enter', () => {
+      journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+      type('sanctum');
+      key('ArrowDown');
+      key('ArrowDown');
+      const second = root.querySelectorAll('.aj-search-hit')[1];
+      expect(second.classList.contains('active')).toBe(true);
+      expect(field().getAttribute('aria-activedescendant')).toBe(second.id);
+      key('Enter');
+      expect(selected()).toBe(sanctumKeys()[1]);
+      // The pick clears the search and the list returns.
+      expect(field().value).toBe('');
+      expect(root.querySelector('.aj-nav')?.classList.contains('aj-searching')).toBe(false);
+      expect(document.activeElement?.getAttribute('data-focus-key')).toBe(
+        `boss:gravewyrm_sanctum:${sanctumKeys()[1]}`,
+      );
+    });
+
+    it('opens a result on a click; Escape and the clear button empty the field', () => {
+      journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+      type('korzul');
+      root.querySelector<HTMLElement>('.aj-search-hit')?.click();
+      expect(selected()).toBe(sanctumKeys().at(-1));
+      type('korzul');
+      key('Escape');
+      expect(field().value).toBe('');
+      expect(root.querySelector('.aj-search-hit')).toBeNull();
+      type('korzul');
+      root.querySelector<HTMLButtonElement>('[data-search-clear]')?.click();
+      expect(field().value).toBe('');
+      expect(root.querySelector('.aj-nav')?.classList.contains('aj-searching')).toBe(false);
+      expect(root.querySelector('[data-search-clear]')?.getAttribute('aria-label')).toBe(
+        'Clear the search',
+      );
+    });
+
+    it('announces the count in one persistent live region, and reopens on the list', () => {
+      journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+      const status = root.querySelector('[data-search-status]');
+      expect(status?.getAttribute('role')).toBe('status');
+      type('sanctum');
+      expect(status?.textContent).toBe(`${sanctumKeys().length} bosses found`);
+      type('zzqx');
+      // The same node, its words changed in place.
+      expect(root.querySelector('[data-search-status]')).toBe(status);
+      expect(status?.textContent).toBe('No bosses found');
+      // An arrow move flips the highlight without touching the count.
+      type('sanctum');
+      const first = root.querySelector('.aj-search-hit');
+      key('ArrowDown');
+      expect(root.querySelector('.aj-search-hit')).toBe(first);
+      expect(first?.getAttribute('aria-selected')).toBe('true');
+      journal.close();
+      journal.toggle();
+      expect(field().value).toBe('');
+      expect(root.querySelector('.aj-nav')?.classList.contains('aj-searching')).toBe(false);
+    });
+
+    it('keeps the query through a repaint of the window', () => {
+      journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'normal');
+      type('aurora');
+      journal.relocalize();
+      expect(field().value).toBe('aurora');
+      expect(hits()).toEqual(['Aurora, the Silent Winter']);
+    });
+  });
+
+  describe('the Loot filter', () => {
+    const sanctum = () => {
+      const found = journalInstance('gravewyrm_sanctum');
+      if (!found) throw new Error('no Gravewyrm Sanctum journal');
+      return found;
+    };
+    const finalKey = () => sanctum().source.bossKeys.at(-1) ?? '';
+    const openLoot = () => {
+      journal.openJournal('gravewyrm_sanctum', undefined, 'heroic');
+      root.querySelector<HTMLButtonElement>(`.aj-boss[data-boss="${finalKey()}"]`)?.click();
+      root.querySelector<HTMLButtonElement>('[data-tab="loot"]')?.click();
+    };
+    // The option the markup marks (happy-dom's select.value ignores it).
+    const picked = (sel: string) =>
+      root.querySelector(`${sel} option[selected]`)?.getAttribute('value');
+    const items = () =>
+      [...root.querySelectorAll<HTMLElement>('.aj-loot-row')].map((row) => row.dataset.itemId);
+    const change = (sel: string, value: string) => {
+      const select = root.querySelector(sel) as HTMLSelectElement;
+      select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    it("opens on the character's class and specialization, showing only what it can use", () => {
+      openLoot();
+      expect(selected()).toBe(finalKey());
+      expect(picked('[data-loot-class]')).toBe('paladin');
+      expect(picked('[data-loot-spec]')).toBe('holy');
+      const all = journalLootView(sanctum(), finalKey(), 'boss', 'heroic', null);
+      const holy = journalLootView(sanctum(), finalKey(), 'boss', 'heroic', {
+        cls: 'paladin',
+        spec: 'holy',
+      });
+      expect(items()).toEqual(holy.sections[0].rows.map((r) => r.itemId));
+      expect(items().length).toBeLessThan(all.total);
+      expect(root.querySelector('.aj-loot-hidden')?.textContent).toMatch(
+        /more drops? (are|is) for/,
+      );
+      // Each drop is still a bag slot with the real item tooltip.
+      expect(root.querySelector('.aj-loot-row .ui-socket--bag')).not.toBeNull();
+    });
+
+    it('shows every drop for All classes and switches specialization', () => {
+      openLoot();
+      change('[data-loot-class]', '');
+      expect(items()).toHaveLength(
+        journalLootView(sanctum(), finalKey(), 'boss', 'heroic', null).total,
+      );
+      expect(root.querySelector<HTMLSelectElement>('[data-loot-spec]')?.disabled).toBe(true);
+      expect(root.querySelector('.aj-loot-hidden')).toBeNull();
+      change('[data-loot-class]', 'mage');
+      expect(picked('[data-loot-spec]')).toBe('');
+      change('[data-loot-spec]', 'fire');
+      expect(items()).toEqual(
+        journalLootView(sanctum(), finalKey(), 'boss', 'heroic', {
+          cls: 'mage',
+          spec: 'fire',
+        }).sections[0].rows.map((r) => r.itemId),
+      );
+    });
+
+    it('reads the whole instance boss by boss', () => {
+      openLoot();
+      change('[data-loot-class]', '');
+      root.querySelector<HTMLButtonElement>('[data-loot-scope="instance"]')?.click();
+      expect(root.querySelector('[data-loot-scope="instance"]')?.getAttribute('aria-pressed')).toBe(
+        'true',
+      );
+      const sections = root.querySelectorAll('.aj-loot-section');
+      expect(sections.length).toBeGreaterThan(1);
+      expect(sections[0].querySelector('.aj-loot-boss')?.textContent).toBeTruthy();
+      const view = journalLootView(sanctum(), finalKey(), 'instance', 'heroic', null);
+      expect(items()).toHaveLength(view.total);
+    });
+
+    it('keeps game keys away from a focused picker, Escape and Tab aside', () => {
+      openLoot();
+      const outside = vi.fn();
+      document.body.addEventListener('keydown', outside);
+      const select = root.querySelector('[data-loot-class]') as HTMLSelectElement;
+      for (const k of ['ArrowDown', 'w', '1']) {
+        select.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+      }
+      expect(outside).not.toHaveBeenCalled();
+      select.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      expect(outside).toHaveBeenCalledTimes(1);
+      document.body.removeEventListener('keydown', outside);
+    });
+
+    it('shows a clean empty card where a boss drops nothing', () => {
+      journal.openJournal(SMITH_HEART_DUNGEON, HEAT_GUARDIAN, 'heroic');
+      root.querySelector<HTMLButtonElement>('[data-tab="loot"]')?.click();
+      expect(root.querySelector('.aj-loot-empty')?.textContent).toContain(
+        'drops no items on Heroic',
+      );
+      // Nothing to narrow, so no class pickers; the scope stays.
+      expect(root.querySelector('[data-loot-class]')).toBeNull();
+      expect(root.querySelector('[data-loot-scope="instance"]')).not.toBeNull();
+    });
   });
 });
 

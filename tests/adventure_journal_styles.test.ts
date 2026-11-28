@@ -119,6 +119,8 @@ describe('Adventure Journal styles', () => {
       '#adventure-journal-window .aj-loot-row:focus-visible',
       '#tf-journal:focus-visible',
       '#adventure-journal-window .aj-diff button:focus-visible',
+      '#adventure-journal-window .aj-loot-scope-btn:focus-visible',
+      '#adventure-journal-window .aj-search-clear:focus-visible',
       '#adventure-journal-window .rbg-model-load:focus-visible',
       '#adventure-journal-window .rbg-model-stage > canvas:focus-visible',
     ]) {
@@ -259,6 +261,67 @@ describe('Adventure Journal styles', () => {
     for (const ink of ['--color-aj-deadly', '--color-aj-mute', '--color-aj-done']) {
       expect(contrast(token(ink), token('--color-aj-well')), ink).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  it('gives each difficulty crest its own lit colour identity, readable and motion-safe', () => {
+    for (const tier of ['normal', 'heroic', 'mythic']) {
+      const own = rule(desktopCss, `#adventure-journal-window .aj-tier-${tier}`);
+      for (const part of ['', '-mid', '-deep', '-glow', '-wash']) {
+        expect(own).toContain(`var(--color-aj-tier-${tier}${part})`);
+      }
+      // The lit name reads in the tier's ink on the panel and on the well.
+      for (const ground of ['--color-aj-panel', '--color-aj-well', '--color-aj-panel-hover']) {
+        expect(
+          contrast(token(`--color-aj-tier-${tier}`), token(ground)),
+          `${tier} on ${ground}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+    // The three identities are distinct colours.
+    const inks = ['normal', 'heroic', 'mythic'].map((tier) => token(`--color-aj-tier-${tier}`));
+    expect(new Set(inks).size).toBe(3);
+    const lit = rule(desktopCss, '#adventure-journal-window .aj-diff button.active');
+    expect(lit).toContain('color: var(--aj-tier)');
+    expect(lit).toMatch(/translate:\s*0 -1px/);
+    expect(lit).not.toMatch(/scale/);
+    const resting = rule(desktopCss, '#adventure-journal-window .aj-diff button');
+    // Every transition runs on the motion scale (reduced motion stills it).
+    for (const line of resting.split(/[;,]/).filter((l) => l.includes('calc('))) {
+      expect(line).toContain('var(--motion-scale)');
+    }
+    expect(rule(desktopCss, '#adventure-journal-window .aj-crest')).toContain('var(--aj-tier-mid)');
+    expect(rule(desktopCss, '#adventure-journal-window .aj-crest-lock')).toContain(
+      'var(--aj-tier)',
+    );
+    // A phone keeps a 40px target and a smaller crest.
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-diff button')).toMatch(
+      /min-height:\s*40px/,
+    );
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-crest-wrap')).toMatch(
+      /width:\s*31px/,
+    );
+  });
+
+  it('gives the search and the Loot bar 40px phone targets', () => {
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-search-input')).toMatch(
+      /height:\s*44px/,
+    );
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-search-hit')).toMatch(
+      /min-height:\s*44px/,
+    );
+    expect(rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-search-clear')).toMatch(
+      /width:\s*40px/,
+    );
+    expect(
+      rule(mobileCss, 'body.mobile-touch #adventure-journal-window .aj-loot-scope-btn'),
+    ).toMatch(/min-height:\s*40px/);
+    expect(
+      rule(mobileCss, 'body.mobile-touch #adventure-journal-window .df-loot-selects select'),
+    ).toMatch(/height:\s*44px/);
+    // While a query narrows the list, the results stand in for it.
+    expect(rule(desktopCss, '#adventure-journal-window .aj-nav.aj-searching .aj-group')).toMatch(
+      /display:\s*none/,
+    );
   });
 
   it('draws a light metal frame from tokens, never in the way of a click', () => {

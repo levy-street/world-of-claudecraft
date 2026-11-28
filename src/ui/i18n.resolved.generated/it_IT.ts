@@ -532,6 +532,7 @@ export const it_IT: EnTranslations = {
       "lootClass": "Classe",
       "lootSpec": "Specializzazione",
       "allSpecs": "Tutte le specializzazioni",
+      "allClasses": "All classes",
       "lootHint": "Equipaggiamento utilizzabile con statistiche adatte alla specializzazione scelta. Le ricompense generali restano visibili. Le probabilità di ottenimento si riferiscono all'intera tabella del bottino.",
       "lootEmpty": "Nessun equipaggiamento corrisponde a questa classe e specializzazione.",
       "fullTableRoll": "Un oggetto dall'intera tabella del bottino",
@@ -4533,7 +4534,25 @@ export const it_IT: EnTranslations = {
       "savedInstance": "Saved on {difficulty}",
       "resetsIn": "Resets in {time}, {when}",
       "defeatedThisWeek": "Defeated this week",
-      "defeatedToday": "Defeated today"
+      "defeatedToday": "Defeated today",
+      "searchLabel": "Search bosses",
+      "searchPlaceholder": "Search bosses or instances",
+      "searchResults": "Bosses found",
+      "searchEmpty": "No bosses found",
+      "searchClear": "Clear the search",
+      "searchCount": {
+        "one": "{count} boss found",
+        "other": "{count} bosses found"
+      },
+      "lootScopeLabel": "Loot to show",
+      "lootScopeBoss": "This boss",
+      "lootScopeInstance": "All bosses",
+      "lootNoneInstance": "No boss in {instance} drops items on {difficulty}.",
+      "lootShowAll": "Show every class",
+      "lootHiddenPlural": {
+        "one": "{count} more drop is for another class or specialization.",
+        "other": "{count} more drops are for other classes or specializations."
+      }
     },
     "raidBossGuide": {
       "title": "Guida al boss",

@@ -532,6 +532,7 @@ export const ru_RU: EnTranslations = {
       "lootClass": "Класс",
       "lootSpec": "Специализация",
       "allSpecs": "Все специализации",
+      "allClasses": "Все классы",
       "lootHint": "Доступное снаряжение с характеристиками, подходящими выбранной специализации. Общие награды остаются видимыми. Вероятности выпадения рассчитаны по полной таблице добычи.",
       "lootEmpty": "Нет снаряжения для этого класса и специализации.",
       "fullTableRoll": "Один предмет из полной таблицы добычи",
@@ -4533,7 +4534,25 @@ export const ru_RU: EnTranslations = {
       "savedInstance": "Сохранение ({difficulty})",
       "resetsIn": "Сброс через {time}, {when}",
       "defeatedThisWeek": "Побеждён на этой неделе",
-      "defeatedToday": "Побеждён сегодня"
+      "defeatedToday": "Побеждён сегодня",
+      "searchLabel": "Поиск боссов",
+      "searchPlaceholder": "Поиск боссов или подземелий",
+      "searchResults": "Найденные боссы",
+      "searchEmpty": "Боссы не найдены",
+      "searchClear": "Очистить поиск",
+      "searchCount": {
+        "one": "Найдено боссов: {count}",
+        "other": "Найдено боссов: {count}"
+      },
+      "lootScopeLabel": "Какую добычу показать",
+      "lootScopeBoss": "Этот босс",
+      "lootScopeInstance": "Все боссы",
+      "lootNoneInstance": "На уровне «{difficulty}» ни один босс в «{instance}» не оставляет предметов.",
+      "lootShowAll": "Показать все классы",
+      "lootHiddenPlural": {
+        "one": "Ещё предметов для других классов или специализаций: {count}.",
+        "other": "Ещё предметов для других классов или специализаций: {count}."
+      }
     },
     "raidBossGuide": {
       "title": "Тактика на босса",

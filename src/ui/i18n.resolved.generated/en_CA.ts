@@ -532,6 +532,7 @@ export const en_CA: EnTranslations = {
       "lootClass": "Class",
       "lootSpec": "Specialization",
       "allSpecs": "All specializations",
+      "allClasses": "All classes",
       "lootHint": "Usable gear with the selected specialization's stat affinity. General rewards remain visible. Drop chances use the full loot table.",
       "lootEmpty": "No equipment matches this class and specialization.",
       "fullTableRoll": "One item from the full loot table",
@@ -4533,7 +4534,25 @@ export const en_CA: EnTranslations = {
       "savedInstance": "Saved on {difficulty}",
       "resetsIn": "Resets in {time}, {when}",
       "defeatedThisWeek": "Defeated this week",
-      "defeatedToday": "Defeated today"
+      "defeatedToday": "Defeated today",
+      "searchLabel": "Search bosses",
+      "searchPlaceholder": "Search bosses or instances",
+      "searchResults": "Bosses found",
+      "searchEmpty": "No bosses found",
+      "searchClear": "Clear the search",
+      "searchCount": {
+        "one": "{count} boss found",
+        "other": "{count} bosses found"
+      },
+      "lootScopeLabel": "Loot to show",
+      "lootScopeBoss": "This boss",
+      "lootScopeInstance": "All bosses",
+      "lootNoneInstance": "No boss in {instance} drops items on {difficulty}.",
+      "lootShowAll": "Show every class",
+      "lootHiddenPlural": {
+        "one": "{count} more drop is for another class or specialization.",
+        "other": "{count} more drops are for other classes or specializations."
+      }
     },
     "raidBossGuide": {
       "title": "Boss Guide",

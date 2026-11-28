@@ -532,6 +532,7 @@ export const de_DE: EnTranslations = {
       "lootClass": "Klasse",
       "lootSpec": "Spezialisierung",
       "allSpecs": "Alle Spezialisierungen",
+      "allClasses": "All classes",
       "lootHint": "Nutzbare Ausrüstung mit passenden Werten für die gewählte Spezialisierung. Allgemeine Belohnungen bleiben sichtbar. Die Beutechancen beziehen sich auf die gesamte Beutetabelle.",
       "lootEmpty": "Keine Ausrüstung passt zu dieser Klasse und Spezialisierung.",
       "fullTableRoll": "Ein Gegenstand aus der gesamten Beutetabelle",
@@ -4533,7 +4534,25 @@ export const de_DE: EnTranslations = {
       "savedInstance": "Saved on {difficulty}",
       "resetsIn": "Resets in {time}, {when}",
       "defeatedThisWeek": "Defeated this week",
-      "defeatedToday": "Defeated today"
+      "defeatedToday": "Defeated today",
+      "searchLabel": "Search bosses",
+      "searchPlaceholder": "Search bosses or instances",
+      "searchResults": "Bosses found",
+      "searchEmpty": "No bosses found",
+      "searchClear": "Clear the search",
+      "searchCount": {
+        "one": "{count} boss found",
+        "other": "{count} bosses found"
+      },
+      "lootScopeLabel": "Loot to show",
+      "lootScopeBoss": "This boss",
+      "lootScopeInstance": "All bosses",
+      "lootNoneInstance": "No boss in {instance} drops items on {difficulty}.",
+      "lootShowAll": "Show every class",
+      "lootHiddenPlural": {
+        "one": "{count} more drop is for another class or specialization.",
+        "other": "{count} more drops are for other classes or specializations."
+      }
     },
     "raidBossGuide": {
       "title": "Bossführer",

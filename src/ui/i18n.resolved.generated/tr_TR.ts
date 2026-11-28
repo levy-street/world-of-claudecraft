@@ -532,6 +532,7 @@ export const tr_TR: EnTranslations = {
       "lootClass": "Sınıf",
       "lootSpec": "Uzmanlık",
       "allSpecs": "Tüm uzmanlıklar",
+      "allClasses": "All classes",
       "lootHint": "Seçili uzmanlığın nitelik eğilimine uygun, kullanılabilir ekipman. Genel ödüller görünür kalır. Düşme olasılıkları tam ganimet tablosunu kullanır.",
       "lootEmpty": "Bu sınıf ve uzmanlıkla eşleşen ekipman yok.",
       "fullTableRoll": "Tam ganimet tablosundan bir eşya",
@@ -4533,7 +4534,25 @@ export const tr_TR: EnTranslations = {
       "savedInstance": "Saved on {difficulty}",
       "resetsIn": "Resets in {time}, {when}",
       "defeatedThisWeek": "Defeated this week",
-      "defeatedToday": "Defeated today"
+      "defeatedToday": "Defeated today",
+      "searchLabel": "Search bosses",
+      "searchPlaceholder": "Search bosses or instances",
+      "searchResults": "Bosses found",
+      "searchEmpty": "No bosses found",
+      "searchClear": "Clear the search",
+      "searchCount": {
+        "one": "{count} boss found",
+        "other": "{count} bosses found"
+      },
+      "lootScopeLabel": "Loot to show",
+      "lootScopeBoss": "This boss",
+      "lootScopeInstance": "All bosses",
+      "lootNoneInstance": "No boss in {instance} drops items on {difficulty}.",
+      "lootShowAll": "Show every class",
+      "lootHiddenPlural": {
+        "one": "{count} more drop is for another class or specialization.",
+        "other": "{count} more drops are for other classes or specializations."
+      }
     },
     "raidBossGuide": {
       "title": "Patron Rehberi",

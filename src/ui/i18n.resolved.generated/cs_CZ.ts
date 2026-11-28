@@ -532,6 +532,7 @@ export const cs_CZ: EnTranslations = {
       "lootClass": "Třída",
       "lootSpec": "Specializace",
       "allSpecs": "Všechny specializace",
+      "allClasses": "All classes",
       "lootHint": "Použitelné vybavení s vlastnostmi vhodnými pro vybranou specializaci. Obecné odměny zůstávají viditelné. Šance na získání vycházejí z úplné tabulky kořisti.",
       "lootEmpty": "Této třídě a specializaci neodpovídá žádné vybavení.",
       "fullTableRoll": "Jeden předmět z úplné tabulky kořisti",
@@ -4533,7 +4534,25 @@ export const cs_CZ: EnTranslations = {
       "savedInstance": "Saved on {difficulty}",
       "resetsIn": "Resets in {time}, {when}",
       "defeatedThisWeek": "Defeated this week",
-      "defeatedToday": "Defeated today"
+      "defeatedToday": "Defeated today",
+      "searchLabel": "Search bosses",
+      "searchPlaceholder": "Search bosses or instances",
+      "searchResults": "Bosses found",
+      "searchEmpty": "No bosses found",
+      "searchClear": "Clear the search",
+      "searchCount": {
+        "one": "{count} boss found",
+        "other": "{count} bosses found"
+      },
+      "lootScopeLabel": "Loot to show",
+      "lootScopeBoss": "This boss",
+      "lootScopeInstance": "All bosses",
+      "lootNoneInstance": "No boss in {instance} drops items on {difficulty}.",
+      "lootShowAll": "Show every class",
+      "lootHiddenPlural": {
+        "one": "{count} more drop is for another class or specialization.",
+        "other": "{count} more drops are for other classes or specializations."
+      }
     },
     "raidBossGuide": {
       "title": "Průvodce bossem",

@@ -15,11 +15,17 @@
 import { audio } from '../../../game/audio';
 import type { LinkedProgramTouchQueue } from '../../../render/linked_program_touch_lane';
 import { dungeonAt, ITEMS } from '../../../sim/data';
-import type { DungeonDifficulty, ItemDef } from '../../../sim/types';
+import {
+  ALL_CLASSES,
+  type DungeonDifficulty,
+  type ItemDef,
+  type PlayerClass,
+} from '../../../sim/types';
 import type { DungeonRunView, RaidLockout, RaidRunView } from '../../../world_api/dungeons';
 import { journalModelFor } from '../../boss_journal/journal_model_spec';
 import type { JournalBossView } from '../../boss_journal/journal_view';
 import { markDialogRoot } from '../../dialog_root';
+import { validLootPreviewSpec } from '../../dungeon_loot_preview_view';
 import { captureFocusKey, FOCUS_KEY_ATTR, restoreFirstEnabled } from '../../focus_restore';
 import { t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -39,7 +45,14 @@ import {
   visibleJournalInstances,
 } from './journal_catalog';
 import { bindJournalLaunchers, type JournalLauncherWorld } from './journal_launchers';
-import { journalLoot } from './journal_loot_view';
+import {
+  JOURNAL_LOOT_SCOPES,
+  type JournalLootFilter,
+  type JournalLootScope,
+  journalLootFilterFor,
+  journalLootView,
+} from './journal_loot_filter_view';
+import { lootPanelHtml } from './journal_loot_html';
 import {
   adjacentJournalBoss,
   buildJournalNav,
@@ -58,7 +71,6 @@ import {
   comingSoonHtml,
   frameCornersHtml,
   headHtml,
-  lootHtml,
   mechanicTooltipHtml,
   mobileTopHtml,
   navHtml,
@@ -70,6 +82,8 @@ import {
 } from './journal_page_html';
 import { progressHtml, savedChipHtml } from './journal_progress_html';
 import { journalPageProgress, journalSavedPages } from './journal_progress_view';
+import { JournalSearchController } from './journal_search_controller';
+import { journalSearchPages } from './journal_search_html';
 
 export interface AdventureJournalDeps
   extends Pick<PainterHostPresentation, 'itemIcon' | 'itemTooltip' | 'attachTooltip'> {
@@ -104,6 +118,9 @@ export interface JournalWorld extends JournalLauncherWorld {
   /** The still-running lockouts (IWorld.raidLockouts), read once per render. */
   raidLockouts(): RaidLockout[];
   readonly player: JournalLauncherWorld['player'] & { readonly pos: { readonly x: number } };
+  /** The character's class and current specialization: the Loot filter opens on them. */
+  readonly cfg: { readonly playerClass: PlayerClass };
+  readonly talentSpec: string | null;
 }
 
 interface Selection {
@@ -118,6 +135,11 @@ export class AdventureJournalWindow {
   private expandedMechanic: string | null = null;
   private readonly closedPhases = new Set<string>();
   private readonly expanded = new Set<string>();
+  /** The Loot tab's filter: undefined follows the character's own class and
+   *  specialization, null is All classes. */
+  private lootFilter: JournalLootFilter | undefined = undefined;
+  /** The Loot tab shows one boss's drops or the whole instance's. */
+  private lootScope: JournalLootScope = 'boss';
   /** The phone drawer holding the navigation list is open. */
   private navOpen = false;
   private openerFocus: HTMLElement | null = null;
@@ -135,6 +157,15 @@ export class AdventureJournalWindow {
   private readonly heldBackdrops = new Map<string, HTMLImageElement>();
   /** The page the last render painted (instance:boss), for the scroll pair. */
   private renderedPage: string | null = null;
+  /** The boss search at the top of the list (inside the phone's drawer). */
+  private readonly search = new JournalSearchController({
+    pages: () => journalSearchPages(this.visible()),
+    open: (instanceId, bossKey) => {
+      const target = journalInstance(instanceId);
+      if (target) this.goTo(target, bossKey, `boss:${target.id}:${bossKey}`);
+    },
+    leave: () => this.deps.root().querySelector<HTMLElement>('.aj-page')?.focus(),
+  });
 
   constructor(
     private readonly deps: AdventureJournalDeps,
@@ -273,6 +304,8 @@ export class AdventureJournalWindow {
     markDialogRoot(root, { labelledBy: 'aj-title' });
     root.style.display = 'block';
     this.navOpen = false;
+    // A fresh opening starts on the list, never behind an old query.
+    this.search.clear();
     const selection = this.selection;
     this.render(selection ? `boss:${selection.instanceId}:${selection.bossKey}` : undefined);
   }
@@ -331,6 +364,7 @@ export class AdventureJournalWindow {
     const keepPage = pageKey === this.renderedPage;
     const pageTop = keepPage ? (root.querySelector<HTMLElement>('.aj-page')?.scrollTop ?? 0) : 0;
     const navTop = root.querySelector<HTMLElement>('.aj-nav')?.scrollTop ?? 0;
+    this.search.captureCaret(root);
     this.renderedPage = pageKey;
     const world = this.deps.world();
     this.seenRoom = this.room();
@@ -399,7 +433,11 @@ export class AdventureJournalWindow {
     root.innerHTML =
       frameCornersHtml() +
       headHtml(instance) +
-      `<div class="aj-shell${this.navOpen ? ' aj-nav-open' : ''}">${navHtml(groups)}<section class="aj-page" tabindex="0" data-focus-key="journal" aria-labelledby="aj-boss-name">${mobileTopHtml(
+      `<div class="aj-shell${this.navOpen ? ' aj-nav-open' : ''}">${navHtml(
+        groups,
+        this.search.html(),
+        this.search.searching,
+      )}<section class="aj-page" tabindex="0" data-focus-key="journal" aria-labelledby="aj-boss-name">${mobileTopHtml(
         groups,
         this.navOpen,
       )}${bannerHtml({
@@ -438,6 +476,7 @@ export class AdventureJournalWindow {
         root.querySelector<HTMLElement>('.aj-page'),
         root.querySelector<HTMLElement>('[data-close]'),
       ]);
+      this.search.restoreCaret(root);
     }
   }
 
@@ -459,9 +498,16 @@ export class AdventureJournalWindow {
     if (this.tab === 'overview') return overviewHtml(instance, view);
     if (this.tab === 'loot') {
       const difficulty = journalTierDifficulty(this.tier) ?? 'normal';
-      return lootHtml(journalLoot(members, difficulty), members, this.tier, (item: ItemDef) =>
-        this.deps.itemIcon(item),
-      );
+      const filter = this.currentLootFilter();
+      const bossKey = this.selection?.bossKey ?? instance.source.bossKeys[0];
+      return lootPanelHtml({
+        view: journalLootView(instance, bossKey, this.lootScope, difficulty, filter),
+        scope: this.lootScope,
+        filter,
+        tier: this.tier,
+        instanceId: instance.id,
+        itemIcon: (item: ItemDef) => this.deps.itemIcon(item),
+      });
     }
     return abilitiesHtml(instance, view, this.closedPhases, this.expandedMechanic, this.tier);
   }
@@ -512,6 +558,7 @@ export class AdventureJournalWindow {
       bindRaidBossGuideScroll(nav);
       nav.addEventListener('keydown', (event) => this.navKey(nav, event));
     }
+    this.search.bind(root);
     root.querySelector<HTMLElement>('[data-close]')?.addEventListener('click', () => this.close());
     // The banner portrait's 3D button: the model lives on the Overview tab.
     root.querySelector<HTMLElement>('[data-show-model]')?.addEventListener('click', () => {
@@ -603,10 +650,77 @@ export class AdventureJournalWindow {
       link.addEventListener('click', () => this.jumpTo(view, link.dataset.jump ?? ''));
     }
     if (view) this.wireMechanics(root, instance, view);
+    this.wireLoot(root);
     for (const row of root.querySelectorAll<HTMLElement>('[data-item-id]')) {
       const item = this.itemDef(row.dataset.itemId ?? '');
       if (item) this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
     }
+  }
+
+  /** The filter the Loot tab reads: the player's pick, else their own class
+   *  and current specialization. */
+  private currentLootFilter(): JournalLootFilter {
+    if (this.lootFilter !== undefined) return this.lootFilter;
+    const world = this.deps.world();
+    return journalLootFilterFor(world.cfg.playerClass, world.talentSpec);
+  }
+
+  /** The Loot tab's bar: the scope buttons, the Adventure Guide's class and
+   *  specialization pickers (with All classes), and the empty card's way back. */
+  private wireLoot(root: HTMLElement): void {
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-loot-scope]')) {
+      button.addEventListener('click', () => {
+        const scope = button.dataset.lootScope as JournalLootScope;
+        if (!JOURNAL_LOOT_SCOPES.includes(scope) || scope === this.lootScope) return;
+        this.deps.hideTooltip();
+        this.sounds.click();
+        this.lootScope = scope;
+        this.render(`loot-scope:${scope}`);
+      });
+    }
+    root
+      .querySelector<HTMLSelectElement>('[data-loot-class]')
+      ?.addEventListener('change', (event) => {
+        const value = (event.currentTarget as HTMLSelectElement).value;
+        const world = this.deps.world();
+        if (value === '') this.lootFilter = null;
+        else if ((ALL_CLASSES as readonly string[]).includes(value)) {
+          const cls = value as PlayerClass;
+          // The character's own class opens on its own specialization, as in
+          // the Adventure Guide; another class on every specialization.
+          this.lootFilter = journalLootFilterFor(
+            cls,
+            cls === world.cfg.playerClass ? world.talentSpec : null,
+          );
+        } else return;
+        this.deps.hideTooltip();
+        this.render('loot-class');
+      });
+    root
+      .querySelector<HTMLSelectElement>('[data-loot-spec]')
+      ?.addEventListener('change', (event) => {
+        const current = this.currentLootFilter();
+        if (!current) return;
+        const value = (event.currentTarget as HTMLSelectElement).value || null;
+        this.lootFilter = { cls: current.cls, spec: validLootPreviewSpec(current.cls, value) };
+        this.deps.hideTooltip();
+        this.render('loot-spec');
+      });
+    // A focused picker owns its keys (arrows and letters pick an option): the
+    // game's keybind dispatcher skips only text fields, so they stop here.
+    // Escape still closes the window and Tab still moves on.
+    for (const select of root.querySelectorAll<HTMLSelectElement>(
+      '[data-loot-class], [data-loot-spec]',
+    )) {
+      select.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' && event.key !== 'Tab') event.stopPropagation();
+      });
+    }
+    root.querySelector<HTMLButtonElement>('[data-loot-show-all]')?.addEventListener('click', () => {
+      this.lootFilter = null;
+      this.deps.hideTooltip();
+      this.render('loot-class');
+    });
   }
 
   private itemDef(id: string): ItemDef | null {

@@ -532,6 +532,7 @@ export const ja_JP: EnTranslations = {
       "lootClass": "クラス",
       "lootSpec": "専門分野",
       "allSpecs": "すべての専門分野",
+      "allClasses": "すべてのクラス",
       "lootHint": "選択した専門分野に適した能力値を持つ、使用可能な装備を表示します。共通の報酬も表示されます。ドロップ率は戦利品テーブル全体に基づきます。",
       "lootEmpty": "このクラスと専門分野に合う装備はありません。",
       "fullTableRoll": "戦利品テーブル全体からアイテム1個",
@@ -4533,7 +4534,25 @@ export const ja_JP: EnTranslations = {
       "savedInstance": "{difficulty}でロック中",
       "resetsIn": "リセットまで {time}（{when}）",
       "defeatedThisWeek": "今週撃破済み",
-      "defeatedToday": "本日撃破済み"
+      "defeatedToday": "本日撃破済み",
+      "searchLabel": "ボスを検索",
+      "searchPlaceholder": "ボスやインスタンスを検索",
+      "searchResults": "見つかったボス",
+      "searchEmpty": "ボスが見つかりません",
+      "searchClear": "検索をクリア",
+      "searchCount": {
+        "one": "ボス{count}体が見つかりました",
+        "other": "ボス{count}体が見つかりました"
+      },
+      "lootScopeLabel": "表示する戦利品",
+      "lootScopeBoss": "このボス",
+      "lootScopeInstance": "すべてのボス",
+      "lootNoneInstance": "{instance}のボスは{difficulty}ではアイテムを落とさない。",
+      "lootShowAll": "すべてのクラスを表示",
+      "lootHiddenPlural": {
+        "one": "ほかに{count}件のドロップが別のクラスまたは専門分野向けです。",
+        "other": "ほかに{count}件のドロップが別のクラスまたは専門分野向けです。"
+      }
     },
     "raidBossGuide": {
       "title": "ボス攻略",

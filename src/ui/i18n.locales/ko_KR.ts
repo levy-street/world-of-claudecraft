@@ -753,6 +753,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureGuide.lootClass': '직업',
   'hudChrome.adventureGuide.lootSpec': '전문화',
   'hudChrome.adventureGuide.allSpecs': '모든 전문화',
+  'hudChrome.adventureGuide.allClasses': '모든 직업',
   'hudChrome.adventureGuide.lootHint':
     '선택한 전문화에 적합한 능력치를 가진 착용 가능한 장비를 표시합니다. 공통 보상도 표시됩니다. 드롭 확률은 전체 전리품 목록을 기준으로 합니다.',
   'hudChrome.adventureGuide.lootEmpty': '이 직업과 전문화에 맞는 장비가 없습니다.',
@@ -8569,7 +8570,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '장인의 불씨',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
-  'hudChrome.raidLockout.bossSavedNoLoot': '이번 주에 이미 이 우두머리를 처치했으므로 당신을 위한 전리품이 없습니다.',
+  'hudChrome.raidLockout.bossSavedNoLoot':
+    '이번 주에 이미 이 우두머리를 처치했으므로 당신을 위한 전리품이 없습니다.',
   'hudChrome.raidLockout.bossNameHeroic': '{raid}: {boss} (영웅)',
   'hudChrome.practiceDps.title': '훈련용 허수아비',
   'hudChrome.practiceDps.prompt': '허수아비를 공격하여 측정을 시작하세요',
@@ -27024,6 +27026,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureJournal.bannerKicker': '{instance}, 우두머리 {index}/{total}',
   'hudChrome.adventureJournal.bossCount': '{defeated}/{total}',
   'hudChrome.adventureJournal.statusNext': '다음 차례',
+  'hudChrome.adventureJournal.searchLabel': '우두머리 검색',
+  'hudChrome.adventureJournal.searchPlaceholder': '우두머리 또는 인스턴스 검색',
+  'hudChrome.adventureJournal.searchResults': '찾은 우두머리',
+  'hudChrome.adventureJournal.searchEmpty': '우두머리를 찾을 수 없습니다',
+  'hudChrome.adventureJournal.searchClear': '검색 지우기',
+  'hudChrome.adventureJournal.searchCount.one': '우두머리 {count}명을 찾았습니다',
+  'hudChrome.adventureJournal.searchCount.other': '우두머리 {count}명을 찾았습니다',
+  'hudChrome.adventureJournal.lootScopeLabel': '표시할 전리품',
+  'hudChrome.adventureJournal.lootScopeBoss': '이 우두머리',
+  'hudChrome.adventureJournal.lootScopeInstance': '모든 우두머리',
+  'hudChrome.adventureJournal.lootNoneInstance':
+    '{instance}의 우두머리는 {difficulty} 난이도에서 아이템을 떨어뜨리지 않습니다.',
+  'hudChrome.adventureJournal.lootShowAll': '모든 직업 보기',
+  'hudChrome.adventureJournal.lootHiddenPlural.one':
+    '다른 직업이나 전문화용 전리품이 {count}개 더 있습니다.',
+  'hudChrome.adventureJournal.lootHiddenPlural.other':
+    '다른 직업이나 전문화용 전리품이 {count}개 더 있습니다.',
   'hudChrome.adventureJournal.mythicSoon': '신화: 출시 예정',
   'hudChrome.adventureJournal.roleEveryone': '모두',
   'hudChrome.adventureJournal.aboutHeading': '전투 소개',

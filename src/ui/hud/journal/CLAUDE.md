@@ -4,18 +4,20 @@ One window (`#adventure-journal-window`) for every five-player dungeon and raid 
 page, in the owner-approved "clean modern" look (a calm dark panel, one amber accent,
 the system sans at 15px and up, Cinzel only for the boss name, no letter-spaced
 capitals): a Dungeons and Raids list with expandable instances and a status under each
-boss (Defeated, Next up, Final boss), a banner (circular portrait, "raid, boss N of M",
-a one-line summary, stat chips, the Normal / Heroic / Mythic selector), underline tabs
+boss (Defeated, Next up, Final boss) under a boss search, a banner (circular portrait, "raid, boss N of M",
+a one-line summary, stat chips, the Normal / Heroic / Mythic crests), underline tabs
 for Overview (the encounter beside its 3D model, Strategy by role), Abilities (phase
 headers with a health pill; each row shows what to do and opens on the full text plus
-damage and timer chips) and Loot. On a phone the list is a drawer behind a breadcrumb,
+damage and timer chips) and Loot (one boss or all bosses, filtered by class and
+specialization). On a phone the list is a drawer behind a breadcrumb,
 with a row of the instance's boss portraits.
 A light MMO layer sits on top of that look, never a redesign: a thin bronze frame with
 corner marks and a lozenge emblem in the title bar (desktop only; the phone sheet has no
 edge to frame), a darkened picture of the boss's room behind the banner, ability icons in
 the action bar's own `.ui-socket`, drops as `.ui-socket--bag` slots rimmed in their
-quality colour (hover or long-press opens the real item tooltip), danger skulls over each
-difficulty (1, 2, 3), a page turn on opening and a soft click on a new tab or difficulty
+quality colour (hover or long-press opens the real item tooltip), each difficulty a small
+shield crest wearing its danger skulls (1, 2, 3) in its own colour (Normal steel,
+Heroic forge fire, Mythic arcane violet; the selected one lit), a page turn on opening and a soft click on a new tab or difficulty
 (the game's sampled UI cues through `GameAudio`, so the SFX volume applies). No open or
 close animation (the owner's call).
 The PAGES are not here: they are journal sources in `src/ui/boss_journal/` (the
@@ -32,7 +34,13 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
 | `journal_hit_icons.ts` | Pure: the death recap's icon lookup, one index over every catalog page (both tiers) of (dealer's mob template, damage label) to the mechanic's `iconId`, from the pages' `hits` and `hitSources`. A label matches only on the page whose body dealt it. |
 | `journal_progress_view.ts` | Pure core: the personal layer of a page. Kills per difficulty from `IWorld.bossKills` (a council reads the member the sim keys it under), and the lockout from `IWorld.raidLockouts` with the sim's own ids: each instance's rooms are its Finder activity's, each room's lock belongs to the page holding that room's final boss, the boundary is the room's (weekly or the realm day). An instance whose rooms the sim never locks (the Smith's Heart today) shows kills only. |
 | `journal_progress_html.ts` | Markup strings only: the "Your kills" strip under the banner chips, the lockout line ("Saved on Heroic: 1 of 2 bosses", resets in, and when) and the kicker's "Defeated this week" chip. |
-| `journal_page_html.ts` | Markup strings only (no DOM): head, nav, the phone's breadcrumb and strip, banner, tab bar, Overview, Abilities, Loot, Coming soon. |
+| `journal_page_html.ts` | Markup strings only (no DOM): head, nav, the phone's breadcrumb and strip, banner, tab bar, Overview, Abilities, Coming soon. |
+| `journal_difficulty_html.ts` | Markup strings only: the difficulty crests (a shield per tier wearing its skulls, Mythic's lock, the Coming soon note) and the tier names. Each tier's colour identity is the `--color-aj-tier-*` tokens, pinned readable by `tests/adventure_journal_styles.test.ts`. |
+| `journal_search_view.ts` | Pure core: the boss search's matcher (case and accent folding, a page found by its title, a council member or its instance, best match first) and the results cursor. Names arrive localized. |
+| `journal_search_html.ts` | Markup strings only: the search field, its results (portrait, name, instance) and empty state, and the page list in the current language. |
+| `journal_search_controller.ts` | The search wired (cold, event-driven): paints results in place (never a window repaint, so the caret and an IME composition survive), arrows, Enter, click, Escape, the clear button. A plain `<input>`, so `src/game/input.ts` fires no game key while typing. |
+| `journal_loot_filter_view.ts` | Pure core: the Loot tab's class and specialization filter, the Adventure Guide's own rule (`lootPreviewFits` in `dungeon_loot_preview_view.ts`), one boss or every boss of the instance. Null is All classes. |
+| `journal_loot_html.ts` | Markup strings only: the Loot bar (This boss / All bosses, then the Adventure Guide's pickers, `lootPreviewControlsHtml` with All classes), the drops as bag slots, the count the filter hides, the empty cards. |
 | `adventure_journal_window.ts` | The cold window (`UI_DOM_MODULES`): state, events, focus, tooltips, the 3D model slot. |
 | `journal_launchers.ts` | Binds the side rail button, the phone More-tray button and the target frame's book. |
 
@@ -52,6 +60,9 @@ dungeon pages, the Smith's Heart in `raids/`) and the shipped raid guide
   A saved page reads Defeated in the list on the difficulty being read. A lockout is the
   sim's per ROOM, so a Heroic dungeon marks only its final boss page while the banner of
   every page says Saved; never invent a lockout for an instance the sim does not lock.
+- The Loot filter opens on the character's class and current specialization
+  (`IWorld.cfg.playerClass`, `IWorld.talentSpec`) and never re-decides what an item is
+  for: it is the Adventure Guide's rule, shared, so the two never disagree.
 - The 3D model lives on the Overview tab (the encounter card); the banner portrait's eye
   button opens it. Abilities and Loot hold no WebGL context.
 - The Raids list reads in catalog order (`RAID_INSTANCES`): Nythraxis, the Crucible, the

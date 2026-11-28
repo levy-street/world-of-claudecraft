@@ -532,6 +532,7 @@ export const zh_CN: EnTranslations = {
       "lootClass": "职业",
       "lootSpec": "专精",
       "allSpecs": "所有专精",
+      "allClasses": "所有职业",
       "lootHint": "显示可用且属性适合所选专精的装备。通用奖励仍会显示。掉落几率按完整掉落列表计算。",
       "lootEmpty": "没有适合此职业和专精的装备。",
       "fullTableRoll": "从完整掉落列表中获得一件物品",
@@ -4533,7 +4534,25 @@ export const zh_CN: EnTranslations = {
       "savedInstance": "{difficulty}已锁定",
       "resetsIn": "{time}后重置，{when}",
       "defeatedThisWeek": "本周已击败",
-      "defeatedToday": "今日已击败"
+      "defeatedToday": "今日已击败",
+      "searchLabel": "搜索首领",
+      "searchPlaceholder": "搜索首领或副本",
+      "searchResults": "找到的首领",
+      "searchEmpty": "未找到首领",
+      "searchClear": "清除搜索",
+      "searchCount": {
+        "one": "找到{count}个首领",
+        "other": "找到{count}个首领"
+      },
+      "lootScopeLabel": "显示的战利品",
+      "lootScopeBoss": "此首领",
+      "lootScopeInstance": "所有首领",
+      "lootNoneInstance": "{instance}中没有首领在{difficulty}难度下掉落物品。",
+      "lootShowAll": "显示所有职业",
+      "lootHiddenPlural": {
+        "one": "另有{count}件掉落适合其他职业或专精。",
+        "other": "另有{count}件掉落适合其他职业或专精。"
+      }
     },
     "raidBossGuide": {
       "title": "首领指南",

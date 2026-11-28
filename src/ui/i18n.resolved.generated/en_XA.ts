@@ -532,6 +532,7 @@ export const en_XA: EnTranslations = {
       "lootClass": "[Çļášš]",
       "lootSpec": "[Šþéçíáļížáţíóñ]",
       "allSpecs": "[Áļļ šþéçíáļížáţíóñš]",
+      "allClasses": "[Áļļ çļáššéš]",
       "lootHint": "[Úšáƀļé ĝéáŕ ŵíţĥ ţĥé šéļéçţéð šþéçíáļížáţíóñ'š šţáţ áƒƒíñíţý. Ĝéñéŕáļ ŕéŵáŕðš ŕéɱáíñ ʋíšíƀļé. Ðŕóþ çĥáñçéš úšé ţĥé ƒúļļ ļóóţ ţáƀļé.]",
       "lootEmpty": "[Ñó éɋúíþɱéñţ ɱáţçĥéš ţĥíš çļášš áñð šþéçíáļížáţíóñ.]",
       "fullTableRoll": "[Óñé íţéɱ ƒŕóɱ ţĥé ƒúļļ ļóóţ ţáƀļé]",
@@ -4533,7 +4534,25 @@ export const en_XA: EnTranslations = {
       "savedInstance": "[Šáʋéð óñ {difficulty}]",
       "resetsIn": "[Ŕéšéţš íñ {time}, {when}]",
       "defeatedThisWeek": "[Ðéƒéáţéð ţĥíš ŵééķ]",
-      "defeatedToday": "[Ðéƒéáţéð ţóðáý]"
+      "defeatedToday": "[Ðéƒéáţéð ţóðáý]",
+      "searchLabel": "[Šéáŕçĥ ƀóššéš]",
+      "searchPlaceholder": "[Šéáŕçĥ ƀóššéš óŕ íñšţáñçéš]",
+      "searchResults": "[Ɓóššéš ƒóúñð]",
+      "searchEmpty": "[Ñó ƀóššéš ƒóúñð]",
+      "searchClear": "[Çļéáŕ ţĥé šéáŕçĥ]",
+      "searchCount": {
+        "one": "[{count} ƀóšš ƒóúñð]",
+        "other": "[{count} ƀóššéš ƒóúñð]"
+      },
+      "lootScopeLabel": "[Ļóóţ ţó šĥóŵ]",
+      "lootScopeBoss": "[Ţĥíš ƀóšš]",
+      "lootScopeInstance": "[Áļļ ƀóššéš]",
+      "lootNoneInstance": "[Ñó ƀóšš íñ {instance} ðŕóþš íţéɱš óñ {difficulty}.]",
+      "lootShowAll": "[Šĥóŵ éʋéŕý çļášš]",
+      "lootHiddenPlural": {
+        "one": "[{count} ɱóŕé ðŕóþ íš ƒóŕ áñóţĥéŕ çļášš óŕ šþéçíáļížáţíóñ.]",
+        "other": "[{count} ɱóŕé ðŕóþš áŕé ƒóŕ óţĥéŕ çļáššéš óŕ šþéçíáļížáţíóñš.]"
+      }
     },
     "raidBossGuide": {
       "title": "[Ɓóšš Ĝúíðé]",

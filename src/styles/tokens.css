@@ -385,6 +385,28 @@
        The mask fades the picture's edges. */
     --color-aj-banner-scrim: #181a20b0;
     --color-aj-mask: #000;
+    /* The difficulty crests' three colour identities (a steady steel for
+       Normal, a forge fire for Heroic, an arcane violet for Mythic): the ink
+       (the lit name and the rim's highlight), the crest's face from light to
+       deep, the glow of the selected crest and the wash of its plate. */
+    --color-aj-tier-normal: #a9cdf0;
+    --color-aj-tier-normal-mid: #5b86ad;
+    --color-aj-tier-normal-deep: #1f3953;
+    --color-aj-tier-normal-glow: #8fbbe666;
+    --color-aj-tier-normal-wash: #8fbbe61f;
+    --color-aj-tier-heroic: #ffab6b;
+    --color-aj-tier-heroic-mid: #d9561f;
+    --color-aj-tier-heroic-deep: #5a1606;
+    --color-aj-tier-heroic-glow: #ff73267a;
+    --color-aj-tier-heroic-wash: #ff8c3a26;
+    --color-aj-tier-mythic: #cfaeff;
+    --color-aj-tier-mythic-mid: #7c52d9;
+    --color-aj-tier-mythic-deep: #26104f;
+    --color-aj-tier-mythic-glow: #a678ff73;
+    --color-aj-tier-mythic-wash: #a678ff24;
+    /* A crest's top sheen and its skulls' shadow. */
+    --color-aj-crest-sheen: #ffffff40;
+    --color-aj-crest-shade: #0000008c;
     --color-store-promo-dot-shadow: #000;
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no

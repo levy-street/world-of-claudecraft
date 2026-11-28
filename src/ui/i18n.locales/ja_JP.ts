@@ -753,6 +753,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureGuide.lootClass': 'クラス',
   'hudChrome.adventureGuide.lootSpec': '専門分野',
   'hudChrome.adventureGuide.allSpecs': 'すべての専門分野',
+  'hudChrome.adventureGuide.allClasses': 'すべてのクラス',
   'hudChrome.adventureGuide.lootHint':
     '選択した専門分野に適した能力値を持つ、使用可能な装備を表示します。共通の報酬も表示されます。ドロップ率は戦利品テーブル全体に基づきます。',
   'hudChrome.adventureGuide.lootEmpty': 'このクラスと専門分野に合う装備はありません。',
@@ -8609,7 +8610,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '匠の残り火',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
-  'hudChrome.raidLockout.bossSavedNoLoot': '今週はすでにこのボスを倒しているため、あなたへの戦利品はありません。',
+  'hudChrome.raidLockout.bossSavedNoLoot':
+    '今週はすでにこのボスを倒しているため、あなたへの戦利品はありません。',
   'hudChrome.raidLockout.bossNameHeroic': '{raid}:{boss}(ヒロイック)',
   'hudChrome.practiceDps.title': '練習用ダミー',
   'hudChrome.practiceDps.prompt': 'ダミーを攻撃して計測を開始',
@@ -27010,6 +27012,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureJournal.bannerKicker': '{instance}、ボス {index}/{total}',
   'hudChrome.adventureJournal.bossCount': '{defeated}/{total}',
   'hudChrome.adventureJournal.statusNext': '次の相手',
+  'hudChrome.adventureJournal.searchLabel': 'ボスを検索',
+  'hudChrome.adventureJournal.searchPlaceholder': 'ボスやインスタンスを検索',
+  'hudChrome.adventureJournal.searchResults': '見つかったボス',
+  'hudChrome.adventureJournal.searchEmpty': 'ボスが見つかりません',
+  'hudChrome.adventureJournal.searchClear': '検索をクリア',
+  'hudChrome.adventureJournal.searchCount.one': 'ボス{count}体が見つかりました',
+  'hudChrome.adventureJournal.searchCount.other': 'ボス{count}体が見つかりました',
+  'hudChrome.adventureJournal.lootScopeLabel': '表示する戦利品',
+  'hudChrome.adventureJournal.lootScopeBoss': 'このボス',
+  'hudChrome.adventureJournal.lootScopeInstance': 'すべてのボス',
+  'hudChrome.adventureJournal.lootNoneInstance':
+    '{instance}のボスは{difficulty}ではアイテムを落とさない。',
+  'hudChrome.adventureJournal.lootShowAll': 'すべてのクラスを表示',
+  'hudChrome.adventureJournal.lootHiddenPlural.one':
+    'ほかに{count}件のドロップが別のクラスまたは専門分野向けです。',
+  'hudChrome.adventureJournal.lootHiddenPlural.other':
+    'ほかに{count}件のドロップが別のクラスまたは専門分野向けです。',
   'hudChrome.adventureJournal.mythicSoon': 'ミシック：近日公開',
   'hudChrome.adventureJournal.roleEveryone': '全員',
   'hudChrome.adventureJournal.aboutHeading': 'この戦いについて',

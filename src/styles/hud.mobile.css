@@ -3947,8 +3947,23 @@
     flex-basis: auto;
   }
   body.mobile-touch #adventure-journal-window .aj-diff button {
+    min-width: 68px;
     min-height: 40px;
+    padding: 8px 8px 7px;
+    gap: 4px;
     font-size: 15px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-crest-wrap {
+    width: 31px;
+    height: 34px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-diff .aj-skulls .ui-icon {
+    width: 10px;
+    height: 10px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-diff .aj-skulls-1 .ui-icon {
+    width: 15px;
+    height: 15px;
   }
   body.mobile-touch #adventure-journal-window .aj-soon-note {
     font-size: 14px;
@@ -4087,6 +4102,31 @@
   }
   body.mobile-touch #adventure-journal-window .aj-loot {
     grid-template-columns: minmax(0, 1fr);
+  }
+  /* The boss search in the drawer, and the Loot bar: 40px targets and up. */
+  body.mobile-touch #adventure-journal-window .aj-search-input {
+    height: 44px;
+    padding-right: 46px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-search-clear {
+    right: 2px;
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-search-hit {
+    min-height: 44px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-loot-bar {
+    align-items: stretch;
+  }
+  body.mobile-touch #adventure-journal-window .aj-loot-scope-btn {
+    flex: 1;
+    min-height: 40px;
+    font-size: 15px;
+  }
+  body.mobile-touch #adventure-journal-window .df-loot-selects select {
+    height: 44px;
   }
   /* One anchor for both strips: the column (hud.css #aura-stack) owns the
      buff-to-debuff clearance, so the two `top` offsets that used to set it are

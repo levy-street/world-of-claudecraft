@@ -469,6 +469,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/journal/journal_backdrop_view.ts',
   // The personal layer: kills per difficulty and the lockouts of a page.
   'src/ui/hud/journal/journal_progress_view.ts',
+  // The boss search's matcher and the Loot tab's class/spec filter.
+  'src/ui/hud/journal/journal_search_view.ts',
+  'src/ui/hud/journal/journal_loot_filter_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',

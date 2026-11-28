@@ -532,6 +532,7 @@ export const sv_SE: EnTranslations = {
       "lootClass": "Klass",
       "lootSpec": "Specialisering",
       "allSpecs": "Alla specialiseringar",
+      "allClasses": "All classes",
       "lootHint": "Användbar utrustning med egenskaper som passar den valda specialiseringen. Allmänna belöningar visas också. Chansen att få ett föremål utgår från hela bytestabellen.",
       "lootEmpty": "Ingen utrustning matchar denna klass och specialisering.",
       "fullTableRoll": "Ett föremål från hela bytestabellen",
@@ -4533,7 +4534,25 @@ export const sv_SE: EnTranslations = {
       "savedInstance": "Saved on {difficulty}",
       "resetsIn": "Resets in {time}, {when}",
       "defeatedThisWeek": "Defeated this week",
-      "defeatedToday": "Defeated today"
+      "defeatedToday": "Defeated today",
+      "searchLabel": "Search bosses",
+      "searchPlaceholder": "Search bosses or instances",
+      "searchResults": "Bosses found",
+      "searchEmpty": "No bosses found",
+      "searchClear": "Clear the search",
+      "searchCount": {
+        "one": "{count} boss found",
+        "other": "{count} bosses found"
+      },
+      "lootScopeLabel": "Loot to show",
+      "lootScopeBoss": "This boss",
+      "lootScopeInstance": "All bosses",
+      "lootNoneInstance": "No boss in {instance} drops items on {difficulty}.",
+      "lootShowAll": "Show every class",
+      "lootHiddenPlural": {
+        "one": "{count} more drop is for another class or specialization.",
+        "other": "{count} more drops are for other classes or specializations."
+      }
     },
     "raidBossGuide": {
       "title": "Bossguide",
