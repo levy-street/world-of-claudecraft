@@ -554,7 +554,17 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // LOWERED 17736 -> 17726: the spell ground aim's construction moved to
+    // hud/action_bar/hud_player_ground_aim.ts, paying for the world markers'
+    // seam (hud/world_markers/), with the slack banked.
+    // LOWERED 17726 -> 17709: the raid target icon picker moved to
+    // hud/raid_target_menu.ts, paying for the ally marks' menu rows and the
+    // party / target-of-target frame wiring.
+    // LOWERED 17709 -> 17704 by the party pings: four dead imports went, paying
+    // for the hud/pings/ field, its import and its fast-band tick.
+    // LOWERED 17704 -> 17671: the target cast bar's element refs, options and
+    // reused paint input moved to target_cast_bar.ts with the boss ability icon.
+    ceiling: 17671,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1318,7 +1328,17 @@ const MONOLITHS: MonolithRow[] = [
     // riding progression lives in riding_training.ts. wc -l on the merged tree.
     // 11485 after the courier full-bank sync (PR 4598). wc -l.
     // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 11410,
+    // LOWERED 11410 -> 11398 by the party pings: the dead partyIncomingHeals (the party
+    // frames read party_frame_info.ts partyFrameIncomingHeals) went, paying for the
+    // three ping delegates over social/party_pings.ts. wc -l, exact count.
+    // LOWERED 11398 -> 11391 by the Adventure Journal's raidRun: the rift
+    // lockpick resolver and the death-zone read moved to rift/runs.ts
+    // (riftInstanceForPid, riftBossDeathZonesFor), paying for the raidRun
+    // getter over instances/raid_run.ts. wc -l, exact count.
+    // LOWERED 11391 -> 11390 by the per-boss save's corpse cue: the raidLockouts
+    // countdown loop moved to raid_lockout_state.ts (raidLockoutCountdowns),
+    // paying for the corpseBossLootDenied delegate over interaction.ts. wc -l.
+    ceiling: 11390,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1577,7 +1597,8 @@ const MONOLITHS: MonolithRow[] = [
     // Landing-first integration extracts the project counter and community tracking.
     // Re-pin the combined release entrypoint at its measured size, with zero slack.
     // LOWERED to 10773 at the merge of PR 4390 (riding ranks) over release/v0.45.0. wc -l.
-    ceiling: 10773,
+    // LOWERED to 10761: the entry's paint wait moved into src/game/next_paint.ts. wc -l.
+    ceiling: 10761,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1861,7 +1882,11 @@ const MONOLITHS: MonolithRow[] = [
     // Membership boot wiring lives with its service factory.
     // Main ce21c7a66f5 sync: parent pins 9758 (Halloween) and 9693 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 9696,
+    // LOWERED to 9694: the raid-marker cases and the social self rows moved to
+    // server/marker_commands.ts and server/self_social_wire.ts. wc -l.
+    // LOWERED 9694 -> 9684: the corpse-loot wire bits (tap, hcb, ffa, cd) moved
+    // to server/corpse_loot_wire.ts with the per-boss lock's new bll. wc -l.
+    ceiling: 9684,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2063,7 +2088,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5338 -> 5330 at the integration merge of #4525: the reconnect backoff
     // schedule moved into reconnect_policy.ts beside its predicates, paying for the
     // tavern's resting getter and sitOnSeat send. wc -l. Exact count.
-    ceiling: 5330,
+    // LOWERED 5330 -> 5326: the corpse-loot decode (tap, hcb, ffa, and the new
+    // per-boss lock bll) moved to src/net/corpse_loot_wire.ts, paying for the
+    // corpseBossLootDenied read. wc -l. Exact count.
+    ceiling: 5326,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

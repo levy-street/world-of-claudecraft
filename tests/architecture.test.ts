@@ -234,6 +234,22 @@ const UI_PURE_CORES = [
   // The trinket auras' tooltip descriptor and their item-icon art map.
   'src/ui/trinket_aura_effect.ts',
   'src/ui/trinket_aura_art.ts',
+  // The Smith's Heart's aura tooltip descriptors and their per-tier damage
+  // rounding (pure: sim tuning in, a hudChrome key plus numbers out).
+  'src/ui/council_aura_effect.ts',
+  'src/ui/breath_aura_effect.ts',
+  'src/ui/quench_aura_effect.ts',
+  'src/ui/heat_aura_effect.ts',
+  'src/ui/hard_enrage_aura_effect.ts',
+  'src/ui/final_aura_effect.ts',
+  'src/ui/final_phase_aura_effect.ts',
+  'src/ui/heart_tier_damage.ts',
+  // The Smith's Heart's painted aura art: the ids with their own painting and the
+  // aliases that share one (pure data folded into icons.ts and aura_icon_view.ts).
+  'src/ui/smith_heart_aura_art.ts',
+  // The Smith's Heart's painted boss ability art: the journal icon ids with a
+  // painting and the ones wearing a raid aura painting (pure data folded into icons.ts).
+  'src/ui/boss_ability_art.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
@@ -303,6 +319,33 @@ const UI_PURE_CORES = [
   // The atlas rail width: clamp, drag and key steps (map_rail_resize_controller.ts
   // applies it as --map-rail-width).
   'src/ui/hud/map/map_rail_width_core.ts',
+  // The raid atlas (src/ui/hud/raid_atlas/): its static plan (pages, rooms,
+  // bosses, portals from the raid's content), its camera (zoom and pan as
+  // pure state), the player's pins (edits, hit test, defensive parse), its
+  // palette roles, and its live frame (player, raid, boss states).
+  'src/ui/hud/raid_atlas/raid_atlas_plan_core.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_camera_core.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_pins_core.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_palette_core.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_view.ts',
+  // The atlas on the round minimap: the page crop, the detail tile, the
+  // room-name policy and the idle-skip key.
+  'src/ui/hud/raid_atlas/raid_atlas_minimap_core.ts',
+  // The boss pins as data: faces, portrait URLs, the tooltip model, the hit
+  // test that follows the camera, and the card's placement beside its pin.
+  'src/ui/hud/raid_atlas/raid_atlas_boss_core.ts',
+  // The group's shared marks (the raid world markers) as data: the page index
+  // to floor mapping, the edit right (the sim's rule), the hit test, the key.
+  'src/ui/hud/raid_atlas/raid_atlas_shared_marks_core.ts',
+  // The rooms' fine detail as a drawing plan: the Anvil's quarters, ridges,
+  // ring, well, altars and grooves, every room's landmarks and line features.
+  'src/ui/hud/raid_atlas/raid_atlas_detail_core.ts',
+  'src/ui/hud/world_markers/world_markers_core.ts',
+  // Party pings: the wheel's wedges, the key's tap-or-hold rule, the feed's chat/minimap math.
+  'src/ui/hud/pings/ping_wheel_core.ts',
+  'src/ui/hud/pings/ping_feed_core.ts',
+  // the ping's chat callout: its parts, the kind colour class, the unit's reaction
+  'src/ui/hud/pings/ping_chat_line_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
@@ -372,6 +415,8 @@ const UI_PURE_CORES = [
   'src/ui/nonplayer_portrait_core.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
+  // The heal-absorb overlay (segment edges + healing-left number) on unit frames.
+  'src/ui/heal_absorb_bar_view.ts',
   'src/ui/party_frames.ts',
   'src/ui/party_target_hotkeys_core.ts',
   'src/ui/party_below_target_core.ts',
@@ -418,6 +463,18 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_boss_guide_view.ts',
   'src/ui/boss_journal/journal_view.ts',
+  // The Adventure Journal's navigation and loot models (hud/journal/).
+  'src/ui/hud/journal/journal_nav_view.ts',
+  'src/ui/hud/journal/journal_loot_view.ts',
+  // The journal page furniture: phase pills, fact chips, list status.
+  'src/ui/hud/journal/journal_banner_view.ts',
+  // The banner backdrops: which room picture a page shows, if any.
+  'src/ui/hud/journal/journal_backdrop_view.ts',
+  // The personal layer: kills per difficulty and the lockouts of a page.
+  'src/ui/hud/journal/journal_progress_view.ts',
+  // The boss search's matcher and the Loot tab's class/spec filter.
+  'src/ui/hud/journal/journal_search_view.ts',
+  'src/ui/hud/journal/journal_loot_filter_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',
@@ -717,6 +774,18 @@ const UI_PURE_CORES = [
   // Zulgar's breath, spear, Sunstruck window and sun glyphs) and its scene scan.
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/dungeon/wildheart_alert_scene_core.ts',
+  // The Smith's Heart's alerts: the Guardian of the Quench's cold bar, the
+  // final's, the Knotted Gale's (the Hammer Council has none since 2026-11-17).
+  'src/ui/hud/dungeon/quench_alert_view.ts',
+  // Its screen effects (the frost border, the water's tint).
+  'src/ui/hud/dungeon/quench_screen_view.ts',
+  'src/ui/hud/dungeon/quench_cold_view.ts',
+  'src/ui/hud/dungeon/knot_alert_view.ts',
+  'src/ui/hud/dungeon/tank_swap_alert_view.ts',
+  'src/ui/hud/dungeon/coal_alert_view.ts',
+  'src/ui/hud/dungeon/heart_final_phase_view.ts',
+  // The Guardian of the Breath's wind badge (every preset).
+  'src/ui/hud/dungeon/breath_wind_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.
@@ -875,6 +944,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
   'src/ui/hud/transport/ferry_hud_view.ts',
   'src/ui/raid_marker_labels_view.ts',
+  'src/ui/raid_target_icons_core.ts',
   'src/ui/hud/practice/practice_dps_view.ts',
   'src/ui/hud/practice/hub_lesson_view.ts',
   'src/ui/hud/talking_head/talking_head_core.ts',
@@ -912,6 +982,9 @@ const RENDER_PURE_CORES = [
   'src/render/mount_embers_core.ts',
   // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)
   'src/render/mount_rear_core.ts',
+  // the Quarryheart Charger's heartbeat, arrival, gait rates and hoof strikes
+  // (quarryheart_charger_fx.ts)
+  'src/render/quarryheart_charger_fx_core.ts',
   // the per-skin swing trail lookup (renderer.ts triggerAttack)
   'src/render/weapon_skin_trail_core.ts',
   // the ambient motes' fade around the local player (motes.ts)
@@ -1076,6 +1149,210 @@ const RENDER_PURE_CORES = [
   'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_works_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_surface_wear_core.ts',
+  'src/render/smith_heart/heart_plan_core.ts',
+  'src/render/smith_heart/heart_walls_core.ts',
+  'src/render/smith_heart/heart_rivers_core.ts',
+  'src/render/smith_heart/heart_seal_core.ts',
+  'src/render/smith_heart/ring_crystal_core.ts',
+  'src/render/smith_heart/heart_gates_core.ts',
+  'src/render/smith_heart/heart_sightline_core.ts',
+  // The Smith's Heart's portal moments (the opening, the hop, the area blend),
+  // the Heart's chains, keels and core, and the mountain round every floor.
+  'src/render/smith_heart/heart_portal_core.ts',
+  'src/render/smith_heart/heart_room_core.ts',
+  'src/render/smith_heart/heart_mountain_core.ts',
+  // The Hammer vein's cliff faces' quarry granite paint.
+  'src/render/smith_heart/heart_cliff_paint_core.ts',
+  // The Hammer vein's Blender kit: the placement record and its plan.
+  'src/render/smith_heart/heart_kit_core.ts',
+  'src/render/smith_heart/hammer_kit_plan_core.ts',
+  // The Breath vein's painted rebuild: what stands in for what, its paint's share.
+  'src/render/smith_heart/breath_env_plan_core.ts',
+  // The Quench vein's painted rebuild: what stands in for what, its paint's share.
+  'src/render/smith_heart/quench_env_plan_core.ts',
+  // The Heat vein's painted rebuild: what stands in for what, its fall, ring and paint.
+  'src/render/smith_heart/heat_env_plan_core.ts',
+  // The Heat's set round its hall: the magma lake, the falls' ribbons, the glows and smoke.
+  'src/render/smith_heart/heat_env_set_core.ts',
+  // The Heart's crown dressed with the four veins' painted rock.
+  'src/render/smith_heart/heart_env_dress_core.ts',
+  // The Ring's set: the pit's mist and each vein's rune on its standing stones.
+  'src/render/smith_heart/ring_set_core.ts',
+  // The vein crystals: a collar over each river's head, its crystal grown when the guardian dies.
+  'src/render/smith_heart/vein_crystal_core.ts',
+  // The painted rock's shader both painted veins lay over the rock they keep.
+  'src/render/smith_heart/env_rock_paint_core.ts',
+  // The Hammer vein's painted rebuild: what stands in for what, and the new ruins.
+  'src/render/smith_heart/hammer_env_plan_core.ts',
+  // The mountain's rock kit (phase 2E): its bands and lips, and the Hammer
+  // Gallery's kerb and chain rail.
+  'src/render/smith_heart/heart_rock_plan_core.ts',
+  'src/render/smith_heart/hammer_walk_plan_core.ts',
+  // The Ring's kit (phase 2F): the Ring, its stairs, the dais, the spires, the mouths.
+  'src/render/smith_heart/ring_kit_plan_core.ts',
+  // The Hammer vein's air and the Hammer guardian's and the Slab's effects.
+  'src/render/smith_heart/hammer_air_core.ts',
+  'src/render/smith_heart_fx/hammer_fx_core.ts',
+  // The Breath vein (phase 2G): its kit's plan, its air and weather, its
+  // guardian's effects.
+  'src/render/smith_heart/breath_kit_plan_core.ts',
+  'src/render/smith_heart/breath_air_core.ts',
+  // The Cornice's open sky (the Breath's third pass): the cloud sea, the far peaks.
+  'src/render/smith_heart/breath_summit_core.ts',
+  // The Breath's storm granite on its cliffs and mountain (vertex paint).
+  'src/render/smith_heart/breath_stone_core.ts',
+  // The Breath's storm granite on the rock kit, and the faces hung under its
+  // high walks (the AAA pass's third round).
+  'src/render/smith_heart/breath_rock_storm_core.ts',
+  'src/render/smith_heart/heart_rock_hang_core.ts',
+  'src/render/smith_heart/heart_rock_gulf_core.ts',
+  // The roots of the mountain readable on the dark crown (the third round).
+  'src/render/smith_heart/heart_root_look_core.ts',
+  'src/render/smith_heart_fx/breath_fx_core.ts',
+  'src/render/smith_heart_fx/boss_far_lod_core.ts',
+  'src/render/smith_heart/heart_crown_ridge_core.ts',
+  'src/render/smith_heart_fx/breath_roar_fx_core.ts',
+  // which players the Breath's red arrows ride (breath_fight_fx.ts)
+  'src/render/smith_heart_fx/breath_arrow_core.ts',
+  'src/render/smith_heart_fx/final_arrow_core.ts',
+  // a thrown body's drawn hop off the floor (thrown_hop.ts, the Summit Roar)
+  'src/render/thrown_hop_core.ts',
+  'src/render/smith_heart_fx/breath_heart_fx_core.ts',
+  // The Quench vein (phase 2H): its kit's plan, the shared lip walls, its
+  // frost on the mountain, its air and weather, its guardian's effects.
+  'src/render/smith_heart/quench_kit_plan_core.ts',
+  'src/render/smith_heart/lip_walls_core.ts',
+  'src/render/smith_heart/quench_frost_core.ts',
+  'src/render/smith_heart/quench_air_core.ts',
+  'src/render/smith_heart_fx/quench_fx_core.ts',
+  // The Smith's Heart's Heat vein (phase 2I): its kit's plan, its basalt on
+  // the mountain, its air and the pour's timeline, its guardian's effects.
+  'src/render/smith_heart/heat_kit_plan_core.ts',
+  'src/render/smith_heart/heat_soot_core.ts',
+  'src/render/smith_heart/heat_air_core.ts',
+  'src/render/smith_heart/heat_pour_core.ts',
+  'src/render/smith_heart_fx/heat_fx_core.ts',
+  // The Smith's Heart's final room (phase 2J): its kit's plan, its crown of
+  // rock, the final boss's memory, its body and effects.
+  'src/render/smith_heart/heart_room_kit_plan_core.ts',
+  'src/render/smith_heart/heart_crown_core.ts',
+  'src/render/smith_heart/heart_arrival_light_core.ts',
+  'src/render/smith_heart/heart_final_core.ts',
+  // The Anvil of the World's quarters awake (phase 2K): the boss memory, the
+  // floods, drains and shocks, the air's seeds.
+  'src/render/smith_heart/heart_quarters_core.ts',
+  'src/render/smith_heart/heart_vein_groove_core.ts',
+  'src/render/smith_heart/heart_floor_rite_core.ts',
+  // Phase 2M: the wall landmarks' frame, spots, eruption and lightning.
+  'src/render/smith_heart/heart_landmarks_core.ts',
+  'src/render/smith_heart_fx/final_body_core.ts',
+  'src/render/smith_heart_fx/final_fx_core.ts',
+  'src/render/smith_heart_fx/final_kit_fx_core.ts',
+  // Weight of the Anvil's hang, countdown, strike, fragments and beats.
+  'src/render/smith_heart_fx/final_anvil_core.ts',
+  'src/render/smith_heart_fx/final_phase_fx_core.ts',
+  'src/render/smith_heart_fx/final_stars_fx_core.ts',
+  'src/render/smith_heart_fx/final_elements_fx_core.ts',
+  // Avalanche's eruption: the spikes, their burst and crumble, the chunks,
+  // the torn floor (Jose's playtest of 2026-11-20).
+  'src/render/smith_heart_fx/final_avalanche_core.ts',
+  // Firestorm's wall of flame, its trail and burnt floor (Jose's playtest of
+  // 2026-11-23).
+  'src/render/smith_heart_fx/final_firestorm_core.ts',
+  // The burning pools' fire (the polish pass of 2026-11-23).
+  'src/render/smith_heart_fx/final_pool_flames_core.ts',
+  // The Hailstorm's ice chunks, their fall and shards (the second polish
+  // pass of 2026-11-24).
+  'src/render/smith_heart_fx/final_hail_core.ts',
+  'src/render/smith_heart_fx/final_overload_core.ts',
+  'src/render/smith_heart_fx/final_overload_ring_core.ts',
+  'src/render/smith_heart/heart_collapse_core.ts',
+  'src/render/smith_heart_fx/council_fx_core.ts',
+  'src/render/smith_heart_fx/breath_isles_fx_core.ts',
+  'src/render/smith_heart_fx/breath_isle_phase_core.ts',
+  'src/render/smith_heart_fx/council_bodies_core.ts',
+  // The members' bodies and Mountain's Rush's wind-up, run and scar.
+  'src/render/smith_heart_fx/council_mechanic_look_core.ts',
+  // The council's pull beat (each member's war cry as a pull begins).
+  'src/render/smith_heart_fx/council_pull_fx_core.ts',
+  // Mountain's Wrath's arena-wide floor.
+  'src/render/smith_heart_fx/council_wrath_field_core.ts',
+  // Mountain's Wrath's and Mountain's Rush's gather and release.
+  'src/render/smith_heart_fx/council_strike_core.ts',
+  // Stone Thrum's ripple off each risen pillar.
+  'src/render/smith_heart_fx/council_thrum_core.ts',
+  // The Guardian of the Breath's body (its storm form) and its fight's effects.
+  'src/render/smith_heart_fx/breath_body_core.ts',
+  'src/render/smith_heart_fx/breath_fight_fx_core.ts',
+  // The Wind Bridge over the chasm (2026-11-25).
+  'src/render/smith_heart_fx/breath_bridge_fx_core.ts',
+  'src/render/smith_heart_fx/quench_body_core.ts',
+  'src/render/smith_heart_fx/quench_wake_core.ts',
+  'src/render/smith_heart_fx/quench_breath_core.ts',
+  'src/render/smith_heart_fx/quench_strike_core.ts',
+  'src/render/smith_heart_fx/quench_strike_windup_core.ts',
+  'src/render/smith_heart_fx/quench_fight_fx_core.ts',
+  // The risen Quench blade's point continuing its kit piece, and the piece split.
+  'src/render/smith_heart_fx/quench_blade_tip_core.ts',
+  // The final boss's rebuild drawn into its own model.
+  'src/render/smith_heart_fx/final_arrival_core.ts',
+  'src/render/smith_heart_fx/final_death_core.ts',
+  // The Hammer Council's deaths, the quarry falling silent.
+  'src/render/smith_heart_fx/council_death_core.ts',
+  // The Guardian of the Heat's death, the fire going home.
+  'src/render/smith_heart_fx/heat_death_core.ts',
+  // The Guardian of the Breath's death, the storm losing its anchor.
+  'src/render/smith_heart_fx/breath_death_core.ts',
+  // The Guardian of the Quench's death, frozen from within and shattered.
+  'src/render/smith_heart_fx/quench_death_core.ts',
+  // The loot moment: the forge coffer rising beside a fallen guardian.
+  'src/render/smith_heart_fx/loot_coffer_core.ts',
+  'src/render/smith_heart_fx/quench_frost_fx_core.ts',
+  // Living Rime's crust and ring on its carrier.
+  'src/render/smith_heart_fx/quench_rime_core.ts',
+  // The Quench's frost glaze painted on a body's own material.
+  'src/render/smith_heart_fx/quench_glaze_core.ts',
+  // A character drawn sunk into water it stands in.
+  'src/render/characters/water_sink_core.ts',
+  'src/render/smith_heart_fx/heat_body_core.ts',
+  // The Heat guardian's living fire: its tongues, lick, ramp and bursts' caps.
+  'src/render/smith_heart_fx/heat_flame_core.ts',
+  'src/render/smith_heart_fx/heat_entrance_core.ts',
+  // The Quench guardian's entrance ("Under the ice"): its clock, beats, web,
+  // chunks and blades.
+  'src/render/smith_heart_fx/quench_entrance_core.ts',
+  'src/render/smith_heart_fx/council_entrance_core.ts',
+  // the five raid entrances' shared per-tier budget (entrance_budget.ts reads it)
+  'src/render/smith_heart_fx/entrance_budget_core.ts',
+  // The Breath guardian's entrance ("Calm before the storm"): its clock,
+  // beats, stone, strikes and bolts.
+  'src/render/smith_heart_fx/breath_entrance_core.ts',
+  'src/render/smith_heart_fx/heat_fight_fx_core.ts',
+  // A Live Coal's arrow, its leap ring and its burst's reach at a moment of the fuse.
+  'src/render/smith_heart_fx/heat_coal_fx_core.ts',
+  'src/render/smith_heart_fx/heat_lava_wall_core.ts',
+  // The Wheel of the Hearth on screen: its slices' warning, eruption and
+  // scorch, its vents' layout and the low tier's share.
+  'src/render/smith_heart_fx/heat_wheel_fx_core.ts',
+  // The Heat's floor ladder (every floor layer's unique rung) and its molten
+  // telegraphs' looks.
+  'src/render/smith_heart_fx/heat_floor_ladder_core.ts',
+  'src/render/smith_heart_fx/quench_floor_ladder_core.ts',
+  'src/render/smith_heart_fx/quench_hole_core.ts',
+  'src/render/smith_heart_fx/heat_telegraph_core.ts',
+  'src/render/smith_heart_fx/final_telegraph_core.ts',
+  'src/render/smith_heart_fx/painted_telegraph_core.ts',
+  // Which of the raid's own trash and add bodies a fight cue moves (their rises, their
+  // claimed cues).
+  'src/render/smith_heart_fx/trash_gestures_core.ts',
+  // The wellspring's bounded flow and its bubbles; the Hearthseeds' one field.
+  'src/render/smith_heart_fx/heat_well_core.ts',
+  // The Heat's lip clip: every floor mark stops at the lip wall; the floor
+  // shaders' precise frame round the well.
+  'src/render/smith_heart_fx/heat_lip_clip_core.ts',
+  'src/render/smith_heart_fx/heat_meteor_core.ts',
+  'src/render/smith_heart_fx/heat_swell_core.ts',
+  'src/render/smith_heart_fx/heat_seed_field_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',
@@ -1097,6 +1374,10 @@ const RENDER_PURE_CORES = [
   'src/render/drowned_temple/temple_score_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
+  // The shared soak / avoid tell (chevrons in or out, the soakers' pips).
+  'src/render/floor_telegraph/floor_tell_core.ts',
+  // The shared soak marker's plan (the element palettes, the clips, the rings).
+  'src/render/floor_telegraph/soak_marker_core.ts',
   // where a body sitting on a seat is drawn, and which seat a screen ray points at
   'src/render/seated_pose_core.ts',
   'src/render/seat_pick_core.ts',
@@ -1361,6 +1642,8 @@ const RENDER_PURE_CORES = [
   'src/render/vfx_screen_bounds_core.ts',
   'src/render/weapon_vfx_emissive_cache_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
+  // the Heartmeld Staff's gems lighting in turn (weapon_vfx.ts coreSprite seq)
+  'src/render/weapon_vfx_seq_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/farm_patches_core.ts',
   'src/render/fishing_bobber_core.ts',
@@ -1393,10 +1676,18 @@ const RENDER_PURE_CORES = [
   'src/render/terrain_detail_shed_core.ts',
   'src/render/frost_ice_fields_core.ts',
   'src/render/frost_sky_fade_core.ts',
+  // the fog scene's crossfade between the Smith's Heart's rooms (fog_scene_fade.ts)
+  'src/render/fog_scene_fade_core.ts',
   'src/render/gfx_aa_policy_core.ts',
   'src/render/gfx_override_core.ts',
   'src/render/goblin_rocket_sled_fx_core.ts',
   'src/render/ground_aim_reticle_core.ts',
+  // the raid's world markers on the floor: slots, drape, pulse, scale, tier look
+  'src/render/world_markers_core.ts',
+  // the party pings in the world: palette, slots, anchor, pop, ripple, fade, size
+  'src/render/party_pings_core.ts',
+  // a ground ping's cursor ray marched against the real floor (world_picking.ts groundHit)
+  'src/render/ping_ground_ray_core.ts',
   'src/render/ignivar_encounter_core.ts',
   'src/render/varkhul_encounter_core.ts',
   'src/render/ignivar_judgment_fire_core.ts',
@@ -1433,6 +1724,7 @@ const RENDER_PURE_CORES = [
   'src/render/resize_coalesce_core.ts',
   'src/render/post_shed_core.ts',
   'src/render/nameplate_view.ts',
+  'src/render/nameplate_raid_mark_core.ts',
   'src/render/nameplate_pick_core.ts',
   'src/render/nameplate_paint_gate_core.ts',
   'src/render/spirit_grade_core.ts',
@@ -1474,6 +1766,8 @@ const RENDER_PURE_CORES = [
   'src/render/sea_mist_core.ts',
   'src/render/self_prediction_core.ts',
   'src/render/self_render_position_core.ts',
+  // where an effect pinned to a unit sits: its drawn pose, never the snapshot
+  'src/render/attached_fx_anchor_core.ts',
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
   'src/render/static_merge_shadow_core.ts',
@@ -1569,6 +1863,16 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/ui/trinket_aura_effect.ts',
+  'src/ui/council_aura_effect.ts',
+  'src/ui/breath_aura_effect.ts',
+  'src/ui/quench_aura_effect.ts',
+  'src/ui/heat_aura_effect.ts',
+  'src/ui/hard_enrage_aura_effect.ts',
+  'src/ui/final_aura_effect.ts',
+  'src/ui/final_phase_aura_effect.ts',
+  'src/ui/heart_tier_damage.ts',
+  'src/ui/smith_heart_aura_art.ts',
+  'src/ui/boss_ability_art.ts',
   'src/ui/trinket_aura_art.ts',
   'src/ui/ability_tooltip_lines.ts',
   'src/ui/banner_queue.ts',
@@ -2697,6 +3001,8 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/bag_item_context_menu.ts',
   'src/ui/bank_filter.ts',
   'src/ui/banner_queue.ts',
+  'src/ui/boss_ability_art.ts',
+  'src/ui/breath_aura_effect.ts',
   'src/ui/buddy_event_lines.ts',
   'src/ui/charter_fit_memory.ts',
   'src/ui/chat_bubble_style.ts',
@@ -2704,14 +3010,20 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/council_aura_effect.ts',
   'src/ui/duration_text.ts',
   'src/ui/fct_event.ts',
+  'src/ui/final_aura_effect.ts',
+  'src/ui/final_phase_aura_effect.ts',
   'src/ui/focus_order.ts',
   'src/ui/gather_rare_event_feedback.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/guild_hide_offline.ts',
   'src/ui/guild_motd_login.ts',
   'src/ui/guild_tag.ts',
+  'src/ui/hard_enrage_aura_effect.ts',
+  'src/ui/heart_tier_damage.ts',
+  'src/ui/heat_aura_effect.ts',
   'src/ui/hud/action_bar/hotbar_drag.ts',
   'src/ui/hud/aura_tracks/aura_track_catalog.ts',
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
@@ -2747,12 +3059,14 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/pet_action_icons.ts',
   'src/ui/purchase_intent_record.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/quench_aura_effect.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/realm_builder_name.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
+  'src/ui/smith_heart_aura_art.ts',
   'src/ui/store_purchase_intent.ts',
   'src/ui/swing_timer.ts',
   'src/ui/system_text_i18n.ts',
@@ -3138,6 +3452,23 @@ const UI_DOM_MODULES = [
   // Hud's map-window sizing wiring: a ResizeObserver over #map-window that
   // re-reads the stored rail width once settings exist.
   'src/ui/hud/map/map_window_sizing_wiring.ts',
+  // The raid atlas's DOM adapter: its own canvas, chrome and input, a
+  // ResizeObserver over the canvas, and the pins' wrapped localStorage access.
+  'src/ui/hud/raid_atlas/raid_atlas_controller.ts',
+  // The bosses' busts: Image loads and a once-made grey canvas per face.
+  'src/ui/hud/raid_atlas/raid_atlas_portraits.ts',
+  // The boss card and the bosses' keyboard focus stops over the atlas.
+  'src/ui/hud/raid_atlas/raid_atlas_boss_pins.ts',
+  // One boss card (the map's and the minimap's), and the minimap's touch card
+  // with its once-per-tap geometry read and its outside-press listener.
+  'src/ui/hud/raid_atlas/raid_atlas_boss_card.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_minimap_card.ts',
+  // The shared raid marks' tool button and symbol panel over the atlas.
+  'src/ui/hud/raid_atlas/raid_atlas_shared_marks.ts',
+  // the raid's world markers: the Hud factory (mints the flyout on document)
+  'src/ui/hud/world_markers/hud_world_markers.ts',
+  // the party pings: the Hud factory (window timers, the clock, the minimap host)
+  'src/ui/hud/pings/hud_pings.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
   // Mounts the Cartographer's Ink map picker into #prompt-stack.
   'src/ui/hud/treasure/ink_map_picker_controller.ts',
@@ -3291,6 +3622,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',
   'src/ui/hud/buddy_menu.ts',
+  'src/ui/hud/raid_target_menu.ts',
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/hud/vendor/warfare_vendor_window.ts',
   'src/ui/hud/woc_trade/woc_trade_controller.ts',
@@ -3298,6 +3630,9 @@ const UI_DOM_MODULES = [
   'src/ui/icon_prewarm.ts',
   'src/ui/icon_prewarm_worker.ts',
   'src/ui/icons.ts',
+  // The party ping icons: loads the painted art (Image) and mints cached
+  // canvases on document (the glowed world icon, procedural glyph fallback).
+  'src/ui/ping_icons.ts',
   'src/ui/inspect_window.ts',
   'src/ui/interface_unlock.ts',
   'src/ui/settings_transfer.ts',
@@ -3377,7 +3712,7 @@ const UI_DOM_MODULES = [
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/hud/professions/professions_window.ts',
-  'src/ui/raid_boss_guide_window.ts',
+  'src/ui/hud/journal/adventure_journal_window.ts',
   'src/ui/raid_boss_guide_model_controller.ts',
   'src/ui/hud/chat/ready_check_leader_window.ts',
   // The binder that gives a purchase-intent ledger a durable half. It reaches

@@ -34,6 +34,7 @@ import type { Entity } from '../types';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { runWeaponProcs } from './equip_procs';
+import { noteHealTaken } from './heal_taken';
 import {
   BEACON_OF_LIGHT_NAME,
   beaconTransferFraction,
@@ -154,6 +155,7 @@ export function applyHeal(
   // double-count. Rides the event for parses (fidelity 7.1).
   const overheal = beforeClamp - healed;
   target.hp += healed;
+  noteHealTaken(ctx, target, healed);
   if (abilityId !== 'enchant_weapon_lastflame_zeal') {
     onCraftedCollectionHeal(ctx, source, target, overheal);
   }
@@ -212,6 +214,7 @@ function applyBeaconTransfer(
   onCraftedCollectionHeal(ctx, source, beacon, intended - healed);
   if (healed <= 0) return;
   beacon.hp += healed;
+  noteHealTaken(ctx, beacon, healed);
   const overheal = intended - healed;
   ctx.emit({
     type: 'heal2',

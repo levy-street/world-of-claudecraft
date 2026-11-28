@@ -7,6 +7,8 @@
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { focusTargetAction } from '../ui/focus_targets_core';
+import { worldMarkerActionSymbol } from '../ui/hud/world_markers/world_markers_core';
+import { targetMarkerActionSymbol } from '../ui/raid_target_icons_core';
 import { detectBrowserEngine } from './browser_env';
 import { clampCamPitch } from './camera_pitch_range';
 import { BASE_ZOOM_MAX } from './camera_zoom_ceiling';
@@ -89,6 +91,11 @@ export interface InputCallbacks {
   // party frame rows top to bottom (src/ui/party_target_hotkeys_core.ts).
   onTargetParty(slot: number): void;
   onFocusTarget?(slot: number, assign: boolean): void;
+  /** A world-marker hotkey (0..7 places that symbol, null clears every mark). */
+  onWorldMarker?(symbol: number | null): void;
+  /** A raid target icon hotkey on the current target (0..7 marks it with that
+   *  symbol, null clears its mark). */
+  onTargetMarker?(symbol: number | null): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -121,6 +128,7 @@ export interface InputCallbacks {
       | 'harvestJournal'
       | 'perfecting'
       | 'lootExplorer'
+      | 'adventureJournal'
       | 'cosmetics'
       | 'crafting'
       | 'sheathe'
@@ -128,6 +136,10 @@ export interface InputCallbacks {
       | 'mount',
   ): void;
   onEmoteWheel(open: boolean): void;
+  /** The Ping key (a held action): 'down' on the press, 'up' on its release,
+   *  'cancel' when the press is lost (focus loss, a client transition). x/y is
+   *  the cursor at that moment. The HUD decides tap versus hold (src/ui/hud/pings/). */
+  onPing?(phase: 'down' | 'up' | 'cancel', x: number, y: number): void;
   onClickPick(x: number, y: number, button: number): void;
   /** Attack-move key pressed (only fires while Attack Move mode is on); x/y is the cursor. */
   onAttackMove?(x: number, y: number): void;
@@ -294,6 +306,8 @@ export class Input {
   private controllerMoveInput: MoveInput | null = null;
   private controllerFacing: number | null = null;
   private emoteWheelHeldCodes = new Set<string>();
+  // The physical code holding the Ping key down (null when it is up).
+  private pingHeldCode: string | null = null;
   // Advances only when the player starts or replaces movement. Releasing a held
   // key/stick is not newer travel intent and must not invalidate a delayed
   // successful interaction that should stop autorun.
@@ -668,6 +682,7 @@ export class Input {
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
     this.releaseHeldSlots();
+    this.cancelPing();
     this.emoteWheelHeldCodes.clear();
     if (emoteWheelWasOpen) this.cb.onEmoteWheel(false);
     if (document.pointerLockElement === this.canvas) document.exitPointerLock?.();
@@ -988,6 +1003,7 @@ export class Input {
       this.cb.onEmoteWheel(false);
     }
     if (reason !== 'pointerlock') this.releaseHeldSlots();
+    if (reason !== 'pointerlock') this.cancelPing();
     // Focus loss swallows the auxclick that would have cleared these, so drop
     // them here rather than letting a stale entry cancel a later, unrelated click.
     if (reason !== 'pointerlock') this.consumedMouseButtons.clear();
@@ -1165,7 +1181,9 @@ export class Input {
     // chord, so Shift+1 is distinct from 1. Both may fire on one press — that is
     // intentional (move while casting).
     const held = this.keybinds.heldActionForCode(e.code);
-    if (held === 'emoteWheel') {
+    if (held === 'ping') {
+      if (this.pressPing(e.code, combo)) e.preventDefault();
+    } else if (held === 'emoteWheel') {
       this.emoteWheelHeldCodes.add(e.code);
       this.cb.onEmoteWheel(true);
       e.preventDefault();
@@ -1235,6 +1253,10 @@ export class Input {
   // the caller cancels the event's default for.
   private releaseBoundCode(code: string): boolean {
     if (this.keys.delete(code)) this.noteIntent('move');
+    if (this.pingHeldCode === code) {
+      this.pingHeldCode = null;
+      this.cb.onPing?.('up', this.hoverX, this.hoverY);
+    }
     let closedEmoteWheel = false;
     if (this.emoteWheelHeldCodes.delete(code) && this.emoteWheelHeldCodes.size === 0) {
       this.cb.onEmoteWheel(false);
@@ -1246,6 +1268,23 @@ export class Input {
       this.cb.onAbilityUp(slot);
     }
     return closedEmoteWheel;
+  }
+
+  // A Ping press: steps aside when another action owns this exact chord (Shift+Y is
+  // Cosmetics; a held action matches the bare key, so it would otherwise fire too).
+  private pressPing(code: string, combo: string | null): boolean {
+    if (combo !== null && combo !== code && this.keybinds.edgeActionForCombo(combo) !== null)
+      return false;
+    this.pingHeldCode = code;
+    this.cb.onPing?.('down', this.hoverX, this.hoverY);
+    return true;
+  }
+
+  // Drop a held Ping press without sending anything (its keyup will never come).
+  private cancelPing(): void {
+    if (this.pingHeldCode === null) return;
+    this.pingHeldCode = null;
+    this.cb.onPing?.('cancel', this.hoverX, this.hoverY);
   }
 
   // Release every held slot (fire onAbilityUp), e.g. on blur/menu, so a charge in
@@ -1265,6 +1304,16 @@ export class Input {
     }
     if (action.startsWith('slot')) {
       this.cb.onAbility(Number(action.slice(4)));
+      return;
+    }
+    const marker = worldMarkerActionSymbol(action);
+    if (marker !== undefined) {
+      this.cb.onWorldMarker?.(marker);
+      return;
+    }
+    const targetMark = targetMarkerActionSymbol(action);
+    if (targetMark !== undefined) {
+      this.cb.onTargetMarker?.(targetMark);
       return;
     }
     const partySlot = partyTargetActionSlot(action);
@@ -1392,6 +1441,9 @@ export class Input {
       case 'lootExplorer':
         this.cb.onUiKey('lootExplorer');
         return;
+      case 'adventureJournal':
+        this.cb.onUiKey('adventureJournal');
+        return;
       case 'cosmetics':
         this.cb.onUiKey('cosmetics');
         return;
@@ -1502,7 +1554,9 @@ export class Input {
       return;
     }
     const held = this.keybinds.heldActionForCode(code);
-    if (held === 'emoteWheel') {
+    if (held === 'ping') {
+      this.pressPing(code, combo);
+    } else if (held === 'emoteWheel') {
       this.emoteWheelHeldCodes.add(code);
       this.cb.onEmoteWheel(true);
     } else if (held !== null) {

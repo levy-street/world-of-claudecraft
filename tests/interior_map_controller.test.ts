@@ -10,9 +10,14 @@ const calls = vi.hoisted(() => ({
   lastKeepWorld: vi.fn(),
   dawnholdMinimap: vi.fn(),
   dawnholdWorld: vi.fn(),
+  atlasMinimap: vi.fn(),
+  atlasGone: vi.fn(),
+  atlasPaints: true,
 }));
 
 vi.mock('../src/ui/dungeon_map_painter', () => ({
+  MINIMAP_BASE_SCALE: 1.7,
+  dungeonTitleWithDifficulty: (id: string) => `${id} title`,
   DungeonMapPainter: class {
     paintMinimap(...args: unknown[]): void {
       calls.dungeonMinimap(...args);
@@ -43,6 +48,24 @@ vi.mock('../src/ui/lastkeep_map_painter', () => {
     },
   };
 });
+
+vi.mock('../src/ui/hud/raid_atlas', () => ({
+  hasRaidAtlas: (id: string) => id === 'smith_heart',
+  RaidAtlasController: class {
+    paintMinimap(...args: unknown[]): boolean {
+      calls.atlasMinimap(...args);
+      return calls.atlasPaints;
+    }
+    hide(): void {}
+    tick(): void {}
+    minimapGone(): void {
+      calls.atlasGone();
+    }
+    minimapTap(): boolean {
+      return true;
+    }
+  },
+}));
 
 import { InteriorMapController } from '../src/ui/interior_map_controller';
 
@@ -132,5 +155,44 @@ describe('InteriorMapController', () => {
     expect(calls.dawnholdMinimap).toHaveBeenCalledWith(ctx, dawnhold, label, 162, 1.25);
     expect(calls.lastKeepWorld).toHaveBeenCalledWith(ctx, lastKeep, 560, lastKeep.player.pos);
     expect(calls.dawnholdWorld).toHaveBeenCalledWith(ctx, dawnhold, 560, dawnhold.player.pos);
+  });
+
+  it('paints a raid with an atlas through the atlas minimap, falling back to the plan', () => {
+    const setText = vi.fn();
+    const controller = new InteriorMapController(
+      { setText } as never,
+      () => '#fff',
+      () => false,
+    );
+    const world = worldIn('smith_heart');
+    const ctx = {} as CanvasRenderingContext2D;
+    const label = {} as HTMLElement;
+    calls.atlasPaints = true;
+    calls.dungeonMinimap.mockClear();
+    expect(controller.paintMinimap(ctx, world, label, 162, 2)).toBe(true);
+    const [actx, aworld, anchor, size, zoom, scale] = calls.atlasMinimap.mock.lastCall ?? [];
+    expect([actx, aworld, size, zoom, scale]).toEqual([ctx, world, 162, 2, 1.7 * 2]);
+    expect((anchor as { dungeonId: string }).dungeonId).toBe('smith_heart');
+    expect(setText).toHaveBeenCalledWith(label, 'smith_heart title');
+    expect(calls.dungeonMinimap).not.toHaveBeenCalled();
+    // Before the atlas can draw (its stylesheet not landed), the plain plan does.
+    calls.atlasPaints = false;
+    expect(controller.paintMinimap(ctx, world, label, 162, 2)).toBe(true);
+    expect(calls.dungeonMinimap).toHaveBeenCalledWith(ctx, world, label, 162, 2);
+    calls.atlasPaints = true;
+  });
+
+  it('never asks the atlas to paint a dungeon that has none', () => {
+    const controller = new InteriorMapController(
+      {} as never,
+      () => '#fff',
+      () => false,
+    );
+    calls.atlasMinimap.mockClear();
+    const world = worldIn('hollow_crypt');
+    const ctx = {} as CanvasRenderingContext2D;
+    expect(controller.paintMinimap(ctx, world, {} as HTMLElement, 162, 1)).toBe(true);
+    expect(calls.atlasMinimap).not.toHaveBeenCalled();
+    expect(calls.dungeonMinimap).toHaveBeenLastCalledWith(ctx, world, {}, 162, 1);
   });
 });

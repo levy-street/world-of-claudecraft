@@ -163,7 +163,7 @@ const FANOUT_ARMS: readonly string[] = [
   // the roster itself is player names plus icons and the static title/close
   // chrome rides data-i18n on the page shell.
   'this.readyCheckLeaderWindow.relocalize|',
-  'this.raidBossGuideWindow.relocalize|',
+  'this.journal.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
   'this.riftPainter.relocalize|',
@@ -731,6 +731,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly memos: readonly string[];
   readonly reason: string;
 }> = [
+  {
+    file: 'hud/dungeon/tank_swap_alert_view.ts',
+    memos: ['lastAt'],
+    reason:
+      "TankBusterLatch.lastAt is the UI-clock second (a number) at which one tank buster marker entered its last second; it times the one-shot last-second pulse and holds the alert in that state. It digests no text: the alert's title, button names and progress label are re-resolved through t() on every view build, so a language switch repaints them on the next frame and nothing here can pin the old locale.",
+  },
   {
     file: 'hud/expeditions/expedition_controller.ts',
     memos: ['compatibilitySig', 'lastWorld', 'liveListingSig', 'soundedRequestSig'],
@@ -1740,7 +1746,10 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-    ).toBe(39);
+      // 40 with the Smith's Heart tank buster alert: TankBusterLatch's
+      // `lastAt` is a UI-clock number that times the last-second pulse; the
+      // alert's text is re-resolved through t() on every view build.
+    ).toBe(40);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

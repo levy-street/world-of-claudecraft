@@ -38,6 +38,7 @@ import type { Aura, Entity } from '../types';
 import { allocateGroupEchoEmergencyBonusRates } from './chronomancy_echo_distribution';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { consumeHealAbsorb, healingTakenMult, healingThreat } from './heal';
+import { noteHealTaken } from './heal_taken';
 import { wearsSetBonus } from './set_bonus_wearer';
 
 // The mark aura kind and ability id (they share one string so the buff bar and
@@ -430,6 +431,7 @@ function applyEchoHeal(
   onCraftedCollectionHeal(ctx, source, ally, overheal);
   if (healed > 0) {
     ally.hp += healed;
+    noteHealTaken(ctx, ally, healed);
   }
   if (healed > 0 || overheal > 0) {
     ctx.emit({

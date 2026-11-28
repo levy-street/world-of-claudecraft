@@ -149,6 +149,15 @@ describe('registry', () => {
       label: 'Target Buffs and Debuffs',
       category: 'Interface',
       kind: 'edge',
+      defaults: ['Shift+KeyB'],
+    });
+    // The Adventure Journal owns Shift+J (the classic encounter-journal key),
+    // a rebindable Interface toggle like every collection window.
+    const adventureJournal = BIND_ACTIONS.find((a) => a.id === 'adventureJournal');
+    expect(adventureJournal).toMatchObject({
+      label: 'Adventure Journal',
+      category: 'Interface',
+      kind: 'edge',
       defaults: ['Shift+KeyJ'],
     });
     // The Book of Deeds is a rebindable Interface toggle on the shifted layer of
@@ -173,7 +182,7 @@ describe('registry', () => {
     expect(hideUi?.defaults).toEqual(['Alt+KeyZ']);
     // The Harvest Journal is a rebindable Interface toggle on the shifted layer
     // of KeyK (Shift+H and Shift+J, its own initials, are Damage Meters and
-    // Target Buffs/Debuffs); bare KeyK stays the Leaderboard, so the two share
+    // the Adventure Journal); bare KeyK stays the Leaderboard, so the two share
     // the physical key across layers and never collide.
     const journal = BIND_ACTIONS.find((a) => a.id === 'harvestJournal');
     expect(journal?.category).toBe('Interface');
@@ -241,7 +250,8 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
     expect(kb.actionForCode('KeyU')).toBe('discord');
     expect(kb.actionForCode('KeyT')).toBe('crafting');
-    expect(kb.actionForCode('KeyY')).toBe(null);
+    // Y was the one free bare letter: the Ping key (held; tap or hold for the wheel).
+    expect(kb.actionForCode('KeyY')).toBe('ping');
     // Bare Z sheathes; the Book of Deeds ships on the shifted layer of the same key.
     expect(kb.actionForCode('KeyZ')).toBe('sheathe');
     expect(kb.actionForCode('Shift+KeyZ')).toBe('deeds');
@@ -470,7 +480,7 @@ describe('snapshot / importBindings (hotkey setup export + import)', () => {
     expect(kb.actionForCode('KeyR')).toBe('slot0');
     expect(kb.codeAt('autorun', 0)).toBe(null); // explicitly unbound by the setup
     expect(kb.actionForCode('Space')).toBe('jump'); // the local rebind did not survive
-    expect(kb.actionForCode('KeyY')).toBe(null);
+    expect(kb.actionForCode('KeyY')).toBe('ping'); // Ping, missing from the setup, keeps its default
     expect(kb.actionForCode('KeyW')).toBe('forward'); // missing action keeps its default
     const reloaded = new Keybinds();
     expect(reloaded.snapshot()).toEqual(kb.snapshot());

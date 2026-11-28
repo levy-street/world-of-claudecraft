@@ -403,4 +403,28 @@ describe('painted HUD-chrome launcher icons', () => {
     expect(hasUiIcon('professions')).toBe(true);
     expect(svgIcon('professions')).not.toBe(svgIcon('target'));
   });
+
+  it('leaves no runtime-rendered [data-icon] placeholder unhydrated', () => {
+    // hydrateIcons fills the entry documents' placeholders once at boot. Markup a
+    // module renders later never sees that pass, so a `data-icon="..."` it emits
+    // stays an empty button (the death recap's close X shipped as a bare box). A
+    // module either draws the glyph inline with svgIcon() or hydrates its own root.
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((d) => {
+        const full = path.join(dir, d.name);
+        if (d.isDirectory()) return walk(full);
+        return d.name.endsWith('.ts') && !d.name.endsWith('.generated.ts') ? [full] : [];
+      });
+    const placeholder = /data-icon="/;
+    const unhydrated = walk(path.join(repoRoot, 'src'))
+      .filter((file) => {
+        const code = readFileSync(file, 'utf8')
+          .split('\n')
+          .filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line))
+          .join('\n');
+        return placeholder.test(code) && !/\bhydrateIcons\(/.test(code);
+      })
+      .map((file) => path.relative(repoRoot, file).replace(/\\/g, '/'));
+    expect(unhydrated).toEqual([]);
+  });
 });

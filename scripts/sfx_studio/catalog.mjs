@@ -22,6 +22,8 @@ import {
   STUDIO_ROOT,
   toolchainStatus,
 } from './audio_io.mjs';
+import { cueGroupSummary, cueGroupsFor } from './cue_groups.mjs';
+import { collectVoiceCatalog } from './voice_catalog.mjs';
 
 const ANALYSIS_CACHE = join(STUDIO_ROOT, 'analysis.json');
 
@@ -86,6 +88,7 @@ export async function collectSfxCatalog({ loudness = true } = {}) {
       designedDuration: source.duration,
       loop: !!source.loop,
       category: categoryForSfx(source.key),
+      groups: cueGroupsFor(source.key),
       preload: preloadForSfx(source.key),
       spatial: spatialForSfx(source.key),
       hash,
@@ -103,6 +106,9 @@ export async function collectSfxCatalog({ loudness = true } = {}) {
   return {
     version: 1,
     clips,
+    groups: cueGroupSummary(clips.map((clip) => clip.key)),
+    // Listen-only: published voice lines are not Studio cues (voice_catalog.mjs).
+    voices: collectVoiceCatalog(join(REPO_ROOT, 'public/audio/voice')),
     missingRuntimeCues: missingRuntimeCues(),
     toolchain,
     summary: {

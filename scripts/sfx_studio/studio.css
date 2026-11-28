@@ -175,6 +175,13 @@ button.primary {
   padding: 6px 9px;
 }
 
+.catalog-controls .group-filter {
+  width: 100%;
+  min-height: 29px;
+  margin-top: 7px;
+  padding: 4px 7px;
+}
+
 .filter-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

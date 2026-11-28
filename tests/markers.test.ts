@@ -141,15 +141,17 @@ describe('target markers — sim layer', () => {
       expect(sim.markersFor(a)).toEqual({});
     });
 
-    it('refuses to mark a non-mob (e.g. a player)', () => {
+    it('marks a group player but refuses a player outside the group', () => {
       const sim = makeWorld();
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
+      const c = sim.addPlayer('rogue', 'Gimel'); // outsider
       makeParty(sim, a, b);
 
-      sim.setMarker(b, SKULL, a); // b is a player entity
-
+      sim.setMarker(c, SKULL, a);
       expect(sim.markersFor(a)).toEqual({});
+      sim.setMarker(b, SKULL, a); // b is a party member
+      expect(sim.markersFor(b)).toEqual({ [b]: SKULL });
     });
 
     it('refuses to mark a dead mob', () => {
@@ -165,17 +167,45 @@ describe('target markers — sim layer', () => {
       expect(sim.markersFor(a)).toEqual({});
     });
 
-    it('refuses to mark an owned pet/summon (ownerId set)', () => {
+    it("marks a member's pet but refuses an outsider's pet/summon", () => {
       const sim = makeWorld();
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
+      const c = sim.addPlayer('rogue', 'Gimel'); // outsider
       makeParty(sim, a, b);
-      const [mob] = liveMobs(sim, 1);
-      mob.ownerId = b; // now a controlled pet, not a wild enemy
+      const [mob, other] = liveMobs(sim, 2);
+      mob.ownerId = c; // an outsider's pet
+      other.ownerId = b; // a party member's pet
 
       sim.setMarker(mob.id, SKULL, a);
+      sim.setMarker(other.id, STAR, a);
 
+      expect(sim.markersFor(a)).toEqual({ [other.id]: STAR });
+    });
+
+    it('in a raid only the leader marks; a member gets the leader error', () => {
+      const sim = makeWorld();
+      const a = sim.addPlayer('warrior', 'Aleph');
+      const b = sim.addPlayer('mage', 'Bet');
+      const rest = ['priest', 'rogue', 'hunter'].map((cls, i) =>
+        sim.addPlayer(cls as 'priest', `Raider${i}`),
+      );
+      makeParty(sim, a, b, ...rest);
+      sim.convertPartyToRaid(a);
+      expect(sim.partyOf(a)?.raid).toBe(true);
+      const [mob] = liveMobs(sim, 1);
+      sim.drainEvents();
+
+      sim.setMarker(b, SKULL, b);
       expect(sim.markersFor(a)).toEqual({});
+      expect(sim.drainEvents()).toContainEqual(
+        expect.objectContaining({ pid: b, text: 'You are not the party leader.' }),
+      );
+      sim.setMarker(mob.id, SKULL, a);
+      sim.setMarker(b, STAR, a);
+      expect(sim.markersFor(b)).toEqual({ [mob.id]: SKULL, [b]: STAR });
+      sim.clearMarker(b, b); // a member cannot clear either
+      expect(sim.markersFor(b)).toEqual({ [mob.id]: SKULL, [b]: STAR });
     });
   });
 
@@ -253,9 +283,39 @@ describe('target markers — sim layer', () => {
       const [mob] = liveMobs(sim, 1);
 
       sim.setMarker(mob.id, SKULL, a);
+      sim.setMarker(b, STAR, a);
       sim.partyLeave(c); // party still has a + b
 
+      expect(sim.markersFor(a)).toEqual({ [mob.id]: SKULL, [b]: STAR });
+    });
+
+    it('a leaving member takes their own mark with them', () => {
+      const sim = makeWorld();
+      const a = sim.addPlayer('warrior', 'Aleph');
+      const b = sim.addPlayer('mage', 'Bet');
+      const c = sim.addPlayer('rogue', 'Gimel');
+      makeParty(sim, a, b, c);
+      const [mob] = liveMobs(sim, 1);
+
+      sim.setMarker(mob.id, SKULL, a);
+      sim.setMarker(c, STAR, a);
+      sim.partyLeave(c);
+
       expect(sim.markersFor(a)).toEqual({ [mob.id]: SKULL });
+      expect(sim.markersFor(c)).toEqual({});
+    });
+
+    it("a player's mark persists through their death", () => {
+      const sim = makeWorld();
+      const a = sim.addPlayer('warrior', 'Aleph');
+      const b = sim.addPlayer('mage', 'Bet');
+      makeParty(sim, a, b);
+      sim.setMarker(b, STAR, a);
+      (sim as unknown as { handleDeath(e: Entity, killer: Entity | null): void }).handleDeath(
+        sim.entities.get(b)!,
+        null,
+      );
+      expect(sim.markersFor(a)).toEqual({ [b]: STAR });
     });
 
     it('clears all marks when the party disbands', () => {
@@ -335,5 +395,24 @@ describe('target markers — server self-wire', () => {
     (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
 
     expect(lastSnap(fcA.sent).self.marks).toBeNull();
+  });
+
+  it('carries a mark on an ally player to both members, and the toggle clears it', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const sA = join(server, fcA, 1, 'Aleph');
+    const fcB = fakeWs();
+    const sB = join(server, fcB, 2, 'Bet');
+    cmd(server, sA, { cmd: 'pinvite', id: sB.pid });
+    cmd(server, sB, { cmd: 'paccept' });
+    const SQUARE = 5;
+    cmd(server, sB, { cmd: 'setMarker', id: sA.pid, marker: SQUARE });
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
+    expect(lastSnap(fcA.sent).self.marks).toEqual({ [sA.pid]: SQUARE });
+    expect(lastSnap(fcB.sent).self.marks).toEqual({ [sA.pid]: SQUARE });
+
+    cmd(server, sA, { cmd: 'setMarker', id: sA.pid, marker: SQUARE }); // same symbol: off
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
+    expect(lastSnap(fcB.sent).self.marks).toEqual({});
   });
 });

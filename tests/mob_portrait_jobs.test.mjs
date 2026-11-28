@@ -6,14 +6,23 @@ import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
 import { MOBS } from '../src/sim/data';
 import { targetPortraitUrl } from '../src/ui/target_portrait_view';
 
-it('renders every live mob portrait except the four shared buddy headshots', async () => {
+it('renders every live mob portrait except the buddy headshots and the baked Stillstone', async () => {
   const root = fileURLToPath(new URL('..', import.meta.url));
   const jobs = await buildMobPortraitJobs(root);
   const ids = new Set(jobs.map((job) => job.mobId));
   const aliases = Object.keys(MOBS)
     .filter((id) => !ids.has(id))
     .sort();
-  expect(aliases).toEqual(['buddy_crystal_lich', 'buddy_forgemaw', 'buddy_horse', 'buddy_sprites']);
+  // The four shared buddy headshots, and the Breath's Stillstone, a bodyless
+  // usable body whose crystal portrait scripts/render_stillstone_portrait.mjs
+  // bakes from the fight painter's own crystal (target_portrait_view.ts).
+  expect(aliases).toEqual([
+    'buddy_crystal_lich',
+    'buddy_forgemaw',
+    'buddy_horse',
+    'buddy_sprites',
+    'heart_breath_stillstone',
+  ]);
   for (const id of aliases) {
     expect(targetPortraitUrl(id, true)).toBe(`/ui/portraits/${id}.webp`);
     expect(existsSync(new URL(`../public/ui/portraits/${id}.webp`, import.meta.url))).toBe(true);

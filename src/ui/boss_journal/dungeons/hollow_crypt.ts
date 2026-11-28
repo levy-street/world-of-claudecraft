@@ -42,10 +42,12 @@ import {
   MARROW_TUNING,
   tollDamageRange,
 } from '../../../sim/encounters/hollow_crypt/marrow_ids';
+import { BOUND_SOUL_WALKER } from '../../../sim/encounters/hollow_crypt/morthen_gravecall';
 import {
   MORTHEN_REAP,
   MORTHEN_RITE,
   MORTHEN_SHADOW_PULSE,
+  MORTHEN_SOUL_TEMPLATE,
   MORTHEN_TUNING,
   RITE_CANDLE_SPOTS,
 } from '../../../sim/encounters/hollow_crypt/morthen_ids';
@@ -93,6 +95,7 @@ function drakeKit(mobId: string, template: (typeof HOLLOW_CRYPT_MOBS)[string] | 
     {
       id: 'barrowflame-breath',
       iconId: 'dgn_crypt_barrowflame',
+      hits: ['Barrowflame Breath'],
       nameKey: cast(CRYPT_BARROWFLAME_BREATH),
       castId: CRYPT_BARROWFLAME_BREATH,
       summaryKey: k('drake.breathSummary'),
@@ -111,6 +114,7 @@ function drakeKit(mobId: string, template: (typeof HOLLOW_CRYPT_MOBS)[string] | 
     {
       id: 'tail-lash',
       iconId: 'dgn_crypt_tail_lash',
+      hits: ['Tail Lash'],
       nameKey: cast(CRYPT_TAIL_LASH),
       castId: CRYPT_TAIL_LASH,
       summaryKey: k('drake.tailSummary'),
@@ -129,6 +133,7 @@ function drakeKit(mobId: string, template: (typeof HOLLOW_CRYPT_MOBS)[string] | 
     {
       id: 'wing-gust',
       iconId: 'dgn_crypt_wing_gust',
+      hits: ['Wing Gust'],
       nameKey: cast(CRYPT_WING_GUST),
       castId: CRYPT_WING_GUST,
       summaryKey: k('drake.gustSummary'),
@@ -165,6 +170,7 @@ const OSSUARY_DRAKE: JournalBossDef = {
         {
           id: 'barrow-embers',
           iconId: 'dgn_crypt_embers',
+          hits: ['Barrow Embers'],
           nameKey: k('drake.embersName'),
           availability: 'heroic',
           summaryKey: k('drake.embersSummary'),
@@ -213,6 +219,7 @@ const SEXTON_MARROW: JournalBossDef = {
         {
           id: 'shovelful',
           iconId: 'dgn_crypt_shovelful',
+          hits: ['Shovelful'],
           nameKey: cast(MARROW_SHOVELFUL),
           castId: MARROW_SHOVELFUL,
           summaryKey: k('marrow.shovelSummary'),
@@ -233,6 +240,7 @@ const SEXTON_MARROW: JournalBossDef = {
         {
           id: 'measured-for-the-grave',
           iconId: 'dgn_crypt_measured',
+          hits: ['Open Grave', 'Grave Dirt'],
           nameKey: cast(MARROW_MEASURE),
           castId: MARROW_MEASURE,
           summaryKey: k('marrow.measureSummary'),
@@ -259,6 +267,7 @@ const SEXTON_MARROW: JournalBossDef = {
         {
           id: 'gravediggers-blow',
           iconId: 'dgn_crypt_blow',
+          hits: ["Gravedigger's Blow"],
           nameKey: cast(MARROW_GRAVEDIGGERS_BLOW),
           castId: MARROW_GRAVEDIGGERS_BLOW,
           availability: 'heroic',
@@ -311,6 +320,7 @@ const SEXTON_MARROW: JournalBossDef = {
         {
           id: 'burial-toll',
           iconId: 'dgn_crypt_burial_toll',
+          hits: ['Burial Toll'],
           nameKey: cast(MARROW_BURIAL_TOLL),
           castId: MARROW_BURIAL_TOLL,
           summaryKey: k('marrow.tollSummary'),
@@ -368,6 +378,7 @@ const LADY: JournalBossDef = {
         {
           id: 'brides-lament',
           iconId: 'dgn_crypt_lament',
+          hits: ["Bride's Lament"],
           nameKey: cast(LADY_BRIDES_LAMENT),
           castId: LADY_BRIDES_LAMENT,
           summaryKey: k('lady.lamentSummary'),
@@ -407,6 +418,7 @@ const LADY: JournalBossDef = {
         {
           id: 'frozen-embrace',
           iconId: 'dgn_crypt_embrace',
+          hits: ['Frozen Embrace', 'Shattering Fall'],
           nameKey: cast(LADY_FROZEN_EMBRACE),
           castId: LADY_FROZEN_EMBRACE,
           summaryKey: { normal: k('lady.embraceSummary'), heroic: k('lady.embraceHeroicSummary') },
@@ -507,6 +519,7 @@ const ILVANE: JournalBossDef = {
         {
           id: 'dirge-of-the-hollow',
           iconId: 'dgn_crypt_dirge',
+          hits: ['Dirge of the Hollow'],
           nameKey: cast(ILVANE_DIRGE),
           castId: ILVANE_DIRGE,
           summaryKey: k('ilvane.dirgeSummary'),
@@ -525,6 +538,7 @@ const ILVANE: JournalBossDef = {
         {
           id: 'bone-organ',
           iconId: 'dgn_crypt_bone_organ',
+          hits: ['Bone Organ'],
           nameKey: cast(ILVANE_BONE_ORGAN),
           castId: ILVANE_BONE_ORGAN,
           summaryKey: k('ilvane.organSummary'),
@@ -612,6 +626,8 @@ const ILVANE: JournalBossDef = {
 
 const MORTHEN: JournalBossDef = {
   mobId: MORTHEN_ID,
+  // A Bound Soul strikes from its orb once Morthen is gone (kit_walker.ts).
+  hitSources: [MORTHEN_SOUL_TEMPLATE],
   rank: 'final',
   overviewKey: k('morthen.overview'),
   overviewValues: { rite: MO.riteAt, last: MO.lastRitesAt },
@@ -625,6 +641,7 @@ const MORTHEN: JournalBossDef = {
         {
           id: 'shadow-pulse',
           iconId: 'dgn_crypt_shadow_pulse',
+          hits: ['Shadow Pulse'],
           nameKey: cast(MORTHEN_SHADOW_PULSE),
           castId: MORTHEN_SHADOW_PULSE,
           summaryKey: k('morthen.pulseSummary'),
@@ -643,6 +660,7 @@ const MORTHEN: JournalBossDef = {
         {
           id: 'gravecall',
           iconId: 'dgn_crypt_gravecall',
+          hits: [BOUND_SOUL_WALKER.name],
           nameKey: k('morthen.gravecallName'),
           summaryKey: k('morthen.gravecallSummary'),
           responseKey: k('morthen.gravecallResponse'),
@@ -662,6 +680,7 @@ const MORTHEN: JournalBossDef = {
         {
           id: 'grasp-of-the-grave',
           iconId: 'dgn_crypt_grasp',
+          hits: ['Grasp of the Grave'],
           nameKey: k('morthen.graspName'),
           availability: 'heroic',
           summaryKey: k('morthen.graspSummary'),
@@ -689,6 +708,7 @@ const MORTHEN: JournalBossDef = {
         {
           id: 'rite-of-the-unquiet',
           iconId: 'dgn_crypt_rite',
+          hits: ['Grave Chill'],
           nameKey: cast(MORTHEN_RITE),
           castId: MORTHEN_RITE,
           summaryKey: k('morthen.riteSummary'),
@@ -706,6 +726,7 @@ const MORTHEN: JournalBossDef = {
         {
           id: 'relight',
           iconId: 'dgn_crypt_candle',
+          hits: ["Candle's Price"],
           nameKey: k('morthen.relightName'),
           summaryKey: k('morthen.relightSummary'),
           responseKey: k('morthen.relightResponse'),
@@ -726,6 +747,7 @@ const MORTHEN: JournalBossDef = {
         {
           id: 'name-the-dead',
           iconId: 'dgn_crypt_name_dead',
+          hits: ['Name the Dead'],
           nameKey: k('morthen.nameDeadName'),
           availability: 'heroic',
           summaryKey: k('morthen.nameDeadSummary'),
@@ -746,6 +768,7 @@ const MORTHEN: JournalBossDef = {
         {
           id: 'reap-the-unquiet',
           iconId: 'dgn_crypt_reap',
+          hits: ['Reap the Unquiet'],
           nameKey: cast(MORTHEN_REAP),
           castId: MORTHEN_REAP,
           summaryKey: k('morthen.reapSummary'),
@@ -817,6 +840,7 @@ const KNELLWYRM: JournalBossDef = {
         {
           id: 'pyre-strafe',
           iconId: 'dgn_crypt_pyre_strafe',
+          hits: ['Pyre Strafe'],
           nameKey: cast(KNELLWYRM_PYRE_STRAFE),
           castId: KNELLWYRM_PYRE_STRAFE,
           summaryKey: k('wyrm.strafeSummary'),
@@ -840,6 +864,7 @@ const KNELLWYRM: JournalBossDef = {
         {
           id: 'dread-bellow',
           iconId: 'dgn_crypt_dread_bellow',
+          hits: ['Dread Bellow'],
           nameKey: cast(KNELLWYRM_DREAD_BELLOW),
           castId: KNELLWYRM_DREAD_BELLOW,
           summaryKey: k('wyrm.bellowSummary'),
@@ -862,6 +887,7 @@ const KNELLWYRM: JournalBossDef = {
         {
           id: 'burning-knell',
           iconId: 'dgn_crypt_burning_knell',
+          hits: ['Burning Knell'],
           nameKey: cast(KNELLWYRM_KNELL_RISE),
           castId: KNELLWYRM_KNELL_RISE,
           availability: 'heroic',

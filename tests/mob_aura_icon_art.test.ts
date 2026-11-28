@@ -180,9 +180,14 @@ describe('mob aura icon art', () => {
     // wildheart_beastmaster), so 111 + 5 - 4. Identities: three new per-template
     // runtime ids (blind_, stackpoison_, warcry_) minus the beastmaster's two;
     // pack_frenzy and mob_charge_stun are shared ids that still have carriers.
+    // 113 and 93 with the Smith's Heart's Guardian of the Heat: its Cinder Grip
+    // is a stackPoison (one new per-template runtime id, stackpoison_, on the
+    // existing family's painted art).
     // The Gourdlight crow adds one blind identity, reusing the existing painting.
-    expect(census.carrierCount).toBe(113);
-    expect(census.identities.size).toBe(93);
+    // 115 and 95 on the merged release/v0.46.0 tree: the Gourdlight crow plus the
+    // Masterless Strength's Hammer Splinter (a stackPoison carrier).
+    expect(census.carrierCount).toBe(115);
+    expect(census.identities.size).toBe(95);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

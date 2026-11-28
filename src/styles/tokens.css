@@ -177,6 +177,10 @@
     --color-ascension-bonus: #c88ef5;
     --color-hostile: #ff6b5e;
     --color-friendly: #9fdc7f;
+    /* A neutral unit's name (an attackable mob that is not wild hostile): the
+       classic yellow, the same value as the nameplate con yellow in
+       src/render/reaction.ts mobNameColor. */
+    --color-neutral: #ffe97a;
     --color-buff: #3a6ea8;
     --color-debuff: #c0392b;
     /* The operator-applied Cheater tag on a name line. Its own token, not
@@ -189,6 +193,17 @@
        yumi match HUD + arena window; never hardcoded in painter TS. */
     --color-team-blue: #2f6fe0;
     --color-team-red: #d8342c;
+    /* Party pings (src/ui/hud/pings/): one colour per kind, in lockstep with
+       PARTY_PING_COLORS in src/render/party_pings_core.ts (the world icon and its
+       ring draw the same five), plus the wheel's dark glass. Sampled from the
+       painted icons in public/ui/pings/: saturated, slightly neon, so a ping
+       pops on any ground. */
+    --color-ping-look: #ffe81a;
+    --color-ping-attack: #ff2d1e;
+    --color-ping-warning: #ff8c00;
+    --color-ping-on-my-way: #1a8cff;
+    --color-ping-assist: #1ff53c;
+    --color-ping-glass: #0d0b09;
     /* Per-school debuff border tints (WoW-style poison/magic/curse reads); physical
        keeps the base --color-debuff red. Driven by the aura node's data-school. */
     --color-debuff-fire: #e8722a;
@@ -313,80 +328,86 @@
     --color-category-text: #bfeec6;
     --color-category-text-active: #d6f5da;
     --color-filter-chip-text: #e6dcc0;
-    /* Raid boss journal palette. These tokens keep its forged-fire treatment in one
-       themeable source while the component sheets own only layout and composition. */
-    --color-rbg-frame-border-base: #2e180d;
-    --color-rbg-frame-flare: #2a160de8;
-    --color-rbg-frame-start: #15100d;
-    --color-rbg-frame-end: #090807;
-    --color-rbg-divider: #8f6a294f;
-    --color-rbg-nav-start: #0b0908dd;
-    --color-rbg-nav-end: #17100ddd;
-    --color-rbg-nav-grid: #ffffff05;
-    --color-rbg-tab-border: #5d4825;
-    --color-rbg-tab-start: #1a1714;
-    --color-rbg-tab-end: #0d0c0b;
-    --color-rbg-portrait-start: #3b2316;
-    --color-rbg-tab-active-start: #4a2b13;
-    --color-rbg-tab-active-glow: #f18b2822;
-    --color-rbg-hero-border: #75562875;
-    --color-rbg-hero-flare: #d66b192e;
-    --color-rbg-hero-start: #20130e;
-    --color-rbg-hero-end: #0d0b0a;
-    --color-rbg-shadow-soft: #0009;
-    --color-rbg-shadow: #000;
+    /* Adventure Journal palette (#adventure-journal-window, the approved
+       "clean modern" look): a calm dark panel, ONE amber accent, light text
+       with strong contrast. Every journal rule in hud.css / hud.mobile.css
+       reads these; the role and status hues are text-on-panel tints. */
+    --font-aj: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+    --color-aj-win: #15171c;
+    --color-aj-win-border: #343a44;
+    --color-aj-head: #121419;
+    --color-aj-nav: #13151a;
+    --color-aj-panel: #1b1e24;
+    --color-aj-panel-hover: #21252c;
+    --color-aj-banner: #181a20;
+    --color-aj-tabbar: #16181d;
+    --color-aj-well: #101216;
+    --color-aj-line: #2c313a;
+    --color-aj-chip: #242830;
+    --color-aj-chip-border: #333944;
+    --color-aj-tag: #262a32;
+    --color-aj-ring: #3a404a;
+    --color-aj-icon-border: #444b56;
+    --color-aj-text: #f1f2f4;
+    --color-aj-bright: #fff;
+    --color-aj-soft: #c3c8d0;
+    --color-aj-mute: #9aa1ac;
+    --color-aj-accent: #f0a24a;
+    --color-aj-accent-hi: #ffcf8a;
+    --color-aj-accent-ink: #1b1206;
+    --color-aj-accent-wash: #f0a24a1a;
+    --color-aj-accent-line: #f0a24a40;
+    --color-aj-accent-glow: #f0a24a1f;
+    --color-aj-accent-strong: #f0a24a2e;
+    --color-aj-accent-faint: #f0a24a0a;
+    --color-aj-ember: #ff8c2829;
+    --color-aj-ember-faint: #ff8c280a;
+    --color-aj-portrait-glow: #ff781e40;
+    --color-aj-deadly: #ff7a6b;
+    --color-aj-done: #8fd19e;
+    --color-aj-tank: #7fb2ff;
+    --color-aj-healer: #7ee0a0;
+    --color-aj-damage: #ff8f7a;
+    --color-aj-everyone: #e8d7a8;
+    --color-aj-info: #8fc8ff;
+    --color-aj-shadow: #00000099;
+    --color-aj-scrim: #000000a6;
+    --color-aj-portrait-bg: #000;
+    /* The journal's light MMO frame: a thin bronze edge, its corner marks and the
+       title emblem (high, mid and low of one metal). */
+    --color-aj-metal: #8c7049;
+    --color-aj-metal-hi: #d9b97c;
+    --color-aj-metal-lo: #3a2e1f;
+    /* The veil over a banner's room picture: the banner colour at 69 percent,
+       so every banner word keeps 4.5:1 over even a white pixel of the picture
+       (pinned by tests/adventure_journal_styles.test.ts with the picture's
+       brightness filter; the two small status inks sit on their own well).
+       The mask fades the picture's edges. */
+    --color-aj-banner-scrim: #181a20b0;
+    --color-aj-mask: #000;
+    /* The difficulty crests' three colour identities (a steady steel for
+       Normal, a forge fire for Heroic, an arcane violet for Mythic): the ink
+       (the lit name and the rim's highlight), the crest's face from light to
+       deep, the glow of the selected crest and the wash of its plate. */
+    --color-aj-tier-normal: #a9cdf0;
+    --color-aj-tier-normal-mid: #5b86ad;
+    --color-aj-tier-normal-deep: #1f3953;
+    --color-aj-tier-normal-glow: #8fbbe666;
+    --color-aj-tier-normal-wash: #8fbbe61f;
+    --color-aj-tier-heroic: #ffab6b;
+    --color-aj-tier-heroic-mid: #d9561f;
+    --color-aj-tier-heroic-deep: #5a1606;
+    --color-aj-tier-heroic-glow: #ff73267a;
+    --color-aj-tier-heroic-wash: #ff8c3a26;
+    --color-aj-tier-mythic: #cfaeff;
+    --color-aj-tier-mythic-mid: #7c52d9;
+    --color-aj-tier-mythic-deep: #26104f;
+    --color-aj-tier-mythic-glow: #a678ff73;
+    --color-aj-tier-mythic-wash: #a678ff24;
+    /* A crest's top sheen and its skulls' shadow. */
+    --color-aj-crest-sheen: #ffffff40;
+    --color-aj-crest-shade: #0000008c;
     --color-store-promo-dot-shadow: #000;
-    --color-rbg-model-border: #8c6b31;
-    --color-rbg-model-start: #4b2814;
-    --color-rbg-model-end: #0d0907;
-    --color-rbg-model-glow: #e36f1824;
-    --color-rbg-model-inset: #d8a84135;
-    --color-rbg-button-border: #b1843b;
-    --color-rbg-button-start: #4f3218;
-    --color-rbg-button-end: #20140c;
-    --color-rbg-button-text: #ffe3a0;
-    --color-rbg-button-text-hover: #fff3ca;
-    --color-rbg-status-text: #efd18a;
-    --color-rbg-heading: #f2d58a;
-    --color-rbg-kicker: #c79745;
-    --color-rbg-segment-border: #5e4828;
-    --color-rbg-control-bg: #080706;
-    --color-rbg-segment-active-start: #66401d;
-    --color-rbg-segment-active-end: #38210f;
-    --color-rbg-segment-active-text: #ffe6a6;
-    --color-rbg-segment-active-border: #b68135;
-    --color-rbg-phase-start: #ffbd50;
-    --color-rbg-phase-end: #6e2b0d;
-    --color-rbg-phase-glow: #f27c2d55;
-    --color-rbg-phase-title: #efc66d;
-    --color-rbg-ability-border: #4d3c25;
-    --color-rbg-ability-start: #17130f;
-    --color-rbg-ability-inset: #ffffff08;
-    --color-rbg-ability-expanded-border: #8d672d;
-    --color-rbg-ability-expanded-start: #20170f;
-    --color-rbg-icon-border: #8b6935;
-    --color-rbg-expand-mark: #d7a949;
-    --color-rbg-badge-border: #56472f;
-    --color-rbg-badge-bg: #0b0a09;
-    --color-rbg-badge-text: #cbb889;
-    --color-rbg-role-icon: #fff;
-    --color-rbg-role-tank-bg: #2878c8;
-    --color-rbg-role-healer-bg: #278a45;
-    --color-rbg-role-damage-bg: #b93b36;
-    --color-rbg-deadly-border: #9f332d;
-    --color-rbg-deadly-text: #ff786d;
-    --color-rbg-important-border: #a97828;
-    --color-rbg-important-text: #ffd15f;
-    --color-rbg-cleansable-border: #3f769b;
-    --color-rbg-cleansable-text: #85d2ff;
-    --color-rbg-detail-border: #a77830;
-    --color-rbg-detail-bg: #080706a8;
-    /* The dungeon pages' extra sections (src/ui/boss_journal/): the trade-off
-       card's gain side, the Heroic callout's ember wash, and the summary prose. */
-    --color-rbg-gain-border: #3f8a52;
-    --color-rbg-gain-text: #9fe3ad;
-    --color-rbg-heroic-bg: #2a0e0bcc;
-    --color-rbg-summary-text: #cfc3a6;
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */
@@ -488,6 +509,54 @@
     --color-delve-label: #ffe9a0;
     --color-delve-outline: #000;
 
+    /* the raid atlas (the Smith's Heart's illustrated M-map; resolved once by
+       src/ui/hud/raid_atlas/raid_atlas_painter.ts via getComputedStyle): the
+       parchment and its stains, the inks, each area's wash, each vein's light,
+       the gilded frame and arrow, the boss medallions and the six pin colours. */
+    --color-raid-atlas-parchment: #e8d3a4;
+    --color-raid-atlas-parchment-light: #f6e9c6;
+    --color-raid-atlas-parchment-dark: #b48d55;
+    --color-raid-atlas-stain: #8a6431;
+    --color-raid-atlas-ink: #36210f;
+    --color-raid-atlas-ink-soft: #6e4b28;
+    --color-raid-atlas-abyss: #4a301a;
+    --color-raid-atlas-rock: #9c7a4c;
+    --color-raid-atlas-area-hammer: #d8ad6c;
+    --color-raid-atlas-area-ring: #d3c39d;
+    --color-raid-atlas-area-breath: #b4c7cc;
+    --color-raid-atlas-area-quench: #bcdbe2;
+    --color-raid-atlas-area-heat: #e6ad6a;
+    --color-raid-atlas-area-heart: #e7c47c;
+    --color-raid-atlas-vein-hammer: #b8782a;
+    --color-raid-atlas-vein-breath: #2f8fc8;
+    --color-raid-atlas-vein-quench: #4fb2d8;
+    --color-raid-atlas-vein-heat: #e0761e;
+    /* The Anvil of the World's quarters (the room's own quarter palette,
+       render/smith_heart/heart_quarters_core.ts HEART_QUARTER_PALETTE; the
+       atlas test pins them equal). */
+    --color-raid-atlas-quarter-hammer: #e0a650;
+    --color-raid-atlas-quarter-breath: #a98cff;
+    --color-raid-atlas-quarter-quench: #6cc8ff;
+    --color-raid-atlas-quarter-heat: #ff5214;
+    --color-raid-atlas-heart-glow: #ff9a3c;
+    --color-raid-atlas-glow: #ffd770;
+    --color-raid-atlas-frame-dark: #1c120a;
+    --color-raid-atlas-frame-mid: #3a2614;
+    --color-raid-atlas-gold-deep: #6e4a1c;
+    --color-raid-atlas-gold: #c49a46;
+    --color-raid-atlas-gold-light: #f6dd96;
+    --color-raid-atlas-gold-white: #fff6d8;
+    --color-raid-atlas-boss: #8c1b14;
+    --color-raid-atlas-boss-engaged: #e2461c;
+    --color-raid-atlas-dead: #6f685d;
+    --color-raid-atlas-portal: #7a4fd0;
+    --color-raid-atlas-pin-gold: #e8b43a;
+    --color-raid-atlas-pin-red: #d1372a;
+    --color-raid-atlas-pin-blue: #3c7ed6;
+    --color-raid-atlas-pin-green: #3c9a48;
+    --color-raid-atlas-pin-purple: #8b4fc9;
+    --color-raid-atlas-pin-white: #f3efe4;
+
     /* painted map of an authored open-air dungeon field (the Sunken Bastion, the
        Hollow Crypt; resolved by field_map_painter.ts via getComputedStyle): the
        sea or the chasm mist, the terraces by ground, the cliffs, walls and
@@ -523,6 +592,12 @@
     --color-field-map-snow: #dfe9f1;
     --color-field-map-ice: #7fb3cf;
     --color-field-map-slate: #4a5058;
+    --color-field-map-quarry: #8a6e4e;
+    --color-field-map-paving: #7d7266;
+    --color-field-map-scoured: #8e9298;
+    --color-field-map-rime: #8a96a6;
+    --color-field-map-lake-ice: #4f7690;
+    --color-field-map-hearth: #4a423c;
     --color-field-map-crevasse: #2e6f9e;
     --color-field-map-crevasse-deep: #0d1f33;
     --color-field-map-wall: #4b433a;
@@ -533,6 +608,21 @@
     --color-field-map-beacon: #ffe39a;
     --color-field-map-vignette: rgba(0, 0, 0, 0.55);
     --color-field-map-vignette-clear: rgba(0, 0, 0, 0);
+
+    /* The Guardian of the Quench's screen effects (hud.css "Quench frost and
+       water screen effects", painted by src/ui/hud/dungeon/quench_screen_painter.ts):
+       the frost border's haze, rim and frozen glint, the mask's solid stop, the
+       water's tint, and the frost's tiled rime texture (fractal noise keyed to
+       an icy white; no colour literal of its own). */
+    --color-quench-frost-clear: rgba(190, 228, 255, 0.12);
+    --color-quench-frost-haze: rgba(132, 198, 250, 0.8);
+    --color-quench-frost-rim: rgba(228, 244, 255, 1);
+    --color-quench-frost-glint: rgba(244, 252, 255, 1);
+    --color-quench-frost-glint-core: rgba(255, 255, 255, 1);
+    --color-quench-mask: rgba(0, 0, 0, 1);
+    --color-quench-water-centre: rgba(30, 108, 186, 0.4);
+    --color-quench-water-edge: rgba(10, 48, 120, 0.7);
+    --quench-frost-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='f' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.03' numOctaves='5' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.9 0 0 0 0 0.97 0 0 0 0 1 -2.3 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
 
     /* overworld world-map window (resolved by map_window_painter.ts via
        getComputedStyle: a 2D canvas context cannot read a CSS var directly).
@@ -798,6 +888,18 @@
     --color-gold-500: #d8a645;
     --color-gold-400: #f0c86d;
     --color-gold-300: #ffe5a3;
+
+    /* The Guardian of the Breath's wind badge (components.css #heart-breath-wind,
+       src/ui/hud/dungeon/breath_wind_painter.ts): a storm-dark dial, a pale wind
+       arrow, gold while the wind turns. */
+    --color-breath-wind-dial: rgb(20 40 60 / 0.85);
+    --color-breath-wind-dial-edge: rgb(10 20 32 / 0.9);
+    --color-breath-wind-glow: rgb(120 200 255 / 0.45);
+    --color-breath-wind-arrow: #dff4ff;
+    --color-breath-wind-arrow-edge: #0b1a28;
+    --color-breath-wind-turning: #fff1b8;
+    --color-breath-wind-turning-glow-soft: rgb(255 220 120 / 0.35);
+    --color-breath-wind-turning-glow: rgb(255 220 120 / 0.9);
 
     /* Performance Overlay gilded-ornament shape defaults. perf_ornament_svg.ts
        overwrites these with the real generated mask-image/gradient values once at
@@ -1312,6 +1414,17 @@
     --color-fct-damage-taken-block: #7ec8e3;
     /* Absorbed damage text keeps the shipped pale blue. */
     --color-fct-absorb: #9fd7ff;
+    /* Heal-absorb overlay on unit-frame health bars (Living Rime, Stone Shell):
+       a dark navy wash that clearly dims the locked health on any bar color,
+       bright ice-white hatching, a bright rime edge where healing bites, an
+       ice-blue frame on the carrier's bar, and the number in an ink outline. */
+    --color-heal-absorb-wash: rgba(8, 22, 48, 0.86);
+    --color-heal-absorb-wash-top: rgba(26, 62, 110, 0.86);
+    --color-heal-absorb-stripe: rgba(228, 246, 255, 0.8);
+    --color-heal-absorb-edge: #f2fbff;
+    --color-heal-absorb-glow: rgba(120, 200, 255, 0.85);
+    --color-heal-absorb-text: #e6f7ff;
+    --color-heal-absorb-chip: #04101f;
     /* Healing combat text keeps the shipped restorative green. */
     --color-fct-heal: #3ce63c;
     /* Experience combat text keeps the shipped violet reward hue. */
@@ -1388,6 +1501,10 @@
     --color-breath-drowning-soft: rgb(255 60 40 / 40%);
     /* Breath text keeps its cool high-contrast parchment tint. */
     --color-breath-label: #eaf4ff;
+    /* The Knotted Gale's second pair of portals (phase 2): Portal C in the
+       storm's spring green, Portal D in its rose, the floor's own colours. */
+    --color-knot-portal-c: #a8ff3e;
+    --color-knot-portal-d: #ff5ab0;
 
     /* chat */
     /* Multiplies the player's chat opacity while the dock is idle. */

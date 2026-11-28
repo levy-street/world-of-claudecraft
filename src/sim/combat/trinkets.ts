@@ -36,6 +36,7 @@ import { duelJustEndedBetween } from '../social/duel';
 import { type Aura, type Entity, MELEE_RANGE } from '../types';
 import { meleeSwing } from './auto_attack';
 import { isForemanShaped, useBalgathTrinket } from './balgath_trinkets';
+import { carriesLoad } from './carried_load';
 import { isUnbreakableControlAura } from './cc';
 import { applyHeal } from './heal';
 import { relocateSwept } from './heroic_leap';
@@ -206,6 +207,11 @@ export function useWornTrinket(
   // Only the Medallion of Defiance works while you cannot act: it is what frees you.
   if (spec.use.kind !== 'defiance' && isStunned(p)) {
     ctx.error(meta.entityId, "Can't do that while incapacitated.");
+    return false;
+  }
+  // The Knotted Gale's carrier moves on foot only (carried_load.ts).
+  if (spec.use.kind === 'blink' && carriesLoad(p)) {
+    ctx.error(meta.entityId, "Can't move!");
     return false;
   }
   let cooldown = spec.cooldown;

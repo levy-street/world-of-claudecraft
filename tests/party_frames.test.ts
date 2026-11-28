@@ -714,3 +714,43 @@ describe('readPartyFrameDisplayConfig', () => {
     });
   });
 });
+
+describe('party frame raid target icons', () => {
+  const info: PartyInfo = {
+    leader: 1,
+    raid: true,
+    master: { enabled: false, looter: 0, threshold: 'uncommon' },
+    members: [member(1, 1), member(2, 1), member(3, 2)],
+  } as unknown as PartyInfo;
+  const pos = { x: 0, z: 0 };
+
+  it('attaches the client-mirrored mark to the marked member only', () => {
+    const marks = new Map([[3, 5]]);
+    const rows = selectPartyFrameMembers(
+      info,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      undefined,
+      (pid) => marks.get(pid) ?? null,
+    );
+    expect(rows.find((r) => r.pid === 3)?.mark).toBe(5);
+    expect(rows.find((r) => r.pid === 2)).not.toHaveProperty('mark');
+  });
+
+  it('folds the mark into the rebuild signature, so a set or clear repaints', () => {
+    const marks = new Map<number, number>();
+    const lookup = (pid: number) => marks.get(pid) ?? null;
+    const sig = () =>
+      partyFrameSignature(info, 1, pos, undefined, undefined, undefined, null, lookup);
+    const before = sig();
+    marks.set(2, 7);
+    const marked = sig();
+    expect(marked).not.toBe(before);
+    marks.set(2, 0);
+    expect(sig()).not.toBe(marked);
+    marks.delete(2);
+    expect(sig()).toBe(before);
+  });
+});

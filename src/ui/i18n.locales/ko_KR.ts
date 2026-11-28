@@ -13,6 +13,621 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'bossJournal.smithHeart.common.softEnrageName': '약한 격노',
+  'bossJournal.smithHeart.common.skyStrikeName': '하늘의 일격',
+  'bossJournal.smithHeart.common.crossingBladeName': '교차하는 칼날',
+  'bossJournal.smithHeart.common.groaningIceName': '신음하는 얼음',
+  'bossJournal.smithHeart.common.furyPhaseName': '용광로의 분노',
+  'bossJournal.smithHeart.common.furyPhaseSummary':
+    '영웅 난이도 전용: 전투 시작 {minutes}분 후의 완전 격노입니다.',
+  'bossJournal.smithHeart.common.furyName': '용광로의 분노',
+  'bossJournal.smithHeart.common.furySummary':
+    '모여드는 용광로의 분노가 {warn}초 전에 경고합니다. 전투 시작 {minutes}분이 지나면 {every}초마다 전투 중인 모두를 태웁니다: 먼저 최대 생명력의 {share}, 그다음 {share2}, 그리고 {kill}번째에는 어떤 보호막이 있어도 모두 죽습니다. 시간은 정지 구간을 포함해 전투의 모든 순간을 세며, 우두머리가 피해를 입지 않는 동안에는 분노가 기다립니다.',
+  'bossJournal.smithHeart.common.furyResponse': '시간이 다 되기 전에 우두머리를 쓰러뜨리세요.',
+  'bossJournal.smithHeart.common.heroicFury':
+    '용광로의 분노: 전투 시작 {minutes}분 후, 전투가 공격대를 불태워 없앱니다.',
+  'bossJournal.smithHeart.common.chipTankSwap': '방어 담당 교대 전투',
+  'bossJournal.smithHeart.common.chipEnrage': '{minutes}분 후 광폭화',
+  'bossJournal.smithHeart.council.overview':
+    '흐로스마르, 굴하지 않는 망치와 벨미라, 광맥의 노래꾼은 채석장에서 한 몸처럼 싸웁니다. 흐로스마르는 방어 담당이 맡는 우두머리로, 그의 산의 분노는 기둥 뒤에 숨지 않은 모두를 칩니다. 벨미라는 시전자로, 공격대가 숨을 기둥을 세우고 노래로 돌을 무너뜨립니다. 하나가 쓰러지면 다른 하나가 치유되고 빨라지며 그 능력을 이어받으니, 둘을 함께 쓰러뜨리세요.',
+  'bossJournal.smithHeart.council.pageName': '흐로스마르와 벨미라',
+  'bossJournal.smithHeart.council.tagline':
+    '두 돌의 수호자가 채석장에서 한 몸처럼 싸웁니다: 기둥 뒤에 숨어 흐로스마르의 산의 분노를 피하고, 벨미라의 노래를 차단하고, 둘을 함께 쓰러뜨리세요.',
+  'bossJournal.smithHeart.council.chipBosses': '우두머리 {count}명, 하나의 전투',
+  'bossJournal.smithHeart.council.chipTogether': '{arrive}초 안에 둘 다 처치',
+  'bossJournal.smithHeart.council.phaseHammerName': '흐로스마르, 굴하지 않는 망치',
+  'bossJournal.smithHeart.council.phaseHammerSummary':
+    '방어 담당이 맡는 우두머리입니다. 기력이 약 {fill}초에 걸쳐 0에서 {energy}까지 차며, 기력이 가득 차면 산의 분노를 시전합니다.',
+  'bossJournal.smithHeart.council.wrathSummary':
+    '기력이 가득 차면 {cast}초 시전 후, 채석장에서 기둥의 그림자 밖에 있는 모두가 {min}~{max}의 피해를 입고 모든 기둥이 부서집니다. 첫 번째 분노는 조각된 돌기둥 다섯 개도 전투가 끝날 때까지 파괴합니다.',
+  'bossJournal.smithHeart.council.wrathHeroicSummary':
+    '기력이 가득 차면 {cast}초 시전 후, 채석장에서 기둥의 그림자 밖에 있는 모두가 {min}~{max}의 피해를 입습니다: 강력한 생존기를 쓴 방어 담당만 버틸 수 있습니다. 그 뒤 모든 기둥이 부서지고, 첫 번째 분노는 조각된 돌기둥 다섯 개도 파괴합니다.',
+  'bossJournal.smithHeart.council.wrathResponse':
+    '시전자 반대편, 기둥 뒤의 그림자에 숨으세요. 기둥 하나는 최대 {limit}명만 지켜 줍니다: 그보다 많이 숨으면 각자 폭발의 {share}를 받습니다. 첫 번째 분노 이후에는 돌 깨우기로 세운 기둥만 엄폐물이 됩니다.',
+  'bossJournal.smithHeart.council.enrageSummary':
+    '분노가 {wraths}번 적중하면 기력이 {mult}배 빠르게 차, 약 {cycle}초마다 분노가 옵니다.',
+  'bossJournal.smithHeart.council.enrageResponse': '그 전에 의회를 끝낼 계획을 세우세요.',
+  'bossJournal.smithHeart.council.weightSummary':
+    '{every}초마다 자신의 방어 담당에게 {cast}초 시전: 일반 공격의 {mult}배에 달하는 일격을 가한 뒤, 방어 담당이 {seconds}초 동안 받는 물리 피해가 {taken} 증가합니다.',
+  'bossJournal.smithHeart.council.weightResponse':
+    '적중하자마자 다른 방어 담당이 도발하세요. 방어 담당이 두 번 연속으로 맞아서는 안 됩니다.',
+  'bossJournal.smithHeart.council.hammerfallName': '망치 내려찍기',
+  'bossJournal.smithHeart.council.hammerfallSummary':
+    '{every}번째 공격마다 일격이 앞쪽 {arc}도 범위를 {range}야드까지 휩쓸어, 범위 안의 모두에게 일반 공격의 {share}만큼 피해를 줍니다.',
+  'bossJournal.smithHeart.council.hammerfallResponse': '흐로스마르의 정면에는 방어 담당만 서세요.',
+  'bossJournal.smithHeart.council.rushSummary':
+    '{every}초마다 {cast}초 시전으로 방어 담당이 아닌 플레이어 한 명에게 표식을 남기고 저주받은 기둥을 세웁니다. 그 뒤 자신에게서 그 플레이어를 지나 채석장 가장자리까지 이어지는 선을 따라 돌진하며, 길을 막는 첫 번째 기둥에서 멈춥니다. 부딪힌 모두는 {min}~{max}의 피해를 입고 {knock}야드 날아갑니다.',
+  'bossJournal.smithHeart.council.rushResponse':
+    '표식 대상: 저주받은 기둥을 자신과 흐로스마르 사이에 두고 선에서 벗어나세요. 기둥이 부서지면 흐로스마르가 {stun}초 동안 기절하고 {exposedSeconds}초 동안 받는 피해가 {exposed} 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다.',
+  'bossJournal.smithHeart.council.cursedName': '저주받은 기둥',
+  'bossJournal.smithHeart.council.cursedSummary':
+    '저주받은 기둥은 서 있는 동안 {every}초마다 공격대 전체에 {min}~{max}의 피해를 줍니다. 분노로부터 아무도 지켜 주지 않으며, 산의 돌진이나 분노로만 부술 수 있습니다.',
+  'bossJournal.smithHeart.council.cursedResponse': '가능한 한 빨리 산의 돌진으로 부수세요.',
+  'bossJournal.smithHeart.council.phaseSingerName': '벨미라, 광맥의 노래꾼',
+  'bossJournal.smithHeart.council.phaseSingerSummary':
+    '시전자입니다. 광맥 화살, 광맥의 노래, 돌 깨우기는 모두 차단할 수 있습니다.',
+  'bossJournal.smithHeart.council.wakeSummary':
+    '{every}초마다, 그리고 분노가 적중할 때마다 {after}초 후에 {cast}초 시전으로 플레이어 {marks}명에게 {mark}초 동안 표식을 남깁니다. 표식이 끝나면 각자 선 자리에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고 밀쳐냅니다. 차단된 시전은 아무것도 세우지 않습니다.',
+  'bossJournal.smithHeart.council.wakeResponse':
+    '다음 분노에 필요한 시전은 허용하고 나머지는 차단하세요. 표식 대상은 서로 떨어진 채 공격대가 엄폐물을 원하는 곳에 서세요.',
+  'bossJournal.smithHeart.council.thrumName': '돌의 울림',
+  'bossJournal.smithHeart.council.thrumSummary':
+    '돌 깨우기로 세워져 아직 서 있는 기둥마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 기둥마다 피해가 더해집니다. 조각된 돌기둥은 울리지 않습니다.',
+  'bossJournal.smithHeart.council.thrumResponse':
+    '다음 분노에 필요한 기둥만 남기세요: 기둥이 하나 늘 때마다 치유가 더 듭니다.',
+  'bossJournal.smithHeart.council.restlessName': '들썩이는 돌',
+  'bossJournal.smithHeart.council.restlessSummary':
+    '{every}초마다 서 있는 모든 기둥이 {reach}야드 안의 모두에게 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.smithHeart.council.restlessResponse': '분노가 오기 전까지는 돌에서 떨어져 있으세요.',
+  'bossJournal.smithHeart.council.rockSummary':
+    '{every}초마다 플레이어 한 명에게 {mark}초 동안 표식을 남긴 뒤 그 위로 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty} 더 받고 공격대 전체가 {tremorMin}~{tremorMax}의 피해를 입습니다. {radius}야드 안의 모든 기둥은 한 조각씩 깨집니다.',
+  'bossJournal.smithHeart.council.rockResponse':
+    '아직 필요한 기둥에서 떨어진 금색 원 안에 최소 {soakers}명이 모이세요.',
+  'bossJournal.smithHeart.council.boltSummary':
+    '{every}초마다 보이는 무작위 플레이어에게 {cast}초 시전: {min}~{max}의 자연 피해. 시야 밖의 플레이어에게는 적중하지 않습니다.',
+  'bossJournal.smithHeart.council.boltResponse': '차단하세요.',
+  'bossJournal.smithHeart.council.songSummary':
+    '분노가 적중할 때마다 {after}초 후에 시작하는 {cast}초 시전입니다. 끝까지 부르면 플레이어 {marks}명에게, 차단되면 {kicked}명에게 공명을 겁니다.',
+  'bossJournal.smithHeart.council.songHeroicSummary':
+    '{every}초마다 독자적인 주기로 {cast}초 시전하므로 공명이 분노와 겹칠 수 있습니다. 끝까지 부르면 플레이어 {marks}명에게, 차단되면 {kicked}명에게 공명을 겁니다.',
+  'bossJournal.smithHeart.council.songResponse': '매번 차단하세요.',
+  'bossJournal.smithHeart.council.resonanceName': '공명',
+  'bossJournal.smithHeart.council.resonanceSummary':
+    '{seconds}초 동안 {every}초마다 표식 대상이 울려 퍼져, 자신의 {radius}야드 안에 있는 모든 아군에게 {min}~{max}의 자연 피해를 줍니다.',
+  'bossJournal.smithHeart.council.resonanceResponse':
+    '표식 대상: 효과가 끝날 때까지 모두에게서 {radius}야드 떨어지세요.',
+  'bossJournal.smithHeart.council.resonanceHeroicResponse':
+    '표식 대상: 효과가 끝날 때까지 모두에게서 {radius}야드 떨어지세요. 분노가 다가오면 혼자 쓸 기둥의 그림자를 차지하세요.',
+  'bossJournal.smithHeart.council.phaseFallName': '하나가 쓰러지면',
+  'bossJournal.smithHeart.council.phaseFallSummary': '둘 다 죽어야 전투가 끝납니다.',
+  'bossJournal.smithHeart.council.furyName': '비탄의 분노',
+  'bossJournal.smithHeart.council.furySummary':
+    '하나가 쓰러지면 그 영혼이 {arrive}초 후 다른 하나에게 닿습니다. 살아남은 쪽은 즉시 생명력의 {heal}를 회복하고, 전투가 끝날 때까지 주는 피해가 {damage} 증가하며 공격, 시전, 모든 능력이 {haste} 빨라집니다.',
+  'bossJournal.smithHeart.council.furyResponse':
+    '둘의 생명력을 함께 낮추고, 첫 번째가 쓰러진 뒤 {arrive}초 안에 두 번째를 처치하세요: 그러면 영혼이 너무 늦게 도착합니다.',
+  'bossJournal.smithHeart.council.inheritName': '물려받은 능력',
+  'bossJournal.smithHeart.council.inheritSummary':
+    '영혼과 함께 살아남은 쪽이 쓰러진 쪽의 능력을 최대 위력으로 이어받습니다. 흐로스마르가 쓰러지면: 벨미라가 그의 기력을 채우고 산의 분노를 시전합니다. 벨미라가 쓰러지면: 흐로스마르가 돌 깨우기와 광맥의 노래를 시전합니다. 산의 돌진과 낙석은 시전자와 함께 사라집니다.',
+  'bossJournal.smithHeart.council.inheritHeroicSummary':
+    '영혼과 함께 살아남은 쪽이 쓰러진 쪽의 능력을 최대 위력으로 이어받습니다. 흐로스마르가 쓰러지면: 벨미라가 그의 기력을 채우고 산의 분노와 망치의 무게를 시전합니다. 벨미라가 쓰러지면: 흐로스마르가 돌 깨우기, 광맥의 노래, 광맥 화살을 시전합니다. 산의 돌진과 낙석은 시전자와 함께 사라집니다.',
+  'bossJournal.smithHeart.council.inheritResponse':
+    '누가 살아남든 계획은 같습니다: 분노에는 기둥, 노래에는 차단, 무게에는 방어 담당 교대.',
+  'bossJournal.smithHeart.council.tipTank':
+    '망치의 무게마다 교대하세요. 공격대가 동시에 쓰러뜨릴 수 있도록 흐로스마르와 벨미라를 가까이 붙여 두세요. 영웅 난이도에서는 분노 때 엄폐물 밖에 있는 방어 담당에게 강력한 생존기가 필요합니다.',
+  'bossJournal.smithHeart.council.tipHealer':
+    '분노가 오기 전마다 모두의 생명력을 채우세요. 돌의 울림과 저주받은 기둥은 돌이 서 있는 동안 공격대 전체를 치고, 낙석을 나눠 맞은 플레이어는 착지 후 치유가 필요합니다.',
+  'bossJournal.smithHeart.council.tipDamage':
+    '광맥 화살과 광맥의 노래를 모두 차단하세요. 분노가 오기 전마다 돌 깨우기를 하나만 허용하고 나머지는 차단하세요. 두 생명력 막대를 모두 지켜보세요: 첫 번째가 쓰러진 뒤 {arrive}초 안에 두 번째도 쓰러져야 합니다.',
+  'bossJournal.smithHeart.council.heroicWrath':
+    '산의 분노는 기둥의 그림자 밖에 있는 모두를 죽입니다. 기둥 하나는 {limit}명만 지켜 주며, 붐비는 기둥은 폭발의 {share}를 통과시킵니다.',
+  'bossJournal.smithHeart.council.heroicOverlap':
+    '돌 깨우기가 플레이어 {marks}명에게 표식을 남기며, 그 표식과 산의 돌진, 공명이 이제 분노 시전 중에도 올 수 있습니다.',
+  'bossJournal.smithHeart.council.heroicFury':
+    '비탄의 분노가 살아남은 쪽을 즉시 {heal} 치유하고, 쓰러진 쪽의 두 번째 능력까지 이어받게 합니다.',
+  'bossJournal.smithHeart.breath.overview':
+    '에어윈, 속박 없는 돌풍은 벽이 없는 폭풍 절벽에서 싸웁니다: 모든 가장자리 너머는 공허로 떨어지는 낭떠러지입니다. 생명력이 절반이 될 때까지는 바람으로 싸우고, 절반이 되면 고치 속에 숨어 공격대를 떠 있는 섬들로 보냅니다. 그 뒤 폭풍이 터지고 끝까지 번개의 몸으로 싸웁니다. 테살리 대장이 곁에서 함께 싸우며 고요의 원을 펼칩니다.',
+  'bossJournal.smithHeart.breath.tagline':
+    '공허 위로 벽 없이 튀어나온 절벽: 바람을 거슬러 걷고, 생명력 {at}에서 떠 있는 섬들을 정리한 뒤 폭풍을 버텨내세요.',
+  'bossJournal.smithHeart.breath.chipEdge': '가장자리에서 떨어지면 사망',
+  'bossJournal.smithHeart.breath.chipIsles': '{at}에서 떠 있는 섬으로',
+  'bossJournal.smithHeart.breath.phaseWindName': '바람',
+  'bossJournal.smithHeart.breath.phaseWindSummary':
+    '전투 시작부터 생명력 {at}까지. 바람에 날리거나, 던져지거나, 걸어서 벼랑 가장자리 밖으로 나간 자는 공허로 떨어져 죽습니다.',
+  'bossJournal.smithHeart.breath.windName': '풀무 바람',
+  'bossJournal.smithHeart.breath.windSummary':
+    '다가올 바람이 {gather}초 동안 바닥에 그려진 뒤 {blow}초 동안 벼랑을 가로질러 불며, 가만히 서 있는 자를 초당 {speed}야드씩 실어 갑니다. 이것이 계속 반복됩니다. 바람과 바람 사이에는 {calmMin}~{calmMax}초 동안 고요합니다.',
+  'bossJournal.smithHeart.breath.windResponse':
+    '바람이 불기 전에 바람이 불어오는 쪽으로 이동하고, 부는 동안에는 바람을 거슬러 걸으세요. 가장자리 근처에서 절대 가만히 서 있지 마세요.',
+  'bossJournal.smithHeart.breath.calmName': '고요의 원',
+  'bossJournal.smithHeart.breath.calmSummary':
+    '{every}초마다 테살리 대장이 바닥에 원을 표시합니다. {land}초 후 원이 내려앉아 {hold}초 동안 유지됩니다. 안에 있는 플레이어 최대 {seats}명이 {anchor}초 동안 닻에 묶여, 바람도 끌어당김도 날려 보내기도 그들을 움직이지 못합니다.',
+  'bossJournal.smithHeart.breath.calmHeroicSummary':
+    '{every}초마다 테살리 대장이 바닥에 원을 표시합니다. {land}초 후 원이 내려앉아 {hold}초 동안 유지됩니다. 안에 있는 플레이어 최대 {seats}명이 {anchor}초 동안 닻에 묶여, 바람도 끌어당김도 날려 보내기도 그들을 움직이지 못합니다. 닻이 다한 플레이어는 {spent}초 동안 다시 닻에 묶일 수 없습니다.',
+  'bossJournal.smithHeart.breath.calmResponse':
+    '바람이나 들이쉬는 숨이 다가올 때 치유 담당과 원거리 공격수가 닻을 차지하세요.',
+  'bossJournal.smithHeart.breath.inhaleSummary':
+    '{every}초마다 {cast}초 시전으로 모두를 에어윈 쪽으로 초당 {pull}야드씩 끌어당깁니다. 입 앞의 소용돌이는 그 안의 모두에게 {tick}초마다 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.smithHeart.breath.inhaleResponse':
+    '입에서 곧장 멀어지는 방향으로 계속 걷거나, 고요의 원 안에 서세요.',
+  'bossJournal.smithHeart.breath.roarSummary':
+    '숨이 끝날 때 {cast}초 시전: 벼랑 위의 모두에게 {min}~{max}의 자연 피해를 주고, 각자를 에어윈에게서 정반대로 {throw}야드 날려 보낸 뒤, {gust}초 동안 초당 {gustSpeed}야드로 계속 밀어냅니다. 일반 난이도에서는 항상 가장자리 앞에서 멈춥니다.',
+  'bossJournal.smithHeart.breath.roarHeroicSummary':
+    '숨이 끝날 때 {cast}초 시전: 벼랑 위의 모두에게 {min}~{max}의 자연 피해를 주고, 각자를 에어윈에게서 정반대로 {throw}야드 날려 보낸 뒤, {gust}초 동안 초당 {gustSpeed}야드로 계속 밀어냅니다. 가장자리까지 날아가면 벼랑 밖으로 떨어집니다.',
+  'bossJournal.smithHeart.breath.roarResponse':
+    '포효할 때 에어윈 가까이 서 있다가, 돌풍이 부는 동안 곧장 에어윈 쪽으로 걸어 돌아가거나 고요의 원 안에 서세요.',
+  'bossJournal.smithHeart.breath.lanceSummary':
+    '{every}초마다 플레이어 한 명에게 {cast}초 시전: 길이 {length}야드, 폭 {width}야드의 직선이 그 안의 모두에게 {min}~{max}의 자연 피해를 줍니다.',
+  'bossJournal.smithHeart.breath.lanceResponse':
+    '표식 대상: 직선을 공격대 반대쪽으로 돌리세요. 나머지는 직선에서 벗어나세요.',
+  'bossJournal.smithHeart.breath.skySummary':
+    '바람과 폭풍 단계에서 {every}초마다 번개가 플레이어 {marks}명과 지점 {spots}곳에 표식을 남깁니다. {warn}초 후 {radius}야드 안에 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.smithHeart.breath.skyResponse':
+    '자신의 원에서 벗어나고, 원이 공격대에 겹치지 않게 하세요.',
+  'bossJournal.smithHeart.breath.blowSummary':
+    '{every}초마다 방어 담당에게 {cast}초 시전: {min}~{max}의 자연 피해를 주고 방어 담당을 에어윈에게서 정반대로 날려 보냅니다. 처음에는 {first}야드, 바람에 시달림 중첩마다 더 멀리, 최대 {last}야드까지 날아갑니다. 방어 담당을 벼랑 밖으로 날려 보내지는 않습니다. 중첩은 {seconds}초 동안 지속됩니다.',
+  'bossJournal.smithHeart.breath.blowHeroicSummary':
+    '{every}초마다 방어 담당에게 {cast}초 시전: {min}~{max}의 자연 피해를 주고 방어 담당을 에어윈에게서 정반대로 날려 보냅니다. 처음에는 {first}야드, 바람에 시달림 중첩마다 더 멀리 날아갑니다. {ruin}중첩일 때의 강타는 방어 담당을 벼랑 밖으로 날려 보냅니다. 중첩은 {seconds}초 동안 지속됩니다.',
+  'bossJournal.smithHeart.breath.blowResponse': '{swap}중첩에서 방어 담당을 교대하세요.',
+  'bossJournal.smithHeart.breath.galeName': '떠도는 돌풍',
+  'bossJournal.smithHeart.breath.galeSummary':
+    '들이쉬는 숨이 끝날 때마다 떠도는 돌풍 {count}개가 {seconds}초 동안 벼랑을 떠돕니다. 닿으면 {min}~{max}의 피해를 입고 {toss}야드 날아갑니다.',
+  'bossJournal.smithHeart.breath.galeResponse':
+    '바람과 싸우는 동안에도 돌풍을 지켜보고, 돌풍이 당신을 가장자리 쪽으로 밀게 두지 마세요.',
+  'bossJournal.smithHeart.breath.knotName': '얽힌 질풍',
+  'bossJournal.smithHeart.breath.knotSummary':
+    '바람 단계에서는 {every}초마다(최대 {runs}번), 폭풍 단계에서는 {stormEvery}초마다 얽힌 질풍이 {fuse}초의 도화선과 함께 벼랑에 떨어집니다. {mark}초 후 표식을 받은 두 플레이어의 발밑에 포털 A와 B가 열립니다: 한쪽에 들어가면 다른 쪽으로 나옵니다. 나르는 자는 {walk} 속도로 걷고, 어느 가장자리에서든 상호작용으로 그것을 공허로 던집니다. 터지면 {core}야드 안의 모두가 죽고, 더 멀리 있는 대상은 피해가 줄어 {far}야드에서는 생명력의 {floor}까지 줄어듭니다.',
+  'bossJournal.smithHeart.breath.knotResponse':
+    '한 명이 집어 들어 포털을 지름길 삼아 가장 가까운 가장자리 밖으로 던지세요. 표식을 받은 플레이어는 나를 수 없습니다. 나머지는 멀리 떨어지세요.',
+  'bossJournal.smithHeart.breath.phaseIslesName': '바람의 섬',
+  'bossJournal.smithHeart.breath.phaseIslesSummary':
+    '생명력 {at}에서 에어윈은 공격할 수 없게 되고, 공격대는 떠 있는 섬들로 이어진 두 갈래로 나뉩니다. 고요석 두 개를 모두 잠재우면 모두가 돌아오고 폭풍이 터집니다.',
+  'bossJournal.smithHeart.breath.novaSummary':
+    '질풍 고치 안에서 에어윈은 피해를 입지 않으며 {nova}초 동안 하늘가름 회오리를 정신 집중합니다. 정신 집중이 끝나면 회오리가 어떤 보호막이 있어도 모두를 죽입니다.',
+  'bossJournal.smithHeart.breath.novaResponse':
+    '테살리 대장의 상승 기류를 타고 동쪽과 서쪽의 섬으로 건너가, 정신 집중이 끝나기 전에 고요석 두 개를 모두 잠재우세요.',
+  'bossJournal.smithHeart.breath.closingName': '조여 오는 폭풍',
+  'bossJournal.smithHeart.breath.closingSummary':
+    '섬에 처음 착지한 순간부터 {closing}초 동안 그 섬의 폭풍이 조여 옵니다. 시간이 다 되면 하늘의 심판이 {every}초마다 그 섬의 모든 플레이어에게 최대 생명력의 {share}만큼 피해를 줍니다.',
+  'bossJournal.smithHeart.breath.closingResponse': '폭풍이 조여 오기 전에 각 섬을 정리하세요.',
+  'bossJournal.smithHeart.breath.isleBoltName': '섬의 번개',
+  'bossJournal.smithHeart.breath.isleBoltSummary':
+    '섬의 적이 살아 있는 동안 {every}초마다 번개가 그 섬의 플레이어 한 명과 지점 한 곳에 표식을 남깁니다. {warn}초 후 최대 생명력의 {share}만큼 피해를 줍니다.',
+  'bossJournal.smithHeart.breath.isleBoltResponse': '원에서 벗어나세요.',
+  'bossJournal.smithHeart.breath.mendSummary':
+    '첫 번째 섬의 질풍 치유사: {every}초마다 {cast}초 동안 정신 집중하여 섬의 모든 적의 생명력을 {share}씩 회복시킵니다.',
+  'bossJournal.smithHeart.breath.mendResponse': '매번 차단하세요.',
+  'bossJournal.smithHeart.breath.shoveSummary':
+    '두 번째 섬의 돌풍 전령: {every}초마다 플레이어 한 명을 향한 직선으로 {cast}초 시전합니다. 직선 위의 모두가 섬 가장자리 쪽으로 {yards}야드 미끄러지며, 가장자리 앞에서 멈춥니다.',
+  'bossJournal.smithHeart.breath.shoveHeroicSummary':
+    '두 번째 섬의 돌풍 전령: {every}초마다 플레이어 한 명을 향한 직선으로 {cast}초 시전합니다. 직선 위의 모두가 섬 가장자리 쪽으로 {yards}야드 미끄러지며, 가장자리가 가까우면 밖으로 떨어집니다.',
+  'bossJournal.smithHeart.breath.shoveResponse':
+    '직선에서 벗어나고, 절대 섬 가장자리를 등지고 싸우지 마세요.',
+  'bossJournal.smithHeart.breath.squallName': '갈라진 스콜',
+  'bossJournal.smithHeart.breath.squallSummary':
+    '두 번째 섬에서 갈라진 스콜은 죽으면서 스콜 파편 두 개로 갈라집니다.',
+  'bossJournal.smithHeart.breath.squallResponse': '파편 두 개를 위해 공격 기술을 아껴 두세요.',
+  'bossJournal.smithHeart.breath.wardName': '스콜 수호막',
+  'bossJournal.smithHeart.breath.wardSummary':
+    '세 번째 섬의 스콜 방패병은 정면 {arc}도 안에서 들어오는 공격의 피해를 {cut} 흘려냅니다.',
+  'bossJournal.smithHeart.breath.wardResponse':
+    '방어 담당이 방패병을 돌려세우고, 모두 등을 공격하세요.',
+  'bossJournal.smithHeart.breath.stoneName': '고요석',
+  'bossJournal.smithHeart.breath.stoneSummary':
+    '섬의 적이 모두 쓰러지면 고요석이 깨어납니다. 섬 위의 모두가 동시에 정신 집중할 수 있습니다: 혼자서는 {solo}초가 걸리고, 많이 할수록 빨리 찹니다. 공격을 받으면 당신의 정신 집중은 끊기지만 돌의 진행도는 사라지지 않습니다.',
+  'bossJournal.smithHeart.breath.stoneResponse': '섬 위의 모두가 함께 정신 집중하세요.',
+  'bossJournal.smithHeart.breath.phaseStormName': '폭풍',
+  'bossJournal.smithHeart.breath.phaseStormSummary':
+    '생명력 {at}부터 끝까지, 에어윈은 번개의 몸으로 싸웁니다.',
+  'bossJournal.smithHeart.breath.breakSummary':
+    '공격대가 돌아오면 {cast}초 시전 후, {seconds}초 동안 번개가 쏟아집니다: {every}초마다 표시된 지점에 번개가 떨어져 각각 {radius}야드 안에 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.smithHeart.breath.breakResponse': '원 사이를 계속 움직이세요.',
+  'bossJournal.smithHeart.breath.forkSummary':
+    '{every}초마다 플레이어 한 명에게 {cast}초 시전: {min}~{max}의 자연 피해를 준 뒤, {jump}야드 안의 가장 가까운 플레이어에게 계속해서 튑니다.',
+  'bossJournal.smithHeart.breath.forkResponse': '서로 {jump}야드씩 산개하세요.',
+  'bossJournal.smithHeart.breath.cradleSummary':
+    '{every}초마다 {cast}초 시전으로 플레이어를 폭풍 속으로 들어 올려({count}명씩) {hold}초 동안 붙잡으며, 그동안 에어윈은 정신 집중하고 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 아래 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty} 더 받고 벼랑 위의 모두가 {bMin}~{bMax}의 피해를 입습니다.',
+  'bossJournal.smithHeart.breath.cradleHeroicSummary':
+    '{every}초마다 {cast}초 시전으로 플레이어 {count}명을 폭풍 속으로 들어 올려 {hold}초 동안 붙잡으며, 그동안 에어윈은 정신 집중하고 다른 것을 시전하지 않습니다. 이후 방전마다 {total}의 피해를 주며, 그 플레이어 아래 {radius}야드 안의 모두가 나눠 받습니다. 한 곳에 {soakers}명 미만이면 그곳의 각자가 {penalty} 더 받고 벼랑 위의 모두가 {bMin}~{bMax}의 피해를 입습니다.',
+  'bossJournal.smithHeart.breath.cradleResponse':
+    '들어 올려진 플레이어의 금색 원 아래에 최소 {soakers}명이 모이세요.',
+  'bossJournal.smithHeart.breath.cradleHeroicResponse':
+    '공격대를 원마다 나누어, 각 원 아래에 최소 {soakers}명씩 서세요.',
+  'bossJournal.smithHeart.breath.drawnSummary':
+    '{every}초마다 플레이어 한 명에게 {seconds}초 동안 표식을 남깁니다. {strike}초마다 그 발밑에 번개가 떨어집니다: {warn}초 후 {radius}야드 안에 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cMin}~{cMax}의 피해를 주는 대전된 땅을 남깁니다.',
+  'bossJournal.smithHeart.breath.drawnResponse':
+    '표식 대상: 계속 움직이며 번개를 공격대에서 먼 가장자리로 유도하세요.',
+  'bossJournal.smithHeart.breath.thunderSummary':
+    '{every}초마다 방어 담당에게 {cast}초 시전: {min}~{max}의 자연 피해와 함께 {seconds}초 동안 천둥 충전 중첩을 하나 남기며, 중첩마다 방어 담당이 받는 자연 피해와 기타 마법 피해가 {per} 증가합니다. {draw}중첩부터는 모든 튀어 오르는 번개가 그 방어 담당에게도 튑니다.',
+  'bossJournal.smithHeart.breath.thunderResponse': '{swap}중첩에서 방어 담당을 교대하세요.',
+  'bossJournal.smithHeart.breath.swellName': '부풀어 오르는 폭풍',
+  'bossJournal.smithHeart.breath.swellSummary':
+    '{every}초마다 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}씩 강해지고 끝없이 이어집니다.',
+  'bossJournal.smithHeart.breath.swellResponse':
+    '이것이 전투의 시계입니다: 생존기를 끝을 위해 아껴 두고 전투를 마무리하세요.',
+  'bossJournal.smithHeart.breath.gustName': '폭풍 돌풍',
+  'bossJournal.smithHeart.breath.gustSummary':
+    '폭풍 단계에서 {every}초마다 바람이 돌아옵니다: {gather}초 동안 바닥에 그려진 뒤 {seconds}초 동안 초당 {speed}야드로 붑니다.',
+  'bossJournal.smithHeart.breath.gustResponse': '가장자리에서 떨어진 채 바람을 거슬러 걸으세요.',
+  'bossJournal.smithHeart.breath.tipTank':
+    '바람에 시달림과 천둥 충전 중첩 수에 맞춰 교대하세요. 에어윈이 공격대 반대쪽을 보게 하고 입이 가장자리를 향하지 않게 하여, 들이쉬는 숨이 공격대를 안쪽으로 끌어당기게 하세요.',
+  'bossJournal.smithHeart.breath.tipHealer':
+    '서서 시전해야 할 때는 테살리의 닻을 차지하세요. 정상의 포효와 천둥의 요람을 치유로 버티고, 부풀어 오르는 폭풍이 커질수록 치유량을 늘리세요.',
+  'bossJournal.smithHeart.breath.tipDamage':
+    '가장자리 근처에서 절대 가만히 서 있지 마세요. 섬에서는 치유의 질풍을 차단하고, 방패병의 등을 공격하며, 고요석이 깨어나는 즉시 함께 정신 집중하세요.',
+  'bossJournal.smithHeart.breath.heroicEdge':
+    '정상의 포효, 밀쳐내는 돌풍, 그리고 {ruin}중첩일 때의 풀무 강타가 이제 플레이어를 가장자리 밖으로 날려 보낼 수 있습니다.',
+  'bossJournal.smithHeart.breath.heroicKnot':
+    '얽힌 질풍은 전투 전반과 후반 모두 공허로 던져야 하며, 들이쉬는 숨이 끝날 때마다 떠도는 돌풍이 돌아다닙니다.',
+  'bossJournal.smithHeart.breath.heroicCradle':
+    '천둥의 요람이 플레이어 {count}명을 한꺼번에 들어 올립니다: 공격대가 그들 사이로 나뉘어야 합니다.',
+  'bossJournal.smithHeart.quench.overview':
+    '오로라, 고요한 겨울이 얼어붙은 호수에서 솟아오릅니다. 모든 플레이어에게는 혼자 있으면 차오르고 무리 지어 있으면 내려가는 냉기 막대가 있지만, 가만히 서 있는 무리는 발밑의 얼음을 깨뜨립니다. 함께 있되, 절대 오래 머물지 마세요. 생명력이 절반이 되면 대장장이의 칼날 네 자루가 모두 깨어나고 냉기가 깊어집니다.',
+  'bossJournal.smithHeart.quench.tagline':
+    '얼어붙은 호수에서는 모든 플레이어에게 냉기 막대가 있습니다: 무리 지어 몸을 녹이되, 계속 움직이지 않으면 발밑의 얼음이 깨집니다.',
+  'bossJournal.smithHeart.quench.chipHuddle': '{group}명 이상 무리 짓기',
+  'bossJournal.smithHeart.quench.chipBlades': '{at}에서 칼날 네 자루 모두 깨어남',
+  'bossJournal.smithHeart.quench.phaseColdName': '냉기',
+  'bossJournal.smithHeart.quench.phaseColdSummary': '전투 내내, 모든 플레이어에게.',
+  'bossJournal.smithHeart.quench.coldName': '담금질의 냉기',
+  'bossJournal.smithHeart.quench.coldSummary':
+    '혼자 있으면 냉기가 약 {fill}초 만에 0에서 {max}까지 찹니다. 다른 플레이어 {others}명 이상과 {radius}야드 안에 있으면 대신 매초 {fall}씩 내려갑니다. 받은 치유는 최대 생명력의 {heal}마다 냉기를 1씩 낮춥니다.',
+  'bossJournal.smithHeart.quench.coldResponse':
+    '세 명 이상씩 무리를 짓고, 무리가 계속 움직이게 하세요.',
+  'bossJournal.smithHeart.quench.frozenName': '서리에 갇힘',
+  'bossJournal.smithHeart.quench.frozenSummary':
+    '냉기가 가득 차면 {freeze}초 동안 꽁꽁 얼어붙고 받는 피해가 {frozen} 증가합니다. 그 뒤 얼음이 부서집니다: {min}~{max}의 냉기 피해를 입고 {brittleSeconds}초 동안 받는 피해가 {brittle} 증가하며, {radius}야드 안의 모두가 냉기 {cold}을 얻습니다.',
+  'bossJournal.smithHeart.quench.frozenResponse':
+    '막대가 가득 차지 않게 하세요. 얼음이 부서지기 전에 얼어붙은 플레이어에게서 떨어지세요.',
+  'bossJournal.smithHeart.quench.iceSummary':
+    '한 자리에 {linger}초 동안 머문 무리는 얼음에 금을 냅니다. {warn}초 후 그 자리가 얼어붙은 물웅덩이로 열려 전투 내내 남습니다. 빠지면 {pMin}~{pMax}의 냉기 피해를 입고 냉기 {plunge}을 얻으며, {trap}초 동안 붙잡혀 매초 {tMin}~{tMax}의 피해를 입습니다. 물만으로는 절대 죽지 않습니다.',
+  'bossJournal.smithHeart.quench.iceResponse':
+    '얼음에 금이 가기 전에 무리를 옮기고, 열린 물에 절대 들어가지 마세요.',
+  'bossJournal.smithHeart.quench.rimeName': '살아 있는 서리',
+  'bossJournal.smithHeart.quench.rimeSummary':
+    '{every}초마다 방어 담당이 아닌 플레이어({targets}명씩)에게 얼음 껍질이 덮입니다: 다음에 받는 치유 {absorb}를 흡수하고, 이동 속도를 {slow} 낮추며, 냉기가 {mult}배 빠르게 오르게 합니다. {seconds}초 안에 치유로 깨뜨리지 못하면 즉시 얼어붙고, {radius}야드 안의 모두에게 냉기가 터져 냉기 {cold}을 더합니다.',
+  'bossJournal.smithHeart.quench.rimeHeroicSummary':
+    '{every}초마다 방어 담당이 아닌 플레이어 {targets}명에게 얼음 껍질이 덮입니다: 다음에 받는 치유 {absorb}를 흡수하고, 이동 속도를 {slow} 낮추며, 냉기가 {mult}배 빠르게 오르게 합니다. {seconds}초 안에 치유로 깨뜨리지 못하면 즉시 얼어붙고, {radius}야드 안의 모두에게 냉기가 터져 냉기 {cold}을 더한 뒤, 가장 가까운 다른 플레이어에게 새 껍질로 옮겨 갑니다.',
+  'bossJournal.smithHeart.quench.rimeResponse':
+    '치유 담당은 껍질부터 깨뜨리세요. 대상은 껍질이 깨질 때까지 무리에서 벗어나 있으세요.',
+  'bossJournal.smithHeart.quench.phaseLakeName': '호수',
+  'bossJournal.smithHeart.quench.phaseLakeSummary':
+    '전투 시작부터 생명력 {at}까지, 대장장이의 칼날 네 자루 중 두 자루가 깨어 있습니다.',
+  'bossJournal.smithHeart.quench.breathSummary':
+    '{every}초마다 {cast}초 시전: 앞쪽 {arc}도 부채꼴이 {range}야드까지 퍼져 {min}~{max}의 냉기 피해를 주고 냉기 {cold}을 더합니다.',
+  'bossJournal.smithHeart.quench.breathResponse':
+    '방어 담당이 오로라를 공격대 반대쪽으로 돌려 두세요. 다른 누구도 그녀의 정면에 서지 마세요.',
+  'bossJournal.smithHeart.quench.temperSummary':
+    '적중한 공격 {every}번마다 주먹이 앞쪽 {arc}도 범위를 {range}야드까지 내리칩니다. 방어 담당에게 적중한 담금질 일격마다 {seconds}초 동안 서리 담금질 중첩이 쌓입니다: 중첩마다 방어 담당의 냉기가 {cold} 아래로 내려가지 않고, 받는 냉기 피해가 {frost} 증가합니다. 중첩은 {most}개에서 멈춥니다.',
+  'bossJournal.smithHeart.quench.temperHeroicSummary':
+    '적중한 공격 {every}번마다 주먹이 앞쪽 {arc}도 범위를 {range}야드까지 내리칩니다. 방어 담당에게 적중한 담금질 일격마다 {seconds}초 동안 서리 담금질 중첩이 쌓입니다: 중첩마다 방어 담당의 냉기가 {cold} 아래로 내려가지 않고, 받는 냉기 피해가 {frost} 증가합니다. {most}중첩이 되면 방어 담당이 꽁꽁 얼어붙습니다.',
+  'bossJournal.smithHeart.quench.temperResponse': '{swap}중첩에서 방어 담당을 교대하세요.',
+  'bossJournal.smithHeart.quench.bladeSummary':
+    '{every}초마다 깨어 있는 칼날이 차례로 플레이어에게 표식을 남깁니다(한 차례에 {marks}명). 칼날은 각 대상을 지나는 선을 따라 호수를 가로질러 날아가며, 날아가기 {lock}초 전에 고정될 때까지 대상을 따라갑니다: 선 위의 모두가 {min}~{max}의 냉기 피해를 입고 냉기 {cold}을 얻습니다. 오로라가 약해질수록 차례가 빨라집니다.',
+  'bossJournal.smithHeart.quench.bladeResponse':
+    '표식 대상: 선을 공격대에서 멀리 유도한 뒤, 선이 고정되면 비켜서세요.',
+  'bossJournal.smithHeart.quench.phaseBladesName': '검의 각성',
+  'bossJournal.smithHeart.quench.phaseBladesSummary':
+    '생명력 {at}부터 끝까지, 칼날 네 자루가 모두 깨어 있습니다.',
+  'bossJournal.smithHeart.quench.wakeSummary':
+    '생명력 {at}에서 {cast}초 시전: 나머지 칼날 두 자루가 뜯겨 나옵니다. 이후 교차하는 칼날은 {every}초마다 한 차례에 플레이어 {marks}명에게 표식을 남깁니다.',
+  'bossJournal.smithHeart.quench.wakeResponse':
+    '표식 대상을 흩어 세워 선이 무리를 가로지르지 않게 하세요.',
+  'bossJournal.smithHeart.quench.deepenName': '깊어지는 냉기',
+  'bossJournal.smithHeart.quench.deepenSummary':
+    '칼날이 깨어난 뒤 {every}초마다 모두의 냉기가 {step}씩 더 빠르게 오르며, 끝없이 이어집니다.',
+  'bossJournal.smithHeart.quench.deepenResponse':
+    '이것이 전투의 시계입니다: 더 단단히 모이고, 더 많이 치유하고, 전투를 마무리하세요.',
+  'bossJournal.smithHeart.quench.tipTank':
+    '담금질의 숨결을 공격대 반대쪽으로 돌려 두세요. 서리 담금질 중첩 수에 맞춰 교대하고, 여유가 있을 때마다 공격대와 함께 모이세요.',
+  'bossJournal.smithHeart.quench.tipHealer':
+    '당신의 치유는 몸을 데웁니다: 생명력을 회복시키는 동시에 냉기를 낮춥니다. 살아 있는 서리의 껍질은 터지기 전에 모두 깨뜨리고, 얼어붙은 플레이어는 얼음이 부서지기 전에 생명력을 채워 주세요.',
+  'bossJournal.smithHeart.quench.tipDamage':
+    '무리가 계속 움직이게 해서 발밑의 얼음에 금이 가지 않게 하세요. 칼날이 당신에게 표식을 남기면 선을 모두에게서 멀리 유도하고, 선이 고정되면 비켜서세요.',
+  'bossJournal.smithHeart.quench.heroicShatter':
+    '얼음이 부서지면 {radius}야드까지 튀어 그 안의 모두에게 냉기 {cold}을 더합니다.',
+  'bossJournal.smithHeart.quench.heroicRime':
+    '살아 있는 서리가 플레이어 {targets}명에게 걸리며, 터지면 가장 가까운 다른 플레이어에게 옮겨 갑니다.',
+  'bossJournal.smithHeart.quench.heroicTemper':
+    '서리 담금질 {most}중첩이 되면 방어 담당이 꽁꽁 얼어붙습니다: {swap}중첩에서 교대하세요.',
+  'bossJournal.smithHeart.quench.heroicWarmth':
+    '생명의 온기가 절반으로 줄어듭니다: 치유받은 생명력 {heal}마다 냉기가 1씩 내려갑니다.',
+  'bossJournal.smithHeart.heat.overview':
+    '이그나자르, 꺼지지 않는 자는 최초의 샘에 허리까지 몸을 담근 채 결코 움직이지 않습니다: 공격대는 그 주위를 둘러싼 물가에서 싸웁니다. 생명력 {one}와 {two}에서 가라앉고 화로가 용암 고리로 넘쳐흐릅니다. 방어 담당은 잿불 손아귀와 샘의 낙인에 맞춰 교대합니다.',
+  'bossJournal.smithHeart.heat.tagline':
+    '최초의 샘에 허리까지 잠긴 채 결코 움직이지 않습니다: 공격대는 그 주위의 물가에서 싸웁니다.',
+  'bossJournal.smithHeart.heat.chipSinks': '{one}와 {two}에서 가라앉음',
+  'bossJournal.smithHeart.heat.chipPhases': '{phases}단계와 {overflows}번의 넘침',
+  'bossJournal.smithHeart.heat.phaseAllName': '모든 단계',
+  'bossJournal.smithHeart.heat.phaseAllSummary':
+    '전투 시작부터 끝까지. 단, 이그나자르가 넘침 속에 가라앉아 있는 동안은 제외합니다.',
+  'bossJournal.smithHeart.heat.wheelName': '화로의 바퀴',
+  'bossJournal.smithHeart.heat.wheelSummary':
+    '{every}초마다 물가가 이그나자르 앞쪽 네 조각과 뒤쪽 네 조각으로 나뉩니다. 각 쪽에서 세 조각이 달아올라 {warn}초 후 분출하며 {min}~{max}의 화염 피해를 주고, {burn}초 더 타오릅니다. 한 조각만 어둡고 안전하게 남습니다. {rounds}차례가 연달아 이어지며, 각 쪽의 안전한 조각은 직전보다 한두 칸 옆에 나타납니다.',
+  'bossJournal.smithHeart.heat.wheelResponse':
+    '자기 쪽의 어두운 조각에 서 있다가, 불이 꺼지는 즉시 다음 안전한 조각으로 건너가세요.',
+  'bossJournal.smithHeart.heat.fistSummary':
+    '{every}초마다 표식을 받은 플레이어가 서 있던 지점에 {cast}초 시전({marks}명씩): 내리칠 때 {radius}야드 안에 있는 모두가 {min}~{max}의 화염 피해를 입습니다. 그 뒤 각 지점에서 용암 너울 세 줄기가 샘의 반대쪽과 양옆으로 {length}야드 굴러 나가며, 지나가는 모두에게 {wMin}~{wMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.heat.fistHeroicSummary':
+    '{every}초마다 표식을 받은 플레이어 {marks}명이 서 있던 지점에 {cast}초 시전: 내리칠 때 {radius}야드 안에 있는 모두가 {min}~{max}의 화염 피해를 입습니다. 그 뒤 각 지점에서 용암 너울 세 줄기가 샘의 반대쪽과 양옆으로 {length}야드 굴러 나가며, 지나가는 모두에게 {wMin}~{wMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.heat.fistResponse':
+    '표식 대상: 그 자리를 떠나세요. 모두 줄기 사이의 틈에 서세요. 이그나자르 쪽은 항상 비어 있습니다.',
+  'bossJournal.smithHeart.heat.gripName': '잿불 손아귀',
+  'bossJournal.smithHeart.heat.gripSummary':
+    '이그나자르의 공격이 적중할 때마다 방어 담당에게 중첩이 하나씩 쌓입니다: {seconds}초 동안 중첩마다 매초 {per}의 화염 피해를 주며, 최대 {most}중첩입니다. 이그나자르가 가라앉아 있는 동안에는 중첩이 유지됩니다: 타지도 줄어들지도 않습니다.',
+  'bossJournal.smithHeart.heat.gripResponse': '{swap}중첩에서 방어 담당을 교대하세요.',
+  'bossJournal.smithHeart.heat.brandSummary':
+    '{every}초마다 이그나자르는 무엇을 하고 있든 {lead}초 전에 예고한 뒤 방어 담당에게 낙인을 던집니다: {min}~{max}의 화염 피해를 주고, {seconds}초 동안 방어 담당이 받는 화염 피해와 기타 마법 피해가 {taken} 증가합니다. 이그나자르가 가라앉아 있는 동안에는 오지 않습니다.',
+  'bossJournal.smithHeart.heat.brandResponse':
+    '낙인이 올 때마다 다른 방어 담당이 도발하세요: 낙인은 다음 낙인까지의 간격보다 오래 지속됩니다.',
+  'bossJournal.smithHeart.heat.coalSummary':
+    '{every}초마다 방어 담당이 아닌 플레이어 {count}명에게 살아있는 숯불이 붙습니다: 다음에 받는 치유 {absorb}를 흡수하고 매초 {bMin}~{bMax}의 화염 피해를 줍니다. {leap}야드 안으로 다가온 자는 숯불을 넘겨받고 {lMin}~{lMax}의 피해를 입습니다. {seconds}초 안에 치유로 꺼지지 않으면 터져 {radius}야드 안의 모두에게 {xMin}~{xMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.heat.coalResponse':
+    '치유 담당이 흡수량을 깎아 내세요. 숯불을 지닌 자는 모두에게서 {leap}야드 떨어지세요.',
+  'bossJournal.smithHeart.heat.phaseOneName': '1단계',
+  'bossJournal.smithHeart.heat.phaseOneSummary': '전투 시작부터 생명력 {one}까지.',
+  'bossJournal.smithHeart.heat.flareName': '화로의 섬광',
+  'bossJournal.smithHeart.heat.flareSummary':
+    '{every}초마다 샘 중심에서 {reach}야드보다 멀리 있는 모두가 {min}~{max}의 화염 피해를 입고 섬광 화상에 걸립니다: {seconds}초 동안 받는 화염 피해와 기타 마법 피해가 {pct} 증가합니다. 이후 단계에서는 방어 담당이 범위 밖에 있을 때만 그 방어 담당을 칩니다.',
+  'bossJournal.smithHeart.heat.flareResponse': '모두 샘 가까이에서 싸우세요.',
+  'bossJournal.smithHeart.heat.phaseOverflowName': '넘침',
+  'bossJournal.smithHeart.heat.phaseOverflowSummary':
+    '생명력 {one}와 {two}에서 이그나자르가 샘으로 가라앉으며, 마지막 용암 고리가 지나갈 때까지 피해를 입지 않습니다.',
+  'bossJournal.smithHeart.heat.wavesName': '샘의 넘침',
+  'bossJournal.smithHeart.heat.wavesSummary':
+    '용암 고리가 샘에서 차례로 굴러 나옵니다: 첫 번째 넘침에서 {first}개, 두 번째 넘침에서는 더 빠르고 좁은 고리가 {second}개. 고리마다 틈이 두 곳 있으며, 다음 고리의 틈은 고리가 오기 전에 바닥에서 빛납니다. 고리는 틈 밖에 있는 모두에게 {min}~{max}의 화염 피해를 줍니다.',
+  'bossJournal.smithHeart.heat.wavesResponse': '고리가 오기 전마다 빛나는 틈으로 걸어가세요.',
+  'bossJournal.smithHeart.heat.boltName': '떨어지는 잉걸불',
+  'bossJournal.smithHeart.heat.boltSummary':
+    '넘침 동안 {every}초마다 무작위 플레이어 {bolts}명이 {min}~{max}의 화염 피해를 입습니다.',
+  'bossJournal.smithHeart.heat.boltResponse': '넘침 동안 공격대의 생명력을 가득 유지하세요.',
+  'bossJournal.smithHeart.heat.spawnName': '샘의 자식',
+  'bossJournal.smithHeart.heat.spawnSummary':
+    '첫 번째 넘침에서만 샘의 자식 {spawn}마리가 방 가장자리에서 기어 나와 샘을 향해 천천히 걸어갑니다. 생명력이 줄수록 느려지고 {slowAt} 아래에서는 기어갑니다. 샘에 닿은 샘의 자식은 이그나자르를 {heal} 치유하고 공격대 전체에 {min}~{max}의 화염 피해를 줍니다.',
+  'bossJournal.smithHeart.heat.spawnHeroicSummary':
+    '넘침마다 샘의 자식 {spawn}마리가 방 가장자리에서 기어 나와 샘을 향해 걸어갑니다. 생명력이 줄수록 느려지고 {slowAt} 아래에서는 기어갑니다. 샘에 닿은 샘의 자식은 이그나자르를 {heal} 치유하고 공격대 전체에 {min}~{max}의 화염 피해를 줍니다.',
+  'bossJournal.smithHeart.heat.spawnResponse':
+    '샘가에 닿기 전에 느리게 하고, 기절시키고, 처치하세요.',
+  'bossJournal.smithHeart.heat.keeperName': '샘지기',
+  'bossJournal.smithHeart.heat.keeperSummary':
+    '두 번째 넘침에서 샘지기 둘이 샘 옆에서 솟아오르며, 방어 담당이 맡아야 합니다. 각각 {every}초마다 플레이어 한 명에게 불쏘시개 표식을 남깁니다: {mark}초 후 그 플레이어가 {trail}초 동안 불의 자취를 남깁니다. 불길마다 매초 {min}~{max}의 화염 피해를 주고, 그 위에 선 샘의 자식의 생명력을 매초 {heal} 회복시킵니다.',
+  'bossJournal.smithHeart.heat.keeperResponse':
+    '방어 담당이 샘지기를 맡으세요. 표식 대상은 자취를 공격대와 샘의 자식이 지나는 길에서 멀리 유도하세요.',
+  'bossJournal.smithHeart.heat.phaseTwoName': '2단계',
+  'bossJournal.smithHeart.heat.phaseTwoSummary': '생명력 {one}부터 {two}까지.',
+  'bossJournal.smithHeart.heat.seedName': '화로 씨앗',
+  'bossJournal.smithHeart.heat.seedSummary':
+    '{every}초마다 이그나자르가 모든 플레이어가 선 자리에 불꽃 씨앗을 던집니다(최대 {cap}개). 씨앗은 던져진 지 {life}초 후 터지며 최대 {max}의 화염 피해를 주고, 멀리 있을수록 피해가 줄어 {reach}야드 밖에서는 피해가 없습니다.',
+  'bossJournal.smithHeart.heat.seedHeroicSummary':
+    '{every}초마다 이그나자르가 모든 플레이어가 선 자리에 불꽃 씨앗을 던집니다(최대 {cap}개). 씨앗은 던져진 지 {life}초 후 터지며 최대 {max}의 화염 피해를 주고, 멀리 있을수록 피해가 줄어 {reach}야드 밖에서는 피해가 없습니다. 터질 때마다 플레이어 한 명을 쫓는 씨불이 깨어납니다.',
+  'bossJournal.smithHeart.heat.seedResponse':
+    '공격대에서 떨어진 곳에 씨앗을 함께 떨어뜨린 뒤 달아나세요.',
+  'bossJournal.smithHeart.heat.seedHeroicResponse':
+    '공격대에서 떨어진 곳에 씨앗을 함께 떨어뜨린 뒤 달아나세요. 씨불은 함께 처치하세요.',
+  'bossJournal.smithHeart.heat.zoneName': '깨어나는 불',
+  'bossJournal.smithHeart.heat.zoneSummary':
+    '2단계와 3단계에서 {every}초마다 샘 둘레의 띠 세 개가 이그나자르에게서 바깥쪽으로 차례로 불붙습니다. 각 띠는 {warn}초 동안 경고한 뒤 그 안의 모두에게 {min}~{max}의 화염 피해를 주고 {burn}초 더 타오릅니다. 다음 띠는 앞 띠가 경고를 시작한 지 {step}초 후에 경고를 시작합니다.',
+  'bossJournal.smithHeart.heat.zoneResponse': '방금 타고 지나간 띠로 들어가세요.',
+  'bossJournal.smithHeart.heat.phaseThreeName': '3단계',
+  'bossJournal.smithHeart.heat.phaseThreeSummary': '생명력 {two}부터 끝까지.',
+  'bossJournal.smithHeart.heat.cinderName': '구르는 잉걸불',
+  'bossJournal.smithHeart.heat.cinderSummary':
+    '{every}초마다 거대한 불덩이가 물가에 떨어져 {land}야드 안에 {lMin}~{lMax}의 피해를 주고, 초당 {speed}야드로 플레이어 한 명을 쫓습니다. 붙잡히면 그 플레이어는 죽고 {splash}야드 안의 모두가 {sMin}~{sMax}의 피해를 입습니다. 때릴 때마다 {knock}야드 밀려나며, 그 뒤 {crust}초 동안은 밀려나지 않습니다. 처치할 수 없습니다.',
+  'bossJournal.smithHeart.heat.cinderResponse':
+    '쫓기는 플레이어가 끌고 다니는 동안, 지정된 플레이어들이 차례로 때려 밀어내세요.',
+  'bossJournal.smithHeart.heat.lateSummary':
+    '3단계가 {after}초 동안 이어지면, 구르는 잉걸불이 대신 {late}초마다 떨어집니다.',
+  'bossJournal.smithHeart.heat.lateResponse':
+    '잉걸불이 쌓이기 전에 피해를 몰아 이그나자르를 마무리하세요.',
+  'bossJournal.smithHeart.heat.tipTank':
+    '잿불 손아귀 중첩 수에 맞춰, 그리고 샘의 낙인마다 교대하세요. 이그나자르가 가라앉아 있는 동안 중첩이 유지되므로, 떠오를 때도 교대해야 할 차례는 그대로입니다.',
+  'bossJournal.smithHeart.heat.tipHealer':
+    '넘침은 모두를 한꺼번에 다치게 합니다: 용암 고리, 떨어지는 잉걸불, 그리고 샘을 먹이는 샘의 자식. 영웅 난이도에서는 살아있는 숯불이 터지기 전에 흡수량을 모두 깎아 내세요.',
+  'bossJournal.smithHeart.heat.tipDamage':
+    '샘의 자식이 샘에 닿기 전에 처치하세요. 3단계에서는 차례가 오면 구르는 잉걸불을 때려 밀어낸 뒤, 단단하게 식은 상태가 끝날 때까지 기다리세요.',
+  'bossJournal.smithHeart.heat.heroicFist':
+    '현무암 주먹이 플레이어 {marks}명에게 한꺼번에 표식을 남기고, 각자의 지점을 내리칩니다.',
+  'bossJournal.smithHeart.heat.heroicAdds':
+    '넘침마다 샘의 자식 {spawn}마리가 나오며, 두 번째 넘침에서는 샘지기 둘도 솟아오릅니다. 화로 씨앗에서 씨불이 깨어납니다.',
+  'bossJournal.smithHeart.heat.heroicCoal':
+    '전투가 이어지는 모든 단계에서 살아있는 숯불이 두 명씩 태웁니다.',
+  'bossJournal.smithHeart.heat.heroicWheel':
+    '화로의 바퀴가 {warn}초만 경고하고 최대 위력으로 분출합니다.',
+  'bossJournal.smithHeart.final.overview':
+    '애시그랜드, 주인 없는 힘의 잔해는 열기, 담금질, 숨결, 망치의 네 구역으로 나뉜 세계의 모루에서 싸웁니다. 서 있는 구역의 힘을 마시므로, 방어 담당은 어느 막대도 터지기 전에 구역에서 구역으로 끌고 다닙니다. 생명력 {first}와 {second}에서 파편을 불러내고, {final}에서는 마지막을 위해 네 구역이 모두 깨어납니다.',
+  'bossJournal.smithHeart.final.tagline':
+    '서 있는 구역의 힘을 마십니다: 방어 담당은 어느 과부하 막대도 터지기 전에 구역에서 구역으로 끌고 다닙니다.',
+  'bossJournal.smithHeart.final.chipQuarters': '원소 구역 {count}곳',
+  'bossJournal.smithHeart.final.chipSplinters': '{first}와 {second}에서 파편',
+  'bossJournal.smithHeart.final.chipFinal': '{final}에서 최후의 결전',
+  'bossJournal.smithHeart.final.phaseQuartersName': '네 구역',
+  'bossJournal.smithHeart.final.phaseQuartersSummary':
+    '모루 중앙에 원이 있고 그 둘레에 네 구역이 있습니다. 각 구역 고유의 능력은 애시그랜드가 들어온 지 {delay}초 후에 시작됩니다.',
+  'bossJournal.smithHeart.final.overloadName': '과부하',
+  'bossJournal.smithHeart.final.overloadSummary':
+    '각 구역에는 과부하 막대가 있어, 애시그랜드가 그 구역에 서 있는 동안 차오르고(비어 있다가 가득 차기까지 {fill}초) 다른 곳에 있으면 그 3분의 1 속도로 줄어듭니다. 차오르는 막대는 {every}초마다 공격대에 맥동 피해를 주며, 비었을 때 {min}에서 가득 찼을 때 {max}까지 강해집니다. 가득 찬 막대는 터져 공격대 전체에 {bMin}~{bMax}의 피해를 주고 비워집니다.',
+  'bossJournal.smithHeart.final.overloadResponse':
+    '방어 담당이 세 구역이나 네 구역을 차례로 돌며 끌고 다니세요. 두 구역 사이를 오가지 마세요.',
+  'bossJournal.smithHeart.final.unboundName': '풀려난 심장',
+  'bossJournal.smithHeart.final.unboundSummary':
+    '애시그랜드가 중앙 원 안에 서 있으면 {delay}초 후부터 매초 중첩을 얻고, 매초 중첩마다 공격대 전체에 {per}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.unboundResponse': '즉시 원 밖으로 끌어내세요.',
+  'bossJournal.smithHeart.final.shockName': '광맥 충격',
+  'bossJournal.smithHeart.final.shockSummary':
+    '구역을 바꿀 때마다 공격대에 {min}~{max}의 피해를 주고 {seconds}초 동안 광맥 흔들림을 남깁니다: 흔들린 상태에서 바꾸면 {mult}배 강하게 적중합니다.',
+  'bossJournal.smithHeart.final.shockResponse':
+    '공격대의 생명력이 충분할 때만 구역을 바꾸고, 절대 연달아 두 번 바꾸지 마세요.',
+  'bossJournal.smithHeart.final.phaseOwnName': '자신의 힘',
+  'bossJournal.smithHeart.final.phaseOwnSummary': '전투 내내, 애시그랜드가 어디에 서 있든.',
+  'bossJournal.smithHeart.final.forgeFistName': '대장간 주먹',
+  'bossJournal.smithHeart.final.forgeFistSummary':
+    '{every}번째 공격마다 주먹이 앞쪽 {arc}도 범위를 {range}야드까지 휩쓸어, 범위 안의 모두에게 일반 공격의 {share}만큼 피해를 줍니다.',
+  'bossJournal.smithHeart.final.forgeFistResponse': '애시그랜드의 정면에는 방어 담당만 서세요.',
+  'bossJournal.smithHeart.final.strikeSummary':
+    '{every}초마다 방어 담당이 1중첩일 때 {min}~{max}의 피해를 입고(중첩마다 {growth} 강해짐), {seconds}초 동안 서 있는 구역의 원소 중첩을 하나 얻습니다: 작열하는 화상(중첩마다 매초 {burn}의 화염 피해), 살을 에는 서리(중첩마다 {slow} 느려짐. {freeze}중첩부터는 안에 남은 대상을 얼리는 고리), 정전기({arc}중첩부터 {reach}야드 안의 아군에게 튐), 갈라진 갑옷(중첩마다 방어도 {armor} 감소).',
+  'bossJournal.smithHeart.final.strikeResponse':
+    '{swap}중첩에서 방어 담당을 교대하세요. 근접 공격수는 정전기가 걸린 방어 담당에게서 {reach}야드 떨어지세요.',
+  'bossJournal.smithHeart.final.anvilSummary':
+    '{every}초마다 {cast}초 시전으로 플레이어 한 명에게 표식을 남깁니다. {radius}야드 원이 그 플레이어를 따라다니다가 떨어지기 {lock}초 전에 고정됩니다. {total}의 물리 피해를 안에 있는 모두가 나눠 받으며, {fewer}명 미만이면 각자 1.5배를 받습니다. 아무도 원 안에 없으면 공격대 전체가 {missMin}~{missMax}의 피해를 입습니다.',
+  'bossJournal.smithHeart.final.anvilResponse':
+    '원이 고정되기 전에 공격대 전체가 표식 대상에게 모이세요.',
+  'bossJournal.smithHeart.final.opposingName': '대립하는 원소',
+  'bossJournal.smithHeart.final.opposingSummary':
+    '{every}초마다 방어 담당이 아닌 플레이어 {marks}명에게 {seconds}초 동안 화염, 얼음, 대지, 번개 중 하나의 표식이 반대 짝을 이루어 붙습니다. 반대되는 두 표식이 {meet}야드 안에서 만나면 둘 다 사라지고, 그 밖의 만남은 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다. 제때 없애지 못한 표식은 그 플레이어에게 {lMin}~{lMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.opposingHeroicSummary':
+    '{every}초마다 방어 담당이 아닌 모든 플레이어에게 {seconds}초 동안 화염, 얼음, 대지, 번개 중 하나의 표식이 반대 짝을 이루어 붙습니다. 반대되는 두 표식이 {meet}야드 안에서 만나면 둘 다 사라지고, 그 밖의 만남은 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다. 제때 없애지 못한 짝마다 공격대 전체에 {lMin}~{lMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.opposingResponse':
+    '반대 짝(화염과 얼음, 대지와 번개)을 찾아 만나고, 다른 표식은 모두 피하세요.',
+  'bossJournal.smithHeart.final.phaseFusionName': '원소 융합',
+  'bossJournal.smithHeart.final.phaseFusionSummary':
+    '애시그랜드가 새 구역에 들어갈 때마다(첫 구역 제외) 제자리에 서서 {cast}초 동안 시전하며, 떠나온 구역의 원소와 들어간 구역의 원소를 들어간 구역 안에서 융합합니다.',
+  'bossJournal.smithHeart.final.fusionSummary':
+    '새 구역으로 이동할 때마다 {cast}초 시전합니다. 시전하는 동안 그 구역 고유의 능력은 기다리며, 시전이 끝나면 조합 공격이 떨어집니다.',
+  'bossJournal.smithHeart.final.fusionResponse':
+    '어느 두 구역이 합쳐졌는지 파악하고 그 조합에 대비하세요.',
+  'bossJournal.smithHeart.final.steamName': '끓는 증기',
+  'bossJournal.smithHeart.final.steamSummary':
+    '열기와 담금질: {warn}초 후 증기 구름({clouds}개씩)이 피어올라 {life}초 동안 구역을 떠다니며, 안에 있는 자에게 매초 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.steamResponse': '구름 밖에 있으세요.',
+  'bossJournal.smithHeart.final.magmaName': '마그마 균열',
+  'bossJournal.smithHeart.final.magmaSummary':
+    '열기와 망치: 플레이어에게 표식이 남습니다({marks}명씩). {mark}초 후 각자의 발밑에서 균열이 분출하여 {radius}야드 안에 {min}~{max}의 화염 피해를 주고, {life}초 동안 타오르는 용암을 남깁니다(매초 {pMin}~{pMax}).',
+  'bossJournal.smithHeart.final.magmaResponse': '표식 대상: 분출하기 전에 공격대에서 멀어지세요.',
+  'bossJournal.smithHeart.final.firestormName': '화염 폭풍',
+  'bossJournal.smithHeart.final.firestormSummary':
+    '열기와 숨결: 폭 {width}야드의 길이 방을 가로질러 표시됩니다({lanes}개씩). {warn}초 후 화염 벽이 각 길을 따라 휩쓸며 {min}~{max}의 화염 피해를 줍니다.',
+  'bossJournal.smithHeart.final.firestormResponse': '불길이 오기 전에 길에서 벗어나세요.',
+  'bossJournal.smithHeart.final.hailName': '우박 폭풍',
+  'bossJournal.smithHeart.final.hailSummary':
+    '담금질과 숨결: {seconds}초 동안 구역에 우박이 쏟아집니다({every}초마다 {per}개, 그중 절반은 플레이어에게). 우박마다 {radius}야드 원을 표시하고 {warn}초 후 떨어져 {min}~{max}의 냉기 피해를 줍니다.',
+  'bossJournal.smithHeart.final.hailResponse': '계속 움직이며 원에서 벗어나세요.',
+  'bossJournal.smithHeart.final.avalancheName': '눈사태',
+  'bossJournal.smithHeart.final.avalancheSummary':
+    '담금질과 망치: 얼음과 바위 가시가 줄지어({lanes}줄씩) 표시된 지 {warn}초 후 벽에서 중앙으로 달려 나가며, 줄 안의 모두에게 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.avalancheResponse': '줄 사이의 틈에 서세요.',
+  'bossJournal.smithHeart.final.spiresName': '폭풍 첨탑',
+  'bossJournal.smithHeart.final.spiresSummary':
+    '숨결과 망치: 폭풍 첨탑이 솟아올라({spires}개씩) {charge}초 동안 충전된 뒤, 첨탑 사이의 모든 선을 따라 번개가 뛰어 {min}~{max}의 자연 피해를 줍니다.',
+  'bossJournal.smithHeart.final.spiresResponse': '두 첨탑 사이에 절대 서지 마세요.',
+  'bossJournal.smithHeart.final.phaseStarsName': '깨어난 별',
+  'bossJournal.smithHeart.final.phaseStarsSummary':
+    '애시그랜드가 어떤 구역에 처음 들어가면 그 구역의 별이 깨어나 전투가 끝날 때까지 이어집니다. 별은 애시그랜드가 그 구역에 서 있는 동안 최대 속도로, 다른 곳에 있으면 {pace} 속도로 움직입니다.',
+  'bossJournal.smithHeart.final.pillarsSummary':
+    '망치의 별: {every}초마다 {warn}초 후 플레이어 발밑에서 기둥이 솟구칩니다({count}개씩). {knock}야드 안의 모두가 {min}~{max}의 피해를 입고 밀려납니다. 기둥은 최대 {cap}개까지 남으며, 이미 가득 찬 상태에서 솟구치면 대신 공격대 전체에 {tMin}~{tMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.pillarsResponse':
+    '기둥을 하늘의 일격에 활용하고, 쌓이기 전에 교차하는 칼날로 부수세요.',
+  'bossJournal.smithHeart.final.chargedName': '폭풍 충전',
+  'bossJournal.smithHeart.final.chargedSummary':
+    '기둥에서 {arcReach}야드 안에 떨어진 하늘의 일격은 기둥 주위로 호를 그리며({arcR}야드 안에 {aMin}~{aMax}) 기둥을 충전합니다. 충전된 기둥은 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 기둥에서 {zone}야드 안의 모두는 매초 {zMin}~{zMax}의 피해를 입습니다.',
+  'bossJournal.smithHeart.final.chargedResponse': '충전된 기둥은 교차하는 칼날로 빨리 부수세요.',
+  'bossJournal.smithHeart.final.skySummary':
+    '숨결의 별: {every}초마다 번개가 플레이어({marks}명씩)와 기둥 옆 지점({spots}곳씩)에 표식을 남깁니다. {warn}초 후 {radius}야드 안에 {min}~{max}의 자연 피해를 줍니다.',
+  'bossJournal.smithHeart.final.skyResponse':
+    '자신의 원에서 벗어나세요. 기둥 옆에 떨어진 번개는 기둥을 충전합니다.',
+  'bossJournal.smithHeart.final.bladeSummary':
+    '담금질의 별: {every}초마다 가장자리에 칼날이 솟아 표식을 받은 플레이어를 지나는 선을 겨누며(한 차례에 {marks}명), 날아가기 {lock}초 전에 고정될 때까지 대상을 따라갑니다. 선 위의 모두가 {min}~{max}의 냉기 피해를 입고, 선 위의 모든 기둥이 부서집니다.',
+  'bossJournal.smithHeart.final.bladeResponse':
+    '표식 대상: 부수고 싶은 기둥을 지나도록 선을 유도한 뒤 선에서 벗어나세요.',
+  'bossJournal.smithHeart.final.whirlName': '불의 회오리',
+  'bossJournal.smithHeart.final.whirlSummary':
+    '열기의 별: {every}초마다 {warn}초 후 불의 회오리가 솟아올라({count}개씩) {life}초 동안 초당 {speed}야드로 바닥을 떠돌며, 닿는 모두에게 {min}~{max}의 화염 피해를 줍니다.',
+  'bossJournal.smithHeart.final.whirlResponse': '옆으로 달려 따돌리세요.',
+  'bossJournal.smithHeart.final.phaseKitsName': '구역 능력',
+  'bossJournal.smithHeart.final.phaseKitsSummary':
+    '애시그랜드가 구역에 서 있는 동안 그 구역 고유의 능력이 작동하며, 들어온 지 {delay}초 후에 시작됩니다.',
+  'bossJournal.smithHeart.final.fistSummary':
+    '열기 구역: {every}초마다 플레이어가 선 자리에 {cast}초 시전: {radius}야드 안에 {min}~{max}의 화염 피해를 준 뒤, 그곳에서 용암 너울 세 줄기가 굴러 나가 지나가는 모두에게 {wMin}~{wMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.fistResponse':
+    '표식 대상: 그 자리를 떠나고, 너울 사이의 틈에 서세요.',
+  'bossJournal.smithHeart.final.boltSummary':
+    '숨결 구역: {every}초마다 플레이어 한 명에게 {cast}초 시전: {min}~{max}의 자연 피해를 준 뒤, 맞은 대상으로부터 {jump}야드 안의 모든 플레이어에게 튀며, 튈 때마다 {growth} 강해집니다.',
+  'bossJournal.smithHeart.final.boltResponse': '서로 {jump}야드씩 산개하세요.',
+  'bossJournal.smithHeart.final.devilName': '먼지 회오리',
+  'bossJournal.smithHeart.final.devilSummary':
+    '숨결 구역: {every}초마다 {warn}초 후 플레이어 곁에서 먼지 회오리가 솟아올라({count}개씩) {life}초 동안 떠돕니다. 닿으면 {min}~{max}의 자연 피해를 입고 {throw}야드 날아갑니다.',
+  'bossJournal.smithHeart.final.devilResponse': '어디로 떠도는지 지켜보고 멀리 피하세요.',
+  'bossJournal.smithHeart.final.tremorName': '진동 균열',
+  'bossJournal.smithHeart.final.tremorSummary':
+    '망치 구역: {every}초마다 플레이어 발밑에 균열이 열립니다({count}개씩). {warn}초 후 각 균열이 분출하여 {radius}야드 안에 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.tremorResponse': '분출하기 전에 자신의 균열에서 벗어나세요.',
+  'bossJournal.smithHeart.final.emberName': '불씨 표식',
+  'bossJournal.smithHeart.final.emberSummary':
+    '열기 구역: {every}초마다 원거리 플레이어 {marks}명에게 표식이 남습니다. {seconds}초 후 발밑에 잉걸불이 떨어져 반경 {radius}야드 웅덩이로 {life}초 동안 타오르며, 매초 {min}~{max}의 화염 피해를 줍니다.',
+  'bossJournal.smithHeart.final.emberResponse':
+    '표식 대상: 구역 가장자리에 웅덩이를 함께 떨어뜨린 뒤 빠져나오세요.',
+  'bossJournal.smithHeart.final.iceSummary':
+    '담금질 구역: {every}초마다 플레이어 {marks}명의 발밑에서 얼음이 신음합니다. {warn}초 후 {radius}야드 안의 얼음이 깨집니다: {min}~{max}의 냉기 피해와 {stun}초 기절.',
+  'bossJournal.smithHeart.final.iceResponse': '깨지기 전에 신음하는 얼음에서 벗어나세요.',
+  'bossJournal.smithHeart.final.drawnSummary':
+    '숨결 구역: {every}초마다 플레이어 {marks}명에게 {seconds}초 동안 표식이 남습니다. 매초 각 대상에게서 {reach}야드 안의 다른 모든 플레이어에게 번개가 튀어 {min}~{max}의 자연 피해를 줍니다.',
+  'bossJournal.smithHeart.final.drawnResponse': '표식 대상: 모두에게서 {reach}야드 떨어지세요.',
+  'bossJournal.smithHeart.final.shellName': '돌 껍질',
+  'bossJournal.smithHeart.final.shellSummary':
+    '망치 구역: {every}초마다 플레이어 {marks}명이 최대 {seconds}초 동안 껍질에 싸여, 다음에 받는 치유 {absorb}를 흡수합니다.',
+  'bossJournal.smithHeart.final.shellResponse': '치유 담당은 다른 치유보다 껍질을 먼저 깨뜨리세요.',
+  'bossJournal.smithHeart.final.phaseCallName': '네 구역의 부름',
+  'bossJournal.smithHeart.final.phaseCallSummary':
+    '생명력 {first}와 {second}에서 애시그랜드가 보호막을 두른 채 중앙으로 걸어 들어가, 가장 많이 찬 구역에서 파편을 불러냅니다.',
+  'bossJournal.smithHeart.final.callSummary':
+    '애시그랜드가 {seconds}초 동안 정신 집중하는 동안 모은 힘이 그를 보호하며, 가장 많이 찬 구역에서 파편이 솟아오릅니다(매번 {adds}개, 각각 생명력 {health}). 모두 처치하면 보호막이 일찍 깨집니다. 정신 집중이 끝날 때 살아 있는 파편은 그 원소를 애시그랜드에게 쏟아붓습니다: 전투가 끝날 때까지 그 구역의 별이 어디에 서 있든 최대 속도로 움직입니다.',
+  'bossJournal.smithHeart.final.callResponse': '정신 집중이 끝나기 전에 파편을 모두 처치하세요.',
+  'bossJournal.smithHeart.final.splinteredName': '쪼개진 힘',
+  'bossJournal.smithHeart.final.splinteredSummary':
+    '{every}초마다 살아 있는 파편마다 공격대 전체에 {min}~{max}의 피해를 주며, 맥동마다 {rise}씩 강해집니다.',
+  'bossJournal.smithHeart.final.splinteredResponse':
+    '파편이 오래 살아 있을수록 더 세게 칩니다: 빨리 처치하세요.',
+  'bossJournal.smithHeart.final.shearSummary':
+    '모든 파편이 {every}초마다: {cast}초 시전 후 대상에게 길이 {range}야드, {arc}도 부채꼴. 대상은 {tMin}~{tMax}, 부채꼴 안의 다른 모두는 {oMin}~{oMax}의 피해를 입습니다.',
+  'bossJournal.smithHeart.final.shearResponse':
+    '각 파편의 방어 담당이 파편을 공격대 반대쪽으로 돌리고, 다른 누구도 그 정면에 서지 마세요.',
+  'bossJournal.smithHeart.final.heatSplinterName': '열기의 파편',
+  'bossJournal.smithHeart.final.heatSplinterSummary':
+    '끌려다니는 곳마다 잉걸불 자취를 남깁니다: {step}야드마다 반경 {radius}야드 불길이 {life}초 동안 탑니다(매초 {tMin}~{tMax}). {every}초마다 플레이어 한 명이 {seconds}초 동안 터지는 석탄을 지니며, 그 뒤 석탄이 터져 {reach}야드 안의 다른 모두에게 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.heatSplinterResponse':
+    '공격대에서 멀리 끌고 가세요. 석탄을 지닌 자는 무리를 떠나세요.',
+  'bossJournal.smithHeart.final.tollSummary':
+    '담금질의 파편: {every}초마다 {cast}초 시전하며, 끝까지 울려 퍼지면 공격대 전체에 {min}~{max}의 냉기 피해를 줍니다.',
+  'bossJournal.smithHeart.final.tollResponse': '매번 차단하세요.',
+  'bossJournal.smithHeart.final.ringName': '담금질 고리',
+  'bossJournal.smithHeart.final.ringSummary':
+    '{every}초마다 틈이 {gaps}곳 있는 서리 고리가 담금질의 파편에서 퍼져 나갑니다. 틈이 아닌 곳으로 넘으면 {min}~{max}의 냉기 피해를 입고 {slowSeconds}초 동안 이동 속도가 {slow} 감소합니다.',
+  'bossJournal.smithHeart.final.ringResponse': '고리가 지나갈 때 틈으로 걸어 통과하세요.',
+  'bossJournal.smithHeart.final.weightName': '쌓이는 무게',
+  'bossJournal.smithHeart.final.weightSummary':
+    '망치의 파편: 공격이 적중할 때마다 대상에게 중첩이 쌓이며(중첩마다 매초 {per}의 피해, {seconds}초 지속), 중첩마다 파편의 공격이 {step} 더 세게 적중합니다.',
+  'bossJournal.smithHeart.final.weightResponse': '{swap}중첩에서 방어 담당을 교대하세요.',
+  'bossJournal.smithHeart.final.pounceSummary':
+    '숨결의 파편: {every}초마다 방어 담당이 아닌 플레이어에게 {cast}초 시전. 그 플레이어에게 덮쳐 {min}~{max}의 피해를 주고 {seconds}초 동안 쫓으며, 몰아치는 돌풍이 {reach}야드 안의 다른 모두에게 매초 {bMin}~{bMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.pounceResponse':
+    '쫓기는 대상은 파편을 무리에서 멀리 끌고 달아나세요.',
+  'bossJournal.smithHeart.final.orbName': '폭풍 구슬',
+  'bossJournal.smithHeart.final.orbSummary':
+    '{every}초마다 숨결의 파편 둘레에 폭풍 구슬이 생깁니다({count}개씩). 혼자 받으면 {min}~{max}의 피해를 입고, 두 명 이상이 받으면 각자 두 배를 받습니다. 아무도 받지 않은 구슬은 {life}초 후 터져 공격대 전체에 {bMin}~{bMax}의 피해를 줍니다.',
+  'bossJournal.smithHeart.final.orbResponse': '구슬마다 한 명씩 올라서세요.',
+  'bossJournal.smithHeart.final.phaseFinalName': '모든 구역의 각성',
+  'bossJournal.smithHeart.final.phaseFinalSummary':
+    '생명력 {final}에서 애시그랜드가 전투의 마지막을 위해 중앙 원으로 걸어 들어갑니다. 과부하 막대는 멈춥니다.',
+  'bossJournal.smithHeart.final.awakeName': '모든 별의 각성',
+  'bossJournal.smithHeart.final.awakeSummary':
+    '네 별이 모두 {pace} 속도로 동시에 움직입니다: 기둥, 번개, 칼날, 회오리가 한꺼번에. 모루의 무게는 독자적인 주기를 유지합니다.',
+  'bossJournal.smithHeart.final.awakeResponse':
+    '맡은 역할을 지키세요: 바닥은 더 혼잡해지지만 새로운 것은 나오지 않습니다.',
+  'bossJournal.smithHeart.final.furyName': '주인 없는 분노',
+  'bossJournal.smithHeart.final.furySummary':
+    '마지막 단계가 시작되고 {after}초 후부터 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 맥동마다 {rise}씩 강해지고 끝없이 이어집니다.',
+  'bossJournal.smithHeart.final.furyResponse': '남은 생존기를 모두 쓰고 마무리하세요.',
+  'bossJournal.smithHeart.final.tipTank':
+    '과부하 막대가 가득 차지 않도록 애시그랜드를 구역마다 차례로 끌고 다니고, 중앙 원에서는 즉시 끌어내세요. 원소 일격 {swap}중첩에서 교대하세요. 부름마다 파편을 맡으세요.',
+  'bossJournal.smithHeart.final.tipHealer':
+    '과부하 맥동, 모루의 무게, 쪼개진 힘은 모두 공격대 전체를 칩니다. 생존기는 부름마다, 그리고 주인 없는 분노가 멈추지 않는 마지막 단계를 위해 아껴 두세요.',
+  'bossJournal.smithHeart.final.tipDamage':
+    '대립하는 원소의 반대 짝을 찾고, 모루의 무게마다 원 안에 모이며, 부름이 끝나기 전에 파편을 모두 처치하세요. 서리 종소리는 모두 차단하세요.',
+  'bossJournal.smithHeart.final.heroicBurst':
+    '가득 찬 과부하 막대는 터지며 {bMin}~{bMax}의 피해를 줍니다: 생명력을 채우고 생존기를 사용하세요.',
+  'bossJournal.smithHeart.final.heroicKits':
+    '구역을 바꿀 때마다 광맥 충격이 적중하며, 불씨 표식, 신음하는 얼음, 끌어당긴 번개, 돌 껍질이 구역 능력에 더해집니다.',
+  'bossJournal.smithHeart.final.heroicOpposing':
+    '대립하는 원소가 방어 담당이 아닌 모든 플레이어에게 표식을 남기며, 없애지 못한 짝마다 공격대 전체를 칩니다.',
+  'bossJournal.smithHeart.final.heroicCall': '네 구역의 부름마다 파편 {adds}개가 솟아오릅니다.',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '{every}초마다 {cast}초 시전 후 {radius}야드 안의 모두에게 {min}~{max} 피해를 줍니다. 꿰뚫린 플레이어는 거리와 관계없이 {pinMult}배 피해를 받습니다.',
   'bossJournal.wildheart.zulgar.spearSummary':
@@ -138,6 +753,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureGuide.lootClass': '직업',
   'hudChrome.adventureGuide.lootSpec': '전문화',
   'hudChrome.adventureGuide.allSpecs': '모든 전문화',
+  'hudChrome.adventureGuide.allClasses': '모든 직업',
   'hudChrome.adventureGuide.lootHint':
     '선택한 전문화에 적합한 능력치를 가진 착용 가능한 장비를 표시합니다. 공통 보상도 표시됩니다. 드롭 확률은 전체 전리품 목록을 기준으로 합니다.',
   'hudChrome.adventureGuide.lootEmpty': '이 직업과 전문화에 맞는 장비가 없습니다.',
@@ -345,6 +961,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '비활성: 멤버십을 갱신하면 장비 능력치와 세트 효과가 복구됩니다.',
   'entities.items.lantern_seal.name': '등불 인장',
   'entities.items.reins_lantern_hall_destrier.name': '등불 회관 군마의 고삐',
+  'entities.items.reins_quarryheart_charger.name': '채석심장 돌격마의 고삐',
+  'entities.items.remnant_of_the_masterless_strength.name': '주인 없는 힘의 잔해',
+  'entities.items.coffer_of_the_highwatch_vigil.name': '하이워치 파수대의 금고',
+  'entities.npcs.heart_warden_ada_collier.name': '파수꾼 에이다 콜리어',
+  'entities.npcs.heart_warden_ada_collier.title': '하이워치 파수대',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    '파수대는 마흔 세대 동안 이유도 모른 채 이 산을 지켜보았습니다. 이제 우리는 압니다, {className}. 그 안에서 무엇을 깨우는지 조심하세요.',
+  'entities.quests.q_heart_what_the_heart_let_go.title': '심장이 놓아준 것',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    '심장 속의 힘에는 주인도 정신도 없습니다, {playerName}. 하지만 형체는 있지요. 쓰러져도 죽지 않습니다. 그 정수는 떨어져 나와 바위 속으로 달아날 겁니다. 그래도 언제나 무언가는 남습니다. 남은 것을 가져오면 파수대가 자신의 금고에서 보상하겠습니다.',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    '아직 따뜻하군요. 네 가지 힘이 하나의 조각에 묶여 있고, 붙잡히길 원하지 않습니다. 파수대는 약속을 지킵니다. 이 금고를 가져가세요. 이 등반에 걸맞은 것이 들어 있기를.',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': '주인 없는 힘의 잔해',
   'entities.items.membership_staff.name': '변화의 지팡이',
   'hudChrome.bags.membershipSlot': '멤버십 가방 칸',
   'hudChrome.bags.membershipSlotLocked': '멤버십으로 이 가방 칸을 잠금 해제하세요.',
@@ -2644,26 +3273,33 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '홈에 등불의 불길을 담은 넓은 강철 검날, 금박 장식, 코등이에서 타오르는 새장 등불, 푸른 가죽 손잡이.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '등불 회관의 검',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '화롯불의 검',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    '양날이 대장간의 열기로 달아오르고 양면에 녹은 균열이 가지를 치며 뻗은, 검게 그을린 강철의 불꽃 물결 검날. 타오르는 돌을 감싼 청동 불꽃 코등이, 검붉은 가죽 손잡이.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    '등불 회관에는 회관이 세워진 이래 한 번도 꺼진 적 없는 화로가 있고, 개릭 홀트는 이 검날이 그 숯불에 담금질되었다고 맹세한다. 이 검을 지닌 이들은 가장 추운 불침번에도 손잡이가 따뜻하다고 말한다. 검날을 따라 흐르는 불은 겉모습일 뿐이다.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '폭풍 물결의 검',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    '부서지는 파도처럼 빛나는 날을 지닌 길고 푸른 바다빛 검날. 갈라진 번개를 품은 폭풍의 홈, 검날 밑동을 넘는 금빛 파도, 한쪽 날을 따라 난 지느러미, 폭풍 진주를 감싼 금빛 파도 코등이.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    '길드를 위해 항해하던 한 선장이 돛대를 앗아 가고 배를 종처럼 울리게 한 돌풍 속에서 이 검을 가지고 돌아왔다. 개릭은 인장을 받고서만 이 검을 팔며, 사는 이마다 폭풍 전에는 검이 웅웅거린다고 경고한다. 번개와 바다빛은 겉모습일 뿐이다.',
   'hudChrome.wocStore.skins.rimelight_staff.name': '서리빛 지팡이',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    '은으로 감싸고 빛나는 서리를 휘감은 창백한 자루. 꼭대기에는 얼음 조각 왕관 속에서 차가운 빛의 거대한 수정을 움켜쥔 은 갈고리가 있고, 깃에는 고드름이 매달려 있다.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    '등불 회관의 겨울 경비대는 이런 지팡이를 들고 높은 길을 걸으며, 눈 속에서 길을 잃은 여행자들을 위해 꼭대기를 밝혔다. 개릭은 인장에 여유가 있는 회원을 위해 하나를 진열대에 두고 있다. 서리와 그 차가운 빛은 겉모습일 뿐이다.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': '황혼 심지 지팡이',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    '쇠로 감싼 두 가닥의 꼬인 검은 나무 자루. 꼭대기에는 휘어 오른 두 뿔 사이에서 보랏빛 황혼의 불꽃을 태우는 열린 쇠 등롱이 있고, 그 바닥에서 사슬이 흔들린다.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    '회관의 등불은 모두 밝게 타오른다, 단 하나만 빼고. 황혼의 불꽃은 밤의 회관을 지키려고 밝힌 것으로, 다른 등불이 빛을 내는 곳에서 그림자를 낸다. 개릭은 그 심지를 직접 다듬는다. 연기와 보랏빛 광채는 겉모습일 뿐이다.',
   'hudChrome.wocStore.collections.lantern_hall': '등불 회관',
+  // The Smith's Heart raid arms (M16 fills).
+  'hudChrome.wocStore.collections.smiths_heart': '대장장이의 심장',
+  'hudChrome.wocStore.skins.seamcaller_maul.name': '광맥을 부르는 자',
+  'hudChrome.wocStore.skins.seamcaller_maul.look':
+    '타오르는 금빛 광맥이 갈라놓은 어두운 채석장 돌 한 덩어리를 깎아 만든 양손 대형 망치. 양 볼에는 테두리를 두른 금빛 룬, 타오르는 호박을 두른 금테 타격면, 리벳을 박은 금띠, 휘어진 금빛 뿔, 머리에서 자라난 호박 광맥 결정, 금으로 감은 땋은 가죽 자루.',
+  'hudChrome.wocStore.skins.seamcaller_maul.lore':
+    '망치 의회는 공격대에게 손을 들기 전에 노래로 광맥을 깨웠고, 돌은 그 모든 음을 기억한다. 이 망치는 그들의 망치가 쪼갠 돌덩이에서 깎아 냈으며, 휘두를 때마다 룬이 여전히 타오른다. 광맥 결정 조각이 머리 주위를 도는 모습은 마치 산이 그것들을 되찾고 싶어 하는 듯하다. 룬과 도는 결정은 외형일 뿐이다.',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '번개처럼 밝은 날을 지닌 긴 폭풍강철 검. 구름무늬를 새긴 양면에는 갈라진 벼락이, 칼등에는 갈고리 모양의 바람 지느러미가 있고, 코등이는 폭풍의 눈 보석을 감싸며 펼쳐진 은빛 날개다.',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '숨결의 수호자는 심장의 공기를 쉼 없이 돌게 했다. 그것이 쓰러졌을 때 품고 있던 폭풍은 흩어지지 않고 이 검에 깃들었다. 바람은 여전히 강철을 감싸고 번개는 여전히 날을 따라 달리며, 이 검을 든 이들은 코등이 속 눈이 하늘을 지켜본다고 맹세한다. 폭풍은 외형일 뿐이다.',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '은빛 세공 무늬를 감고 보석 박힌 은 고리로 조인 푸른 강철 지팡이. 꼭대기에서는 네 개의 은빛 초승달 칼날이 차가운 빛의 거대한 결정을 감싸고, 그 둘레를 작은 결정들의 고리가 두르며, 아래로는 고드름이 매달려 있다.',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '담금질의 수호자는 심장이 벼린 모든 칼날을 식혀 왔다. 그것이 쓰러졌을 때 가장 마지막까지 빛을 잃지 않은 것이 이 결정이었고, 공격대가 들고 나올 때도 손에 서리가 앉을 만큼 차가웠다. 얼음이 관을 돌고 서리의 룬이 그 둘레를 회전한다. 냉기는 외형일 뿐이다.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '식어 굳은 용암 껍질로 된 넓은 검. 날은 아직 녹아 있고 양면에는 잔불 같은 균열이 그물처럼 퍼져 있으며, 칼등에는 흑요석 이빨이, 검은 쇠 코등이는 녹은 쇳물이 떨어지는 두 뿔로 휘어 용암의 심장을 감싼다.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '열기의 수호자는 심장이라는 이름이 비롯된 바로 그 불이었다. 그것이 꺼질 때 마지막 용암이 대장간 바닥의 검 모양 틈으로 흘러들어 그곳에서 식었다. 겉은 껍질, 속은 불이다. 그 날은 한 번도 타오르기를 멈춘 적이 없다. 불은 외형일 뿐이다.',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '심장융합 지팡이',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '채석장 돌을 층층이 박은 용광로 청동 지팡이. 꼭대기에는 거대한 금빛 고리가 있고, 네 보석(채석장의 호박, 돌풍, 서리, 불)이 차례로 빛나며 백금빛 핵을 품은 모루의 심장을 둘러싼다.',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '주인 없는 힘은 심장의 네 광맥이 세상의 모루 위에서 하나의 몸으로 묶인 것이었다. 그것이 부서졌을 때 넷은 흩어지지 않고 이 고리에 깃들어 돌, 바람, 서리, 불의 차례로 타오른다. 한때 차례로 공격했던 것처럼. 네 개의 빛은 외형일 뿐이다.',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '길드마크 무장검',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '푸르게 처리한 강철 칼날, 청동 물고기 꼬리형 십자 가드, 청록색으로 염색한 가죽 손잡이, 작게 찍힌 길드 문장.',
@@ -7934,6 +8570,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '장인의 불씨',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
+  'hudChrome.raidLockout.bossSavedNoLoot':
+    '이번 주에 이미 이 우두머리를 처치했으므로 당신을 위한 전리품이 없습니다.',
+  'hudChrome.raidLockout.bossNameHeroic': '{raid}: {boss} (영웅)',
   'hudChrome.practiceDps.title': '훈련용 허수아비',
   'hudChrome.practiceDps.prompt': '허수아비를 공격하여 측정을 시작하세요',
   'hudChrome.practiceDps.previous': '이전 측정',
@@ -14358,6 +14997,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': '숨김',
   'hudChrome.deeds.titleChip': '칭호 보상',
   'hudChrome.deeds.borderChip': '테두리 보상',
+  'hudChrome.deeds.cosmeticChip': '외형 보상',
+  'hudChrome.deeds.rewardAppearance': '보상: {name} 무기 외형, 계정의 모든 캐릭터 공용',
+  'hudChrome.deeds.rewardMount': '보상: {name} 탈것',
   'hudChrome.deeds.watch': '추적',
   'hudChrome.deeds.unwatch': '추적 해제',
   'hudChrome.deeds.watchFull': '추적 목록이 가득 찼습니다 (최대 {cap}개)',
@@ -14469,6 +15111,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.',
   'hudChrome.mounts.name_lanternback_troll': '등불지기 그룸볼',
   'hudChrome.mounts.name_lantern_hall_destrier': '등불 회관 군마',
+  'hudChrome.mounts.name_quarryheart_charger': '채석심장 돌격마',
   'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
@@ -14481,6 +15124,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '등불 회관의 군마. 길드의 푸른 천 아래 참나무와 쇠로 된 마갑을 두르고, 안장에서 흔들리는 두 개의 폭풍 등불이 귀갓길을 밝힌다.',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '대장장이의 심장의 군마. 살아 있는 불길의 몸 위로 채석장 돌판이 떠 있고, 금빛 갈비뼈 너머로 백열의 심장이 고동친다. 이마에는 얼음 수정 뿔, 갈기는 번개가 튀는 바람이다.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
@@ -18119,7 +18764,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '경험치 바 위에 능력 슬롯 11칸짜리 줄이 셋 놓이고, 첫 줄 맨 앞에는 전용 공격 버튼이 자리합니다. 처음에는 첫 줄만 있습니다. 둘째 줄과 셋째 줄은 자리가 더 필요할 때 옵션에서 켜며, 셋째 줄을 켜려면 둘째 줄이 있어야 합니다. 키보드 위쪽 숫자 줄이 첫 번째 단축바를 쏘고, 늘어난 단축바는 기본적으로 숫자 키패드에 배정됩니다.\n\n능력은 주문서(P)에서 옵니다. 책에서 능력을 끌어다 슬롯에 놓거나, 그 줄의 토글을 눌러 비어 있는 첫 슬롯에 올리세요. 아이템도 똑같이 다루니, 물약 한 뭉치나 붕대를 슬롯에 두고 키 하나로 쓸 수 있습니다.\n\n단축바를 마음에 드는 대로 정리했다면 잠글 수 있습니다. 잠긴 단축바는 끌기와 놓기, 비우기를 받아들이지 않지만 능력 자체는 여전히 그대로 쓸 수 있어, 전투 중 잘못 누른 클릭이 버튼 배치를 흐트러뜨리는 일이 없습니다.\n\n해당되는 경우 작은 단축바 두 개가 함께 붙습니다. 공격, 중지, 도발, 방어, 공격적을 Ctrl+1에서 Ctrl+5에 담은 소환수 단축바와, 태세나 변신을 바꾸는 직업을 위한 태세 단축바입니다.',
   'guide.interfacePage.actionBarsTitle': '행동 단축바',
   'guide.interfacePage.aurasBody':
-    '자신에게 걸린 강화 효과는 오른쪽 위 미니맵 옆에 작은 아이콘 줄로 나타나며, 각각 남은 시간을 세어 내려갑니다. 그 아래 줄에는 약화 효과가 놓입니다. 자신의 강화 효과를 오른쪽 클릭하면 해제됩니다.\n\n옵션에서 강화 효과 줄을 자기 유닛 프레임 위로 옮길 수 있고, 그러면 그 모서리 전체가 약화 효과의 자리가 됩니다.\n\n대상의 강화 및 약화 효과는 대상 프레임 아래 한 줄에 함께 놓입니다. 자리가 더 필요하면 Shift+J로 별도의 대상 강화 및 약화 효과 창을 열 수 있는데, 이 창은 옮길 수 있고 강화만 또는 약화만 보도록 걸러 낼 수 있으며 열어 둔 채로 둘 수도 있습니다.',
+    '자신에게 걸린 강화 효과는 오른쪽 위 미니맵 옆에 작은 아이콘 줄로 나타나며, 각각 남은 시간을 세어 내려갑니다. 그 아래 줄에는 약화 효과가 놓입니다. 자신의 강화 효과를 오른쪽 클릭하면 해제됩니다.\n\n옵션에서 강화 효과 줄을 자기 유닛 프레임 위로 옮길 수 있고, 그러면 그 모서리 전체가 약화 효과의 자리가 됩니다.\n\n대상의 강화 및 약화 효과는 대상 프레임 아래 한 줄에 함께 놓입니다. 자리가 더 필요하면 Shift+B로 별도의 대상 강화 및 약화 효과 창을 열 수 있는데, 이 창은 옮길 수 있고 강화만 또는 약화만 보도록 걸러 낼 수 있으며 열어 둔 채로 둘 수도 있습니다.',
   'guide.interfacePage.aurasTitle': '강화 효과와 약화 효과',
   'guide.interfacePage.barsBody':
     '주문을 시전하거나 정신을 집중할 때마다 화면 한가운데, 행동 단축바 바로 위에 시전 바가 나타나 주문 이름과 남은 시간을 알려 줍니다. 대상도 자기 프레임에 시전 바를 가지므로, 무엇이 날아오는지 보고 답할 수 있습니다.\n\n시전 바 아래에는 가느다란 공격 속도 바가 있어 무기를 휘두르는 사이를 채웁니다. 근접이나 원거리 공격자는 다음 자동 공격이 언제 들어가는지 볼 수 있습니다.\n\n경험치 바는 행동 단축바 아래를 가로질러 화면 전체 폭으로 이어지며 눈금으로 나뉘어 있고, 밝게 표시된 구간이 쌓아 둔 휴식 경험치를 보여 줍니다.\n\n물속으로 헤엄쳐 들어가면 화면 위쪽에 파란 호흡 바가 나타납니다. 머리가 잠겨 있는 동안 줄어들고, 다 떨어져 익사가 시작되면 붉게 깜빡이며, 물 위로 올라오는 순간 빠르게 다시 찹니다. 스페이스로 위로 헤엄치고, 기본값이 Ctrl인 아래로 헤엄치기 키로 더 깊이 내려갑니다.\n\n피해와 치유는 맞은 대상 위로 작은 숫자가 되어 떠오르므로, 글을 읽지 않고도 전투를 읽어 낼 수 있습니다. 채팅창의 전투 탭에는 온전한 기록이 글로 남습니다.',
@@ -20051,6 +20696,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.close': '닫기',
   'worldContent.realmBuilderMonumentName': '왕국 건설자 기념비',
   'worldContent.musterRackName': '소집대 무기 거치대',
+  'worldContent.heartSealCrystalName': '심장 봉인 수정',
   'hudChrome.talkingHead.label': '대화',
   'hudChrome.hubLesson.target': '먼저 허수아비를 대상으로 삼으세요.',
   'hudChrome.hubLesson.openWindow': '{meters}을(를) 여세요.',
@@ -22454,6 +23100,269 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.',
   'apiError.character.referral_bond_pending':
     '친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.',
+  // The Smith's Heart raid: its name, guardians, vein warders and casts (M16 fills).
+  'entities.dungeons.smith_heart.name': '대장장이의 심장',
+  'entities.dungeons.smith_heart.enterText':
+    '산이 당신을 감싸고 웅웅 울립니다. 밤을 위해 불을 묻어 둔 화로처럼...',
+  'entities.dungeons.smith_heart.leaveText': '스톰크래그의 바람 속으로 다시 올라갑니다.',
+  'entities.mobs.heart_hammer_guardian.name': '흐로스마르, 굴하지 않는 망치',
+  'entities.mobs.heart_breath_guardian.name': '에어윈, 속박 없는 돌풍',
+  'entities.mobs.heart_quench_guardian.name': '오로라, 고요한 겨울',
+  'entities.mobs.heart_heat_guardian.name': '이그나자르, 꺼지지 않는 자',
+  'entities.mobs.heart_masterless_strength.name': '애시그랜드, 주인 없는 힘의 잔해',
+  'entities.mobs.heart_hammer_warder.name': '망치 광맥 파수꾼',
+  'entities.mobs.heart_ring_warder.name': '고리 화로 파수꾼',
+  'entities.mobs.heart_breath_warder.name': '숨결 광맥 파수꾼',
+  'entities.mobs.heart_breath_caller.name': '숨결 광맥 부름꾼',
+  'entities.mobs.heart_quench_warder.name': '담금질 광맥 파수꾼',
+  'entities.mobs.heart_quench_caller.name': '담금질 광맥 부름꾼',
+  'entities.mobs.heart_heat_warder.name': '열기 광맥 파수꾼',
+  'entities.mobs.heart_heat_caller.name': '열기 광맥 부름꾼',
+  'entities.mobs.heart_heat_wellspawn.name': '샘의 자식',
+  'entities.mobs.heart_heat_wellkeeper.name': '샘지기',
+  'entities.mobs.heart_heat_seedflame.name': '씨불',
+  'entities.mobs.heart_heat_rolling_cinder.name': '구르는 잉걸불',
+  'abilityUi.cast.heart_mountains_wrath': '산의 분노',
+  'abilityUi.cast.heart_bellows_gust': '정상의 포효',
+  'abilityUi.cast.heart_storm_lance': '폭풍 창',
+  'abilityUi.cast.heart_quenching_breath': '담금질의 숨결',
+  'hudChrome.auraEffect.heatGuardian.statePhase1':
+    '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 화로의 바퀴가 물가를 네 조각으로 나눕니다: 세 조각은 붉게 달아올라 {warn}초 뒤 분출하고(영웅 난이도 {heroicWarn}초), 한 조각만 어둡고 안전하게 남습니다. 한 차례가 분출하면 다음 차례의 안전한 조각이 다른 곳에 나타납니다. 현무암 주먹이 물가의 한 지점을 내리찍고, 그곳에서 용암 너울 세 줄기가 퍼져 나갑니다. 화로의 섬광은 샘에서 {reach}미터보다 멀리 있는 모두를 칩니다. 생명력 70%에서 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
+  'hudChrome.auraEffect.heatGuardian.statePhase2':
+    '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 화로의 바퀴와 현무암 주먹은 계속됩니다. 화로 씨앗이 공격대의 발밑에 떨어졌다가 잠시 뒤 터지고, 깨어나는 불이 샘 주위의 바닥을 띠마다 차례로 불태웁니다. 생명력 40%에서 다시 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
+  'hudChrome.auraEffect.heatGuardian.statePhase3':
+    '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 화로의 바퀴, 현무암 주먹, 깨어나는 불은 계속되고, 구르는 잉걸불이 떨어져 플레이어를 쫓습니다: 때리면 밀려납니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '샘 속에서 차갑게 식어 있다: 공격대가 다가와 깨어나 불타오를 때까지 공격하거나 피해를 줄 수 없다.',
+  'hudChrome.auraEffect.heatGuardian.stateUnder':
+    '샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 용암 고리가 샘에서 차례로 퍼져 나오며, 고리마다 불길이 갈라지는 틈이 두 곳 있습니다. 다음 고리의 틈은 고리가 오기 전에 바닥에서 빛납니다. 고리가 지나갈 때 틈 안에 서 있지 않으면 화염 피해를 {min}~{max} 입습니다(영웅 난이도 {heroicMin}~{heroicMax}). 두 번째 넘침의 고리는 더 빨리 오고 틈도 더 좁습니다. 마지막 고리가 지나가면 다시 떠오릅니다.',
+  'hudChrome.auraEffect.heatGuardian.scorched':
+    '받는 화염, 냉기, 자연, 암흑, 비전 피해가 {pct}% 증가합니다. {every}초마다 화로의 섬광이 샘에서 {reach}미터보다 멀리 있는 모두를 치고 이 효과를 갱신합니다.',
+  'hudChrome.auraEffect.heatGuardian.grip':
+    '매초 화염 피해를 {total} 받습니다(중첩 {stacks}개마다 {per}). 수호자의 공격이 적중할 때마다 중첩이 하나씩 쌓이고(최대 {most}개) {seconds}초 동안 지속됩니다: 너무 무거워지기 전에 방어 전담을 교대하십시오.',
+  'hudChrome.auraEffect.heatGuardian.kindling':
+    '{seconds}초 뒤 {trail}초 동안 불의 자취를 남깁니다. 자취마다 아군에게 매초 {min}~{max}의 화염 피해를 주고, 그 위에 선 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다: 무리와 샘의 자식이 지나는 길에서 벗어나십시오. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.heatGuardian.trail':
+    '잉걸불 자취를 남기고 있습니다: 폭 {radius}미터의 불이 {life}초 동안 타며, 그 안의 아군에게 매초 {min}~{max}의 화염 피해를 주고 그 안의 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.heatGuardian.hunted':
+    '구르는 잉걸불이나 씨불이 당신을 쫓고 있습니다. 구르는 잉걸불에 붙잡히면 죽고 {radius}미터 안의 모두가 불탑니다: 거리를 두고 아군이 때리게 하십시오. 한 번 칠 때마다 {knock}미터 밀려납니다(그 뒤 {crust}초 동안은 밀려나지 않습니다).',
+  'hudChrome.auraEffect.heatGuardian.crust':
+    '단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다.',
+  'hudChrome.auraEffect.heatGuardian.brand':
+    '샘의 낙인: {seconds}초 동안 받는 화염, 냉기, 자연, 암흑, 비전 피해가 {pct}% 증가합니다(잿불 손아귀의 화상 포함). 수호자는 {every}초마다 자신의 방어 전담에게 낙인을 던집니다. 시전 중이거나, 자신의 시전 막대가 진행 중이거나, 당신에게 닿지 않아도 던집니다: 화염 피해 {min}~{max}와 이 낙인. 다음 낙인이 떨어지기 전에 다른 방어 전담이 도발해야 합니다. 영웅·신화: 피해 {heroicMin}~{heroicMax}.',
+  'hudChrome.auraEffect.heatGuardian.coal':
+    '다음에 받는 치유 {absorb}를 흡수하고 매초 {burnMin}~{burnMax}의 화염 피해를 줍니다. 치유로 흡수량을 모두 깎으면 꺼집니다. {leap}미터 안으로 다가온 플레이어에게 남은 흡수량과 함께 옮겨 가며 {leapMin}~{leapMax}의 화염 피해를 줍니다. 누군가에게 옮겨 간 뒤 {grace}초 동안은 다시 옮겨 가지 않습니다. {seconds}초 안에 꺼지지 않으면 폭발해 당신을 포함한 {radius}미터 안의 모두에게 {burstMin}~{burstMax}의 화염 피해를 줍니다.',
+  'hudChrome.heatGuardian.say.fist': '돌이 떨어지는 곳에 서라. 그리고 그 일부가 되어라.',
+  'hudChrome.heatGuardian.say.sink': '샘이 너희를 맞으러 솟아오른다!',
+  'hudChrome.heatGuardian.say.sinkAgain': '다시 화로가 넘친다. 다시 너희는 타오른다.',
+  'hudChrome.heatGuardian.say.feed': '그래... 불꽃의 품으로 돌아오너라.',
+  'hudChrome.heatGuardian.say.rise': '나는 최초의 불과 함께 솟아오른다!',
+  'hudChrome.heatGuardian.say.seeds': '내가 흩뿌리는 불티마다 뿌리를 내린다.',
+  'hudChrome.heatGuardian.say.zones': '화로가 너희 발밑에서 깨어난다.',
+  'hudChrome.heatGuardian.say.cinder': '달려라, 작은 불씨야. 불꽃은 굶주렸다.',
+  'hudChrome.heatGuardian.say.intro':
+    '벌레들. 최초의 불꽃 속으로 기어들어 와 놓고 살아 나가길 바라느냐? 너희 족속이 불을 알기 전부터 나는 타오르고 있었다. 그렇다면 함께 타올라라!',
+  'abilityUi.cast.heart_heat_fist': '현무암 주먹',
+  'abilityUi.cast.heart_forge_wrath': '화로의 분노',
+  'abilityUi.cast.heart_forge_pour': '화로 붓기',
+  'abilityUi.cast.heart_ember_bolt': '잔불 화살',
+  // The Smith's Heart's Hammer Council (M16 fills).
+  'entities.mobs.heart_seam_singer.name': '벨미라, 광맥의 노래꾼',
+  'abilityUi.cast.heart_hammers_weight': '망치의 무게',
+  'abilityUi.cast.heart_wake_the_stone': '돌 깨우기',
+  'abilityUi.cast.heart_falling_rock': '낙석',
+  'abilityUi.cast.heart_seam_bolt': '광맥 화살',
+  'abilityUi.cast.heart_song_of_the_seam': '광맥의 노래',
+  'hudChrome.auraEffect.breathGuardian.intro':
+    '잠들어 있다: 폭풍이 그를 내려놓을 때까지 공격할 수도, 피해를 줄 수도 없다.',
+  'hudChrome.auraEffect.council.intro':
+    '잠들어 있다: 의회가 깨어날 때까지 공격할 수도, 피해를 줄 수도 없다.',
+  'hudChrome.auraEffect.council.wakeMark':
+    '효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.council.rockMark':
+    '효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 나눠 받는 피해 {heroicTotal}, 공격대 전체 피해 {heroicTremorMin}에서 {heroicTremorMax}.',
+  'hudChrome.auraEffect.council.memory':
+    '주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 동료의 영혼이 그 안에서 불타고 있습니다.',
+  'hudChrome.auraEffect.council.fury':
+    '공격, 시전, 모든 능력이 {pct}% 빨라지고, 쓰러진 동료의 능력을 최대 위력으로 사용합니다. 둘을 함께 처치하면 막을 수 있습니다.',
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': '분노의 메아리',
+  'abilityUi.cast.heart_endless_song': '끝없는 노래',
+  'hudChrome.council.say.guardian_pull':
+    '채석장에 낯선 자들이라. 망치의 힘은 살덩이에 굴하지 않는다.',
+  'hudChrome.council.say.guardian_wrath': '산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!',
+  'hudChrome.council.say.guardian_death': '나의 힘을... 돌에 맡긴다.',
+  'hudChrome.council.say.guardian_remember': '돌은 기억한다. 그들의 것은 이제 나의 것이다.',
+  'hudChrome.council.say.guardian_grief':
+    '너희가 그녀의 노래를 빼앗았다. 내가 그것을 만가로 만들어 주마.',
+  'hudChrome.council.say.guardian_soul': '이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.',
+  'hudChrome.council.say.guardian_wipe': '먼지로다. 모든 살덩이가 그러하듯.',
+  'hudChrome.council.say.guardian_defeat': '망치의 힘은... 이제 너희가 짊어져라.',
+  'hudChrome.council.say.singer_pull':
+    '광맥의 노래가 들리나요? 너무 오래 당신들의 목소리를 기다렸어요.',
+  'hudChrome.council.say.singer_song': '나와 함께 노래하고, 부서지세요!',
+  'hudChrome.council.say.singer_death': '나의 노래가... 바위로 흘러들어...',
+  'hudChrome.council.say.singer_remember': '돌은 기억해요. 들어 봐요, 아직 노래하고 있어요.',
+  'hudChrome.council.say.singer_grief': '그의 힘은 이제 내 것이에요. 산이 노래하는 걸 느껴 봐요.',
+  'hudChrome.council.say.singer_soul': '들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.',
+  'hudChrome.council.say.singer_wipe': '쉿. 광맥이 잠잠해졌어요.',
+  'hudChrome.council.say.singer_defeat': '마지막 음이... 사라져요.',
+  // The Hammer Council's rework: Mountain's Rush, the Cursed Pillar, Bond of
+  // the Stone, Quarry Collapse and Resonance (M16 fills).
+  'abilityUi.cast.heart_mountains_rush': '산의 돌진',
+  'hudChrome.auraEffect.council.resonance':
+    '{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.council.rushMark':
+    '효과가 끝나면 망치의 수호자가 {windup}초 동안 자세를 잡은 뒤, 당신이 서 있던 곳을 지나 채석장 가장자리까지 일직선으로 돌진하며, 길을 막는 기둥이 있으면 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 멈추기 전까지 돌진에 부딪힌 모두가 {min}에서 {max}의 피해를 받고 밀려나며, 아직 경로 위에 있다면 당신도 마찬가지입니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.council.rushExposed':
+    '받는 피해가 {pct}% 증가합니다: 산의 돌진이 저주받은 기둥을 부쉈습니다.',
+  'hudChrome.auraEffect.council.collapse':
+    '채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.',
+  'hudChrome.auraEffect.council.pillarLimit':
+    '기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다. 숨지 않은 대상은 일반에서 {min}에서 {max}, 영웅에서 {heroicMin}에서 {heroicMax}, 신화에서 {mythicMin}에서 {mythicMax}의 피해를 받습니다.',
+  'hudChrome.council.say.guardian_rush': '그렇다면 내 길을 막아 보아라. 산은 비켜 가지 않는다.',
+  'hudChrome.council.say.singer_wake': '깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!',
+  'hudChrome.council.say.singer_rock': '위를 봐요, 꼬마들! 산이 무너지고 있어요!',
+  // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.say.guardian_intro':
+    '정상은 오랜 세월 침묵했다. 이제 숨을 들이쉬고, 하늘도 함께 숨 쉰다.',
+  'hudChrome.breathGuardian.say.guardian_pull':
+    '산의 꼭대기까지 올라와 그 숨결을 훔치려는가? 그렇다면 나와 함께 숨 쉬어라.',
+  'hudChrome.breathGuardian.say.guardian_blow':
+    '바람이 방향을 바꾸는 것을 느껴라. 가장자리는 생각보다 가깝다.',
+  'hudChrome.breathGuardian.say.guardian_inhale': '가까이 오너라. 모두 다.',
+  'hudChrome.breathGuardian.say.guardian_storm': '숨은 이걸로 충분하다. 이제 폭풍이다!',
+  'hudChrome.breathGuardian.say.guardian_cradle': '올라라, 작은 것아. 저들이 너를 받아 주게 하라.',
+  'hudChrome.breathGuardian.say.guardian_drawn': '하늘이 너를 골랐다. 달아나라, 번개가 따라간다.',
+  'hudChrome.breathGuardian.say.guardian_wipe': '날려 갔구나. 산꼭대기의 먼지처럼.',
+  'hudChrome.breathGuardian.say.guardian_death': '숨결은... 산으로... 돌아간다...',
+  'hudChrome.breathGuardian.say.thessaly_pull':
+    '하이워치가 함께한다! 여기엔 벽이 없어, 바람이 너희를 가장자리 밖으로 날려 버릴 거야!',
+  'hudChrome.breathGuardian.say.thessaly_circle_a':
+    '어서 제 고요 속으로! 셋까지만, 그 이상은 안 됩니다!',
+  'hudChrome.breathGuardian.say.thessaly_circle_b': '여기요! 제 곁에 서서 바람을 함께 받아 냅시다!',
+  'hudChrome.breathGuardian.say.thessaly_circle_c': '돌 위에 고요를! 셋, 지금 당장!',
+  'hudChrome.breathGuardian.say.thessaly_inhale':
+    '놈이 숨을 들이쉽니다! 입 앞이 아니라 옆으로 가세요!',
+  'hudChrome.breathGuardian.say.thessaly_storm':
+    '폭풍이 터집니다! 제 고요로는 버틸 수 없어요. 산개하세요!',
+  'hudChrome.breathGuardian.say.thessaly_fall': '돌을 붙잡으세요!',
+  'hudChrome.breathGuardian.say.thessaly_victory':
+    '숨결이 풀려났습니다. 하이워치는 이 등반을 기억할 겁니다.',
+  'hudChrome.breathGuardian.say.thessaly_wipe': '물러나서 숨을 고르세요. 다시 갑니다.',
+  'hudChrome.breathGuardian.say.guardian_isles':
+    '바람이여, 나를 둘러싸라! 섬들이 내 숨결을 지켜 주리라.',
+  'hudChrome.breathGuardian.say.guardian_bulwark':
+    '내 방패가... 찢어졌다. 그렇다면 다시 질풍을 맛보아라!',
+  'hudChrome.breathGuardian.say.thessaly_isles':
+    '저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!',
+  'hudChrome.auraEffect.breathGuardian.wind':
+    '숨결의 수호자의 바람은 서 있는 동안 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 걸을 때는 향한 곳으로 갑니다: 바람을 거슬러 걸으면 느려지고, 바람을 타고 걸으면 빨라지며, 바람을 가로질러 걸으면 {cross}%의 힘으로만 밀립니다. 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다.',
+  'hudChrome.auraEffect.breathGuardian.blast':
+    '정상의 포효의 돌풍이 당신을 수호자에게서 밀어냅니다: 입 앞에서는 초당 {speed}미터, 멀어질수록 약해지며 모두 {seconds}초 동안 지속됩니다. 즉시 바람을 거슬러 곧장 돌아가거나 세살리의 닻에 서세요. 그러지 않으면 처마 밖으로 날려갑니다.',
+  'hudChrome.auraEffect.breathGuardian.draw':
+    '수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 정반대로 {throw}야드 날려 보냅니다(영웅·신화는 {heroicThrow}야드이며, 가장자리까지 날아가면 벼랑 밖으로 떨어집니다). 그 뒤 돌풍이 몇 초 동안 같은 방향으로 초당 {gustSpeed}야드(영웅·신화는 {heroicGustSpeed}야드) 밀어냅니다: 수호자를 향해 곧장 걸어 돌아오지 않으면 가장자리까지 밀려납니다. 포효할 때 수호자 가까이 있거나 테살리의 닻 안에 서십시오. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicGustMin}에서 {heroicGustMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.pinned':
+    '바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.anchor':
+    '테살리 대장의 고요가 당신을 붙잡고 있습니다: 바람도, 끌어당김도, 폭발도, 날려 보내기도 당신을 움직일 수 없습니다. 피해는 그대로 받습니다.',
+  'hudChrome.auraEffect.breathGuardian.spent':
+    '닻이 다했습니다: 이것이 끝날 때까지 테살리 대장의 고요의 원은 당신을 다시 붙잡을 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.skyMark':
+    '이것이 걸렸을 때 서 있던 자리에 {warn}초 후 번개가 떨어집니다: {radius}미터 안에 {min}~{max}의 피해. 원 밖으로 나가세요. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.drawn':
+    '{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicCMin}에서 {heroicCMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.cradled':
+    '폭풍 속으로 들어 올려져, 수호자가 요람을 유지하는 {hold}초 동안 붙잡힙니다. 그동안 수호자는 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다. 영웅: {heroicCount}명이 한꺼번에 들어 올려지며, 각 방전은 {heroicTotal}이고 {heroicSoakers}명이 필요하니 공격대가 나뉘어 받아야 합니다. 영웅·신화: 반동 피해는 {heroicBMin}에서 {heroicBMax}입니다.',
+  'hudChrome.auraEffect.breathGuardian.stormForm':
+    '찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.',
+  'hudChrome.auraEffect.breathGuardian.swell':
+    '{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해, 앞선 맥동마다 {heroicGrowth}%씩 강해집니다.',
+  'hudChrome.auraEffect.breathGuardian.riding':
+    '바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.thrown':
+    '정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.tossed':
+    '떠도는 돌풍에 날아갔습니다: 돌풍이 내려놓을 때까지 움직일 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.portalA':
+    '효과가 끝나면 당신이 선 자리에 포털 A가 열립니다. 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.portalB':
+    '효과가 끝나면 당신이 선 자리에 포털 B가 열립니다. 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.portalC':
+    '효과가 끝나면 당신이 선 자리에 포털 C가 열립니다. 포털 D와만 이어집니다. 다른 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.portalD':
+    '효과가 끝나면 당신이 선 자리에 포털 D가 열립니다. 포털 C와만 이어집니다. 포털 B에서 떨어진 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.laden':
+    '얽힌 질풍을 나르고 있습니다: 이동 속도가 {walk}%가 되고, 점멸·돌진·도약을 할 수 없으며, 바람도 끌어당김도 폭발도 날려 보내기도 당신을 움직일 수 없습니다. 벼랑 가장자리에서 상호작용을 누르면 공허로 던집니다. 포털은 지름길입니다: 하나에 들어가면 짝 포털로 나옵니다(A에서 B, 신화에서는 C에서 D도). 이 효과가 끝나면 터집니다: {core}야드 안의 모두는 어떤 보호막이 있어도 죽고, 더 멀리 있는 대상은 멀수록 피해가 줄어 {far}야드 이상에서는 최대 생명력의 {floor}%까지 내려갑니다. 공격대에서 멀리 가져가십시오.',
+  'abilityUi.cast.heart_breath_inhale': '들이쉬는 숨',
+  'abilityUi.cast.heart_breath_storm_break': '폭풍 붕괴',
+  'abilityUi.cast.heart_breath_forking_bolt': '튀어 오르는 번개',
+  'abilityUi.cast.heart_breath_thunders_cradle': '천둥의 요람',
+  'abilityUi.cast.heart_breath_drawn_lightning': '끌려오는 번개',
+  'entities.npcs.heart_captain_thessaly.name': '대장 테살리',
+  'entities.npcs.heart_captain_thessaly.title': '하이워치 대장',
+  'entities.npcs.heart_captain_thessaly.greeting':
+    '발을 단단히 딛으세요, {className}. 풀무가 숨을 쉬면 제 고요 속으로 들어와 바람이 우리에게 부딪혀 흩어지게 하세요.',
+  // The Smith's Heart's Guardian of the Quench (M16 fills).
+  'hudChrome.auraEffect.quenchGuardian.marked':
+    '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.quenchAlert.markedTitle': '칼날이 당신을 노립니다! ({count}명 중 {order}번째)',
+  'abilityUi.cast.heart_quench_blades_hunt': '칼날의 사냥',
+  'hudChrome.quenchGuardian.say.flurry':
+    '모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!',
+  'hudChrome.quenchGuardian.say.pull': '내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.',
+  'hudChrome.quenchGuardian.say.intro':
+    '쉿… 호수는 잠들어 있었다. 너희가 냉기를 깨웠으니, 냉기는 결코 용서하지 않으리라.',
+  'hudChrome.quenchGuardian.say.shatter': '속까지 얼었구나. 이제 부서져라.',
+  'hudChrome.quenchGuardian.say.hole': '얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.',
+  'hudChrome.quenchGuardian.say.wake':
+    '대장장이의 칼날들아, 깨어나라! 얼음 위에서 놈들을 사냥하라!',
+  'hudChrome.quenchGuardian.say.cross': '가라, 칼날들아! 놈들을 온기에서 떼어 내라!',
+  'hudChrome.quenchGuardian.say.deepen': '느껴지느냐? 냉기가 더 깊어지고 있다.',
+  'hudChrome.quenchGuardian.say.wipe': '고요하다. 잠잠하다. 담금질되었다.',
+  'hudChrome.quenchGuardian.say.death': '냉기가... 물러난다... 담금질은 너희의 것이다.',
+  'hudChrome.auraEffect.quenchGuardian.cold':
+    '당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 생명의 온기: 받은 치유는 최대 생명력의 {healPct}%마다 냉기를 1씩 낮춥니다(영웅과 신화에서는 {heroicHealPct}%마다). 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '호수의 얼음 아래 얼어붙어 있습니다: 그녀가 얼음을 깨고 나올 때까지 그녀를 공격하거나 피해를 줄 수 없습니다.',
+  'hudChrome.auraEffect.quenchGuardian.warmth':
+    '공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.',
+  'hudChrome.auraEffect.quenchGuardian.frozen':
+    '서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 서리가 차가운 관 같은 무적 효과를 깨뜨립니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}). 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    '모든 공격으로부터 받는 피해가 {pct}% 증가합니다. 이 효과가 지속되는 동안에는 아군의 얼음 파편이 당신의 냉기를 {cap} 넘게 올리지 못합니다.',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    '아군의 부서진 얼음이 튀었습니다: 냉기 +{cold}. 자신의 게이지가 가득 차기 전에 무리로 돌아가세요.',
+  'hudChrome.quenchAlert.splashTitle': '서리 파편! 냉기 +{cold}',
+  'hudChrome.auraEffect.quenchGuardian.trapped':
+    '얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.quenchGuardian.awake':
+    '대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더합니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.quenchGuardian.deepening':
+    '호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회).',
+  'abilityUi.cast.heart_quench_blades_wake': '검의 각성',
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': '냉기',
+  'hudChrome.quenchAlert.freezingTitle': '얼어붙는 중!',
+  'hudChrome.quenchAlert.warmTitle': '모여서 얻은 온기',
+  'hudChrome.quenchAlert.frozenTitle': '서리에 갇힘!',
+  'hudChrome.quenchAlert.waterTitle': '얼음 아래!',
+  'hudChrome.quenchAlert.coldBar': '냉기 {cold} / {max}',
+  'hudChrome.quenchAlert.coldAria': '냉기 {max} 중 {cold}',
+  'hudChrome.quenchAlert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.quenchGuardian.rime':
+    '살아 있는 서리가 다음에 받는 치유를 {left}만큼 흡수합니다(전체 {whole}). 남아 있는 동안 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오르니 무리에서 벗어나십시오. {seconds}초 안에 치유로 깨뜨리면 사라집니다. 깨뜨리지 못하면 즉시 서리에 갇히고, {radius}미터 안의 모두에게 냉기가 터져 냉기 {cold}을 더합니다(영웅과 신화에서는 {heroicCold}). 일반: 1명에게 {normalAbsorb}. 영웅: {heroicTargets}명에게 {heroicAbsorb}, 터지면 가장 가까운 다른 플레이어에게 새 서리가 옮겨 갑니다. 신화: 영웅과 같으며 {mythicTargets}명.',
+  'hudChrome.auraEffect.quenchGuardian.rimePool':
+    '살아 있는 서리: 깨뜨리려면 최대 생명력의 {pct}%만큼 치유가 더 필요합니다. 걸린 뒤 {seconds}초 안에 깨지 못하면 서리에 갇히고 {radius}미터 안의 모두에게 냉기가 터집니다.',
+  'hudChrome.auraEffect.quenchGuardian.rimeSlow':
+    '살아 있는 서리로 느려짐: 서리가 치유로 깨지거나 터질 때까지 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오릅니다.',
+  'hudChrome.quenchAlert.rimeTitle': '살아 있는 서리! 무리에서 벗어나십시오',
+  'hudChrome.quenchAlert.rimeBar': '서리 {left} / {whole}',
+  'hudChrome.quenchAlert.rimeAria': '살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음',
+  'hudChrome.heatGuardian.say.pull':
+    '너희는 최초의 불꽃 속으로 걸어 들어왔다. 그 무엇도 변하지 않고는 나가지 못한다.',
+  'hudChrome.heatGuardian.say.wipe': '재다, 너희 모두. 화로는 계속 타오른다.',
+  'hudChrome.heatGuardian.say.death': '불꽃이... 돌 속으로... 가라앉는다. 잘 지니고 가라.',
   'hudChrome.guildHall.title': '등불 회관',
   'hudChrome.guildHall.close': '길드 창 닫기',
   'hudChrome.guildHall.tabsLabel': '등불 회관 항목',
@@ -25491,6 +26400,143 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.godlike': '{name}님이 신의 경지에 올랐습니다!',
   'hudChrome.hill.callout.legendary': '{name}님이 전설이 되었습니다!',
   'hudChrome.hill.callout.shutDown': '{killer}님이 {victim}님의 연속 처치를 끊었습니다!',
+  'abilityUi.cast.heart_final_leaping_bolt': '튀어 오르는 번개',
+  'abilityUi.cast.heart_final_anvil': '모루의 무게',
+  'hudChrome.auraEffect.finalBoss.stateHeat':
+    '열기를 마십니다: 현무암 주먹이 플레이어가 선 자리를 내리치고 거기서 용암 너울 세 줄기가 굴러 나옵니다. 그 별인 불의 회오리가 깨어나 전투가 끝날 때까지 이어집니다: 높이 치솟은 불기둥이 바닥을 가로지릅니다. 영웅에서는 불씨 표식이 원거리 플레이어 발밑에 불을 떨어뜨리고, 신화에서는 정면 공격이 대장간 불을 남깁니다.',
+  'hudChrome.auraEffect.finalBoss.stateQuench':
+    '담금질을 마십니다. 그 별인 교차하는 칼날이 깨어나 전투가 끝날 때까지 이어집니다: 얼음 검이 표식이 찍힌 플레이어를 지나는 선을 휩쓸고 그 선 위의 기둥을 모두 부숩니다. 영웅에서는 표식이 찍힌 플레이어 발밑의 얼음이 깨지고, 신화에서는 정면 공격이 이동 속도를 {slow}% 낮춥니다.',
+  'hudChrome.auraEffect.finalBoss.stateBreath':
+    '숨결을 마십니다: 튀어 오르는 번개가 서로 {jump}미터 안에 있는 플레이어 사이를 튑니다. 그 별인 하늘의 일격이 깨어나 전투가 끝날 때까지 이어집니다: 번개가 플레이어 발밑에 떨어지고, 기둥 옆에 떨어진 번개는 기둥 주위로 호를 그리며 기둥을 충전합니다. 영웅에서는 끌어당긴 번개가 플레이어에게 표식을 남기고, 신화에서는 폭풍 구슬을 각각 한 명이 받아야 합니다.',
+  'hudChrome.auraEffect.finalBoss.stateHammer':
+    '망치를 마십니다: 진동 균열이 플레이어 발밑에서 터집니다. 그 별인 돌의 각성이 깨어나 전투가 끝날 때까지 이어집니다: 기둥이 바닥에서 솟구쳐 교차하는 칼날에 부서질 때까지 남습니다. 영웅에서는 돌 껍질이 치유를 흡수합니다.',
+  'hudChrome.auraEffect.finalBoss.stateRing':
+    '중앙 원 안에서는 어느 구역의 힘도 마시지 않습니다: 깨어난 별은 모두 {pace}% 속도로 움직입니다. 생명력이 {pct}%보다 높으면 그곳에서 매초 풀려난 심장 중첩을 얻습니다.',
+  'hudChrome.auraEffect.finalBoss.overloadHeat':
+    '열기의 과부하, {value}% 찼습니다. 우두머리가 열기 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
+  'hudChrome.auraEffect.finalBoss.overloadQuench':
+    '담금질의 과부하, {value}% 찼습니다. 우두머리가 담금질 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
+  'hudChrome.auraEffect.finalBoss.overloadBreath':
+    '숨결의 과부하, {value}% 찼습니다. 우두머리가 숨결 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
+  'hudChrome.auraEffect.finalBoss.overloadHammer':
+    '망치의 과부하, {value}% 찼습니다. 우두머리가 망치 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
+  'hudChrome.auraEffect.finalBoss.unbound':
+    '중첩마다 매초 공격대 전체에 {per}의 피해를 주며(현재 {total}), 중앙 원 안에 서 있는 동안 매초 중첩이 쌓입니다. 원 밖으로 끌어내면 끝납니다. 영웅: 중첩당 {heroicPer}. 신화: 중첩당 {mythicPer}.',
+  'hudChrome.auraEffect.finalBoss.shaken':
+    '이 효과가 지속되는 동안 구역 전환이 {mult}배 강하게 적중합니다({baseMin}~{baseMax} 대신 {min}~{max}의 피해). 전환할 때마다 {seconds}초로 갱신됩니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
+  'hudChrome.auraEffect.finalBoss.skyMark':
+    '{seconds}초 후 당신이 선 자리에 번개가 떨어집니다: {radius}미터 안의 모두에게 {min}~{max}의 자연 피해. 자리를 벗어나세요. 기둥에서 {arcReach}미터 안에 떨어진 번개는 기둥 주위로 호를 그리며 기둥을 폭풍으로 충전합니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.',
+  'hudChrome.auraEffect.finalBoss.bladeMark':
+    '교차하는 칼날이 당신을 지나는 선을 겨눕니다: 선은 당신을 따라오다가 날아가기 {lock}초 전에 고정됩니다. 선을 기둥에 통과시켜 부순 뒤 선에서 벗어나세요. 선 위의 모두가 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.',
+  'hudChrome.auraEffect.finalBoss.anvilMark':
+    '모루의 무게가 당신을 따라옵니다: {radius}미터 원이 당신과 함께 움직이다가 떨어지기 {lock}초 전에 고정됩니다. 공격대를 원 안에 모으세요: {total}의 물리 피해를 안에 있는 모두가 나누어 받으며, {fewer}명 미만이면 각자 1.5배를 받습니다. 영웅: {heroicTotal}. 신화: {mythicTotal}.',
+  'hudChrome.auraEffect.finalBoss.strikeHeat':
+    '작열하는 화상: 매초 {total}의 화염 피해를 받습니다({stacks}중첩마다 {per}). {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 우두머리가 서 있는 구역의 원소 중첩을 부여합니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅: 중첩마다 {heroicPer}, 일격은 중첩마다 {heroicGrowth}% 강화. 신화: 중첩마다 {mythicPer}, {mythicGrowth}% 강화.',
+  'hudChrome.auraEffect.finalBoss.strikeQuench':
+    '살을 에는 서리: 이동 속도가 {pct}% 감소합니다({stacks}중첩마다 {per}%, 최대 {cap}%). {freeze}중첩부터는 일격마다 발밑에 굳어가는 서리를 남깁니다: {radius}야드 얼음 고리가 {warn}초 후 닫히며 안에 남은 대상을 {frozen}초 동안 얼립니다. 고리 밖으로 나가세요. 기존 중첩을 서리로 바꾸는 일격은 이를 남기지 않습니다. {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅과 신화에서는 중첩마다 {heroicGrowth}%와 {mythicGrowth}% 강화됩니다.',
+  'hudChrome.auraEffect.finalBoss.strikeBreath':
+    '정전기: 받는 마법 피해가 {pct}% 증가합니다. {from}중첩부터 {arcEvery}초마다 번개가 당신에게서 {reach}미터 내 모든 아군에게 튀어 {arcMin}~{arcMax}의 자연 피해를 주며, 추가 중첩마다 {arcGrowth}% 강해집니다: 공격대를 {reach}미터 떨어뜨리세요. {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅 번개: {heroicArcMin}~{heroicArcMax}. 신화 번개: {mythicArcMin}~{mythicArcMax}.',
+  'hudChrome.auraEffect.finalBoss.strikeHammer':
+    '갈라진 갑옷: 방어도가 {pct}% 감소합니다({stacks}중첩마다 {per}%, 방어도의 {floor}% 아래로는 내려가지 않음). {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅: 중첩마다 {heroicPer}%. 신화: 중첩마다 {mythicPer}%.',
+  'hudChrome.auraEffect.finalBoss.frozen': '살을 에는 서리에 꽁꽁 얼어붙음: {seconds}초 동안 기절.',
+  'hudChrome.auraEffect.finalBoss.rime':
+    '굳어가는 서리가 {seconds}초 후 발밑에서 닫힙니다: {radius}야드 안의 모든 대상이 {frozen}초 동안 얼어붙습니다. 고리 밖으로 나가세요.',
+  'hudChrome.auraEffect.finalBoss.fusionSteam':
+    '열기와 담금질의 원소 융합: {seconds}초 후 들어간 구역에 짙은 끓는 증기 구름이 피어올라 떠다니며, 안에 있는 자를 매초 태웁니다. 구름 밖에 있으세요.',
+  'hudChrome.auraEffect.finalBoss.fusionMagma':
+    '열기와 망치의 원소 융합: {seconds}초 후 마그마 균열이 플레이어들에게 표식을 남기고, 각자의 발밑에서 분출하여 용암 웅덩이를 남깁니다. 표식 대상은 공격대에서 멀어지세요.',
+  'hudChrome.auraEffect.finalBoss.fusionFirestorm':
+    '열기와 숨결의 원소 융합: {seconds}초 후 방을 가로지르는 화염 폭풍의 길이 표시되고, 화염 벽이 그 길을 따라 휩씁니다. 길에서 벗어나세요.',
+  'hudChrome.auraEffect.finalBoss.fusionHail':
+    '담금질과 숨결의 원소 융합: {seconds}초 후 들어간 구역에 몇 초 동안 우박 폭풍이 쏟아지며, 우박은 바닥의 작은 원에 떨어집니다. 원에서 벗어나세요.',
+  'hudChrome.auraEffect.finalBoss.fusionAvalanche':
+    '담금질과 망치의 원소 융합: {seconds}초 후 얼음과 바위 가시가 벽에서 중앙으로 줄지어 달립니다. 줄 사이의 틈에 서세요.',
+  'hudChrome.auraEffect.finalBoss.fusionSpires':
+    '숨결과 망치의 원소 융합: {seconds}초 후 들어간 구역에 폭풍 첨탑이 솟아 충전되고, 바닥에 표시된 선을 따라 번개가 첨탑에서 첨탑으로 뜁니다. 두 첨탑 사이에 절대 서지 마세요.',
+  'hudChrome.auraEffect.finalBoss.magmaMark':
+    '마그마 균열: {seconds}초 후 당신의 발밑에서 균열이 분출하여 {radius}미터 내 모두에게 {min}~{max}의 화염 피해를 주고, {life}초 동안 타오르는 용암 웅덩이를 남깁니다(매초 {poolMin}~{poolMax}의 화염 피해). 분출하기 전에 공격대에서 멀어지세요. 영웅: {heroicMin}~{heroicMax}. 신화: {mythicMin}~{mythicMax}.',
+  'hudChrome.auraEffect.finalBoss.polarityFire':
+    '대립하는 원소, 화염: 얼음 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 취소되지 않은 짝마다 한 번씩 줍니다.',
+  'hudChrome.auraEffect.finalBoss.polarityIce':
+    '대립하는 원소, 얼음: 화염 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 취소되지 않은 짝마다 한 번씩 줍니다.',
+  'hudChrome.auraEffect.finalBoss.polarityEarth':
+    '대립하는 원소, 대지: 번개 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 취소되지 않은 짝마다 한 번씩 줍니다.',
+  'hudChrome.auraEffect.finalBoss.polarityLightning':
+    '대립하는 원소, 번개: 대지 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 취소되지 않은 짝마다 한 번씩 줍니다.',
+  'hudChrome.auraEffect.finalBoss.underIce': '기절 상태: 깨지는 얼음 아래로 떨어졌습니다.',
+  'hudChrome.auraEffect.finalBoss.numbing':
+    '정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.',
+  'hudChrome.auraEffect.finalBoss.ember':
+    '{seconds}초 후 발밑에 잉걸불이 떨어져 반경 {radius}미터 웅덩이로 {life}초 동안 타오르며, 그 안의 모두에게 매초 {min}~{max}의 화염 피해를 줍니다. 표식이 찍힌 다른 플레이어와 같은 구석에 모였다가 빠져나가세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
+  'hudChrome.auraEffect.finalBoss.drawn':
+    '{seconds}초 동안 매초 당신에게서 {reach}미터 안의 다른 모든 플레이어에게 번개가 튀어 각각 {min}~{max}의 자연 피해를 줍니다. 모두에게서 {reach}미터 떨어지세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
+  'hudChrome.auraEffect.finalBoss.shell': '다음에 받는 치유 {value}을(를) 흡수합니다.',
+  'hudChrome.finalOverload.title': '과부하',
+  'hudChrome.finalOverload.quench': '담금질',
+  'hudChrome.finalOverload.breath': '숨결',
+  'hudChrome.finalOverload.hammer': '망치',
+  'hudChrome.finalOverload.shaken': '흔들림 {seconds}',
+  'hudChrome.finalOverload.unbound': '풀려남 x{stacks}',
+  'hudChrome.finalOverload.barAria': '{quarter} 과부하 {pct}퍼센트',
+  'hudChrome.finalOverload.activeAria': '현재 구역: {quarter}',
+  'hudChrome.finalOverload.groupAria': '애시그랜드: 과부하 막대',
+  'hudChrome.auraEffect.finalBoss.phaseFight':
+    '생명력이 {first}%와 {second}%가 되면 보호막을 두른 채 중앙으로 걸어 들어가, 가장 많이 찬 구역마다 파편을 하나씩 불러냅니다. {final}%에서는 네 구역이 모두 깨어나 마지막 저항이 시작됩니다.',
+  'abilityUi.cast.heart_final_call': '네 구역의 부름',
+  'abilityUi.cast.heart_final_shearing_blow': '베어 가르는 일격',
+  'abilityUi.cast.heart_final_gale_pounce': '돌풍 덮치기',
+  'abilityUi.cast.heart_final_fusion': '원소 융합',
+  'abilityUi.cast.heart_final_rime_toll': '서리 종소리',
+  'abilityUi.cast.heart_breath_cradle_channel': '천둥의 요람',
+  'abilityUi.cast.heart_breath_mending_gale': '치유의 질풍',
+  'entities.mobs.heart_final_splinter_heat.name': '열기의 파편',
+  'entities.mobs.heart_final_splinter_quench.name': '담금질의 파편',
+  'entities.mobs.heart_final_splinter_breath.name': '숨결의 파편',
+  'entities.mobs.heart_final_splinter_hammer.name': '망치의 파편',
+  'hudChrome.auraEffect.finalBoss.phaseCall':
+    '네 구역의 부름: 파편이 살아 있는 동안 {seconds}초 동안 중앙에서 보호받습니다. 파편 하나마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 모두 처치하면 보호막이 일찍 깨집니다. 부름이 끝날 때 살아 있는 파편은 전투가 끝날 때까지 그 원소를 우두머리에게 쏟아붓습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
+  'hudChrome.finalOverload.titleUnmade': '무너지는 모루',
+  'hudChrome.finalOverload.kneeling': '무릎을 꿇었다',
+  'hudChrome.finalOverload.rising': '심장이 고동친다',
+  'hudChrome.finalOverload.fallsIn': '{quarter} 붕괴까지 {seconds}',
+  'hudChrome.finalOverload.ringFallsIn': '고리 붕괴까지 {seconds}',
+  'hudChrome.finalOverload.allFallen': '아무것도 남지 않았다',
+  'hudChrome.auraEffect.finalBoss.phaseKneel': '무릎을 꿇었다. 어떤 공격도 통하지 않는다.',
+  'hudChrome.auraEffect.finalBoss.phaseRebirth':
+    '심장이 고동친다. 생명력 {percent}%로 일어설 때까지 어떤 공격도 통하지 않는다.',
+  'hudChrome.auraEffect.finalBoss.unmade':
+    '{every}초마다 모루의 구역 하나가 통째로 무너진다. 과부하 막대가 가장 찼던 구역부터 {warn}초의 균열 경고 후에 떨어진다. 그 위에 선 자는 함께 떨어져 죽는다. 마지막 구역이 무너지고 {ring}초 뒤 중앙 고리가 부서져 모두 죽는다.',
+  'hudChrome.auraEffect.finalBoss.phaseFinal':
+    '네 구역이 모두 깨어났습니다: 중앙 원에 머물며 네 별이 모두 {pace}% 속도로 동시에 움직입니다. 기둥, 번개, 칼날, 회오리가 한꺼번에 몰아칩니다. {enrage}초 후에는 모든 절제를 잃습니다(주인 없는 분노).',
+  'hudChrome.auraEffect.finalBoss.shield':
+    '모은 힘: 모든 피해에 면역이며 대상으로 지정할 수 없습니다.',
+  'hudChrome.auraEffect.finalBoss.pouredHeat':
+    '열기가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 불의 회오리가 일어납니다.',
+  'hudChrome.auraEffect.finalBoss.pouredQuench':
+    '담금질이 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 교차하는 칼날이 방을 휩쓸니다.',
+  'hudChrome.auraEffect.finalBoss.pouredBreath':
+    '숨결이 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 하늘의 일격이 떨어집니다.',
+  'hudChrome.auraEffect.finalBoss.pouredHammer':
+    '망치가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 기둥이 솟구칩니다.',
+  'hudChrome.auraEffect.finalBoss.fury':
+    '주인 없는 분노: {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 지금 처치하십시오. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
+  'hudChrome.auraEffect.finalBoss.coal':
+    '{seconds}초 후 석탄이 터집니다: 당신으로부터 {reach}미터 안의 다른 모든 플레이어에게 {min}~{max}의 화염 피해, 당신에게 {selfMin}~{selfMax}. 지금 무리를 떠나십시오. 영웅: 각각 {heroicMin}에서 {heroicMax}, {heroicSelfMin}에서 {heroicSelfMax}의 피해. 신화: 각각 {mythicMin}에서 {mythicMax}, {mythicSelfMin}에서 {mythicSelfMax}.',
+  'hudChrome.auraEffect.finalBoss.tether':
+    '숨결의 파편이 {seconds}초 동안 당신을 쫓습니다. 그 몰아치는 돌풍은 파편으로부터 {reach}미터 안의 다른 모든 사람에게 매초 {min}~{max}의 자연 피해를 줍니다: 파편을 무리에서 떼어 놓으십시오. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
+  'hudChrome.auraEffect.finalBoss.chill':
+    '{seconds}초 동안 이동 속도가 {pct}% 감소합니다: 담금질 고리를 틈이 아닌 곳으로 넘었습니다.',
+  'hudChrome.auraEffect.finalBoss.weight':
+    '매초 {total}의 물리 피해를 입힙니다(중첩당 {per}). 중첩마다 망치의 파편이 당신을 {step}% 더 세게 칩니다(현재 {harder}%). {seconds}초 동안 지속되며, 탱커는 {swap}중첩에서 교대합니다. 중첩당 받는 피해 증가는 영웅에서 {heroicStep}%, 신화에서 {mythicStep}%입니다.',
+  'hudChrome.finalOverload.call': '보호막 {seconds}',
+  'hudChrome.finalOverload.enrage': '격노까지 {seconds}',
+  'hudChrome.finalOverload.fury': '주인 없는 분노 x{stacks}',
+  'hudChrome.finalOverload.poured': '쏟아부어진 원소: {elements}',
+  'hudChrome.finalOverload.pouredTimes': '{quarter} x{times}',
+  'hudChrome.finalOverload.splinters': '파편 {count}',
+  'hudChrome.finalOverload.striding': '중앙으로 이동 중',
+  'hudChrome.finalOverload.titleCall': '네 구역의 부름',
+  'hudChrome.finalOverload.titleFinal': '모든 구역 각성',
   'hudChrome.auraEffect.seasonalCosmetic': '외형 전용: 전투에 영향 없음',
   'seasonal.event.gourdlight_eve.name': '고드라이트 축제의 밤',
   'seasonal.trickOrTreat.row': '과자 안 주면 장난칠 거야!',
@@ -25677,4 +26723,348 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '밭에 밤이 내린다! 누가 내 밭을 걷느냐?',
   'seasonal.thatchgrin.sleepYell': '해가 떴군. 기둥으로 돌아가 다시 지켜봐야지.',
   'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'entities.mobs.heart_gale_sentinel.name': '질풍 파수병',
+  'entities.mobs.heart_gale_mender.name': '질풍 치유사',
+  'hudChrome.auraEffect.breathGuardian.cocoon':
+    '수호자는 하늘가름 회오리를 정신 집중하는 동안 피해를 입지 않습니다. 정신 집중이 끝나면 회오리가 어떤 보호막이 있어도 모두를 죽입니다. 테살리 대장의 상승 기류를 타고 동쪽과 서쪽의 떠 있는 섬으로 건너가 고요석 두 개를 정신 집중해 끊으십시오: {stilled}/2 잠재움. 고요석은 그 섬의 적이 쓰러지면 깨어납니다. 섬 위의 모두가 동시에 정신 집중할 수 있으며, 많이 할수록 빨리 찹니다. 공격을 받으면 당신의 정신 집중은 끊기지만 돌의 진행도는 남습니다.',
+  'hudChrome.auraEffect.breathGuardian.ward':
+    '정면 {arc}도 안에서 들어오는 공격의 피해를 {cut}% 흘려냅니다. 대상이 이것을 돌려세운 동안 등을 공격하십시오. 영웅 및 신화: {heroicCut}%.',
+  'hudChrome.breathGuardian.say.thessaly_updraft': '섬 정리 완료! 다음 상승 기류가 떴다, 가라!',
+  'hudChrome.breathGuardian.say.thessaly_stone': '돌이 깨어났다! 정신 집중해, 아무것에도 맞지 마!',
+  'abilityUi.cast.heart_breath_skyrend_nova': '하늘가름 회오리',
+  'abilityUi.cast.heart_breath_shoving_gale': '밀쳐내는 돌풍',
+  'abilityUi.cast.kituse_heart_still_the_gale': '돌풍 잠재우기',
+  'entities.mobs.heart_gust_herald.name': '돌풍 전령',
+  'entities.mobs.heart_riven_squall.name': '갈라진 스콜',
+  'entities.mobs.heart_squall_fragment.name': '스콜 파편',
+  'entities.mobs.heart_squall_shieldbearer.name': '스콜 방패병',
+  'entities.mobs.heart_breath_stillstone.name': '고요석',
+  'hudChrome.knotAlert.aTitle': '당신은 포털 A!',
+  'hudChrome.knotAlert.bTitle': '당신은 포털 B!',
+  'hudChrome.knotAlert.cTitle': '당신은 포털 C!',
+  'hudChrome.knotAlert.dTitle': '당신은 포털 D!',
+  'hudChrome.knotAlert.carryTitle': '얽힌 질풍을 나르는 중!',
+  'hudChrome.knotAlert.lipTitle': '지금 던지세요!',
+  'hudChrome.knotAlert.throwKey': '가장자리에서 {key}를 눌러 던지기',
+  'hudChrome.knotAlert.throwTap': '가장자리에서 여기를 탭해 던지기',
+  'hudChrome.knotAlert.throwClick': '가장자리에서 여기를 클릭해 던지기',
+  'hudChrome.knotAlert.throwAria': '얽힌 질풍을 공허로 던지기',
+  // The Smith's Heart's voice lines: kill lines, new barks and the Masterless Strength (M16 fills).
+  'hudChrome.council.say.guardian_collapse': '그렇다면 채석장 전체가 무너져라!',
+  'hudChrome.council.say.guardian_slay_a': '망치 아래 원석처럼, 부서졌다.',
+  'hudChrome.council.say.guardian_slay_b': '힘을 훔치려는 손이 하나 줄었다.',
+  'hudChrome.council.say.singer_hush': '광맥을 침묵시키겠다고? 노래는 더 커질 뿐이에요.',
+  'hudChrome.council.say.singer_slay_a': '당신의 목소리도 이제 광맥과 함께해요.',
+  'hudChrome.council.say.singer_slay_b': '들려요? 음 하나가 줄었네요.',
+  'hudChrome.breathGuardian.say.guardian_roar': '정상의 포효를 들어라!',
+  'hudChrome.breathGuardian.say.guardian_knot': '내 폭풍을 들어 보아라, 네 팔이 견딜 수 있다면.',
+  'hudChrome.breathGuardian.say.guardian_slay_a': '또 하나를 바람에게 내주었다.',
+  'hudChrome.breathGuardian.say.guardian_slay_b': '하늘은 떨어지는 자를 붙잡지 않는다.',
+  'hudChrome.breathGuardian.say.guardian_slay_c': '네 마지막 숨은 내 것이다.',
+  'hudChrome.quenchGuardian.say.breath': '깊은 냉기를 들이마셔라.',
+  'hudChrome.quenchGuardian.say.slay_a': '담금질되고... 부서졌다.',
+  'hudChrome.quenchGuardian.say.slay_b': '이제 식었구나. 이제 조용하구나.',
+  'hudChrome.quenchGuardian.say.slay_c': '호수는 앗아 간 것을 돌려주지 않는다.',
+  'hudChrome.heatGuardian.say.wheel': '화로가 돈다! 그 걸음에 맞춰라, 아니면 타 버려라!',
+  'hudChrome.heatGuardian.say.slay_a': '또 하나의 불티가 불꽃의 품으로 돌아간다.',
+  'hudChrome.heatGuardian.say.slay_b': '깨끗이 태워졌다.',
+  'hudChrome.heatGuardian.say.slay_c': '최초의 불꽃이 제 몫을 거둔다.',
+  'hudChrome.finalBoss.say.arrivalWake':
+    '누가 산의 심장을 깨우는가? 따뜻한 숨결... 아무것도 숨 쉬지 않는 이곳에서.',
+  'hudChrome.finalBoss.say.arrivalRise':
+    '돌이여, 일어나라. 우리에게 묶여라. 우리를 빚은 손은 떠났으니, 우리가 우리 자신을 빚는다.',
+  'hudChrome.finalBoss.say.arrivalRoar': '우리는 대장장이의 힘이며, 우리에게는 주인이 없다!',
+  'hudChrome.finalBoss.say.pull':
+    '너희는 그 피 속에 네 줄기 광맥을 품고 있다. 우리가 그것을 되찾고, 너희 위로 산을 봉인하리라.',
+  'hudChrome.finalBoss.say.drinkHeat': '최초의 불꽃이 우리를 채운다!',
+  'hudChrome.finalBoss.say.drinkQuench': '차가운 물이여, 우리를 단단하게 하라!',
+  'hudChrome.finalBoss.say.drinkBreath': '불어라, 풀무여! 폭풍을 일으켜라!',
+  'hudChrome.finalBoss.say.drinkHammer': '내리쳐라, 망치여! 우리를 무겁게 하라!',
+  'hudChrome.finalBoss.say.burst': '광맥이 넘친다! 그 속에 잠겨라!',
+  'hudChrome.finalBoss.say.anvil': '세상의 무게를 짊어져라!',
+  'hudChrome.finalBoss.say.call': '우리 힘의 파편들이여, 광맥에서 일어나라! 심장을 지켜라!',
+  'hudChrome.finalBoss.say.callAgain': '다시! 모든 광맥이여, 너희의 자식들을 우리에게 바쳐라!',
+  'hudChrome.finalBoss.say.shattered':
+    '우리의 파편이... 산산이 부서졌다. 그렇다면 남은 것으로 싸우리라.',
+  'hudChrome.finalBoss.say.poured': '그래... 우리 안으로 쏟아져라. 모든 광맥이, 하나의 몸으로.',
+  'hudChrome.finalBoss.say.final': '이제 그만! 모든 광맥을 한꺼번에! 산 전체가 너희 위로 무너진다!',
+  'hudChrome.finalBoss.say.fury': '우리를 막을 손은 없다. 우리의 힘에는 끝이 없다!',
+  'hudChrome.finalBoss.say.kneel': '이것이... 그분이 느낀 것인가... 눕는다는 것... 마침내...',
+  'hudChrome.finalBoss.say.rebirth': '아니. 산은 두 번 잠들지 않는다!',
+  'hudChrome.finalBoss.say.collapse':
+    '무너져라, 돌이여! 우리가 산을 지킬 수 없다면, 아무도 그 위에 서지 못한다!',
+  'hudChrome.finalBoss.say.anvilsEnd': '모루가 끝난다. 모든 것이 끝난다.',
+  'hudChrome.finalBoss.say.slay_a': '돌 속으로 돌아가라.',
+  'hudChrome.finalBoss.say.slay_b': '네 피는 광맥으로 돌아간다.',
+  'hudChrome.finalBoss.say.slay_c': '또 하나의 온기를 봉인했다.',
+  'hudChrome.finalBoss.say.wipe': '봉인되었다. 고요하다. 그분이 바란 대로.',
+  'hudChrome.finalBoss.say.death':
+    '그 손은... 결코 돌아오지 않았다. 불씨 하나가 아직 타오른다... 그것을 가져가라. 그리고 산을 잠들게 하라.',
+  // The Smith's Heart tank swaps (quench_temper.ts, breath_blow.ts).
+  'abilityUi.cast.heart_breath_bellows_blow': '풀무 강타',
+  'abilityUi.cast.heart_breath_thunder_lash': '천둥 채찍',
+  'hudChrome.auraEffect.breathGuardian.blown':
+    '풀무 강타에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.blowMark':
+    '시전이 끝나면 풀무 강타가 당신을 강타합니다: {min}~{max}의 자연 피해를 입고 숨결의 수호자 반대 방향으로 곧장 {yards}야드 날아갑니다. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.blowMarkRuin':
+    '시전이 끝나면 풀무 강타가 당신을 강타합니다: {min}~{max}의 자연 피해를 입고 숨결의 수호자 반대 방향으로 곧장 벼랑 밖으로 날아갑니다. 테살리 대장의 닻만이 당신을 붙잡아 줍니다. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.battered':
+    '다음 풀무 강타는 당신을 숨결의 수호자 반대 방향으로 곧장 {next}야드 날려 보냅니다({stacks}중첩: 중첩마다 더 멀리). 당신을 맞히는 풀무 강타마다 1중첩이 쌓이고 지속시간이 {seconds}초로 초기화됩니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화에서는 {heroicRuin}중첩일 때의 강타가 당신을 벼랑 밖으로 날려 보냅니다. 일반에서는 항상 가장자리 앞에서 멈춥니다.',
+  'hudChrome.auraEffect.breathGuardian.thunderLaden':
+    '받는 자연 피해와 기타 마법 피해가 {pct}% 증가합니다({stacks}중첩, 중첩당 {per}%). 당신을 맞히는 천둥 채찍마다 {min}~{max}의 자연 피해를 입고 1중첩이 쌓이며 지속시간이 {seconds}초로 초기화됩니다. {draw}중첩부터는 모든 튀어 오르는 번개가 당신에게도 튑니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.',
+  'hudChrome.auraEffect.quenchGuardian.tempered':
+    '담금질 일격에 {stacks}번 담금질되었습니다: 냉기가 {floor} 아래로 내려가지 않고, 받는 냉기 피해가 {pct}% 증가합니다. 당신을 맞히는 담금질 일격마다 1중첩이 쌓이고(중첩당 냉기 {cold}, 냉기 피해 {per}%) 지속시간이 {seconds}초로 초기화됩니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화에서는 {heroicMax}중첩이 냉기를 {max}로 유지해 얼어붙습니다. 일반은 최대 {normalMax}중첩(냉기 {normalFloor})입니다.',
+  'hudChrome.knotAlert.batteredTitle': '바람에 시달림 x{stacks}: 탱커 교대!',
+  'hudChrome.knotAlert.chargedTitle': '천둥 충전 x{stacks}: 탱커 교대!',
+  'hudChrome.knotAlert.ruinTitle': '풀무 강타가 당신을 가장자리 밖으로 날립니다!',
+  'hudChrome.tankSwap.swapTitle': '교대 x{stacks}',
+  'hudChrome.auraEffect.forgeFury.gathering':
+    '용광로의 분노는 전투 시작 {minutes}분 후에 찾아옵니다. 이 효과가 끝나면 {every}초마다 전투 중인 모두를 태웁니다: 먼저 최대 생명력의 {share}%, 그다음 {share2}%, 세 번째에는 어떤 보호막이 있어도 모두 죽습니다. 그 전에 우두머리를 쓰러뜨리십시오. 영웅 및 신화 전용이며, 우두머리가 피해를 입지 않는 동안에는 절대 오지 않습니다.',
+  'hudChrome.auraEffect.forgeFury.fury':
+    '전투가 {minutes}분을 넘겼습니다. 용광로의 분노가 {every}초마다 전투 중인 모두를 태웁니다: 먼저 최대 생명력의 {share}%, 그다음 {share2}%, 세 번째에는 어떤 보호막이 있어도 모두 죽습니다. 전투가 끝날 때까지 지속됩니다.',
+  'hudChrome.tankSwap.timeAria': '약화 효과 {seconds}초 남음',
+  'hudChrome.tankBuster.weight': '망치의 무게',
+  'hudChrome.tankBuster.blow': '풀무 강타',
+  'hudChrome.tankBuster.thunder': '천둥 채찍',
+  'hudChrome.tankBuster.tempering': '담금질 일격',
+  'hudChrome.tankBuster.strike': '원소 일격',
+  'hudChrome.tankBuster.shear': '베어 가르는 일격',
+  'hudChrome.tankBuster.brand': '샘의 낙인',
+  'hudChrome.tankBuster.onYou': '당신에게',
+  'hudChrome.tankBuster.seconds': '{seconds}초',
+  'hudChrome.tankBuster.timeAria': '{name}이(가) {seconds}초 후 당신을 칩니다',
+  'hudChrome.liveCoal.title': '살아있는 숯불',
+  'hudChrome.liveCoal.absorb': '치유 필요 {absorb}',
+  'hudChrome.liveCoal.fuseAria': '폭발까지 {seconds}초',
+  'hudChrome.quenchAlert.temperedTitle': '탱커 교대! x{stacks}',
+  'hudChrome.raidAtlas.canvasAria': '공격대 지도',
+  'hudChrome.raidAtlas.subtitle.one': '{floor}: 우두머리 {total}명 중 {defeated}명 처치',
+  'hudChrome.raidAtlas.subtitle.other': '{floor}: 우두머리 {total}명 중 {defeated}명 처치',
+  'hudChrome.raidAtlas.north': '북',
+  'hudChrome.raidAtlas.scale': '{yards}야드',
+  'hudChrome.raidAtlas.floorsAria': '지도 페이지',
+  'hudChrome.raidAtlas.floor.veins': '광맥',
+  'hudChrome.raidAtlas.floor.heart': '심장부',
+  'hudChrome.raidAtlas.youAreHere': '현재 위치',
+  'hudChrome.raidAtlas.room.cleft': '균열',
+  'hudChrome.raidAtlas.room.gallery': '망치 회랑',
+  'hudChrome.raidAtlas.room.quarry': '대장장이의 채석장',
+  'hudChrome.raidAtlas.room.balcony': '발코니',
+  'hudChrome.raidAtlas.room.ring': '고리 회랑',
+  'hudChrome.raidAtlas.room.dais': '봉인의 단',
+  'hudChrome.raidAtlas.room.cornice': '폭풍 절벽',
+  'hudChrome.raidAtlas.room.bridge': '바람의 다리',
+  'hudChrome.raidAtlas.room.basin': '담금질 분지',
+  'hudChrome.raidAtlas.room.hearth': '화덕',
+  'hudChrome.raidAtlas.room.castingFloor': '주조장',
+  'hudChrome.raidAtlas.room.anvil': '세계의 모루',
+  'hudChrome.raidAtlas.room.terrace': '도착 테라스',
+  'hudChrome.raidAtlas.zoomIn': '확대',
+  'hudChrome.raidAtlas.zoomOut': '축소',
+  'hudChrome.raidAtlas.reset': '지도 전체 보기',
+  'hudChrome.raidAtlas.pinTool': '핀 놓기',
+  'hudChrome.raidAtlas.pinToolHint': '핀 도구 켜짐: 지도를 탭하거나 클릭해 핀을 놓으세요',
+  'hudChrome.raidAtlas.pinStyle': '핀 모양',
+  'hudChrome.raidAtlas.pinEdit': '핀 편집',
+  'hudChrome.raidAtlas.removePin': '핀 제거',
+  'hudChrome.raidAtlas.clearPins': '모든 핀 제거',
+  'hudChrome.raidAtlas.done': '완료',
+  'hudChrome.raidAtlas.pinIconsAria': '핀 아이콘',
+  'hudChrome.raidAtlas.pinColorsAria': '핀 색상',
+  'hudChrome.raidAtlas.pinIcon.star': '별',
+  'hudChrome.raidAtlas.pinIcon.flag': '깃발',
+  'hudChrome.raidAtlas.pinIcon.skull': '해골',
+  'hudChrome.raidAtlas.pinIcon.swords': '검',
+  'hudChrome.raidAtlas.pinIcon.shield': '방패',
+  'hudChrome.raidAtlas.pinIcon.diamond': '마름모',
+  'hudChrome.raidAtlas.pinColor.gold': '금색',
+  'hudChrome.raidAtlas.pinColor.red': '빨강',
+  'hudChrome.raidAtlas.pinColor.blue': '파랑',
+  'hudChrome.raidAtlas.pinColor.green': '초록',
+  'hudChrome.raidAtlas.pinColor.purple': '보라',
+  'hudChrome.raidAtlas.pinColor.white': '흰색',
+  'hudChrome.raidAtlas.legendToggle': '범례',
+  'hudChrome.raidAtlas.legend.you': '나',
+  'hudChrome.raidAtlas.legend.member': '공격대원',
+  'hudChrome.raidAtlas.legend.boss': '우두머리',
+  'hudChrome.raidAtlas.legend.engaged': '전투 중인 우두머리',
+  'hudChrome.raidAtlas.legend.defeated': '처치한 우두머리',
+  'hudChrome.raidAtlas.legend.portal': '차원문',
+  'hudChrome.raidAtlas.legend.entrance': '입구',
+  'hudChrome.raidAtlas.legend.pin': '내 핀',
+  'hudChrome.raidAtlas.legend.shared': '공격대 징표(공유)',
+  'hudChrome.raidAtlas.shared.tool': '공격대 징표',
+  'hudChrome.raidAtlas.shared.title': '공격대 징표',
+  'hudChrome.raidAtlas.shared.symbolsAria': '공격대 징표 기호',
+  'hudChrome.raidAtlas.shared.placeHint':
+    '지도를 누르거나 클릭해 파티에 {marker} 징표를 놓습니다. 공격대 징표를 누르거나 클릭하면 지워집니다.',
+  'hudChrome.raidAtlas.shared.clearAll': '모두 지우기',
+  'hudChrome.raidAtlas.shared.noteEditable': '파티원 모두가 이 징표를 봅니다.',
+  'hudChrome.raidAtlas.shared.readOnly': '공격대장만 공격대 징표를 놓을 수 있습니다.',
+  'hudChrome.raidAtlas.legend.river': '수호자에게 이어지는 빛의 길',
+  'hudChrome.raidAtlas.hintDesktop':
+    '휠로 확대와 축소, 드래그로 이동, 더블클릭으로 확대합니다. 지도를 우클릭하면 핀을 놓고, 핀을 우클릭하면 제거하며, 핀을 클릭하면 모양을 바꿉니다.',
+  'hudChrome.raidAtlas.hintTouch':
+    '두 손가락으로 확대와 축소, 드래그로 이동합니다. 핀 도구를 켠 뒤 지도를 탭하면 핀을 놓고, 핀을 탭하면 모양을 바꾸거나 제거합니다.',
+  'hudChrome.raidAtlas.boss.aria': '우두머리: {name}, {state}',
+  'hudChrome.raidAtlas.boss.state.alive': '생존',
+  'hudChrome.raidAtlas.boss.state.engaged': '전투 중',
+  'hudChrome.raidAtlas.boss.state.dead': '처치됨',
+  'hudChrome.raidAtlas.boss.hammer.title': '망치 평의회',
+  'hudChrome.raidAtlas.boss.hammer.subtitle': '{lead}, {partner}',
+  'hudChrome.raidAtlas.boss.hammer.lore':
+    '살아 있는 돌로 된 두 존재가 산을 빚는 힘인 망치를 나누어 지니고 있다. 주인을 잃은 지금도 그들은 마지막 명령을 맹목적으로 따른다. 채석장에 들어오는 모든 것을 부숴라. 이음매 노래꾼이 노래로 바위를 깨우면 수호자가 그것을 내리친다.',
+  'hudChrome.raidAtlas.boss.breath.subtitle': '풀무의 힘',
+  'hudChrome.raidAtlas.boss.breath.lore':
+    '한때 대장장이의 화로에 바람을 불어 넣던 풀무의 숨결은 이제 북쪽 광맥, 허공 위로 솟은 절벽 끝에서 잠들어 있다. 그 수호자는 살아 있는 바람으로 엮인 화강암과 수정이며, 그 돌풍은 공격대를 돌 위에서 날려 버릴 만큼 강하다.',
+  'hudChrome.raidAtlas.boss.quench.subtitle': '얼어붙은 호수의 여왕',
+  'hudChrome.raidAtlas.boss.quench.lore':
+    '담금질은 칼날을 단단하게 만드는 차가운 물이며, 그 힘은 동쪽 광맥의 얼어붙은 호수 아래에서 잠들어 있다. 그 수호자는 어두운 점판암과 얼음으로 된 거인 여인으로, 서리 왕관을 쓰고 가슴에는 냉기의 별이 타오른다. 그녀는 주먹으로 싸우며, 그 주먹이 내리치는 곳마다 호수가 갈라진다.',
+  'hudChrome.raidAtlas.boss.heat.subtitle': '샘의 거인',
+  'hudChrome.raidAtlas.boss.heat.lore':
+    '화덕에는 대장장이의 가장 오래된 불꽃, 살아 있는 수정과 검은 현무암에 봉인된 백금빛 불이 깃들어 있다. 그 수호자는 샘에 허리까지 잠긴 채 사람 일곱 명만큼 높이 서 있으며 결코 그곳을 떠나지 않는다. 공격대가 불꽃에게 다가가야 한다.',
+  'hudChrome.raidAtlas.boss.final.subtitle': '하나가 된 네 광맥',
+  'hudChrome.raidAtlas.boss.final.lore':
+    '쏜피크가 되어 눕기 전, 대장장이는 봉인이 수백 년을 버티도록 자신의 힘을 넷으로 나누었다. 이곳 세계의 모루에서 네 광맥이 하나의 생각 없는 몸으로 모여들고 있다. 그것은 주인의 마지막 일을 끝내려 한다. 숨 쉬는 모든 것을 안에 둔 채 산을 영원히 봉인하는 일을.',
+  'hudChrome.worldMarkers.button': '위치 표시기',
+  'hudChrome.worldMarkers.buttonArmed': '{marker} 놓는 중',
+  'hudChrome.worldMarkers.title': '위치 표시기',
+  'hudChrome.worldMarkers.flyoutAria': '위치 표시기',
+  'hudChrome.worldMarkers.tip':
+    '파티를 위해 바닥에 위치를 표시합니다. 표시기를 고른 뒤 놓을 지면을 클릭하세요. 이 인스턴스 안에 있는 파티원 모두가 바닥과 지도에서 볼 수 있습니다.',
+  'hudChrome.worldMarkers.tipTouch':
+    '파티를 위해 바닥에 위치를 표시합니다. 표시기를 고른 뒤 놓을 지면을 누르세요. 이 인스턴스 안에 있는 파티원 모두가 바닥과 지도에서 볼 수 있습니다.',
+  'hudChrome.worldMarkers.tileTip':
+    '클릭한 다음 지면을 클릭하면 그곳에 놓습니다. 다시 놓으면 옮겨집니다. 지면을 오른쪽 클릭하거나 Esc 키를 누르면 취소합니다.',
+  'hudChrome.worldMarkers.tileTipTouch':
+    '누른 다음 지면을 누르면 그곳에 놓습니다. 다시 놓으면 옮겨집니다.',
+  'hudChrome.worldMarkers.tileRemove': '오른쪽 클릭: 제거합니다.',
+  'hudChrome.worldMarkers.tileRemoveTouch': '길게 누르기: 제거합니다.',
+  'hudChrome.worldMarkers.tileAria': '{marker} 위치 표시기',
+  'hudChrome.worldMarkers.tileAriaPlaced': '{marker} 위치 표시기, 놓음',
+  'hudChrome.worldMarkers.clearAll': '모두 지우기',
+  'hudChrome.worldMarkers.clearAllTip':
+    '이 인스턴스에서 파티가 놓은 위치 표시기를 모두 제거합니다.',
+  'hudChrome.worldMarkers.readOnly': '공격대장만 위치 표시기를 놓을 수 있습니다.',
+  'hudChrome.worldMarkers.bindPlace': '위치 표시기 놓기: {marker}',
+  'hudChrome.worldMarkers.bindClear': '위치 표시기 모두 지우기',
+  'hudChrome.raidTargets.menuRow': '공격대 대상 아이콘',
+  'hudChrome.raidTargets.menuRowTip':
+    '이 대상의 머리 위에 여덟 가지 공격대 대상 아이콘 중 하나를 표시합니다. 파티 전체가 볼 수 있으며, 각 아이콘은 한 번에 한 대상에만 표시됩니다.',
+  'hudChrome.raidTargets.bindCategory': '공격대 대상 아이콘',
+  'hudChrome.raidTargets.bindSet': '대상 표시: {marker}',
+  'hudChrome.raidTargets.bindClear': '대상 표시 지우기',
+  'hudChrome.raidTargets.frameMark': '표시됨: {marker}',
+  'hudChrome.pings.bindCategory': '핑',
+  'hudChrome.pings.bindPing': '핑',
+  'hudChrome.pings.wheelAria': '핑 휠',
+  'hudChrome.pings.cancel': '취소',
+  'hudChrome.pings.kindLook': '여기 보세요',
+  'hudChrome.pings.kindAttack': '공격',
+  'hudChrome.pings.kindWarning': '경고',
+  'hudChrome.pings.kindOnMyWay': '가는 중',
+  'hudChrome.pings.kindAssist': '지원',
+  'hudChrome.pings.chatLine': '{name}: {callout}',
+  'hudChrome.pings.calloutAttackUnit': '{target} 공격',
+  'hudChrome.pings.calloutAssistUnit': '{target} 지원',
+  'hudChrome.pings.calloutWarningUnit': '경고, {target}',
+  'hudChrome.pings.calloutOnMyWayUnit': '{target}에게 가는 중',
+  'hudChrome.pings.calloutLookUnit': '{target} 보세요',
+  'hudChrome.pings.enableSetting': '핑 사용',
+  'hudChrome.pings.chatSetting': '채팅에 핑 표시',
+  'hudChrome.pings.enableSettingNote':
+    '핑 키를 누르고 있으면 핑 휠이 열리고, 짧게 누르면 커서 아래에 있는 대상에 핑을 보냅니다. 핑은 파티나 공격대원에게만 보이며 5초마다 최대 4번까지 보낼 수 있습니다. 끄면 그룹의 핑도 모두 숨겨집니다: 아이콘, 소리, 채팅 줄, 미니맵 표시가 나타나지 않습니다.',
+  'guide.controls.ping': '핑: 짧게 누르면 커서 아래에 핑, 길게 누르면 핑 휠',
+  'hudChrome.auraEffect.finalBoss.devilThrown':
+    '먼지 회오리에 내던져짐: 회오리바람 밖으로 {yards}야드 날아갑니다. 땅에 내려설 때까지 움직일 수 없습니다.',
+  'hudChrome.breathWind.turning': '바람 방향 전환',
+  'hudChrome.auraEffect.breathGuardian.gust':
+    '정상의 포효의 돌풍이 당신이 던져진 방향으로 몇 초 동안 계속 밀어냅니다(초당 {speed}미터). 수호자 쪽으로 곧장 걸어가 버티거나 세살리의 닻에 서세요. 그러지 않으면 처마 가장자리로 밀려갑니다.',
+  'hudChrome.mobile.journal': '일지',
+  'hudChrome.adventureJournal.title': '모험 일지',
+  'hudChrome.adventureJournal.close': '모험 일지 닫기',
+  'hudChrome.adventureJournal.crumbs': '{instance} | {boss} | {difficulty}',
+  'hudChrome.adventureJournal.browse': '목록',
+  'hudChrome.adventureJournal.navLabel': '던전과 공격대',
+  'hudChrome.adventureJournal.groupDungeons': '던전',
+  'hudChrome.adventureJournal.groupRaids': '공격대',
+  'hudChrome.adventureJournal.expandInstance': '{instance}의 우두머리 보기',
+  'hudChrome.adventureJournal.collapseInstance': '{instance}의 우두머리 숨기기',
+  'hudChrome.adventureJournal.bossProgress': '처치 {defeated}/{total}',
+  'hudChrome.adventureJournal.youAreHere': '현재 위치',
+  'hudChrome.adventureJournal.inCombat': '전투 중',
+  'hudChrome.adventureJournal.kindRaid': '공격대',
+  'hudChrome.adventureJournal.kindDungeon': '던전',
+  'hudChrome.adventureJournal.pageKicker': '{instance} | {kind} | 우두머리 {index}/{total}',
+  'hudChrome.adventureJournal.previousBoss': '이전 우두머리: {boss}',
+  'hudChrome.adventureJournal.nextBoss': '다음 우두머리: {boss}',
+  'hudChrome.adventureJournal.noPreviousBoss': '첫 번째 우두머리입니다',
+  'hudChrome.adventureJournal.noNextBoss': '마지막 우두머리입니다',
+  'hudChrome.adventureJournal.councilMembers': '의회 구성원',
+  'hudChrome.adventureJournal.mythic': '신화',
+  'hudChrome.adventureJournal.sectionsLabel': '일지 항목',
+  'hudChrome.adventureJournal.tabOverview': '개요',
+  'hudChrome.adventureJournal.tabAbilities': '능력',
+  'hudChrome.adventureJournal.tabLoot': '전리품',
+  'hudChrome.adventureJournal.comingSoon': '출시 예정',
+  'hudChrome.adventureJournal.comingSoonBody':
+    '신화 난이도는 아직 벼려지는 중입니다. 열리면 능력, 수치, 보상이 여기에 기록됩니다.',
+  'hudChrome.adventureJournal.readTier': '{difficulty} 보기',
+  'hudChrome.adventureJournal.strategyHeading': '역할별 공략',
+  'hudChrome.adventureJournal.watchFor': '주의할 능력',
+  'hudChrome.adventureJournal.jumpToAbility': '능력에서 {ability} 보기',
+  'hudChrome.adventureJournal.roleNothing':
+    '이 역할만 대응할 능력은 없습니다. 모든 역할 공통 항목을 따르세요.',
+  'hudChrome.adventureJournal.abilityCountPlural.one': '능력 {count}개',
+  'hudChrome.adventureJournal.abilityCountPlural.other': '능력 {count}개',
+  'hudChrome.adventureJournal.lootLabel': '{difficulty} 전리품',
+  'hudChrome.adventureJournal.lootNone':
+    '이 우두머리는 {difficulty}에서 아이템을 떨어뜨리지 않습니다.',
+  'hudChrome.adventureJournal.lootFrom': '획득처: {boss}',
+  'hudChrome.adventureJournal.targetButton': '모험 일지에서 이 우두머리 열기',
+  'hudChrome.adventureJournal.bannerKicker': '{instance}, 우두머리 {index}/{total}',
+  'hudChrome.adventureJournal.bossCount': '{defeated}/{total}',
+  'hudChrome.adventureJournal.statusNext': '다음 차례',
+  'hudChrome.adventureJournal.searchLabel': '우두머리 검색',
+  'hudChrome.adventureJournal.searchPlaceholder': '우두머리 또는 인스턴스 검색',
+  'hudChrome.adventureJournal.searchResults': '찾은 우두머리',
+  'hudChrome.adventureJournal.searchEmpty': '우두머리를 찾을 수 없습니다',
+  'hudChrome.adventureJournal.searchClear': '검색 지우기',
+  'hudChrome.adventureJournal.searchCount.one': '우두머리 {count}명을 찾았습니다',
+  'hudChrome.adventureJournal.searchCount.other': '우두머리 {count}명을 찾았습니다',
+  'hudChrome.adventureJournal.lootScopeLabel': '표시할 전리품',
+  'hudChrome.adventureJournal.lootScopeBoss': '이 우두머리',
+  'hudChrome.adventureJournal.lootScopeInstance': '모든 우두머리',
+  'hudChrome.adventureJournal.lootNoneInstance':
+    '{instance}의 우두머리는 {difficulty} 난이도에서 아이템을 떨어뜨리지 않습니다.',
+  'hudChrome.adventureJournal.lootShowAll': '모든 직업 보기',
+  'hudChrome.adventureJournal.lootHiddenPlural.one':
+    '다른 직업이나 전문화용 전리품이 {count}개 더 있습니다.',
+  'hudChrome.adventureJournal.lootHiddenPlural.other':
+    '다른 직업이나 전문화용 전리품이 {count}개 더 있습니다.',
+  'hudChrome.adventureJournal.mythicSoon': '신화: 출시 예정',
+  'hudChrome.adventureJournal.roleEveryone': '모두',
+  'hudChrome.adventureJournal.aboutHeading': '전투 소개',
+  'hudChrome.adventureJournal.openList': '모든 던전과 공격대 보기',
+  'hudChrome.adventureJournal.phaseRangeWhole': '전투 내내',
+  'hudChrome.adventureJournal.phaseRangeBand': '{from}~{to}',
+  'hudChrome.adventureJournal.phaseRangeToEnd': '{from}~끝까지',
+  'hudChrome.adventureJournal.phaseRangeAt': '{marks}에서',
+  'hudChrome.adventureJournal.factDamage': '{min}~{max}의 피해',
+  'hudChrome.adventureJournal.factDamageArcane': '{min}~{max}의 비전 피해',
+  'hudChrome.adventureJournal.factDamageFire': '{min}~{max}의 화염 피해',
+  'hudChrome.adventureJournal.factDamageFrost': '{min}~{max}의 냉기 피해',
+  'hudChrome.adventureJournal.factDamageNature': '{min}~{max}의 자연 피해',
+  'hudChrome.adventureJournal.factDamagePhysical': '{min}~{max}의 물리 피해',
+  'hudChrome.adventureJournal.factDamageShadow': '{min}~{max}의 암흑 피해',
+  'hudChrome.adventureJournal.factEvery': '{seconds}초마다',
+  'hudChrome.adventureJournal.progressLabel': '이 우두머리에 대한 내 진행도',
+  'hudChrome.adventureJournal.killsLabel': '내 처치 횟수',
+  'hudChrome.adventureJournal.killsCell': '{difficulty} 처치: {count}',
+  'hudChrome.adventureJournal.savedBosses': '{difficulty} 귀속: 우두머리 {saved}/{total}',
+  'hudChrome.adventureJournal.savedInstance': '{difficulty} 귀속',
+  'hudChrome.adventureJournal.resetsIn': '{time} 후 초기화, {when}',
+  'hudChrome.adventureJournal.defeatedThisWeek': '이번 주 처치함',
+  'hudChrome.adventureJournal.defeatedToday': '오늘 처치함',
 };

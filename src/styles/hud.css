@@ -3503,6 +3503,102 @@
   .absorb-shields-hidden .bar-absorb {
     display: none;
   }
+  /* Heal-absorb overlay (heal_absorb_bar_view.ts + heal_absorb_overlay.ts): an icy
+     hatch laid OVER current health, from the health edge inward, covering the
+     health a heal absorb (Living Rime, Stone Shell) still locks, plus the
+     healing-left number at that edge. The painter writes the two edges as custom
+     properties; the hatch is clipped to them (paint only, never scaled, so the
+     stripes stay crisp at any width) and the number rides a transform. It is
+     actionable, so no graphics tier and no Show Absorb Shields option hides it.
+     The root sets no z-index (no stacking context), so the hatch and the
+     carrier frame sit UNDER the frame's health text (z-index 4) and the raid
+     name, and only the number rides above them. */
+  .bar-heal-absorb {
+    position: absolute;
+    inset: 0;
+    display: none;
+    pointer-events: none;
+  }
+  .bar-heal-absorb.on {
+    display: block;
+  }
+  /* The carrier's whole health bar gets a static ice-blue frame while the absorb
+     holds, so a healer scanning a column of frames spots every carrier at once.
+     No animation: it costs nothing per frame and shows on every tier. */
+  .bar-heal-absorb::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    box-shadow:
+      inset 0 0 0 1px var(--color-heal-absorb-glow),
+      inset 0 0 2px var(--color-heal-absorb-glow);
+  }
+  .bar-heal-absorb-fill {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    clip-path: inset(0 calc(100% - var(--heal-absorb-end, 0%)) 0 var(--heal-absorb-start, 0%));
+    background:
+      linear-gradient(
+        to right,
+        transparent var(--heal-absorb-start, 0%),
+        var(--color-heal-absorb-edge) var(--heal-absorb-start, 0%),
+        var(--color-heal-absorb-edge) calc(var(--heal-absorb-start, 0%) + 2px),
+        transparent calc(var(--heal-absorb-start, 0%) + 2px)
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        var(--color-heal-absorb-stripe) 0 1.5px,
+        transparent 1.5px 5px
+      ),
+      linear-gradient(to bottom, var(--color-heal-absorb-wash-top), var(--color-heal-absorb-wash));
+  }
+  .bar-heal-absorb-text {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* Right edge on the health edge, but never closer than 3.6em to the bar's
+       left end, so a nearly dead unit's number stays inside the bar. */
+    transform: translateX(max(calc(var(--heal-absorb-end, 0%) - 100%), calc(3.6em - 100%)));
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1;
+    white-space: nowrap;
+    padding-right: 3px;
+    color: var(--color-heal-absorb-text);
+    /* An ink halo instead of a box: legible over the hatch, the bare health
+       fill and the frame's own health text alike. */
+    text-shadow:
+      1px 0 0 var(--color-heal-absorb-chip),
+      -1px 0 0 var(--color-heal-absorb-chip),
+      0 1px 0 var(--color-heal-absorb-chip),
+      0 -1px 0 var(--color-heal-absorb-chip),
+      1px 1px 0 var(--color-heal-absorb-chip),
+      -1px -1px 0 var(--color-heal-absorb-chip),
+      1px -1px 0 var(--color-heal-absorb-chip),
+      -1px 1px 0 var(--color-heal-absorb-chip),
+      0 0 3px var(--color-heal-absorb-chip);
+  }
+  .bar-heal-absorb-text:empty {
+    display: none;
+  }
+  /* Forced colors strips gradient backgrounds and text shadows; the locked
+     health stays visible as a solid system-color block. */
+  @media (forced-colors: active) {
+    .bar-heal-absorb-fill {
+      background: Mark;
+    }
+    .bar-heal-absorb::before {
+      box-shadow: none;
+      outline: 1px solid Mark;
+      outline-offset: -1px;
+    }
+  }
   /* Low-mana/energy warning: the resource fill pulses brighter and a short
      caption appears at the end of the bar. Driven by --lr-opacity / --lr-pulse
      set from the HUD (intensity scales as the bar nears empty). */
@@ -11635,6 +11731,98 @@
     opacity: var(--lhv-opacity);
   }
 
+  /* ---------- Quench frost and water screen effects ---------- */
+  /* The Guardian of the Quench's screen effects, self-mounted by
+     src/ui/hud/dungeon/quench_screen_painter.ts from quench_screen_view.ts.
+     The frost: a frosty blue border creeping in from the edges as the cold bar
+     fills (--hqs-frost, 0 to 1), deepest and whitest frozen solid. It starts
+     at 62 percent of the corner distance (inside the sides, which sit at
+     about 71 percent, so the first frost already shows on every edge) and
+     its clear middle shrinks to the inner 42 percent of that distance and
+     never further; the middle never frosts, so the raid stays readable. The water: a blue tint while
+     the player is held in a hole. The overlay mounts just before #nameplates
+     (outside #ui) at the nameplates' own z-index, so it paints over the 3D
+     world but under every nameplate and every HUD frame: the raid stays in
+     view. Every tier draws the same coverage; it never takes the pointer. */
+  #heart-quench-screen {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 1;
+    pointer-events: none;
+    --hqs-frost: 0;
+    --hqs-clear: calc(62% - var(--hqs-frost) * 20%);
+  }
+  #heart-quench-screen .hqs-water,
+  #heart-quench-screen .hqs-frost {
+    position: absolute;
+    inset: 0;
+  }
+  #heart-quench-screen .hqs-water {
+    background: radial-gradient(
+      ellipse at center,
+      var(--color-quench-water-centre) 0%,
+      var(--color-quench-water-edge) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease-out;
+  }
+  #heart-quench-screen.is-submerged .hqs-water {
+    opacity: 1;
+  }
+  #heart-quench-screen .hqs-frost {
+    background:
+      var(--quench-frost-texture),
+      radial-gradient(
+        ellipse at center,
+        var(--color-quench-frost-clear) 24%,
+        var(--color-quench-frost-haze) 62%,
+        var(--color-quench-frost-rim) 100%
+      );
+    background-size:
+      360px 360px,
+      100% 100%;
+    -webkit-mask-image: radial-gradient(
+      ellipse at center,
+      transparent var(--hqs-clear),
+      var(--color-quench-mask) calc(var(--hqs-clear) + 24%)
+    );
+    mask-image: radial-gradient(
+      ellipse at center,
+      transparent var(--hqs-clear),
+      var(--color-quench-mask) calc(var(--hqs-clear) + 24%)
+    );
+    opacity: min(0.95, calc(0.25 + var(--hqs-frost) * 3));
+    transition: box-shadow 0.25s ease-out;
+  }
+  #heart-quench-screen.is-frozen .hqs-frost {
+    opacity: 1;
+    box-shadow:
+      inset 0 0 28px 14px var(--color-quench-frost-glint-core),
+      inset 0 0 180px 64px var(--color-quench-frost-glint);
+    filter: brightness(1.18);
+  }
+  /* Motion-calming: the fades snap, on all three axes. */
+  @media (prefers-reduced-motion: reduce) {
+    #heart-quench-screen .hqs-water,
+    #heart-quench-screen .hqs-frost {
+      transition: none;
+    }
+  }
+  body.reduce-motion #heart-quench-screen .hqs-water,
+  body.reduce-motion #heart-quench-screen .hqs-frost,
+  :root[data-fx-level="low"] #heart-quench-screen .hqs-water,
+  :root[data-fx-level="low"] #heart-quench-screen .hqs-frost {
+    transition: none;
+  }
+  /* Forced colours: the effects carry no information the cold bar does not,
+     and a forced palette would flatten them to opaque fills. */
+  @media (forced-colors: active) {
+    #heart-quench-screen {
+      display: none !important;
+    }
+  }
+
   /* ---------- death overlay ---------- */
   #death-overlay {
     position: absolute;
@@ -12184,17 +12372,326 @@
   #party-frames.party-header-collapsed #party-frame-header .ui-icon {
     transform: none;
   }
-  #party-frames.party-header-collapsed > :is(.party-rows, .party-boss-guide-button, .party-loot) {
+  #party-frames.party-header-collapsed > :is(.party-rows, .party-loot) {
     display: none;
   }
-  .party-boss-guide-button {
+  #adventure-journal-window .aj-boss:focus-visible,
+  #adventure-journal-window .aj-instance-toggle:focus-visible,
+  #adventure-journal-window .aj-tab:focus-visible,
+  #adventure-journal-window .aj-step:focus-visible,
+  #adventure-journal-window .aj-crumb:focus-visible,
+  #adventure-journal-window .aj-strip-boss:focus-visible,
+  #adventure-journal-window .aj-close:focus-visible,
+  #adventure-journal-window .aj-model-jump:focus-visible,
+  #adventure-journal-window .aj-ab-row:focus-visible,
+  #adventure-journal-window .aj-phase-toggle:focus-visible,
+  #adventure-journal-window .aj-watch-link:focus-visible,
+  #adventure-journal-window .aj-soon-tier:focus-visible,
+  #adventure-journal-window .aj-loot-row:focus-visible,
+  #tf-journal:focus-visible,
+  #adventure-journal-window .aj-diff button:focus-visible,
+  #adventure-journal-window .aj-loot-scope-btn:focus-visible,
+  #adventure-journal-window .aj-search-clear:focus-visible,
+  #adventure-journal-window .rbg-model-load:focus-visible,
+  #adventure-journal-window .rbg-model-stage > canvas:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* A ping's chat callout (src/ui/hud/pings/ping_chat_line.ts): the kind's icon,
+     the sender, the callout words in the kind's colour token and the unit's name
+     in its reaction colour, so it reads apart from party talk at a glance. */
+  .ping-chat-line.ping-kind-0 {
+    --ping-color: var(--color-ping-look);
+  }
+  .ping-chat-line.ping-kind-1 {
+    --ping-color: var(--color-ping-attack);
+  }
+  .ping-chat-line.ping-kind-2 {
+    --ping-color: var(--color-ping-warning);
+  }
+  .ping-chat-line.ping-kind-3 {
+    --ping-color: var(--color-ping-on-my-way);
+  }
+  .ping-chat-line.ping-kind-4 {
+    --ping-color: var(--color-ping-assist);
+  }
+  .ping-chat-icon {
+    width: 1.25em;
+    height: 1.25em;
+    margin-right: 0.3em;
+    vertical-align: -0.28em;
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--ping-color) 60%, transparent));
+  }
+  .ping-chat-callout {
+    color: var(--ping-color);
+    font-weight: 700;
+  }
+  .ping-chat-target {
+    font-weight: 700;
+  }
+  .ping-chat-target.is-hostile {
+    color: var(--color-hostile);
+  }
+  .ping-chat-target.is-friendly {
+    color: var(--color-friendly);
+  }
+  .ping-chat-target.is-neutral {
+    color: var(--color-neutral);
+  }
+  /* Party pings (src/ui/hud/pings/): the hold wheel centred on the cursor (the
+     root is a zero-size anchor moved by transform; everything inside is placed
+     around it) and the icons on the minimap. Kind colours are the ping tokens. */
+  .ping-wheel {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    z-index: 60;
+    pointer-events: none;
+    --ping-wheel-size: 280px;
+  }
+  .ping-wheel .ping-kind-0 {
+    --ping-color: var(--color-ping-look);
+  }
+  .ping-wheel .ping-kind-1 {
+    --ping-color: var(--color-ping-attack);
+  }
+  .ping-wheel .ping-kind-2 {
+    --ping-color: var(--color-ping-warning);
+  }
+  .ping-wheel .ping-kind-3 {
+    --ping-color: var(--color-ping-on-my-way);
+  }
+  .ping-wheel .ping-kind-4 {
+    --ping-color: var(--color-ping-assist);
+  }
+  .ping-wheel-ring {
+    position: absolute;
+    left: calc(var(--ping-wheel-size) / -2);
+    top: calc(var(--ping-wheel-size) / -2);
+    width: var(--ping-wheel-size);
+    height: var(--ping-wheel-size);
+    overflow: visible;
+    filter: drop-shadow(0 4px 14px color-mix(in srgb, var(--color-ping-glass) 70%, transparent));
+  }
+  .ping-wheel.is-open .ping-wheel-ring,
+  .ping-wheel.is-open .ping-wheel-slot {
+    animation: ping-wheel-open calc(150ms * var(--motion-scale, 1)) cubic-bezier(0.2, 1.4, 0.4, 1)
+      both;
+  }
+  @keyframes ping-wheel-open {
+    from {
+      opacity: 0;
+      scale: 0.72;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+  /* The wheel in the house panel recipe: dark glass, a dark keyline outside a
+     fine gold edge, gold studs in the gaps. A wedge sits dark with a faint
+     tint of its kind; the lit one glows its kind's colour from the centre out
+     (the per-kind radial gradients the controller builds) and its painted icon
+     and label light up in that colour. */
+  .ping-wheel-backdrop {
+    fill: color-mix(in srgb, var(--color-ping-glass) 82%, transparent);
+    stroke: none;
+  }
+  .ping-wheel-keyline {
+    fill: none;
+    stroke: var(--color-ping-glass);
+    stroke-width: 4;
+  }
+  .ping-wheel-rim {
+    fill: none;
+    stroke: var(--color-gold-600);
+    stroke-width: 1.6;
+  }
+  .ping-wheel-stud {
+    fill: var(--color-gold-500);
+    stroke: var(--color-ping-glass);
+    stroke-width: 1.2;
+  }
+  .ping-wheel-glow-core {
+    stop-color: var(--ping-color);
+    stop-opacity: 0.05;
+  }
+  .ping-wheel-glow-mid {
+    stop-color: var(--ping-color);
+    stop-opacity: 0.32;
+  }
+  .ping-wheel-glow-edge {
+    stop-color: var(--ping-color);
+    stop-opacity: 0.66;
+  }
+  .ping-wheel-wedge {
+    fill: color-mix(in srgb, var(--ping-color) 9%, var(--color-ping-glass));
+    fill-opacity: 0.9;
+    stroke: color-mix(in srgb, var(--ping-color) 28%, transparent);
+    stroke-width: 1;
+    transition:
+      fill calc(90ms * var(--motion-scale, 1)) ease-out,
+      stroke calc(90ms * var(--motion-scale, 1)) ease-out;
+  }
+  .ping-wheel-wedge.is-lit {
+    fill-opacity: 1;
+    stroke: var(--ping-color);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 12px var(--ping-color));
+  }
+  .ping-wheel-wedge.ping-kind-1.is-lit {
+    fill: url(#ping-wheel-glow-1);
+  }
+  .ping-wheel-wedge.ping-kind-2.is-lit {
+    fill: url(#ping-wheel-glow-2);
+  }
+  .ping-wheel-wedge.ping-kind-3.is-lit {
+    fill: url(#ping-wheel-glow-3);
+  }
+  .ping-wheel-wedge.ping-kind-4.is-lit {
+    fill: url(#ping-wheel-glow-4);
+  }
+  .ping-wheel-center circle {
+    fill: var(--color-ping-glass);
+    stroke: var(--color-gold-600);
+    stroke-width: 1.6;
+  }
+  .ping-wheel-x {
+    fill: none;
+    stroke: color-mix(in srgb, var(--color-text-light) 70%, transparent);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+  .ping-wheel-center.is-lit circle {
+    stroke: var(--color-hostile);
+    stroke-width: 2.5;
+  }
+  .ping-wheel-center.is-lit .ping-wheel-x {
+    stroke: var(--color-text-light);
+  }
+  .ping-wheel-slot {
+    position: absolute;
+    left: -40px;
+    top: -40px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+  /* The painted icons carry their own dark outline; the glow is their colour. */
+  .ping-wheel-icon {
+    width: 52px;
+    height: 52px;
+    opacity: 0.86;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--ping-color) 55%, transparent))
+      drop-shadow(0 2px 2px var(--color-ping-glass));
+    transition:
+      scale calc(90ms * var(--motion-scale, 1)) ease-out,
+      opacity calc(90ms * var(--motion-scale, 1)) ease-out;
+  }
+  .ping-wheel-slot.is-lit .ping-wheel-icon {
+    scale: 1.18;
+    opacity: 1;
+    filter: drop-shadow(0 0 10px var(--ping-color)) drop-shadow(0 2px 2px var(--color-ping-glass));
+  }
+  .ping-wheel-label {
+    font: 700 12px / 1.1 var(--font-display);
+    letter-spacing: 0.6px;
+    color: var(--color-text-light);
+    text-shadow:
+      0 1px 2px var(--color-ping-glass),
+      0 0 4px var(--color-ping-glass);
+    white-space: nowrap;
+  }
+  /* Cream over the lit glow (the kind's colour on its own glow loses contrast),
+     haloed in that colour. */
+  .ping-wheel-slot.is-lit .ping-wheel-label {
+    color: var(--color-text-light);
+    text-shadow:
+      0 1px 2px var(--color-ping-glass),
+      0 0 3px var(--color-ping-glass),
+      0 0 10px var(--ping-color);
+  }
+  .ping-wheel-cancel {
+    position: absolute;
+    left: -40px;
+    top: 16px;
+    width: 80px;
+    text-align: center;
+    font: 600 9px / 1 var(--font-ui);
+    color: color-mix(in srgb, var(--color-text-light) 75%, transparent);
+    opacity: 0;
+  }
+  .ping-wheel.is-center .ping-wheel-cancel {
+    opacity: 1;
+  }
+  .ping-minimap-layer {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 162px;
+    height: 162px;
+    pointer-events: none;
+    line-height: 0;
+  }
+  .ping-minimap-mark {
+    position: absolute;
+    left: -9px;
+    top: -9px;
+    width: 18px;
+    height: 18px;
+  }
+  .ping-minimap-mark img {
+    width: 18px;
+    height: 18px;
+    filter: drop-shadow(0 0 2px var(--color-ping-glass));
+    animation: ping-minimap-pulse calc(1100ms * var(--motion-scale, 1)) ease-out infinite;
+  }
+  .ping-minimap-mark.is-edge img {
+    width: 14px;
+    height: 14px;
+    margin: 2px;
+    opacity: 0.85;
+  }
+  @keyframes ping-minimap-pulse {
+    0% {
+      scale: 1.35;
+    }
+    35% {
+      scale: 1;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ping-wheel.is-open .ping-wheel-ring,
+    .ping-wheel.is-open .ping-wheel-slot,
+    .ping-minimap-mark img {
+      animation: none;
+    }
+  }
+  /* The raid's world markers (src/ui/hud/world_markers/): the party-column
+     button (the boss guide's family) and its flyout of the eight symbols. */
+  .party-world-markers {
+    position: relative;
     width: 170px;
+  }
+  #party-frames.party-header-collapsed > .party-world-markers {
+    display: none;
+  }
+  .party-world-markers-button {
+    width: 100%;
     min-height: 30px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 7px;
-    padding: 5px 8px;
+    padding: 4px 8px;
     border: 1px solid var(--gold-dim);
     border-radius: 4px;
     background: var(--panel-bg);
@@ -12205,190 +12702,1419 @@
     cursor: var(--cursor-point);
     box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold) 7%, transparent);
   }
-  .party-boss-guide-button:hover,
-  .party-boss-guide-button:focus-visible {
+  .party-world-markers-button:hover,
+  .party-world-markers-button:focus-visible,
+  .party-world-markers.is-open .party-world-markers-button {
     border-color: var(--gold);
     color: var(--color-text-light);
   }
-  .party-boss-guide-button:focus-visible,
-  #raid-boss-guide-window .rbg-boss-tab:focus-visible,
-  #raid-boss-guide-window .rbg-segmented button:focus-visible,
-  #raid-boss-guide-window .rbg-model-load:focus-visible,
-  #raid-boss-guide-window .rbg-model-stage > canvas:focus-visible {
+  .party-world-markers.is-armed .party-world-markers-button {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 45%, transparent),
+      0 0 10px color-mix(in srgb, var(--gold) 35%, transparent);
+  }
+  .party-world-markers.is-read-only .party-world-markers-button {
+    opacity: 0.62;
+  }
+  .party-world-markers-glyph {
+    width: 17px;
+    height: 17px;
+    flex: none;
+  }
+  .party-world-markers-label {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .party-world-markers-chevron {
+    width: 0;
+    height: 0;
+    flex: none;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 5px solid currentColor;
+  }
+  .party-world-markers-flyout {
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 0;
+    z-index: 5;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    padding: 7px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+  }
+  .party-world-markers.is-open .party-world-markers-flyout {
+    display: flex;
+  }
+  .party-world-markers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 36px);
+    gap: 5px;
+  }
+  .party-world-markers-tile {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--gold-dim);
+    border-radius: 5px;
+    background: var(--panel-bg);
+    cursor: var(--cursor-point);
+  }
+  .party-world-markers-tile:hover,
+  .party-world-markers-tile:focus-visible {
+    border-color: var(--gold);
+  }
+  .party-world-markers-tile.is-placed {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 8px color-mix(in srgb, var(--gold) 40%, transparent);
+  }
+  .party-world-markers-tile.is-armed {
+    border-color: var(--color-text-light);
+    box-shadow: 0 0 9px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+  .party-world-markers-tile-glyph {
+    width: 26px;
+    height: 26px;
+    opacity: 0.78;
+  }
+  .party-world-markers-tile.is-placed .party-world-markers-tile-glyph,
+  .party-world-markers-tile.is-armed .party-world-markers-tile-glyph {
+    opacity: 1;
+  }
+  .party-world-markers-tile-key {
+    position: absolute;
+    right: 2px;
+    top: 1px;
+    color: var(--color-text-light);
+    font-size: 9px;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .party-world-markers-clear {
+    min-height: 26px;
+    padding: 3px 8px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .party-world-markers-clear:hover:not(:disabled),
+  .party-world-markers-clear:focus-visible {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  .party-world-markers-clear:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .party-world-markers-button:focus-visible,
+  .party-world-markers-tile:focus-visible,
+  .party-world-markers-clear:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
-  .party-boss-guide-button .ui-icon {
-    width: 15px;
-    height: 15px;
-    flex: none;
+  @media (forced-colors: active) {
+    .party-world-markers-tile.is-placed {
+      border-style: double;
+      border-width: 3px;
+    }
+    .party-world-markers-tile.is-armed,
+    .party-world-markers.is-armed .party-world-markers-button {
+      outline: 2px solid Highlight;
+    }
   }
-  #raid-boss-guide-window {
-    top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale, 1));
-    width: min(820px, calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 24px));
-    max-height: min(calc(var(--app-vh, 100vh) * 0.84 / var(--window-scale, 1) - 24px), 760px);
+  /* The Adventure Journal (#adventure-journal-window, src/ui/hud/journal/): the
+     approved clean modern look. A calm dark panel with one amber accent, the
+     system sans at 15px and up with a 1.55 line height, Cinzel only for the
+     boss name, no letter-spaced capitals. Palette: the --color-aj-* tokens. */
+  #adventure-journal-window {
+    --window-pad: 0px;
+    top: calc(var(--app-vh, 100vh) * 0.06 / var(--window-scale, 1));
+    width: min(1240px, calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 24px));
+    max-height: min(calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale, 1) - 16px), 860px);
+    padding: 0;
     overflow: hidden;
-    border-color: color-mix(in srgb, var(--gold) 54%, var(--color-rbg-frame-border-base));
+    /* The light metal frame: a thin bronze edge drawn as a border-box
+       gradient under the panel, plus the corner marks (.aj-corner). */
+    border: 2px solid transparent;
+    outline: 0;
+    border-radius: 14px;
     background:
-      linear-gradient(135deg, var(--color-rbg-frame-flare), transparent 34%),
-      linear-gradient(180deg, var(--color-rbg-frame-start) 0%, var(--color-rbg-frame-end) 100%);
+      linear-gradient(var(--color-aj-win), var(--color-aj-win)) padding-box,
+      linear-gradient(
+        155deg,
+        var(--color-aj-metal-hi),
+        var(--color-aj-metal-lo) 26%,
+        var(--color-aj-metal) 50%,
+        var(--color-aj-metal-lo) 76%,
+        var(--color-aj-metal-hi)
+      )
+      border-box;
+    box-shadow:
+      0 0 0 1px var(--color-aj-shadow),
+      0 30px 80px var(--color-aj-shadow);
+    color: var(--color-aj-text);
+    font: 15px / 1.55 var(--font-aj);
+    -webkit-font-smoothing: antialiased;
   }
-  #raid-boss-guide-window .rbg-head {
+  #adventure-journal-window button {
+    font-family: var(--font-aj);
+  }
+  #adventure-journal-window .aj-glyph {
+    display: block;
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+  #adventure-journal-window > .aj-head {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
+    align-items: center;
+    gap: 12px;
+    height: 52px;
+    margin: 0;
+    padding: 0 60px 0 18px;
+    border-bottom: 1px solid var(--color-aj-line);
+    border-radius: 0;
+    background: var(--color-aj-head);
+    color: var(--color-aj-text);
+    font: 600 16px / 1.2 var(--font-aj);
+    letter-spacing: 0.2px;
+    text-shadow: none;
   }
-  #raid-boss-guide-window .rbg-subtitle {
-    margin-top: 4px;
-    color: var(--color-text-muted);
-    font-family: var(--body-font);
-    font-size: 12px;
-    font-weight: 400;
+  /* The frame's corner marks: one bracket drawn top-left, mirrored. */
+  #adventure-journal-window .aj-corner {
+    position: absolute;
+    /* Above the window's sticky head (z-index 6 in layout.css). */
+    z-index: 7;
+    width: 22px;
+    height: 22px;
+    color: var(--color-aj-metal-hi);
+    pointer-events: none;
   }
-  #raid-boss-guide-window .rbg-shell {
+  #adventure-journal-window .aj-corner svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #adventure-journal-window .aj-corner-tl {
+    top: 2px;
+    left: 2px;
+  }
+  #adventure-journal-window .aj-corner-tr {
+    top: 2px;
+    right: 2px;
+    transform: scaleX(-1);
+  }
+  #adventure-journal-window .aj-corner-bl {
+    bottom: 2px;
+    left: 2px;
+    transform: scaleY(-1);
+  }
+  #adventure-journal-window .aj-corner-br {
+    right: 2px;
+    bottom: 2px;
+    transform: scale(-1);
+  }
+  /* The title emblem: a small bronze lozenge holding the journal glyph. */
+  #adventure-journal-window .aj-title-sigil {
     display: grid;
-    grid-template-columns: 182px minmax(0, 1fr);
-    height: min(
-      calc(var(--app-vh, 100vh) * 0.7 / var(--window-scale, 1)),
-      calc(var(--app-vh, 100vh) * 0.84 / var(--window-scale, 1) - 82px),
-      640px
+    flex: none;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    margin: 0 4px 0 2px;
+    border: 1px solid var(--color-aj-metal);
+    border-radius: 5px;
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-aj-metal-lo),
+      var(--color-aj-well) 80%
     );
-    min-height: 0;
-    max-height: min(
-      calc(var(--app-vh, 100vh) * 0.7 / var(--window-scale, 1)),
-      calc(var(--app-vh, 100vh) * 0.84 / var(--window-scale, 1) - 82px),
-      640px
-    );
-    margin: 10px -10px -10px;
-    border-top: 1px solid var(--color-rbg-divider);
+    box-shadow:
+      0 0 0 2px var(--color-aj-head),
+      0 0 0 3px var(--color-aj-metal-lo);
+    color: var(--color-aj-accent);
+    transform: rotate(45deg);
   }
-  #raid-boss-guide-window .rbg-boss-nav {
+  #adventure-journal-window .aj-title-sigil .ui-icon {
+    width: 16px;
+    height: 16px;
+    transform: rotate(-45deg);
+  }
+  #adventure-journal-window .aj-head-crumb {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--color-aj-mute);
+    font-size: 14px;
+    font-weight: 400;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #adventure-journal-window > .aj-head > .aj-close {
+    inset-inline-end: 12px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-aj-soft);
+  }
+  #adventure-journal-window > .aj-head > .aj-close:hover {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-close .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  #adventure-journal-window .aj-shell {
+    position: relative;
+    display: grid;
+    grid-template-columns: 268px minmax(0, 1fr);
+    height: min(calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale, 1) - 70px), 806px);
+    min-height: 0;
+  }
+
+  /* the instance list */
+  #adventure-journal-window .aj-nav {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 14px 10px;
+    border-right: 1px solid var(--color-aj-line);
+    background: var(--color-aj-nav);
+  }
+  /* The boss search at the top of the list: the library's input with a
+     magnifier, and its results (portrait, name, instance) in place of the
+     list while a query narrows it. */
+  #adventure-journal-window .aj-search {
+    margin: 0 0 12px;
+  }
+  #adventure-journal-window .aj-search-field {
+    position: relative;
+    display: block;
+  }
+  #adventure-journal-window .aj-search-glyph {
+    position: absolute;
+    top: 50%;
+    left: 11px;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    color: var(--color-aj-mute);
+    pointer-events: none;
+  }
+  #adventure-journal-window .aj-search-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 36px 0 34px;
+    font-family: var(--font-aj);
+    font-size: 14.5px;
+  }
+  /* The field's own clear button stands in for the browser's (off palette),
+     shown only while there is something to clear. */
+  #adventure-journal-window .aj-search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  #adventure-journal-window .aj-search-clear {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-aj-mute);
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-search-clear:hover {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-search-clear .aj-glyph {
+    width: 14px;
+    height: 14px;
+  }
+  #adventure-journal-window .aj-search-input:placeholder-shown + .aj-search-clear {
+    display: none;
+  }
+  #adventure-journal-window .aj-nav.aj-searching .aj-group {
+    display: none;
+  }
+  #adventure-journal-window .aj-search-list {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    padding: 12px 8px;
-    border-right: 1px solid var(--color-rbg-divider);
-    background:
-      linear-gradient(90deg, var(--color-rbg-nav-start), var(--color-rbg-nav-end)),
-      repeating-linear-gradient(0deg, transparent 0 19px, var(--color-rbg-nav-grid) 20px);
+    gap: 2px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
   }
-  #raid-boss-guide-window .rbg-boss-tab {
-    display: grid;
-    grid-template-columns: 48px minmax(0, 1fr);
+  #adventure-journal-window .aj-search-hit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-search-hit:hover {
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-search-hit.active {
+    background: linear-gradient(90deg, var(--color-aj-accent-strong), var(--color-aj-accent-faint));
+    box-shadow: inset 3px 0 0 var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-search-name {
+    color: var(--color-aj-text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  #adventure-journal-window .aj-search-instance {
+    color: var(--color-aj-mute);
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-search-empty {
+    margin: 10px 2px 0;
+    padding: 16px 12px;
+    border: 1px dashed var(--color-aj-line);
+    border-radius: 10px;
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    text-align: center;
+  }
+  #adventure-journal-window .aj-group + .aj-group {
+    margin-top: 12px;
+  }
+  #adventure-journal-window .aj-group-title {
+    margin: 6px 10px;
+    color: var(--color-aj-mute);
+    font: 600 13px / 1.4 var(--font-aj);
+  }
+  #adventure-journal-window .aj-instance-toggle {
+    display: flex;
     align-items: center;
     gap: 8px;
-    min-height: 58px;
-    padding: 5px;
-    border: 1px solid var(--color-rbg-tab-border);
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--color-rbg-tab-start), var(--color-rbg-tab-end));
-    color: var(--color-text-muted);
-    font-family: var(--title-font);
-    font-size: 10px;
-    line-height: 1.2;
+    width: 100%;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    font-size: 14.5px;
+    line-height: 1.4;
     text-align: left;
     cursor: var(--cursor-point);
   }
-  #raid-boss-guide-window .rbg-boss-tab img {
-    width: 48px;
-    height: 48px;
-    border: 1px solid var(--color-rbg-tab-border);
-    border-radius: 2px;
-    object-fit: contain;
-    padding: 2px;
-    background: radial-gradient(
-      circle,
-      var(--color-rbg-portrait-start),
-      var(--color-rbg-frame-end) 72%
-    );
-    filter: saturate(0.72) brightness(0.72);
+  #adventure-journal-window .aj-instance-toggle:hover {
+    background: var(--color-aj-panel);
+    color: var(--color-aj-text);
   }
-  #raid-boss-guide-window .rbg-boss-tab:hover,
-  #raid-boss-guide-window .rbg-boss-tab:focus-visible,
-  #raid-boss-guide-window .rbg-boss-tab.active {
-    border-color: var(--gold);
-    color: var(--color-text-light);
+  #adventure-journal-window .aj-instance.expanded .aj-instance-toggle {
+    color: var(--color-aj-text);
+    font-weight: 600;
   }
-  #raid-boss-guide-window .rbg-boss-tab.active {
-    background: linear-gradient(
-      90deg,
-      var(--color-rbg-tab-active-start),
-      var(--color-rbg-frame-start)
-    );
-    box-shadow:
-      inset 3px 0 0 var(--gold),
-      inset 0 0 18px var(--color-rbg-tab-active-glow);
+  #adventure-journal-window .aj-chevron {
+    display: flex;
+    flex: none;
+    color: var(--color-aj-mute);
   }
-  #raid-boss-guide-window .rbg-boss-tab.active img {
-    border-color: var(--gold);
-    filter: none;
+  #adventure-journal-window .aj-instance-toggle .aj-chevron .aj-glyph {
+    transform: rotate(-90deg);
+    transition: transform calc(150ms * var(--motion-scale, 1));
   }
-  #raid-boss-guide-window .rbg-journal {
+  #adventure-journal-window .aj-instance.expanded .aj-instance-toggle .aj-chevron .aj-glyph {
+    transform: none;
+  }
+  #adventure-journal-window .aj-instance-name {
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-here-dot {
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-aj-accent);
+    box-shadow: 0 0 0 3px var(--color-aj-accent-glow);
+  }
+  #adventure-journal-window .aj-instance-count {
+    margin-left: auto;
+    color: var(--color-aj-mute);
+    font-size: 12.5px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  #adventure-journal-window .aj-boss-list {
+    margin: 4px 0 6px 10px;
+    padding: 0 0 0 8px;
+    border-left: 1px solid var(--color-aj-line);
+    list-style: none;
+  }
+  #adventure-journal-window .aj-boss {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-boss:hover {
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-boss-portrait {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    overflow: hidden;
+    border: 1px solid var(--color-aj-ring);
+    border-radius: 50%;
+    background: var(--color-aj-portrait-bg);
+  }
+  #adventure-journal-window .aj-boss-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  #adventure-journal-window .aj-boss.defeated .aj-boss-portrait img {
+    filter: saturate(0.5) brightness(0.8);
+  }
+  #adventure-journal-window .aj-boss-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-boss-name {
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  #adventure-journal-window .aj-boss-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-aj-mute);
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-boss-status .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #adventure-journal-window .aj-status-defeated {
+    color: var(--color-aj-done);
+  }
+  #adventure-journal-window .aj-status-next,
+  #adventure-journal-window .aj-status-engaged {
+    color: var(--color-aj-accent-hi);
+  }
+  #adventure-journal-window .aj-boss.active {
+    background: linear-gradient(90deg, var(--color-aj-accent-strong), var(--color-aj-accent-faint));
+    box-shadow: inset 3px 0 0 var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-boss.active .aj-boss-name {
+    color: var(--color-aj-text);
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-boss.active .aj-boss-portrait {
+    border-color: var(--color-aj-accent);
+  }
+
+  /* the page: the phone top (hidden here), the banner, the tabs */
+  #adventure-journal-window .aj-page {
     min-width: 0;
     min-height: 0;
-    max-height: 100%;
-    padding: 14px 16px 20px;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
   }
-  #raid-boss-guide-window .rbg-hero {
+  #adventure-journal-window .aj-mobile-top {
+    display: none;
+  }
+  #adventure-journal-window .aj-banner {
+    position: relative;
     display: grid;
-    grid-template-columns: 190px minmax(0, 1fr);
-    gap: 18px;
-    align-items: stretch;
-    min-height: 190px;
-    padding: 8px;
-    border: 1px solid var(--color-rbg-hero-border);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 22px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--color-aj-line);
     background:
-      radial-gradient(circle at 13% 40%, var(--color-rbg-hero-flare), transparent 32%),
-      linear-gradient(100deg, var(--color-rbg-hero-start), var(--color-rbg-hero-end) 72%);
-    box-shadow: inset 0 0 24px var(--color-rbg-shadow-soft);
+      linear-gradient(
+        100deg,
+        var(--color-aj-ember) 0%,
+        var(--color-aj-ember-faint) 45%,
+        transparent 70%
+      ),
+      var(--color-aj-banner);
   }
-  #raid-boss-guide-window .rbg-model-slot {
-    min-width: 0;
-    min-height: 190px;
+  /* The room picture behind the banner (journal_backdrop_view.ts): darkened by
+     a filter, faded at its edges by a mask and veiled by the scrim, so the
+     words keep 4.5:1 over any pixel (the styles test pins the arithmetic).
+     Cosmetic: a page without one keeps the plain banner above. */
+  #adventure-journal-window .aj-banner.has-art {
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--color-aj-banner);
   }
-  #raid-boss-guide-window .rbg-model-viewer {
+  #adventure-journal-window .aj-banner-art {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
     height: 100%;
-    min-height: 190px;
+    object-fit: cover;
+    object-position: center 35%;
+    filter: brightness(0.65) saturate(0.9);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-aj-mask) 18%,
+      var(--color-aj-mask) 82%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-aj-mask) 18%,
+      var(--color-aj-mask) 82%,
+      transparent
+    );
+  }
+  #adventure-journal-window .aj-banner.has-art::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, transparent 55%, var(--color-aj-banner)), var(--color-aj-banner-scrim);
+    pointer-events: none;
+  }
+  /* Over a picture the two small status inks (In combat, Mythic: coming
+     soon) sit on the well, so they never ride on a lit pixel. */
+  #adventure-journal-window .aj-banner.has-art .aj-chip-status,
+  #adventure-journal-window .aj-banner.has-art .aj-soon-note {
+    background: var(--color-aj-well);
+  }
+  #adventure-journal-window .aj-banner.has-art .aj-soon-note {
+    padding: 0 8px;
+    border-radius: 999px;
+  }
+  #adventure-journal-window .aj-portrait-wrap {
+    position: relative;
+    align-self: center;
+  }
+  #adventure-journal-window .aj-portrait,
+  #adventure-journal-window .aj-council-member {
+    width: 108px;
+    height: 108px;
+    overflow: hidden;
+    border: 2px solid var(--color-aj-accent);
+    border-radius: 50%;
+    background: var(--color-aj-portrait-bg);
+    box-shadow:
+      0 0 0 5px var(--color-aj-accent-glow),
+      0 8px 30px var(--color-aj-portrait-glow);
+  }
+  #adventure-journal-window .aj-portrait img,
+  #adventure-journal-window .aj-council-member img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.22);
+  }
+  #adventure-journal-window .aj-council {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  #adventure-journal-window .aj-council-member {
+    width: 92px;
+    height: 92px;
+  }
+  #adventure-journal-window .aj-council-member + .aj-council-member {
+    margin-left: -22px;
+  }
+  #adventure-journal-window .aj-model-jump {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 50%;
+    background: var(--color-aj-well);
+    color: var(--color-aj-accent-hi);
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-model-jump:hover {
+    border-color: var(--color-aj-accent);
+    background: var(--color-aj-accent);
+    color: var(--color-aj-accent-ink);
+  }
+  #adventure-journal-window .aj-model-jump .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  #adventure-journal-window .aj-banner-text {
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin-bottom: 2px;
+    color: var(--color-aj-accent-hi);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-chip-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 9px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-chip-status .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #adventure-journal-window .aj-chip-engaged {
+    color: var(--color-aj-deadly);
+  }
+  #adventure-journal-window .aj-chip-defeated {
+    color: var(--color-aj-done);
+  }
+  #adventure-journal-window .aj-boss-title {
+    margin: 0;
+    color: var(--color-aj-bright);
+    font: 700 30px / 1.15 var(--font-display);
+    letter-spacing: 0.3px;
+    overflow-wrap: anywhere;
+  }
+  #adventure-journal-window .aj-tagline {
+    max-width: 62ch;
+    margin: 8px 0 0;
+    color: var(--color-aj-soft);
+    font-size: 15.5px;
+  }
+  #adventure-journal-window .aj-tagline-overview {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  #adventure-journal-window .aj-stat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  #adventure-journal-window .aj-stat-chip {
+    padding: 4px 10px;
+    border: 1px solid var(--color-aj-chip-border);
+    border-radius: 999px;
+    background: var(--color-aj-chip);
+    color: var(--color-aj-soft);
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-stat-chip b {
+    color: var(--color-aj-text);
+    font-weight: 600;
+  }
+  /* The personal progress strip under the chips: this character's kills per
+     difficulty (the one being read underlined in amber, Mythic as coming
+     soon) and, when saved, the instance's lockout line. Every count sits in
+     a well-backed cell, so it reads the same over a banner picture. */
+  #adventure-journal-window .aj-progress {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    max-width: 62ch;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-aj-line);
+  }
+  #adventure-journal-window .aj-progress-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-aj-soft);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-progress-label .ui-icon {
+    width: 13px;
+    height: 13px;
+    color: var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-kills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  #adventure-journal-window .aj-kill {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 3px 11px 4px;
+    border: 1px solid var(--color-aj-chip-border);
+    border-radius: 8px;
+    background: var(--color-aj-well);
+    color: var(--color-aj-soft);
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-kill-count {
+    color: var(--color-aj-bright);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  #adventure-journal-window .aj-kill.none .aj-kill-count {
+    color: var(--color-aj-mute);
+  }
+  #adventure-journal-window .aj-kill.selected {
+    border-color: var(--color-aj-accent-line);
+    box-shadow: inset 0 -2px 0 var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-kill-soon {
+    color: var(--color-aj-mute);
+  }
+  #adventure-journal-window .aj-kill-note {
+    font-size: 13px;
+  }
+  #adventure-journal-window .aj-lockout {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin: 0;
+    color: var(--color-aj-done);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-lockout .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #adventure-journal-window .aj-lockout-reset {
+    color: var(--color-aj-soft);
+    font-weight: 500;
+  }
+  #adventure-journal-window .aj-diffbox {
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  /* The difficulty crests: a row of small plates in a dark well, each with
+     a shield crest wearing its skulls and its name under it. Every tier has
+     its own colour identity (--aj-tier-*: Normal a steady steel, Heroic a
+     forge fire, Mythic an arcane violet); a resting crest is dimmed, the
+     selected one is lit (its plate washed in its colour, a lit rim, a glow
+     round the crest, a lit bar under the name, a 1px lift). */
+  #adventure-journal-window .aj-diff {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 12px;
+    background: var(--color-aj-well);
+    box-shadow: inset 0 1px 3px var(--color-aj-shadow);
+  }
+  #adventure-journal-window .aj-tier-normal {
+    --aj-tier: var(--color-aj-tier-normal);
+    --aj-tier-mid: var(--color-aj-tier-normal-mid);
+    --aj-tier-deep: var(--color-aj-tier-normal-deep);
+    --aj-tier-glow: var(--color-aj-tier-normal-glow);
+    --aj-tier-wash: var(--color-aj-tier-normal-wash);
+  }
+  #adventure-journal-window .aj-tier-heroic {
+    --aj-tier: var(--color-aj-tier-heroic);
+    --aj-tier-mid: var(--color-aj-tier-heroic-mid);
+    --aj-tier-deep: var(--color-aj-tier-heroic-deep);
+    --aj-tier-glow: var(--color-aj-tier-heroic-glow);
+    --aj-tier-wash: var(--color-aj-tier-heroic-wash);
+  }
+  #adventure-journal-window .aj-tier-mythic {
+    --aj-tier: var(--color-aj-tier-mythic);
+    --aj-tier-mid: var(--color-aj-tier-mythic-mid);
+    --aj-tier-deep: var(--color-aj-tier-mythic-deep);
+    --aj-tier-glow: var(--color-aj-tier-mythic-glow);
+    --aj-tier-wash: var(--color-aj-tier-mythic-wash);
+  }
+  #adventure-journal-window .aj-diff button {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 76px;
+    padding: 8px 10px 9px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: var(--cursor-point);
+    transition:
+      background-color calc(var(--dur-panel) * var(--motion-scale)) ease-out,
+      border-color calc(var(--dur-panel) * var(--motion-scale)) ease-out,
+      translate calc(var(--dur-panel) * var(--motion-scale)) ease-out;
+  }
+  #adventure-journal-window .aj-diff button:hover {
+    border-color: var(--color-aj-line);
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-diff button.active {
+    border-color: var(--aj-tier-mid);
+    background:
+      linear-gradient(180deg, var(--aj-tier-wash), transparent 85%), var(--color-aj-panel);
+    box-shadow:
+      0 0 0 1px var(--aj-tier-wash),
+      0 4px 14px var(--aj-tier-wash);
+    color: var(--aj-tier);
+    font-weight: 700;
+    translate: 0 -1px;
+  }
+  /* The lit bar under the selected name. */
+  #adventure-journal-window .aj-diff button.active::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: -1px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--aj-tier);
+    box-shadow: 0 0 8px var(--aj-tier-glow);
+  }
+  /* The crest: a shield cut by clip-path, a metal rim in the tier's colours
+     around a face that shades from its light to its deep, with a sheen on
+     top. The wrap carries the glow (a clipped box cannot cast one). */
+  #adventure-journal-window .aj-crest-wrap {
+    position: relative;
+    display: block;
+    width: 36px;
+    height: 40px;
+    filter: saturate(0.6) brightness(0.8) drop-shadow(0 2px 2px var(--color-aj-crest-shade));
+    transition: filter calc(var(--dur-panel) * var(--motion-scale)) ease-out;
+  }
+  #adventure-journal-window .aj-diff button:hover .aj-crest-wrap {
+    filter: saturate(0.85) brightness(0.95) drop-shadow(0 2px 2px var(--color-aj-crest-shade));
+  }
+  #adventure-journal-window .aj-diff button.active .aj-crest-wrap {
+    filter: drop-shadow(0 0 7px var(--aj-tier-glow))
+      drop-shadow(0 2px 2px var(--color-aj-crest-shade));
+  }
+  #adventure-journal-window .aj-crest,
+  #adventure-journal-window .aj-crest::before,
+  #adventure-journal-window .aj-crest-face {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(50% 0, 100% 12%, 100% 56%, 50% 100%, 0 56%, 0 12%);
+  }
+  #adventure-journal-window .aj-crest {
+    inset: 0;
+    background: linear-gradient(
+      165deg,
+      var(--aj-tier),
+      var(--aj-tier-mid) 48%,
+      var(--aj-tier-deep)
+    );
+  }
+  /* A dark keyline between the rim and the face, as on a struck badge. */
+  #adventure-journal-window .aj-crest::before {
+    content: "";
+    inset: 2px;
+    background: var(--aj-tier-deep);
+  }
+  #adventure-journal-window .aj-crest-face {
+    inset: 3px;
+    padding-bottom: 5px;
+    background:
+      linear-gradient(180deg, var(--color-aj-crest-sheen), transparent 42%),
+      radial-gradient(circle at 50% 32%, var(--aj-tier-mid), var(--aj-tier-deep) 78%);
+  }
+  /* The skulls on the face: one, two in a row, or the heraldic two over one. */
+  #adventure-journal-window .aj-skulls {
+    display: grid;
+    grid-auto-flow: column;
+    justify-items: center;
+    gap: 1px 2px;
+    color: var(--color-aj-bright);
+    filter: drop-shadow(0 1px 1px var(--color-aj-crest-shade));
+  }
+  #adventure-journal-window .aj-diff .aj-skulls .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #adventure-journal-window .aj-diff .aj-skulls-1 .ui-icon {
+    width: 17px;
+    height: 17px;
+  }
+  #adventure-journal-window .aj-diff .aj-skulls-2 .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #adventure-journal-window .aj-skulls-3 {
+    grid-template-columns: repeat(2, auto);
+    grid-auto-flow: row;
+    gap: 0 3px;
+    margin-bottom: -2px;
+  }
+  #adventure-journal-window .aj-diff .aj-skulls-3 .ui-icon {
+    width: 11px;
+    height: 11px;
+  }
+  #adventure-journal-window .aj-skulls-3 .ui-icon:last-child {
+    grid-column: 1 / -1;
+  }
+  /* Mythic's lock: a small sealed disc on the crest's lower corner. */
+  #adventure-journal-window .aj-crest-lock {
+    position: absolute;
+    right: -6px;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--aj-tier-mid);
+    border-radius: 50%;
+    background: var(--color-aj-well);
+    color: var(--aj-tier);
+  }
+  #adventure-journal-window .aj-diff .aj-crest-lock .ui-icon {
+    width: 11px;
+    height: 11px;
+  }
+  #adventure-journal-window .aj-tier-name {
+    display: block;
+    white-space: nowrap;
+  }
+  #adventure-journal-window .aj-soon-note {
+    color: var(--color-aj-mute);
+    font-size: 13px;
+  }
+  #adventure-journal-window .aj-tabbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 20px 0 28px;
+    border-bottom: 1px solid var(--color-aj-line);
+    background: var(--color-aj-tabbar);
+  }
+  #adventure-journal-window .aj-tabs {
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-tabs-spacer {
+    min-height: 50px;
+  }
+  #adventure-journal-window .aj-tab {
+    margin-bottom: -1px;
+    padding: 12px 14px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-aj-mute);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-tab:hover {
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-tab.active {
+    border-bottom-color: var(--color-aj-accent);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-steps {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  #adventure-journal-window .aj-step {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-step:hover:not(:disabled) {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-step:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  #adventure-journal-window .aj-step .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  #adventure-journal-window .aj-panel {
+    padding: 18px 28px 28px;
+  }
+  #adventure-journal-window .aj-section-title,
+  #adventure-journal-window .rbg-section-title {
+    margin: 0 0 10px;
+    color: var(--color-aj-text);
+    font: 700 16.5px / 1.3 var(--font-aj);
+  }
+
+  /* Abilities: phase headers with a health pill, one row per ability */
+  #adventure-journal-window .aj-phase {
+    margin-bottom: 18px;
+  }
+  #adventure-journal-window .aj-phase-head {
+    margin: 0 0 8px;
+    font: inherit;
+  }
+  #adventure-journal-window .aj-phase-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-aj-text);
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-phase-name {
+    font-size: 16.5px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  #adventure-journal-window .aj-phase-range {
+    padding: 1px 9px;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 999px;
+    background: var(--color-aj-accent-wash);
+    color: var(--color-aj-accent-hi);
+    font-size: 13.5px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  #adventure-journal-window .aj-phase-toggle .aj-chevron {
+    margin-left: auto;
+  }
+  #adventure-journal-window .aj-phase-toggle:hover .aj-chevron {
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-phase:not(.open) .aj-phase-toggle .aj-glyph {
+    transform: rotate(-90deg);
+  }
+  #adventure-journal-window .aj-phase-summary {
+    max-width: 80ch;
+    margin: -2px 0 10px;
+    color: var(--color-aj-soft);
+    font-size: 14.5px;
+  }
+  #adventure-journal-window .aj-ab {
+    margin-bottom: 6px;
+    overflow: hidden;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-ab.deadly {
+    border-left: 3px solid var(--color-aj-deadly);
+  }
+  #adventure-journal-window .aj-ab-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto 20px;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 9px 14px 9px 10px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-ab-row:hover {
+    background: var(--color-aj-panel-hover);
+  }
+  /* The ability icon sits in the action bar's own forged socket
+     (library .ui-socket); only its size is set here. */
+  #adventure-journal-window .aj-ab-socket {
+    --ui-socket-size: 44px;
+    display: block;
+  }
+  #adventure-journal-window .aj-ab-row:hover .aj-ab-socket,
+  #adventure-journal-window .aj-ab.open .aj-ab-socket {
+    border-color: var(--gold-dim);
+  }
+  #adventure-journal-window .aj-ab-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  #adventure-journal-window .aj-ab-name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 8px;
+    color: var(--color-aj-text);
+    font-size: 15.5px;
+    font-weight: 650;
+  }
+  #adventure-journal-window .aj-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-flag .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #adventure-journal-window .aj-flag-deadly {
+    color: var(--color-aj-deadly);
+  }
+  #adventure-journal-window .aj-flag-interruptible {
+    color: var(--color-aj-info);
+  }
+  #adventure-journal-window .aj-flag-cleansable {
+    color: var(--color-aj-done);
+  }
+  #adventure-journal-window .rbg-marks {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  #adventure-journal-window .rbg-mark {
+    padding: 0 8px;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 999px;
+    background: var(--color-aj-accent-wash);
+    color: var(--color-aj-accent-hi);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  /* A mechanic Heroic adds reads apart from one Heroic only retunes. */
+  #adventure-journal-window .rbg-mark-heroicOnly {
+    border-color: var(--color-aj-deadly);
+    background: transparent;
+    color: var(--color-aj-deadly);
+  }
+  #adventure-journal-window .aj-ab-do {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--color-aj-soft);
+    font-size: 14.5px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  #adventure-journal-window .aj-ab.open .aj-ab-do {
+    color: var(--color-aj-text);
+    font-weight: 500;
+    -webkit-line-clamp: unset;
+  }
+  #adventure-journal-window .aj-ab-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  #adventure-journal-window .aj-role-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px 3px 7px;
+    border-radius: 999px;
+    background: var(--color-aj-tag);
+    color: var(--color-aj-soft);
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  #adventure-journal-window .aj-role-tag :is(.ui-icon, .aj-glyph),
+  #adventure-journal-window .aj-role-badge :is(.ui-icon, .aj-glyph) {
+    width: 14px;
+    height: 14px;
+  }
+  #adventure-journal-window .aj-role-tank :is(.ui-icon, .aj-glyph) {
+    color: var(--color-aj-tank);
+  }
+  #adventure-journal-window .aj-role-healer :is(.ui-icon, .aj-glyph) {
+    color: var(--color-aj-healer);
+  }
+  #adventure-journal-window .aj-role-damage :is(.ui-icon, .aj-glyph) {
+    color: var(--color-aj-damage);
+  }
+  #adventure-journal-window .aj-role-all :is(.ui-icon, .aj-glyph) {
+    color: var(--color-aj-everyone);
+  }
+  #adventure-journal-window .aj-ab-chev {
+    display: grid;
+    place-items: center;
+    color: var(--color-aj-mute);
+  }
+  #adventure-journal-window .aj-ab-chev .aj-glyph {
+    transition: transform calc(150ms * var(--motion-scale, 1));
+  }
+  #adventure-journal-window .aj-ab.open .aj-ab-chev {
+    color: var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-ab.open .aj-ab-chev .aj-glyph {
+    transform: rotate(180deg);
+  }
+  #adventure-journal-window .aj-ab-detail {
+    padding: 2px 16px 14px 68px;
+    color: var(--color-aj-soft);
+  }
+  #adventure-journal-window .aj-ab-detail p {
+    max-width: 78ch;
+    margin: 0 0 10px;
+  }
+  #adventure-journal-window .aj-ab-detail .aj-compare {
+    color: var(--color-aj-mute);
+    font-size: 14px;
+  }
+  #adventure-journal-window .aj-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #adventure-journal-window .aj-fact {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 7px;
+    background: var(--color-aj-well);
+    color: var(--color-aj-text);
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  #adventure-journal-window .aj-fact .aj-glyph {
+    width: 13px;
+    height: 13px;
+    color: var(--color-aj-accent);
+  }
+
+  /* Overview: the encounter beside its 3D model, the Heroic callout, Strategy
+     by role and the key choices */
+  #adventure-journal-window .aj-about {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 22px;
+    margin-bottom: 22px;
+    padding: 16px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 12px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-about-model {
+    min-width: 0;
+    min-height: 300px;
+  }
+  #adventure-journal-window .aj-about-text p {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--color-aj-soft);
+  }
+  #adventure-journal-window .rbg-model-viewer {
+    height: 100%;
+    min-height: 300px;
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
   }
-  #raid-boss-guide-window .rbg-model-stage {
+  #adventure-journal-window .rbg-model-stage {
     position: relative;
-    min-height: 164px;
+    min-height: 270px;
     overflow: hidden;
-    border: 1px solid var(--color-rbg-model-border);
-    background: radial-gradient(
-      circle,
-      var(--color-rbg-model-start),
-      var(--color-rbg-model-end) 70%
-    );
-    box-shadow:
-      inset 0 0 22px var(--color-rbg-shadow),
-      0 0 12px var(--color-rbg-model-glow);
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background:
+      radial-gradient(circle at 50% 42%, var(--color-aj-accent-strong), transparent 62%),
+      var(--color-aj-well);
   }
-  #raid-boss-guide-window .rbg-model-stage::after {
-    content: "";
+  #adventure-journal-window .rbg-model-poster {
     position: absolute;
-    inset: 4px;
-    border: 1px solid var(--color-rbg-model-inset);
-    pointer-events: none;
-    z-index: 4;
-  }
-  #raid-boss-guide-window .rbg-model-poster {
-    position: absolute;
-    inset: 5px;
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
+    inset: 16px;
+    width: calc(100% - 32px);
+    height: calc(100% - 32px);
     object-fit: contain;
-    image-rendering: auto;
     pointer-events: none;
     z-index: 1;
   }
-  #raid-boss-guide-window .rbg-model-stage > canvas {
+  #adventure-journal-window .rbg-model-stage > canvas {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -12398,541 +14124,509 @@
     touch-action: pan-y;
     z-index: 2;
   }
-  #raid-boss-guide-window .rbg-model-stage > canvas:active {
+  #adventure-journal-window .rbg-model-stage > canvas:active {
     cursor: var(--cursor-grab, grabbing);
   }
-  #raid-boss-guide-window .rbg-model-viewer[data-state="ready"] .rbg-model-poster {
+  #adventure-journal-window .rbg-model-viewer[data-state="ready"] .rbg-model-poster {
     visibility: hidden;
   }
-  #raid-boss-guide-window .rbg-model-viewer[data-state="ready"] .rbg-model-stage > canvas {
+  #adventure-journal-window .rbg-model-viewer[data-state="ready"] .rbg-model-stage > canvas {
     opacity: 1;
   }
-  #raid-boss-guide-window .rbg-model-load {
+  #adventure-journal-window .rbg-model-load {
     position: absolute;
     left: 50%;
     bottom: 12px;
-    min-width: 104px;
     min-height: 34px;
     display: none;
-    padding: 6px 10px;
-    border: 1px solid var(--color-rbg-button-border);
-    border-radius: 3px;
-    background: linear-gradient(var(--color-rbg-button-start), var(--color-rbg-button-end));
-    color: var(--color-rbg-button-text);
-    font-family: var(--title-font);
-    font-size: 10px;
+    padding: 6px 14px;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 8px;
+    background: var(--color-aj-well);
+    color: var(--color-aj-accent-hi);
+    font-size: 14px;
+    font-weight: 600;
     cursor: var(--cursor-point);
     transform: translateX(-50%);
     z-index: 3;
   }
-  #raid-boss-guide-window
+  #adventure-journal-window
     .rbg-model-viewer:is([data-state="idle"], [data-state="error"])
     .rbg-model-load {
     display: block;
   }
-  #raid-boss-guide-window .rbg-model-load:hover,
-  #raid-boss-guide-window .rbg-model-load:focus-visible {
-    border-color: var(--gold);
-    color: var(--color-rbg-button-text-hover);
+  #adventure-journal-window .rbg-model-load:hover {
+    border-color: var(--color-aj-accent);
+    background: var(--color-aj-accent);
+    color: var(--color-aj-accent-ink);
   }
-  #raid-boss-guide-window .rbg-model-status {
+  #adventure-journal-window .rbg-model-status {
     position: absolute;
-    left: 8px;
-    right: 8px;
+    left: 10px;
+    right: 10px;
     top: 10px;
     margin: 0;
-    color: var(--color-rbg-status-text);
-    font-size: 10px;
-    line-height: 1.35;
+    color: var(--color-aj-soft);
+    font-size: 13.5px;
     text-align: center;
-    text-shadow: 0 1px 3px var(--color-rbg-shadow);
     z-index: 3;
   }
-  #raid-boss-guide-window .rbg-model-hint {
+  #adventure-journal-window .rbg-model-hint {
     min-height: 22px;
     margin: 0;
-    padding: 5px 4px 0;
-    color: var(--color-text-muted);
-    font-size: 9px;
-    line-height: 1.25;
+    padding: 6px 4px 0;
+    color: var(--color-aj-mute);
+    font-size: 13px;
     text-align: center;
     visibility: hidden;
   }
-  #raid-boss-guide-window .rbg-model-viewer[data-state="ready"] .rbg-model-hint {
+  #adventure-journal-window .rbg-model-viewer[data-state="ready"] .rbg-model-hint {
     visibility: visible;
   }
-  #raid-boss-guide-window .rbg-overview {
-    padding: 8px 10px 6px 0;
+  #adventure-journal-window .aj-ab-row:focus-visible,
+  #adventure-journal-window .aj-phase-toggle:focus-visible {
+    outline-offset: -2px;
   }
-  #raid-boss-guide-window .rbg-overview h2 {
-    margin: 0 0 12px;
-    color: var(--color-rbg-heading);
-    font-family: var(--title-font);
-    font-size: 20px;
-    line-height: 1.15;
-    text-shadow: 0 2px 5px var(--color-rbg-shadow);
+  #adventure-journal-window .rbg-heroic {
+    margin: 16px 0 0;
+    padding: 14px 16px;
+    border: 1px solid var(--color-aj-line);
+    border-left: 3px solid var(--color-aj-deadly);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
   }
-  #raid-boss-guide-window .rbg-section-kicker,
-  #raid-boss-guide-window .rbg-section-title {
-    color: var(--color-rbg-kicker);
-    font-family: var(--title-font);
-    font-size: 10px;
-    letter-spacing: 0.9px;
-    text-transform: uppercase;
-  }
-  #raid-boss-guide-window .rbg-overview p {
-    margin: 5px 0 0;
-    color: var(--color-text-light);
-    font-size: 12px;
-    line-height: 1.48;
-  }
-  #raid-boss-guide-window .rbg-difficulty {
+  #adventure-journal-window .rbg-heroic-head {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 9px;
-    margin: 12px 0 14px;
-    color: var(--color-text-muted);
-    font-family: var(--title-font);
-    font-size: 10px;
-  }
-  #raid-boss-guide-window .rbg-segmented {
-    display: inline-flex;
-    padding: 2px;
-    border: 1px solid var(--color-rbg-segment-border);
-    border-radius: 4px;
-    background: var(--color-rbg-control-bg);
-  }
-  #raid-boss-guide-window .rbg-segmented button {
-    min-width: 72px;
-    min-height: 28px;
-    padding: 4px 10px;
-    border: 0;
-    border-radius: 2px;
-    background: transparent;
-    color: var(--color-text-muted);
-    font-family: var(--title-font);
-    font-size: 10px;
-    cursor: var(--cursor-point);
-  }
-  #raid-boss-guide-window .rbg-segmented button:hover,
-  #raid-boss-guide-window .rbg-segmented button:focus-visible {
-    color: var(--color-text-light);
-  }
-  #raid-boss-guide-window .rbg-segmented button.active {
-    background: linear-gradient(
-      var(--color-rbg-segment-active-start),
-      var(--color-rbg-segment-active-end)
-    );
-    color: var(--color-rbg-segment-active-text);
-    box-shadow: inset 0 0 0 1px var(--color-rbg-segment-active-border);
-  }
-  #raid-boss-guide-window .rbg-section-title {
-    margin: 0 0 4px;
-    font-size: 12px;
-  }
-  #raid-boss-guide-window .rbg-phase {
-    margin-top: 14px;
-  }
-  #raid-boss-guide-window .rbg-phase > header {
-    display: grid;
-    grid-template-columns: 4px minmax(0, 1fr);
-    gap: 9px;
+    gap: 8px;
     margin-bottom: 6px;
-    padding: 3px 1px;
+    color: var(--color-aj-deadly);
+    font-size: 15.5px;
+    font-weight: 700;
   }
-  #raid-boss-guide-window .rbg-phase-rule {
-    border-radius: 3px;
-    background: linear-gradient(var(--color-rbg-phase-start), var(--color-rbg-phase-end));
-    box-shadow: 0 0 8px var(--color-rbg-phase-glow);
+  #adventure-journal-window .rbg-heroic-head .ui-icon {
+    width: 16px;
+    height: 16px;
   }
-  #raid-boss-guide-window .rbg-phase h3 {
+  #adventure-journal-window .rbg-heroic ul {
     margin: 0;
-    color: var(--color-rbg-phase-title);
-    font-family: var(--title-font);
-    font-size: 13px;
+    padding-left: 20px;
+    color: var(--color-aj-soft);
   }
-  #raid-boss-guide-window .rbg-phase header p {
-    margin: 3px 0 0;
-    color: var(--color-text-muted);
-    font-size: 11px;
-    line-height: 1.35;
+  #adventure-journal-window .rbg-heroic li + li {
+    margin-top: 4px;
   }
-  #raid-boss-guide-window .rbg-abilities {
+  #adventure-journal-window .aj-role-grid {
     display: grid;
-    gap: 4px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
   }
-  #raid-boss-guide-window .rbg-ability {
-    border: 1px solid var(--color-rbg-ability-border);
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--color-rbg-ability-start), var(--color-rbg-tab-end));
-    box-shadow: inset 0 1px 0 var(--color-rbg-ability-inset);
+  #adventure-journal-window .aj-role-card {
+    padding: 14px 16px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
   }
-  #raid-boss-guide-window .rbg-ability.expanded {
-    border-color: var(--color-rbg-ability-expanded-border);
-    background: linear-gradient(
-      90deg,
-      var(--color-rbg-ability-expanded-start),
-      var(--color-rbg-tab-end)
-    );
-  }
-  #raid-boss-guide-window .rbg-ability-toggle {
-    width: 100%;
-    min-height: 56px;
-    display: grid;
-    grid-template-columns: 48px minmax(0, 1fr) auto;
+  #adventure-journal-window .aj-role-card header {
+    display: flex;
     align-items: center;
-    gap: 9px;
-    padding: 4px 8px 4px 4px;
+    gap: 10px;
+  }
+  #adventure-journal-window .aj-role-badge {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-aj-tag);
+  }
+  #adventure-journal-window .aj-role-badge :is(.ui-icon, .aj-glyph) {
+    width: 16px;
+    height: 16px;
+  }
+  #adventure-journal-window .aj-role-card h4 {
+    margin: 0;
+    color: var(--color-aj-text);
+    font-size: 15.5px;
+    font-weight: 700;
+  }
+  #adventure-journal-window .aj-role-card p {
+    margin: 10px 0 0;
+    color: var(--color-aj-soft);
+  }
+  #adventure-journal-window .aj-muted {
+    color: var(--color-aj-mute);
+  }
+  #adventure-journal-window .aj-watch {
+    margin-top: 12px;
+  }
+  #adventure-journal-window .aj-watch-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-aj-mute);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-watch ul {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  #adventure-journal-window .aj-watch-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 4px 6px;
     border: 0;
+    border-radius: 6px;
     background: transparent;
-    color: var(--color-text-light);
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    line-height: 1.35;
     text-align: left;
     cursor: var(--cursor-point);
   }
-  #raid-boss-guide-window .rbg-ability-toggle > img {
-    width: 46px;
-    height: 46px;
-    border: 1px solid var(--color-rbg-icon-border);
-    border-radius: 3px;
-    background: var(--color-rbg-control-bg);
-    box-shadow: inset 0 0 5px var(--color-rbg-shadow);
+  #adventure-journal-window .aj-watch-link:hover {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
   }
-  #raid-boss-guide-window .rbg-ability-toggle:hover > img,
-  #raid-boss-guide-window .rbg-ability-toggle:focus-visible > img {
-    border-color: var(--gold);
+  #adventure-journal-window .aj-watch-link img {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--color-aj-icon-border);
+    border-radius: 5px;
   }
-  #raid-boss-guide-window .rbg-ability-toggle:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 1px;
+  #adventure-journal-window .rbg-choices {
+    margin-top: 22px;
   }
-  #raid-boss-guide-window .rbg-ability-main {
-    min-width: 0;
+  #adventure-journal-window .rbg-choice {
+    margin-bottom: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .rbg-choice header {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 10px;
   }
-  #raid-boss-guide-window .rbg-expand-mark {
-    width: 13px;
-    color: var(--color-rbg-expand-mark);
-    font-size: 17px;
+  #adventure-journal-window .rbg-choice header img {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-aj-icon-border);
+    border-radius: 6px;
+  }
+  #adventure-journal-window .rbg-choice h3 {
+    margin: 0;
+    color: var(--color-aj-text);
+    font-size: 15.5px;
     font-weight: 700;
-    text-align: center;
   }
-  #raid-boss-guide-window .rbg-ability-name {
-    font-family: var(--title-font);
-    font-size: 12px;
-    line-height: 1.2;
+  #adventure-journal-window .rbg-choice-sides {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 10px;
   }
-  #raid-boss-guide-window .rbg-badges,
-  #raid-boss-guide-window .rbg-role-badges,
-  #raid-boss-guide-window .rbg-flag-badges {
-    display: inline-flex;
+  #adventure-journal-window .rbg-choice-label {
+    display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
   }
-  #raid-boss-guide-window .rbg-badges {
-    gap: 7px;
-  }
-  #raid-boss-guide-window .rbg-badge {
-    width: 23px;
-    height: 23px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--color-rbg-badge-border);
-    border-radius: 50%;
-    background: var(--color-rbg-badge-bg);
-    color: var(--color-rbg-badge-text);
-  }
-  #raid-boss-guide-window .rbg-badge-role {
-    border: 0;
-    color: var(--color-rbg-role-icon);
-  }
-  #raid-boss-guide-window .rbg-badge-tank {
-    background: var(--color-rbg-role-tank-bg);
-  }
-  #raid-boss-guide-window .rbg-badge-healer {
-    background: var(--color-rbg-role-healer-bg);
-  }
-  #raid-boss-guide-window .rbg-badge-damage {
-    background: var(--color-rbg-role-damage-bg);
-  }
-  #raid-boss-guide-window .rbg-badge .ui-icon {
+  #adventure-journal-window .rbg-choice-label .ui-icon {
     width: 13px;
     height: 13px;
   }
-  #raid-boss-guide-window .rbg-badge > span {
-    display: none;
+  #adventure-journal-window .rbg-choice-gain .rbg-choice-label {
+    color: var(--color-aj-done);
   }
-  #raid-boss-guide-window .rbg-badge-deadly {
-    border-color: var(--color-rbg-deadly-border);
-    color: var(--color-rbg-deadly-text);
+  #adventure-journal-window .rbg-choice-risk .rbg-choice-label {
+    color: var(--color-aj-deadly);
   }
-  #raid-boss-guide-window .rbg-badge-important,
-  #raid-boss-guide-window .rbg-badge-interruptible {
-    border-color: var(--color-rbg-important-border);
-    color: var(--color-rbg-important-text);
+  #adventure-journal-window .rbg-choice p {
+    margin: 4px 0 0;
+    color: var(--color-aj-soft);
   }
-  #raid-boss-guide-window .rbg-badge-cleansable {
-    border-color: var(--color-rbg-cleansable-border);
-    color: var(--color-rbg-cleansable-text);
-  }
-  #raid-boss-guide-window .rbg-ability-detail {
-    margin: 0 9px 9px 61px;
-    padding: 8px 10px;
-    border-left: 2px solid var(--color-rbg-detail-border);
-    background: var(--color-rbg-detail-bg);
-  }
-  #raid-boss-guide-window .rbg-ability-detail p {
-    margin: 0;
-    color: var(--color-text-muted);
-    font-size: 11px;
-    line-height: 1.45;
-  }
-  #raid-boss-guide-window .rbg-ability-detail p + p {
-    margin-top: 7px;
-    color: var(--color-text-light);
-  }
-  /* The five-player dungeon pages (src/ui/boss_journal/): rank and defeated
-     marks on the boss tabs, the Heroic callout, role tips, trade-off cards,
-     the always-visible ability summary and the two-tier damage line. Every
-     text block wraps; nothing in the journal truncates. */
-  /* The dungeon pages carry tips, choices and summaries: a wider sheet. */
-  #raid-boss-guide-window:has(.rbg-boss-nav-dungeon) {
-    width: min(980px, calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 24px));
-  }
-  #raid-boss-guide-window .rbg-boss-nav-dungeon {
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-  #raid-boss-guide-window .rbg-boss-text {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    overflow-wrap: anywhere;
-  }
-  #raid-boss-guide-window .rbg-boss-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px 6px;
-    color: var(--color-rbg-kicker);
-    font-family: var(--body-font);
-    font-size: 9px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-  }
-  #raid-boss-guide-window .rbg-defeated {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    color: var(--color-rbg-gain-text);
-  }
-  #raid-boss-guide-window .rbg-defeated .ui-icon {
-    width: 10px;
-    height: 10px;
-  }
-  #raid-boss-guide-window .rbg-boss-tab.defeated:not(.active) img {
-    filter: grayscale(1) brightness(0.55);
-  }
-  #raid-boss-guide-window .rbg-rank {
-    display: inline-block;
-    margin: -6px 0 10px;
-    padding: 2px 8px;
-    border: 1px solid var(--color-rbg-important-border);
-    border-radius: 999px;
-    color: var(--color-rbg-important-text);
-    font-family: var(--title-font);
-    font-size: 9px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-  }
-  #raid-boss-guide-window .rbg-rank-final {
-    border-color: var(--color-rbg-deadly-border);
-    color: var(--color-rbg-deadly-text);
-  }
-  #raid-boss-guide-window .rbg-heroic {
-    margin: 0 0 14px;
-    padding: 9px 12px 10px;
-    border: 1px solid var(--color-rbg-deadly-border);
-    border-left-width: 3px;
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--color-rbg-heroic-bg), var(--color-rbg-detail-bg));
-  }
-  #raid-boss-guide-window .rbg-heroic-head {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--color-rbg-deadly-text);
-    font-family: var(--title-font);
-    font-size: 11px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-  }
-  #raid-boss-guide-window .rbg-heroic-head .ui-icon {
-    width: 14px;
-    height: 14px;
-  }
-  #raid-boss-guide-window .rbg-heroic ul {
-    margin: 6px 0 0;
-    padding-left: 18px;
-    color: var(--color-text-light);
-    font-size: 11px;
-    line-height: 1.45;
-  }
-  #raid-boss-guide-window .rbg-heroic li + li {
-    margin-top: 3px;
-  }
-  #raid-boss-guide-window .rbg-tips,
-  #raid-boss-guide-window .rbg-choices {
-    margin: 0 0 14px;
-  }
-  #raid-boss-guide-window .rbg-tip-grid {
+
+  /* Loot, Mythic's Coming soon */
+  #adventure-journal-window .aj-loot {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    margin-top: 5px;
-  }
-  #raid-boss-guide-window .rbg-tip {
-    padding: 8px 9px 9px;
-    border: 1px solid var(--color-rbg-ability-border);
-    border-top-width: 2px;
-    border-radius: 3px;
-    background: linear-gradient(180deg, var(--color-rbg-ability-start), var(--color-rbg-tab-end));
-  }
-  #raid-boss-guide-window .rbg-tip-tank {
-    border-top-color: var(--color-rbg-role-tank-bg);
-  }
-  #raid-boss-guide-window .rbg-tip-healer {
-    border-top-color: var(--color-rbg-role-healer-bg);
-  }
-  #raid-boss-guide-window .rbg-tip-damage {
-    border-top-color: var(--color-rbg-role-damage-bg);
-  }
-  #raid-boss-guide-window .rbg-tip header,
-  #raid-boss-guide-window .rbg-choice header {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-  #raid-boss-guide-window .rbg-tip h3,
-  #raid-boss-guide-window .rbg-choice h3 {
-    margin: 0;
-    color: var(--color-rbg-phase-title);
-    font-family: var(--title-font);
-    font-size: 12px;
-    line-height: 1.2;
-  }
-  #raid-boss-guide-window .rbg-tip p,
-  #raid-boss-guide-window .rbg-choice p {
-    margin: 6px 0 0;
-    color: var(--color-text-light);
-    font-size: 11px;
-    line-height: 1.45;
-  }
-  #raid-boss-guide-window .rbg-choice {
-    margin-top: 5px;
-    padding: 8px 9px 9px;
-    border: 1px solid var(--color-rbg-important-border);
-    border-radius: 3px;
-    background: linear-gradient(
-      90deg,
-      var(--color-rbg-ability-expanded-start),
-      var(--color-rbg-tab-end)
-    );
-  }
-  #raid-boss-guide-window .rbg-choice header img {
-    width: 30px;
-    height: 30px;
-    border: 1px solid var(--color-rbg-icon-border);
-    border-radius: 3px;
-  }
-  #raid-boss-guide-window .rbg-choice-sides {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 8px;
-    margin-top: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
-  #raid-boss-guide-window .rbg-choice-gain,
-  #raid-boss-guide-window .rbg-choice-risk {
-    padding: 6px 8px 7px;
-    border-left: 2px solid var(--color-rbg-gain-border);
-    background: var(--color-rbg-detail-bg);
+  /* The Loot tab's bar: This boss / All bosses, then the Adventure Guide's
+     own class and specialization pickers (dungeon_catalogue_chrome.ts), set
+     in the journal's type. */
+  #adventure-journal-window .aj-loot-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 20px;
+    margin: 0 0 14px;
+    padding: 0 0 14px;
+    border-bottom: 1px solid var(--color-aj-line);
   }
-  #raid-boss-guide-window .rbg-choice-risk {
-    border-left-color: var(--color-rbg-deadly-border);
+  #adventure-journal-window .aj-loot-scope {
+    display: flex;
+    padding: 3px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-well);
   }
-  #raid-boss-guide-window .rbg-choice-label {
-    display: inline-flex;
-    align-items: center;
+  #adventure-journal-window .aj-loot-scope-btn {
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--color-aj-soft);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+  }
+  #adventure-journal-window .aj-loot-scope-btn:hover {
+    background: var(--color-aj-panel-hover);
+    color: var(--color-aj-text);
+  }
+  #adventure-journal-window .aj-loot-scope-btn.active {
+    background: var(--color-aj-chip);
+    box-shadow: inset 0 0 0 1px var(--color-aj-accent-line);
+    color: var(--color-aj-accent-hi);
+    font-weight: 600;
+  }
+  #adventure-journal-window .df-loot-filter {
+    flex: 1 1 340px;
+    max-width: 480px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  #adventure-journal-window .df-loot-selects label {
     gap: 4px;
-    color: var(--color-rbg-gain-text);
-    font-family: var(--title-font);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    color: var(--color-aj-mute);
+    font-size: 13px;
   }
-  #raid-boss-guide-window .rbg-choice-risk .rbg-choice-label {
-    color: var(--color-rbg-deadly-text);
+  #adventure-journal-window .df-loot-selects select {
+    height: 36px;
+    font-family: var(--font-aj);
+    font-size: 14.5px;
   }
-  #raid-boss-guide-window .rbg-choice-label .ui-icon {
-    width: 12px;
-    height: 12px;
+  #adventure-journal-window .aj-loot-hidden {
+    margin: -4px 0 12px;
+    color: var(--color-aj-mute);
+    font-size: 13.5px;
   }
-  #raid-boss-guide-window .rbg-choice-sides p {
-    margin-top: 4px;
+  #adventure-journal-window .aj-loot-section + .aj-loot-section {
+    margin-top: 20px;
   }
-  #raid-boss-guide-window .rbg-ability-text {
-    min-width: 0;
+  #adventure-journal-window .aj-loot-boss {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 10px;
+    color: var(--color-aj-text);
+    font-size: 15.5px;
+    font-weight: 700;
+  }
+  #adventure-journal-window .aj-loot-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 10px;
+    background: var(--color-aj-panel);
+  }
+  #adventure-journal-window .aj-loot-row:hover {
+    background: var(--color-aj-panel-hover);
+  }
+  /* Each drop is a bag slot (library .ui-socket--bag) rimmed in its
+     quality colour, the bags' own read; hovering it opens the real item
+     tooltip. Poor and common keep the neutral rim, as the bags do. */
+  #adventure-journal-window .aj-loot-slot {
+    --ui-socket-size: 44px;
+    display: block;
+  }
+  /* The item art fills the slot as the bag cell's does: the slot's rim is the
+     quality ring, so the icon's own border and glow step aside. */
+  #adventure-journal-window .aj-loot-slot > .item-icon {
+    position: absolute;
+    inset: var(--socket-art-inset);
+    width: calc(100% - 2 * var(--socket-art-inset));
+    height: calc(100% - 2 * var(--socket-art-inset));
+    border: 0;
+    border-radius: calc(var(--radius-socket) - 2px);
+    box-shadow: none;
+  }
+  #adventure-journal-window .aj-quality-uncommon {
+    --aj-quality: var(--color-quality-uncommon);
+  }
+  #adventure-journal-window .aj-quality-rare {
+    --aj-quality: var(--color-quality-rare);
+  }
+  #adventure-journal-window .aj-quality-epic {
+    --aj-quality: var(--color-quality-epic);
+  }
+  #adventure-journal-window .aj-quality-legendary {
+    --aj-quality: var(--color-quality-legendary);
+  }
+  #adventure-journal-window
+    .aj-loot-row:is(.aj-quality-uncommon, .aj-quality-rare, .aj-quality-epic, .aj-quality-legendary)
+    .aj-loot-slot {
+    border-color: var(--aj-quality);
+    box-shadow:
+      var(--shadow-socket),
+      0 0 6px color-mix(in srgb, var(--aj-quality) 45%, transparent);
+  }
+  #adventure-journal-window .aj-loot-text {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    padding: 4px 0;
+    gap: 2px;
+    min-width: 0;
   }
-  #raid-boss-guide-window .rbg-ability-text .rbg-ability-name {
+  #adventure-journal-window .aj-loot-name {
+    font-size: 15px;
+    font-weight: 600;
     overflow-wrap: anywhere;
   }
-  #raid-boss-guide-window .rbg-ability-summary {
-    color: var(--color-rbg-summary-text);
-    font-family: var(--body-font);
-    font-size: 11px;
-    line-height: 1.42;
-    white-space: normal;
-    overflow-wrap: anywhere;
+  #adventure-journal-window .aj-loot-detail {
+    color: var(--color-aj-mute);
+    font-size: 13.5px;
   }
-  #raid-boss-guide-window .rbg-marks {
-    display: inline-flex;
+  #adventure-journal-window .aj-soon,
+  #adventure-journal-window .aj-loot-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 34px 20px 30px;
+    border: 1px solid var(--color-aj-line);
+    border-radius: 12px;
+    background:
+      radial-gradient(circle at 50% 0%, var(--color-aj-accent-glow), transparent 60%),
+      var(--color-aj-panel);
+    text-align: center;
+  }
+  #adventure-journal-window .aj-soon {
+    margin: 22px 28px 28px;
+  }
+  #adventure-journal-window .aj-soon-sigil {
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 50%;
+    background: var(--color-aj-well);
+    color: var(--color-aj-accent);
+  }
+  #adventure-journal-window .aj-soon-sigil .ui-icon {
+    width: 26px;
+    height: 26px;
+  }
+  #adventure-journal-window .aj-soon-kicker {
+    margin-top: 4px;
+    color: var(--color-aj-accent-hi);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  #adventure-journal-window .aj-soon h3 {
+    margin: 0;
+    color: var(--color-aj-text);
+    font-size: 22px;
+    font-weight: 700;
+  }
+  #adventure-journal-window .aj-soon p,
+  #adventure-journal-window .aj-loot-empty p {
+    max-width: 460px;
+    margin: 0;
+    color: var(--color-aj-soft);
+  }
+  #adventure-journal-window .aj-soon-actions {
+    display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
   }
-  #raid-boss-guide-window .rbg-mark {
-    padding: 1px 6px;
-    border: 1px solid var(--color-rbg-important-border);
-    border-radius: 999px;
-    color: var(--color-rbg-important-text);
-    font-family: var(--title-font);
-    font-size: 9px;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
+  #adventure-journal-window .aj-soon-tier {
+    min-height: 36px;
+    padding: 0 16px;
+    border: 1px solid var(--color-aj-accent-line);
+    border-radius: 8px;
+    background: var(--color-aj-well);
+    color: var(--color-aj-accent-hi);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: var(--cursor-point);
   }
-  #raid-boss-guide-window .rbg-mark-heroicOnly {
-    border-color: var(--color-rbg-deadly-border);
-    color: var(--color-rbg-deadly-text);
+  #adventure-journal-window .aj-soon-tier:hover {
+    border-color: var(--color-aj-accent);
+    background: var(--color-aj-accent);
+    color: var(--color-aj-accent-ink);
   }
-  #raid-boss-guide-window .rbg-boss-nav-dungeon ~ .rbg-journal .rbg-ability-detail p:first-child {
-    color: var(--color-text-light);
+  #adventure-journal-window .aj-crumb,
+  #adventure-journal-window .aj-strip-boss {
+    font: inherit;
   }
-  #raid-boss-guide-window .rbg-ability-detail .rbg-compare {
-    color: var(--color-rbg-kicker);
-    font-family: var(--title-font);
-    font-size: 10px;
+  #tf-journal {
+    position: absolute;
+    left: -10px;
+    bottom: -6px;
+    z-index: 3;
+    width: 24px;
+    height: 24px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    background: var(--panel-bg);
+    cursor: var(--cursor-point);
+    pointer-events: auto;
+  }
+  #tf-journal::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
+  #target-frame.has-journal #tf-journal {
+    display: inline-flex;
+  }
+  #tf-journal:hover {
+    border-color: var(--gold);
+  }
+  #tf-journal .ui-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--gold);
   }
   @media (forced-colors: active) {
-    #raid-boss-guide-window .rbg-boss-tab.active,
-    #raid-boss-guide-window .rbg-ability.expanded,
-    #raid-boss-guide-window .rbg-segmented button.active {
+    #adventure-journal-window .aj-banner-art {
+      display: none;
+    }
+    #adventure-journal-window .aj-boss.active,
+    #adventure-journal-window .aj-tab.active,
+    #adventure-journal-window .aj-ab.open,
+    #adventure-journal-window .aj-diff button.active,
+    #adventure-journal-window .aj-loot-scope-btn.active,
+    #adventure-journal-window .aj-search-hit.active,
+    #adventure-journal-window .aj-kill.selected {
       outline: 2px solid Highlight;
       outline-offset: -2px;
     }
@@ -13088,6 +14782,16 @@
     background: rgba(255, 225, 140, 0.35);
     box-shadow: none;
   }
+  /* A raid cell writes the member name across the middle of the bar and its
+     aura icons along the bottom right, so the hatch sits under the name (the
+     name stays readable) and the healing-left number takes the free bottom-left
+     corner (the classic row's rule below seats it left), in the same spot on
+     every cell so a healer scans one column. */
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-heal-absorb-text {
+    align-items: flex-end;
+    padding: 0 0 2px 4px;
+    font-size: 9px;
+  }
   #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
     position: absolute;
     left: 0;
@@ -13173,6 +14877,28 @@
     border-radius: 50%;
     box-shadow: 0 0 0 1px var(--color-keyline);
     object-fit: cover;
+  }
+  /* The raid target icon the group put on this member (party_frame_row.ts .pfm-mark):
+     seated on the crest's top-right like the target frame's #tf-raid-marker, above
+     the ring. Hidden by the painter while unmarked; never a hit target. */
+  .party-frame .pfm-mark {
+    position: absolute;
+    left: 26px;
+    top: -3px;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px calc(2px * var(--fx-shadow, 1)) var(--color-art-shadow));
+    pointer-events: none;
+    z-index: 3;
+  }
+  /* Compact raid cells drop the crest, so the icon takes the cell's top-right corner. */
+  #party-frames.party-style-raid .party-frame .pfm-mark {
+    left: auto;
+    right: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
   }
   .party-frame .pfm-role {
     display: none;
@@ -13272,6 +14998,25 @@
     line-height: 1;
     text-shadow: var(--title-shadow);
     pointer-events: none;
+  }
+  /* A party row's health bar is thin and carries the percent in its middle, so
+     the healing-left number sits at the bar's left end (the same spot on every
+     row) and the hatch at the health edge stays fully visible, under the
+     percent text (z-index 2). The raid cell's own rule lifts the hatch back
+     over its z-index 2 class-colored fill, still under the name. */
+  .party-frame .bar.hp .bar-heal-absorb-fill,
+  .party-frame .bar.hp .bar-heal-absorb::before {
+    z-index: 1;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-heal-absorb-fill,
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-heal-absorb::before {
+    z-index: 3;
+  }
+  .party-frame .bar.hp .bar-heal-absorb-text {
+    justify-content: flex-start;
+    transform: none;
+    padding: 0 0 0 4px;
+    font-size: 9px;
   }
   .party-frame .pfm-rewind {
     position: absolute;

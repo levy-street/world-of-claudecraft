@@ -21,7 +21,8 @@ const FULL_CIRCLE = Math.PI * 2;
 const OPAQUE = 1;
 
 const MINIMAP_CLIP_INSET = 2;
-const MINIMAP_BASE_SCALE = 1.7;
+/** Minimap px per yard at zoom 1 (the raid atlas projects its pins with it). */
+export const MINIMAP_BASE_SCALE = 1.7;
 const WORLD_MAP_PAD_RATIO = 0.06;
 
 const FLOOR_ALPHA = 0.92;

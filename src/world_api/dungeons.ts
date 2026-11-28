@@ -99,6 +99,31 @@ export interface DungeonRunView {
   bosses: readonly DungeonRunBossView[];
 }
 
+/** One boss body of the raid run the local player stands in. */
+export interface RaidRunBossView {
+  /** The boss's mob template id (a council lists each body as its own row). */
+  mobId: string;
+  /** True once this body is dead in this claim (dead stays dead until reset). */
+  defeated: boolean;
+  /** True while this body is alive and fighting (in combat, not walking home). */
+  engaged: boolean;
+}
+
+/**
+ * The raid the local player is physically inside, with each boss body's
+ * defeated and engaged state, or null anywhere else. It drives the Adventure
+ * Journal's landing page (the engaged boss, else the next living one). Kept
+ * apart from `dungeonRun` on purpose: that view feeds the five-player
+ * objectives tracker, which a raid does not show. The rows are the raid's own
+ * boss list in route order (src/sim/instances/raid_run.ts). Reference-stable
+ * like `dungeonRun`: the same object until a row changes.
+ */
+export interface RaidRunView {
+  dungeonId: string;
+  difficulty: DungeonDifficulty;
+  bosses: readonly RaidRunBossView[];
+}
+
 export interface IWorldDungeons {
   enterDungeon(dungeonId: string): WorldInteractionOutcome;
   leaveDungeon(): WorldInteractionOutcome;
@@ -106,6 +131,16 @@ export interface IWorldDungeons {
   // defeated state, driving the HUD's dungeon objectives tracker. Null outside
   // a tracked dungeon. Online it mirrors the self record's `dgrun` key.
   dungeonRun: DungeonRunView | null;
+  // The raid run the local player stands in (boss defeated and engaged state),
+  // the Adventure Journal's landing read. Null outside a tracked raid. Online it
+  // mirrors the self record's `rdrun` key.
+  raidRun: RaidRunView | null;
+  // The local character's lifetime boss kills per difficulty, keyed
+  // `<bossMobId>` (Normal) or `<bossMobId>:heroic`; a council or a
+  // several-headed boss counts under its lead body (src/sim/boss_kill_tally.ts).
+  // Only the server's death hub ever raises a count. Frozen and the same object
+  // until a count moves. Online it mirrors the self record's `bkills` key.
+  readonly bossKills: Readonly<Record<string, number>>;
   // Still-locked raids for the local player (unlock countdown in ms), driving the
   // minimap raid-lockout badge + panel. Empty when nothing is locked.
   raidLockouts(): RaidLockout[];

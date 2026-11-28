@@ -392,6 +392,8 @@ export const guideStrings = {
       'Swimming uses two keys: hold Space to rise and LCtrl to sink. Aiming the camera down while you swim forward dives as well, so you can steer your depth with the view. LCtrl is the one default that is a modifier key on its own, and a lone modifier press is ignored while you are binding, so pick a key that is not a modifier if you rebind Swim Down.',
     bgFlag: 'Take the enemy flag in Thornhollow Fields',
     attackMove: 'Attack Move (only once you switch the option on)',
+    // The party pings' held key (src/game/keybinds.ts `ping`, default KeyY).
+    ping: 'Ping: tap to ping what is under the cursor, hold for the ping wheel',
     meters: 'Damage meters (damage, healing, and threat)',
     petMark: 'Pet: Mark, select your own pet (the same as clicking its frame)',
     targetSelf: 'Target yourself',
@@ -805,7 +807,7 @@ export const guideStrings = {
 
     aurasTitle: 'Buffs and debuffs',
     aurasBody:
-      "Your own buffs show as a row of small icons in the top right corner beside the minimap, each counting down the time it has left, with your debuffs in a row below them. Right-clicking one of your own buffs drops it, as long as it is one you are allowed to drop; debuffs never are, and your target's strip is read-only.\n\nBuffs on the Player Frame, an option that is off to begin with, moves your buff row onto your own unit frame and leaves the whole corner to your debuffs. It is a desktop setting: the phone and tablet layout places your auras for you.\n\nYour target's buffs and debuffs sit together in a strip under its frame. When you want more room for them, Shift+J opens a separate Target Buffs and Debuffs window that you can move, filter down to just buffs or just debuffs, and leave open.",
+      "Your own buffs show as a row of small icons in the top right corner beside the minimap, each counting down the time it has left, with your debuffs in a row below them. Right-clicking one of your own buffs drops it, as long as it is one you are allowed to drop; debuffs never are, and your target's strip is read-only.\n\nBuffs on the Player Frame, an option that is off to begin with, moves your buff row onto your own unit frame and leaves the whole corner to your debuffs. It is a desktop setting: the phone and tablet layout places your auras for you.\n\nYour target's buffs and debuffs sit together in a strip under its frame. When you want more room for them, Shift+B opens a separate Target Buffs and Debuffs window that you can move, filter down to just buffs or just debuffs, and leave open.",
 
     actionBarsTitle: 'Your action bars',
     actionBarsBody:

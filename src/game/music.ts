@@ -4388,7 +4388,7 @@ export class MusicDirector {
       resumeWhenAllowed(this.ctx);
       const element = this.bossLoop.element();
       if (element) {
-        element.volume = target;
+        this.bossLoop.setVolume(target);
         void element.play().catch(() => {
           this.ensureBossBuffer();
           this.startBossSource();

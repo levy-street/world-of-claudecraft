@@ -21,7 +21,6 @@ import {
   shockRingLook,
 } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 import {
-  DUST_FRAG,
   FIRE_FRAG,
   FIRE_VERT,
   GHOST_RAMP,
@@ -30,8 +29,17 @@ import {
   ParticlePool,
   type ParticleSpec,
 } from '../hollow_crypt/crypt_fx_particles';
+import { SMOKE_FRAG, SMOKE_VERT } from './engine_smoke_glsl';
 
 const RING_SLOTS = 14;
+
+/** Each pool's authored ring at full density, and the slack every ring keeps
+ *  over its share (pinned against the Smith's Heart entrances' particle
+ *  ceiling, smith_heart_fx/entrance_budget_core.ts). */
+export const ENGINE_POOL_RINGS = { smoke: 1200, glow: 1200, soulfire: 700, pyre: 600 } as const;
+export const ENGINE_POOL_SLACK = 64;
+/** The shock ring's hot crest, as a share of its radius. */
+const RING_CREST = 0.22;
 
 const RING_VERT = /* glsl */ `
 varying vec3 vLocal;
@@ -45,19 +53,40 @@ const RING_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uAlpha;
 uniform float uSeed;
+uniform float uWake;
+uniform float uCrest;
 varying vec3 vLocal;
 float h(float n) { return fract(sin(n) * 43758.5453); }
 void main() {
   float r = length(vLocal.xz);
   float a = atan(vLocal.z, vLocal.x);
-  float lead = smoothstep(0.78, 0.96, r) * (1.0 - smoothstep(0.96, 1.0, r));
+  float lead = smoothstep(1.0 - uCrest, 1.0 - uCrest * 0.18, r) * (1.0 - smoothstep(1.0 - uCrest * 0.18, 1.0, r));
   float broken = 0.6 + 0.4 * h(floor(a * 13.0) + uSeed);
-  float wake = smoothstep(0.3, 0.95, r) * 0.22 * step(r, 1.0);
+  float wake = smoothstep(0.3, 0.95, r) * 0.22 * uWake * step(r, 1.0);
   gl_FragColor = vec4(uColor * (1.0 + lead * 1.3), (lead * broken + wake) * uAlpha);
 }
 `;
 
+/** The encounter steps of the pools and the shock rings. An owner that
+ *  shares a floor with other encounter painters passes its own (the Heat's
+ *  ladder, heat_floor_ladder_core.ts), so its pools never tie theirs. */
+export interface EngineParticleSteps {
+  ring: number;
+  smoke: number;
+  fire: number;
+  glow: number;
+}
+
+/** The steps every engine layer has always drawn its pools on. */
+export const ENGINE_PARTICLE_STEPS: Readonly<EngineParticleSteps> = {
+  ring: 4,
+  smoke: 6,
+  fire: 7,
+  glow: 8,
+};
+
 interface Ring {
+  strength: number;
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
   born: number;
@@ -97,6 +126,7 @@ export class EngineParticles {
     private readonly rand: () => number,
     private readonly reducedMotion: () => boolean,
     flameTex: THREE.Texture | null,
+    steps: EngineParticleSteps = ENGINE_PARTICLE_STEPS,
   ) {
     const pool = (
       name: string,
@@ -117,7 +147,7 @@ export class EngineParticles {
       });
       this.materials.push(m);
       const p = new ParticlePool(
-        Math.round(capacity * density) + 64,
+        Math.round(capacity * density) + ENGINE_POOL_SLACK,
         m,
         floorVfxRenderOrder('encounter', order),
       );
@@ -126,23 +156,37 @@ export class EngineParticles {
       return p;
     };
     this.pools = {
-      smoke: pool('trashEngineSmoke', PARTICLE_VERT, DUST_FRAG, THREE.NormalBlending, 1200, 6),
-      glow: pool('trashEngineGlow', PARTICLE_VERT, GLOW_FRAG, THREE.AdditiveBlending, 1200, 8),
+      smoke: pool(
+        'trashEngineSmoke',
+        SMOKE_VERT,
+        SMOKE_FRAG,
+        THREE.NormalBlending,
+        ENGINE_POOL_RINGS.smoke,
+        steps.smoke,
+      ),
+      glow: pool(
+        'trashEngineGlow',
+        PARTICLE_VERT,
+        GLOW_FRAG,
+        THREE.AdditiveBlending,
+        ENGINE_POOL_RINGS.glow,
+        steps.glow,
+      ),
       soulfire: pool(
         'trashEngineSoulfire',
         FIRE_VERT,
         FIRE_FRAG.replace(GHOST_RAMP, rampGlsl(SOULFIRE_RAMP, 'ghostRamp')),
         THREE.AdditiveBlending,
-        700,
-        7,
+        ENGINE_POOL_RINGS.soulfire,
+        steps.fire,
       ),
       pyre: pool(
         'trashEnginePyre',
         FIRE_VERT,
         FIRE_FRAG.replace(GHOST_RAMP, rampGlsl(PYRE_RAMP, 'ghostRamp')),
         THREE.AdditiveBlending,
-        600,
-        7,
+        ENGINE_POOL_RINGS.pyre,
+        steps.fire,
       ),
     };
     this.poolList = [this.pools.smoke, this.pools.glow, this.pools.soulfire, this.pools.pyre];
@@ -155,6 +199,8 @@ export class EngineParticles {
           uColor: { value: new THREE.Color() },
           uAlpha: { value: 0 },
           uSeed: { value: i * 7.3 },
+          uWake: { value: 1 },
+          uCrest: { value: RING_CREST },
         },
         vertexShader: RING_VERT,
         fragmentShader: RING_FRAG,
@@ -167,9 +213,9 @@ export class EngineParticles {
       const mesh = new THREE.Mesh(ringGeo, mat);
       mesh.frustumCulled = false;
       mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 4);
+      mesh.renderOrder = floorVfxRenderOrder('encounter', steps.ring);
       root.add(mesh);
-      this.rings.push({ mesh, mat, born: 0, radius: 0, span: 1, alive: false });
+      this.rings.push({ mesh, mat, born: 0, radius: 0, span: 1, alive: false, strength: 1 });
     }
   }
 
@@ -205,7 +251,7 @@ export class EngineParticles {
       s.az = 0;
       s.life = o.life * (0.7 + this.rand() * 0.6);
       s.drag = o.drag ?? 1.2;
-      s.floor = y - 0.6;
+      s.floor = o.floor ?? y - 0.6;
       s.size0 = o.size[0];
       s.size1 = o.size[1];
       s.spin = (this.rand() - 0.5) * 2;
@@ -219,8 +265,22 @@ export class EngineParticles {
   }
 
   /** A shock ring racing out to `radius` over `seconds`. */
-  shockRing(x: number, z: number, color: number, radius: number, seconds: number): void {
-    const slot = this.rings.find((r) => !r.alive) ?? this.rings[0];
+  /** `look`: a room-sized wave's own crest and wake (the family's crest is a
+   *  share of the radius: at 90 yd it would cover the floor and burn it out).
+   *  `wake` scales the filled air behind it, `crest` is the crest's share of
+   *  the radius, `strength` scales the whole ring. */
+  shockRing(
+    x: number,
+    z: number,
+    color: number,
+    radius: number,
+    seconds: number,
+    look?: { wake: number; crest: number; strength: number },
+  ): void {
+    const slot = this.rings.find((r) => !r.alive) ?? this.oldestRing();
+    slot.mat.uniforms.uWake.value = look?.wake ?? 1;
+    slot.mat.uniforms.uCrest.value = look?.crest ?? RING_CREST;
+    slot.strength = look?.strength ?? 1;
     slot.alive = true;
     slot.born = this.clock;
     slot.radius = radius;
@@ -228,6 +288,21 @@ export class EngineParticles {
     (slot.mat.uniforms.uColor.value as THREE.Color).setHex(color);
     slot.mesh.position.set(x, this.groundY(x, z) + 0.14, z);
     slot.mesh.visible = true;
+  }
+
+  /** Every slot busy: the ring born first gives way (never always slot 0,
+   *  which let a burst of rings on one tick wipe each other out). */
+  private oldestRing(): Ring {
+    let best = this.rings[0];
+    for (const r of this.rings) if (r.born < best.born) best = r;
+    return best;
+  }
+
+  /** Live shock rings (the tests read it). */
+  liveRings(): number {
+    let n = 0;
+    for (const r of this.rings) if (r.alive) n++;
+    return n;
   }
 
   update(clock: number): void {
@@ -242,7 +317,7 @@ export class EngineParticles {
       }
       const look = shockRingLook(elapsed, r.radius, r.span);
       r.mesh.scale.setScalar(Math.max(0.01, look.radius));
-      r.mat.uniforms.uAlpha.value = look.alpha;
+      r.mat.uniforms.uAlpha.value = look.alpha * r.strength;
     }
     for (const p of this.poolList) p.update(clock);
   }

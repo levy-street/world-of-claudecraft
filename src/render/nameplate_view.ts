@@ -91,6 +91,17 @@ export interface NameplatePlan {
   /** an NPC beyond NPC_NAMEPLATE_RANGE: only its quest marker is drawn, and
    *  the painter drops the plate when there is no marker to show */
   markerOnly: boolean;
+  /** a nameplate TOGGLE hides this plate, but the unit wears the group's raid
+   *  target icon: only the floating icon is drawn above its head (the classic
+   *  client shows a marked unit's icon whatever the nameplate settings) */
+  raidMarkOnly: boolean;
+}
+
+/** One number for a plate's raid target state (-1 = unmarked, 0..7 the symbol,
+ *  8..15 the symbol drawn icon-only), so the painter can tell in one compare
+ *  that a mark was set, moved or cleared, or that the plate changed mode. */
+export function raidMarkPlateKey(mark: number | null, markOnly: boolean): number {
+  return mark === null ? -1 : mark + (markOnly ? 8 : 0);
 }
 
 /** A zeroed plan for the painter to own and reuse. */
@@ -105,6 +116,7 @@ export function newNameplatePlan(): NameplatePlan {
     noHealthBar: false,
     nameOnly: false,
     markerOnly: false,
+    raidMarkOnly: false,
   };
 }
 
@@ -134,7 +146,13 @@ export function newNameplatePlan(): NameplatePlan {
  * cosmetic-buddy toggle (src/sim/pet/buddy_ai.ts's isBuddyMob):
  * a buddy's plate ignores `showNameplates` entirely (it is never a hostile,
  * attackable mob) and is hidden unless this is on, in which case it shows
- * name-only (noHealthBar is always true for a buddy; see that field). Pure:
+ * name-only (noHealthBar is always true for a buddy; see that field).
+ * `raidMarked` says the unit wears the group's raid target icon and
+ * `friendlyHidden` that the Toggle Friendly Nameplates key hides it
+ * (nameplate_friendly_core.ts): a plate a TOGGLE hides then stays up as
+ * `raidMarkOnly`, the icon alone, while range, death and the plateless rules
+ * still hide it outright (the icon is actionable, so no toggle may take it
+ * away; graphics-settings fairness). Pure:
  * same inputs give the same plan, no DOM/Three/i18n, no
  * Math.random/Date.now/performance.now.
  */
@@ -148,6 +166,8 @@ export function nameplatePlanInto(
   showPlayerNameplates: boolean,
   showPetNames: boolean,
   standIn: boolean,
+  raidMarked = false,
+  friendlyHidden = false,
 ): NameplatePlan {
   const dx = e.pos.x - player.pos.x;
   const dz = e.pos.z - player.pos.z;
@@ -195,21 +215,30 @@ export function nameplatePlanInto(
   const rackNear =
     e.templateId === MUSTER_RACK_TEMPLATE_ID && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
-  out.hidden =
-    (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
+  // Hidden whatever the unit wears: out of range, a plateless object, encounter
+  // scenery, a looted corpse, the label-less sealed door.
+  const hardHidden =
     // Encounter scenery (Vysska's clutch hatches on HER health): no plate, no bar.
     e.templateId === HOARD_BROOD_EGG_TEMPLATE ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
+    (!standIn &&
+      (d2 > NAMEPLATE_RANGE_SQ ||
+        (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear && !rackNear)));
+  // Hidden by one of the player's nameplate TOGGLES (their own plate, buddies,
+  // mobs, other players, friendly units): a raid target icon still floats here.
+  const toggleHidden =
+    friendlyHidden ||
+    (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
     // A buddy's own dedicated toggle, unconditional even over standIn: it is
     // never a hostile, attackable mob, so it earns none of the "tell the
     // player it's there" urgency a gated loot pile or quest object does.
     (isBuddyPet && !showPetNames) ||
     (!standIn &&
-      (d2 > NAMEPLATE_RANGE_SQ ||
-        (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear && !rackNear) ||
-        (!isBuddyPet && !showNameplates && e.kind === 'mob' && !e.dead) ||
+      ((!isBuddyPet && !showNameplates && e.kind === 'mob' && !e.dead) ||
         (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
+  out.raidMarkOnly = !hardHidden && toggleHidden && raidMarked;
+  out.hidden = hardHidden || (toggleHidden && !raidMarked);
   out.noHealthBar = isBuddyPet;
   out.anchorYOffset =
     viewHeight * e.scale +

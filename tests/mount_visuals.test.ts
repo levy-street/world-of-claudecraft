@@ -126,6 +126,8 @@ describe('mount visual specs cover the sim catalog', () => {
     for (const key of MOUNT_KEYS) {
       if (key === 'lantern_hall_destrier') continue;
       expect(MOUNT_VISUAL_SPECS[key].embers, key).toBeNull();
+      // the Smith's Heart charger plays its own arrival (tests/quarryheart_charger.test.ts)
+      if (key === 'quarryheart_charger') continue;
       expect(MOUNT_VISUAL_SPECS[key].summonFx, key).toBe('shimmer');
     }
     expect(mountSummonFx('lantern_hall_destrier')).toBe('lanternBurst');
@@ -376,7 +378,7 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the Emberbristle Broom, the goblin rocket sled, the Lantern Hall Destrier, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the Emberbristle Broom, the goblin rocket sled, the Lantern Hall Destrier, the Quarryheart Charger, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
@@ -385,6 +387,8 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
       'models/mounts/emberbristle_broom.glb',
       'models/mounts/goblin_rocket_sled.glb',
       'models/mounts/lantern_hall_destrier.glb',
+      // the charger's painted occlusion (scripts/assets/quarryheart_charger/, the Shade layer)
+      'models/mounts/quarryheart_charger.glb',
       'models/mounts/rickshaw_mount.glb',
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',

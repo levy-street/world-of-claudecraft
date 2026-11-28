@@ -19,6 +19,7 @@ import { finishVaelIntro } from '../src/sim/encounters/sunken_bastion/vael_intro
 import { createMob } from '../src/sim/entity';
 import { IGNIVAR_LIFT_RIDE_SECONDS } from '../src/sim/ignivar_forge_lift';
 import { IGNIVAR_LIFT_ROOM_ID, isIgnivarRaidRoom } from '../src/sim/ignivar_raid_ids';
+import { authoredFieldFor } from '../src/sim/instances/authored_field';
 import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
@@ -730,15 +731,17 @@ describe('the Hollow Crypt doors', () => {
 describe('dungeon instance placement and targetability', () => {
   it('places every dungeon entry and mob spawn on unblocked instance ground', () => {
     for (const dungeon of DUNGEON_LIST) {
-      const ignivarRaidRoom = isIgnivarRaidRoom(dungeon.id);
-      const sim = ignivarRaidRoom
+      // The Smith's Heart's entry is still dev-gated (encounters/smith_heart/
+      // entry.ts), so it rides the Ignivar rooms' dev raid path.
+      const devRaidRoom = isIgnivarRaidRoom(dungeon.id) || dungeon.id === 'smith_heart';
+      const sim = devRaidRoom
         ? new Sim({ seed: SEED, playerClass: 'warrior', devCommands: true })
         : makeSim();
       if (dungeon.id === 'nythraxis_boss_arena') {
         sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_bound_guardian');
         formRaid(sim);
       }
-      if (ignivarRaidRoom) {
+      if (devRaidRoom) {
         formRaid(sim);
         expect(enterDungeon(sim.ctx, dungeon.id, sim.playerId, true)).toBe(true);
       } else {
@@ -779,8 +782,18 @@ describe('dungeon instance placement and targetability', () => {
           sim.isHostileTo(sim.player, mob),
           `${dungeon.id} ${mob.name} is not targetable`,
         ).toBe(true);
+        // The one sanctioned exception: an authored ring wall that names the
+        // body its encounter pins at its middle (FieldRingWall.holds: the
+        // Guardian of the Heat sunk in its wellspring). Only that template,
+        // only at that ring's middle; anything else inside the circle fails.
+        const held = (authoredFieldFor(dungeon.interior)?.ringWalls ?? []).some((ring) => {
+          if (ring.holds !== mob.templateId) return false;
+          const slot = sim.ctx.instances.find((i) => i.mobIds.includes(mob.id));
+          const o = slot ? sim.ctx.instanceOriginOf(slot) : null;
+          return o !== null && Math.hypot(mob.pos.x - o.x - ring.x, mob.pos.z - o.z - ring.z) < 0.5;
+        });
         expect(
-          isBlocked(SEED, mob.pos.x, mob.pos.z, 0.5),
+          !held && isBlocked(SEED, mob.pos.x, mob.pos.z, 0.5),
           `${dungeon.id} ${mob.name} spawned in geometry`,
         ).toBe(false);
       }

@@ -28,15 +28,10 @@ import {
   nonSelfRepaintDue,
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
-import { voice, voiceDistanceGain } from '../game/voice';
+import { voice, voiceFadeGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState, mountSummonBarState } from '../render/cast_bar';
-import {
-  CharacterPreview,
-  modularKeyFor,
-  modularLookFor,
-  type PreviewFramingName,
-} from '../render/characters';
+import { CharacterPreview, modularKeyFor, modularLookFor } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
 import { npcPortraitSourceFor, playerVisualKey } from '../render/characters/manifest';
 import { helmSlotAvailableForEntity } from '../render/characters/player_look_core';
@@ -86,7 +81,6 @@ import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rul
 import type { FactionId } from '../sim/factions';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MaterialComposition } from '../sim/material_sources';
-import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { PET_MODES } from '../sim/pet/pet_assist';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import {
@@ -204,7 +198,7 @@ import { CalendarWindow } from './calendar_window';
 import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
-import { castDisplayName, targetCastDisplayName } from './cast_display_name';
+import { castDisplayName } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -220,7 +214,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
-import { CHAT_TEMPLATE_KEYS, localizeChatBody } from './chat_templates';
+import { CHAT_TEMPLATE_KEYS, localizeChatBody, raidWarningSpeaker } from './chat_templates';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
@@ -242,6 +236,7 @@ import {
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
+  smithHeartSoundClaims,
   spellFxCue,
 } from './combat_sfx';
 import { compassView } from './compass';
@@ -356,6 +351,7 @@ import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { generalChatQuotaView } from './general_chat_quota_view';
 import { craftedLineKey, grantItemToken, grantQtyText } from './grant_line_view';
 import { decideGuildMotdLine } from './guild_motd_login';
+import { mountHealAbsorbOverlay } from './heal_absorb_overlay';
 import {
   healLandingFloatTextKey,
   healLandingLogKey,
@@ -405,19 +401,13 @@ import {
 import { bindEmpoweredActionHold } from './hud/action_bar/empowered_hold';
 import {
   type AimPoint,
-  quickGroundTarget,
   resolveGroundAimAbility,
-  selectedGroundAimPoint,
   shouldUseGroundAim,
   XHB_ONLY_AIM_SLOT,
 } from './hud/action_bar/ground_aim';
-import {
-  GroundAimController,
-  type GroundAimReticleView,
-} from './hud/action_bar/ground_aim_controller';
+import type { GroundAimReticleView } from './hud/action_bar/ground_aim_controller';
 import {
   assignAttackSlotAction,
-  attackDragDisposition,
   clearHotbarSlot,
   type FreedAttackSlotAbility,
   freedAttackSlotDisplayAbility,
@@ -436,6 +426,7 @@ import {
   readDraggedAction,
   writeDraggedAction,
 } from './hud/action_bar/hotbar_drag';
+import { createHudPlayerGroundAim } from './hud/action_bar/hud_player_ground_aim';
 import { itemInBagsLine } from './hud/action_bar/item_bags_line_core';
 import {
   clampMobilePage,
@@ -509,6 +500,7 @@ import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
 import { GuildHallWindow } from './hud/guild_hall';
 import { buildHillBarView, HillBar } from './hud/hill';
+import { AdventureJournalWindow } from './hud/journal';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
@@ -529,6 +521,7 @@ import {
   type PetBarButtonDeps,
 } from './hud/pet_bar_button';
 import { livingSecondaryPet } from './hud/pet_bar_core';
+import { createHudPings } from './hud/pings';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { commissionOrderResultLine } from './hud/professions/commission_order_feedback';
@@ -630,6 +623,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { openRaidTargetMenu } from './hud/raid_target_menu';
 import { createReferralCardsHud } from './hud/referral_cards/referral_cards_hud_controller';
 import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
 import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
@@ -641,7 +635,7 @@ import { skullBagTooltipLines } from './hud/skull_bag';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
-import { targetFrameMenuKind } from './hud/target_frame_menu';
+import { raidTargetMenuRowHtml, targetFrameMenuKindFor } from './hud/target_frame_menu';
 import { FerryHudPainter } from './hud/transport';
 import { TreasureMapWindow } from './hud/treasure';
 import { createHudVehicleBar, VehicleActionBarController } from './hud/vehicle';
@@ -668,6 +662,7 @@ import {
 } from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
+import { createHudWorldMarkers, type HudWorldMarkers } from './hud/world_markers';
 import { HudFrameGroups, refreshHudFrameGroupLabels } from './hud_frame_groups';
 import { partyFrameGrid, registerHudFrames } from './hud_frame_registry';
 import { healthTextMode, unitFrameCurrentMaxText, unitFrameHealthText } from './hud_frames';
@@ -870,11 +865,11 @@ import {
   questItemTooltipModel,
   questItemTooltipRelatedKey,
 } from './quest_item_tooltip_view';
-import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
-import { RAID_MARKER_LABEL_KEYS, raidMarkerDisplayName } from './raid_marker_labels_view';
+import { RAID_MARKER_LABEL_KEYS } from './raid_marker_labels_view';
+import { offersRaidTargetIconIn, raidTargetPlayerUnit } from './raid_target_icons_core';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import { RecipePinStore } from './recipe_pins_store';
 import { RecipeTrackerPainter } from './recipe_tracker_painter';
@@ -950,12 +945,12 @@ import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
+import { TargetCastBar } from './target_cast_bar';
 import { TargetDiscordController } from './target_discord_controller';
 import {
   fillTargetFrameDescriptor,
   fillTargetHealthText,
   fillTargetOfTargetDescriptor,
-  targetPortraitKey,
 } from './target_frame_descriptor';
 import { targetOfTargetId } from './target_of_target';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -995,7 +990,7 @@ import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
 import { vendorSellConfirmPolicyFrom } from './vendor_sell_confirm_policy';
 import { visibleVendorStock } from './vendor_stock_gate_core';
-import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
+import { nextVoicedYell, type VoicedYellState, voicedYellMix } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
 import { requestWalletVerify } from './wallet_verify_request';
 import { weaponProcEffectText } from './weapon_proc_text';
@@ -1309,7 +1304,6 @@ export class Hud {
     },
   });
   private playerCastBarInput: CastBarPaintInput | null = null;
-  private targetCastBarInput: CastBarPaintInput | null = null;
   // The mobile action ring: a SECOND createActionBarView instance over a 6-slot
   // descriptor (slot 0 attack, slots 1-5 resolve through
   // sourceSlotForMobileButton(mobileActionPage, i-1)). mobileActionPage is the
@@ -1367,26 +1361,22 @@ export class Hud {
     this.vehicleBar ??= createHudVehicleBar(this);
     return this.vehicleBar;
   }
+  // The one aim seam: the cannon's, else an armed world marker's, else the spell aim.
   private get groundAim() {
-    return this.sim.vehicleSession ? this.vehicleControls.aim : this.playerGroundAim;
+    const spell = this.playerGroundAim;
+    return this.sim.vehicleSession ? this.vehicleControls.aim : this.worldMarkers.aimOr(spell);
   }
-  private readonly playerGroundAim = new GroundAimController({
-    player: () => this.sim.player,
-    resolveAbility: (id) => resolveGroundAimAbility(this.sim.known, id),
-    seedTargetPoint: () =>
-      selectedGroundAimPoint(
-        this.sim.player,
-        this.sim.entities,
-        this.optionsHooks?.groundAimTargetAttackable,
-      ),
-    fallbackPoint: () => quickGroundTarget(this.sim.player, this.sim.entities),
-    castAt: (id, pt) =>
-      id === 'clockwork_shock_bomb'
-        ? this.sim.useItem(id, { aim: pt })
-        : this.sim.castAbilityAt(id, pt),
-    clearReticle: () => this.renderer.setGroundAimReticle(null),
-    projectPlacement: (id, point) => this.sim.groundAimPlacementPreview(id, point),
-  });
+  private readonly playerGroundAim = createHudPlayerGroundAim(this);
+  readonly pings = createHudPings(this); // hud/pings/: the Ping key, wheel and feed
+  private worldMarkerHost: HudWorldMarkers | null = null;
+  private get worldMarkers(): HudWorldMarkers {
+    this.worldMarkerHost ??= createHudWorldMarkers(this); // hud/world_markers/
+    return this.worldMarkerHost;
+  }
+  /** A world-marker hotkey (0..7 places that symbol at the cursor, null clears all). */
+  worldMarkerHotkey(symbol: number | null): void {
+    this.worldMarkers.controller.hotkey(symbol);
+  }
   private readonly empowerHold = new EmpowerHold();
   private dragAction: {
     action: Exclude<HotbarAction, null>;
@@ -1618,10 +1608,6 @@ export class Hud {
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
   private castbarLabelEl = this.castbarEl.querySelector('.label') as HTMLElement;
   private castbarTimerEl = this.castbarEl.querySelector('.timer') as HTMLElement;
-  private targetCastbarEl = $('#tf-castbar');
-  private targetCastbarFillEl = this.targetCastbarEl.querySelector('.fill') as HTMLElement;
-  private targetCastbarLabelEl = this.targetCastbarEl.querySelector('.label') as HTMLElement;
-  private targetCastbarTimerEl = this.targetCastbarEl.querySelector('.timer') as HTMLElement;
   private actionbarEl = $('#actionbar');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
@@ -2498,8 +2484,7 @@ export class Hud {
       voice: {
         play: (key) => voice.play(key),
         isPlaying: () => voice.isPlaying(),
-        setDistance: (distance) =>
-          voice.setDistanceGain(distance === null ? 0 : voiceDistanceGain(distance)),
+        setDistance: (distance, fade) => voice.setDistanceGain(voiceFadeGain(distance, fade)),
       },
     });
     this.lootWindow = new LootWindowController({
@@ -3712,8 +3697,8 @@ export class Hud {
       case 'dungeon-finder-window':
         this.dungeonFinderWindow.close();
         break;
-      case 'raid-boss-guide-window':
-        this.raidBossGuideWindow.close();
+      case 'adventure-journal-window':
+        this.journal.close();
         break;
       case 'card-duel-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -4596,7 +4581,11 @@ export class Hud {
     this.mapMarkerArt,
     this.mapMarkerProfile,
   );
-  private readonly interiorMaps = new InteriorMapController(this.writerFacet, classCss);
+  private readonly interiorMaps = new InteriorMapController(
+    this.writerFacet,
+    classCss,
+    () => $('#map-window').style.display === 'block' && this.mapLevel === 'instance',
+  );
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
@@ -4711,6 +4700,7 @@ export class Hud {
     hpFill: this.pfHpEl,
     hpText: this.pfHpTextEl,
     absorb: this.pfAbsorbEl,
+    healAbsorb: mountHealAbsorbOverlay(this.pfAbsorbEl),
     portraitBorder: this.pfPortraitWrapEl,
     heraldry: {
       nameHeader: $('#pf-name-header'),
@@ -4727,10 +4717,8 @@ export class Hud {
   // castBarState core. Both instances localize cast ids: the PLAYER instance
   // resolves through castDisplayName, layers the eat/drink overlay
   // (consumeBarState, player-only), and clears the bar on hide (its inline
-  // block did). The TARGET instance resolves every id through
-  // abilityDisplayNameFromSource, has no eat/drink (the target never
-  // eats/drinks, so its paint omits `consume`), and hides with only
-  // display:none (no inline-block clear).
+  // block did). The TARGET instance (target_cast_bar.ts) names the cast,
+  // paints the boss ability icon and never eats/drinks.
   private readonly playerCastBarPainter = new CastBarPainter(
     this.writerFacet,
     {
@@ -4741,22 +4729,7 @@ export class Hud {
     },
     { resolveCastLabel: (s) => castDisplayName(s.label), clearOnHide: true },
   );
-  private readonly targetCastBarPainter = new CastBarPainter(
-    this.writerFacet,
-    {
-      bar: this.targetCastbarEl,
-      fill: this.targetCastbarFillEl,
-      label: this.targetCastbarLabelEl,
-      timer: this.targetCastbarTimerEl,
-    },
-    {
-      // Hoard and rift boss cast IDs resolve to their localized wind-up name,
-      // then every other label through abilityDisplayNameFromSource (the boss
-      // mechanic names ride the aura/mechanic matcher there), so a cave boss
-      // never shows its raw cast id (cast_display_name.ts).
-      resolveCastLabel: (s) => targetCastDisplayName(s.label),
-    },
-  );
+  private readonly targetCastBarPainter = new TargetCastBar(this.writerFacet, $('#tf-castbar'));
   // Second unit-frame painter instance; heraldry hosts are player identity only.
   // Target validity stays call-site gated. Elite and reaction CSS stay there too;
   // dead/out-of-range are deliberately pinned false, so no stateClasses.
@@ -4777,6 +4750,7 @@ export class Hud {
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
       absorb: this.targetAbsorbEl,
+      healAbsorb: mountHealAbsorbOverlay(this.targetAbsorbEl),
       raidMarker: $('#tf-raid-marker'),
       portraitBorder: this.targetPortraitWrapEl,
       heraldry: {
@@ -4810,10 +4784,12 @@ export class Hud {
       hpFill: this.totHpEl,
       hpText: this.totHpTextEl,
       resource: { container: this.totResourceEl, fill: this.totResEl, text: this.totResTextEl },
+      raidMarker: $('#totf-raid-marker'),
     },
     {
       shownDisplay: 'flex',
       repaintPortrait: () => this.drawTargetOfTargetPortrait(),
+      raidMarkerUrl: raidMarkerDataUrl,
     },
   );
   // The pet frame is the FOURTH instance of the unit_frame family. Like the
@@ -4908,8 +4884,11 @@ export class Hud {
       chipLabel: () => t('hudChrome.unitFrame.partyChip'),
       onToggleCollapse: () => this.togglePartyCollapsed(),
       partyAuras: this.partyAurasDeps,
+      raidMarkerUrl: raidMarkerDataUrl,
     },
   );
+  // One stable lookup (no per-frame closure): a member's raid target icon.
+  private readonly partyMarkOf = (pid: number): number | null => this.sim.markerFor(pid);
   // The below-target offset painter: measures the target frame plus its
   // #tf-debuffs strip (only when its cheap invalidation key changes) and keeps
   // --party-below-target-bottom on #party-frames current, so the below-target
@@ -5613,8 +5592,7 @@ export class Hud {
     closeOthers: (selector) => this.closeOtherWindows(selector),
     hideTooltip: () => this.hideTooltip(),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
-    hasBossGuide: RaidBossGuideWindow.hasJournal,
-    openBossGuide: (d, m, diff) => this.raidBossGuideWindow.openJournal(d, m, diff),
+    openBossGuide: (d, m, diff) => this.journal.openJournal(d, m, diff),
     openFinder: () => this.toggleDungeonFinder(),
     maskPlayerText: (note) => this.maskChat(note),
     // An applicant in view gets the live card; anyone else their finder snapshot.
@@ -5625,15 +5603,15 @@ export class Hud {
   });
   private readonly dungeonFinderWindow = this.finderSurfaces.window;
 
-  private readonly raidBossGuideWindow = new RaidBossGuideWindow({
-    root: () => $('#raid-boss-guide-window'),
-    closeOthers: () => this.closeOtherWindows('#raid-boss-guide-window'),
-    contextFallback: () => raidBossGuideContextFallback(document, this.isMobileLayout()),
-    attachTooltip: (element, html) => this.attachTooltip(element, html),
+  private readonly journal = new AdventureJournalWindow({
+    ...this.presentationBag,
+    root: () => $('#adventure-journal-window'),
+    closeOthers: () => this.closeOtherWindows('#adventure-journal-window'),
     hideTooltip: () => this.hideTooltip(),
+    world: () => this.sim,
+    showUnreleased: () => this.devCommandsAvailable,
     modelTouchQueue: () => previewTouchQueueOf(this.renderer),
-    dungeonRun: () => this.sim.dungeonRun,
-    ...this.windowFocus('#raid-boss-guide-window'),
+    ...this.windowFocus('#adventure-journal-window'),
   });
 
   private readonly dungeonFinderProposalPopup = this.finderSurfaces.proposal;
@@ -6808,8 +6786,9 @@ export class Hud {
     // locale, so relocalize() clears the latch for exactly one rebuild.
     this.gatheringGoalController.relocalize();
     this.partyFramesPainter.relocalize();
+    this.worldMarkerHost?.controller.relocalize();
     this.readyCheckLeaderWindow.relocalize();
-    this.raidBossGuideWindow.relocalize();
+    this.journal.relocalize();
     // The world map rasterizes its labels into sprites keyed on the RESOLVED
     // string, so a switch can never draw the old language; clearing is about not
     // carrying dead rasters in the sprite budget.
@@ -8669,6 +8648,7 @@ export class Hud {
     // paint call for why).
     this.buffBarPainter.paint(this.buffBarView.tick(p));
     this.debuffBarPainter.paint(this.debuffBarView.tick(p));
+    this.interiorMaps.frame(this.sim); // the raid atlas: smooth zoom and the live arrow
     // Caged or chained in the Sunken Gaol: the prompts, every frame (press feedback, reach).
     this.dungeonPrompts.paint({
       player: p,
@@ -8769,6 +8749,7 @@ export class Hud {
       // original writers cannot express, hence the toggleClass / setStyleProp).
       this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));
       this.toggleClass(this.targetFrameEl, 'boss', targetRank === 'boss');
+      this.toggleClass(this.targetFrameEl, 'has-journal', this.journal.covers(target.templateId));
       this.setText(
         this.targetEliteTagEl,
         targetRank === 'boss' ? t('hud.core.boss') : t('hud.core.elite'),
@@ -8803,21 +8784,9 @@ export class Hud {
         );
       }
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
-      // HP so the raid sees exactly when to channel the wardstones. The target
-      // instance shows the raw cast id and never eats/drinks (no `consume`).
-      const targetCast = castBarState(target);
-      let targetCastInput = this.targetCastBarInput;
-      if (targetCastInput) {
-        targetCastInput.cast = targetCast;
-        targetCastInput.castRemaining = target.castRemaining;
-      } else {
-        targetCastInput = {
-          cast: targetCast,
-          castRemaining: target.castRemaining,
-        };
-        this.targetCastBarInput = targetCastInput;
-      }
-      this.targetCastBarPainter.paint(targetCastInput);
+      // HP so the raid sees exactly when to channel the wardstones, with the boss
+      // ability icon the Adventure Journal shows for that cast (target_cast_bar.ts).
+      this.targetCastBarPainter.paint(target);
       // Target of Target (showTargetOfTarget): resolve who the target is targeting (a
       // mob/pet's aggro target, a player's selected target) and paint the mini-frame.
       // The id already rides the wire (aggro for mobs, tgt for players), but the ENTITY
@@ -8845,6 +8814,7 @@ export class Hud {
             totFrame,
             tot,
             healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3),
+            sim.markerFor(tot.id),
           );
           this.totFramePainter.paint(unitFrameViewInto(this.totFrameBuffer, totFrame));
         }
@@ -9293,6 +9263,7 @@ export class Hud {
         this.lastMinimapDrawAt = now;
         this.updateMinimap();
       }
+      this.pings.frame(); // the group's pings: sound, chat line, minimap marks
       this.updateClock();
       this.dayNightDial.paint(now);
       this.updateMinimapCoords();
@@ -10780,10 +10751,9 @@ export class Hud {
           this.combat(ev.sfxKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
           return;
         }
-        if (ev.fx !== 'nova') return;
-        // A per-ability nova recording is the whole read on the aimed path
-        // too, at the same 1.0 the entity-anchored spellfx path plays it;
-        // the generic burst keeps its school-flavored layer.
+        // A raid fight's own cue is never doubled (it sounds itself).
+        if (ev.fx !== 'nova' || smithHeartSoundClaims(ev.ability)) return;
+        // A per-ability nova recording is the whole read; else the generic burst.
         const novaKey = novaAbilityCue(ev.ability);
         if (novaKey !== 'spell_nova') {
           this.combat(novaKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
@@ -12085,7 +12055,7 @@ export class Hud {
               {
                 const text = localizeChatBody(ev);
                 this.chatLogFrom(
-                  ev.from,
+                  raidWarningSpeaker(ev, bubbleSpeaker),
                   text,
                   CHAT_TEMPLATE_KEYS.raidWarning,
                   'raidWarning',
@@ -12106,7 +12076,7 @@ export class Hud {
                   bubbleSpeaker?.templateId,
                   ev.classId,
                 ),
-                localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId),
+                localizeAuthoredYellText(localizeChatBody(ev), bubbleSpeaker?.kind, ev.classId),
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -12243,7 +12213,7 @@ export class Hud {
           if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
             const visibleText =
               ev.channel === 'yell'
-                ? localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId)
+                ? localizeAuthoredYellText(localizeChatBody(ev), bubbleSpeaker?.kind, ev.classId)
                 : ev.text;
             const masked = this.maskChat(this.chatLinkPlainText(visibleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
@@ -12259,10 +12229,10 @@ export class Hud {
             );
             this.lastVoicedYell = voiced.state;
             if (voiced.play) {
-              voice.play(voiced.state.key, { gain: voicedYellGain(ev.from) });
-              // A distinct overheard yell, not a dialogue: do not let the per-frame
-              // distance fade attenuate it by a talked-to NPC's position.
-              this.questDialog.clearVoiceSource();
+              const mix = voicedYellMix(ev.from, ev.text);
+              voice.play(voiced.state.key, mix.play);
+              // An overheard yell, not a dialogue: a raid boss's fades with its distance.
+              this.questDialog.setYellSource(bubbleSpeakerId, mix.fade);
             }
           }
           break;
@@ -15495,6 +15465,7 @@ export class Hud {
     this.lootExplorerWindow.toggle();
   }
 
+  readonly toggleAdventureJournal = (): void => this.journal.toggle();
   toggleCosmetics(): void {
     this.cosmeticsWindow.toggle();
   }
@@ -15826,7 +15797,7 @@ export class Hud {
     this.charPreview = null;
     this.charPreviewCanvas = null;
     this.dailyRewardsWindow.resetArmoryPreviewForGraphicsRebuild();
-    this.raidBossGuideWindow.resetGraphicsPreviewContext();
+    this.journal.resetGraphicsPreviewContext();
   }
 
   /** Restore preview surfaces that were visible across the renderer swap. */
@@ -15834,7 +15805,7 @@ export class Hud {
     if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
     this.restoreCharPreviewAfterGraphicsRebuild = false;
     this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
-    this.raidBossGuideWindow.restoreGraphicsPreviewContext();
+    this.journal.restoreGraphicsPreviewContext();
     // Fresh contexts start cold; re-run the paced schedule so the portrait
     // caches stay covered after a rebuild exactly like they are after boot.
     // (The armory is not in that schedule: it warms per inspected card.)
@@ -16693,8 +16664,8 @@ export class Hud {
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
     const info = this.sim.partyInfo;
-    const dungeonId = info ? (dungeonAt(this.sim.player.pos.x)?.id ?? null) : null;
-    this.partyFramesPainter.setGuideControl(this.raidBossGuideWindow.syncAvailability(dungeonId));
+    this.journal.syncRun();
+    this.partyFramesPainter.setWorldMarkerControl(this.worldMarkers.controller.sync());
     // Re-seat below the target only when its measured stack overlaps this column.
     const targetShown = !!target && target.kind !== 'object';
     const belowTarget = this.partyBelowTargetPainter.update(
@@ -16766,6 +16737,7 @@ export class Hud {
       config,
       pets,
       this.sim.player.targetId,
+      this.partyMarkOf,
     );
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
@@ -16776,6 +16748,7 @@ export class Hud {
       undefined,
       config,
       pets,
+      this.partyMarkOf,
     );
     this.partyFramesPainter.sync(others, info.leader, info.raid, config, this.sim.player.targetId);
     // Re-dock the Loot Settings panel below the (just re-synced) party frames when their
@@ -16800,10 +16773,7 @@ export class Hud {
     this.ctxMenuOpener = opener;
     const party = this.sim.partyInfo;
     let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm', catalog: this.sim.player.skinCatalog, appearance: this.sim.player.modularAppearance })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
-    // Party membership actions (convert, loot, leave), the dungeon-difficulty
-    // toggle, the reset-dungeons action, and close, resolved by the pure
-    // selfPlayerContextActions. Leaving the party lives here now, not a
-    // permanent button under the party frames.
+    // Party actions, dungeon difficulty, reset and close (selfPlayerContextActions).
     const actions = selfPlayerContextActions({
       inParty: !!party,
       isLeader: party?.leader === this.sim.playerId,
@@ -16816,6 +16786,7 @@ export class Hud {
       const attrs = action.inert ? 'aria-disabled="true"' : `data-act="${action.id}"`;
       html += `<div class="ctx-item" ${attrs}>${esc(action.label)}</div>`;
     }
+    if (offersRaidTargetIconIn(this.sim, this.sim.player)) html += raidTargetMenuRowHtml();
     el.innerHTML = html;
     hydratePortraits(el);
     el.style.display = 'block';
@@ -16831,6 +16802,8 @@ export class Hud {
         this.sim.convertRaidToParty();
         this.socialWindow.selectRaidTab();
       } else if (act === 'loot-settings') this.openLootSettings();
+      else if (act === 'raid-target')
+        this.openMarkerMenu(this.sim.playerId, this.sim.player.name, x, y);
       else if (act === 'leave-party') this.sim.partyLeave();
       else if (act === 'dungeon-difficulty') {
         this.sim.setDungeonDifficulty(
@@ -16855,11 +16828,11 @@ export class Hud {
   private openTargetFrameMenuAt(x: number, y: number, tid = this.sim.player.targetId): void {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (!t) return;
-    const kind = targetFrameMenuKind(t, this.sim.playerId, !!this.sim.partyInfo);
+    const kind = targetFrameMenuKindFor(t, this.sim);
     if (kind === 'player') this.openContextMenu(t.id, t.name, x, y);
     else if (kind === 'pet') this.openPetMenu(t.id, t.name, t.dead, x, y);
     else if (kind === 'buddy') this.openBuddyMenu(t.id, entityDisplayName(t), x, y);
-    else if (kind === 'marker') this.openMarkerMenu(t.id, t.name, x, y);
+    else if (kind === 'marker') this.openMarkerMenu(t.id, entityDisplayName(t), x, y);
   }
 
   /**
@@ -16988,6 +16961,8 @@ export class Hud {
     }
     if (isMember || pid === this.sim.playerId)
       html += `<div class="ctx-item" data-act="loot-settings">${esc(t('hudChrome.lootSettings.menuItem'))}</div>`;
+    if (offersRaidTargetIconIn(this.sim, raidTargetPlayerUnit(pid, ent)))
+      html += raidTargetMenuRowHtml();
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -17017,6 +16992,7 @@ export class Hud {
       else if (act === 'promote') this.sim.partyPromote(pid);
       else if (act === 'kick') this.sim.partyKick(pid);
       else if (act === 'loot-settings') this.openLootSettings();
+      else if (act === 'raid-target') this.openMarkerMenu(pid, name, x, y);
     });
   }
 
@@ -17114,46 +17090,12 @@ export class Hud {
     );
   }
 
-  // Raid/target marker picker for an enemy, opened from its target unit frame.
-  // Party-only (markers are a coordination feature); shows the 8 symbols with a
-  // check on the one currently on this mob, plus localized clear and cancel actions.
+  // The raid target icon picker for one unit (hud/raid_target_menu.ts).
   openMarkerMenu(entityId: number, name: string, x: number, y: number): void {
-    if (!this.sim.partyInfo) return;
-    const el = $('#ctx-menu');
-    el.classList.remove(CTX_MENU_PICKER_CLASS);
-    const current = this.sim.markerFor(entityId);
-    let html = `<div class="ctx-title">${esc(name)}</div>`;
-    for (let i = 0; i < RAID_MARKER_LABEL_KEYS.length; i++) {
-      const markerName = raidMarkerDisplayName(i);
-      const aria =
-        current === i
-          ? t('hud.markers.markerSelectedAria', { marker: markerName })
-          : t('hud.markers.markerAria', { marker: markerName });
-      const check = current === i ? `<span class="ctx-selected">${svgIcon('check')}</span>` : '';
-      html += `<div class="ctx-item" role="button" tabindex="0" data-act="m${i}" aria-label="${esc(aria)}"><span class="ctx-mark" style="background-image:url(${raidMarkerDataUrl(i)})"></span>${esc(markerName)}${check}</div>`;
-    }
-    html += `<div class="ctx-item" role="button" tabindex="0" data-act="clear">${esc(t('hud.markers.clear'))}</div>`;
-    html += `<div class="ctx-item" role="button" tabindex="0" data-act="close">${esc(t('hud.markers.cancel'))}</div>`;
-    el.innerHTML = html;
-    this.placePopupAt(el, x, y, 170, 340);
-    el.style.display = 'block';
-    el.querySelectorAll('.ctx-item').forEach((item) => {
-      const activate = () => {
-        const act = (item as HTMLElement).dataset.act;
-        el.style.display = 'none';
-        if (act === 'clear') this.sim.clearMarker(entityId);
-        else if (act?.startsWith('m')) this.sim.setMarker(entityId, Number(act.slice(1)));
-      };
-      item.addEventListener('click', activate);
-      item.addEventListener('keydown', (e) => {
-        if (!(e instanceof KeyboardEvent) || (e.key !== 'Enter' && e.key !== ' ')) return;
-        e.preventDefault();
-        activate();
-      });
-    });
+    openRaidTargetMenu(this, this.sim, entityId, name, x, y);
   }
 
-  openPetMenu(_entityId: number, name: string, dead: boolean, x: number, y: number): void {
+  openPetMenu(entityId: number, name: string, dead: boolean, x: number, y: number): void {
     const el = $('#ctx-menu');
     el.classList.remove(CTX_MENU_PICKER_CLASS);
     const isWarlock = this.sim.cfg.playerClass === 'warlock';
@@ -17162,6 +17104,8 @@ export class Hud {
     if (dead) html += `<div class="ctx-item" data-act="revive">${esc(t('hud.pet.revive'))}</div>`;
     if (!isWarlock)
       html += `<div class="ctx-item" data-act="abandon">${esc(t('hud.pet.abandon'))}</div>`;
+    if (offersRaidTargetIconIn(this.sim, this.sim.entities.get(entityId)))
+      html += raidTargetMenuRowHtml();
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.pet.cancel'))}</div>`;
     el.innerHTML = html;
     el.style.display = 'block';
@@ -17180,6 +17124,8 @@ export class Hud {
             okText: t('hud.pet.renameConfirm'),
             onOk: (value) => this.sim.renamePet(value),
           });
+        } else if (act === 'raid-target') {
+          this.openMarkerMenu(entityId, name, x, y);
         } else if (act === 'revive') {
           this.sim.castAbility('revive_pet');
         } else if (act === 'abandon') {

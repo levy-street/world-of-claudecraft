@@ -868,6 +868,36 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 8, '.setAttribute': 3 },
     reflowAllow: {},
   },
+  // The Masterless Strength's phase readout (hud/dungeon/) builds its
+  // self-mounted panel skeleton ONCE in ensure (seven construction-only class
+  // assignments: the panel, its title, the foot and its three lines, the
+  // poured line); every per-frame value (texts, the urgent class, the
+  // displays) rides the elided writers. Its Overload bars moved into the
+  // room (the ring round the central well, render/smith_heart_fx/).
+  {
+    file: 'hud/dungeon/heart_final_phase_painter.ts',
+    allow: { '.className': 7 },
+    reflowAllow: {},
+  },
+  // The Guardian of the Quench's screen effects (hud/dungeon/) build their
+  // self-mounted overlay ONCE in ensure (two construction-only class
+  // assignments, the water and the frost layers, and the overlay's
+  // aria-hidden); every per-frame value (the display, the frost's reach,
+  // the frozen and submerged classes) rides the elided writers.
+  {
+    file: 'hud/dungeon/quench_screen_painter.ts',
+    allow: { '.className': 2, '.setAttribute': 1 },
+    reflowAllow: {},
+  },
+  // The Breath's wind badge (hud/dungeon/) builds its self-mounted dial ONCE
+  // in ensure (four construction-only class assignments, the badge's
+  // aria-hidden, the arrow svg's three attributes and its path's d and
+  // class); every per-frame value rides the elided writers.
+  {
+    file: 'hud/dungeon/breath_wind_painter.ts',
+    allow: { '.className': 4, '.setAttribute': 6 },
+    reflowAllow: {},
+  },
   // The death screen's PvP Resurrect button and note (hud/death/): every write,
   // the countdown text, the disabled attribute and the two displays, rides the
   // elided writers; the press is bound once at construction.
@@ -963,6 +993,22 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   // the painted plate of an authored open-air field (the Sunken Bastion, the Hollow
   // Crypt): rasterised once per field, caching its one --color-field-map-* resolve
   { file: 'field_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  // The raid atlas (hud/raid_atlas/): the composing painter caches its one
+  // --color-raid-atlas-* and font resolve for the session; the page painter
+  // rasterises the illustrated floor (a plate once per floor, a sharp view once
+  // a zoomed view settles); the glyph painter strokes the arrow, medallions,
+  // pins and frame as vector paths.
+  { file: 'hud/raid_atlas/raid_atlas_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/raid_atlas/raid_atlas_page_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/raid_atlas/raid_atlas_glyph_painter.ts', allow: {}, reflowAllow: {} },
+  // the rooms' fine detail (landmarks, the Anvil's quarters), inked into the
+  // same plate or settled view, never per frame
+  { file: 'hud/raid_atlas/raid_atlas_detail_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/raid_atlas/raid_atlas_heart_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/raid_atlas/raid_atlas_landmark_painter.ts', allow: {}, reflowAllow: {} },
+  // the atlas on the round minimap: blits the prewarmed plate (or one cached
+  // detail tile) on the minimap cadence; the caller skips unchanged paints
+  { file: 'hud/raid_atlas/raid_atlas_minimap_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
@@ -1033,6 +1079,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // One app-viewport rect when the player starts dragging an aura in setup mode. The cached
   // rect converts pointer moves to persisted normalized X/Y values; the controller owns no
   // clock and performs no layout read during ordinary combat painting.
+  // The raid atlas measures its canvas ONCE per gesture (a wheel notch, a press,
+  // a right-click, a double-click) to turn client coordinates into map pixels;
+  // the pointer moves of a drag or pinch reuse that measure, and no repaint or
+  // frame tick ever reads layout.
+  {
+    file: 'hud/raid_atlas/raid_atlas_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   {
     file: 'aura_overlay_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1 },
@@ -1169,6 +1224,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // Preserve the courier body and its two storage grids' scroll offsets (one
   // read and one write each) only across a changed render, never per frame.
   { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
+  // The Adventure Journal's scroll pair, read before its cold rebuild and written
+  // back after, for the page and the list: a boss falling (syncRun) or a tab
+  // click must not throw a reader back to the top. Rebuild-only, never a frame.
+  {
+    file: 'hud/journal/adventure_journal_window.ts',
+    reflowAllow: { '.scrollTop': 4 },
+    driverAllow: {},
+  },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
   // usable items and the picker was deleted. The sheet now reads nothing and

@@ -1,5 +1,6 @@
 // The static collider set of an authored field, in instance-local yards:
-// generated cliff walls, authored walls, and prop footprints. Built once per
+// generated cliff walls, authored walls (boxes and round ones), and prop
+// footprints. Built once per
 // def (the interior collider seam caches it). Gate colliders are NOT here:
 // they belong to the dungeon's gate list (instances/dungeon_gates.ts), which
 // appends them tagged with their gate id.
@@ -17,6 +18,8 @@ const CLIFF_END_PAD = 0.5;
 export function authoredFieldColliders(def: AuthoredFieldDef, floorY: number): Collider[] {
   const out: Collider[] = [];
   for (const run of authoredFieldCliffRuns(def)) {
+    // A break in the wall over the void (AuthoredFieldDef.lipOpenings).
+    if (run.open) continue;
     const dx = run.bx - run.ax;
     const dz = run.bz - run.az;
     const len = Math.hypot(dx, dz);
@@ -39,9 +42,23 @@ export function authoredFieldColliders(def: AuthoredFieldDef, floorY: number): C
       hd: w.hd,
       rot: w.rot,
       cameraTopY: floorY + authoredFieldHeight(def, w.x, w.z) + w.height,
+      ...(w.sightClear ? { sightClear: true } : {}),
+    });
+  }
+  for (const w of def.ringWalls ?? []) {
+    // One circle over the whole band: a body slides round it smoothly.
+    out.push({
+      type: 'circle',
+      x: w.x,
+      z: w.z,
+      r: w.outer,
+      cameraTopY: floorY + authoredFieldHeight(def, w.x, w.z) + w.height,
+      ...(w.sightClear ? { sightClear: true } : {}),
     });
   }
   for (const p of def.props) {
+    // An encounter publishes its own body as a combat wall (FieldProp).
+    if (p.encounterOwned) continue;
     const top = floorY + authoredFieldHeight(def, p.x, p.z) + (p.h ?? 6);
     if (p.r !== undefined && p.r > 0) {
       out.push({ type: 'circle', x: p.x, z: p.z, r: p.r, cameraTopY: top });

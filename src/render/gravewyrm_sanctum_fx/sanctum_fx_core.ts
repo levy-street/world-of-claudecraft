@@ -454,6 +454,10 @@ export interface SanctumPuffOptions {
   gravity?: number;
   /** Scatter the births over a disc of this radius. */
   radius?: number;
+  /** The height a particle never sinks under (default: 0.6 under its
+   *  birth, a puff on a floor); a mote falling into the open air sets it
+   *  far below. */
+  floor?: number;
 }
 
 /** A shock ring racing out: its radius and brightness `elapsed` seconds in. */

@@ -92,7 +92,8 @@ export type UiIconName =
   | 'wiki'
   | 'alert'
   | 'perfecting'
-  | 'harvest-journal';
+  | 'harvest-journal'
+  | 'journal';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -292,6 +293,14 @@ const ICONS: Record<UiIconName, string> = {
   // side-rail launcher registered in CHROME_ART_IDS.
   'harvest-journal':
     '<path d="M256 464V236" stroke="currentColor" stroke-width="36" fill="none" stroke-linecap="round"/><path d="M252 300C150 300 100 240 90 150C190 150 250 200 252 300Z"/><path d="M260 240C262 140 320 90 420 90C410 190 360 240 260 240Z"/><path d="M128 464H384" stroke="currentColor" stroke-width="28" fill="none" stroke-linecap="round"/>',
+  // hand-authored field journal (the Adventure Journal launcher and its window
+  // sigils): a bound tome with a spine, a ribbon marker below the pages, and a
+  // horned skull cut out of the cover for the boss pages. Distinct from the
+  // deeds `book` (an open tome) and the `harvest-journal` sprout. This glyph
+  // remains the inline and load-failure fallback for the painted side-rail
+  // launcher registered in CHROME_ART_IDS.
+  journal:
+    '<path fill-rule="evenodd" d="M136 56h232c22 0 40 18 40 40v296c0 22-18 40-40 40H136c-22 0-40-18-40-40V96c0-22 18-40 40-40zm120 96c-40 0-68 28-68 64 0 22 10 38 26 48v30h84v-30c16-10 26-26 26-48 0-36-28-64-68-64zm-34 58a14 14 0 1 0 0 28 14 14 0 0 0 0-28zm68 0a14 14 0 1 0 0 28 14 14 0 0 0 0-28zm-114-62c-10-24-6-46 10-62 2 26 14 40 30 48l-40 14zm160 0c10-24 6-46-10-62-2 26-14 40-30 48l40 14zM132 92v312h24V92h-24z"/><path d="M300 432h44v52l-22-18-22 18z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

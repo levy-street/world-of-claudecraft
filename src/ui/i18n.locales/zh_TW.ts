@@ -13,6 +13,586 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'bossJournal.smithHeart.common.softEnrageName': '軟狂暴',
+  'bossJournal.smithHeart.common.skyStrikeName': '天落雷擊',
+  'bossJournal.smithHeart.common.crossingBladeName': '交錯之刃',
+  'bossJournal.smithHeart.common.groaningIceName': '呻吟寒冰',
+  'bossJournal.smithHeart.common.furyPhaseName': '熔爐之怒',
+  'bossJournal.smithHeart.common.furyPhaseSummary':
+    '僅限英雄難度：硬狂暴，在開戰{minutes}分鐘後到來。',
+  'bossJournal.smithHeart.common.furyName': '熔爐之怒',
+  'bossJournal.smithHeart.common.furySummary':
+    '熔爐之怒聚集時會提前{warn}秒發出警告。開戰{minutes}分鐘後，它每{every}秒灼燒戰鬥中的所有人，先造成其最大生命值{share}的傷害，然後是{share2}，第{kill}次灼燒無論有何護盾都會將其殺死。計時涵蓋戰鬥的每一秒，包括停頓時間；首領無法受到傷害時，怒火會暫緩降臨。',
+  'bossJournal.smithHeart.common.furyResponse': '在計時結束前擊敗首領。',
+  'bossJournal.smithHeart.common.heroicFury':
+    '熔爐之怒：開戰{minutes}分鐘後，戰鬥會將團隊焚燒殆盡。',
+  'bossJournal.smithHeart.common.chipTankSwap': '需要換坦',
+  'bossJournal.smithHeart.common.chipEnrage': '{minutes}分鐘後狂暴',
+  'bossJournal.smithHeart.council.overview':
+    '不屈之錘赫羅斯瑪爾與礦脈歌者維爾米拉在採石場中並肩作戰。赫羅斯瑪爾是坦克首領：他的山岳之怒會擊中所有未躲在石柱後方的人。維爾米拉是施法者：她升起供團隊躲藏的石柱，並以歌聲震鬆岩石。其中一人倒下時，另一人會恢復生命、速度加快並接手其技能，所以要將兩者一起擊倒。',
+  'bossJournal.smithHeart.council.pageName': '赫羅斯瑪爾與維爾米拉',
+  'bossJournal.smithHeart.council.tagline':
+    '兩位石之守護者在採石場中並肩作戰：躲在石柱後避開赫羅斯瑪爾的山岳之怒，打斷維爾米拉的歌聲，並將兩者一起擊倒。',
+  'bossJournal.smithHeart.council.chipBosses': '{count}名首領，一場戰鬥',
+  'bossJournal.smithHeart.council.chipTogether': '在{arrive}秒內擊殺兩者',
+  'bossJournal.smithHeart.council.phaseHammerName': '赫羅斯瑪爾，不屈之錘',
+  'bossJournal.smithHeart.council.phaseHammerSummary':
+    '坦克首領。他的能量約在{fill}秒內從0充至{energy}；能量全滿時施放山岳之怒。',
+  'bossJournal.smithHeart.council.wrathSummary':
+    '能量全滿時施法{cast}秒，隨後採石場中所有不在石柱陰影內的人受到{min}到{max}點傷害，所有石柱隨之碎裂。第一次山岳之怒還會摧毀五根雕刻石柱，直到戰鬥結束都不會恢復。',
+  'bossJournal.smithHeart.council.wrathHeroicSummary':
+    '能量全滿時施法{cast}秒，隨後採石場中所有不在石柱陰影內的人受到{min}到{max}點傷害：只有開著強力減傷的坦克能撐過。之後所有石柱碎裂，第一次山岳之怒還會摧毀五根雕刻石柱。',
+  'bossJournal.smithHeart.council.wrathResponse':
+    '躲進石柱後方的陰影，站在與施法者相反的一側。每根石柱最多掩護{limit}名玩家：躲在後面的人更多時，每人承受衝擊的{share}。第一次山岳之怒之後，只有喚醒岩石升起的石柱能提供掩護。',
+  'bossJournal.smithHeart.council.enrageSummary':
+    '山岳之怒命中{wraths}次後，他的能量充能速度變為{mult}倍：約每{cycle}秒一次山岳之怒。',
+  'bossJournal.smithHeart.council.enrageResponse': '計畫在此之前擊敗議會。',
+  'bossJournal.smithHeart.council.weightSummary':
+    '每{every}秒對他的坦克施法{cast}秒：一記相當於普通攻擊{mult}倍的重擊，之後坦克在{seconds}秒內受到的物理傷害提高{taken}。',
+  'bossJournal.smithHeart.council.weightResponse':
+    '命中後另一名坦克立刻嘲諷。坦克絕不能連續承受兩次。',
+  'bossJournal.smithHeart.council.hammerfallName': '落錘',
+  'bossJournal.smithHeart.council.hammerfallSummary':
+    '每攻擊{every}次，他的重擊會橫掃前方{arc}度弧形範圍，最遠{range}碼，對範圍內所有人造成相當於一次普通攻擊{share}的傷害。',
+  'bossJournal.smithHeart.council.hammerfallResponse': '只有坦克站在赫羅斯瑪爾面前。',
+  'bossJournal.smithHeart.council.rushSummary':
+    '每{every}秒施法{cast}秒，標記一名非坦克玩家並升起一根詛咒石柱。隨後他沿著從自己穿過該玩家、直到採石場邊緣的直線衝鋒，在路上遇到的第一根石柱處停下。被他撞到的人受到{min}到{max}點傷害並被擊飛{knock}碼。',
+  'bossJournal.smithHeart.council.rushResponse':
+    '被標記者：讓詛咒石柱擋在你和赫羅斯瑪爾之間，然後離開那條直線。撞碎它會使他昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}。若路上擋著一根掩護石柱，則改為摧毀那根石柱。',
+  'bossJournal.smithHeart.council.cursedName': '詛咒石柱',
+  'bossJournal.smithHeart.council.cursedSummary':
+    '詛咒石柱矗立期間，每{every}秒對全團造成{min}到{max}點傷害。它無法替任何人擋住山岳之怒，且只有山岳衝鋒或山岳之怒能將其擊碎。',
+  'bossJournal.smithHeart.council.cursedResponse': '盡快用山岳衝鋒撞碎它。',
+  'bossJournal.smithHeart.council.phaseSingerName': '維爾米拉，礦脈歌者',
+  'bossJournal.smithHeart.council.phaseSingerSummary':
+    '施法者。礦脈箭、礦脈之歌與喚醒岩石都可以被打斷。',
+  'bossJournal.smithHeart.council.wakeSummary':
+    '每{every}秒，以及每次山岳之怒命中後{after}秒，施法{cast}秒，標記{marks}名玩家{mark}秒。標記結束時，每名被標記者所站之處會衝出一根石柱，對{radius}碼內所有人造成{min}到{max}點傷害並將其擊退。被打斷的施法不會升起任何石柱。',
+  'bossJournal.smithHeart.council.wakeResponse':
+    '放過下一次山岳之怒所需的那次施法，其餘全部打斷。被標記者站到團隊想要掩體的位置，彼此分開。',
+  'bossJournal.smithHeart.council.thrumName': '岩石低鳴',
+  'bossJournal.smithHeart.council.thrumSummary':
+    '喚醒岩石升起且仍矗立的每根石柱，每{every}秒對全團造成{min}到{max}點傷害，每根石柱各自疊加。雕刻石柱永遠不會鳴響。',
+  'bossJournal.smithHeart.council.thrumResponse':
+    '只保留下一次山岳之怒需要的石柱：每多一根都會增加治療壓力。',
+  'bossJournal.smithHeart.council.restlessName': '躁動之石',
+  'bossJournal.smithHeart.council.restlessSummary':
+    '每{every}秒，每根矗立的石柱會對其{reach}碼內的所有人造成{min}到{max}點傷害。',
+  'bossJournal.smithHeart.council.restlessResponse': '在山岳之怒即將到來之前，遠離石柱。',
+  'bossJournal.smithHeart.council.rockSummary':
+    '每{every}秒，她標記一名玩家{mark}秒，隨後一塊巨石砸向該玩家：{total}點傷害由{radius}碼內所有人分擔。若下方少於{soakers}人，每人多受{penalty}傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊。',
+  'bossJournal.smithHeart.council.rockResponse':
+    '至少{soakers}名玩家聚集在金色圓圈內，並遠離任何仍需要的石柱。',
+  'bossJournal.smithHeart.council.boltSummary':
+    '每{every}秒，對一名她看得見的隨機玩家施法{cast}秒：{min}到{max}點自然傷害。不在她視線內的玩家不會被命中。',
+  'bossJournal.smithHeart.council.boltResponse': '打斷它。',
+  'bossJournal.smithHeart.council.songSummary':
+    '每次山岳之怒命中後{after}秒開始的{cast}秒施法。唱完時對{marks}名玩家施加共鳴；被打斷時則對{kicked}名施加。',
+  'bossJournal.smithHeart.council.songHeroicSummary':
+    '每{every}秒施法{cast}秒，擁有獨立計時，因此其共鳴可能與山岳之怒重疊。唱完時對{marks}名玩家施加共鳴；被打斷時則對{kicked}名施加。',
+  'bossJournal.smithHeart.council.songResponse': '每次都要打斷。',
+  'bossJournal.smithHeart.council.resonanceName': '共鳴',
+  'bossJournal.smithHeart.council.resonanceSummary':
+    '持續{seconds}秒，被標記的玩家每{every}秒發出共鳴，對其{radius}碼內的每名盟友造成{min}到{max}點自然傷害。',
+  'bossJournal.smithHeart.council.resonanceResponse':
+    '被標記者：在效果結束前與所有人保持{radius}碼距離。',
+  'bossJournal.smithHeart.council.resonanceHeroicResponse':
+    '被標記者：在效果結束前與所有人保持{radius}碼距離。若山岳之怒即將到來，自己另找一根石柱的陰影躲。',
+  'bossJournal.smithHeart.council.phaseFallName': '一者倒下之時',
+  'bossJournal.smithHeart.council.phaseFallSummary': '兩者都死亡時戰鬥才會結束。',
+  'bossJournal.smithHeart.council.furyName': '悲慟之怒',
+  'bossJournal.smithHeart.council.furySummary':
+    '一者倒下時，其靈魂會在{arrive}秒後抵達另一者。存活者立刻恢復{heal}生命值，造成的傷害提高{damage}，攻擊、施法和所有技能的速度提高{haste}，直到戰鬥結束。',
+  'bossJournal.smithHeart.council.furyResponse':
+    '將兩者一起壓低血量，並在第一個倒下後{arrive}秒內擊殺第二個：靈魂便會來不及抵達。',
+  'bossJournal.smithHeart.council.inheritName': '承繼之技',
+  'bossJournal.smithHeart.council.inheritSummary':
+    '靈魂抵達後，存活者以全部威力接手倒下者的技能。赫羅斯瑪爾倒下：維爾米拉會累積他的能量並施放山岳之怒。維爾米拉倒下：赫羅斯瑪爾會施放喚醒岩石和礦脈之歌。山岳衝鋒和落石隨其施放者一同終止。',
+  'bossJournal.smithHeart.council.inheritHeroicSummary':
+    '靈魂抵達後，存活者以全部威力接手倒下者的技能。赫羅斯瑪爾倒下：維爾米拉會累積他的能量並施放山岳之怒和重錘之壓。維爾米拉倒下：赫羅斯瑪爾會施放喚醒岩石、礦脈之歌和礦脈箭。山岳衝鋒和落石隨其施放者一同終止。',
+  'bossJournal.smithHeart.council.inheritResponse':
+    '不論誰活著，計畫都不變：用石柱躲山岳之怒，打斷歌聲，重錘之壓時換坦。',
+  'bossJournal.smithHeart.council.tipTank':
+    '每次重錘之壓都要換坦。讓赫羅斯瑪爾與維爾米拉靠在一起，方便團隊同時擊倒他們。英雄難度下，山岳之怒時被困在掩體外的坦克需要強力減傷。',
+  'bossJournal.smithHeart.council.tipHealer':
+    '每次山岳之怒前補滿所有人。岩石低鳴和詛咒石柱只要石頭還在就會持續打擊全團，落石的分擔者在落石後也需要治療。',
+  'bossJournal.smithHeart.council.tipDamage':
+    '打斷每一次礦脈箭和礦脈之歌。每次山岳之怒前放過一次喚醒岩石，其餘打斷。留意兩條生命條：第二個必須在第一個倒下後{arrive}秒內倒下。',
+  'bossJournal.smithHeart.council.heroicWrath':
+    '山岳之怒會殺死所有不在石柱陰影內的人。每根石柱只能掩護{limit}名玩家，人擠太多時會有{share}的衝擊穿透。',
+  'bossJournal.smithHeart.council.heroicOverlap':
+    '喚醒岩石會標記{marks}名玩家，且其標記、山岳衝鋒與共鳴現在都可能在山岳之怒施法期間到來。',
+  'bossJournal.smithHeart.council.heroicFury':
+    '悲慟之怒會讓存活者立刻恢復{heal}生命值，且它還會接手倒下者的第二個技能。',
+  'bossJournal.smithHeart.breath.overview':
+    '無羈狂風艾爾溫在風暴崖台上作戰，這是一片沒有牆的岩架：每一處邊緣都通往虛空。生命值降到一半之前，它以風作戰；降到一半時，它躲進繭中，把團隊送往浮空島；隨後風暴爆發，它化為閃電作戰到最後。瑟薩莉隊長與你們並肩作戰，佈下寧靜之環。',
+  'bossJournal.smithHeart.breath.tagline':
+    '虛空之上一處沒有牆的岩架：頂著風前進，在生命值{at}時清理浮空島，然後撐過風暴。',
+  'bossJournal.smithHeart.breath.chipEdge': '從邊緣墜落即死',
+  'bossJournal.smithHeart.breath.chipIsles': '{at}時前往浮空島',
+  'bossJournal.smithHeart.breath.phaseWindName': '狂風',
+  'bossJournal.smithHeart.breath.phaseWindSummary':
+    '從開戰到生命值{at}。任何被吹出、擊飛或走出崖台邊緣的人都會墜入虛空而死。',
+  'bossJournal.smithHeart.breath.windName': '風箱之風',
+  'bossJournal.smithHeart.breath.windSummary':
+    '即將到來的風會反覆在地面上標示{gather}秒，隨後橫吹崖台{blow}秒，把站著不動的人每秒帶走{speed}碼。兩次吹襲之間會平靜{calmMin}到{calmMax}秒。',
+  'bossJournal.smithHeart.breath.windResponse':
+    '每次吹襲前，移動到風吹來的那一側，吹襲時逆風行走。絕不要在邊緣附近站著不動。',
+  'bossJournal.smithHeart.breath.calmName': '寧靜之環',
+  'bossJournal.smithHeart.breath.calmSummary':
+    '每{every}秒，瑟薩莉隊長在地面上標出一個圓圈；{land}秒後它落下並維持{hold}秒。圈內最多{seats}名玩家會被錨定{anchor}秒：風、拉扯或擊飛都無法移動他們。',
+  'bossJournal.smithHeart.breath.calmHeroicSummary':
+    '每{every}秒，瑟薩莉隊長在地面上標出一個圓圈；{land}秒後它落下並維持{hold}秒。圈內最多{seats}名玩家會被錨定{anchor}秒：風、拉扯或擊飛都無法移動他們。錨定耗盡的玩家在{spent}秒內無法再次被錨定。',
+  'bossJournal.smithHeart.breath.calmResponse': '吹襲或深吸之息將至時，由治療者與遠程拿下錨定。',
+  'bossJournal.smithHeart.breath.inhaleSummary':
+    '每{every}秒施法{cast}秒，以每秒{pull}碼的速度將所有人拉向艾爾溫。它嘴前的漩渦每{tick}秒對其中的人造成{min}到{max}點傷害。',
+  'bossJournal.smithHeart.breath.inhaleResponse': '持續朝遠離它嘴巴的方向直走，或站在寧靜之環內。',
+  'bossJournal.smithHeart.breath.roarSummary':
+    '吸氣結束時施法{cast}秒：對崖台上所有人造成{min}到{max}點自然傷害，每人被徑直向遠離艾爾溫的方向擊飛{throw}碼，之後再以每秒{gustSpeed}碼被吹送{gust}秒。普通難度下它總會在邊緣前停下。',
+  'bossJournal.smithHeart.breath.roarHeroicSummary':
+    '吸氣結束時施法{cast}秒：對崖台上所有人造成{min}到{max}點自然傷害，每人被徑直向遠離艾爾溫的方向擊飛{throw}碼，之後再以每秒{gustSpeed}碼被吹送{gust}秒。擊飛若到達邊緣，會讓你飛出崖台。',
+  'bossJournal.smithHeart.breath.roarResponse':
+    '它咆哮時站在艾爾溫附近，狂風吹襲時徑直走回它身邊，或站在寧靜之環內。',
+  'bossJournal.smithHeart.breath.lanceSummary':
+    '每{every}秒對一名玩家施法{cast}秒：一條長{length}碼、寬{width}碼的直線對其中所有人造成{min}到{max}點自然傷害。',
+  'bossJournal.smithHeart.breath.lanceResponse': '被標記者：把直線轉離團隊。其他人離開直線。',
+  'bossJournal.smithHeart.breath.skySummary':
+    '在狂風與風暴階段，每{every}秒閃電會標記{marks}名玩家及另外{spots}個地點。{warn}秒後劈下，對{radius}碼內造成{min}到{max}點傷害。',
+  'bossJournal.smithHeart.breath.skyResponse': '走出你的圓圈，並讓圓圈遠離團隊。',
+  'bossJournal.smithHeart.breath.blowSummary':
+    '每{every}秒對坦克施法{cast}秒：{min}到{max}點自然傷害，並將坦克徑直向遠離艾爾溫的方向擊飛，起初{first}碼，每層風蝕都會更遠，最遠{last}碼。它絕不會把坦克擊出崖台。層數持續{seconds}秒。',
+  'bossJournal.smithHeart.breath.blowHeroicSummary':
+    '每{every}秒對坦克施法{cast}秒：{min}到{max}點自然傷害，並將坦克徑直向遠離艾爾溫的方向擊飛，起初{first}碼，每層風蝕都會更遠。{ruin}層時的重擊會把坦克擊出崖台。層數持續{seconds}秒。',
+  'bossJournal.smithHeart.breath.blowResponse': '{swap}層時換坦。',
+  'bossJournal.smithHeart.breath.galeName': '遊蕩狂風',
+  'bossJournal.smithHeart.breath.galeSummary':
+    '每次深吸之息後，{count}道遊蕩狂風會在崖台上遊走{seconds}秒。碰到你時造成{min}到{max}點傷害並將你掀飛{toss}碼。',
+  'bossJournal.smithHeart.breath.galeResponse': '對抗風的同時留意它們，絕不要讓它們把你推向邊緣。',
+  'bossJournal.smithHeart.breath.knotName': '結風',
+  'bossJournal.smithHeart.breath.knotSummary':
+    '狂風階段每{every}秒（最多{runs}次）及風暴階段每{stormEvery}秒，一團結風會落在崖台上，引信{fuse}秒。{mark}秒後，傳送門A和B會在兩名被標記玩家腳下開啟：走進其中一個，就會從另一個出來。攜帶者的移動速度變為{walk}，可在任意邊緣按互動鍵將它扔進虛空。若它爆裂，{core}碼內的所有人死亡，更遠的人受到的傷害遞減，在{far}碼處降至其生命值的{floor}。',
+  'bossJournal.smithHeart.breath.knotResponse':
+    '由一名玩家撿起它，扔出最近的邊緣，可利用傳送門抄近路。被標記的玩家無法攜帶它。其他人遠遠避開。',
+  'bossJournal.smithHeart.breath.phaseIslesName': '風之浮島',
+  'bossJournal.smithHeart.breath.phaseIslesSummary':
+    '生命值{at}時，艾爾溫變得無法觸及，團隊分頭前往兩條浮空島鏈。兩塊靜風石都平息後，所有人會被送回，風暴隨之爆發。',
+  'bossJournal.smithHeart.breath.novaSummary':
+    '在狂風之繭中，艾爾溫無法受到傷害，並引導天裂新星{nova}秒。若引導結束，新星會殺死所有人，無論有何護盾。',
+  'bossJournal.smithHeart.breath.novaResponse':
+    '乘著瑟薩莉隊長的上升氣流前往東西兩側的浮島，在引導結束前平息兩塊靜風石。',
+  'bossJournal.smithHeart.breath.closingName': '合圍風暴',
+  'bossJournal.smithHeart.breath.closingSummary':
+    '從首次登上一座浮島起，該島的風暴會在{closing}秒內合攏。時間耗盡時，天空審判會每{every}秒擊中該島上的所有玩家，造成其最大生命值{share}的傷害。',
+  'bossJournal.smithHeart.breath.closingResponse': '在風暴合攏前清空每座浮島。',
+  'bossJournal.smithHeart.breath.isleBoltName': '浮島閃電',
+  'bossJournal.smithHeart.breath.isleBoltSummary':
+    '浮島上的敵人仍存活時，每{every}秒閃電會標記島上的一名玩家和一個地點。{warn}秒後劈下，造成最大生命值{share}的傷害。',
+  'bossJournal.smithHeart.breath.isleBoltResponse': '走出圓圈。',
+  'bossJournal.smithHeart.breath.mendSummary':
+    '第一座浮島的狂風癒者：每{every}秒引導{cast}秒，為其島上的每個敵人恢復{share}生命值。',
+  'bossJournal.smithHeart.breath.mendResponse': '每次都要打斷。',
+  'bossJournal.smithHeart.breath.shoveSummary':
+    '第二座浮島的陣風使者：每{every}秒朝一名玩家施放{cast}秒的直線攻擊。線上所有人向島緣滑動{yards}碼，會在邊緣前停下。',
+  'bossJournal.smithHeart.breath.shoveHeroicSummary':
+    '第二座浮島的陣風使者：每{every}秒朝一名玩家施放{cast}秒的直線攻擊。線上所有人向島緣滑動{yards}碼，若靠近邊緣則會被推出去。',
+  'bossJournal.smithHeart.breath.shoveResponse': '離開直線，絕不要背對島緣作戰。',
+  'bossJournal.smithHeart.breath.squallName': '裂空颮',
+  'bossJournal.smithHeart.breath.squallSummary':
+    '在第二座浮島上，裂空颮死亡時會分裂為兩個颮之碎片。',
+  'bossJournal.smithHeart.breath.squallResponse': '保留一些傷害給兩個碎片。',
+  'bossJournal.smithHeart.breath.wardName': '颮之護障',
+  'bossJournal.smithHeart.breath.wardSummary':
+    '第三座浮島的颮之持盾者會偏轉來自其正面{arc}度以內攻擊的{cut}傷害。',
+  'bossJournal.smithHeart.breath.wardResponse': '坦克將它轉開，所有人攻擊它的背後。',
+  'bossJournal.smithHeart.breath.stoneName': '靜風石',
+  'bossJournal.smithHeart.breath.stoneSummary':
+    '島上的敵人倒下後，靜風石會甦醒。島上所有人都能同時引導它：單人需{solo}秒，引導的人越多，充滿得越快。受到攻擊會打斷你的引導，但不會打斷石頭的進度。',
+  'bossJournal.smithHeart.breath.stoneResponse': '島上所有人一起引導。',
+  'bossJournal.smithHeart.breath.phaseStormName': '風暴',
+  'bossJournal.smithHeart.breath.phaseStormSummary':
+    '從生命值{at}到戰鬥結束，艾爾溫以閃電之軀作戰。',
+  'bossJournal.smithHeart.breath.breakSummary':
+    '團隊返回時施法{cast}秒，隨後是持續{seconds}秒的閃電彈幕：每{every}秒落雷擊中標記的地點，每次對{radius}碼內造成{min}到{max}點傷害。',
+  'bossJournal.smithHeart.breath.breakResponse': '在圓圈之間持續移動。',
+  'bossJournal.smithHeart.breath.forkSummary':
+    '每{every}秒對一名玩家施法{cast}秒：{min}到{max}點自然傷害，隨後跳向{jump}碼內最近的玩家，一再跳躍。',
+  'bossJournal.smithHeart.breath.forkResponse': '散開，彼此相距{jump}碼。',
+  'bossJournal.smithHeart.breath.cradleSummary':
+    '每{every}秒施法{cast}秒，將玩家舉入風暴（每次{count}名）{hold}秒，其間艾爾溫進行引導，不施放其他技能。隨後的放電造成{total}點傷害，由下方{radius}碼內所有人分擔。若下方少於{soakers}人，每人多受{penalty}傷害，且崖台上所有人受到{bMin}到{bMax}點傷害。',
+  'bossJournal.smithHeart.breath.cradleHeroicSummary':
+    '每{every}秒施法{cast}秒，將{count}名玩家舉入風暴{hold}秒，其間艾爾溫進行引導，不施放其他技能。隨後每次放電造成{total}點傷害，由該玩家下方{radius}碼內所有人分擔。若某處少於{soakers}人，該處每人多受{penalty}傷害，且崖台上所有人受到{bMin}到{bMax}點傷害。',
+  'bossJournal.smithHeart.breath.cradleResponse':
+    '至少{soakers}名玩家聚集在被舉起玩家的金色圓圈下。',
+  'bossJournal.smithHeart.breath.cradleHeroicResponse':
+    '團隊分散到各個圓圈下，每個至少{soakers}人。',
+  'bossJournal.smithHeart.breath.drawnSummary':
+    '每{every}秒，一名玩家被標記{seconds}秒。每{strike}秒會有一道落雷劈在其腳下：{warn}秒後對{radius}碼內造成{min}到{max}點傷害，並留下帶電的地面，在{charged}秒內每秒造成{cMin}到{cMax}點傷害。',
+  'bossJournal.smithHeart.breath.drawnResponse': '被標記者：持續移動，把落雷引向邊緣，遠離團隊。',
+  'bossJournal.smithHeart.breath.thunderSummary':
+    '每{every}秒對坦克施法{cast}秒：{min}到{max}點自然傷害並附加一層雷霆纏身，持續{seconds}秒，每層使坦克受到的自然及其他魔法傷害提高{per}。達到{draw}層起，每道跳躍雷擊也會跳到該坦克身上。',
+  'bossJournal.smithHeart.breath.thunderResponse': '{swap}層時換坦。',
+  'bossJournal.smithHeart.breath.swellName': '膨脹風暴',
+  'bossJournal.smithHeart.breath.swellSummary':
+    '每{every}秒對崖台上所有人造成{min}到{max}點傷害，之前每次脈動都使其提高{growth}，永無止境。',
+  'bossJournal.smithHeart.breath.swellResponse':
+    '這是戰鬥的計時器：把冷卻技能留到最後，然後解決它。',
+  'bossJournal.smithHeart.breath.gustName': '風暴陣風',
+  'bossJournal.smithHeart.breath.gustSummary':
+    '在風暴階段，每{every}秒風會回來：在地面上標示{gather}秒，隨後以每秒{speed}碼吹襲{seconds}秒。',
+  'bossJournal.smithHeart.breath.gustResponse': '逆風行走，遠離邊緣。',
+  'bossJournal.smithHeart.breath.tipTank':
+    '在風蝕與雷霆纏身達到指定層數時換坦。讓艾爾溫背對團隊、嘴巴不要朝向邊緣，這樣深吸之息會把團隊往內拉。',
+  'bossJournal.smithHeart.breath.tipHealer':
+    '需要站定施法時，拿下瑟薩莉的錨定。撐過每次巔峰咆哮與雷霆搖籃，並隨著膨脹風暴增強而加大治療。',
+  'bossJournal.smithHeart.breath.tipDamage':
+    '絕不要在邊緣附近站著不動。在浮島上打斷癒合之風，攻擊持盾者的背後，靜風石一甦醒就一起引導。',
+  'bossJournal.smithHeart.breath.heroicEdge':
+    '巔峰咆哮、推搡狂風以及{ruin}層時的風箱重擊，現在都能把玩家帶出邊緣。',
+  'bossJournal.smithHeart.breath.heroicKnot':
+    '前後兩個半場都必須把結風扔進虛空，且每次深吸之息後都會有遊蕩狂風出沒。',
+  'bossJournal.smithHeart.breath.heroicCradle': '雷霆搖籃一次舉起{count}名玩家：團隊需分頭承受。',
+  'bossJournal.smithHeart.quench.overview':
+    '寂靜之冬奧蘿拉從冰封之湖中升起。每名玩家都有一條寒意條，獨處時上升，聚在一起時下降，但站著不動的人群會壓碎腳下的冰。待在一起，但絕不能停留太久。生命值降到一半時，鑄匠的四把利刃全部甦醒，寒意也隨之加深。',
+  'bossJournal.smithHeart.quench.tagline':
+    '在冰封之湖上，每名玩家都有一條寒意條：聚在一起取暖，但人群要持續移動，否則腳下的冰會碎裂。',
+  'bossJournal.smithHeart.quench.chipHuddle': '{group}人以上聚在一起',
+  'bossJournal.smithHeart.quench.chipBlades': '{at}時四把利刃全部甦醒',
+  'bossJournal.smithHeart.quench.phaseColdName': '寒意',
+  'bossJournal.smithHeart.quench.phaseColdSummary': '整場戰鬥，對每名玩家生效。',
+  'bossJournal.smithHeart.quench.coldName': '淬火寒意',
+  'bossJournal.smithHeart.quench.coldSummary':
+    '獨自一人時，你的寒意約在{fill}秒內從0升至{max}。若{radius}碼內有{others}名或更多其他玩家，則改為每秒下降{fall}。你受到的治療每達到最大生命值的{heal}，寒意降低1。',
+  'bossJournal.smithHeart.quench.coldResponse': '三人或更多人一組抱團，並讓人群持續移動。',
+  'bossJournal.smithHeart.quench.frozenName': '冰霜封身',
+  'bossJournal.smithHeart.quench.frozenSummary':
+    '寒意全滿時，你會被凍結{freeze}秒，受到的傷害提高{frozen}。隨後冰層碎裂：受到{min}到{max}點冰霜傷害，{brittleSeconds}秒內受到的傷害提高{brittle}，{radius}碼內所有人獲得{cold}點寒意。',
+  'bossJournal.smithHeart.quench.frozenResponse':
+    '絕不要讓寒意條充滿。在冰層碎裂前遠離被凍結的玩家。',
+  'bossJournal.smithHeart.quench.iceSummary':
+    '在同一處停留{linger}秒的人群會使冰面破裂；{warn}秒後裂開成冰冷的水洞，持續整場戰鬥。掉進去會受到{pMin}到{pMax}點冰霜傷害，增加{plunge}點寒意，並被困{trap}秒，期間每秒受到{tMin}到{tMax}點傷害。僅憑冰水絕不會致死。',
+  'bossJournal.smithHeart.quench.iceResponse': '在冰面破裂前移動人群，絕不要走進開放的水面。',
+  'bossJournal.smithHeart.quench.rimeName': '活體霜殼',
+  'bossJournal.smithHeart.quench.rimeSummary':
+    '每{every}秒，冰殼會封住非坦克玩家（每次{targets}名）：吸收接下來{absorb}點治療，使其減速{slow}，寒意上升速度變為{mult}倍。在{seconds}秒內用治療打穿，否則他們會立刻被凍結，寒意在{radius}碼內對所有人爆發，增加{cold}點寒意。',
+  'bossJournal.smithHeart.quench.rimeHeroicSummary':
+    '每{every}秒，冰殼會封住{targets}名非坦克玩家：吸收接下來{absorb}點治療，使其減速{slow}，寒意上升速度變為{mult}倍。在{seconds}秒內用治療打穿，否則他們會立刻被凍結，寒意在{radius}碼內對所有人爆發，增加{cold}點寒意，隨後以新的冰殼跳到最近的另一名玩家身上。',
+  'bossJournal.smithHeart.quench.rimeResponse': '治療者優先打破冰殼。攜帶者在冰殼破除前離開人群。',
+  'bossJournal.smithHeart.quench.phaseLakeName': '冰湖',
+  'bossJournal.smithHeart.quench.phaseLakeSummary':
+    '從開戰到生命值{at}，鑄匠的四把利刃中有兩把甦醒。',
+  'bossJournal.smithHeart.quench.breathSummary':
+    '每{every}秒施法{cast}秒：她前方{arc}度錐形範圍、最遠{range}碼，造成{min}到{max}點冰霜傷害並增加{cold}點寒意。',
+  'bossJournal.smithHeart.quench.breathResponse': '坦克讓她背對團隊；其他人都不要站在她面前。',
+  'bossJournal.smithHeart.quench.temperSummary':
+    '每命中{every}次，她的雙拳會猛擊前方{arc}度弧形範圍，最遠{range}碼。每次淬火打擊命中坦克都會疊加一層霜淬，持續{seconds}秒：每層使坦克的寒意下限提高{cold}，受到的冰霜傷害提高{frost}。最多{most}層。',
+  'bossJournal.smithHeart.quench.temperHeroicSummary':
+    '每命中{every}次，她的雙拳會猛擊前方{arc}度弧形範圍，最遠{range}碼。每次淬火打擊命中坦克都會疊加一層霜淬，持續{seconds}秒：每層使坦克的寒意下限提高{cold}，受到的冰霜傷害提高{frost}。達到{most}層時坦克會被凍結。',
+  'bossJournal.smithHeart.quench.temperResponse': '{swap}層時換坦。',
+  'bossJournal.smithHeart.quench.bladeSummary':
+    '每{every}秒，甦醒的利刃會輪流標記玩家（每輪{marks}名）。利刃沿著穿過每名玩家的直線飛越湖面，直線會跟隨他們，直到飛出前{lock}秒鎖定：線上的人受到{min}到{max}點冰霜傷害並獲得{cold}點寒意。她越虛弱，輪次來得越快。',
+  'bossJournal.smithHeart.quench.bladeResponse': '被標記者：把直線引離團隊，鎖定時離開直線。',
+  'bossJournal.smithHeart.quench.phaseBladesName': '諸刃甦醒',
+  'bossJournal.smithHeart.quench.phaseBladesSummary': '從生命值{at}到戰鬥結束，四把利刃全部甦醒。',
+  'bossJournal.smithHeart.quench.wakeSummary':
+    '生命值{at}時施法{cast}秒：另外兩把利刃掙脫而出。此後每輪交錯之刃每{every}秒標記{marks}名玩家。',
+  'bossJournal.smithHeart.quench.wakeResponse': '讓被標記的玩家散開，使他們的直線絕不穿過人群。',
+  'bossJournal.smithHeart.quench.deepenName': '寒意漸深',
+  'bossJournal.smithHeart.quench.deepenSummary':
+    '利刃甦醒後，每{every}秒所有人的寒意上升速度再加快{step}，永無止境。',
+  'bossJournal.smithHeart.quench.deepenResponse':
+    '這是戰鬥的計時器：抱得更緊、治療更猛，然後解決它。',
+  'bossJournal.smithHeart.quench.tipTank':
+    '讓淬火吐息朝向遠離團隊的方向。在霜淬達到指定層數時換坦，空閒時與團隊抱團。',
+  'bossJournal.smithHeart.quench.tipHealer':
+    '你的治療能帶來溫暖：除了恢復生命，還會降低寒意。在每個活體霜殼爆發前打破它，並在冰層碎裂前補滿被凍結的人。',
+  'bossJournal.smithHeart.quench.tipDamage':
+    '讓你的人群持續移動，以免腳下冰面破裂。利刃標記你時，把直線引離所有人，鎖定時離開。',
+  'bossJournal.smithHeart.quench.heroicShatter':
+    '碎冰會濺射{radius}碼，使範圍內所有人增加{cold}點寒意。',
+  'bossJournal.smithHeart.quench.heroicRime':
+    '活體霜殼會封住{targets}名玩家，其爆發會跳到最近的另一名玩家身上。',
+  'bossJournal.smithHeart.quench.heroicTemper': '霜淬達到{most}層時坦克會被凍結：{swap}層時換坦。',
+  'bossJournal.smithHeart.quench.heroicWarmth':
+    '生命之暖減半：治療每達到生命值的{heal}，寒意才降低1。',
+  'bossJournal.smithHeart.heat.overview':
+    '不滅者伊格納扎爾半身沉在最初湧泉之中，從不移動：團隊在它四周的岸上作戰。生命值{one}和{two}時，它會沉下，爐心隨之湧出一圈圈熔岩。它的坦克在餘燼之握與湧泉烙印上換坦。',
+  'bossJournal.smithHeart.heat.tagline':
+    '它半身沉在最初湧泉之中，從不移動：團隊在它四周的岸上作戰。',
+  'bossJournal.smithHeart.heat.chipSinks': '在{one}和{two}時沉下',
+  'bossJournal.smithHeart.heat.chipPhases': '{phases}個階段，{overflows}次滿溢',
+  'bossJournal.smithHeart.heat.phaseAllName': '所有階段',
+  'bossJournal.smithHeart.heat.phaseAllSummary': '從開戰到戰鬥結束，伊格納扎爾沉入滿溢期間除外。',
+  'bossJournal.smithHeart.heat.wheelName': '爐心之輪',
+  'bossJournal.smithHeart.heat.wheelSummary':
+    '每{every}秒，岸邊被切成伊格納扎爾前方四塊、後方四塊扇形。每一側有三塊發光，在{warn}秒後爆發，造成{min}到{max}點火焰傷害，之後再燃燒{burn}秒；一塊保持黑暗、安全。連續進行{rounds}輪，每一側的安全區與上一輪相隔一到兩塊。',
+  'bossJournal.smithHeart.heat.wheelResponse':
+    '站在你這一側的黑暗扇形，火一熄滅就立刻移到下一個安全區。',
+  'bossJournal.smithHeart.heat.fistSummary':
+    '每{every}秒，對被標記玩家所站的位置施法{cast}秒（每次{marks}名）：砸下時{radius}碼內的人受到{min}到{max}點火焰傷害。隨後三道熔岩湧浪從每個落點滾出{length}碼，朝遠離湧泉的方向及兩側，對經過的所有人造成{wMin}到{wMax}點傷害。',
+  'bossJournal.smithHeart.heat.fistHeroicSummary':
+    '每{every}秒，對{marks}名被標記玩家所站的位置施法{cast}秒：砸下時{radius}碼內的人受到{min}到{max}點火焰傷害。隨後三道熔岩湧浪從每個落點滾出{length}碼，朝遠離湧泉的方向及兩側，對經過的所有人造成{wMin}到{wMax}點傷害。',
+  'bossJournal.smithHeart.heat.fistResponse':
+    '被標記者：離開落點。所有人站在湧浪路線之間的空隙；朝向伊格納扎爾的那一側總是安全的。',
+  'bossJournal.smithHeart.heat.gripName': '餘燼之握',
+  'bossJournal.smithHeart.heat.gripSummary':
+    '伊格納扎爾每次命中都會對其坦克疊加一層：每層每秒{per}點火焰傷害，最多{most}層，持續{seconds}秒。伊格納扎爾沉下期間，層數保持不變：既不灼燒也不消退。',
+  'bossJournal.smithHeart.heat.gripResponse': '{swap}層時換坦。',
+  'bossJournal.smithHeart.heat.brandSummary':
+    '每{every}秒，無論伊格納扎爾在做什麼，都會向其坦克擲出一枚烙印，提前{lead}秒預告：{min}到{max}點火焰傷害，且坦克在{seconds}秒內受到的火焰及其他魔法傷害提高{taken}。伊格納扎爾沉下期間絕不會出現。',
+  'bossJournal.smithHeart.heat.brandResponse':
+    '每次烙印後另一名坦克嘲諷：印記的持續時間比到下一枚的間隔更長。',
+  'bossJournal.smithHeart.heat.coalSummary':
+    '每{every}秒，{count}名非坦克玩家身上會帶著熾炭：吸收接下來{absorb}點治療，並每秒對其造成{bMin}到{bMax}點火焰傷害。任何靠近到{leap}碼內的人都會接過它，並受到{lMin}到{lMax}點傷害。若{seconds}秒內未被治療打穿，它會爆裂，對{radius}碼內所有人造成{xMin}到{xMax}點傷害。',
+  'bossJournal.smithHeart.heat.coalResponse': '治療者打穿吸收。攜帶者與所有人保持{leap}碼距離。',
+  'bossJournal.smithHeart.heat.phaseOneName': '第一階段',
+  'bossJournal.smithHeart.heat.phaseOneSummary': '從開戰到生命值{one}。',
+  'bossJournal.smithHeart.heat.flareName': '爐心閃焰',
+  'bossJournal.smithHeart.heat.flareSummary':
+    '每{every}秒，距離湧泉中心超過{reach}碼的所有人受到{min}到{max}點火焰傷害並獲得閃焰灼傷：{seconds}秒內受到的火焰及其他魔法傷害提高{pct}。在後續階段，它只會擊中其坦克，且只在坦克超出範圍時。',
+  'bossJournal.smithHeart.heat.flareResponse': '所有人都靠近湧泉作戰。',
+  'bossJournal.smithHeart.heat.phaseOverflowName': '爐心滿溢',
+  'bossJournal.smithHeart.heat.phaseOverflowSummary':
+    '生命值{one}和{two}時，伊格納扎爾沉入湧泉，在最後一圈熔岩過去之前無法受到傷害。',
+  'bossJournal.smithHeart.heat.wavesName': '湧泉滿溢',
+  'bossJournal.smithHeart.heat.wavesSummary':
+    '熔岩之環一圈接一圈地從湧泉中湧出：第一次滿溢{first}圈，第二次{second}圈，更快也更窄。每一圈都有兩處缺口，下一圈的缺口會在它到來前於地面上發光。熔岩環對缺口以外的人造成{min}到{max}點火焰傷害。',
+  'bossJournal.smithHeart.heat.wavesResponse': '每圈到來前走到發光的缺口。',
+  'bossJournal.smithHeart.heat.boltName': '墜落餘燼',
+  'bossJournal.smithHeart.heat.boltSummary':
+    '滿溢期間每{every}秒，{bolts}名隨機玩家受到{min}到{max}點火焰傷害。',
+  'bossJournal.smithHeart.heat.boltResponse': '滿溢期間讓團隊保持滿血。',
+  'bossJournal.smithHeart.heat.spawnName': '湧泉之子',
+  'bossJournal.smithHeart.heat.spawnSummary':
+    '僅在第一次滿溢時，{spawn}個湧泉之子會從房間邊緣爬出，緩慢走向湧泉，生命值越低走得越慢，低於{slowAt}時改為爬行。抵達湧泉的湧泉之子會為伊格納扎爾恢復{heal}生命值，並對全團造成{min}到{max}點火焰傷害。',
+  'bossJournal.smithHeart.heat.spawnHeroicSummary':
+    '每次滿溢時，{spawn}個湧泉之子會從房間邊緣爬出並走向湧泉，生命值越低走得越慢，低於{slowAt}時改為爬行。抵達湧泉的湧泉之子會為伊格納扎爾恢復{heal}生命值，並對全團造成{min}到{max}點火焰傷害。',
+  'bossJournal.smithHeart.heat.spawnResponse': '在它們抵達湧泉邊緣前減速、昏迷並擊殺它們。',
+  'bossJournal.smithHeart.heat.keeperName': '湧泉看守',
+  'bossJournal.smithHeart.heat.keeperSummary':
+    '第二次滿溢時，兩名湧泉看守會在湧泉旁升起，必須有人坦住。每{every}秒，每名看守對一名玩家施加引火印記：{mark}秒後該玩家會留下火焰足跡，持續{trail}秒。每一塊足跡每秒造成{min}到{max}點火焰傷害，並為站在其中的湧泉之子每秒恢復{heal}生命值。',
+  'bossJournal.smithHeart.heat.keeperResponse':
+    '坦克接住湧泉看守。被標記者把足跡引離團隊與湧泉之子的路線。',
+  'bossJournal.smithHeart.heat.phaseTwoName': '第二階段',
+  'bossJournal.smithHeart.heat.phaseTwoSummary': '從生命值{one}到{two}。',
+  'bossJournal.smithHeart.heat.seedName': '爐心火種',
+  'bossJournal.smithHeart.heat.seedSummary':
+    '每{every}秒，伊格納扎爾向每名玩家所站之處擲出一顆火種（最多{cap}顆）。每顆在擲出{life}秒後爆裂，最多造成{max}點火焰傷害，距離越遠越低，超過{reach}碼則無傷害。',
+  'bossJournal.smithHeart.heat.seedHeroicSummary':
+    '每{every}秒，伊格納扎爾向每名玩家所站之處擲出一顆火種（最多{cap}顆）。每顆在擲出{life}秒後爆裂，最多造成{max}點火焰傷害，距離越遠越低，超過{reach}碼則無傷害。每次爆裂都會孵出一個追獵某名玩家的籽焰。',
+  'bossJournal.smithHeart.heat.seedResponse': '一起把火種放在遠離團隊的地方，然後跑開。',
+  'bossJournal.smithHeart.heat.seedHeroicResponse':
+    '一起把火種放在遠離團隊的地方，然後跑開。集中火力擊殺籽焰。',
+  'bossJournal.smithHeart.heat.zoneName': '甦醒之火',
+  'bossJournal.smithHeart.heat.zoneSummary':
+    '在第二和第三階段，每{every}秒湧泉周圍的三道環帶會從伊格納扎爾向外依序點燃。每道會預警{warn}秒，然後對其中所有人造成{min}到{max}點火焰傷害，並再燃燒{burn}秒。下一道環帶在上一道之後{step}秒開始預警。',
+  'bossJournal.smithHeart.heat.zoneResponse': '走進剛燒完的那道環帶。',
+  'bossJournal.smithHeart.heat.phaseThreeName': '第三階段',
+  'bossJournal.smithHeart.heat.phaseThreeSummary': '從生命值{two}到戰鬥結束。',
+  'bossJournal.smithHeart.heat.cinderName': '滾動餘燼',
+  'bossJournal.smithHeart.heat.cinderSummary':
+    '每{every}秒，一顆巨大的火球落在岸上，對{land}碼內造成{lMin}到{lMax}點傷害，並以每秒{speed}碼追獵一名玩家。若追上，該玩家死亡，{splash}碼內所有人受到{sMin}到{sMax}點傷害。每次擊打都會把它打退{knock}碼，之後{crust}秒內無法再次打退。它無法被殺死。',
+  'bossJournal.smithHeart.heat.cinderResponse': '被追獵者帶著它跑，指定的玩家輪流把它打退。',
+  'bossJournal.smithHeart.heat.lateSummary':
+    '第三階段進行{after}秒後，滾動餘燼改為每{late}秒落下一顆。',
+  'bossJournal.smithHeart.heat.lateResponse': '全力輸出，在餘燼堆積之前解決伊格納扎爾。',
+  'bossJournal.smithHeart.heat.tipTank':
+    '在餘燼之握達到指定層數時以及每次湧泉烙印後換坦。伊格納扎爾沉下期間層數保持不變，所以它升起時仍要換坦。',
+  'bossJournal.smithHeart.heat.tipHealer':
+    '滿溢會同時傷害所有人：熔岩環、墜落餘燼，以及任何餵養湧泉的湧泉之子。英雄難度下，在每個熾炭爆裂前打穿其吸收。',
+  'bossJournal.smithHeart.heat.tipDamage':
+    '在湧泉之子抵達湧泉前擊殺它們。第三階段輪到你時把滾動餘燼打退，然後等它的硬殼消退。',
+  'bossJournal.smithHeart.heat.heroicFist': '玄武岩之拳一次標記{marks}名玩家，各自砸向自己的落點。',
+  'bossJournal.smithHeart.heat.heroicAdds':
+    '每次滿溢會升起{spawn}個湧泉之子，第二次還會升起兩名湧泉看守。爐心火種會孵出籽焰。',
+  'bossJournal.smithHeart.heat.heroicCoal': '在每個作戰階段，熾炭一次灼燒兩名玩家。',
+  'bossJournal.smithHeart.heat.heroicWheel': '爐心之輪只預警{warn}秒，並以全部威力爆發。',
+  'bossJournal.smithHeart.final.overview':
+    '無主之力的殘餘阿什格蘭德在世界之砧上作戰，此處分為四個區域：熾熱、淬火、吐息與重錘。它所站的區域就是它汲取的力量，因此它的坦克要在任何過載條爆發前，把它從一個區域拖到另一個區域。生命值{first}和{second}時，它會召喚碎片；生命值{final}時，四個區域全部甦醒，迎來最終決戰。',
+  'bossJournal.smithHeart.final.tagline':
+    '它會汲取所站區域的力量：它的坦克要在任何過載條爆發前，把它從一個區域拖到另一個區域。',
+  'bossJournal.smithHeart.final.chipQuarters': '{count}個元素區域',
+  'bossJournal.smithHeart.final.chipSplinters': '{first}和{second}時召喚碎片',
+  'bossJournal.smithHeart.final.chipFinal': '{final}時最終決戰',
+  'bossJournal.smithHeart.final.phaseQuartersName': '四個區域',
+  'bossJournal.smithHeart.final.phaseQuartersSummary':
+    '鐵砧中央有一個圓環，四個區域環繞其外。每個區域的專屬技能在阿什格蘭德進入後{delay}秒開始。',
+  'bossJournal.smithHeart.final.overloadName': '過載',
+  'bossJournal.smithHeart.final.overloadSummary':
+    '每個區域都有一條過載條，阿什格蘭德站在其中時會充能（從空到滿需{fill}秒），在其他地方則以三分之一的速度消退。充能中的過載條每{every}秒對團隊造成脈衝傷害，空時{min}點，滿時{max}點。過載條全滿時會對全團爆發，造成{bMin}到{bMax}點傷害並清空。',
+  'bossJournal.smithHeart.final.overloadResponse':
+    '坦克依序把它拖過三或四個區域，絕不要在兩個區域之間來回。',
+  'bossJournal.smithHeart.final.unboundName': '心之脫縛',
+  'bossJournal.smithHeart.final.unboundSummary':
+    '阿什格蘭德站在中央圓環內時，{delay}秒後每秒獲得一層，並且每秒每層對全團造成{per}點傷害。',
+  'bossJournal.smithHeart.final.unboundResponse': '立刻把它拖出圓環。',
+  'bossJournal.smithHeart.final.shockName': '礦脈震擊',
+  'bossJournal.smithHeart.final.shockSummary':
+    '每次切換區域都會對團隊造成{min}到{max}點傷害，並使其陷入礦脈動搖{seconds}秒：動搖期間再次切換，傷害變為{mult}倍。',
+  'bossJournal.smithHeart.final.shockResponse': '只在團隊血量健康時切換區域，絕不連續切換兩次。',
+  'bossJournal.smithHeart.final.phaseOwnName': '自身之力',
+  'bossJournal.smithHeart.final.phaseOwnSummary': '整場戰鬥，無論阿什格蘭德站在哪裡。',
+  'bossJournal.smithHeart.final.forgeFistName': '熔爐之拳',
+  'bossJournal.smithHeart.final.forgeFistSummary':
+    '每攻擊{every}次，它的拳頭會橫掃前方{arc}度弧形範圍，最遠{range}碼，對範圍內所有人造成相當於一次普通攻擊{share}的傷害。',
+  'bossJournal.smithHeart.final.forgeFistResponse': '只有坦克站在阿什格蘭德面前。',
+  'bossJournal.smithHeart.final.strikeSummary':
+    '每{every}秒，它的坦克受到1層時{min}到{max}點傷害，每層提高{growth}，並獲得一層所在區域元素的效果，持續{seconds}秒：灼燒（每層每秒{burn}點火焰傷害）、刺骨冰霜（每層減速{slow}；達到{freeze}層起會出現冰環，凍結仍在其中的人）、靜電（達到{arc}層起會躍向{reach}碼內的盟友）或碎裂護甲（每層護甲降低{armor}）。',
+  'bossJournal.smithHeart.final.strikeResponse':
+    '{swap}層時換坦。近戰與帶有靜電的坦克保持{reach}碼距離。',
+  'bossJournal.smithHeart.final.anvilSummary':
+    '每{every}秒施法{cast}秒標記一名玩家；一個{radius}碼的圓圈跟隨該玩家，並在落下前{lock}秒固定。{total}點物理傷害由圈內所有人分擔，少於{fewer}人時每人多承受一半。若圈下無人，全團受到{missMin}到{missMax}點傷害。',
+  'bossJournal.smithHeart.final.anvilResponse': '全團在圓圈固定前聚集到被標記玩家身上。',
+  'bossJournal.smithHeart.final.opposingName': '對立元素',
+  'bossJournal.smithHeart.final.opposingSummary':
+    '每{every}秒，{marks}名非坦克玩家會被標記為火焰、寒冰、大地或閃電，兩兩相對，持續{seconds}秒。兩個相對的標記相距{meet}碼內時會同時消除；其他任何相遇都會爆炸，對兩人造成{min}到{max}點奧術傷害。未及時消除的標記會對其玩家造成{lMin}到{lMax}點傷害。',
+  'bossJournal.smithHeart.final.opposingHeroicSummary':
+    '每{every}秒，所有非坦克玩家都會被標記為火焰、寒冰、大地或閃電，兩兩相對，持續{seconds}秒。兩個相對的標記相距{meet}碼內時會同時消除；其他任何相遇都會爆炸，對兩人造成{min}到{max}點奧術傷害。每一對未及時消除的標記都會對全團造成{lMin}到{lMax}點傷害。',
+  'bossJournal.smithHeart.final.opposingResponse':
+    '找到你的對立標記（火焰對寒冰、大地對閃電）並會合，同時避開其他所有標記。',
+  'bossJournal.smithHeart.final.phaseFusionName': '元素融合',
+  'bossJournal.smithHeart.final.phaseFusionSummary':
+    '阿什格蘭德每次進入新的區域（第一次除外），都會停下施法{cast}秒，在它進入的區域內把離開的元素與進入的元素融合。',
+  'bossJournal.smithHeart.final.fusionSummary':
+    '每次移入新區域時施法{cast}秒。施法期間該區域的專屬技能暫停，組合技在施法結束時落下。',
+  'bossJournal.smithHeart.final.fusionResponse':
+    '弄清楚它結合了哪兩個區域，並為對應的組合技做好準備。',
+  'bossJournal.smithHeart.final.steamName': '灼熱蒸汽',
+  'bossJournal.smithHeart.final.steamSummary':
+    '熾熱與淬火：{warn}秒後升起蒸汽雲（每次{clouds}團），在區域內飄盪{life}秒，每秒對雲中的人造成{min}到{max}點傷害。',
+  'bossJournal.smithHeart.final.steamResponse': '遠離蒸汽雲。',
+  'bossJournal.smithHeart.final.magmaName': '岩漿裂隙',
+  'bossJournal.smithHeart.final.magmaSummary':
+    '熾熱與重錘：玩家被標記（每次{marks}名）；{mark}秒後每人腳下噴發裂縫，對{radius}碼內造成{min}到{max}點火焰傷害，並留下燃燒{life}秒的熔岩（每秒{pMin}到{pMax}點傷害）。',
+  'bossJournal.smithHeart.final.magmaResponse': '被標記者：在噴發前遠離團隊。',
+  'bossJournal.smithHeart.final.firestormName': '火焰風暴',
+  'bossJournal.smithHeart.final.firestormSummary':
+    '熾熱與吐息：寬{width}碼的通道橫穿大廳（每次{lanes}條）；{warn}秒後一道火牆沿每條通道橫掃，造成{min}到{max}點火焰傷害。',
+  'bossJournal.smithHeart.final.firestormResponse': '在火焰到來前離開通道。',
+  'bossJournal.smithHeart.final.hailName': '冰雹風暴',
+  'bossJournal.smithHeart.final.hailSummary':
+    '淬火與吐息：在{seconds}秒內，冰雹落在區域中（每{every}秒{per}顆，其中一半落在玩家身上）。每顆會標出{radius}碼的圓圈，{warn}秒後落地，造成{min}到{max}點冰霜傷害。',
+  'bossJournal.smithHeart.final.hailResponse': '持續移動，離開圓圈。',
+  'bossJournal.smithHeart.final.avalancheName': '雪崩',
+  'bossJournal.smithHeart.final.avalancheSummary':
+    '淬火與重錘：冰與岩石的尖刺沿通道從牆邊衝向中心（每次{lanes}條），在出現{warn}秒後發動，對通道中的人造成{min}到{max}點傷害。',
+  'bossJournal.smithHeart.final.avalancheResponse': '站在通道之間的空隙。',
+  'bossJournal.smithHeart.final.spiresName': '風暴尖塔',
+  'bossJournal.smithHeart.final.spiresSummary':
+    '吐息與重錘：風暴尖塔升起（每次{spires}座）並充能{charge}秒，隨後閃電沿尖塔之間的每條連線跳躍，造成{min}到{max}點自然傷害。',
+  'bossJournal.smithHeart.final.spiresResponse': '絕不要站在兩座尖塔之間。',
+  'bossJournal.smithHeart.final.phaseStarsName': '甦醒的星辰',
+  'bossJournal.smithHeart.final.phaseStarsSummary':
+    '阿什格蘭德第一次進入某個區域時，該區域的星辰會甦醒並持續到戰鬥結束。阿什格蘭德站在其區域內時，星辰全速運轉；在其他地方則以{pace}的速度運轉。',
+  'bossJournal.smithHeart.final.pillarsSummary':
+    '重錘之星：每{every}秒，石柱在{warn}秒後從玩家腳下衝出（每次{count}根）。{knock}碼內的人受到{min}到{max}點傷害並被擊退。石柱會留下，最多{cap}根；若石柱已達上限，該波改為對全團造成{tMin}到{tMax}點傷害。',
+  'bossJournal.smithHeart.final.pillarsResponse':
+    '利用石柱應對天落雷擊，並在它們堆積之前用交錯之刃擊碎。',
+  'bossJournal.smithHeart.final.chargedName': '風暴充能',
+  'bossJournal.smithHeart.final.chargedSummary':
+    '落在石柱{arcReach}碼內的天落雷擊會環繞石柱形成電弧（{arcR}碼內{aMin}到{aMax}點傷害）並使其充能。每{every}秒，每根充能的石柱對全團造成{min}到{max}點傷害，距離其{zone}碼內的人每秒受到{zMin}到{zMax}點傷害。',
+  'bossJournal.smithHeart.final.chargedResponse': '盡快用交錯之刃擊碎充能的石柱。',
+  'bossJournal.smithHeart.final.skySummary':
+    '吐息之星：每{every}秒，閃電標記玩家（每次{marks}名）以及石柱旁的地點（每次{spots}個）。{warn}秒後劈下，對{radius}碼內造成{min}到{max}點自然傷害。',
+  'bossJournal.smithHeart.final.skyResponse': '走出你的圓圈；落在石柱旁的雷擊會使其充能。',
+  'bossJournal.smithHeart.final.bladeSummary':
+    '淬火之星：每{every}秒，一把利刃從邊緣升起，瞄準一條穿過被標記玩家的直線（每輪{marks}名），直線跟隨他們，直到飛出前{lock}秒鎖定。線上所有人受到{min}到{max}點冰霜傷害，線上的每根石柱都會碎裂。',
+  'bossJournal.smithHeart.final.bladeResponse':
+    '被標記者：把直線引過你想擊碎的石柱，然後離開直線。',
+  'bossJournal.smithHeart.final.whirlName': '火焰旋風',
+  'bossJournal.smithHeart.final.whirlSummary':
+    '熾熱之星：每{every}秒，火焰旋風在{warn}秒後升起（每次{count}道），以每秒{speed}碼在地面上遊走{life}秒，對碰到的人造成{min}到{max}點火焰傷害。',
+  'bossJournal.smithHeart.final.whirlResponse': '往側面跑開，甩掉它們。',
+  'bossJournal.smithHeart.final.phaseKitsName': '區域技能',
+  'bossJournal.smithHeart.final.phaseKitsSummary':
+    '阿什格蘭德站在某個區域時，該區域的專屬技能會運作，在它進入後{delay}秒開始。',
+  'bossJournal.smithHeart.final.fistSummary':
+    '在熾熱區域：每{every}秒對一名玩家所站位置施法{cast}秒：{radius}碼內{min}到{max}點火焰傷害，隨後三道熔岩湧浪從該處滾出，對經過的所有人造成{wMin}到{wMax}點傷害。',
+  'bossJournal.smithHeart.final.fistResponse': '被標記者：離開落點，並站在湧浪之間的空隙。',
+  'bossJournal.smithHeart.final.boltSummary':
+    '在吐息區域：每{every}秒對一名玩家施法{cast}秒：{min}到{max}點自然傷害，隨後跳向任何被擊中者{jump}碼內的每名玩家，每次跳躍傷害提高{growth}。',
+  'bossJournal.smithHeart.final.boltResponse': '散開，彼此相距{jump}碼。',
+  'bossJournal.smithHeart.final.devilName': '塵捲風',
+  'bossJournal.smithHeart.final.devilSummary':
+    '在吐息區域：每{every}秒，塵捲風在{warn}秒後於玩家身旁升起（每次{count}道），遊走{life}秒。碰到你時造成{min}到{max}點自然傷害並將你拋出{throw}碼。',
+  'bossJournal.smithHeart.final.devilResponse': '留意它們遊走的方向，避開它們。',
+  'bossJournal.smithHeart.final.tremorName': '震顫裂痕',
+  'bossJournal.smithHeart.final.tremorSummary':
+    '在重錘區域：每{every}秒，玩家腳下會裂開裂痕（每次{count}道）。{warn}秒後每道裂痕爆發，對{radius}碼內造成{min}到{max}點傷害。',
+  'bossJournal.smithHeart.final.tremorResponse': '在爆發前離開你的裂痕。',
+  'bossJournal.smithHeart.final.emberName': '餘燼印記',
+  'bossJournal.smithHeart.final.emberSummary':
+    '在熾熱區域：每{every}秒，{marks}名遠程玩家被標記。{seconds}秒後餘燼落在他們腳下，形成{radius}碼的火池陰燃{life}秒，每秒造成{min}到{max}點火焰傷害。',
+  'bossJournal.smithHeart.final.emberResponse': '被標記者：一起把火池放在區域邊緣，然後離開。',
+  'bossJournal.smithHeart.final.iceSummary':
+    '在淬火區域：每{every}秒，{marks}名玩家腳下的冰面發出呻吟。{warn}秒後冰面在{radius}碼內碎裂：{min}到{max}點冰霜傷害並昏迷{stun}秒。',
+  'bossJournal.smithHeart.final.iceResponse': '在冰面碎裂前離開呻吟的冰面。',
+  'bossJournal.smithHeart.final.drawnSummary':
+    '在吐息區域：每{every}秒，{marks}名玩家被標記{seconds}秒。每秒閃電從每名被標記者身上躍向{reach}碼內的其他每名玩家，造成{min}到{max}點自然傷害。',
+  'bossJournal.smithHeart.final.drawnResponse': '被標記者：與所有人保持{reach}碼距離。',
+  'bossJournal.smithHeart.final.shellName': '石殼',
+  'bossJournal.smithHeart.final.shellSummary':
+    '在重錘區域：每{every}秒，{marks}名玩家被石殼包覆，吸收接下來{absorb}點治療，最多持續{seconds}秒。',
+  'bossJournal.smithHeart.final.shellResponse': '治療者在治療其他目標之前先打破石殼。',
+  'bossJournal.smithHeart.final.phaseCallName': '四角召喚',
+  'bossJournal.smithHeart.final.phaseCallSummary':
+    '生命值{first}和{second}時，阿什格蘭德在護盾保護下走入中央，從最滿的幾個區域召喚出碎片。',
+  'bossJournal.smithHeart.final.callSummary':
+    '聚集之力在阿什格蘭德引導的{seconds}秒內為其提供護盾，碎片從它最滿的區域升起（每次{adds}個，各{health}點生命值）。將它們全部擊殺可提前打破護盾。引導結束時仍存活的碎片會把自己的元素注入阿什格蘭德：直到戰鬥結束，無論它站在哪裡，該區域的星辰都會全速運轉。',
+  'bossJournal.smithHeart.final.callResponse': '在引導結束前擊殺所有碎片。',
+  'bossJournal.smithHeart.final.splinteredName': '碎裂之力',
+  'bossJournal.smithHeart.final.splinteredSummary':
+    '每{every}秒，每個存活的碎片對全團造成{min}到{max}點傷害，每次脈動提高{rise}。',
+  'bossJournal.smithHeart.final.splinteredResponse': '碎片活得越久，打得越痛：快速擊殺它們。',
+  'bossJournal.smithHeart.final.shearSummary':
+    '每個碎片每{every}秒：施法{cast}秒，對其目標施放{arc}度、長{range}碼的錐形攻擊。目標受到{tMin}到{tMax}點傷害；錐形內的其他人受到{oMin}到{oMax}點傷害。',
+  'bossJournal.smithHeart.final.shearResponse':
+    '每個碎片的坦克讓它背對團隊，其他人不要站在它面前。',
+  'bossJournal.smithHeart.final.heatSplinterName': '熾熱碎片',
+  'bossJournal.smithHeart.final.heatSplinterSummary':
+    '它被拖過的地方會留下餘燼足跡：每{step}碼一塊{radius}碼的火焰，燃燒{life}秒（每秒{tMin}到{tMax}點傷害）。每{every}秒，一名玩家會攜帶爆裂煤塊{seconds}秒；之後它爆裂，對{reach}碼內的其他所有人造成{min}到{max}點傷害。',
+  'bossJournal.smithHeart.final.heatSplinterResponse': '把它拖離團隊。煤塊攜帶者離開人群。',
+  'bossJournal.smithHeart.final.tollSummary':
+    '淬火碎片：每{every}秒施法{cast}秒，若鐘聲響完，會對全團造成{min}到{max}點冰霜傷害。',
+  'bossJournal.smithHeart.final.tollResponse': '每次都要打斷。',
+  'bossJournal.smithHeart.final.ringName': '淬火之環',
+  'bossJournal.smithHeart.final.ringSummary':
+    '每{every}秒，一道帶有{gaps}處缺口的冰霜之環從淬火碎片向外擴散。從缺口以外穿過會受到{min}到{max}點冰霜傷害，並在{slowSeconds}秒內減速{slow}。',
+  'bossJournal.smithHeart.final.ringResponse': '冰環經過時從缺口穿過。',
+  'bossJournal.smithHeart.final.weightName': '疊加重壓',
+  'bossJournal.smithHeart.final.weightSummary':
+    '重錘碎片：每次命中都會對其目標疊加一層（每層每秒{per}點傷害，持續{seconds}秒），每層使它的攻擊加重{step}。',
+  'bossJournal.smithHeart.final.weightResponse': '{swap}層時換坦。',
+  'bossJournal.smithHeart.final.pounceSummary':
+    '吐息碎片：每{every}秒對一名非坦克玩家施法{cast}秒。它撲向該玩家，造成{min}到{max}點傷害，並追獵該玩家{seconds}秒，其狂襲之風每秒對{reach}碼內的其他所有人造成{bMin}到{bMax}點傷害。',
+  'bossJournal.smithHeart.final.pounceResponse': '被追獵者帶著它遠離人群。',
+  'bossJournal.smithHeart.final.orbName': '風暴寶珠',
+  'bossJournal.smithHeart.final.orbSummary':
+    '每{every}秒，風暴寶珠在吐息碎片周圍成形（每次{count}顆）。單獨一人接下時受到{min}到{max}點傷害；兩人或更多人接下時每人承受雙倍。無人接下的寶珠會在{life}秒後爆裂，對全團造成{bMin}到{bMax}點傷害。',
+  'bossJournal.smithHeart.final.orbResponse': '每顆寶珠由一名玩家踩上。',
+  'bossJournal.smithHeart.final.phaseFinalName': '四角皆醒',
+  'bossJournal.smithHeart.final.phaseFinalSummary':
+    '生命值{final}時，阿什格蘭德走入中央圓環，迎來戰鬥的最後階段。過載條停止運作。',
+  'bossJournal.smithHeart.final.awakeName': '群星皆醒',
+  'bossJournal.smithHeart.final.awakeSummary':
+    '四顆星辰同時以{pace}的速度運轉：石柱、閃電、利刃與旋風一齊襲來。鐵砧之重維持自己的計時。',
+  'bossJournal.smithHeart.final.awakeResponse': '守住各自的分工：場面更忙亂，但不會出現新東西。',
+  'bossJournal.smithHeart.final.furyName': '無主之怒',
+  'bossJournal.smithHeart.final.furySummary':
+    '最終階段開始{after}秒後，它每{every}秒對全團造成{min}到{max}點傷害，每次脈動提高{rise}，永無止境。',
+  'bossJournal.smithHeart.final.furyResponse': '用上所有剩餘的冷卻技能，解決它。',
+  'bossJournal.smithHeart.final.tipTank':
+    '依序把阿什格蘭德拖過各個區域，以免任何過載條充滿，並立刻把它拖出中央圓環。元素打擊{swap}層時換坦。每次召喚時接住碎片。',
+  'bossJournal.smithHeart.final.tipHealer':
+    '每次過載脈衝、鐵砧之重與碎裂之力都會擊中全團。為每次召喚和最終階段保留冷卻技能，最終階段的無主之怒永不停歇。',
+  'bossJournal.smithHeart.final.tipDamage':
+    '對立元素時找到你的對立標記，每次鐵砧之重都聚集到圈下，並在召喚結束前擊殺所有碎片。打斷每一次霜凇鐘鳴。',
+  'bossJournal.smithHeart.final.heroicBurst':
+    '過載條全滿時會爆發，造成{bMin}到{bMax}點傷害：先補滿血並使用減傷技能。',
+  'bossJournal.smithHeart.final.heroicKits':
+    '每次切換區域都會觸發礦脈震擊，餘燼印記、呻吟寒冰、引雷與石殼也會加入各區域的技能。',
+  'bossJournal.smithHeart.final.heroicOpposing':
+    '對立元素會標記所有非坦克玩家，每一對未消除的標記都會擊中全團。',
+  'bossJournal.smithHeart.final.heroicCall': '每次四角召喚會升起{adds}個碎片。',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '每{every}秒施法{cast}秒，對{radius}碼內所有玩家造成{min}至{max}點傷害。被釘住的玩家無論距離多遠都會受到{pinMult}倍傷害。',
   'bossJournal.wildheart.zulgar.spearSummary':
@@ -1776,6 +2356,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureGuide.lootClass': '職業',
   'hudChrome.adventureGuide.lootSpec': '專精',
   'hudChrome.adventureGuide.allSpecs': '所有專精',
+  'hudChrome.adventureGuide.allClasses': '所有職業',
   'hudChrome.adventureGuide.lootHint':
     '顯示可用且屬性適合所選專精的裝備。通用獎勵仍會顯示。掉落機率按完整掉落清單計算。',
   'hudChrome.adventureGuide.lootEmpty': '沒有適合此職業和專精的裝備。',
@@ -1969,6 +2550,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipDormant': '未啟用：續訂會員以恢復裝備屬性和套裝加成。',
   'entities.items.lantern_seal.name': '燈火印章',
   'entities.items.reins_lantern_hall_destrier.name': '燈火大廳戰馬的韁繩',
+  'entities.items.reins_quarryheart_charger.name': '石心戰駒的韁繩',
+  'entities.items.remnant_of_the_masterless_strength.name': '無主之力的殘餘',
+  'entities.items.coffer_of_the_highwatch_vigil.name': '高望守夜會的寶匣',
+  'entities.npcs.heart_warden_ada_collier.name': '守望者艾達·科利爾',
+  'entities.npcs.heart_warden_ada_collier.title': '高望守夜會',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    '守夜會四十代人守望這座山，卻不知為何。如今我們知道了，{className}。當心你在裡面喚醒的東西。',
+  'entities.quests.q_heart_what_the_heart_let_go.title': '心臟放走之物',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    '心臟中的力量沒有主人，也沒有心智，{playerName}，但它有形體。它倒下時不會死去：它的精華會掙脫出來，逃回岩石之中。總有些東西會留下。把它留下的殘餘帶給我，守夜會將從自己的寶庫中付你報酬。',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    '還是溫熱的。四股力量凝在一塊碎片裡，它不願被握住。守夜會信守承諾：拿走這個寶匣，願它裝著值得這番攀登的東西。',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': '無主之力的殘餘',
   'entities.items.membership_staff.name': '萬變法杖',
   'hudChrome.bags.membershipSlot': '會員背包欄位',
   'hudChrome.bags.membershipSlotLocked': '開通會員以解鎖此背包欄位。',
@@ -4267,26 +4861,33 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '寬闊的鋼製劍身，血槽中燃著燈火，鍍金的護頰，護手中燃著一盞籠中提燈，藍色皮革劍柄。',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火大廳之劍',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '爐火之刃',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    '焦黑鋼鐵鑄成的火焰波紋劍身，兩側刃口如出爐般熾熱，熔融的裂縫在兩面分叉蔓延，青銅火焰護手環繞一塊燃燒的寶石，牛血色握柄。',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    '燈火大廳裡有一座自大廳建成以來從未熄滅的爐膛，加里克·霍爾特發誓這把劍就是在它的炭火中淬火的。佩戴它的成員說，即使在最寒冷的守夜裡，劍柄也依然溫暖。刃口上的火焰只是外觀。',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '風暴浪峰',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    '海藍色的修長劍身，刃口如碎浪般明亮，風暴血槽中封著分叉的閃電，劍根上方是一道鍍金的浪，一側刃口生著鰭，鍍金浪濤護手環繞一顆風暴珍珠。',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    '一位為公會出海的船長從一場狂風中帶回了這把劍，那場風暴折斷了她的桅桿，讓整艘船像鐘一樣鳴響。加里克只肯用印章出售它，並提醒每位買家，風暴來臨前它會嗡嗡作響。閃電與海光只是外觀。',
   'hudChrome.wocStore.skins.rimelight_staff.name': '霜光法杖',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    '蒼白的杖身以銀箍束緊，纏繞著發光的霧凇，杖頂的銀爪在冰晶之冠中托著一顆巨大的寒光水晶，杖頸垂著冰柱。',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    '燈火大廳的冬季守望者曾手持這樣的法杖行走在高路上，點亮杖頂，為迷失在雪中的旅人引路。加里克在架上留了一根，給印章有餘的成員。寒霜與冷光只是外觀。',
-  'hudChrome.wocStore.skins.duskwick_staff.name': '暮芯法杖',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    '兩股扭結的黑木以鐵箍束緊，杖頂是一盞敞開的鐵提燈，在兩隻捲曲的角之間燃著紫色的暮光火焰，燈底垂著晃動的鎖鏈。',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    '大廳裡的每一盞燈都明亮地燃燒，只有一盞例外。暮光之焰是為在夜裡守護大廳而點燃的，別的燈發出光的地方，它發出影子；加里克親自修剪它的燈芯。煙霧與紫色光輝只是外觀。',
   'hudChrome.wocStore.collections.lantern_hall': '燈火大廳',
+  // The Smith's Heart raid arms (M16 fills).
+  'hudChrome.wocStore.collections.smiths_heart': '鐵匠之心',
+  'hudChrome.wocStore.skins.seamcaller_maul.name': '喚脈者',
+  'hudChrome.wocStore.skins.seamcaller_maul.look':
+    '以一整塊深色採石場岩石鑿成的雙手巨錘，燃燒的金色礦脈將石身裂開，兩側各嵌一枚帶框的金色符文，金邊打擊面環繞燃燒的琥珀，鉚接的金箍，彎曲的金角，錘冠長出琥珀礦脈晶體，編織皮革的錘柄以黃金箍束。',
+  'hudChrome.wocStore.skins.seamcaller_maul.lore':
+    '鐵錘議會在向突襲者舉起手之前，先用歌聲喚醒了礦脈，岩石記住了每一個音符。這把巨錘取自他們的鐵錘劈開的那塊石頭，揮動時符文仍在燃燒。礦脈晶體的碎片繞著錘頭盤旋，彷彿山嶺想把它們要回去。符文和盤旋的晶體只是外觀。',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '修長的風暴鋼劍身，刃口如閃電般明亮，兩面蝕刻雲紋，各有一道分叉的雷霆，劍脊上勾著風之鰭，護手是環繞風暴之眼寶石展開的銀色羽翼。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '吐息守護者讓心臟中的空氣永不停歇，它倒下時，所攜的風暴並未散去，而是沉入了這把劍中。風仍繞著鋼身旋轉，閃電仍沿著刃口奔走，持劍者發誓護手中的眼睛一直望著天空。風暴只是外觀。',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '纏繞銀絲花紋的藍鋼杖身，以鑲嵌寶石的銀箍束緊，杖頂四片銀色月牙刃托著一顆冷光巨晶，周圍環繞一圈較小的晶體，下方垂著冰柱。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '淬火守護者冷卻了心臟鍛造過的每一把刀刃。它倒下時，它的晶體是最後一個停止發光的東西，突襲者把它帶出來時，它仍冷得能讓手結霜。冰片環繞杖冠，霜之符文繞著它旋轉。寒意只是外觀。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '冷卻的岩漿外殼鑄成的寬刃，刃口仍在熔融，兩面布滿餘燼脈絡般的裂紋，劍脊長著黑曜石利齒，黑鐵護手向上彎成滴落熔流的雙角，環抱一顆岩漿之心。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '熾熱守護者就是心臟得名的那團火。它熄滅時，最後的熔流流進鍛爐地面上一道劍形的裂縫，在那裡冷卻：外面是硬殼，裡面是火。它的刃口從未停止燃燒。這火只是外觀。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '心熔法杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '鍛爐青銅杖身鑲嵌著層層採石場岩石，杖頂是一圈巨大的金色光環，四顆寶石輪流亮起（採石琥珀、狂風、寒霜與烈火），環抱一顆白金核心的鐵砧之心。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '無主之力是心臟的四條礦脈在世界之砧上結成的一具軀體。它破碎時，四者並未分離：它們沉入這圈光環，輪流燃燒，岩石、風、霜與火，就像它們曾經輪流出擊一樣。四道光只是外觀。',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公會印記武裝劍',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '發藍鋼劍刃、青銅魚尾形十字護手、青綠色染皮握柄，以及一枚小巧的公會鋼印。',
@@ -9300,6 +9901,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '匠人餘燼',
   'hudChrome.raidLockout.heroicName': '英雄難度:{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被鎖定至英雄難度的{name}。',
+  'hudChrome.raidLockout.bossSavedNoLoot': '你本週已擊敗過這個首領，它不會再為你掉落戰利品。',
+  'hudChrome.raidLockout.bossNameHeroic': '{raid}:{boss}(英雄難度)',
   'hudChrome.practiceDps.title': '訓練假人',
   'hudChrome.practiceDps.prompt': '攻擊假人以開始一輪測試',
   'hudChrome.practiceDps.previous': '先前的測試',
@@ -15345,6 +15948,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': '隱藏',
   'hudChrome.deeds.titleChip': '頭銜獎勵',
   'hudChrome.deeds.borderChip': '邊框獎勵',
+  'hudChrome.deeds.cosmeticChip': '外觀獎勵',
+  'hudChrome.deeds.rewardAppearance': '獎勵：{name}武器外觀，帳號內所有角色可用',
+  'hudChrome.deeds.rewardMount': '獎勵：{name}坐騎',
   'hudChrome.deeds.watch': '追蹤',
   'hudChrome.deeds.unwatch': '取消追蹤',
   'hudChrome.deeds.watchFull': '追蹤清單已滿（最多 {cap} 項）',
@@ -15450,6 +16056,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。',
   'hudChrome.mounts.name_lanternback_troll': '提燈背者格倫博',
   'hudChrome.mounts.name_lantern_hall_destrier': '燈火大廳戰馬',
+  'hudChrome.mounts.name_quarryheart_charger': '石心戰駒',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
@@ -15462,6 +16069,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '鐵匠之心的戰駒：採石場的石板懸浮在活火之軀上，白熱的心臟在金色肋骨後跳動，額生冰晶之角，鬃毛是劈啪作響的雷風。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
@@ -18947,7 +19556,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '三排各十一個技能格位於你的經驗條上方，第一排的最前端還有一顆專用的攻擊按鈕。一開始只有第一排在那裡：想要更多空間時，可以在設定中開啟第二排與第三排，而第三排需要先開啟第二排。鍵盤最上方的數字鍵列發動第一條動作列，額外的動作列則預設對應數字鍵盤。\n\n技能來自你的法術書（P）：把技能從書裡拖到格位上，或使用該列上的切換鈕，把它放進第一個空著的格位。物品也是同樣的用法，所以一疊藥水或一捲繃帶也能住在格位上，用一個按鍵使用。\n\n等一條動作列排成你喜歡的樣子之後，你可以把它鎖起來。鎖定會拒絕拖曳、放置與清除，同時讓那些技能一如往常地可用，所以戰鬥中一次手滑的點擊，再也不會把你的按鈕弄亂。\n\n另外有兩條較小的動作列會在適用時加入這一排：寵物指令列，上頭是攻擊、停止、挑釁、防禦與主動，綁定在 Ctrl 加 1 到 5；以及給那些會切換姿態或形態的職業使用的姿態列。',
   'guide.interfacePage.actionBarsTitle': '你的動作列',
   'guide.interfacePage.aurasBody':
-    '你自己的增益會化作一排小圖示，顯示在右上角、小地圖旁邊，每個圖示都在倒數自己剩餘的時間，而你的減益排在它們下方一列。右鍵點擊自己的增益即可取消它。\n\n有一個選項能把你的增益列移到你自己的單位框架上，這樣整個角落就全留給你的減益。\n\n你目標的增益與減益則一起排在它框架下方的一條帶狀區裡。想給它們更多空間時，Shift+J 會開啟獨立的「目標增益與減益效果」視窗，你可以移動它、篩選成只看增益或只看減益，並讓它一直開著。',
+    '你自己的增益會化作一排小圖示，顯示在右上角、小地圖旁邊，每個圖示都在倒數自己剩餘的時間，而你的減益排在它們下方一列。右鍵點擊自己的增益即可取消它。\n\n有一個選項能把你的增益列移到你自己的單位框架上，這樣整個角落就全留給你的減益。\n\n你目標的增益與減益則一起排在它框架下方的一條帶狀區裡。想給它們更多空間時，Shift+B 會開啟獨立的「目標增益與減益效果」視窗，你可以移動它、篩選成只看增益或只看減益，並讓它一直開著。',
   'guide.interfacePage.aurasTitle': '增益與減益',
   'guide.interfacePage.barsBody':
     '你的施法條會在你施法或引導時出現在畫面中央、動作列的正上方，上頭帶著法術的名稱與剩餘時間。你的目標在自己的框架上也有一條施法條，讓你看清接下來要來的是什麼，並做出回應。\n\n施法條下方還有一條細細的揮擊條，會在兩次武器揮擊之間逐漸填滿，讓近戰或遠程攻擊者看出下一次自動攻擊何時落下。\n\n你的經驗條橫貫動作列下方的整個寬度，切分成一段一段，其中較亮的一段顯示你已經存下的充分休息經驗。\n\n潛到水面下時，畫面上方會出現一條藍色的呼吸條。頭部沒入水中時它會逐漸消耗，耗盡並開始溺水時會閃成紅色，而你一浮出水面便會迅速回滿。空白鍵讓你往上游，下潛鍵（預設是 Ctrl）則帶你潛得更深。\n\n傷害與治療會化作小小的數字，從它們落下之處往上浮起，讓你不必讀文字也能看懂一場戰鬥。聊天框中的「戰鬥」分頁則保留完整的文字紀錄。',
@@ -20758,6 +21367,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.close': '關閉',
   'worldContent.realmBuilderMonumentName': '王國建造者紀念碑',
   'worldContent.musterRackName': '徵召兵器架',
+  'worldContent.heartSealCrystalName': '心之封印水晶',
   'hudChrome.talkingHead.label': '對話',
   'hudChrome.hubLesson.target': '先將假人設為目標。',
   'hudChrome.hubLesson.openWindow': '打開{meters}。',
@@ -23014,6 +23624,247 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '刪除此角色前，請先將所有尚未鎖定的集章卡轉移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推薦獎勵會員契約正在發放給此角色。請在發放完成後再嘗試刪除此角色。',
+  // The Smith's Heart raid: its name, guardians, vein warders and casts (M16 fills).
+  'entities.dungeons.smith_heart.name': '鐵匠之心',
+  'entities.dungeons.smith_heart.enterText': '群山在你周圍低鳴，宛如一座為夜晚封住的熔爐……',
+  'entities.dungeons.smith_heart.leaveText': '你爬回風暴岩的狂風之中。',
+  'entities.mobs.heart_hammer_guardian.name': '赫羅斯瑪爾，不屈之錘',
+  'entities.mobs.heart_breath_guardian.name': '艾爾溫，無羈狂風',
+  'entities.mobs.heart_quench_guardian.name': '奧蘿拉，寂靜之冬',
+  'entities.mobs.heart_heat_guardian.name': '伊格納扎爾，不滅者',
+  'entities.mobs.heart_masterless_strength.name': '阿什格蘭德，無主之力的殘餘',
+  'entities.mobs.heart_hammer_warder.name': '錘脈守衛',
+  'entities.mobs.heart_ring_warder.name': '環爐守衛',
+  'entities.mobs.heart_breath_warder.name': '息脈守衛',
+  'entities.mobs.heart_breath_caller.name': '息脈召喚者',
+  'entities.mobs.heart_quench_warder.name': '淬脈守衛',
+  'entities.mobs.heart_quench_caller.name': '淬脈召喚者',
+  'entities.mobs.heart_heat_warder.name': '熱脈守衛',
+  'entities.mobs.heart_heat_caller.name': '熱脈召喚者',
+  'entities.mobs.heart_heat_wellspawn.name': '湧泉之子',
+  'entities.mobs.heart_heat_wellkeeper.name': '湧泉看守',
+  'entities.mobs.heart_heat_seedflame.name': '籽焰',
+  'entities.mobs.heart_heat_rolling_cinder.name': '滾動餘燼',
+  'abilityUi.cast.heart_mountains_wrath': '山岳之怒',
+  'abilityUi.cast.heart_bellows_gust': '巔峰咆哮',
+  'abilityUi.cast.heart_storm_lance': '風暴長槍',
+  'abilityUi.cast.heart_quenching_breath': '淬火吐息',
+  'hudChrome.auraEffect.heatGuardian.statePhase1':
+    '半身沉在湧泉之中，從不移動。爐心之輪把岸邊切成四塊：三塊發紅並在{warn}秒後爆發（英雄難度{heroicWarn}秒），一塊保持黑暗、安全；每一輪爆發時，下一輪的安全區會出現在別處。玄武岩之拳砸向岸上的一點，三道熔岩湧浪從那裡滾滾而出；爐心閃焰會擊中所有距離湧泉超過{reach}碼的人。生命值降到70%時它會沉下，爐心隨之滿溢。英雄難度下傷害提高{heroicPct}%。',
+  'hudChrome.auraEffect.heatGuardian.statePhase2':
+    '半身沉在湧泉之中，從不移動。爐心之輪與玄武岩之拳仍在繼續；爐心火種落在團隊腳下，片刻後爆裂，甦醒之火將湧泉周圍的地面一圈接一圈地點燃。生命值降到40%時它會再次沉下，爐心再度滿溢。英雄難度下傷害提高{heroicPct}%。',
+  'hudChrome.auraEffect.heatGuardian.statePhase3':
+    '半身沉在湧泉之中，從不移動。爐心之輪、玄武岩之拳與甦醒之火仍在繼續，滾動餘燼會墜落並追逐玩家：擊中它就能把它打退。英雄難度下傷害提高{heroicPct}%。',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '在湧泉中冰冷沉寂：在團隊靠近、它甦醒燃起之前，無法被攻擊或傷害。',
+  'hudChrome.auraEffect.heatGuardian.stateUnder':
+    '沉入湧泉之中：爐心滿溢期間無法被攻擊或傷害。熔岩之環一圈接一圈地從湧泉中湧出，每一圈都有兩處火焰分開的缺口；下一圈的缺口會在它到來之前在地面上發光。熔岩環經過時站進缺口裡，否則會受到{min}到{max}點火焰傷害（英雄難度{heroicMin}到{heroicMax}點）。第二次滿溢的熔岩環來得更快，缺口也更窄。最後一圈過去後它會再次升起。',
+  'hudChrome.auraEffect.heatGuardian.scorched':
+    '受到的火焰、冰霜、自然、暗影和祕法傷害提高{pct}%。每{every}秒，爐心閃焰會擊中所有距離湧泉超過{reach}碼的人並刷新此效果。',
+  'hudChrome.auraEffect.heatGuardian.grip':
+    '每秒受到{total}點火焰傷害（{stacks}層中每層{per}點）。守護者每次命中都會疊加一層（最多{most}層），持續{seconds}秒：在灼燒過重之前換坦克。',
+  'hudChrome.auraEffect.heatGuardian.kindling':
+    '{seconds}秒後你會在{trail}秒內留下火焰足跡。每一塊足跡每秒對友方造成{min}到{max}點火焰傷害，並為站在其中的湧泉之子每秒恢復{heal}%生命值：離開團隊和湧泉之子的路線。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.heatGuardian.trail':
+    '你正在留下餘燼足跡：寬{radius}碼的火焰燃燒{life}秒，每秒對其中的友方造成{min}到{max}點火焰傷害，並為其中的湧泉之子每秒恢復{heal}%生命值。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.heatGuardian.hunted':
+    '一團滾動餘燼或籽焰正在追你。被滾動餘燼追上你會死亡，{radius}碼內的所有人都會被灼燒：保持距離，讓隊友擊打它，每次擊打都會把它打退{knock}碼（之後{crust}秒內無法再次打退）。',
+  'hudChrome.auraEffect.heatGuardian.crust': '已冷卻變硬：此效果結束前，擊打無法將它打退。',
+  'hudChrome.auraEffect.heatGuardian.brand':
+    '湧泉烙印：{seconds}秒內，你受到的火焰、冰霜、自然、暗影和祕法傷害提高{pct}%，餘燼之握的灼燒也包括在內。守護者每{every}秒向它的坦克擲出一枚烙印，即使它正在施法、處於自身的施法條中或搆不到你：造成{min}到{max}點火焰傷害並附加此印記。另一名坦克必須在下一枚落下前嘲諷。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.heatGuardian.coal':
+    '吸收你受到的接下來{absorb}點治療，並每秒對你造成{burnMin}到{burnMax}點火焰傷害。用治療打穿吸收即可將其熄滅。任何靠近你{leap}碼以內的玩家都會帶著剩餘的吸收量接過它，並受到{leapMin}到{leapMax}點火焰傷害；它落到某人身上後{grace}秒內不會再轉移。若{seconds}秒內未被治療打穿，它會爆裂，對包括你在內{radius}碼內的所有人造成{burstMin}到{burstMax}點火焰傷害。',
+  'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成為它的一部分。',
+  'hudChrome.heatGuardian.say.sink': '湧泉升起來迎接你們了！',
+  'hudChrome.heatGuardian.say.sinkAgain': '爐心再次滿溢。你們再次燃燒。',
+  'hudChrome.heatGuardian.say.feed': '是的……回到火焰的懷抱吧。',
+  'hudChrome.heatGuardian.say.rise': '我隨最初之火一同升起！',
+  'hudChrome.heatGuardian.say.seeds': '我撒下的每一顆火星都會生根。',
+  'hudChrome.heatGuardian.say.zones': '爐心在你們腳下甦醒。',
+  'hudChrome.heatGuardian.say.cinder': '跑吧，小小的火星。火焰餓了。',
+  'hudChrome.heatGuardian.say.intro':
+    '蟲子們。你們爬進最初之焰，還指望能離開？在你們的族類學會用火之前，我就已在燃燒。那就與它一同燃盡吧！',
+  'abilityUi.cast.heart_heat_fist': '玄武岩之拳',
+  'abilityUi.cast.heart_forge_wrath': '熔爐之怒',
+  'abilityUi.cast.heart_forge_pour': '熔爐傾瀉',
+  'abilityUi.cast.heart_ember_bolt': '餘燼箭',
+  // The Smith's Heart's Hammer Council (M16 fills).
+  'entities.mobs.heart_seam_singer.name': '維爾米拉，礦脈歌者',
+  'abilityUi.cast.heart_hammers_weight': '重錘之壓',
+  'abilityUi.cast.heart_wake_the_stone': '喚醒岩石',
+  'abilityUi.cast.heart_falling_rock': '落石',
+  'abilityUi.cast.heart_seam_bolt': '礦脈箭',
+  'abilityUi.cast.heart_song_of_the_seam': '礦脈之歌',
+  'hudChrome.auraEffect.breathGuardian.intro': '沉睡中：在風暴將它放下之前，無法被攻擊或傷害。',
+  'hudChrome.auraEffect.council.intro': '沉睡中：在議會甦醒之前，無法被攻擊或傷害。',
+  'hudChrome.auraEffect.council.wakeMark':
+    '結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.council.rockMark':
+    '結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：分擔{heroicTotal}點傷害，全團受到{heroicTremorMin}到{heroicTremorMax}點傷害。',
+  'hudChrome.auraEffect.council.memory':
+    '造成的傷害提高{pct}%：重錘議會中倒下同伴的靈魂在其體內燃燒。',
+  'hudChrome.auraEffect.council.fury':
+    '攻擊、施法及其所有技能的速度提高{pct}%，並以全部威力使用倒下同伴的技能。將兩者同時擊殺即可避免。',
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': '怒火迴響',
+  'abilityUi.cast.heart_endless_song': '無盡之歌',
+  'hudChrome.council.say.guardian_pull': '採石場來了外人。鐵鎚之力絕不向血肉屈服。',
+  'hudChrome.council.say.guardian_wrath': '群山回應了我！若岩石肯收留你們，就躲起來吧！',
+  'hudChrome.council.say.guardian_death': '我的力量……交給岩石。',
+  'hudChrome.council.say.guardian_remember': '岩石銘記。它們的一切，如今歸我。',
+  'hudChrome.council.say.guardian_grief': '你們奪走了她的歌。我要讓它化作輓歌。',
+  'hudChrome.council.say.guardian_soul': '如今我即是岩石。我的怒火再無會倒下的軀體。',
+  'hudChrome.council.say.guardian_wipe': '塵土。一切血肉終歸如此。',
+  'hudChrome.council.say.guardian_defeat': '鐵鎚之力……由你們來承擔。',
+  'hudChrome.council.say.singer_pull': '聽見礦脈在歌唱嗎？它等你們的聲音等了好久。',
+  'hudChrome.council.say.singer_song': '與我同唱，然後碎裂吧！',
+  'hudChrome.council.say.singer_death': '我的歌……流入了岩石……',
+  'hudChrome.council.say.singer_remember': '岩石銘記。聽，它仍在歌唱。',
+  'hudChrome.council.say.singer_grief': '他的力量如今歸我。感受大山的歌唱吧。',
+  'hudChrome.council.say.singer_soul': '聽啊。在岩石之中，我的歌永不終結。',
+  'hudChrome.council.say.singer_wipe': '噓。礦脈已歸於寂靜。',
+  'hudChrome.council.say.singer_defeat': '最後一個音……消散了。',
+  // The Hammer Council's rework: Mountain's Rush, the Cursed Pillar, Bond of
+  // the Stone, Quarry Collapse and Resonance (M16 fills).
+  'abilityUi.cast.heart_mountains_rush': '山岳衝鋒',
+  'hudChrome.auraEffect.council.resonance':
+    '每{every}秒你會發出共鳴，對你{radius}碼內的每名盟友造成{min}到{max}點自然傷害。在效果結束前遠離所有人。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.council.rushMark':
+    '結束時，重錘守護者會先蓄勢{windup}秒，然後沿直線穿過你所站的位置，一直衝到採石場邊緣；若路上有石柱，則停在遇到的第一根石柱處。把它引向詛咒石柱：石柱碎裂，守護者被昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}%。若路線上擋著一根掩護石柱，則改為摧毀那根石柱。它停下之前撞到的所有人會受到{min}到{max}點傷害並被擊退，如果你還在它的路線上，你也一樣。傳奇難度：沒有撞上任何石柱的衝鋒會引發採石場坍塌，直到詛咒石柱碎裂為止。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.council.rushExposed': '受到的傷害提高{pct}%：山岳衝鋒撞碎了詛咒石柱。',
+  'hudChrome.auraEffect.council.collapse':
+    '採石場正在坍塌：每{every}秒，你每層受到{min}到{max}點傷害，且每次增加一層。詛咒石柱碎裂時結束。',
+  'hudChrome.auraEffect.council.pillarLimit':
+    '每根石柱最多只能為{limit}名玩家擋住山岳之怒。躲在後面的人更多時，每人承受衝擊的{share}%。未躲藏者在普通難度受到{min}到{max}點傷害，英雄難度{heroicMin}到{heroicMax}點，傳奇難度{mythicMin}到{mythicMax}點。',
+  'hudChrome.council.say.guardian_rush': '那就站在我的路上吧。群山從不繞行。',
+  'hudChrome.council.say.singer_wake': '醒來吧，沉睡的岩石。在他們腳下升起！',
+  'hudChrome.council.say.singer_rock': '抬頭看，小傢伙們！山要塌下來了！',
+  // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.say.guardian_intro':
+    '山巔沉寂了一個紀元。如今它開始呼吸，天空也隨之呼吸。',
+  'hudChrome.breathGuardian.say.guardian_pull':
+    '你們爬上山巔，是來偷走它的氣息嗎？那就與我一同呼吸吧。',
+  'hudChrome.breathGuardian.say.guardian_blow': '感受風向的轉變。邊緣比你想的更近。',
+  'hudChrome.breathGuardian.say.guardian_inhale': '靠近些。所有人。',
+  'hudChrome.breathGuardian.say.guardian_storm': '氣息夠了。現在，迎接風暴！',
+  'hudChrome.breathGuardian.say.guardian_cradle': '升起吧，小傢伙。讓他們接住你。',
+  'hudChrome.breathGuardian.say.guardian_drawn': '天空選中了你。跑吧，它會緊隨而至。',
+  'hudChrome.breathGuardian.say.guardian_wipe': '被吹散了，就像山巔的塵埃。',
+  'hudChrome.breathGuardian.say.guardian_death': '氣息……回歸……群山……',
+  'hudChrome.breathGuardian.say.thessaly_pull':
+    '高望與你們同在！這上面沒有牆：風會把你們從邊緣吹下去！',
+  'hudChrome.breathGuardian.say.thessaly_circle_a': '快進我的寧靜之中！最多三人，不能再多！',
+  'hudChrome.breathGuardian.say.thessaly_circle_b': '這裡！站在我身邊，讓風撞碎在我們身上！',
+  'hudChrome.breathGuardian.say.thessaly_circle_c': '石上的寧靜！三個人，現在就來！',
+  'hudChrome.breathGuardian.say.thessaly_inhale': '牠在吸氣！繞到牠的兩側，千萬別站在牠嘴前！',
+  'hudChrome.breathGuardian.say.thessaly_storm': '風暴要爆發了！我的寧靜擋不住這個。散開！',
+  'hudChrome.breathGuardian.say.thessaly_fall': '抓緊岩石！',
+  'hudChrome.breathGuardian.say.thessaly_victory': '氣息自由了。高望會記住這次攀登。',
+  'hudChrome.breathGuardian.say.thessaly_wipe': '退後，喘口氣。我們再來一次。',
+  'hudChrome.breathGuardian.say.guardian_isles': '風啊，將我圍起！浮島會護住我的氣息。',
+  'hudChrome.breathGuardian.say.guardian_bulwark': '我的護盾……被撕開了。那就再嘗嘗狂風吧！',
+  'hudChrome.breathGuardian.say.thessaly_isles': '它的護盾靠浮島供能！乘風飛過去，解決癒者再回來！',
+  'hudChrome.auraEffect.breathGuardian.wind':
+    '氣息守護者的風在你站立時以每秒{speed}碼的速度將你帶往它吹去的方向。行走時你會去往你指向的地方：逆風行走會變慢，順風行走會變快，橫穿風向時它只以{cross}%的力度推你。它不會打斷你的施法。崖台四周沒有牆：被吹出邊緣，你會墜入虛空。',
+  'hudChrome.auraEffect.breathGuardian.blast':
+    '巔峰咆哮的狂風將你吹離守護者：在其口前每秒{speed}碼，越遠越弱，共持續{seconds}秒。立刻逆風直奔回去，或站進塞薩莉的錨點，否則會被吹下飛簷。',
+  'hudChrome.auraEffect.breathGuardian.draw':
+    '守護者深吸一口氣，以每秒{speed}碼的速度將你拉向它。它嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後巔峰咆哮對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們徑直吹離守護者{throw}碼（英雄和傳奇難度為{heroicThrow}碼，被吹到邊緣會讓你飛出崖台），隨後一陣狂風繼續沿該方向吹送他們數秒，每秒{gustSpeed}碼（英雄和傳奇難度為{heroicGustSpeed}碼）：徑直走回守護者身邊，否則狂風會把你吹到邊緣。守護者咆哮時站在它附近，或待在瑟薩莉的錨點中。英雄和傳奇難度：分別為{heroicMin}到{heroicMax}點和{heroicGustMin}到{heroicGustMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.pinned':
+    '被風壓在邊緣的牆上：在風停歇或你離開牆邊之前，每秒受到{min}到{max}點傷害。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.anchor':
+    '瑟薩莉隊長的寧靜穩住了你：風、拉扯、衝擊和擊飛都無法移動你。傷害照常生效。',
+  'hudChrome.auraEffect.breathGuardian.spent':
+    '你的錨定已經耗盡：在此效果結束前，瑟薩莉隊長的寧靜之環無法再次錨定你。',
+  'hudChrome.auraEffect.breathGuardian.skyMark':
+    '{warn}秒後，閃電會劈向此效果施加時你所站的位置：{radius}碼內造成{min}到{max}點傷害。走出圓圈。英雄和史詩：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.drawn':
+    '每{every}秒會有一道閃電落在你所站之處：{warn}秒後對{radius}碼內的所有人造成{min}到{max}點傷害，並留下帶電的地面，在{charged}秒內每秒造成{cmin}到{cmax}點傷害。保持移動，把落雷引向遠離團隊的邊緣。英雄和傳奇難度：分別為{heroicMin}到{heroicMax}點和{heroicCMin}到{heroicCMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.cradled':
+    '被舉入風暴，在守護者引導搖籃的{hold}秒內被定住；其間守護者不會施放其他任何技能。隨後的放電造成{total}點傷害，由你和你下方{radius}碼內的所有人分擔。分擔人數少於{soakers}人時，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}點傷害。英雄難度：同時舉起{heroicCount}名玩家，每次放電{heroicTotal}點，需要{heroicSoakers}人分擔，團隊要分頭承受。英雄和傳奇難度：反衝造成{heroicBMin}到{heroicBMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.stormForm':
+    '撕裂為閃電之軀：戰鬥的風暴後半段，直到氣息守護者倒下。',
+  'hudChrome.auraEffect.breathGuardian.swell':
+    '每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害，之前每次脈動增強{heroicGrowth}%。',
+  'hudChrome.auraEffect.breathGuardian.riding':
+    '風沿著固定的路線帶你越過虛空：在被放下之前你無法行動。',
+  'hudChrome.auraEffect.breathGuardian.thrown': '被巔峰咆哮掀飛：落地之前無法移動。',
+  'hudChrome.auraEffect.breathGuardian.tossed': '被遊蕩狂風掀飛：狂風放下你之前無法移動。',
+  'hudChrome.auraEffect.breathGuardian.portalA':
+    '效果結束時，傳送門A會在你所站的位置打開。站在結風附近。本輪你無法攜帶它。',
+  'hudChrome.auraEffect.breathGuardian.portalB':
+    '效果結束時，傳送門B會在你所站的位置打開。站在崖台邊緣。本輪你無法攜帶結風。',
+  'hudChrome.auraEffect.breathGuardian.portalC':
+    '效果結束時，傳送門C會在你所站的位置打開。它只與傳送門D相連。站在另一團結風附近。本輪你無法攜帶它。',
+  'hudChrome.auraEffect.breathGuardian.portalD':
+    '效果結束時，傳送門D會在你所站的位置打開。它只與傳送門C相連。站在遠離傳送門B的崖台邊緣。本輪你無法攜帶結風。',
+  'hudChrome.auraEffect.breathGuardian.laden':
+    '你正攜帶結風：移動速度變為{walk}%，無法閃現、衝鋒或跳躍，風、拉扯、衝擊和擊飛都無法移動你。在崖台邊緣按下互動鍵，把它扔進虛空。傳送門是一條捷徑：走進一個，你會從它的另一端出來（A到B；傳奇難度還有C到D）。效果結束時它會爆裂：距離它{core}碼以內的所有人無論有何護盾都會死亡，更遠的人受到的傷害隨距離遞減，在{far}碼或更遠處降至最大生命值的{floor}%。把它帶離團隊。',
+  'abilityUi.cast.heart_breath_inhale': '深吸之息',
+  'abilityUi.cast.heart_breath_storm_break': '風暴破裂',
+  'abilityUi.cast.heart_breath_forking_bolt': '跳躍雷擊',
+  'abilityUi.cast.heart_breath_thunders_cradle': '雷霆搖籃',
+  'abilityUi.cast.heart_breath_drawn_lightning': '引雷',
+  'entities.npcs.heart_captain_thessaly.name': '瑟薩莉隊長',
+  'entities.npcs.heart_captain_thessaly.title': '高望隊長',
+  'entities.npcs.heart_captain_thessaly.greeting':
+    '站穩腳跟，{className}。當風箱呼吸時，進入我的寧靜之中，讓風撞碎在我們身上。',
+  // The Smith's Heart's Guardian of the Quench (M16 fills).
+  'hudChrome.auraEffect.quenchGuardian.marked':
+    '你是{count}人中的第{order}個：利刃將沿穿過你的直線飛來。把直線引離團隊。直線在利刃飛出前{lock}秒鎖定，屆時請離開，否則將受到{min}到{max}點冰霜傷害和{cold}點寒冷。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.quenchAlert.markedTitle': '利刃在追獵你！（{count}人中第{order}個）',
+  'abilityUi.cast.heart_quench_blades_hunt': '利刃狩獵',
+  'hudChrome.quenchGuardian.say.flurry': '所有利刃！所有鋒刃！別讓任何人站在我的湖上！',
+  'hudChrome.quenchGuardian.say.pull': '我的湖上來了溫熱的血。它不會溫熱太久。',
+  'hudChrome.quenchGuardian.say.intro': '噓……湖本在沉睡。你們喚醒了寒冷，而寒冷從不寬恕。',
+  'hudChrome.quenchGuardian.say.shatter': '凍透了。現在，碎裂吧。',
+  'hudChrome.quenchGuardian.say.hole': '冰記得每一步。聚在一起，它便會崩塌。',
+  'hudChrome.quenchGuardian.say.wake': '鑄匠之刃，醒來！在冰面上獵殺他們！',
+  'hudChrome.quenchGuardian.say.cross': '去吧，利刃！將他們與溫暖斬斷！',
+  'hudChrome.quenchGuardian.say.deepen': '感覺到了嗎？寒意正越來越深。',
+  'hudChrome.quenchGuardian.say.wipe': '靜止。無聲。淬火已成。',
+  'hudChrome.quenchGuardian.say.death': '寒意……放手了……淬火歸你們了。',
+  'hudChrome.auraEffect.quenchGuardian.cold':
+    '你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，則改為每秒下降{fall}。生命之暖：你受到的治療每達到最大生命值的{healPct}%，寒意降低1（英雄和傳奇難度為每{heroicHealPct}%）。寒冰棺等免疫效果無法阻止它：免疫期間你既不提供也不獲得溫暖。達到{max}時你會被冰霜封住{freeze}秒，隨後冰層碎裂。',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '被凍結在湖冰之下：在她破冰而出之前，無法攻擊或傷害她。',
+  'hudChrome.auraEffect.quenchGuardian.warmth':
+    '與團隊相擁取暖：寒意每秒下降{fall}。在同一處停留{linger}秒的人群，腳下冰面會裂成冰冷的水洞，所以要不斷移動。',
+  'hudChrome.auraEffect.quenchGuardian.frozen':
+    '被冰霜封住：你無法行動，受到的所有傷害提高{pct}%，冰霜會擊碎寒冰棺等免疫效果。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害，隨後{seconds}秒內受到的傷害提高{brittle}%，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    '受到的所有傷害提高{pct}%。此效果持續期間，隊友碎冰的濺射無法讓你的寒意超過{cap}。',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    '隊友碎裂的冰濺到了你：寒意+{cold}。在你自己的寒意條充滿前回到人群中。',
+  'hudChrome.quenchAlert.splashTitle': '冰霜濺射！寒意+{cold}',
+  'hudChrome.auraEffect.quenchGuardian.trapped':
+    '踏穿冰面掉進冰冷的水中：無法移動，每秒受到{min}到{max}點冰霜傷害，寒意不斷上升。{seconds}秒後你會爬上岸邊。僅憑冰水絕不會致死。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.quenchGuardian.awake':
+    '鑄匠的四把利刃已甦醒。每一輪會有更多玩家被標記，利刃依次沿穿過他們的直線飛出。直線在利刃飛出前{lock}秒鎖定，隨後對線上的目標造成{min}到{max}點冰霜傷害，增加{cold}點寒冷。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.quenchGuardian.deepening':
+    '湖的寒意上升快了{total}%：自刃甦醒後每{every}秒再快{step}%（目前{stacks}次）。',
+  'abilityUi.cast.heart_quench_blades_wake': '諸刃甦醒',
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': '寒意',
+  'hudChrome.quenchAlert.freezingTitle': '快凍僵了！',
+  'hudChrome.quenchAlert.warmTitle': '抱團取暖',
+  'hudChrome.quenchAlert.frozenTitle': '被霜封住！',
+  'hudChrome.quenchAlert.waterTitle': '在冰下！',
+  'hudChrome.quenchAlert.coldBar': '寒意 {cold} / {max}',
+  'hudChrome.quenchAlert.coldAria': '寒意 {cold}/{max}',
+  'hudChrome.quenchAlert.timeAria': '剩餘{seconds}秒',
+  'hudChrome.auraEffect.quenchGuardian.rime':
+    '活體霜殼吸收你受到的接下來{left}點治療（共{whole}點）。存在期間你的移動速度降低{slow}%，寒意上升速度變為{normalMult}倍（英雄和傳奇難度為{heroicMult}倍），所以請離開隊伍。在{seconds}秒內用治療將其擊碎即可消失。否則你會立刻被冰霜封住，寒意在{radius}碼內爆發，使所有人獲得{cold}點寒意（英雄和傳奇難度為{heroicCold}點）。普通難度：1名玩家，{normalAbsorb}點。英雄難度：{heroicTargets}名玩家，各{heroicAbsorb}點，爆發後會以新的霜殼跳到最近的另一名玩家身上。傳奇難度：同英雄難度，{mythicTargets}名玩家。',
+  'hudChrome.auraEffect.quenchGuardian.rimePool':
+    '活體霜殼：還需要相當於其最大生命值{pct}%的治療才能擊碎。施加後{seconds}秒內未被擊碎，其將被冰霜封住，寒意在{radius}碼內對所有人爆發。',
+  'hudChrome.auraEffect.quenchGuardian.rimeSlow':
+    '被活體霜殼減速：在霜殼被治療擊碎或爆發前，你的移動速度降低{slow}%，寒意上升速度變為{normalMult}倍（英雄和傳奇難度為{heroicMult}倍）。',
+  'hudChrome.quenchAlert.rimeTitle': '活體霜殼！離開隊伍',
+  'hudChrome.quenchAlert.rimeBar': '霜殼 {left} / {whole}',
+  'hudChrome.quenchAlert.rimeAria': '活體霜殼：還需{left}/{whole}點治療才能擊碎',
+  'hudChrome.heatGuardian.say.pull': '你們走進了最初的火焰。沒有什麼能毫無改變地離開。',
+  'hudChrome.heatGuardian.say.wipe': '都化為灰燼吧。爐心依舊燃燒。',
+  'hudChrome.heatGuardian.say.death': '火焰……沉回……岩石之中。好好帶著它。',
   'hudChrome.guildHall.title': '燈火大廳',
   'hudChrome.guildHall.close': '關閉公會視窗',
   'hudChrome.guildHall.tabsLabel': '燈火大廳分頁',
@@ -24190,6 +25041,141 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.godlike': '{name}已經接近神了！',
   'hudChrome.hill.callout.legendary': '{name}已經超越神了！',
   'hudChrome.hill.callout.shutDown': '{killer}終結了{victim}！',
+  'abilityUi.cast.heart_final_leaping_bolt': '跳躍雷擊',
+  'abilityUi.cast.heart_final_anvil': '鐵砧之重',
+  'hudChrome.auraEffect.finalBoss.stateHeat':
+    '飲下熾熱：玄武之拳砸向玩家所站之處，三道熔岩湧浪從那裡滾出。它的星辰火焰旋風甦醒並持續到戰鬥結束：高聳的火柱在地面上疾馳。英雄難度下，餘燼印記會把火焰落在遠程玩家腳下；史詩難度下，它的正面攻擊會留下鍛爐之火。',
+  'hudChrome.auraEffect.finalBoss.stateQuench':
+    '飲下淬火。它的星辰交錯之刃甦醒並持續到戰鬥結束：一把冰劍沿著穿過被標記玩家的直線橫掃，擊碎線上的所有石柱。英雄難度下，被標記玩家腳下的冰會碎裂；史詩難度下，它的正面攻擊使移動速度降低{slow}%。',
+  'hudChrome.auraEffect.finalBoss.stateBreath':
+    '飲下吐息：跳躍閃電在彼此相距{jump}碼以內的玩家之間跳躍。它的星辰天落雷擊甦醒並持續到戰鬥結束：閃電劈向玩家腳下，落在石柱旁的閃電會環繞石柱形成電弧並使其帶電。英雄難度下，牽引閃電會標記玩家；史詩難度下，每顆風暴寶珠都必須由一名玩家接下。',
+  'hudChrome.auraEffect.finalBoss.stateHammer':
+    '飲下重錘：震顫裂痕在玩家腳下爆發。它的星辰石之甦醒甦醒並持續到戰鬥結束：石柱從地面衝出，直到被交錯之刃擊碎前都會一直矗立。英雄難度下，石殼會吸收治療。',
+  'hudChrome.auraEffect.finalBoss.stateRing':
+    '身處中央圓環時，它不飲下任何一角的力量：所有已甦醒的星辰都以{pace}%的速度運轉。生命值高於{pct}%時，它在那裡每秒獲得一層心之脫縛。',
+  'hudChrome.auraEffect.finalBoss.overloadHeat':
+    '熾熱過載，已滿{value}%。首領站在熾熱區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.overloadQuench':
+    '淬火過載，已滿{value}%。首領站在淬火區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.overloadBreath':
+    '吐息過載，已滿{value}%。首領站在吐息區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.overloadHammer':
+    '重錘過載，已滿{value}%。首領站在重錘區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.unbound':
+    '每層每秒對整個團隊造成{per}點傷害（目前{total}點）；站在中央圓環內時每秒獲得一層。把它拖出圓環即可結束。英雄難度：每層{heroicPer}點。傳奇難度：每層{mythicPer}點。',
+  'hudChrome.auraEffect.finalBoss.shaken':
+    '持續期間，切換區域對你造成的傷害提高至{mult}倍（{min}至{max}點，而非{baseMin}至{baseMax}點）。每次切換都會將其刷新為{seconds}秒。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.skyMark':
+    '{seconds}秒後閃電會劈在你所站之處：對{radius}碼內的所有人造成{min}到{max}點自然傷害。快離開。落在石柱{arcReach}碼內的閃電會環繞石柱形成電弧，使其被風暴充能。英雄：{heroicMin}到{heroicMax}點傷害。史詩：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.bladeMark':
+    '一把交錯之刃把它的直線瞄準了你：直線會跟隨你，並在飛出前{lock}秒鎖定。把直線引過石柱將其擊碎，然後離開直線。直線上的所有人受到{min}到{max}點冰霜傷害。英雄：{heroicMin}到{heroicMax}點傷害。史詩：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.anvilMark':
+    '鐵砧之重跟隨著你：它的{radius}碼法圈隨你移動，並在落下前{lock}秒固定。讓團隊聚集在圈內：{total}點物理傷害由圈內所有人分擔，少於{fewer}人時每人多承受一半。英雄：{heroicTotal}。史詩：{mythicTotal}。',
+  'hudChrome.auraEffect.finalBoss.strikeHeat':
+    '灼燒：你每秒受到{total}點火焰傷害（{stacks}層中每層{per}點）。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。它會附加首領所站區域元素的一層。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄：每層{heroicPer}點，打擊每層強化{heroicGrowth}%。史詩：每層{mythicPer}點，強化{mythicGrowth}%。',
+  'hudChrome.auraEffect.finalBoss.strikeQuench':
+    '刺骨冰霜：移動速度降低{pct}%（{stacks}層中每層{per}%，最多{cap}%）。達到{freeze}層後，每次打擊還會在你腳下佈下凝結寒霜：一個{radius}碼的冰環，{warn}秒後閉合，將仍在其中的人凍結{frozen}秒。離開冰環。將舊層數轉化為冰霜的那一擊不會佈下它。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄和史詩中，打擊每層分别強化{heroicGrowth}%和{mythicGrowth}%。',
+  'hudChrome.auraEffect.finalBoss.strikeBreath':
+    '靜電：受到的法術傷害提高{pct}%。達到{from}層後，閃電每{arcEvery}秒從你身上躍向{reach}碼內的所有盟友，造成{arcMin}到{arcMax}點自然傷害，之後每層再提高{arcGrowth}%：讓團隊離你{reach}碼以外。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄閃電：{heroicArcMin}到{heroicArcMax}。史詩閃電：{mythicArcMin}到{mythicArcMax}。',
+  'hudChrome.auraEffect.finalBoss.strikeHammer':
+    '碎裂護甲：護甲降低{pct}%（{stacks}層中每層{per}%，不會低於你護甲的{floor}%）。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄：每層{heroicPer}%。史詩：每層{mythicPer}%。',
+  'hudChrome.auraEffect.finalBoss.frozen': '被刺骨冰霜凍結：昏迷{seconds}秒。',
+  'hudChrome.auraEffect.finalBoss.rime':
+    '凝結寒霜將在{seconds}秒後於你腳下閉合：{radius}碼內的所有人被凍結{frozen}秒。離開冰環。',
+  'hudChrome.auraEffect.finalBoss.fusionSteam':
+    '熾熱與淬火的元素融合：{seconds}秒後，濃密的灼熱蒸汽雲在它進入的區域升起并四處飄盪，每秒灼傷雲中的人。远離雲團。',
+  'hudChrome.auraEffect.finalBoss.fusionMagma':
+    '熾熱與戰錘的元素融合：{seconds}秒後，岩漿裂隙標記數名玩家；裂縫在每人腳下噴發并留下熔岩池。被標記者請远離團隊。',
+  'hudChrome.auraEffect.finalBoss.fusionFirestorm':
+    '熾熱與氣息的元素融合：{seconds}秒後，一條橫穿大廳的火焰風暴之路被標出，隨後火牆沿路橫掃。離开這條路。',
+  'hudChrome.auraEffect.finalBoss.fusionHail':
+    '淬火與氣息的元素融合：{seconds}秒後，冰雹風暴在它進入的區域持續落下數秒，每顆冰雹落入地面上的小圓圈。離开圓圈。',
+  'hudChrome.auraEffect.finalBoss.fusionAvalanche':
+    '淬火與戰錘的元素融合：{seconds}秒後，冰與岩石的尖刺沿著一條條通道從牆邊衝向中心。站在通道之間的空隙裡。',
+  'hudChrome.auraEffect.finalBoss.fusionSpires':
+    '氣息與戰錘的元素融合：{seconds}秒後，風暴尖塔在它進入的區域升起并充能，隨後閃電沿地面標出的線在尖塔之間跳躍。絕不要站在兩座尖塔之間。',
+  'hudChrome.auraEffect.finalBoss.magmaMark':
+    '岩漿裂隙：{seconds}秒後，裂縫在你腳下噴發，對{radius}碼內的所有人造成{min}到{max}點火焰傷害，并留下燃燒{life}秒的熔岩池（每秒{poolMin}到{poolMax}點火焰傷害）。在噴發前远離團隊。英雄：{heroicMin}到{heroicMax}。史詩：{mythicMin}到{mythicMax}。',
+  'hudChrome.auraEffect.finalBoss.polarityFire':
+    '對立元素，火焰：觸碰帶有寒冰標記的玩家（{meet}碼內）即可消除雙方的標記。觸碰其他任何標記會爆炸，對你們兩人造成{min}到{max}點奧術傷害（史詩中為{clash}碼內所有人）。{seconds}秒內未消除：普通難度對你造成{lateMin}到{lateMax}點奧術傷害；英雄（{heroicLateMin}到{heroicLateMax}）和史詩（{mythicLateMin}到{mythicLateMax}）中對整個團隊造成傷害，每有一對未消除的標記就造成一次。',
+  'hudChrome.auraEffect.finalBoss.polarityIce':
+    '對立元素，寒冰：觸碰帶有火焰標記的玩家（{meet}碼內）即可消除雙方的標記。觸碰其他任何標記會爆炸，對你們兩人造成{min}到{max}點奧術傷害（史詩中為{clash}碼內所有人）。{seconds}秒內未消除：普通難度對你造成{lateMin}到{lateMax}點奧術傷害；英雄（{heroicLateMin}到{heroicLateMax}）和史詩（{mythicLateMin}到{mythicLateMax}）中對整個團隊造成傷害，每有一對未消除的標記就造成一次。',
+  'hudChrome.auraEffect.finalBoss.polarityEarth':
+    '對立元素，大地：觸碰帶有閃電標記的玩家（{meet}碼內）即可消除雙方的標記。觸碰其他任何標記會爆炸，對你們兩人造成{min}到{max}點奧術傷害（史詩中為{clash}碼內所有人）。{seconds}秒內未消除：普通難度對你造成{lateMin}到{lateMax}點奧術傷害；英雄（{heroicLateMin}到{heroicLateMax}）和史詩（{mythicLateMin}到{mythicLateMax}）中對整個團隊造成傷害，每有一對未消除的標記就造成一次。',
+  'hudChrome.auraEffect.finalBoss.polarityLightning':
+    '對立元素，閃電：觸碰帶有大地標記的玩家（{meet}碼內）即可消除雙方的標記。觸碰其他任何標記會爆炸，對你們兩人造成{min}到{max}點奧術傷害（史詩中為{clash}碼內所有人）。{seconds}秒內未消除：普通難度對你造成{lateMin}到{lateMax}點奧術傷害；英雄（{heroicLateMin}到{heroicLateMax}）和史詩（{mythicLateMin}到{mythicLateMax}）中對整個團隊造成傷害，每有一對未消除的標記就造成一次。',
+  'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你從碎裂的冰面掉了下去。',
+  'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻擊減速{pct}%，持續{seconds}秒。',
+  'hudChrome.auraEffect.finalBoss.ember':
+    '{seconds}秒後餘燼會落在你的腳下，在{radius}碼的範圍內陰燃{life}秒，每秒對其中的任何人造成{min}至{max}點火焰傷害。與其他被標記的玩家站到同一個角落，然後離開。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.drawn':
+    '在{seconds}秒內，它每秒從你身上跳向{reach}碼內的其他每名玩家，對每人造成{min}至{max}點自然傷害。與所有人保持{reach}碼距離。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.shell': '吸收你受到的下{value}點治療。',
+  'hudChrome.finalOverload.title': '過載',
+  'hudChrome.finalOverload.quench': '淬火',
+  'hudChrome.finalOverload.breath': '吐息',
+  'hudChrome.finalOverload.hammer': '重錘',
+  'hudChrome.finalOverload.shaken': '動搖 {seconds}',
+  'hudChrome.finalOverload.unbound': '脫縛 x{stacks}',
+  'hudChrome.finalOverload.barAria': '{quarter}過載 百分之{pct}',
+  'hudChrome.finalOverload.activeAria': '目前區域：{quarter}',
+  'hudChrome.finalOverload.groupAria': '阿什格蘭德：過載條',
+  'hudChrome.auraEffect.finalBoss.phaseFight':
+    '生命值降到{first}%和{second}%時，它會在護盾保護下走入中央，從最滿的幾個角各召出一個碎片。降到{final}%時四個角全部甦醒，開始最後的抵抗。',
+  'abilityUi.cast.heart_final_call': '四角召喚',
+  'abilityUi.cast.heart_final_shearing_blow': '劈裂重擊',
+  'abilityUi.cast.heart_final_gale_pounce': '疾風撲擊',
+  'abilityUi.cast.heart_final_fusion': '元素融合',
+  'abilityUi.cast.heart_final_rime_toll': '霜凇鐘鳴',
+  'abilityUi.cast.heart_breath_cradle_channel': '雷霆搖籃',
+  'abilityUi.cast.heart_breath_mending_gale': '癒合之風',
+  'entities.mobs.heart_final_splinter_heat.name': '熾熱碎片',
+  'entities.mobs.heart_final_splinter_quench.name': '淬火碎片',
+  'entities.mobs.heart_final_splinter_breath.name': '吐息碎片',
+  'entities.mobs.heart_final_splinter_hammer.name': '重錘碎片',
+  'hudChrome.auraEffect.finalBoss.phaseCall':
+    '四角召喚：只要碎片還活著，它就在中央受到護盾保護{seconds}秒。每個碎片每{every}秒對整個團隊造成{min}至{max}點傷害，每次脈動提高{rise}%。將它們全部擊殺可提前打破護盾；召喚結束時仍存活的碎片會把自己的元素注入它體內，直到戰鬥結束。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.finalOverload.titleUnmade': '崩解的鐵砧',
+  'hudChrome.finalOverload.kneeling': '它跪下了',
+  'hudChrome.finalOverload.rising': '心臟搏動',
+  'hudChrome.finalOverload.fallsIn': '{quarter}將在 {seconds} 後墜落',
+  'hudChrome.finalOverload.ringFallsIn': '圓環將在 {seconds} 後破碎',
+  'hudChrome.finalOverload.allFallen': '什麼也不剩了',
+  'hudChrome.auraEffect.finalBoss.phaseKneel': '它跪下了。任何攻擊都無法傷害它。',
+  'hudChrome.auraEffect.finalBoss.phaseRebirth':
+    '心臟正在搏動。在它以{percent}%生命值站起之前，任何攻擊都無法傷害它。',
+  'hudChrome.auraEffect.finalBoss.unmade':
+    '每{every}秒鐵砧的一整塊區域墜落，過載條最滿的區域最先，墜落前有{warn}秒裂紋警告。站在其上的人會一同墜落並死亡。最後一塊區域墜落{ring}秒後，中央圓環破碎，所有人死亡。',
+  'hudChrome.auraEffect.finalBoss.phaseFinal':
+    '四個角已全部甦醒：它停留在中央圓環，四顆星辰同時以{pace}%的速度運轉，石柱、閃電、冰刃與旋風一齊襲來。{enrage}秒後它將失去一切克制（無主之怒）。',
+  'hudChrome.auraEffect.finalBoss.shield': '聚集之力：免疫所有傷害，且無法被選為目標。',
+  'hudChrome.auraEffect.finalBoss.pouredHeat':
+    '熾熱注入其中：直到戰鬥結束，無論它站在哪裡，每{every}秒都會升起火焰旋風。',
+  'hudChrome.auraEffect.finalBoss.pouredQuench':
+    '淬火注入其中：直到戰鬥結束，無論它站在哪裡，每{every}秒都會有交錯之刃橫掃大廳。',
+  'hudChrome.auraEffect.finalBoss.pouredBreath':
+    '吐息注入其中：直到戰鬥結束，無論它站在哪裡，每{every}秒都會落下天落雷擊。',
+  'hudChrome.auraEffect.finalBoss.pouredHammer':
+    '重錘注入其中：直到戰鬥結束，無論它站在哪裡，每{every}秒都會有石柱衝出。',
+  'hudChrome.auraEffect.finalBoss.fury':
+    '無主之怒：每{every}秒對整個團隊造成{min}至{max}點傷害，每次脈動提高{rise}%。立刻擊殺它。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.coal':
+    '{seconds}秒後煤塊爆裂：對你{reach}碼內的所有其他玩家造成{min}至{max}點火焰傷害，對你自己造成{selfMin}至{selfMax}點。現在就離開人群。英雄難度：分別為{heroicMin}到{heroicMax}點和{heroicSelfMin}到{heroicSelfMax}點傷害。傳奇難度：分別為{mythicMin}到{mythicMax}點和{mythicSelfMin}到{mythicSelfMax}點。',
+  'hudChrome.auraEffect.finalBoss.tether':
+    '吐息碎片追獵你{seconds}秒。它的狂襲之風每秒對它{reach}碼內的其他所有人造成{min}至{max}點自然傷害：把它從人群中拖走。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
+  'hudChrome.auraEffect.finalBoss.chill':
+    '移動速度降低{pct}%，持續{seconds}秒：你從缺口以外的地方穿過了淬火之環。',
+  'hudChrome.auraEffect.finalBoss.weight':
+    '每秒造成{total}點物理傷害（每層{per}點）。每一層都讓重錘碎片對你的攻擊加重{step}%（目前{harder}%）。持續{seconds}秒；坦克在{swap}層時換坦。英雄難度下每層使其傷害提高{heroicStep}%，傳奇難度下為{mythicStep}%。',
+  'hudChrome.finalOverload.call': '護盾 {seconds}',
+  'hudChrome.finalOverload.enrage': '狂暴倒數 {seconds}',
+  'hudChrome.finalOverload.fury': '無主之怒 x{stacks}',
+  'hudChrome.finalOverload.poured': '已注入：{elements}',
+  'hudChrome.finalOverload.pouredTimes': '{quarter} x{times}',
+  'hudChrome.finalOverload.splinters': '碎片 {count}',
+  'hudChrome.finalOverload.striding': '正走向中央',
+  'hudChrome.finalOverload.titleCall': '四角召喚',
+  'hudChrome.finalOverload.titleFinal': '四角皆醒',
   'hudChrome.auraEffect.seasonalCosmetic': '僅為外觀：不影響戰鬥',
   'seasonal.event.gourdlight_eve.name': '南瓜燈之夜',
   'seasonal.trickOrTreat.row': '不給糖就搗蛋！',
@@ -24369,4 +25355,338 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '夜幕降臨南瓜田！誰敢踏進我的田地？',
   'seasonal.thatchgrin.sleepYell': '太陽出來了。回到木樁上，繼續看守。',
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
+  'entities.mobs.heart_gale_sentinel.name': '狂風哨兵',
+  'entities.mobs.heart_gale_mender.name': '狂風癒者',
+  'hudChrome.auraEffect.breathGuardian.cocoon':
+    '守護者引導天裂新星時無法受到傷害。若引導結束，新星會殺死所有人，無論有何護盾。乘上賽薩莉隊長的上升氣流前往東西兩側的浮空島，引導兩塊靜風石來打斷它：已平息 {stilled}/2。靜風石在其島上的敵人倒下後甦醒；島上的所有人都能同時引導它，引導的人越多，它充滿得越快。受到攻擊會打斷你的引導，但不會打斷石頭的進度。',
+  'hudChrome.auraEffect.breathGuardian.ward':
+    '偏轉來自其正面{arc}度以內攻擊的{cut}%傷害。在其目標將它轉開時攻擊它的背後。英雄和傳奇難度：{heroicCut}%。',
+  'hudChrome.breathGuardian.say.thessaly_updraft': '島嶼已肅清！下一道上升氣流已經升起，快走！',
+  'hudChrome.breathGuardian.say.thessaly_stone': '石頭醒了！引導它，別讓任何東西打到你！',
+  'abilityUi.cast.heart_breath_skyrend_nova': '天裂新星',
+  'abilityUi.cast.heart_breath_shoving_gale': '推搡狂風',
+  'abilityUi.cast.kituse_heart_still_the_gale': '平息狂風',
+  'entities.mobs.heart_gust_herald.name': '陣風使者',
+  'entities.mobs.heart_riven_squall.name': '裂空颮',
+  'entities.mobs.heart_squall_fragment.name': '颮之碎片',
+  'entities.mobs.heart_squall_shieldbearer.name': '颮之持盾者',
+  'entities.mobs.heart_breath_stillstone.name': '靜風石',
+  'hudChrome.knotAlert.aTitle': '你是傳送門A！',
+  'hudChrome.knotAlert.bTitle': '你是傳送門B！',
+  'hudChrome.knotAlert.cTitle': '你是傳送門C！',
+  'hudChrome.knotAlert.dTitle': '你是傳送門D！',
+  'hudChrome.knotAlert.carryTitle': '你正攜帶結風！',
+  'hudChrome.knotAlert.lipTitle': '現在扔！',
+  'hudChrome.knotAlert.throwKey': '在邊緣按{key}投擲',
+  'hudChrome.knotAlert.throwTap': '在邊緣點按此處投擲',
+  'hudChrome.knotAlert.throwClick': '在邊緣點擊此處投擲',
+  'hudChrome.knotAlert.throwAria': '將結風扔進虛空',
+  // The Smith's Heart's voice lines: kill lines, new barks and the Masterless Strength (M16 fills).
+  'hudChrome.council.say.guardian_collapse': '那就讓整座採石場崩塌吧！',
+  'hudChrome.council.say.guardian_slay_a': '碎了，就像鐵鎚下的礦石。',
+  'hudChrome.council.say.guardian_slay_b': '又少了一隻偷取力量的手。',
+  'hudChrome.council.say.singer_hush': '你想讓礦脈沉默？它只會唱得更響。',
+  'hudChrome.council.say.singer_slay_a': '你的聲音，如今也融入礦脈了。',
+  'hudChrome.council.say.singer_slay_b': '聽見了嗎？少了一個音符。',
+  'hudChrome.breathGuardian.say.guardian_roar': '聽啊，山巔在咆哮！',
+  'hudChrome.breathGuardian.say.guardian_knot': '來接住我的風暴吧，如果你的雙臂撐得住。',
+  'hudChrome.breathGuardian.say.guardian_slay_a': '又一個交給了風。',
+  'hudChrome.breathGuardian.say.guardian_slay_b': '天空不會接住墜落的人。',
+  'hudChrome.breathGuardian.say.guardian_slay_c': '你最後一口氣，歸我了。',
+  'hudChrome.quenchGuardian.say.breath': '吸入這深寒吧。',
+  'hudChrome.quenchGuardian.say.slay_a': '淬火……然後碎裂。',
+  'hudChrome.quenchGuardian.say.slay_b': '涼了。安靜了。',
+  'hudChrome.quenchGuardian.say.slay_c': '湖泊留下它奪走的一切。',
+  'hudChrome.heatGuardian.say.wheel': '爐心在轉動！跟上它的步伐，否則就燃燒吧！',
+  'hudChrome.heatGuardian.say.slay_a': '又一點火星回到了火焰之中。',
+  'hudChrome.heatGuardian.say.slay_b': '燒得乾乾淨淨。',
+  'hudChrome.heatGuardian.say.slay_c': '最初的火焰收取它的代價。',
+  'hudChrome.finalBoss.say.arrivalWake': '是誰喚醒了大山之心？溫熱的氣息……在這萬物無息之地。',
+  'hudChrome.finalBoss.say.arrivalRise':
+    '岩石，起來。與我們相連。塑造我們的那隻手已經離去，所以我們塑造自己。',
+  'hudChrome.finalBoss.say.arrivalRoar': '我們是鑄匠之力，而我們沒有主人！',
+  'hudChrome.finalBoss.say.pull':
+    '你們的血中流著四條礦脈。我們會把它們奪回來，再把大山封在你們頭頂。',
+  'hudChrome.finalBoss.say.drinkHeat': '最初的火焰充滿了我們！',
+  'hudChrome.finalBoss.say.drinkQuench': '冷水啊，讓我們堅硬！',
+  'hudChrome.finalBoss.say.drinkBreath': '吹吧，風箱！掀起風暴！',
+  'hudChrome.finalBoss.say.drinkHammer': '擊打吧，鐵鎚！讓我們沉重！',
+  'hudChrome.finalBoss.say.burst': '礦脈滿溢了！在其中溺亡吧！',
+  'hudChrome.finalBoss.say.anvil': '承受世界的重量吧！',
+  'hudChrome.finalBoss.say.call': '我們力量的碎片，從礦脈中升起！守護心臟！',
+  'hudChrome.finalBoss.say.callAgain': '再來！每一條礦脈，把你們的孩子交給我們！',
+  'hudChrome.finalBoss.say.shattered': '我們的碎片……粉碎了。那就用剩下的來戰鬥。',
+  'hudChrome.finalBoss.say.poured': '是的……流入我們。所有礦脈，合為一體。',
+  'hudChrome.finalBoss.say.final': '夠了！所有礦脈一齊湧來！整座大山都將壓在你們身上！',
+  'hudChrome.finalBoss.say.fury': '沒有手能阻止我們。我們的力量沒有盡頭！',
+  'hudChrome.finalBoss.say.kneel': '原來……他當時就是這種感覺……躺下……終於……',
+  'hudChrome.finalBoss.say.rebirth': '不。大山不會第二次沉睡！',
+  'hudChrome.finalBoss.say.collapse': '崩塌吧，岩石！如果我們守不住大山，誰也別想站在上面！',
+  'hudChrome.finalBoss.say.anvilsEnd': '鐵砧終結了。一切都終結了。',
+  'hudChrome.finalBoss.say.slay_a': '回到岩石裡去吧。',
+  'hudChrome.finalBoss.say.slay_b': '你的血回歸礦脈。',
+  'hudChrome.finalBoss.say.slay_c': '又一份溫暖，被封存了。',
+  'hudChrome.finalBoss.say.wipe': '封存了。寂靜了。正如他所願。',
+  'hudChrome.finalBoss.say.death':
+    '那隻手……再也不會回來了。還有一點餘燼在燃燒……帶上它，讓大山安眠吧。',
+  // The Smith's Heart tank swaps (quench_temper.ts, breath_blow.ts).
+  'abilityUi.cast.heart_breath_bellows_blow': '風箱重擊',
+  'abilityUi.cast.heart_breath_thunder_lash': '雷霆鞭笞',
+  'hudChrome.auraEffect.breathGuardian.blown': '被風箱重擊掀飛：落地之前無法移動。',
+  'hudChrome.auraEffect.breathGuardian.blowMark':
+    '施法結束時風箱重擊命中你：造成{min}到{max}點自然傷害，並將你徑直向遠離氣息守護者的方向掀飛{yards}碼。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.blowMarkRuin':
+    '施法結束時風箱重擊命中你：造成{min}到{max}點自然傷害，並將你徑直向遠離氣息守護者的方向掀出崖台。只有瑟薩莉隊長的錨定能讓你站穩。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.battered':
+    '你的下一次風箱重擊會將你徑直向遠離氣息守護者的方向掀飛{next}碼（{stacks}層：每層都讓它掀得更遠）。每次命中你的風箱重擊都會疊加一層，並將持續時間重置為{seconds}秒。達到{swap}層時換坦。英雄和史詩難度下，{heroicRuin}層時的重擊會將你掀出崖台；普通難度下它總會在邊緣前停下。',
+  'hudChrome.auraEffect.breathGuardian.thunderLaden':
+    '你受到的自然及其他魔法傷害提高{pct}%（{stacks}層，每層{per}%）。每次命中你的雷霆鞭笞造成{min}到{max}點自然傷害，疊加一層，並將持續時間重置為{seconds}秒。達到{draw}層起，每道跳躍雷擊也會跳到你身上。達到{swap}層時換坦。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.quenchGuardian.tempered':
+    '淬火打擊已淬鍊你{stacks}次：你的寒意不會低於{floor}，你受到的冰霜傷害提高{pct}%。每次命中你的淬火打擊都會疊加一層（每層{cold}點寒意和{per}%冰霜傷害），並將持續時間重置為{seconds}秒。達到{swap}層時換坦。英雄和史詩難度下，{heroicMax}層會將你的寒意維持在{max}，你會被凍結；普通難度最多{normalMax}層（{normalFloor}點寒意）。',
+  'hudChrome.knotAlert.batteredTitle': '風蝕 x{stacks}：換坦！',
+  'hudChrome.knotAlert.chargedTitle': '雷霆纏身 x{stacks}：換坦！',
+  'hudChrome.knotAlert.ruinTitle': '風箱重擊會把你掀出邊緣！',
+  'hudChrome.tankSwap.swapTitle': '換坦 x{stacks}',
+  'hudChrome.auraEffect.forgeFury.gathering':
+    '熔爐之怒在開戰{minutes}分鐘後到來。此效果結束時，它每{every}秒灼燒戰鬥中的所有人：先是最大生命值的{share}%，然後是{share2}%，第三次灼燒無論有何護盾都會殺死他們。先擊敗首領。僅限英雄和傳奇難度；首領無法受到傷害時它絕不會降臨。',
+  'hudChrome.auraEffect.forgeFury.fury':
+    '戰鬥已超過{minutes}分鐘。熔爐之怒每{every}秒灼燒戰鬥中的所有人：先是最大生命值的{share}%，然後是{share2}%，第三次灼燒無論有何護盾都會殺死他們。它持續到戰鬥結束。',
+  'hudChrome.tankSwap.timeAria': '減益效果剩餘{seconds}秒',
+  'hudChrome.tankBuster.weight': '重錘之壓',
+  'hudChrome.tankBuster.blow': '風箱重擊',
+  'hudChrome.tankBuster.thunder': '雷霆鞭笞',
+  'hudChrome.tankBuster.tempering': '淬火打擊',
+  'hudChrome.tankBuster.strike': '元素打擊',
+  'hudChrome.tankBuster.shear': '劈裂重擊',
+  'hudChrome.tankBuster.brand': '湧泉烙印',
+  'hudChrome.tankBuster.onYou': '目標是你',
+  'hudChrome.tankBuster.seconds': '{seconds}秒',
+  'hudChrome.tankBuster.timeAria': '{name}將在{seconds}秒後擊中你',
+  'hudChrome.liveCoal.title': '熾炭',
+  'hudChrome.liveCoal.absorb': '需治療 {absorb}',
+  'hudChrome.liveCoal.fuseAria': '{seconds}秒後爆裂',
+  'hudChrome.quenchAlert.temperedTitle': '換坦！x{stacks}',
+  'hudChrome.raidAtlas.canvasAria': '團隊副本地圖',
+  'hudChrome.raidAtlas.subtitle.one': '{floor}：已擊敗首領 {defeated}/{total}',
+  'hudChrome.raidAtlas.subtitle.other': '{floor}：已擊敗首領 {defeated}/{total}',
+  'hudChrome.raidAtlas.north': '北',
+  'hudChrome.raidAtlas.scale': '{yards} 碼',
+  'hudChrome.raidAtlas.floorsAria': '地圖頁',
+  'hudChrome.raidAtlas.floor.veins': '礦脈',
+  'hudChrome.raidAtlas.floor.heart': '心臟',
+  'hudChrome.raidAtlas.youAreHere': '你在這裡',
+  'hudChrome.raidAtlas.room.cleft': '裂隙',
+  'hudChrome.raidAtlas.room.gallery': '鐵鎚長廊',
+  'hudChrome.raidAtlas.room.quarry': '鐵匠採石場',
+  'hudChrome.raidAtlas.room.balcony': '露台',
+  'hudChrome.raidAtlas.room.ring': '環廊',
+  'hudChrome.raidAtlas.room.dais': '封印台',
+  'hudChrome.raidAtlas.room.cornice': '風暴崖簷',
+  'hudChrome.raidAtlas.room.bridge': '風之橋',
+  'hudChrome.raidAtlas.room.basin': '淬火盆地',
+  'hudChrome.raidAtlas.room.hearth': '爐膛',
+  'hudChrome.raidAtlas.room.castingFloor': '鑄造場',
+  'hudChrome.raidAtlas.room.anvil': '世界之砧',
+  'hudChrome.raidAtlas.room.terrace': '抵達平台',
+  'hudChrome.raidAtlas.zoomIn': '放大',
+  'hudChrome.raidAtlas.zoomOut': '縮小',
+  'hudChrome.raidAtlas.reset': '顯示整張地圖',
+  'hudChrome.raidAtlas.pinTool': '放置圖釘',
+  'hudChrome.raidAtlas.pinToolHint': '圖釘工具已開啟：點擊地圖即可放置圖釘',
+  'hudChrome.raidAtlas.pinStyle': '圖釘樣式',
+  'hudChrome.raidAtlas.pinEdit': '編輯圖釘',
+  'hudChrome.raidAtlas.removePin': '移除圖釘',
+  'hudChrome.raidAtlas.clearPins': '移除所有圖釘',
+  'hudChrome.raidAtlas.done': '完成',
+  'hudChrome.raidAtlas.pinIconsAria': '圖釘圖示',
+  'hudChrome.raidAtlas.pinColorsAria': '圖釘顏色',
+  'hudChrome.raidAtlas.pinIcon.star': '星',
+  'hudChrome.raidAtlas.pinIcon.flag': '旗幟',
+  'hudChrome.raidAtlas.pinIcon.skull': '骷髏',
+  'hudChrome.raidAtlas.pinIcon.swords': '雙劍',
+  'hudChrome.raidAtlas.pinIcon.shield': '盾牌',
+  'hudChrome.raidAtlas.pinIcon.diamond': '菱形',
+  'hudChrome.raidAtlas.pinColor.gold': '金色',
+  'hudChrome.raidAtlas.pinColor.red': '紅色',
+  'hudChrome.raidAtlas.pinColor.blue': '藍色',
+  'hudChrome.raidAtlas.pinColor.green': '綠色',
+  'hudChrome.raidAtlas.pinColor.purple': '紫色',
+  'hudChrome.raidAtlas.pinColor.white': '白色',
+  'hudChrome.raidAtlas.legendToggle': '圖例',
+  'hudChrome.raidAtlas.legend.you': '你',
+  'hudChrome.raidAtlas.legend.member': '團隊成員',
+  'hudChrome.raidAtlas.legend.boss': '首領',
+  'hudChrome.raidAtlas.legend.engaged': '戰鬥中的首領',
+  'hudChrome.raidAtlas.legend.defeated': '已擊敗的首領',
+  'hudChrome.raidAtlas.legend.portal': '傳送門',
+  'hudChrome.raidAtlas.legend.entrance': '入口',
+  'hudChrome.raidAtlas.legend.pin': '你的圖釘',
+  'hudChrome.raidAtlas.legend.shared': '團隊標記（共享）',
+  'hudChrome.raidAtlas.shared.tool': '團隊標記',
+  'hudChrome.raidAtlas.shared.title': '團隊標記',
+  'hudChrome.raidAtlas.shared.symbolsAria': '團隊標記符號',
+  'hudChrome.raidAtlas.shared.placeHint': '點擊地圖為隊伍放置{marker}。點擊團隊標記可將其移除。',
+  'hudChrome.raidAtlas.shared.clearAll': '全部清除',
+  'hudChrome.raidAtlas.shared.noteEditable': '隊伍中的所有人都能看到這些標記。',
+  'hudChrome.raidAtlas.shared.readOnly': '只有團隊隊長可以放置團隊標記。',
+  'hudChrome.raidAtlas.legend.river': '通往守護者的光之路',
+  'hudChrome.raidAtlas.hintDesktop':
+    '滾輪縮放，拖曳平移，雙擊放大。右鍵點擊地圖放置圖釘，右鍵點擊圖釘將其移除，單擊圖釘變更樣式。',
+  'hudChrome.raidAtlas.hintTouch':
+    '雙指縮放，拖曳平移。開啟圖釘工具後點擊地圖即可放置圖釘；點擊圖釘可變更樣式或將其移除。',
+  'hudChrome.raidAtlas.boss.aria': '首領：{name}，{state}',
+  'hudChrome.raidAtlas.boss.state.alive': '存活',
+  'hudChrome.raidAtlas.boss.state.engaged': '戰鬥中',
+  'hudChrome.raidAtlas.boss.state.dead': '已擊敗',
+  'hudChrome.raidAtlas.boss.hammer.title': '鐵鎚議會',
+  'hudChrome.raidAtlas.boss.hammer.subtitle': '{lead}與{partner}',
+  'hudChrome.raidAtlas.boss.hammer.lore':
+    '兩個活石之軀共享著鐵鎚之力，那是塑造山脈的力量。失去主人後，它們仍盲目地執行他最後的命令：粉碎一切踏入採石場的人。接縫歌者以歌聲喚醒岩石，守護者則將其砸下。',
+  'hudChrome.raidAtlas.boss.breath.subtitle': '風箱之力',
+  'hudChrome.raidAtlas.boss.breath.lore':
+    '風箱之息曾為鐵匠的熔爐鼓風，如今沉睡在北方礦脈，高踞於虛空之上的岩簷。它的守護者是由活風束縛的花崗岩與水晶，其狂風足以將整支團隊從岩石上捲走。',
+  'hudChrome.raidAtlas.boss.quench.subtitle': '冰封湖之女王',
+  'hudChrome.raidAtlas.boss.quench.lore':
+    '淬火是讓刀刃變硬的冷水，其力量沉睡在東方礦脈的冰封湖下。它的守護者是一位由深色板岩與寒冰構成的巨人女王，頭戴霜冠，胸中燃著寒冰之星。她以雙拳作戰，拳落之處，湖面碎裂。',
+  'hudChrome.raidAtlas.boss.heat.subtitle': '泉湧巨人',
+  'hudChrome.raidAtlas.boss.heat.lore':
+    '爐膛守護著鐵匠最古老的火焰，那是封存在活水晶與黑玄武岩中的白金之火。它的守護者半身浸在泉湧之中，高如七人，從不離開：團隊必須親自走向火焰。',
+  'hudChrome.raidAtlas.boss.final.subtitle': '四脈歸一',
+  'hudChrome.raidAtlas.boss.final.lore':
+    '在躺下化為荊峰之前，鐵匠將自己的力量一分為四，好讓封印延續數百年。在這世界之砧上，四條礦脈正匯聚成一具沒有心智的軀體。它要完成主人最後的工作：將整座山永遠封住，連同其中一切會呼吸的生命。',
+  'hudChrome.worldMarkers.button': '地面標記',
+  'hudChrome.worldMarkers.buttonArmed': '正在放置{marker}',
+  'hudChrome.worldMarkers.title': '地面標記',
+  'hudChrome.worldMarkers.flyoutAria': '地面標記',
+  'hudChrome.worldMarkers.tip':
+    '在地面上為隊伍標出位置：選擇一個標記，然後點擊要放置的地面。此副本中的所有隊友都能在地面和地圖上看到它。',
+  'hudChrome.worldMarkers.tipTouch':
+    '在地面上為隊伍標出位置：選擇一個標記，然後輕觸要放置的地面。此副本中的所有隊友都能在地面和地圖上看到它。',
+  'hudChrome.worldMarkers.tileTip':
+    '點擊它，再點擊地面即可放在那裡。再次放置會移動它。右鍵點擊地面或按 Esc 取消。',
+  'hudChrome.worldMarkers.tileTipTouch': '輕觸它，再輕觸地面即可放在那裡。再次放置會移動它。',
+  'hudChrome.worldMarkers.tileRemove': '右鍵點擊：移除它。',
+  'hudChrome.worldMarkers.tileRemoveTouch': '長按：移除它。',
+  'hudChrome.worldMarkers.tileAria': '{marker}地面標記',
+  'hudChrome.worldMarkers.tileAriaPlaced': '{marker}地面標記，已放置',
+  'hudChrome.worldMarkers.clearAll': '全部清除',
+  'hudChrome.worldMarkers.clearAllTip': '移除你的隊伍在此副本中放置的所有地面標記。',
+  'hudChrome.worldMarkers.readOnly': '只有團隊隊長可以放置地面標記。',
+  'hudChrome.worldMarkers.bindPlace': '放置地面標記：{marker}',
+  'hudChrome.worldMarkers.bindClear': '清除所有地面標記',
+  'hudChrome.raidTargets.menuRow': '團隊目標圖示',
+  'hudChrome.raidTargets.menuRowTip':
+    '在此單位頭上放置八個團隊目標圖示之一。你的整個隊伍都能看到，每個圖示同一時間只能標記一個單位。',
+  'hudChrome.raidTargets.bindCategory': '團隊目標圖示',
+  'hudChrome.raidTargets.bindSet': '標記目標：{marker}',
+  'hudChrome.raidTargets.bindClear': '清除目標標記',
+  'hudChrome.raidTargets.frameMark': '已標記：{marker}',
+  'hudChrome.pings.bindCategory': '信號',
+  'hudChrome.pings.bindPing': '信號',
+  'hudChrome.pings.wheelAria': '信號輪盤',
+  'hudChrome.pings.cancel': '取消',
+  'hudChrome.pings.kindLook': '看這裡',
+  'hudChrome.pings.kindAttack': '攻擊',
+  'hudChrome.pings.kindWarning': '警告',
+  'hudChrome.pings.kindOnMyWay': '正在趕來',
+  'hudChrome.pings.kindAssist': '協助',
+  'hudChrome.pings.chatLine': '{name}：{callout}',
+  'hudChrome.pings.calloutAttackUnit': '攻擊{target}',
+  'hudChrome.pings.calloutAssistUnit': '協助{target}',
+  'hudChrome.pings.calloutWarningUnit': '警告，{target}',
+  'hudChrome.pings.calloutOnMyWayUnit': '正在趕往{target}',
+  'hudChrome.pings.calloutLookUnit': '看{target}',
+  'hudChrome.pings.enableSetting': '啟用信號',
+  'hudChrome.pings.chatSetting': '在聊天中顯示信號',
+  'hudChrome.pings.enableSettingNote':
+    '按住信號鍵開啟信號輪盤，輕按則向游標下的目標發出信號。只有你的隊伍或團隊能看到你的信號，每5秒最多4次。關閉後也會隱藏隊友的所有信號：沒有圖示、聲音、聊天訊息或小地圖標記。',
+  'guide.controls.ping': '信號：輕按向游標下的目標發出信號，按住開啟信號輪盤',
+  'hudChrome.auraEffect.finalBoss.devilThrown':
+    '被塵捲風拋出：被捲出旋風 {yards} 碼。在它把你放下之前你無法移動。',
+  'hudChrome.breathWind.turning': '風向轉變',
+  'hudChrome.auraEffect.breathGuardian.gust':
+    '巔峰咆哮的狂風沿你被拋出的方向繼續推你數秒，每秒{speed}碼。徑直走向守護者以穩住腳步，或站進塞薩莉的錨點，否則會被吹向飛簷邊緣。',
+  'hudChrome.mobile.journal': '日誌',
+  'hudChrome.adventureJournal.title': '冒險日誌',
+  'hudChrome.adventureJournal.close': '關閉冒險日誌',
+  'hudChrome.adventureJournal.crumbs': '{instance} | {boss} | {difficulty}',
+  'hudChrome.adventureJournal.browse': '瀏覽',
+  'hudChrome.adventureJournal.navLabel': '地城與團隊副本',
+  'hudChrome.adventureJournal.groupDungeons': '地城',
+  'hudChrome.adventureJournal.groupRaids': '團隊副本',
+  'hudChrome.adventureJournal.expandInstance': '顯示{instance}的首領',
+  'hudChrome.adventureJournal.collapseInstance': '隱藏{instance}的首領',
+  'hudChrome.adventureJournal.bossProgress': '已擊敗 {defeated}/{total}',
+  'hudChrome.adventureJournal.youAreHere': '你在這裡',
+  'hudChrome.adventureJournal.inCombat': '戰鬥中',
+  'hudChrome.adventureJournal.kindRaid': '團隊副本',
+  'hudChrome.adventureJournal.kindDungeon': '地城',
+  'hudChrome.adventureJournal.pageKicker': '{instance} | {kind} | 首領 {index}/{total}',
+  'hudChrome.adventureJournal.previousBoss': '上一個首領：{boss}',
+  'hudChrome.adventureJournal.nextBoss': '下一個首領：{boss}',
+  'hudChrome.adventureJournal.noPreviousBoss': '這是第一個首領',
+  'hudChrome.adventureJournal.noNextBoss': '這是最後一個首領',
+  'hudChrome.adventureJournal.councilMembers': '議會成員',
+  'hudChrome.adventureJournal.mythic': '傳奇',
+  'hudChrome.adventureJournal.sectionsLabel': '日誌章節',
+  'hudChrome.adventureJournal.tabOverview': '概覽',
+  'hudChrome.adventureJournal.tabAbilities': '技能',
+  'hudChrome.adventureJournal.tabLoot': '戰利品',
+  'hudChrome.adventureJournal.comingSoon': '即將推出',
+  'hudChrome.adventureJournal.comingSoonBody':
+    '傳奇難度仍在鍛造之中。開放後，它的技能、數值與獎勵都會寫在這裡。',
+  'hudChrome.adventureJournal.readTier': '查看{difficulty}',
+  'hudChrome.adventureJournal.strategyHeading': '職責攻略',
+  'hudChrome.adventureJournal.watchFor': '留意',
+  'hudChrome.adventureJournal.jumpToAbility': '在技能中查看{ability}',
+  'hudChrome.adventureJournal.roleNothing':
+    '這裡沒有只針對該職責的技能。請留意所有職責共有的部分。',
+  'hudChrome.adventureJournal.abilityCountPlural.one': '{count}項技能',
+  'hudChrome.adventureJournal.abilityCountPlural.other': '{count}項技能',
+  'hudChrome.adventureJournal.lootLabel': '{difficulty}戰利品',
+  'hudChrome.adventureJournal.lootNone': '該首領在{difficulty}難度下不掉落物品。',
+  'hudChrome.adventureJournal.lootFrom': '掉落者：{boss}',
+  'hudChrome.adventureJournal.targetButton': '在冒險日誌中開啟此首領',
+  'hudChrome.adventureJournal.bannerKicker': '{instance}，首領 {index}/{total}',
+  'hudChrome.adventureJournal.bossCount': '{defeated}/{total}',
+  'hudChrome.adventureJournal.statusNext': '下一個',
+  'hudChrome.adventureJournal.searchLabel': '搜尋首領',
+  'hudChrome.adventureJournal.searchPlaceholder': '搜尋首領或副本',
+  'hudChrome.adventureJournal.searchResults': '找到的首領',
+  'hudChrome.adventureJournal.searchEmpty': '找不到首領',
+  'hudChrome.adventureJournal.searchClear': '清除搜尋',
+  'hudChrome.adventureJournal.searchCount.one': '找到{count}個首領',
+  'hudChrome.adventureJournal.searchCount.other': '找到{count}個首領',
+  'hudChrome.adventureJournal.lootScopeLabel': '顯示的戰利品',
+  'hudChrome.adventureJournal.lootScopeBoss': '此首領',
+  'hudChrome.adventureJournal.lootScopeInstance': '所有首領',
+  'hudChrome.adventureJournal.lootNoneInstance':
+    '{instance}中沒有首領在{difficulty}難度下掉落物品。',
+  'hudChrome.adventureJournal.lootShowAll': '顯示所有職業',
+  'hudChrome.adventureJournal.lootHiddenPlural.one': '另有{count}件掉落適合其他職業或專精。',
+  'hudChrome.adventureJournal.lootHiddenPlural.other': '另有{count}件掉落適合其他職業或專精。',
+  'hudChrome.adventureJournal.mythicSoon': '傳奇：即將推出',
+  'hudChrome.adventureJournal.roleEveryone': '所有人',
+  'hudChrome.adventureJournal.aboutHeading': '關於這場首領戰',
+  'hudChrome.adventureJournal.openList': '顯示所有地城與團隊副本',
+  'hudChrome.adventureJournal.phaseRangeWhole': '全程',
+  'hudChrome.adventureJournal.phaseRangeBand': '{from}至{to}',
+  'hudChrome.adventureJournal.phaseRangeToEnd': '{from}至結束',
+  'hudChrome.adventureJournal.phaseRangeAt': '於{marks}',
+  'hudChrome.adventureJournal.factDamage': '{min}到{max}點傷害',
+  'hudChrome.adventureJournal.factDamageArcane': '{min}到{max}點秘法傷害',
+  'hudChrome.adventureJournal.factDamageFire': '{min}到{max}點火焰傷害',
+  'hudChrome.adventureJournal.factDamageFrost': '{min}到{max}點冰霜傷害',
+  'hudChrome.adventureJournal.factDamageNature': '{min}到{max}點自然傷害',
+  'hudChrome.adventureJournal.factDamagePhysical': '{min}到{max}點物理傷害',
+  'hudChrome.adventureJournal.factDamageShadow': '{min}到{max}點暗影傷害',
+  'hudChrome.adventureJournal.factEvery': '每{seconds}秒',
+  'hudChrome.adventureJournal.progressLabel': '你在此首領上的進度',
+  'hudChrome.adventureJournal.killsLabel': '你的擊殺',
+  'hudChrome.adventureJournal.killsCell': '{difficulty}擊殺：{count}',
+  'hudChrome.adventureJournal.savedBosses': '{difficulty}已鎖定：首領 {saved}/{total}',
+  'hudChrome.adventureJournal.savedInstance': '{difficulty}已鎖定',
+  'hudChrome.adventureJournal.resetsIn': '{time}後重置，{when}',
+  'hudChrome.adventureJournal.defeatedThisWeek': '本週已擊敗',
+  'hudChrome.adventureJournal.defeatedToday': '今日已擊敗',
 };

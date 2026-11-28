@@ -1,8 +1,7 @@
 // Swing trails carried by a weapon SKIN (the Season 1 Armory's per-skin look, plus the earned
 // ones): a ribbon traced by the blade's tip through every melee swing the wearer makes,
-// auto-attack and ability alike. Today Lantern Hall's blade (a lantern-fire streak) and the four
-// elemental arms (reserved for a future raid) carry one; a skin without a row here swings exactly
-// as before.
+// auto-attack and ability alike. Today Lantern Hall's blade (a lantern-fire streak) and the five
+// Smith's Heart raid arms carry one; a skin without a row here swings exactly as before.
 //
 // Pure and Three-free: the decision (does this swing trail, in what colour, how wide, how
 // long) is a table lookup a Vitest pins (tests/weapon_skin_trail.test.ts). The ribbon itself
@@ -25,12 +24,13 @@ export interface WeaponSkinTrailSpec {
 export const WEAPON_SKIN_TRAILS: Readonly<Record<string, WeaponSkinTrailSpec>> = {
   // a streak of lantern-fire, wide and warm, gone in a third of a second
   lantern_hall_sword: { color: 0xff9a3c, width: 0.34, duration: 0.32 },
-  // the elemental arms (reserved for a future raid), each swing streaking its element:
-  // forge-fire, storm light, frost and dusk-violet
-  hearthbrand: { color: 0xff6a1e, width: 0.4, duration: 0.36 },
-  squallcrest: { color: 0x5fd0ff, width: 0.4, duration: 0.36 },
-  rimelight_staff: { color: 0x9fe4ff, width: 0.36, duration: 0.34 },
-  duskwick_staff: { color: 0x9a50ff, width: 0.36, duration: 0.34 },
+  // the Smith's Heart raid arms, each swing streaking its element: the quarry's gold, storm
+  // light, frost, molten fire and the Heartmeld's white-gold
+  seamcaller_maul: { color: 0xffb53a, width: 0.48, duration: 0.38 },
+  squallcrest: { color: 0x7fdcff, width: 0.42, duration: 0.36 },
+  rimelight_staff: { color: 0x9fe4ff, width: 0.38, duration: 0.34 },
+  hearthbrand: { color: 0xff6a1e, width: 0.44, duration: 0.38 },
+  duskwick_staff: { color: 0xffe0a0, width: 0.4, duration: 0.36 },
 };
 
 /** The trail a swing with this skin draws, or null (no skin, an unknown skin, a skin without a

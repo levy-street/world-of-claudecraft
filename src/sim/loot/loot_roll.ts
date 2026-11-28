@@ -44,6 +44,7 @@ import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { publicInstanceView } from '../item_instance_transfer';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
+import { corpseStandsUntilTeardown } from '../mob/boss_corpse_hold';
 import { corpseKeepsBody } from '../mob/boss_corpse_sink';
 import { isHarvestableCorpse } from '../professions/gathering';
 import type { PlayerMeta } from '../sim';
@@ -66,6 +67,7 @@ import type {
 import { cloneItemInstancePayload, dist2d, PARTY_XP_RANGE } from '../types';
 import { grantAwardedLootItem, grantOrHoldAwardedLoot, mobLootSource } from './awarded_loot_hold';
 import { announceBossDrops } from './boss_drop_announce';
+import { bossLootDenied } from './boss_loot_lock';
 import { lootItemUsableByClasses, usableRollGroup } from './class_locked_drop';
 import { rollEnemyLootQuality } from './enemy_quality';
 import { heroicLootItemId } from './heroic_item';
@@ -154,9 +156,14 @@ function ffaLooterTakesAll(
 
 export function partyLootCandidatesForMob(ctx: SimContext, mob: Entity): PlayerMeta[] {
   if (mob.lootRecipientIds && mob.lootRecipientIds.length > 0) {
+    // A per-boss raid corpse (loot/boss_loot_lock.ts) leaves out the raiders
+    // saved to its boss: no roll, no master-loot award, no copper share.
+    const nowMs = mob.bossLootLock ? ctx.lockoutNowMs() : 0;
     return mob.lootRecipientIds.flatMap((pid) => {
       const candidate = ctx.players.get(pid);
-      return candidate && !candidate.leaving ? [candidate] : [];
+      return candidate && !candidate.leaving && !bossLootDenied(mob, candidate, nowMs)
+        ? [candidate]
+        : [];
     });
   }
   if (mob.tappedById === null) return [];
@@ -1199,6 +1206,14 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
       return;
     }
     mob.lootable = false;
+    // A raid set piece (a Smith's Heart boss) stands as a plain body until its
+    // instance is torn down: straight to the decayed state every consumer reads
+    // as "nothing here", while the view policy keeps drawing it
+    // (mob/boss_corpse_hold.ts corpseStandsUntilTeardown).
+    if (corpseStandsUntilTeardown(MOBS[mob.templateId], mob)) {
+      mob.corpseTimer = 0;
+      return;
+    }
     // A body that sinks out at the end of its window (mob/boss_corpse_sink.ts) keeps
     // lying for the whole of it: nothing left to take, but no four-second vanish either.
     // After the harvest arm above, so a sinking body that still owes a harvest keeps it.

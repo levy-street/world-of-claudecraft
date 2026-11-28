@@ -5,14 +5,17 @@
 // the drawn views, never writes either.
 
 import * as THREE from 'three';
+import { floorHeightAt } from '../sim/physics';
 import type { IWorld } from '../world_api';
+import { fxPickProxies } from './fx_pick_proxies';
 import { resolveGatherNodePick } from './gather_nodes';
 import { isProjectedNameplateAnchorVisible } from './nameplate_projection';
+import { marchRayToFloor, type RayPoint } from './ping_ground_ray_core';
 import type { PlacedAssetsView } from './placed_assets';
 import type { MoverHit } from './placed_movers';
 import type { EntityView } from './renderer';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
-import { resolveWorldDirectPick } from './world_direct_pick';
+import { resolveWorldDirectPick, takesNoClick } from './world_direct_pick';
 
 /** What picking reads from the renderer. */
 export interface WorldPickingHost {
@@ -60,6 +63,27 @@ export class WorldPicking {
     return this.raycaster.ray.intersectPlane(this.raycastGroundPlane, this.raycastHit)
       ? { x: this.raycastHit.x, z: this.raycastHit.z }
       : null;
+  }
+
+  // A ground ping (src/ui/hud/pings/): where the cursor ray first meets the
+  // real floor (terrain, standable tops), marched up to `maxDist` yards along
+  // the ray (ping_ground_ray_core.ts). Null on a sky or too-far pick. Unlike
+  // groundPoint above it holds on slopes and at range, and its y is the floor
+  // actually under the cursor; click-to-move and ground aim keep the plane.
+  groundHit(clientX: number, clientY: number, maxDist: number): RayPoint | null {
+    this.raycastNdc.set(
+      (clientX / window.innerWidth) * 2 - 1,
+      -(clientY / window.innerHeight) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(this.raycastNdc, this.host.camera());
+    const seed = this.host.sim().cfg.seed;
+    const { origin, direction } = this.raycaster.ray;
+    return marchRayToFloor(
+      origin,
+      direction,
+      (x, z, y) => floorHeightAt(seed, x, z, 0, y),
+      maxDist,
+    );
   }
 
   /** The moving part of a placed building under the cursor (the bank's vault
@@ -119,6 +143,12 @@ export class WorldPicking {
     const hits = this.raycastHits;
     hits.length = 0;
     this.raycaster.intersectObjects(this.host.clickTargets(), true, this.raycastHits);
+    // The proxies an effect lends a body (fx_pick_proxies.ts: the Smith's
+    // Heart loot coffer for its corpse). three sorts the whole list, so they
+    // join the capsules' hits nearest first.
+    const lent = fxPickProxies();
+    if (lent.length > 0)
+      this.raycaster.intersectObjects(lent as THREE.Object3D[], false, this.raycastHits);
     const directHitIds = this.directHitIds;
     directHitIds.length = 0;
     for (const hit of hits) {
@@ -136,6 +166,9 @@ export class WorldPicking {
           // click-pickable either (the capsule proxy ignores `visible`): skip it
           // unless the local player is a released spirit.
           if (e?.templateId === 'spirit_healer' && !sim.player?.ghost) break;
+          // A fight's telegraph object takes no click: the ray passes on to
+          // what stands behind it (world_direct_pick.ts takesNoClick).
+          if (e && takesNoClick(e)) break;
           directHitIds.push(id);
           break;
         }

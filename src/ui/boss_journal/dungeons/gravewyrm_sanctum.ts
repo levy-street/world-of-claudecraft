@@ -28,6 +28,7 @@ import {
   KORZUL_TUNING,
   KORZUL_WING_GALE,
   SANCTUM_DUNGEON,
+  SCALEGUARD_ID,
   SEAL_TOOLS,
   SLEDGE_TUSKER_ID,
   TUSKER_TRAMPLE,
@@ -64,6 +65,14 @@ const KZ = KORZUL_TUNING;
 const TUSKER_BODY = MOBS[SLEDGE_TUSKER_ID]?.bodyRadius ?? 0;
 
 const KORGATH_ENRAGE = templateEnrage(KORGATH_ID);
+
+/** The brood's Scaleguard kit, read off its template: what its hits are named. */
+const SCALEGUARD = MOBS[SCALEGUARD_ID];
+const SCALEGUARD_HITS: readonly string[] = [
+  SCALEGUARD?.breathCone?.name,
+  SCALEGUARD?.trashKit?.tailLash?.name,
+  SCALEGUARD?.trashKit?.breathPool?.hazard?.name,
+].filter((name): name is string => name !== undefined);
 const KORZUL_ENRAGE = templateEnrage(KORZUL_ID);
 
 const SLEDGE_TUSKER: JournalBossDef = {
@@ -79,6 +88,7 @@ const SLEDGE_TUSKER: JournalBossDef = {
         {
           id: 'tusk-sweep',
           iconId: 'dgn_sanctum_tusk_sweep',
+          hits: ['Tusk Sweep'],
           nameKey: cast(TUSKER_TUSK_SWEEP),
           castId: TUSKER_TUSK_SWEEP,
           summaryKey: k('tusker.sweepSummary'),
@@ -98,6 +108,7 @@ const SLEDGE_TUSKER: JournalBossDef = {
         {
           id: 'trample',
           iconId: 'dgn_sanctum_trample',
+          hits: ['Trample'],
           nameKey: cast(TUSKER_TRAMPLE),
           castId: TUSKER_TRAMPLE,
           summaryKey: k('tusker.trampleSummary'),
@@ -125,6 +136,7 @@ const SLEDGE_TUSKER: JournalBossDef = {
         {
           id: 'spilled-braziers',
           iconId: 'dgn_sanctum_spilled_braziers',
+          hits: ['Spilled Braziers'],
           nameKey: k('tusker.spillName'),
           summaryKey: k('tusker.spillSummary'),
           responseKey: k('tusker.spillResponse'),
@@ -214,6 +226,7 @@ const KORGATH: JournalBossDef = {
         {
           id: 'strain',
           iconId: 'dgn_sanctum_strain',
+          hits: ['Strain'],
           nameKey: cast(KORGATH_STRAIN),
           castId: KORGATH_STRAIN,
           summaryKey: k('korgath.strainSummary'),
@@ -227,6 +240,7 @@ const KORGATH: JournalBossDef = {
         {
           id: 'shuddering-stomp',
           iconId: 'dgn_sanctum_stomp',
+          hits: ['Shuddering Stomp'],
           nameKey: cast(KORGATH_STOMP),
           castId: KORGATH_STOMP,
           summaryKey: k('korgath.stompSummary'),
@@ -275,6 +289,7 @@ const KORGATH: JournalBossDef = {
         {
           id: 'maul-arc',
           iconId: 'dgn_sanctum_maul_arc',
+          hits: ['Maul Arc'],
           nameKey: cast(KORGATH_MAUL_ARC),
           castId: KORGATH_MAUL_ARC,
           summaryKey: k('korgath.maulSummary'),
@@ -292,6 +307,7 @@ const KORGATH: JournalBossDef = {
         {
           id: 'chain-flail',
           iconId: 'dgn_sanctum_chain_flail',
+          hits: ['Chain Flail'],
           nameKey: cast(KORGATH_CHAIN_FLAIL),
           castId: KORGATH_CHAIN_FLAIL,
           summaryKey: k('korgath.flailSummary'),
@@ -307,6 +323,7 @@ const KORGATH: JournalBossDef = {
         {
           id: 'threshold-charge',
           iconId: 'dgn_sanctum_threshold_charge',
+          hits: ['Threshold Charge'],
           nameKey: cast(KORGATH_THRESHOLD_CHARGE),
           castId: KORGATH_THRESHOLD_CHARGE,
           summaryKey: k('korgath.chargeSummary'),
@@ -325,6 +342,7 @@ const KORGATH: JournalBossDef = {
         {
           id: 'foremans-bellow',
           iconId: 'dgn_sanctum_bellow',
+          hits: ["Foreman's Bellow"],
           nameKey: cast(KORGATH_BELLOW),
           castId: KORGATH_BELLOW,
           summaryKey: k('korgath.bellowSummary'),
@@ -442,6 +460,7 @@ const VELKHAR: JournalBossDef = {
         {
           id: 'soulfire-trench',
           iconId: 'dgn_sanctum_soulfire_trench',
+          hits: ['Soulfire Trench'],
           nameKey: cast(VELKHAR_SOULFIRE_TRENCH),
           castId: VELKHAR_SOULFIRE_TRENCH,
           summaryKey: k('velkhar.trenchSummary'),
@@ -460,6 +479,7 @@ const VELKHAR: JournalBossDef = {
         {
           id: 'shadow-volley',
           iconId: 'dgn_sanctum_shadow_volley',
+          hits: ['Shadow Volley'],
           nameKey: cast(VELKHAR_SHADOW_VOLLEY),
           castId: VELKHAR_SHADOW_VOLLEY,
           summaryKey: k('velkhar.volleySummary'),
@@ -529,6 +549,8 @@ const VELKHAR: JournalBossDef = {
 
 const KORZUL: JournalBossDef = {
   mobId: KORZUL_ID,
+  // The Scaleguards its brood raises.
+  hitSources: [SCALEGUARD_ID],
   rank: 'final',
   overviewKey: k('korzul.overview'),
   phases: [
@@ -550,6 +572,7 @@ const KORZUL: JournalBossDef = {
         {
           id: 'open-water',
           iconId: 'dgn_sanctum_open_water',
+          hits: ['Quench-Water'],
           nameKey: k('korzul.waterName'),
           summaryKey: k('korzul.waterSummary'),
           responseKey: k('korzul.waterResponse'),
@@ -562,6 +585,7 @@ const KORZUL: JournalBossDef = {
         {
           id: 'grave-breath',
           iconId: 'dgn_sanctum_grave_breath',
+          hits: ['Grave Breath'],
           nameKey: cast(KORZUL_GRAVE_BREATH),
           castId: KORZUL_GRAVE_BREATH,
           summaryKey: k('korzul.breathSummary'),
@@ -581,6 +605,7 @@ const KORZUL: JournalBossDef = {
         {
           id: 'tail-sweep',
           iconId: 'dgn_sanctum_tail_sweep',
+          hits: ['Tail Sweep'],
           nameKey: cast(KORZUL_TAIL_SWEEP),
           castId: KORZUL_TAIL_SWEEP,
           summaryKey: k('korzul.tailSummary'),
@@ -599,6 +624,7 @@ const KORZUL: JournalBossDef = {
         {
           id: 'grave-inferno',
           iconId: 'dgn_sanctum_grave_inferno',
+          hits: ['Grave Inferno'],
           nameKey: cast(KORZUL_GRAVE_INFERNO),
           castId: KORZUL_GRAVE_INFERNO,
           summaryKey: k('korzul.infernoSummary'),
@@ -647,6 +673,7 @@ const KORZUL: JournalBossDef = {
         {
           id: 'plunging-fire',
           iconId: 'dgn_sanctum_plunging_fire',
+          hits: ['Plunging Fire'],
           nameKey: cast(KORZUL_PLUNGING_FIRE),
           castId: KORZUL_PLUNGING_FIRE,
           summaryKey: {
@@ -668,6 +695,7 @@ const KORZUL: JournalBossDef = {
         {
           id: 'brood',
           iconId: 'dgn_sanctum_brood',
+          hits: SCALEGUARD_HITS,
           nameKey: k('korzul.broodName'),
           summaryKey: k('korzul.broodSummary'),
           responseKey: k('korzul.broodResponse'),
@@ -678,6 +706,7 @@ const KORZUL: JournalBossDef = {
         {
           id: 'crashing-descent',
           iconId: 'dgn_sanctum_crashing_descent',
+          hits: ['Crashing Descent'],
           nameKey: cast(KORZUL_CRASHING_DESCENT),
           castId: KORZUL_CRASHING_DESCENT,
           summaryKey: k('korzul.descentSummary'),

@@ -11,6 +11,7 @@
 import {
   CHARACTER_EFFECT_FEIGN_DEATH,
   CHARACTER_EFFECT_IMPALED,
+  CHARACTER_EFFECT_TREADING_WATER,
   hasCharacterEffect,
 } from '../character_effects_core';
 import { type LocoState, MOVE_ENTER_SPEED } from '../locomotion';
@@ -105,6 +106,26 @@ export function applyEntityAnimOverrides(
     st.moving = false;
     st.running = false;
     st.airborne = false;
+    st.combat = false;
+    st.stealthed = false;
+    return;
+  }
+  // Held in the Quench's freezing water (fallen through its ice): the body
+  // treads water in place, upright in the swim tread clip, rather than
+  // standing on a floor it is not touching. The sim roots it on the ice, so
+  // the renderer's own water read never fires; this supplies the pose, and the
+  // rig's tread sink (with quenchSinkOf's) puts the waterline at the chest.
+  if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_TREADING_WATER) && !visuallyDead) {
+    st.swimming = true;
+    st.submerged = false;
+    st.swimPitch = 0;
+    st.bankRoll = 0;
+    st.wading = false;
+    st.sitting = false;
+    st.moving = false;
+    st.running = false;
+    st.airborne = false;
+    st.falling = false;
     st.combat = false;
     st.stealthed = false;
   }

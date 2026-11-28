@@ -165,6 +165,7 @@ import {
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
+  type PartyPing,
   PET_SPECIAL_WIRE_VERSION,
   type PlayerProfessionsView,
   type RaidLockout,
@@ -174,6 +175,7 @@ import {
   type ReliquaryPageCompletion,
   type ReliquaryRarity,
   type RiftFloorView,
+  type SharedMapMark,
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
@@ -215,6 +217,7 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import { applySelfCombatScalars } from './combat_scalar_wire';
+import { applyCorpseLootWire, clientBossLootDenied } from './corpse_loot_wire';
 import { craftResultViewFromEvent } from './craft_result_mirror';
 import { decodeMobileStationCrafts, EMPTY_MST_CRAFTS } from './crafting_wire';
 import {
@@ -261,6 +264,7 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { decodePartyPings, PartyPingReplayGuard } from './party_pings_wire';
 import { applyPeerMajorCooldownWire } from './peer_major_cooldown_wire';
 import { perfectingCommand } from './perfecting_command';
 import {
@@ -281,6 +285,7 @@ import {
 import { decodeReferralCardsSnapshot } from './referral_cards_wire';
 import { type RiftStateEvent, swapMirroredRiftFloor } from './rift_floor_mirror';
 import { isInputSendBackpressured } from './send_backpressure';
+import { decodeSharedMapMarks } from './shared_map_marks_wire';
 import { snapshotAlpha } from './snapshot_alpha';
 import { applySnapshotHeadSyncs } from './snapshot_head_syncs';
 import {
@@ -1544,6 +1549,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
+  // the raid map's shared marks, from the self-wire `mmarks` (null = none in view)
+  sharedMapMarkList: readonly SharedMapMark[] = [];
+  partyPingList: readonly PartyPing[] = []; // the group's pings, from the self-wire `pings`
+  private readonly pingReplay = new PartyPingReplayGuard(); // a (re)join's live pings: no replay
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
   // group-visible choices on the open rolls (the vote strip), mirrored from the self-wire
   private lootRollGroup: LootRollGroupStatus[] = [];
@@ -1810,6 +1819,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       ? `${this.base.replace(/^http/, 'ws')}/ws`
       : buildWebSocketUrl(location.protocol, location.host);
     this.ws = new WebSocket(wsUrl);
+    this.pingReplay.newSession();
     this.ws.onopen = () => {
       this.ws.send(
         JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
@@ -2850,15 +2860,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // guard (countStale false here: the self-decode owns the budget decrement).
       if (w.id === this.playerId) this.applySelfTargetFromServer(e, w.tgt ?? null, false);
       else e.targetId = w.tgt ?? null;
-      e.tappedById = w.tap ?? null;
-      // corpse harvest claim: unconditional so a record without hcb (unclaimed,
-      // or a respawn that cleared the claim) resets any stale mirrored pid
-      e.harvestClaimedBy = typeof w.hcb === 'number' ? w.hcb : null;
-      // loot owner-lock lapse: flag present means lapsed (mirror as already counted down),
-      // absent means the lock still holds or never started; unconditional so a respawned
-      // record resets any stale lapse (same contract as hcb above). The server owns the
-      // countdown; the client only ever needs the boolean.
-      e.lootFfaTimer = w.ffa ? 0 : Infinity;
+      applyCorpseLootWire(e, w); // tap, hcb, ffa and the per-boss lock bll (corpse_loot_wire.ts)
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
@@ -3195,6 +3197,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
+      if (s.mmarks !== undefined) this.sharedMapMarkList = decodeSharedMapMarks(s.mmarks);
+      if (s.pings !== undefined)
+        this.partyPingList = this.pingReplay.mark(decodePartyPings(s.pings));
       // The own presentation has released the spectate hold, so preference
       // changes made while watching can now pass cmd()'s normal guard.
       if (restoreSessionPreferences) this.resendSessionPreferences();
@@ -3522,6 +3527,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   activeMasterLootRolls(): MasterLootPrompt[] {
     return this.masterLootPrompts;
+  }
+  corpseBossLootDenied(corpse: Pick<Entity, 'bossLootLock'>): boolean {
+    return clientBossLootDenied(corpse, this.playerId, this.selfLockouts, Date.now());
   }
   pickUpObject(id: number): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'pickup', id });
@@ -4210,6 +4218,24 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   clearMarker(entityId: number): void {
     this.cmd({ cmd: 'clearMarker', id: entityId });
+  }
+  sharedMapMarks(): readonly SharedMapMark[] {
+    return this.sharedMapMarkList;
+  }
+  placeSharedMapMark(page: number, x: number, z: number, symbol: number): void {
+    this.cmd({ cmd: 'map_mark_set', page, x, z, symbol });
+  }
+  placeSharedWorldMark(page: number, x: number, y: number, z: number, symbol: number): void {
+    this.cmd({ cmd: 'map_mark_place', page, x, y, z, symbol });
+  }
+  clearSharedMapMarks(symbol: number | null): void {
+    this.cmd({ cmd: 'map_mark_clear', symbol });
+  }
+  partyPings(): readonly PartyPing[] {
+    return this.partyPingList;
+  }
+  sendPing(kind: number, target: number | null, x: number, y: number, z: number): void {
+    this.cmd({ cmd: 'ping', kind, target, x, y, z });
   }
   // --- IWorldTrade: trade-window command sends (tradeInfo is a snapshot read). ---
   tradeRequest(targetPid: number): void {

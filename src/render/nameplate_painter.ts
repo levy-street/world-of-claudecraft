@@ -7,7 +7,11 @@ import * as THREE from 'three';
 import { friendlyNameplatesShown } from '../game/nameplate_view_prefs';
 import { isOwnAura } from '../sim/aura_classify';
 import { isPlayingDead } from '../sim/combat/hunter_play_dead';
-import { corpseIndicatorFor } from '../sim/corpse_loot_state';
+import {
+  type CorpseIndicator,
+  corpseIndicatorFor,
+  viewerBossLootDenied,
+} from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isBuddyMob } from '../sim/pet/buddy_ai';
@@ -30,12 +34,7 @@ import { tEntity } from '../ui/entity_i18n';
 import { hillBountyTagLabel } from '../ui/hill_bounty_tag';
 import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
-import {
-  auraImageUrl,
-  cachedProceduralIconDataUrl,
-  proceduralIconDataUrl,
-  raidMarkerDataUrl,
-} from '../ui/icons';
+import { auraImageUrl, cachedProceduralIconDataUrl, proceduralIconDataUrl } from '../ui/icons';
 import { professionTrainerNameplateLabel } from '../ui/profession_trainer_label_core';
 import { localizeSimAuraName } from '../ui/sim_i18n';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
@@ -70,6 +69,7 @@ import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
+import { raidMarkPlateUrl } from './nameplate_raid_mark';
 import { nameplateHasBounty } from './nameplate_tag_fill_core';
 import {
   newTargetOverlay,
@@ -83,6 +83,7 @@ import {
   type NameplatePlan,
   nameplatePlanInto,
   newNameplatePlan,
+  raidMarkPlateKey,
 } from './nameplate_view';
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, isMobHostileToViewer, mobNameColor } from './reaction';
@@ -254,6 +255,9 @@ export class NameplatePainter {
    *  NPC_NAMEPLATE_RANGE): crossing the range re-resolves the plate the same
    *  frame, so a name never lingers far out or waits to appear up close. */
   private readonly markerOnlyPlates = new Set<number>();
+  // Per plate, the raid target icon and icon-only mode its content was resolved
+  // with (raidMarkPlateKey), so a mark set, moved or cleared re-resolves at once.
+  private readonly raidMarkPlates = new Map<number, number>();
   private readonly traceLabels = new WorldQuestTraceLabels();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
@@ -315,6 +319,13 @@ export class NameplatePainter {
     this.surface = new NameplateCanvasSurface(deps.layer);
   }
 
+  /** What this body offers the viewer (corpseIndicatorFor), the viewer's
+   *  per-boss raid save included (IWorld.corpseBossLootDenied). */
+  private corpseIndicator(entity: Entity, viewerId: number): CorpseIndicator {
+    const denied = viewerBossLootDenied(this.world, entity);
+    return corpseIndicatorFor(entity, viewerId, this.viewerPartyIds, true, denied);
+  }
+
   update(fullPass: boolean): void {
     const world = this.world;
     const player = world.player;
@@ -370,18 +381,19 @@ export class NameplatePainter {
       // the entity is the whole hide, so a gated plate leaves no pick anchor
       // behind, and `standIn` wins over it exactly as it wins over the other
       // nameplate toggles: a body the compile gate is still hiding keeps the
-      // plate that says it is there.
-      if (
+      // plate that says it is there. A unit wearing the group's raid target
+      // icon keeps it floating over its head whatever the toggles say
+      // (NameplatePlan.raidMarkOnly): a direct map lookup, no allocation.
+      const raidMark = entity.kind === 'npc' ? null : this.world.markerFor(id);
+      const friendlyHidden =
         !standIn &&
         isFriendlyNameplateHidden(
           entity,
           world.entities,
           this.isHostilePlayer,
           showFriendlyNameplates,
-        )
-      ) {
-        continue;
-      }
+        );
+      if (friendlyHidden && raidMark === null) continue;
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,
@@ -393,6 +405,8 @@ export class NameplatePainter {
         showPlayerNameplates,
         showPetNames,
         standIn,
+        raidMark !== null,
+        friendlyHidden,
       );
       if (plan.hidden) continue;
 
@@ -427,7 +441,12 @@ export class NameplatePainter {
       // Play Dead (hunter feign death) hides a player's bar the frame it lands.
       const feignFlipped = entity.kind === 'player' && state.hpVisible === shownDead(entity);
       const markerOnlyFlipped = this.markerOnlyPlates.has(id) !== plan.markerOnly;
-      const flipped = pvpFlipped || bountyFlipped || feignFlipped || markerOnlyFlipped;
+      // A raid target icon set, moved or cleared shows the same frame, never on
+      // the tier cadence: it is what the group is told to act on.
+      const raidMarkFlipped =
+        this.raidMarkPlates.get(id) !== raidMarkPlateKey(raidMark, plan.raidMarkOnly);
+      const flipped =
+        pvpFlipped || bountyFlipped || feignFlipped || markerOnlyFlipped || raidMarkFlipped;
       if (!state.initialized || fullPass || plan.urgent || languageChanged || flipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
         // Recorded here, not inside resolveContent's early-returning branches,
@@ -436,9 +455,11 @@ export class NameplatePainter {
         else this.plateBounty.delete(id);
         if (plan.markerOnly) this.markerOnlyPlates.add(id);
         else this.markerOnlyPlates.delete(id);
+        this.raidMarkPlates.set(id, raidMarkPlateKey(raidMark, plan.raidMarkOnly));
       }
-      // A far NPC draws only its quest marker; with none there is no plate.
-      if (plan.markerOnly && !state.marker) continue;
+      // A far NPC draws only its quest marker (or the group's raid target icon);
+      // with neither there is no plate.
+      if (plan.markerOnly && !state.marker && !state.raidMarkerUrl) continue;
 
       const anchor = this.anchorScratch[this.anchorCount];
       if (anchor) {
@@ -590,6 +611,7 @@ export class NameplatePainter {
     this.states.delete(id);
     this.plateBounty.delete(id);
     this.markerOnlyPlates.delete(id);
+    this.raidMarkPlates.delete(id);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       if (anchor.id !== id) continue;
@@ -607,6 +629,7 @@ export class NameplatePainter {
     this.states.clear();
     this.plateBounty.clear();
     this.markerOnlyPlates.clear();
+    this.raidMarkPlates.clear();
     this.paintGate.invalidate();
     this.surface.dispose();
   }
@@ -708,7 +731,12 @@ export class NameplatePainter {
       languageChanged,
     );
 
-    if (plan.nameOnly) {
+    if (plan.raidMarkOnly) {
+      state.emphasis = false;
+      state.comboPips = 0;
+      state.threat = false;
+    }
+    if (plan.nameOnly || plan.raidMarkOnly) {
       state.dots.count = 0;
       state.castVisible = false;
       state.castSource = '';
@@ -750,7 +778,9 @@ export class NameplatePainter {
     state.levelColor = '#fff';
     // A far NPC's marker stands alone above the head, without its role line.
     state.guild =
-      entity.kind === 'npc' && !plan.markerOnly ? (npcRoleLabel(entity.templateId) ?? '') : '';
+      entity.kind === 'npc' && !plan.markerOnly && !plan.raidMarkOnly
+        ? (npcRoleLabel(entity.templateId) ?? '')
+        : '';
     state.guildLabel = '';
     state.guildTier = 0;
     state.title = '';
@@ -768,8 +798,14 @@ export class NameplatePainter {
     state.emoteLabel = '';
     state.friendlyPet = false;
 
-    const raidMark = plan.nameOnly ? null : this.world.markerFor(entity.id);
-    if (raidMark !== null) state.raidMarkerUrl = raidMarkerDataUrl(raidMark);
+    // A true NPC is never markable (src/sim/social/raid_target_marks.ts).
+    const raidMark = entity.kind === 'npc' ? null : this.world.markerFor(entity.id);
+    if (raidMark !== null) state.raidMarkerUrl = raidMarkPlateUrl(raidMark);
+    // A plate a nameplate toggle hides keeps only the floating raid target icon.
+    if (plan.raidMarkOnly) {
+      state.badges.length = 0;
+      return;
+    }
 
     let emote = null;
     if (entity.overheadEmoteId) {
@@ -835,7 +871,7 @@ export class NameplatePainter {
       // blow: src/sim/pvp/world_pvp_spoils.ts) wears the corpse loot satchel,
       // through the same per-viewer rule as a mob corpse.
       if (entity.dead) {
-        const spoils = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
+        const spoils = this.corpseIndicator(entity, player.id);
         if (spoils !== 'none') {
           state.marker = spoils;
           state.markerTone = spoils;
@@ -951,7 +987,7 @@ export class NameplatePainter {
     // stranger's owner-locked kill is lootable for someone else. Ordinary loot
     // wins the satchel; an open harvest with no ordinary loot shows the blade;
     // neither shows nothing.
-    const corpse = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
+    const corpse = this.corpseIndicator(entity, player.id);
     state.marker = corpse !== 'none' ? corpse : elite && !entity.dead ? '◆' : '';
     state.markerTone = corpse;
     state.frame = entity.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';

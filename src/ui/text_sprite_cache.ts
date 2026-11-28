@@ -46,6 +46,9 @@ export interface TextSpriteStyle {
   fill: string;
   stroke?: string;
   lineWidth?: number;
+  /** Round the outline's joins (a soft halo with no miter spikes at glyph
+   *  apexes, for wide outlines on display faces). Default: mitered. */
+  roundJoin?: boolean;
 }
 
 /** A rasterized label plus where the caller's (x, y) anchor sits inside it, so
@@ -340,7 +343,7 @@ export class TextSpriteCache {
     if (!strokes) return undefined;
     const widths = strokes.get(style.stroke);
     if (!widths) return undefined;
-    return widths.get(outlineWidth(style))?.get(text);
+    return widths.get(widthKey(style))?.get(text);
   }
 
   /** Resolve (creating on demand) the text bucket for a style. Miss path only:
@@ -361,7 +364,7 @@ export class TextSpriteCache {
       widths = new Map();
       strokes.set(style.stroke, widths);
     }
-    const width = outlineWidth(style);
+    const width = widthKey(style);
     let bucket = widths.get(width);
     if (!bucket) {
       bucket = new Map();
@@ -414,6 +417,14 @@ function outlineWidth(style: TextSpriteStyle): number {
   return style.stroke === undefined ? 0 : (style.lineWidth ?? 1);
 }
 
+// The width level's key: the outline width, NEGATED for a round-join outline.
+// A width is never negative, so the sign keeps the two joins in separate
+// buckets without another map level on the hot lookup.
+function widthKey(style: TextSpriteStyle): number {
+  const w = outlineWidth(style);
+  return style.roundJoin && w > 0 ? -w : w;
+}
+
 // Rasterize one label into its own canvas, or null when the 2D context fails.
 function rasterize(text: string, style: TextSpriteStyle, pixelRatio: number): TextSprite | null {
   const canvas = document.createElement('canvas');
@@ -445,6 +456,7 @@ function rasterize(text: string, style: TextSpriteStyle, pixelRatio: number): Te
     // Cap the join BEFORE stroking: this is what makes `pad` above a real bound
     // rather than a hope, so the two must never drift apart.
     ctx.miterLimit = SPRITE_MITER_LIMIT;
+    if (style.roundJoin) ctx.lineJoin = 'round';
     ctx.strokeText(text, originX, originY);
   }
   ctx.fillStyle = style.fill;

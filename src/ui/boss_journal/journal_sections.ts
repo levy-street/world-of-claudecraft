@@ -2,7 +2,7 @@
 // the Heroic callout, rank chips, tier marks, the two-tier damage line). Pure
 // strings from the view model: every label is a t() key, every number goes
 // through formatNumber, every interpolation through esc(). The window
-// (raid_boss_guide_window.ts) owns the DOM, the events and the focus.
+// (hud/journal/adventure_journal_window.ts) owns the DOM, the events and the focus.
 
 import { esc } from '../esc';
 import { formatNumber, type InterpolationValues, type TranslationKey, t } from '../i18n';

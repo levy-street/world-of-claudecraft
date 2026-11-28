@@ -89,6 +89,40 @@ describe('authored field height', () => {
     expect(colliders.length).toBe(authoredFieldCliffRuns(MINI).length + 1);
     expect(colliders.some((c) => c.type === 'circle' && c.x === 5 && c.r === 0.5)).toBe(true);
   });
+
+  it('leaves a lip opening bare over the void, and only there', () => {
+    // An opening on the low square's east lip (over the void), and one over
+    // its join with the ramp (no void below it: walled as before).
+    const open: AuthoredFieldDef = {
+      ...MINI,
+      lipOpenings: [
+        { x: 10, z: 0, r: 3 },
+        { x: 0, z: 10, r: 2 },
+      ],
+    };
+    const runs = authoredFieldCliffRuns(open);
+    const bare = runs.filter((r) => r.open);
+    expect(bare.length).toBeGreaterThan(0);
+    for (const r of bare) {
+      expect(r.low).toBeLessThanOrEqual(open.voidHeight + 1);
+      expect(Math.hypot((r.ax + r.bx) / 2 - 10, (r.az + r.bz) / 2)).toBeLessThanOrEqual(3);
+    }
+    // The same lip, walled everywhere else: the plain field's runs split, and
+    // the opening's samples build no collider.
+    const plain = authoredFieldCliffRuns(MINI);
+    expect(plain.some((r) => r.open)).toBe(false);
+    const colliders = authoredFieldColliders(open, 0);
+    expect(colliders.length).toBe(runs.length - bare.length + 1);
+    const walledAt = (x: number, z: number) =>
+      colliders.some(
+        (c) =>
+          c.type === 'obb' &&
+          Math.abs((x - c.x) * Math.cos(c.rot) - (z - c.z) * Math.sin(c.rot)) <= c.hw &&
+          Math.abs((x - c.x) * Math.sin(c.rot) + (z - c.z) * Math.cos(c.rot)) <= c.hd + 0.05,
+      );
+    expect(walledAt(10, 0)).toBe(false);
+    expect(walledAt(10, -7)).toBe(true);
+  });
 });
 
 describe('the Hollow Crypt field', () => {

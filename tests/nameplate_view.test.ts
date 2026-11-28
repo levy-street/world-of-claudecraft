@@ -587,3 +587,66 @@ describe('nameplate interval WIRING - renderer reads the static stamp, never the
     );
   });
 });
+
+describe('nameplate_view - raid target icon over toggled-off plates', () => {
+  function marked(
+    e: any,
+    toggles: {
+      showNameplates?: boolean;
+      showOwnNameplate?: boolean;
+      showPlayerNameplates?: boolean;
+      showPetNames?: boolean;
+      friendlyHidden?: boolean;
+    },
+    raidMarked = true,
+    p: any = viewer(),
+  ) {
+    return nameplatePlanInto(
+      newNameplatePlan(),
+      e,
+      p,
+      2,
+      toggles.showNameplates ?? true,
+      toggles.showOwnNameplate ?? false,
+      toggles.showPlayerNameplates ?? true,
+      toggles.showPetNames ?? false,
+      false,
+      raidMarked,
+      toggles.friendlyHidden ?? false,
+    );
+  }
+
+  it('keeps a marked unit as an icon-only plate under every nameplate toggle', () => {
+    const ally = ent({ id: 5, kind: 'player', pos: { x: 3, y: 0, z: 0 } });
+    const offPlayers = marked(ally, { showPlayerNameplates: false });
+    expect(offPlayers.hidden).toBe(false);
+    expect(offPlayers.raidMarkOnly).toBe(true);
+    const mob = ent({ pos: { x: 3, y: 0, z: 0 } });
+    expect(marked(mob, { showNameplates: false }).raidMarkOnly).toBe(true);
+    const friendlyPet = ent({ ownerId: 5, hostile: false, pos: { x: 3, y: 0, z: 0 } });
+    expect(marked(friendlyPet, { friendlyHidden: true }).raidMarkOnly).toBe(true);
+    const me = ent({ id: PLAYER_ID, kind: 'player' });
+    const self = marked(me, {}, true, viewer({ id: PLAYER_ID }));
+    expect(self.hidden).toBe(false);
+    expect(self.raidMarkOnly).toBe(true);
+  });
+
+  it('draws the full plate when nothing hides it, and hides an unmarked toggled plate', () => {
+    const ally = ent({ id: 5, kind: 'player', pos: { x: 3, y: 0, z: 0 } });
+    const shown = marked(ally, {});
+    expect(shown.hidden).toBe(false);
+    expect(shown.raidMarkOnly).toBe(false);
+    const unmarked = marked(ally, { showPlayerNameplates: false }, false);
+    expect(unmarked.hidden).toBe(true);
+    expect(unmarked.raidMarkOnly).toBe(false);
+    expect(marked(ally, { friendlyHidden: true }, false).hidden).toBe(true);
+  });
+
+  it('never resurrects a plate that range or death hides', () => {
+    const far = ent({ kind: 'player', pos: { x: NAMEPLATE_RANGE + 5, y: 0, z: 0 } });
+    expect(marked(far, { showPlayerNameplates: false }).hidden).toBe(true);
+    expect(marked(far, { showPlayerNameplates: false }).raidMarkOnly).toBe(false);
+    const corpse = ent({ dead: true, lootable: false });
+    expect(marked(corpse, { showNameplates: false }).hidden).toBe(true);
+  });
+});

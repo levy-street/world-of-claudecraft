@@ -4,15 +4,31 @@
 // the local player; the world map takes an explicit anchor so the HUD can draw
 // the dungeon or castle a PARTY MEMBER stands in while the viewer is outside
 // (map_surface_core.ts resolves that anchor from the roster).
+//
+// A raid with an illustrated atlas (src/ui/hud/raid_atlas/, the Smith's Heart
+// pilot) draws its plan through the atlas instead of the plain floor plan; the
+// atlas also rides the HUD's frame tick (`frame`) and paints the raid's
+// minimap (the same illustrated page cropped round the player).
 
+import { dungeonInstanceAt } from '../sim/dungeon_floor';
 import type { IWorld } from '../world_api';
-import { DungeonMapPainter } from './dungeon_map_painter';
+import {
+  DungeonMapPainter,
+  dungeonTitleWithDifficulty,
+  MINIMAP_BASE_SCALE,
+} from './dungeon_map_painter';
 import {
   type DungeonMapModel,
   dungeonMapActive,
   dungeonMapLocal,
   type MapAnchor,
 } from './dungeon_map_view';
+import {
+  hasRaidAtlas,
+  type RaidAtlasAnchor,
+  RaidAtlasController,
+  type RaidAtlasMinimapTap,
+} from './hud/raid_atlas';
 import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_painter';
 import {
   dawnholdLocal,
@@ -34,8 +50,14 @@ export class InteriorMapController {
   private readonly dungeon: DungeonMapPainter;
   private readonly lastKeep: LastKeepMapPainter;
   private readonly dawnhold: LastKeepMapPainter;
+  private readonly atlas: RaidAtlasController | null;
 
-  constructor(writers: PainterHostWriters, classColor: (cls: string) => string) {
+  constructor(
+    private readonly writers: PainterHostWriters,
+    classColor: (cls: string) => string,
+    planShown: (() => boolean) | null = null,
+  ) {
+    this.atlas = planShown ? new RaidAtlasController({ planShown, classColor }) : null;
     this.dungeon = new DungeonMapPainter(writers, classColor);
     this.lastKeep = new LastKeepMapPainter(writers, classColor);
     this.dawnhold = new LastKeepMapPainter(writers, classColor, DAWNHOLD_MAP_PAINTER_SPEC);
@@ -49,9 +71,19 @@ export class InteriorMapController {
     zoom: number,
   ): boolean {
     if (dungeonMapActive(world)) {
+      const anchor = this.atlas ? atlasAnchorAt(world.player.pos.x, world.player.pos.z) : null;
+      if (
+        anchor &&
+        this.atlas?.paintMinimap(ctx, world, anchor, size, zoom, MINIMAP_BASE_SCALE * zoom)
+      ) {
+        this.writers.setText(zoneLabelEl, dungeonTitleWithDifficulty(anchor.dungeonId, world));
+        return true;
+      }
+      this.atlas?.minimapGone();
       this.dungeon.paintMinimap(ctx, world, zoneLabelEl, size, zoom);
       return true;
     }
+    this.atlas?.minimapGone();
     if (lastKeepMapActive(world)) {
       this.lastKeep.paintMinimap(ctx, world, zoneLabelEl, size, zoom);
       return true;
@@ -72,6 +104,12 @@ export class InteriorMapController {
     size: number,
     anchor: MapAnchor = world.player.pos,
   ): PaintedInteriorWorldMap | null {
+    const atlasAnchor = this.atlas ? atlasAnchorAt(anchor.x, anchor.z) : null;
+    if (atlasAnchor && this.atlas) {
+      const title = this.atlas.show(ctx.canvas, world, atlasAnchor);
+      if (title !== null) return { title, model: null };
+    }
+    this.atlas?.hide();
     if (dungeonMapLocal(anchor.x, anchor.z)) {
       const painted = this.dungeon.paintWorldMap(ctx, world, size, anchor);
       return painted ? { title: painted.title, model: painted.model } : null;
@@ -84,4 +122,33 @@ export class InteriorMapController {
     }
     return null;
   }
+
+  /** A tap on the minimap: true when the raid atlas spent it (a boss card
+   *  opened or closed on a touch tap), so the minimap does not also toggle
+   *  the map. */
+  minimapTap(tap: RaidAtlasMinimapTap, touch: boolean): boolean {
+    return this.atlas?.minimapTap(tap, touch) ?? false;
+  }
+
+  /** The HUD's frame tick (the raid atlas's glide and live layer). */
+  frame(world: IWorld): void {
+    this.atlas?.tick(world);
+  }
+}
+
+/** The raid atlas anchor of a world point: its instance, when that instance's
+ *  dungeon draws an atlas. */
+function atlasAnchorAt(x: number, z: number): RaidAtlasAnchor | null {
+  const local = dungeonMapLocal(x, z);
+  if (!local || !hasRaidAtlas(local.dungeonId)) return null;
+  const { originX, originZ } = local;
+  return {
+    dungeonId: local.dungeonId,
+    originX,
+    originZ,
+    contains(px, pz) {
+      const f = dungeonInstanceAt(px, pz);
+      return f !== null && f.ox === originX && f.oz === originZ;
+    },
+  };
 }

@@ -10,7 +10,19 @@ import {
   WEAPON_VFX,
 } from '../src/render/weapon_vfx';
 
-const KNOWN_FX_KINDS = ['coreSprite', 'motes', 'aurora', 'drift', 'twinkles', 'arcs'];
+const KNOWN_FX_KINDS = [
+  'coreSprite',
+  'motes',
+  'aurora',
+  'drift',
+  'twinkles',
+  'arcs',
+  // the Smith's Heart raid families (src/render/weapon_vfx_raid_parts.ts)
+  'orbiters',
+  'runeRing',
+  'flames',
+  'vortex',
+];
 
 describe('WEAPON_VFX specs', () => {
   it('has at least 20 weapons and every tier exists in TIERS', () => {
@@ -43,6 +55,17 @@ describe('WEAPON_VFX specs', () => {
       expect(spec.fx.length, `${key}: empty fx array`).toBeGreaterThan(0);
       for (const c of spec.fx) {
         expect(KNOWN_FX_KINDS, `${key}: unknown fx kind '${c.kind}'`).toContain(c.kind);
+      }
+    }
+  });
+
+  it('keeps an authored orbit depth above zero', () => {
+    // depth scales an orbit's reach along one axis: 0 flattens the ring to a line through its
+    // anchor and a negative value mirrors the path. Unset means a circle.
+    for (const [key, spec] of Object.entries(WEAPON_VFX)) {
+      for (const c of spec.fx) {
+        if (c.kind !== 'orbiters' || c.depth === undefined) continue;
+        expect(c.depth, `${key}: orbiters depth`).toBeGreaterThan(0);
       }
     }
   });

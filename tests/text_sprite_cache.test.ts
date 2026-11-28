@@ -370,6 +370,24 @@ describe('text_sprite_cache: cache identity', () => {
     expect(cache.size).toBe(6);
   });
 
+  it('keys a round-join outline apart from a mitered one of the same width', () => {
+    const trace = newTrace();
+    installDocument(trace);
+    const cache = new TextSpriteCache();
+    const ctx = targetContext(trace);
+    cache.draw(ctx, 'AB', 0, 0, OUTLINED);
+    cache.draw(ctx, 'AB', 0, 0, { ...OUTLINED, roundJoin: true });
+    expect(trace.sprites).toHaveLength(2);
+    cache.draw(ctx, 'AB', 0, 0, { ...OUTLINED, roundJoin: true });
+    cache.draw(ctx, 'AB', 0, 0, OUTLINED);
+    expect(trace.sprites).toHaveLength(2);
+    // A fill-only style has no join to round: it shares the plain sprite.
+    const { stroke: _s, lineWidth: _w, ...fillOnly } = OUTLINED;
+    cache.draw(ctx, 'AB', 0, 0, fillOnly);
+    cache.draw(ctx, 'AB', 0, 0, { ...fillOnly, roundJoin: true });
+    expect(trace.sprites).toHaveLength(3);
+  });
+
   it('serves a fill-only label from the cache on the second draw', () => {
     const trace = newTrace();
     installDocument(trace);

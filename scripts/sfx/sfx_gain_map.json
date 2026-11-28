@@ -219,6 +219,12 @@
     "mount_jump_mech_bird": 1.6,
     "mount_land_mech_bird": 1.6,
     "mount_squawk_avian_strider": 4.5,
-    "mount_flap_avian_strider": 4.5
+    "mount_flap_avian_strider": 4.5,
+    "heart_breath_knot_carry_loop": -3,
+    "heart_breath_ride_loop": -2,
+    "heart_quench_hunt_loop": -3,
+    "heart_heat_cinder_roll": -2,
+    "heart_final_unbound": -2,
+    "heart_final_overload_pulse": -1.5
   }
 }

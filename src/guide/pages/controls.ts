@@ -39,11 +39,13 @@ const GROUPS: Group[] = [
       { keys: ['J'], label: 'guide.controls.cycleFriendly' },
       { keys: ['F1'], label: 'guide.controls.targetSelf' },
       { keys: ['F2', 'F10'], label: 'guide.controls.targetParty' },
-      { keys: ['Shift+J'], label: 'guide.controls.targetAuras' },
+      { keys: ['Shift+B'], label: 'guide.controls.targetAuras' },
       { keys: ['F'], label: 'controls.interact' },
       { keys: ['Shift+F'], label: 'guide.controls.bgFlag' },
       // Only live while the Attack Move option is on; the note under the tables says so.
       { keys: ['A'], label: 'guide.controls.attackMove' },
+      // Party pings: a held key, tap for a contextual ping, hold for the wheel.
+      { keys: ['Y'], label: 'guide.controls.ping' },
       { keys: ['1', '0'], label: 'guide.controls.abilities' },
     ],
   },
@@ -71,6 +73,7 @@ const GROUPS: Group[] = [
       { keys: ['Shift+T'], label: 'hudChrome.perfecting.title' },
       { keys: ['O'], label: 'controls.friends' },
       { keys: ['Shift+O'], label: 'hudChrome.lootExplorer.title' },
+      { keys: ['Shift+J'], label: 'hudChrome.adventureJournal.title' },
       { keys: ['G'], label: 'guide.controls.arena' },
       { keys: ['`'], label: 'guide.controls.mount' },
       { keys: ['K'], label: 'guide.controls.leaderboard' },

@@ -40,8 +40,9 @@ import {
   migrationBagsFor,
 } from './bags';
 import * as bankMod from './bank';
-import { applyBankBonusStamp, type BankState, emptyBankState } from './bank';
+import { applyBankBonusStamp, emptyBankState } from './bank';
 import * as bankSocketsMod from './bank_sockets';
+import { type BossKillTally, EMPTY_BOSS_KILLS } from './boss_kill_tally';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import * as buddiesMod from './buddies';
 import { revealBuddiesOnJoin, updateBuddyReveals } from './buddy_drops';
@@ -125,7 +126,7 @@ import {
   isStunned,
   isUnbreakableControlAura,
 } from './combat/cc';
-import { CHARGE_ARRIVE_RANGE, CHARGE_SPEED_MULT, finishChargeArrival } from './combat/charge_route';
+import { CHARGE_SPEED_MULT, chargeArriveRange, finishChargeArrival } from './combat/charge_route';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
@@ -672,6 +673,7 @@ import * as worldPvpMod from './pvp/world_pvp';
 import { savedWorldPvpFields } from './pvp/world_pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { turnInOrAcceptAtNpc } from './quests/npc_quest_talk';
+import { raidLockoutCountdowns } from './raid_lockout_state';
 import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {
   accountReliquaryOwnershipOpts,
@@ -776,6 +778,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { raidRunForPlayer } from './instances/raid_run';
 import { updatePortalTriggers } from './portals';
 import { interactNpcForQuests } from './quest_npc_interaction';
 import * as questCommands from './quests/quest_commands';
@@ -810,7 +813,8 @@ import {
   hoardBossCueViewsForPlayer,
   leaveRift as leaveRiftImpl,
   liftRiftEntities as liftRiftEntitiesImpl,
-  riftInstanceAtPos,
+  riftBossDeathZonesFor,
+  riftInstanceForPid,
   riftOpenTreasure as riftOpenTreasureImpl,
   tickRiftBossDeathZones as tickRiftBossDeathZonesImpl,
   tickRiftLockpicks as tickRiftLockpicksImpl,
@@ -854,6 +858,7 @@ export { eloDelta } from './social/arena';
 
 import type { FinderListingTag } from './content/dungeon_finder';
 import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
+import { OFFLINE_GUILD_BANK_LOG } from './offline_guild_bank_log';
 import { collectPartyInfo } from './party_frame_info';
 import { DungeonFinderMachine, type FinderConfigureArgs } from './social/dungeon_finder';
 import { seedDungeonFinderDev } from './social/dungeon_finder_dev';
@@ -1418,11 +1423,7 @@ export interface PlayerMeta
   // Four normal bags plus an active member bag; backpack space is implicit.
   bags: (string | null)[];
   membershipBag?: string;
-  // The per-character bank: a second pooled item store with its own copper-bought
-  // slot budget. Capacity/move math lives in bank.ts. Persisted (inside the
-  // character save, exactly like inventory/bags).
-  bank: BankState;
-  // The per-source breakdown behind bank.bonusSlots, stamped by the host at join
+  // The per-source breakdown behind bank.bonusSlots (character_storage.ts), stamped at join
   // alongside the total (addPlayer's bankBonus opt). Display-only session state:
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
   // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
@@ -1870,19 +1871,6 @@ export interface PendingMobRespawn {
 // the shape, so a counter added without a matching zero cannot ship. Re-exported
 // here so headless/env_server.ts's import stays byte-identical.
 export type { RewardCounters };
-
-// The offline guild bank log answer: a FROZEN empty ready view. Offline play
-// never has a guild (guilds live in the server social DB) and there is no
-// bank_ledger to read, so the log is empty rather than loading or refused. One
-// shared frozen instance so the inert facet arm can never be mutated by a
-// caller into a per-Sim divergence.
-const OFFLINE_GUILD_BANK_LOG: import('../world_api').GuildBankLogView = Object.freeze({
-  state: 'ready' as const,
-  kind: 'all' as const,
-  entries: Object.freeze([]) as readonly import('../world_api').GuildBankLogEntry[],
-  more: false,
-  olderPending: false,
-});
 
 // isPetClass relocated to types.ts (P1b; imported in the './types' block above). The
 // cast-toggle predicates (isFormToggle/isToggleBuff/isStealthToggle/preservesStealth/
@@ -4795,13 +4783,7 @@ export class Sim {
     return Promise.resolve(ids.slice(-deedsMod.DEEDS_RECENT_CAP).reverse());
   }
   raidLockouts(): import('../world_api').RaidLockout[] {
-    const now = this.lockoutNowMs();
-    const out: import('../world_api').RaidLockout[] = [];
-    for (const [id, until] of this.primary.raidLockouts) {
-      const msRemaining = until - now;
-      if (msRemaining > 0) out.push({ id, msRemaining });
-    }
-    return out;
+    return raidLockoutCountdowns(this.primary.raidLockouts, this.lockoutNowMs());
   }
   worldBossActive(bossId: string): boolean {
     return worldQuestState.worldBossActive(this.entities, this.worldBossEntityIds, bossId);
@@ -5431,6 +5413,7 @@ export class Sim {
       // isFriendlyTo/pvpController/stopFollow, which are already bound above (C4a/C1) and
       // stay on Sim.
       dropPartyMarkers: (partyId: number) => sim.targeting.dropPartyMarkers(partyId),
+      dropMemberMarkers: (partyId, pid) => sim.targeting.dropMemberMarkers(partyId, pid),
       // Q1 quest-credit trio now lives in quests/quest_credit.ts; the callbacks route
       // through `sim.ctx` (lazily read at call time, after the ctor sets it). countItem
       // stays on Sim (L2 inventory hub) and is consumed by the collect updater.
@@ -6454,7 +6437,7 @@ export class Sim {
       return true;
     };
     if (!target || target.dead || p.chargeTimeLeft <= 0 || isRooted(p)) return done(false);
-    if (dist2d(p.pos, target.pos) <= CHARGE_ARRIVE_RANGE) return done(true);
+    if (dist2d(p.pos, target.pos) <= chargeArriveRange(target)) return done(true);
     if (p.sitting) seatingMod.standUp(this.ctx, p);
     // re-route when the target has run well away from where the path ends
     const pathEnd = p.chargePath[p.chargePath.length - 1];
@@ -7382,6 +7365,10 @@ export class Sim {
 
   activeMasterLootRolls(pid = this.playerId): MasterLootPrompt[] {
     return activeMasterLootRollsImpl(this.ctx, pid);
+  }
+
+  corpseBossLootDenied(corpse: Pick<Entity, 'bossLootLock'>, pid = this.playerId): boolean {
+    return interaction.corpseBossLootDenied(this.ctx, corpse, pid);
   }
 
   submitLootRoll(rollId: number, choice: LootRollChoice, pid?: number): void {
@@ -9158,17 +9145,39 @@ export class Sim {
   markersFor(pid: number): Record<number, number> {
     return this.targeting.markersFor(pid);
   }
-
   setMarker(entityId: number, markerId: number, pid?: number): void {
     this.targeting.setMarker(entityId, markerId, pid);
   }
-
   clearMarker(entityId: number, pid?: number): void {
     this.targeting.clearMarker(entityId, pid);
   }
-
   markerFor(entityId: number): number | null {
     return this.targeting.markerFor(entityId);
+  }
+  sharedMapMarks(): readonly import('./social/shared_map_marks').SharedMapMark[] {
+    return this.targeting.mapMarks.viewFor(this.primaryId);
+  }
+  placeSharedMapMark(page: number, x: number, z: number, symbol: number, pid?: number): void {
+    this.targeting.mapMarks.place(page, x, z, symbol, pid);
+  }
+  placeSharedWorldMark(...a: Parameters<Targeting['mapMarks']['placeWorld']>): void {
+    this.targeting.mapMarks.placeWorld(...a);
+  }
+  clearSharedMapMarks(symbol: number | null, pid?: number): void {
+    this.targeting.mapMarks.clear(symbol, pid);
+  }
+  sharedMapMarksWireFor(pid: number): string {
+    return this.targeting.mapMarks.wireFor(pid);
+  }
+  // The group's pings (social/party_pings.ts owns every rule; the wire reads targeting.pings).
+  partyPings(): readonly import('./social/party_pings').PartyPing[] {
+    return this.targeting.pings.viewFor(this.primaryId);
+  }
+  sendPing(...a: Parameters<Targeting['pings']['send']>): void {
+    this.targeting.pings.send(...a);
+  }
+  partyPingsWireFor(pid: number): string {
+    return this.targeting.pings.wireFor(pid);
   }
 
   // -------------------------------------------------------------------------
@@ -10382,28 +10391,6 @@ export class Sim {
   }
 
   // UI-facing info objects (the same shapes the server sends over the wire)
-  partyIncomingHeals(memberIds: readonly number[]): Map<number, number> {
-    const members = new Set(memberIds);
-    const incoming = new Map<number, number>();
-    for (const casterId of memberIds) {
-      const caster = this.entities.get(casterId);
-      if (!caster?.castingAbility || caster.castTargetId === null) continue;
-      if (!members.has(caster.castTargetId)) continue;
-      const ability = this.players
-        .get(casterId)
-        ?.known.find((known) => known.def.id === caster.castingAbility);
-      if (!ability) continue;
-      let amount = 0;
-      for (const effect of ability.effects) {
-        if (effect.type === 'heal') amount += Math.round((effect.min + effect.max) / 2);
-        else if (effect.type === 'hot') amount += effect.total;
-      }
-      if (amount > 0)
-        incoming.set(caster.castTargetId, (incoming.get(caster.castTargetId) ?? 0) + amount);
-    }
-    return incoming;
-  }
-
   get partyInfo(): import('../world_api').PartyInfo | null {
     return collectPartyInfo(this.ctx);
   }
@@ -10884,17 +10871,9 @@ export class Sim {
   // never serialized, only visibleCells() inside the fog window is emitted.
   // -------------------------------------------------------------------------
 
-  /** The rift instance the acting player is standing in, or null. Lockpick ops
-   * route to the rift-cache driver when in a rift, else the delve controller (a
-   * player is never in both), so the shared engine/HUD/commands serve both. */
-  private riftInstForPid(pid?: number) {
-    const r = this.ctx.resolve(pid);
-    return r ? riftInstanceAtPos(this.ctx, r.e.pos) : null;
-  }
-
   /** Start a lockpicking attempt: commit an ante (1/2/3 lives = loot tier). */
   lockpickEngage(objectId: number, ante: Ante, pid?: number): void {
-    const inst = this.riftInstForPid(pid);
+    const inst = riftInstanceForPid(this.ctx, pid);
     if (inst) {
       riftLockpickEngageImpl(this.ctx, inst, objectId, ante, pid);
       return;
@@ -10904,7 +10883,7 @@ export class Sim {
 
   /** Submit one pick action on the player's active attempt (server-authoritative). */
   lockpickAction(action: PickAction, pid?: number, sessionId?: string): void {
-    const inst = this.riftInstForPid(pid);
+    const inst = riftInstanceForPid(this.ctx, pid);
     if (inst) {
       riftLockpickActionImpl(this.ctx, inst, action, pid, sessionId);
       return;
@@ -10913,7 +10892,7 @@ export class Sim {
   }
 
   lockpickAbort(pid?: number, sessionId?: string): void {
-    const inst = this.riftInstForPid(pid);
+    const inst = riftInstanceForPid(this.ctx, pid);
     if (inst) {
       riftLockpickAbortImpl(this.ctx, inst, pid, sessionId);
       return;
@@ -10933,7 +10912,7 @@ export class Sim {
 
   /** Read-only projection of the active lockpick attempt for IWorld (offline). */
   lockpickViewFor(pid?: number): LockpickView | null {
-    const inst = this.riftInstForPid(pid);
+    const inst = riftInstanceForPid(this.ctx, pid);
     if (inst) return riftLockpickViewForImpl(this.ctx, inst, pid);
     return lockpickMod.lockpickViewFor(this.ctx, pid);
   }
@@ -11003,11 +10982,7 @@ export class Sim {
   private riftFloorViewTick = -1;
   private riftFloorView: import('../world_api/dungeons').RiftFloorView | null = null;
   riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
-    const p = this.entities.get(this.primaryId);
-    if (!p) return [];
-    const inst = riftInstanceAtPos(this.ctx, p.pos);
-    if (!inst || inst.partyKey === null) return [];
-    return inst.bossDeathZones;
+    return riftBossDeathZonesFor(this.ctx, this.primaryId);
   }
   hoardBossCues(): import('../world_api/dungeons').HoardBossCueView[] {
     return hoardBossCueViewsForPlayer(this.ctx, this.primaryId);
@@ -11015,9 +10990,15 @@ export class Sim {
   riftEventMsRemaining(): number | null {
     return riftEventMsRemainingFor(this.ctx, this.riftFloor);
   }
-  // The group dungeon run the primary player stands in (instances/dungeon_run.ts).
+  // The dungeon and raid runs the primary player stands in (instances/*_run.ts).
   get dungeonRun(): import('../world_api/dungeons').DungeonRunView | null {
     return dungeonRunForPlayer(this.ctx, this.primaryId);
+  }
+  get raidRun(): import('../world_api/dungeons').RaidRunView | null {
+    return raidRunForPlayer(this.ctx, this.primaryId);
+  }
+  get bossKills(): BossKillTally {
+    return this.players.get(this.primaryId)?.bossKills ?? EMPTY_BOSS_KILLS;
   }
 
   get delveRun(): DelveRunInfo | null {

@@ -23,11 +23,13 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { recordBossKillTally } from '../boss_kill_tally';
 import { rollBossBuddyDrops } from '../buddy_drops';
 import { MEMBERSHIP_XP_MULTIPLIER } from '../content/membership';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { reflectionIgnoresHit } from '../encounters/drowned_temple/reflection_guard';
+import { heatCinderHitPoints } from '../encounters/smith_heart/heat_cinder_ward';
 import { bastionWardHitPoints } from '../encounters/sunken_bastion/ward_hits';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
@@ -41,6 +43,7 @@ import {
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
 import { awardQueueEncounter, recordQueueDamage } from '../instances/queue_participation';
+import { settleBossLockoutDeath, withoutBossSaved } from '../instances/raid_boss_lockout';
 import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
 import { membershipActive } from '../membership';
 import { wearsMembershipArmour } from '../membership_armour';
@@ -131,6 +134,7 @@ import {
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
 import { formAutoRageMult } from './form_swing';
+import { frontWardAmount } from './front_ward';
 import { clearFieldcraftState } from './hunter_fieldcraft';
 import { lonelySoulDamageMult, lonelySoulPetFloor } from './hunter_lonely_soul';
 import { clearPacklordState } from './hunter_packlord';
@@ -277,6 +281,15 @@ export function dealDamage(
   const bastionWard = bastionWardHitPoints(source, target);
   if (bastionWard !== null) {
     amount = bastionWard;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
+  // The Smith's Heart's Rolling Cinder is a ward while it rolls
+  // (encounters/smith_heart/heat_cinder_ward.ts): a strike lands one point
+  // (the encounter reads it as the hit that knocks it back).
+  const cinderWard = heatCinderHitPoints(source, target, direct);
+  if (cinderWard !== null) {
+    amount = cinderWard;
     resolvedHpLoss = true;
     alreadyFinal = true;
   }
@@ -446,6 +459,10 @@ export function dealDamage(
     for (const a of target.auras) if (a.kind === 'vulnerability') vuln += a.value;
     if (vuln > 0) amount = Math.round(amount * (1 + vuln));
   }
+
+  // A frontal ward (combat/front_ward.ts: the Breath's Squall Shieldbearer)
+  // turns aside a share of a blow struck from inside its front arc.
+  if (!resolvedHpLoss && source && amount > 0) amount = frontWardAmount(target, source, amount);
 
   // Breachmaker only sharpens the originating Warrior's attacks. It must not
   // become a raid-wide vulnerability when another attacker hits the target.
@@ -1527,6 +1544,10 @@ export function handleDeath(
   // Death cannot shed persistent death penalties or encounter-owned unbreakable
   // control. The encounter script remains responsible for releasing its markers.
   e.auras = aurasSurvivingDeath(e.auras);
+  // A dormant mob killed through its ward dies awake: no sleep bit or rise rides its corpse
+  // onto the wire or into the next life (mob/dormant.ts).
+  if (e.asleep) e.asleep = false;
+  if (e.dormantRise) e.dormantRise = 0;
   e.ccDr.clear();
   stopChannelVisual(ctx, e);
   emitRainOfFireStop(ctx, e);
@@ -1979,7 +2000,12 @@ export function handleDeath(
       // their own damage-contributor snapshot (rareContribs) so rollLoot's guaranteed
       // personal quest-item entries (questId, chance:1) can credit every contributing
       // quest-needer, not just the tap-credited party.
-      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible, rareContribs ?? undefined);
+      // A per-boss raid boss (the Smith's Heart) rolls only for the raiders not
+      // saved to it this week, and nothing when every one of them is
+      // (instances/raid_boss_lockout.ts); every other death passes `eligible`.
+      const lootEligible = withoutBossSaved(ctx, e, claimedInst, eligible);
+      if (!template?.worldBoss && lootEligible.length > 0)
+        ctx.rollLoot(e, meta, lootEligible, rareContribs ?? undefined);
       // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
@@ -1991,15 +2017,23 @@ export function handleDeath(
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     recordWeeklyBossKill(ctx, e, heroicRewardRecipients, claimedInst);
+    // The character's lifetime boss kill tally (the Adventure Journal's "Your
+    // kills"), on the same roster; draws no rng.
+    recordBossKillTally(ctx, e, heroicRewardRecipients, claimedInst);
     // Boss pets and their challenge looks (content/buddy_sources.ts): one
     // independent roll per credited player, never a corpse item, then the
     // speed/dps looks for the same roster. World bosses roll on the
     // never-pruned contributor roster below instead. Draws rng ONLY for a
     // boss that carries a companion row.
     if (!template?.worldBoss) {
-      rollBossBuddyDrops(ctx, e, heroicRewardRecipients, claimedInst);
+      const buddyRecipients = withoutBossSaved(ctx, e, claimedInst, heroicRewardRecipients);
+      rollBossBuddyDrops(ctx, e, buddyRecipients, claimedInst);
     }
     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
+    // A per-boss raid's weekly lock (instances/raid_boss_lockout.ts): gate the
+    // corpse, credit the weekly raid quest, save the raid. After every reward
+    // read above, so each of them judged the locks held BEFORE this kill.
+    settleBossLockoutDeath(ctx, e, heroicRewardRecipients, claimedInst);
     // Intentional Gathering PR3: the kill-credit priority snapshot for a
     // future corpse-harvest cast, taken from the exact same eligible list the
     // heroic-reward award above uses (empty means the corpse is public at

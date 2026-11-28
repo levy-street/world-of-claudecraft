@@ -22,6 +22,7 @@ import {
   authoredFieldCliffRuns,
   authoredFieldFor,
   type FieldGround,
+  ringWallBoxes,
   surfaceOutline,
 } from '../sim/instances/authored_field';
 import type { DungeonGateDef } from '../sim/types';
@@ -226,7 +227,11 @@ export function fieldMapPlan(def: AuthoredFieldDef): FieldMapPlan {
     intoVoid: run.low <= def.voidHeight + 0.5,
     masonry: run.style === 'masonry' || run.style === 'balustrade',
   }));
-  const walls = def.walls.map((w) => boxCorners(w.x, w.z, w.hw, w.hd, w.rot));
+  // A round wall draws its band as the boxes it was once built of (it collides
+  // as one circle: ring_wall.ts).
+  const walls = [...def.walls, ...(def.ringWalls ?? []).flatMap((w) => ringWallBoxes(w))].map((w) =>
+    boxCorners(w.x, w.z, w.hw, w.hd, w.rot),
+  );
   const props: FieldMapProp[] = [];
   const landmarks: FieldMapPlan['landmarks'] = [];
   for (const p of def.props) {

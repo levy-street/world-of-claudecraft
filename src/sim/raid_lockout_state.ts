@@ -7,13 +7,15 @@
 // host wall clock, exactly the clock the live lockout gate compares against.
 //
 // Lockout ids are the sim's own: a bare dungeon id for a normal-difficulty
-// final-boss lock, `<dungeon>:heroic` for the heroic daily, and
+// final-boss lock, `<dungeon>:heroic` for the heroic daily, a per-boss raid's
+// `<raid>:<encounter>[:heroic]` (raid_boss_lockout_id.ts), and
 // `worldboss:<mobId>` for a looted world boss (src/sim/world_boss.ts). The
 // roster ships them verbatim; the client resolves display names
 // (src/ui/raid_lockout_format.ts raidLockoutDisplayName) and groups them by
 // lockoutKind below.
 
 import { weeklyQuestIdFromLockout } from './quests/weekly_quest_lock';
+import { parseBossLockoutId } from './raid_boss_lockout_id';
 import { isRaidRoom } from './raid_rooms';
 import { worldBossIdFromLockout } from './world_boss';
 
@@ -33,6 +35,8 @@ export function lockoutKind(lockoutId: string): RaidLockoutKind {
   if (worldBossIdFromLockout(lockoutId) !== null) return 'worldBoss';
   // A weekly quest turned in this week (`weeklyquest:<questId>`).
   if (weeklyQuestIdFromLockout(lockoutId) !== null) return 'weeklyQuest';
+  // One boss of a per-boss raid (the Smith's Heart), either difficulty.
+  if (parseBossLockoutId(lockoutId) !== null) return 'raid';
   const dungeonId = lockoutId.endsWith(':heroic')
     ? lockoutId.slice(0, -':heroic'.length)
     : lockoutId;
@@ -52,6 +56,21 @@ export function activeRaidLockouts(
   for (const id of Object.keys(saved).sort()) {
     const until = saved[id];
     if (typeof until === 'number' && Number.isFinite(until) && until > nowMs) out[id] = until;
+  }
+  return out;
+}
+
+/** The live lockouts of a character's in-memory map as countdowns (the offline
+ *  IWorld.raidLockouts read, in map order): only those still running at
+ *  `nowMs`, each with its remaining milliseconds. */
+export function raidLockoutCountdowns(
+  lockouts: ReadonlyMap<string, number>,
+  nowMs: number,
+): { id: string; msRemaining: number }[] {
+  const out: { id: string; msRemaining: number }[] = [];
+  for (const [id, until] of lockouts) {
+    const msRemaining = until - nowMs;
+    if (msRemaining > 0) out.push({ id, msRemaining });
   }
   return out;
 }

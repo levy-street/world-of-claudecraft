@@ -118,7 +118,11 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
       targetEntity() {},
       partyInfo: null,
       playerId: 1,
-      player: { pos: { x: 0, z: 0 } } as never,
+      player: { pos: { x: 0, z: 0 }, targetId: null } as never,
+      entities: new Map(),
+      markerFor: () => null,
+      setMarker() {},
+      clearMarker() {},
     };
     const collections = {
       toggleDeeds() {},
@@ -128,6 +132,7 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
       toggleHarvestJournal() {},
       togglePerfecting() {},
       toggleLootExplorer() {},
+      toggleAdventureJournal() {},
     };
     const petWorld = {
       setPetMode() {},

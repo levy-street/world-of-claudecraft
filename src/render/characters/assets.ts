@@ -103,7 +103,9 @@ import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
 import {
+  bodyStreamVerdict,
   characterStreamPlan,
+  dungeonAndBuddyBodyUrls,
   dungeonCharacterBodyUrls,
   RiftBodyLanes,
   RiftBodyStreamTrigger,
@@ -225,6 +227,9 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   cinderbrand: 'VAR_SWORD',
   lantern_hall_sword: 'VAR_SWORD',
   hearthbrand: 'VAR_SWORD',
+  // Seamcaller (the Smith's Heart's Hammer Council maul): a two-hander on the hammer family,
+  // drawn at maul length by its weapon_grip.ts scale
+  seamcaller_maul: 'VAR_HAMMER',
   squallcrest: 'VAR_SWORD',
   rimelight_staff: 'VAR_STAFF',
   duskwick_staff: 'VAR_STAFF',
@@ -920,6 +925,29 @@ export function visualAssetsResident(key: string, fetch = true): boolean {
     if (!characterRetryArmed.has(url)) ensureCharacterUrl(url);
   }
   return resident;
+}
+
+/** True while a visual key's body is still on the wire and every missing file
+ *  is an ON-DEMAND dungeon or buddy body (dungeonAndBuddyBodyUrls: loaded
+ *  behind a raid's or a dungeon's arrival cover by design;
+ *  rift_body_stream_core.ts bodyStreamVerdict): the world's view factory then
+ *  waits quietly, the fetch kicked here (and asked for again after a failure,
+ *  as visualAssetsResident does), and the caller's retry cooldown builds it
+ *  once it lands. Every other missing file (a WOC base, a lazy cosmetic, a
+ *  preload-set bug) keeps the logged miss (PR 4360 review B1,
+ *  tests/character_visual_fail_soft.test.ts). False when it is resident or
+ *  unknown. */
+export function characterVisualAwaitingStream(key: string): boolean {
+  const def = VISUALS[key];
+  if (!def) return false;
+  const verdict = bodyStreamVerdict(
+    [def.url, ...(def.animUrls ?? [])],
+    characterAssetResident,
+    (url) => streamedUrlSet.has(url) && dungeonAndBuddyBodyUrls().has(url),
+  );
+  if (verdict !== 'await') return false;
+  visualAssetsResident(key);
+  return true;
 }
 
 /**
@@ -2809,6 +2837,16 @@ function buildTintedClone(
         polygonOffsetFactor: s.polygonOffsetFactor,
         polygonOffsetUnits: s.polygonOffsetUnits,
       });
+      // The GLB's material extras survive too (a rig's own per-material data, such as the
+      // Quarryheart Charger's dequantization), and a material whose glow IS its look (extras
+      // lowTierEmissive: the charger's living fire) keeps its emissive map on this tier.
+      mat.userData = { ...s.userData };
+      if ((s.userData as { lowTierEmissive?: boolean }).lowTierEmissive === true && s.emissiveMap) {
+        const lm = mat as THREE.MeshLambertMaterial;
+        lm.emissiveMap = s.emissiveMap;
+        lm.emissive.copy(s.emissive);
+        lm.emissiveIntensity = s.emissiveIntensity;
+      }
       attachGloamClimb(mat); // the Lambert tier's only layer: same climb, no rim
     }
   }

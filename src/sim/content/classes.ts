@@ -761,7 +761,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     offGcd: true,
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
-    description: 'Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
+    description:
+      'Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range, measured to the edge of a large target.',
   },
   thunder_clap: {
     id: 'thunder_clap',
@@ -6677,7 +6678,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     usableInForm: true,
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
     description:
-      'Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Usable in any form.',
+      'Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range, measured to the edge of a large target. Usable in any form.',
   },
   maul: {
     id: 'maul',

@@ -22,6 +22,15 @@ describe('exact runtime aura paintings', () => {
     'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json';
   const masterwroughtManifest =
     'docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json';
+  const smithHeartManifest =
+    'docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json';
+  // The one hand-authored replacement: Quenching Cold's gauntlet read as a hand
+  // icon in playtest, so a snowflake (an SVG rasterized with sharp) supersedes
+  // that single painting. The 2026-11-19 record stays as it was accepted.
+  const quenchColdManifest = 'docs/achievements/quench-cold-icon-2026-11-25/accepted-aura-art.json';
+  const quenchColdManifestSha256 =
+    'd9b3cdc0fb0e067ef402e7ca7ed58475cd7d0c9e721e9703e66fb0a847851751';
+  const HAND_AUTHORED = 'Hand-authored SVG, rasterized with sharp';
   const secondPassManifestSha256 =
     'bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe';
   const externalAuraArt = new Map([
@@ -175,6 +184,47 @@ describe('exact runtime aura paintings', () => {
         prompt: string;
       }>;
     };
+    const quenchColdBytes = readFileSync(path.join(process.cwd(), quenchColdManifest));
+    const quenchCold = JSON.parse(quenchColdBytes.toString('utf8')) as {
+      batch: { id: string; rasterGenerator: string; supersedes: string };
+      assets: Array<{
+        auraId: string;
+        sourceProvenance: string;
+        sourceFile: string;
+        sourceBytes: number;
+        sourceSha256: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+        references: Array<{ path: string; role: string }>;
+      }>;
+    };
+    const smithHeartBytes = readFileSync(path.join(process.cwd(), smithHeartManifest));
+    const smithHeart = JSON.parse(smithHeartBytes.toString('utf8')) as {
+      schemaVersion: number;
+      batch: { id: string; acceptedDate: string; rasterGenerator: string };
+      scope: {
+        exactRuntimeAuras: number;
+        sharedRuntimeAliases: number;
+        runtimeIdsCovered: number;
+      };
+      generationContract: {
+        builtInImagegenCalls: number;
+        acceptedFirstOutputs: number;
+        rejectedOutputs: number;
+      };
+      assets: Array<{
+        auraId: string;
+        runtimeIds: string[];
+        sourceProvenance: string;
+        sourceFile: string;
+        sourceBytes: number;
+        sourceSha256: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+        references: Array<{ path: string; role: string }>;
+        prompt: string;
+      }>;
+    };
     const committed = readdirSync(auraArtDir).sort();
     const committedIds = committed
       .filter((name) => name.endsWith('.webp') && !name.startsWith('mob_'))
@@ -284,12 +334,65 @@ describe('exact runtime aura paintings', () => {
             },
           ] as const,
       ),
+      ...smithHeart.assets.map(
+        (asset) =>
+          [
+            asset.auraId,
+            {
+              auraId: asset.auraId,
+              sourceFile: asset.sourceFile,
+              sourceBytes: asset.sourceBytes,
+              sourceSha256: asset.sourceSha256,
+              acceptedSha256: asset.acceptedSha256,
+              acceptedBytes: asset.acceptedBytes,
+              acceptedArtManifest: smithHeartManifest,
+              references: asset.references.map(({ path: referencePath }) => referencePath),
+              sourceProvenance: asset.sourceProvenance,
+            },
+          ] as const,
+      ),
+      // Last, so its entry supersedes the painting it replaces.
+      ...quenchCold.assets.map(
+        (asset) =>
+          [
+            asset.auraId,
+            {
+              auraId: asset.auraId,
+              sourceFile: asset.sourceFile,
+              sourceBytes: asset.sourceBytes,
+              sourceSha256: asset.sourceSha256,
+              acceptedSha256: asset.acceptedSha256,
+              acceptedBytes: asset.acceptedBytes,
+              acceptedArtManifest: quenchColdManifest,
+              references: asset.references.map(({ path: referencePath }) => referencePath),
+              sourceProvenance: asset.sourceProvenance,
+            },
+          ] as const,
+      ),
     ]);
+    expect(createHash('sha256').update(quenchColdBytes).digest('hex')).toBe(
+      quenchColdManifestSha256,
+    );
+    expect(quenchCold.batch).toMatchObject({
+      id: 'quench-cold-icon-2026-11-25',
+      rasterGenerator: HAND_AUTHORED,
+      supersedes: smithHeartManifest,
+    });
+    expect(quenchCold.assets.map(({ auraId }) => auraId)).toEqual(['heart_quench_cold']);
+    for (const asset of quenchCold.assets) {
+      expect(existsSync(path.join(process.cwd(), asset.sourceFile)), asset.auraId).toBe(true);
+      const sourceBytes = readFileSync(path.join(process.cwd(), asset.sourceFile));
+      expect(sourceBytes.length, asset.auraId).toBe(asset.sourceBytes);
+      expect(createHash('sha256').update(sourceBytes).digest('hex'), asset.auraId).toBe(
+        asset.sourceSha256,
+      );
+    }
 
     expect(committed.filter((name) => name !== 'mapping.json' && !name.endsWith('.webp'))).toEqual(
       [],
     );
-    expect(expectedIds).toHaveLength(86);
+    // 153: 86 plus the Smith's Heart raid's 67 paintings (smith_heart_aura_art.ts).
+    expect(expectedIds).toHaveLength(153);
     expect(committedIds).toEqual(expectedIds);
     expect(mappedIds).toEqual(expectedIds);
     expect([...acceptedById.keys()].sort()).toEqual(expectedIds);
@@ -373,6 +476,42 @@ describe('exact runtime aura paintings', () => {
       },
     });
     expect(masterwrought.assets).toHaveLength(1);
+    expect(createHash('sha256').update(smithHeartBytes).digest('hex')).toBe(
+      '2d2b8ff274378823d4abdd544b7d651bdcff9ba20698806f2c36739de5ec8e0b',
+    );
+    expect(smithHeart).toMatchObject({
+      schemaVersion: 1,
+      batch: {
+        id: 'smith-heart-aura-art-2026-11-19',
+        acceptedDate: '2026-11-19',
+        rasterGenerator: 'OpenAI built-in image generation',
+      },
+      scope: { exactRuntimeAuras: 67, sharedRuntimeAliases: 22, runtimeIdsCovered: 89 },
+      generationContract: {
+        builtInImagegenCalls: 74,
+        acceptedFirstOutputs: 70,
+        rejectedOutputs: 2,
+      },
+    });
+    expect(smithHeart.assets).toHaveLength(67);
+    expect(smithHeart.assets.flatMap(({ runtimeIds }) => runtimeIds)).toHaveLength(89);
+    for (const asset of smithHeart.assets) {
+      expect(asset.sourceFile, asset.auraId).toBe(
+        `tmp/imagegen/smith-heart-auras-2026-11-19/raw/${asset.auraId}.png`,
+      );
+      expect(asset.runtimeIds[0], asset.auraId).toBe(asset.auraId);
+      expect(asset.sourceBytes, asset.auraId).toBeGreaterThan(0);
+      expect(asset.sourceSha256, asset.auraId).toMatch(/^[0-9a-f]{64}$/);
+      expect(asset.references.length, asset.auraId).toBeGreaterThanOrEqual(2);
+      expect(asset.references.length, asset.auraId).toBeLessThanOrEqual(4);
+      expect(asset.prompt, asset.auraId).toMatch(/\b(text|letters)\b/i);
+      expect(asset.prompt, asset.auraId).toMatch(/\b(border|frame)\b/i);
+      for (const reference of asset.references) {
+        expect(reference.role.length, asset.auraId).toBeGreaterThan(0);
+        expect(trackedPaths.has(reference.path), `${asset.auraId}: ${reference.path}`).toBe(true);
+        expect(existsSync(path.join(process.cwd(), reference.path)), asset.auraId).toBe(true);
+      }
+    }
     for (const asset of [...secondPass.assets, ...elixir.assets, ...fear.assets]) {
       expect(asset.sourceFile, asset.auraId).toMatch(/^tmp\/imagegen\/v039-second-pass\//);
       expect(asset.sourceBytes, asset.auraId).toBeGreaterThan(0);
@@ -402,6 +541,8 @@ describe('exact runtime aura paintings', () => {
         fearManifest,
         mobManifest,
         masterwroughtManifest,
+        smithHeartManifest,
+        quenchColdManifest,
       ]),
     );
     expect(mapping.externalAssets.map(({ auraId, runtimeUrl }) => [auraId, runtimeUrl])).toEqual([
@@ -424,7 +565,11 @@ describe('exact runtime aura paintings', () => {
     const hashes = new Set<string>();
     for (const entry of mappedEntries) {
       expect(entry.output, entry.auraId).toBe(`${entry.auraId}.webp`);
-      expect(entry.source, entry.auraId).toBe('OpenAI built-in image generation');
+      expect(entry.source, entry.auraId).toBe(
+        entry.acceptedArtManifest === quenchColdManifest
+          ? HAND_AUTHORED
+          : 'OpenAI built-in image generation',
+      );
       expect(entry.owner, entry.auraId).toBe('World of ClaudeCraft');
       expect(entry.license, entry.auraId).toContain('project asset');
       expect(entry.sourceSha256, entry.auraId).toMatch(/^[0-9a-f]{64}$/);

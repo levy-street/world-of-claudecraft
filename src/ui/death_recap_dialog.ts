@@ -22,6 +22,14 @@ export interface DeathRecapDialogDeps {
   onClose?(): void;
 }
 
+/** The header's close X, its glyph drawn inline like every runtime-rendered
+ *  window's: this markup renders after boot, so the one-shot hydrateIcons pass
+ *  over index.html's `[data-icon]` placeholders never reaches it. */
+function closeButtonHtml(): string {
+  const label = esc(t('hud.core.deathRecapClose'));
+  return `<button type="button" class="x-btn death-recap-close" title="${label}" aria-label="${label}">${svgIcon('close')}</button>`;
+}
+
 export class DeathRecapDialog {
   private element: HTMLElement | null = null;
   private keydownHandler: ((ev: KeyboardEvent) => void) | null = null;
@@ -89,7 +97,7 @@ export class DeathRecapDialog {
       el.innerHTML = `
         <div class="death-recap-header">
           <h3 id="death-recap-title" class="death-recap-title">${esc(t('hud.core.deathRecapTitle'))}</h3>
-          <button type="button" class="x-btn death-recap-close" title="${esc(t('hud.core.deathRecapClose'))}" aria-label="${esc(t('hud.core.deathRecapClose'))}" data-icon="close"></button>
+          ${closeButtonHtml()}
         </div>
         <div class="death-recap-content">
           <div class="death-recap-empty">${esc(t('hud.core.deathRecapNoEvents'))}</div>
@@ -136,7 +144,7 @@ export class DeathRecapDialog {
       cardsHtml += `
         <div class="recap-card ${typeClass} ${lethalClass}" data-card-index="${card.index}">
           <div class="recap-card-left">
-            <div class="recap-icon-frame" style="background-image:url(${iconDataUrl('ability', card.abilityId || 'attack', 36)})" aria-hidden="true"></div>
+            <div class="recap-icon-frame" style="background-image:url(${iconDataUrl('ability', card.iconId, 36)})" aria-hidden="true"></div>
             <div class="recap-details">
               <div class="recap-name-row">
                 <span class="recap-ability">${esc(card.ability)}</span>
@@ -165,7 +173,7 @@ export class DeathRecapDialog {
     el.innerHTML = `
       <div class="death-recap-header">
         <h3 id="death-recap-title" class="death-recap-title">${esc(t('hud.core.deathRecapTitle'))}</h3>
-        <button type="button" class="x-btn death-recap-close" title="${esc(t('hud.core.deathRecapClose'))}" aria-label="${esc(t('hud.core.deathRecapClose'))}" data-icon="close"></button>
+        ${closeButtonHtml()}
       </div>
       <div class="death-recap-subbar">
         ${killerLine}

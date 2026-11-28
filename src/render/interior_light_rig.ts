@@ -13,6 +13,15 @@ import { sharedUniforms } from './gfx';
 import { SANCTUM_KEY_DIRECTION } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
+import {
+  SMITH_HEART_BREATH_LIGHT,
+  SMITH_HEART_CORE_LIGHT,
+  SMITH_HEART_HAMMER_LIGHT,
+  SMITH_HEART_HEAT_LIGHT,
+  SMITH_HEART_KEY_DIRECTION,
+  SMITH_HEART_QUENCH_LIGHT,
+  SMITH_HEART_RING_LIGHT,
+} from './smith_heart/heart_environment';
 import { BASIN_SUN_DIRECTION } from './wildheart_basin/basin_plan_core';
 
 /** Every fog scene state the renderer resolves to (single source of truth). */
@@ -34,6 +43,12 @@ export type FogSceneState =
   | 'wildheartBasin'
   | 'hollowCrypt'
   | 'sunkenBastion'
+  | 'smithHeartCore'
+  | 'smithHeartHammer'
+  | 'smithHeartRing'
+  | 'smithHeartBreath'
+  | 'smithHeartQuench'
+  | 'smithHeartHeat'
   | 'drownedTemple'
   | 'gravewyrmSanctum'
   | 'lastkeep'
@@ -212,6 +227,13 @@ export interface InteriorLightTargets {
   rimColor: { value: { setHex(value: number): unknown } };
 }
 
+/** Where every Smith's Heart room's key comes from: the raid's one sun
+ *  (`SMITH_HEART_KEY_DIRECTION`, low in the south-east), so walking between
+ *  rooms never moves a shadow. */
+export const SMITH_HEART_KEY_LIGHT_DIRECTION = new THREE.Vector3(
+  ...SMITH_HEART_KEY_DIRECTION,
+).normalize();
+
 /** The outdoor rig legs, graded per frame by the renderer before the call. */
 export interface OutdoorLightLegs {
   sunIntensity: number;
@@ -233,6 +255,17 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
   }
   if (state === 'sunkenBastion') {
     out.copy(SUNKEN_BASTION_SUN_DIRECTION);
+    return true;
+  }
+  if (
+    state === 'smithHeartCore' ||
+    state === 'smithHeartHammer' ||
+    state === 'smithHeartRing' ||
+    state === 'smithHeartBreath' ||
+    state === 'smithHeartQuench' ||
+    state === 'smithHeartHeat'
+  ) {
+    out.copy(SMITH_HEART_KEY_LIGHT_DIRECTION);
     return true;
   }
   if (state === 'drownedTemple') {
@@ -425,6 +458,38 @@ export function applyInteriorLightRig(
     targets.hemi.groundColor.setHex(NYTHRAXIS_HEMI_GROUND_COLOR);
   } else if (ignivarForge) {
     applyIgnivarRaidLighting(state as IgnivarRaidFogState, targets);
+  } else if (
+    state === 'smithHeartCore' ||
+    state === 'smithHeartHammer' ||
+    state === 'smithHeartRing' ||
+    state === 'smithHeartBreath' ||
+    state === 'smithHeartQuench' ||
+    state === 'smithHeartHeat'
+  ) {
+    // The Smith's Heart's final room (lit from below by the heart, a pale
+    // key over the oculus, a warm rim) and its Hammer vein (a warm low key
+    // down the fissure, a dusty amber sky, a warm rim): their own rigs
+    // (smith_heart/heart_environment.ts).
+    const L =
+      state === 'smithHeartCore'
+        ? SMITH_HEART_CORE_LIGHT
+        : state === 'smithHeartRing'
+          ? SMITH_HEART_RING_LIGHT
+          : state === 'smithHeartBreath'
+            ? SMITH_HEART_BREATH_LIGHT
+            : state === 'smithHeartQuench'
+              ? SMITH_HEART_QUENCH_LIGHT
+              : state === 'smithHeartHeat'
+                ? SMITH_HEART_HEAT_LIGHT
+                : SMITH_HEART_HAMMER_LIGHT;
+    targets.sun.intensity = L.sun;
+    targets.hemi.intensity = L.hemi;
+    targets.scene.environmentIntensity = L.env;
+    targets.rim.value = L.rim;
+    targets.sun.color.setHex(L.sunColor);
+    targets.hemi.color.setHex(L.hemiSky);
+    targets.hemi.groundColor.setHex(L.hemiGround);
+    targets.rimColor.value.setHex(L.rimColor);
   } else if (mazeNight) {
     targets.sun.color.setHex(YUMI_MAZE_SUN_COLOR);
     targets.hemi.color.setHex(YUMI_MAZE_HEMI_SKY_COLOR);

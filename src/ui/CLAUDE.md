@@ -557,6 +557,12 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
   `public/ui/chrome/mapping.json`. `tests/chrome_icons.test.ts` gates the bijection, the alpha,
   the 128px square, launcher reachability from BOTH entry documents, and the role split
   (secondary controls and brand marks may never gain art).
+- **The same exception for BOSS ABILITIES (the Smith's Heart only):** `boss_ability_art.ts` maps
+  each raid journal icon id to its painting under `public/ui/boss-abilities/<id>.webp` or to the
+  raid aura painting of the same mechanic, and `staticIconUrl` asks it after `abilityImageUrl`,
+  so the journal rows, the death recap and the boss cast bar (`target_cast_bar.ts` through
+  `hud/journal/journal_cast_icons.ts`) all paint it; every other journal id keeps its recipe.
+  `tests/boss_ability_art.test.ts` is the census, file and provenance gate.
 - **The same exception for ITEMS:** `ITEM_IMAGE_IDS` ships painted art for non-weapon items, and
   `itemImageUrl(id)` returns `/ui/items/<id>.webp`, served for `kind:'item'` (bags, tooltips,
   loot, vendor, the `/wiki` guide). `WEAPON_IMAGE_IDS` uses that same directory for one bespoke

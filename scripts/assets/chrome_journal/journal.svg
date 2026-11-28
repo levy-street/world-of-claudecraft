@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <title>Adventure Journal launcher icon source</title>
+  <!-- The Adventure Journal, chrome launcher style: an oxblood field journal
+       with a gilded horned-skull medallion (the boss pages), gold corner caps
+       and spine bands, a cream page block, a crimson ribbon marker, and a
+       sword slung behind it for the adventure. Pale gold, warm bronze, cream,
+       thick dark outline, top-left light. The title serves the a11y lint on
+       this SOURCE file only; the shipped asset is the keyed WebP. -->
+  <defs>
+    <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a8423a"/>
+      <stop offset="0.55" stop-color="#7a2a26"/>
+      <stop offset="1" stop-color="#521a18"/>
+    </linearGradient>
+    <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4a1614"/>
+      <stop offset="0.6" stop-color="#6e2420"/>
+      <stop offset="1" stop-color="#3e1210"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbe7a6"/>
+      <stop offset="0.45" stop-color="#e2b84c"/>
+      <stop offset="1" stop-color="#9a6a1e"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f6e8c2"/>
+      <stop offset="1" stop-color="#c9b07a"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2f4f6"/>
+      <stop offset="1" stop-color="#8d98a4"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="0.35" cy="0.3" r="0.85">
+      <stop offset="0.45" stop-color="#2a0a08" stop-opacity="0"/>
+      <stop offset="1" stop-color="#2a0a08" stop-opacity="0.55"/>
+    </radialGradient>
+    <radialGradient id="medal" cx="0.38" cy="0.32" r="0.75">
+      <stop offset="0" stop-color="#fff0bc"/>
+      <stop offset="0.5" stop-color="#e6bb50"/>
+      <stop offset="1" stop-color="#8e6018"/>
+    </radialGradient>
+  </defs>
+  <!-- the sword slung behind the journal: its hilt rises past the top right
+       corner, its point shows below the spine -->
+  <g stroke="#1a0f08" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M24 102 L10 124 L6 116 L18 98 Z" fill="url(#steel)"/>
+    <path d="M100 20 L112 6 L118 11 L106 25 Z" fill="#6a4020"/>
+    <circle cx="117" cy="6" r="4.5" fill="url(#gold)"/>
+    <path d="M88 13 L92 9 L115 33 L111 37 Z" fill="url(#gold)"/>
+  </g>
+  <g transform="translate(-2 6)">
+  <g stroke="#1a0f08" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- the page block, seen past the cover's right edge -->
+    <path d="M90 24 L101 28 L101 104 L90 106 Z" fill="url(#pages)"/>
+    <!-- the cover -->
+    <path d="M30 18 L88 18 Q94 18 94 24 L94 102 Q94 108 88 108 L30 108 Z" fill="url(#leather)"/>
+    <!-- the spine -->
+    <path d="M20 22 Q20 16 28 16 L34 16 L34 110 L28 110 Q20 110 20 104 Z" fill="url(#spine)"/>
+  </g>
+  <!-- page lines -->
+  <g stroke="#9c8250" stroke-width="1.4" opacity="0.85">
+    <path d="M92 36 L99 37"/>
+    <path d="M92 48 L99 49"/>
+    <path d="M92 60 L99 61"/>
+    <path d="M92 72 L99 73"/>
+    <path d="M92 84 L99 85"/>
+    <path d="M92 96 L99 97"/>
+  </g>
+  <!-- worn edges darken toward the bottom right -->
+  <path d="M34 20 L88 20 Q92 20 92 24 L92 102 Q92 106 88 106 L34 106 Z" fill="url(#vignette)"/>
+  <!-- leather sheen, top left -->
+  <path d="M38 23 L84 23 Q72 30 56 30 Q44 30 38 36 Z" fill="#c4614f" opacity="0.55"/>
+  <!-- tooled border -->
+  <path d="M41 27 L84 27 L84 99 L41 99 Z" fill="none" stroke="#e2b84c" stroke-width="1.6" opacity="0.75"/>
+  <!-- spine bands -->
+  <g stroke="#1a0f08" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M19 30 L35 30 L35 37 L19 37 Z" fill="url(#gold)"/>
+    <path d="M19 89 L35 89 L35 96 L19 96 Z" fill="url(#gold)"/>
+  </g>
+  <!-- gold corner caps -->
+  <g stroke="#1a0f08" stroke-width="2.5" stroke-linejoin="round" fill="url(#gold)">
+    <path d="M78 18 L88 18 Q94 18 94 24 L94 34 L86 30 L82 22 Z"/>
+    <path d="M78 108 L88 108 Q94 108 94 102 L94 92 L86 96 L82 104 Z"/>
+  </g>
+  <!-- the medallion: a gilded horned skull -->
+  <g stroke="#1a0f08" stroke-width="3" stroke-linejoin="round">
+    <circle cx="63" cy="62" r="20" fill="url(#medal)"/>
+  </g>
+  <g stroke="#1a0f08" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+    <!-- horns -->
+    <path d="M50 58 Q42 50 46 40 Q50 50 56 54 Z" fill="#fff2c8"/>
+    <path d="M76 58 Q84 50 80 40 Q76 50 70 54 Z" fill="#fff2c8"/>
+    <!-- skull -->
+    <path d="M52 62 Q52 49 63 49 Q74 49 74 62 Q74 68 70 70 L70 75 L56 75 L56 70 Q52 68 52 62 Z" fill="#fff6dc"/>
+  </g>
+  <g fill="#2a1408">
+    <path d="M56 61 Q56 57 60 58 Q62 61 60 64 Q56 64 56 61 Z"/>
+    <path d="M70 61 Q70 57 66 58 Q64 61 66 64 Q70 64 70 61 Z"/>
+    <path d="M63 64 L65 68 L61 68 Z"/>
+    <path d="M59 72 L59 75 M63 72 L63 75 M67 72 L67 75" stroke="#2a1408" stroke-width="1.6"/>
+  </g>
+  <!-- medallion rim highlight -->
+  <path d="M48 56 Q52 45 63 43" fill="none" stroke="#fff6d0" stroke-width="2" opacity="0.8"/>
+  <!-- the ribbon marker hanging below the pages -->
+  <path d="M84 106 L84 119 L88 115 L92 119 L92 106 Z" fill="#c8302a" stroke="#1a0f08" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+</svg>

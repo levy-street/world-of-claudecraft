@@ -17,9 +17,11 @@ import {
   GHOST_CAPTAIN_BROADSIDE,
   GHOST_CAPTAIN_ID,
   inGhostLane,
+  GHOST_CAPTAIN_NAMES as N,
   GHOST_CAPTAIN_TUNING as T,
 } from '../src/sim/encounters/sunken_bastion/ghost_captain_ids';
 import { DT, type Entity } from '../src/sim/types';
+import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { boss, earned, engage, fight, live, put, run, tick, took } from './helpers/bastion_fight';
 
 vi.setConfig({ testTimeout: 60_000 });
@@ -82,17 +84,17 @@ describe('Shipwreck Captain authoritative encounters', () => {
         placeInLane(f, f.others[0], center, 12, 2.5);
       };
       run(f, T.broadsideWarning - 0.1, hold);
-      expect(took(f, f.tank, GHOST_CAPTAIN_BROADSIDE)).toBe(0);
+      expect(took(f, f.tank, N.broadside)).toBe(0);
       run(f, 0.2, hold);
       expect(live(f, GHOST_BROADSIDE_FIRE)).toHaveLength(5);
       expect(ship.castTotal).toBe(shipLife);
       expect(ship.castRemaining).toBeLessThanOrEqual(T.flashSeconds);
-      const damage = took(f, f.tank, GHOST_CAPTAIN_BROADSIDE);
+      const damage = took(f, f.tank, N.broadside);
       expect(damage).toBeGreaterThanOrEqual(difficulty === 'heroic' ? 720 : 90);
       expect(damage).toBeLessThanOrEqual(difficulty === 'heroic' ? 880 : 110);
-      expect(took(f, f.others[0], GHOST_CAPTAIN_BROADSIDE)).toBe(0);
+      expect(took(f, f.others[0], N.broadside)).toBe(0);
       run(f, T.flashSeconds, hold);
-      expect(took(f, f.tank, GHOST_CAPTAIN_BROADSIDE)).toBe(damage);
+      expect(took(f, f.tank, N.broadside)).toBe(damage);
       expect(live(f, GHOST_BROADSIDE_FIRE)).toHaveLength(0);
     },
   );
@@ -111,18 +113,14 @@ describe('Shipwreck Captain authoritative encounters', () => {
       run(f, T.anchorWarning + 0.3, hold);
       expect(lane.pos).toEqual(locked);
       expect(lane.templateId).toBe(GHOST_ANCHOR_DRAG);
-      expect(took(f, f.tank, GHOST_CAPTAIN_ANCHOR)).toBe(0);
+      expect(took(f, f.tank, N.anchor)).toBe(0);
       run(f, T.anchorSeconds, hold);
-      expect(took(f, f.tank, GHOST_CAPTAIN_ANCHOR)).toBeGreaterThanOrEqual(
-        difficulty === 'heroic' ? 400 : 50,
+      expect(took(f, f.tank, N.anchor)).toBeGreaterThanOrEqual(difficulty === 'heroic' ? 400 : 50);
+      expect(took(f, f.tank, N.anchor)).toBeLessThanOrEqual(difficulty === 'heroic' ? 480 : 60);
+      expect(f.hits.filter((h) => h.targetId === f.tank.id && h.ability === N.anchor)).toHaveLength(
+        1,
       );
-      expect(took(f, f.tank, GHOST_CAPTAIN_ANCHOR)).toBeLessThanOrEqual(
-        difficulty === 'heroic' ? 480 : 60,
-      );
-      expect(
-        f.hits.filter((h) => h.targetId === f.tank.id && h.ability === GHOST_CAPTAIN_ANCHOR),
-      ).toHaveLength(1);
-      expect(took(f, f.others[0], GHOST_CAPTAIN_ANCHOR)).toBe(0);
+      expect(took(f, f.others[0], N.anchor)).toBe(0);
     },
   );
 
@@ -140,15 +138,13 @@ describe('Shipwreck Captain authoritative encounters', () => {
       run(f, T.boardingWarning - 0.1, hold);
       expect(captain.pos.x).toBeCloseTo(start.x);
       expect(captain.pos.z).toBeCloseTo(start.z);
-      expect(took(f, f.tank, GHOST_CAPTAIN_BOARDING)).toBe(0);
+      expect(took(f, f.tank, N.boarding)).toBe(0);
       run(f, 0.2, hold);
-      expect(took(f, f.tank, GHOST_CAPTAIN_BOARDING)).toBeGreaterThanOrEqual(
+      expect(took(f, f.tank, N.boarding)).toBeGreaterThanOrEqual(
         difficulty === 'heroic' ? 400 : 50,
       );
-      expect(took(f, f.tank, GHOST_CAPTAIN_BOARDING)).toBeLessThanOrEqual(
-        difficulty === 'heroic' ? 480 : 60,
-      );
-      expect(took(f, f.others[0], GHOST_CAPTAIN_BOARDING)).toBe(0);
+      expect(took(f, f.tank, N.boarding)).toBeLessThanOrEqual(difficulty === 'heroic' ? 480 : 60);
+      expect(took(f, f.others[0], N.boarding)).toBe(0);
       expect(Math.hypot(captain.pos.x - start.x, captain.pos.z - start.z)).toBeGreaterThan(1);
     },
   );
@@ -174,7 +170,7 @@ describe('Shipwreck Captain authoritative encounters', () => {
         expect(f.inst.objectIds).not.toContain(id);
       }
       run(f, T.broadsideWarning + 0.1);
-      expect(f.hits.filter((h) => h.ability === GHOST_CAPTAIN_BROADSIDE)).toHaveLength(0);
+      expect(f.hits.filter((h) => h.ability === N.broadside)).toHaveLength(0);
     },
   );
 
@@ -221,7 +217,7 @@ describe('Shipwreck Captain authoritative encounters', () => {
       placeInLane(f, f.others[0], lane, 12);
     };
     run(f, T.broadsideWarning - DT, hold);
-    expect(took(f, f.others[0], GHOST_CAPTAIN_BROADSIDE)).toBe(0);
+    expect(took(f, f.others[0], N.broadside)).toBe(0);
     // Move only after the warning is established, keeping identical X/Z geometry.
     // The direct encounter tick preserves this test's deliberate floor transition
     // instead of allowing the unrelated player-gravity phase to alter the elevation.
@@ -230,7 +226,7 @@ describe('Shipwreck Captain authoritative encounters', () => {
     tickGhostCaptain(f.sim.ctx, f.inst, captain, true);
     const damage = f.sim
       .drainEvents()
-      .filter((e) => e.type === 'damage' && e.ability === GHOST_CAPTAIN_BROADSIDE);
+      .filter((e) => e.type === 'damage' && e.ability === N.broadside);
     expect(
       damage.some((e) => e.type === 'damage' && e.targetId === f.tank.id && e.amount > 0),
     ).toBe(true);
@@ -316,13 +312,49 @@ describe('Shipwreck Captain authoritative encounters', () => {
       expect(actual).toBeGreaterThanOrEqual(authored - 1e-6);
       expect(actual).toBeLessThanOrEqual(authored + DT + 1e-6);
     }
-    for (const id of [GHOST_CAPTAIN_BROADSIDE, GHOST_CAPTAIN_ANCHOR, GHOST_CAPTAIN_BOARDING])
+    for (const name of [N.broadside, N.anchor, N.boarding])
       expect(
-        first.hits.some((h) => h.ability === id && h.amount > 0),
-        id,
+        first.hits.some((h) => h.ability === name && h.amount > 0),
+        name,
       ).toBe(true);
     expect(first.draws.length).toBeGreaterThan(0);
     expect(trace()).toEqual(first);
+  });
+
+  it('deals each lane attack under the name the journal shows, never its raw cast id', () => {
+    // The recap, combat log, meters and floating text all print the damage
+    // event's ability label, so it must be the player-facing English the
+    // client matcher localizes (and the same name the journal row shows).
+    const journalName = {
+      broadside: 'Spectral Broadside',
+      anchor: 'Cursed Anchor',
+      boarding: 'Phantom Boarding',
+    } as const;
+    expect(N).toEqual(journalName);
+    for (const move of ['broadside', 'anchor', 'boarding'] as const) {
+      const { f, captain } = setup();
+      expect(startGhostCaptainMove(f.sim.ctx, f.inst, captain, move)).toBe(true);
+      const action =
+        captain.bastionFight?.kind === 'ghostCaptain' ? captain.bastionFight.action : null;
+      const laneId = action?.objects[move === 'broadside' ? 2 : 0];
+      const lane = laneId === undefined ? undefined : f.sim.ctx.entities.get(laneId);
+      if (!lane) throw new Error(`no ${move} lane`);
+      run(f, T.broadsideWarning + T.anchorSeconds + 0.5, () =>
+        placeInLane(f, f.tank, lane, move === 'broadside' ? 12 : 4),
+      );
+      // A null label is the captain's own white swing, not a mechanic.
+      const labels = [
+        ...new Set(
+          f.hits.filter((h) => h.targetId === f.tank.id && h.ability).map((h) => h.ability),
+        ),
+      ];
+      expect(labels, move).toEqual([journalName[move]]);
+      expect(
+        labels.some((l) => /^[a-z0-9]+(_[a-z0-9]+)+$/.test(l ?? '')),
+        move,
+      ).toBe(false);
+      expect(localizeSimAuraName(journalName[move]), move).not.toBeNull();
+    }
   });
 
   it('does not erase a failed deed when players briefly leave the targeting area', () => {
@@ -333,7 +365,7 @@ describe('Shipwreck Captain authoritative encounters', () => {
       placeInLane(f, f.tank, lane, 12);
       placeInLane(f, f.others[0], lane, 12, 2.5);
     });
-    expect(took(f, f.tank, GHOST_CAPTAIN_BROADSIDE)).toBeGreaterThan(0);
+    expect(took(f, f.tank, N.broadside)).toBeGreaterThan(0);
     const st = captain.bastionFight;
     if (st?.kind !== 'ghostCaptain') throw new Error('captain state missing');
     expect(st.struck).toBe(true);

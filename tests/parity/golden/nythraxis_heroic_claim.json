@@ -775,7 +775,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1021,
-      "state": "9b991258",
+      "state": "44c383ab",
       "events": "a82dd91b",
       "rng": {
         "draws": 19,
@@ -803,6 +803,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -1015,6 +1018,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -1218,6 +1224,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -1421,6 +1430,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -1624,6 +1636,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -2157,7 +2172,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1021,
-      "state": "9b991258",
+      "state": "44c383ab",
       "events": "741638a5",
       "rng": {
         "draws": 19,
@@ -2185,6 +2200,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -2397,6 +2415,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -2600,6 +2621,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -2803,6 +2827,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -3006,6 +3033,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak:heroic": 1
+          },
           "buddies": {
             "names": {}
           },

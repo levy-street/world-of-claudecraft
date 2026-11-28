@@ -718,6 +718,34 @@ describe('raid lockouts over the wire', () => {
     expect(out[0].msRemaining).toBeGreaterThan(5 * 60 * 60 * 1000 - 5000);
   });
 
+  it("carries the Smith's Heart per-boss locks verbatim, each difficulty its own", () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Saved');
+    const meta = (server as any).sim.players.get(session.pid);
+    const until = Date.now() + 3 * 24 * 60 * 60 * 1000;
+    meta.raidLockouts.set('smith_heart:heart_hammer_guardian', until);
+    meta.raidLockouts.set('smith_heart:heart_masterless_strength:heroic', until);
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.lockouts).toEqual({
+      'smith_heart:heart_hammer_guardian': until,
+      'smith_heart:heart_masterless_strength:heroic': until,
+    });
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(
+      client
+        .raidLockouts()
+        .map((l) => l.id)
+        .sort(),
+    ).toEqual([
+      'smith_heart:heart_hammer_guardian',
+      'smith_heart:heart_masterless_strength:heroic',
+    ]);
+  });
+
   it('clears the client lockout once the server-side entry has expired', () => {
     const server = new GameServer();
     const fc = fakeWs();
@@ -5820,6 +5848,7 @@ const ALL_DELTA_KEYS = [
   'bags',
   'bank',
   'bg',
+  'bkills',
   'blk',
   'bpsl',
   'budOwn',
@@ -5895,6 +5924,7 @@ const ALL_DELTA_KEYS = [
   'milestones',
   'mktU',
   'mloot',
+  'mmarks',
   'mntLesson',
   'mntOwn',
   'mntRace',
@@ -5903,6 +5933,7 @@ const ALL_DELTA_KEYS = [
   'ncd',
   'offhandWeapon',
   'party',
+  'pings',
   'prk',
   'prof',
   'ptime',
@@ -5910,6 +5941,7 @@ const ALL_DELTA_KEYS = [
   'pvrw',
   'qdone',
   'qlog',
+  'rdrun',
   'reliq',
   'renown',
   'rxp',
@@ -5987,6 +6019,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   atitle: 'activeTitle',
   bags: 'bags',
   bank: 'bankInfo',
+  bkills: 'bossKills',
   blk: 'blockChance',
   budOwn: 'ownedBuddies',
   budPend: 'pendingBuddies',
@@ -6050,6 +6083,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   milestones: 'unlockedMilestones',
   mktU: 'marketCollectPending',
   mloot: 'masterLootPrompts',
+  mmarks: 'sharedMapMarkList',
   mntLesson: 'mountLessonActive',
   mntOwn: 'ownedMounts',
   mntRace: 'mountRaceView',
@@ -6057,6 +6091,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   mres: 'maxResource',
   mst: 'activeMobileStationCrafts',
   party: 'partyInfo',
+  pings: 'partyPingList',
   prk: 'prestigeRank',
   prof: 'professionsState',
   ptime: 'playtimeSeconds',
@@ -6064,6 +6099,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   pvrw: 'pvpResurrectWait',
   qdone: 'questsDone',
   qlog: 'questLog',
+  rdrun: 'raidRun',
   res: 'resource',
   rtype: 'resourceType',
   rxp: 'restedXp',
@@ -6721,7 +6757,15 @@ describe('full self-state snapshot delta fixture', () => {
       // udiff is null while the group's claims match the selection, which a
       // delve-bound fixture always does; its non-null arrival is pinned in the
       // 'dungeon difficulty wire' block above.
-      if (key === 'cvault' || key === 'dgrun' || key === 'udiff') {
+      // mmarks (the raid map's shared marks) is position-exclusive the same way:
+      // marks live on the instance claim the player stands in, so a delve-bound
+      // fixture's first value is the explicit null. Its non-null arrival is
+      // pinned in tests/shared_map_marks_wire.test.ts. pings (the group's party
+      // pings) is null until someone pings; its arrival is pinned in
+      // tests/party_pings_wire.test.ts. rdrun (the raid run) is null outside a
+      // tracked raid, like dgrun; its arrival is pinned in tests/server/raid_run_wire.test.ts.
+      const gatedNull = ['cvault', 'dgrun', 'rdrun', 'udiff', 'mmarks', 'pings'];
+      if (gatedNull.includes(key)) {
         expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();
         continue;
       }
@@ -7575,7 +7619,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 136 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 137 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +2: the courier's courierTravelTicks and courierLegTicks (PR 4281), for 124.
@@ -7644,8 +7688,12 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 125.
     // Courier vault and other-character stores add one owner delta key.
     // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
-    expect(ALL_DELTA_KEYS).toHaveLength(136);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(136);
+    // +1: the raid map's shared marks mmarks (server/self_social_wire.ts), for 137.
+    // +1: the group's party pings (server/self_social_wire.ts), for 138.
+    // +1: the Adventure Journal's raid run rdrun (server/dungeon_run_wire.ts), for 139.
+    // +1: the journal's boss kill tally bkills (server/dungeon_run_wire.ts), for 140.
+    expect(ALL_DELTA_KEYS).toHaveLength(140);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(140);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7826,7 +7874,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 125.
     // Courier vault and other-character stores add one owner delta key.
     // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
-    expect(scraped.size).toBe(136);
+    // The raid map's shared marks mmarks (self_social_wire.ts) make 137.
+    // The party pings (self_social_wire.ts) make 138.
+    // The raid run rdrun (dungeon_run_wire.ts) makes 139.
+    // The boss kill tally bkills (dungeon_run_wire.ts) makes 140.
+    expect(scraped.size).toBe(140);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

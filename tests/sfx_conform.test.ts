@@ -165,6 +165,113 @@ describe('shared conform command', () => {
     }
   });
 
+  it('caps the LUFS branch limiter instead of crushing a transient cue to the target', () => {
+    // A hard hit over a long quiet tail cannot reach -14 LUFS without the
+    // long-form limiter flattening the hit. Before the cap the gain search kept
+    // raising gain into the limiter (loudness barely moves once it saturates),
+    // so a cleaned raid impact went out with +55 dB of gain and its fade tail
+    // lifted into an audible burst. The search must stop at
+    // MAX_LONG_FORM_LIMITING_DB of limiting and publish that peak-safe result.
+    if (!ffmpegPath) throw new Error('ffmpeg-static is unavailable');
+    const directory = mkdtempSync(join(tmpdir(), 'wocc-sfx-lufs-cap-'));
+    const inputFile = join(directory, 'source.wav');
+    const outputFile = join(directory, 'output.mp3');
+    try {
+      execFileSync(
+        ffmpegPath,
+        [
+          '-hide_banner',
+          '-loglevel',
+          'error',
+          '-nostdin',
+          '-y',
+          '-f',
+          'lavfi',
+          '-i',
+          "aevalsrc='if(lt(t,0.03),0.5*sin(2*PI*120*t),0.003*sin(2*PI*440*t))':s=44100:d=1.5",
+          '-c:a',
+          'pcm_f32le',
+          inputFile,
+        ],
+        { stdio: 'ignore' },
+      );
+      const inputTruePeak = measureSfxTruePeakDb(inputFile, ffmpegPath);
+      const result = conformSfxAudio({ inputFile, outputFile, duration: 1.5, ffmpegPath });
+      expect(result.normBranch).toBe('lufs');
+      expect(result.peakLimited).toBe(true);
+      const maxGainDb =
+        TARGET_PEAK_DBFS - 1 + conformAudioModule.MAX_LONG_FORM_LIMITING_DB - inputTruePeak;
+      expect(result.gainDb).toBeLessThanOrEqual(maxGainDb + 1e-6);
+      expect(result.outputLevel).toBeLessThan(TARGET_LUFS - NORM_TOLERANCE);
+      const report = inspectSfxConformance(outputFile, { ffmpegPath, ffprobePath });
+      expect(report.problems).toEqual([]);
+    } finally {
+      rmSync(directory, { force: true, recursive: true });
+    }
+  });
+
+  it.each([0.28, 0.29, 0.3, 0.31])(
+    'a capped cue just under the target still passes the check (bed %s)',
+    (bed) => {
+      // A dense cue (a hit over a loud steady bed) reaches the limiter budget
+      // only a little under -14 LUFS with its peak at the limiter ceiling,
+      // below the check's peak-constrained slack. Stopping there published a
+      // master sfx:check rejects (-14.6 LUFS at -7.3 dBTP for bed 0.29), so
+      // the conform must close a shortfall the check would not excuse.
+      if (!ffmpegPath) throw new Error('ffmpeg-static is unavailable');
+      const directory = mkdtempSync(join(tmpdir(), 'wocc-sfx-lufs-edge-'));
+      const inputFile = join(directory, 'source.wav');
+      const outputFile = join(directory, 'output.mp3');
+      try {
+        execFileSync(
+          ffmpegPath,
+          [
+            '-hide_banner',
+            '-loglevel',
+            'error',
+            '-nostdin',
+            '-y',
+            '-f',
+            'lavfi',
+            '-i',
+            `aevalsrc='if(lt(t,0.004),0.5*sin(2*PI*250*t),0)+${bed}*sin(2*PI*1000*t)':s=44100:d=1.5`,
+            '-c:a',
+            'pcm_f32le',
+            inputFile,
+          ],
+          { stdio: 'ignore' },
+        );
+        const result = conformSfxAudio({ inputFile, outputFile, duration: 1.5, ffmpegPath });
+        expect(result.normBranch).toBe('lufs');
+        const report = inspectSfxConformance(outputFile, { ffmpegPath, ffprobePath });
+        expect(report.problems).toEqual([]);
+      } finally {
+        rmSync(directory, { force: true, recursive: true });
+      }
+    },
+  );
+
+  it('ships an exhausted LUFS conform only with a shortfall the check excuses', () => {
+    const allowed = conformAudioModule.exhaustedConformFallbackAllowed;
+    // A transient pinned at the peak ceiling, 3 dB under target: the check's
+    // peak-constrained shortfall, so the loudest safe attempt may ship.
+    const excused = { measuredOutput: TARGET_LUFS - 3, measuredPeakDb: TARGET_PEAK_DBFS };
+    expect(allowed('lufs', excused)).toBe(true);
+    // The same shortfall with 6 dB of peak headroom left is one sfx:check
+    // rejects, so the conform throws instead of writing that file.
+    const unexcused = { measuredOutput: TARGET_LUFS - 3, measuredPeakDb: TARGET_PEAK_DBFS - 6 };
+    expect(allowed('lufs', unexcused)).toBe(false);
+    // Over target is never a peak-constrained shortfall either.
+    expect(
+      allowed('lufs', { measuredOutput: TARGET_LUFS + 2, measuredPeakDb: TARGET_PEAK_DBFS }),
+    ).toBe(false);
+    // No peak-safe attempt at all: nothing to fall back to, on either branch.
+    expect(allowed('lufs', null)).toBe(false);
+    expect(allowed('peak', null)).toBe(false);
+    // The short-clip peak branch keeps its fallback unchanged.
+    expect(allowed('peak', unexcused)).toBe(true);
+  });
+
   it('builds the fixed peak branch for clips below one second', () => {
     const plan = buildSfxConformArgs({
       inputFile: '/tmp/source.wav',

@@ -58,6 +58,20 @@ describe('raidLockoutDisplayName', () => {
       'Thunzharr, the Waking Peak',
     );
   });
+
+  it('names a per-boss raid lock as the raid and its journal page, Heroic apart', () => {
+    setLanguage('en');
+    expect(raidLockoutDisplayName('smith_heart:heart_hammer_guardian')).toBe(
+      "The Smith's Heart: Hrothmar and Velmira",
+    );
+    // A page with no title of its own reads as its boss's name.
+    expect(raidLockoutDisplayName('smith_heart:heart_masterless_strength:heroic')).toBe(
+      "The Smith's Heart: Ashgrand, Remnant of the Masterless Strength (Heroic)",
+    );
+    expect(raidLockoutDisplayName('smith_heart:heart_breath_guardian')).toBe(
+      "The Smith's Heart: Aerwyn, the Unbound Gale",
+    );
+  });
 });
 
 // The one consumer no unit test drives: the minimap badge panel's raidName

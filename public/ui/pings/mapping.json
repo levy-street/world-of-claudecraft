@@ -1,0 +1,13 @@
+{
+  "license": "Project asset, rights reserved. Generated for World of ClaudeCraft; see the party ping icons row in CREDITS.md.",
+  "iconSize": 128,
+  "note": "The party ping icons (src/ui/ping_icons.ts): one painted icon per ping kind, shown in the ping wheel, the chat callout, the minimap and (with a glow in the kind's colour) the world marker. No circle or badge: the object alone. Authored on a flat magenta (#FF00FF) key, then keyed to alpha, trimmed, centered and encoded by `node scripts/convert_chrome_icons_webp.mjs --dir public/ui/pings`. The ping colour tokens (--color-ping-* in src/styles/tokens.css, PARTY_PING_COLORS in src/render/party_pings_core.ts) were sampled from this art.",
+  "source": "OpenAI image generation in ChatGPT, 26 November 2026, one chat with the project's HUD chrome icons as the style reference: the ornate painted classic-MMO icon finish, each icon a single saturated slightly neon colour with bright highlights and a thick very dark outline, no gold, one square image per icon. Full-size sources and the style reference are kept outside the repo (tmp/imagegen/ping-icons-2026-11-26).",
+  "icons": {
+    "look": "Look Here: a simple bold eye, neon yellow.",
+    "attack": "Attack: a sword pointing down with a jewelled crossguard, neon red.",
+    "warning": "Warning: a carved exclamation rune, neon orange-amber.",
+    "on_my_way": "On My Way: a bevelled downward chevron, electric blue.",
+    "assist": "Assist: a pennant flag with a ball finial, neon green."
+  }
+}

@@ -13,6 +13,7 @@ import { buildDrownedTempleInterior } from './drowned_temple';
 import { buildGravewyrmSanctumInterior } from './gravewyrm_sanctum';
 import { buildHollowCryptInterior } from './hollow_crypt';
 import type { FireLightSink } from './point_light_budget';
+import { buildSmithHeartInterior } from './smith_heart';
 import { buildSunkenBastionInterior } from './sunken_bastion';
 import { buildWildheartBasinInterior } from './wildheart_basin';
 
@@ -35,4 +36,5 @@ export const OPEN_AIR_FIELDS: Readonly<
   sunken_bastion: buildSunkenBastionInterior,
   drowned_temple: buildDrownedTempleInterior,
   gravewyrm_sanctum: buildGravewyrmSanctumInterior,
+  smith_heart: buildSmithHeartInterior,
 };

@@ -231,3 +231,88 @@ describe('CastBarPainter: no raw DOM writes, no magic values', () => {
     expect(px, `px: ${px.join(', ')}`).toEqual([]);
   });
 });
+
+describe('CastBarPainter: the boss ability icon slot (target only)', () => {
+  const ICON = { tag: 'icon' } as unknown as HTMLElement;
+  const WITH_ICON: CastBarElements = { ...ELEMENTS, icon: ICON };
+
+  function iconCalls(calls: Call[]): Call[] {
+    return calls.filter((c) => c.args[0] === ICON);
+  }
+
+  it('paints the resolved painting and shows the slot', () => {
+    const { calls, writers } = recordingFacet();
+    const seen: [string | undefined, string][] = [];
+    const painter = new CastBarPainter(writers, WITH_ICON, {
+      ...TARGET_OPTS,
+      resolveCastIcon: (caster, castId) => {
+        seen.push([caster, castId]);
+        return '/ui/boss-abilities/x.webp';
+      },
+    });
+    painter.paint({
+      cast: castState({ label: 'heart_seam_bolt' }),
+      castRemaining: 1,
+      casterTemplateId: 'heart_seam_singer',
+    });
+    expect(seen).toEqual([['heart_seam_singer', 'heart_seam_bolt']]);
+    expect(iconCalls(calls)).toEqual([
+      { m: 'setStyleProp', args: [ICON, 'background-image', 'url("/ui/boss-abilities/x.webp")'] },
+      { m: 'setAttr', args: [ICON, 'hidden', null] },
+    ]);
+  });
+
+  it('keeps the slot hidden for a cast with no painting', () => {
+    const { calls, writers } = recordingFacet();
+    const painter = new CastBarPainter(writers, WITH_ICON, {
+      ...TARGET_OPTS,
+      resolveCastIcon: () => null,
+    });
+    painter.paint({ cast: castState(), castRemaining: 1, casterTemplateId: 'warrior' });
+    expect(iconCalls(calls)).toEqual([{ m: 'setAttr', args: [ICON, 'hidden', ''] }]);
+  });
+
+  it('reruns the resolve only when the caster or the cast changes', () => {
+    const { writers } = recordingFacet();
+    let resolves = 0;
+    const painter = new CastBarPainter(writers, WITH_ICON, {
+      ...TARGET_OPTS,
+      resolveCastIcon: () => {
+        resolves++;
+        return '/ui/boss-abilities/x.webp';
+      },
+    });
+    const input: CastBarPaintInput = {
+      cast: castState({ label: 'heart_seam_bolt' }),
+      castRemaining: 1,
+      casterTemplateId: 'heart_seam_singer',
+    };
+    painter.paint(input);
+    painter.paint(input);
+    input.cast = castState({ label: 'heart_seam_bolt', fill: 0.9 });
+    painter.paint(input);
+    expect(resolves).toBe(1);
+    input.cast = castState({ label: 'heart_song_of_the_seam' });
+    painter.paint(input);
+    input.casterTemplateId = 'heart_hammer_guardian';
+    painter.paint(input);
+    expect(resolves).toBe(3);
+  });
+
+  it('leaves the slot alone on hide (the bar itself is display:none)', () => {
+    const { calls, writers } = recordingFacet();
+    const painter = new CastBarPainter(writers, WITH_ICON, {
+      ...TARGET_OPTS,
+      resolveCastIcon: () => '/ui/boss-abilities/x.webp',
+    });
+    painter.paint({ cast: HIDDEN_CAST, castRemaining: 0, casterTemplateId: 'heart_seam_singer' });
+    expect(calls).toEqual([{ m: 'setDisplay', args: [BAR, 'none'] }]);
+  });
+
+  it('never touches the slot without a resolver (the player bar)', () => {
+    const { calls, writers } = recordingFacet();
+    const painter = new CastBarPainter(writers, WITH_ICON, PLAYER_OPTS);
+    painter.paint({ cast: castState(), castRemaining: 1, casterTemplateId: 'heart_seam_singer' });
+    expect(iconCalls(calls)).toEqual([]);
+  });
+});

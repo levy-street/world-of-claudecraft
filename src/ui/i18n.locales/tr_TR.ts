@@ -3988,7 +3988,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Tecrübe çubuğunun üzerinde, ilk sıranın başında özel bir saldırı düğmesiyle birlikte on birer yetenek yuvasından oluşan üç sıra bulunur. Başlangıçta yalnızca ilk sıra oradadır: ikinci ve üçüncüsü, yere ihtiyaç duyduğunda seçeneklerden açılır ve üçüncüsü ikincisini gerektirir. Klavyenin üstündeki sayı sırası ilk çubuğu ateşler, ek çubuklar ise varsayılan olarak sayısal tuş takımına atanır.\n\nYetenekler büyü kitabından (P) gelir: birini kitaptan bir yuvaya sürükle ya da sırasındaki geçişi kullanarak onu ilk boş yuvaya koy. Eşyalar da aynı şekilde çalışır, yani bir yığın iksir ya da bir bandaj bir yuvada durabilir ve bir tuşla kullanılabilir.\n\nBir çubuğu istediğin gibi düzenledikten sonra kilitleyebilirsin. Kilitlemek sürüklemeyi, bırakmayı ve temizlemeyi reddederken yeteneklerin kendisini her zamanki gibi kullanılabilir bırakır, böylece bir dövüşteki yanlış tıklama düğmelerini yeniden düzenleyemez.\n\nUygun oldukları zaman sıraya iki daha küçük çubuk katılır: Ctrl artı 1'den 5'e kadar Saldır, Dur, Tahrik, Savunmacı ve Saldırgan komutlarını taşıyan evcil çubuğu ve duruş ya da form değiştiren sınıflar için bir duruş çubuğu.",
   'guide.interfacePage.actionBarsTitle': 'Eylem çubukların',
   'guide.interfacePage.aurasBody':
-    'Kendi takviyelerin, mini haritanın yanındaki sağ üst köşede küçük simgelerden oluşan bir sıra halinde görünür, her biri kalan süresini geri sayar; zayıflatmaların ise onların altındaki bir sırada durur. Kendi takviyelerinden birine sağ tıklamak, bırakmana izin verilen bir takviyeyse onu düşürür; zayıflatmalar asla düşürülemez ve hedefinin şeridi salt okunurdur.\n\nOyuncu Çerçevesinde Güçlendirmeler, başlangıçta kapalı bir seçenek, takviye sıranı kendi birim çerçevene taşır ve köşenin tamamını zayıflatmalarına bırakır. Bu masaüstüne özgü bir ayardır: telefon ve tablet düzeni auralarını senin için kendisi yerleştirir.\n\nHedefinin takviyeleri ve zayıflatmaları çerçevesinin altındaki bir şeritte birlikte durur. Onlara daha fazla yer istediğinde, Shift+J taşıyabileceğin, yalnızca takviyelere ya da yalnızca zayıflatmalara filtreleyebileceğin ve açık bırakabileceğin ayrı bir Hedefin Takviyeleri ve Zayıflatmaları penceresi açar.',
+    'Kendi takviyelerin, mini haritanın yanındaki sağ üst köşede küçük simgelerden oluşan bir sıra halinde görünür, her biri kalan süresini geri sayar; zayıflatmaların ise onların altındaki bir sırada durur. Kendi takviyelerinden birine sağ tıklamak, bırakmana izin verilen bir takviyeyse onu düşürür; zayıflatmalar asla düşürülemez ve hedefinin şeridi salt okunurdur.\n\nOyuncu Çerçevesinde Güçlendirmeler, başlangıçta kapalı bir seçenek, takviye sıranı kendi birim çerçevene taşır ve köşenin tamamını zayıflatmalarına bırakır. Bu masaüstüne özgü bir ayardır: telefon ve tablet düzeni auralarını senin için kendisi yerleştirir.\n\nHedefinin takviyeleri ve zayıflatmaları çerçevesinin altındaki bir şeritte birlikte durur. Onlara daha fazla yer istediğinde, Shift+B taşıyabileceğin, yalnızca takviyelere ya da yalnızca zayıflatmalara filtreleyebileceğin ve açık bırakabileceğin ayrı bir Hedefin Takviyeleri ve Zayıflatmaları penceresi açar.',
   'guide.interfacePage.aurasTitle': 'Takviyeler ve zayıflatmalar',
   'guide.interfacePage.barsBody':
     'Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.',
@@ -24324,30 +24324,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedLine':
     'Isırıklarından kaçmak için jaguardan koş. Sürü Bağını kırmak için Canavar Efendisinden uzağa çek',
   'hudChrome.wildheartAlert.stalkedTitle': 'İzleniyorsun!',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Demirle bağlanmış iki bükülü kara ahşap kol; tepesinde iki kıvrık boynuz arasında mor alacakaranlık alevi yakan açık demir fener, tabanından sallanan zincirler.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Salondaki bir fener dışında hepsi parlak yanar. Alacakaranlık alevi gece salonu korumak için yakıldı; diğerlerinin ışık verdiği yerde gölge yayar. Garrick fitilini kendisi keser. Duman ve mor parıltı yalnızca görünümdür.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Alacakaranlık Fitili Asası',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Ocak sıcağı kenarlı, karartılmış çelikten alev dalgalı bıçak; iki yüzünde dallanan erimiş damar, yanan taş çevresinde bronz alev kabza siperi, koyu kan kırmızısı sap.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Fener Salonunda, kurulduğundan beri sönmemiş ocak vardır; Garrick Holt bu bıçağın onun közlerinde soğutulduğuna yemin eder. Taşıyan üyeler, en soğuk nöbette bile sapın sıcak kaldığını söyler. Kenarlarındaki ateş yalnızca görünümdür.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Ocak Damgası',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Kor fener ateşi yivli geniş çelik bıçak, yaldızlı yanlar, çapraz siperde yanan kafesli fener, mavi deri sap.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt bu bıçağı yabancıya satmaz. Fener Salonunun sözleşmelerini hafta hafta tutan üyelere gider; her seferinde aynı sözlerle verir: siperdeki fener salonun kendi ocağından yakılır; nereye taşırsan salon seninle gelir. Yivdeki ateş yalnızca görünümdür. Asıl olan sözdür.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Fener Salonunun Kılıcı',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Gümüş bağlı, parlayan kırağı sarılı soluk gövde; tepesinde parçalı buz tacı içinde büyük soğuk ışık kristali tutan gümüş pençe, yakasından sarkan buz sarkıtları.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Fener Salonunun kış nöbetçileri ana yolda böyle asalar taşırdı; taçları karda kaybolan yolcular için yanardı. Garrick, fazla mührü olan üyeler için rafta bir tane tutar. Buz ve soğuk ışığı yalnızca görünümdür.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Kırağı Işığı Asası',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Kırılan dalga kadar parlak kenarlı uzun deniz mavisi bıçak; çatallı yıldırım tutan fırtına kanalı, tabanında yaldızlı dalga, bir kenarında yüzgeç, fırtına incisi çevresinde yaldızlı dalga siperi.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Lonca için yelken açan kaptan bu bıçağı, direğini koparıp gemisini çan gibi çınlatan sağanaktan getirdi. Garrick yalnızca mühürle satar, her alıcıyı fırtına öncesi uğuldadığı konusunda uyarır. Yıldırım ve deniz ışığı yalnızca görünümdür.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Sağanak Tepesi',
   'dungeonGuide.drownedTemple.accept.1': 'Teşekkürler. Arkandan yürüyüp yoluna çıkmayacağım.',
   'dungeonGuide.drownedTemple.accept.2': 'Sonunda aşağı iniyorum. Yürü. Yetişirim.',

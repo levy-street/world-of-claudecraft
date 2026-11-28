@@ -18,6 +18,7 @@ import { VOICE_ALIAS, VOICE_PROMPTS } from '../scripts/voices/npc_voice_prompts.
 import { collectVoiceLines } from '../scripts/voices/voice_line_catalog.mjs';
 import { ESCORTS, NPCS, QUESTS } from '../src/sim/data';
 import { IGNIVAR_DIALOGUE_LINES } from '../src/sim/encounters/ignivar_dialogue';
+import { SMITH_HEART_VOICE_LINES } from '../src/sim/encounters/smith_heart/voice_lines';
 import { VARKHUL_DIALOGUE_LINES } from '../src/sim/encounters/varkhul_dialogue';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -33,6 +34,7 @@ const allLines = () =>
     ESCORTS,
     IGNIVAR_DIALOGUE_LINES,
     VARKHUL_DIALOGUE_LINES,
+    SMITH_HEART_VOICE_LINES,
   });
 
 describe('NPC voice prompt catalog', () => {

@@ -36,7 +36,18 @@ export type FieldGround =
   // bare slate of Thornpeak.
   | 'snow'
   | 'ice'
-  | 'slate';
+  | 'slate'
+  // The Smith's Heart's Hammer vein: the quarry's cut bedrock, and the
+  // Gallery's worn paving (phase 2E); its Breath vein's storm-scoured pale
+  // granite (phase 2G); its Quench vein's frost-bound granite and the Frozen
+  // Lake's clear ice (phase 2H); its Heat vein's columnar basalt, fire in its
+  // joints (phase 2I).
+  | 'quarry'
+  | 'paving'
+  | 'scoured'
+  | 'rime'
+  | 'lake_ice'
+  | 'hearth';
 
 interface FieldSurfaceBase {
   id: string;
@@ -92,6 +103,34 @@ export interface FieldWall {
   rot: number;
   /** Visual height above the ground under its centre (sight top follows it). */
   height: number;
+  /** A low wall a sight line passes over (under every eye): it blocks
+   *  bodies, never line of sight. */
+  sightClear?: boolean;
+}
+
+/** A round low wall about a point (the Guardian of the Heat's lip wall round
+ *  its wellspring): a band from `inner` to `outer` yards off (x, z). It
+ *  collides as ONE circle of radius `outer` (field_colliders.ts), so a body
+ *  walking along it slides round a smooth curve (a ring of box segments left
+ *  corners a melee player snagged on: Jose's playtest of 2026-11-25); the map
+ *  draws its band (ring_wall.ts). Nothing stands inside it but what an
+ *  encounter pins there itself. */
+export interface FieldRingWall {
+  id: string;
+  x: number;
+  z: number;
+  inner: number;
+  outer: number;
+  /** Visual height above the ground under its centre (sight top follows it). */
+  height: number;
+  /** A low wall a sight line passes over: it blocks bodies, never sight. */
+  sightClear?: boolean;
+  /** The one body its encounter pins at the circle's middle (a mob template
+   *  id: the Guardian of the Heat, sunk in its wellspring, heat.ts
+   *  holdStance). It stands inside the solid circle by design; the placement
+   *  sweep (tests/fixes.test.ts) admits exactly it, exactly there, and every
+   *  other body in the circle still reads as spawned in geometry. */
+  holds?: string;
 }
 
 /** A dressing piece from the dungeon's kit. `r` or `hw`/`hd` add a collider. */
@@ -108,6 +147,12 @@ export interface FieldProp {
   hd?: number;
   /** Visual height of the collider (sight top); defaults to 6. */
   h?: number;
+  /** An encounter owns this prop's solid body (it cracks and falls in a fight
+   *  and stands again on a reset: the Smith's Heart's quarry columns): the
+   *  field builds no collider for it, and a live claim publishes one as a
+   *  combat wall instead (instances/combat_wall_state.ts). Its footprint and
+   *  height still describe the body. */
+  encounterOwned?: boolean;
 }
 
 /** One lighting mood region (render-only: key tint, fog tint, torch colour). */
@@ -133,9 +178,17 @@ export interface AuthoredFieldDef {
   voidHeight: number;
   /** A drop taller than this between neighbouring ground becomes a cliff wall. */
   cliffStep: number;
+  /** Breaks in the walls over the void (the Smith's Heart's Storm Cornice
+   *  gaps): a cliff sample inside one of these discs whose low side is the
+   *  void builds no collider, so a body walks, or is blown, off the lip there
+   *  and falls. The run is still derived (its rock face is drawn), marked
+   *  `open` (cliffs.ts FieldCliffRun). */
+  lipOpenings?: readonly { x: number; z: number; r: number }[];
   /** Ordered: a later surface wins where two overlap. */
   surfaces: readonly FieldSurface[];
   walls: readonly FieldWall[];
+  /** Round low walls (FieldRingWall), each one circle collider. */
+  ringWalls?: readonly FieldRingWall[];
   props: readonly FieldProp[];
   lightZones: readonly FieldLightZone[];
   /** What the painted dungeon map shows in the void round the terraces (the

@@ -113,17 +113,37 @@ export function corpseHarvestClaimOpen(
   );
 }
 
+/** The structural slice of IWorld the per-boss save read needs (optional so a
+ *  bare world fixture with no such read simply reads as not saved). */
+export interface BossLootDeniedWorld {
+  corpseBossLootDenied?(corpse: Pick<Entity, 'bossLootLock'>): boolean;
+}
+
+/** Is the local viewer kept off this body's loot by a per-boss raid lockout
+ *  (IWorld.corpseBossLootDenied)? Only a body that carries a lock asks the
+ *  world, so every other corpse costs one field read on the per-frame paths. */
+export function viewerBossLootDenied(
+  world: BossLootDeniedWorld,
+  mob: Pick<Entity, 'bossLootLock'>,
+): boolean {
+  return mob.bossLootLock !== undefined && world.corpseBossLootDenied?.(mob) === true;
+}
+
 /** The indicator one viewer sees over a body. Only a dead, lootable, wild
  *  (unowned) mob inside its corpse window can show anything; ordinary loot for
  *  this viewer wins, else an open harvest, else nothing, even while `lootable`
  *  stays true for the harvest grace window. `viewerPartyIds` is the VIEWER's
  *  roster (self included, empty or null when solo). Honors the FFA lapse, as
- *  the generic press does. */
+ *  the generic press does. `lootDenied` is the viewer's per-boss raid save
+ *  (IWorld.corpseBossLootDenied, loot/boss_loot_lock.ts): a saved raider takes
+ *  nothing from the body, so its ordinary loot never shows for them; the
+ *  harvest half is not that gate's business. */
 export function corpseIndicatorFor(
   mob: Entity,
   viewerId: number,
   viewerPartyIds: readonly number[] | null,
   harvestStateReliable = true,
+  lootDenied = false,
 ): CorpseIndicator {
   if (
     (mob.kind !== 'mob' && mob.kind !== 'player') ||
@@ -142,7 +162,7 @@ export function corpseIndicatorFor(
     mob.lootFfaTimer,
     true,
   );
-  if (corpseHasOrdinaryLootFor(mob.loot, viewerId, shared)) return 'loot';
+  if (!lootDenied && corpseHasOrdinaryLootFor(mob.loot, viewerId, shared)) return 'loot';
   if (corpseHarvestClaimOpen(mob.templateId, mob.harvestClaimedBy, harvestStateReliable)) {
     return 'harvest';
   }

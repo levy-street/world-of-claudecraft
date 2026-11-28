@@ -9,9 +9,14 @@
 // lake) and the Hollow Crypt's (crypt_alert_view.ts on the same family: the
 // grave mark, the Frozen Embrace, the Bride's Lament, the Open Grave, the
 // Burning Knell's half, Grasp of the Grave, the Reap, the Toll and Harmony
-// readouts, the Rite's candles and the Bound Souls) and the Drowned Temple's
+// readouts, the Rite's candles and the Bound Souls), the Drowned Temple's
 // (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
-// melody, its answer and her broken voice), plus the trash engine's
+// melody, its answer and her broken voice), the Smith's Heart's Guardian of
+// the Quench's bar (quench_alert_view.ts: a slash's mark and Living Rime,
+// the player's own gauge, never advisory) and its screen effects
+// (quench_screen_view.ts and quench_screen_painter.ts: the frost border
+// creeping in as the cold fills, the blue tint in the water; never advisory
+// either), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
@@ -21,6 +26,21 @@
 // Sanctum, Crypt, Wildheart and Temple alerts and the use prompt keep their
 // scenes off the roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
 // wildheart_alert_scene_core.ts, temple_alert_scene_core.ts, KitUseSceneScan).
+//
+// Off the slot it paints the Smith's Heart's tank swap alert
+// (tank_swap_alert_view.ts on the same family: Swap for the tank carrying a
+// swap debuff at its count, its stacks; nobody else), small beside the
+// target frame, on every tier and whatever the hints setting; it never holds
+// the slot. Its sibling, the tank buster alert (the same view module: a boss's
+// heavy hit and its countdown for the tank it is aimed at), is a compact line
+// just above it in the same tank corner, under the same rules. Its mirror on the action bar's other side is the Live Coal chip
+// (coal_alert_view.ts: its bearer's absorb left and fuse), the same rules.
+//
+// Beside the slot it paints the Masterless Strength's raid HUD, its phase
+// readout at the top of the screen (heart_final_phase_view.ts and
+// heart_final_phase_painter.ts: the switch mark and part 2's clocks; the
+// Overload bars are the room's ring now), on every tier and whatever the
+// hints setting.
 //
 // The prompts share one slot over the action bar, so the use prompt gives way
 // to every encounter prompt above it (a strike to dodge or a cage to break
@@ -37,8 +57,16 @@
 // holds the slot are both decided in dungeon_prompt_policy_core.ts.
 
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
+import { BreathWindBadge } from './breath_wind_painter';
+import {
+  type BreathWindBody,
+  BreathWindScan,
+  buildBreathWindView,
+  makeBreathWindView,
+} from './breath_wind_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
+import { buildCoalAlertView, COAL_ALERT_KINDS } from './coal_alert_view';
 import { CryptAlertSceneScan, type CryptSceneEntity } from './crypt_alert_scene_core';
 import {
   buildCryptAlertView,
@@ -54,14 +82,33 @@ import {
 import { EncounterAlert } from './encounter_alert_painter';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
+import { HeartFinalPhasePanel } from './heart_final_phase_painter';
+import {
+  buildFinalPhaseView,
+  type FinalPhaseBoss,
+  HeartFinalScan,
+  makeFinalPhaseView,
+} from './heart_final_phase_view';
 import {
   buildKitUsePromptView,
   KIT_USE_PROMPT_KINDS,
   type KitUseBody,
   KitUseSceneScan,
 } from './kit_use_prompt_view';
+import { buildKnotAlertView, KNOT_ALERT_KINDS } from './knot_alert_view';
+import { buildQuenchAlertView, QUENCH_ALERT_KINDS } from './quench_alert_view';
+import { QuenchScreenOverlay } from './quench_screen_painter';
+import { buildQuenchScreenView, makeQuenchScreenView } from './quench_screen_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
+import {
+  buildTankBusterAlertView,
+  buildTankSwapAlertView,
+  TANK_BUSTER_ALERT_LOOK,
+  TANK_SWAP_ALERT_KINDS,
+  TankBusterLatch,
+  type TankSwapBody,
+} from './tank_swap_alert_view';
 import { TempleAlertSceneScan, type TempleSceneEntity } from './temple_alert_scene_core';
 import { buildTempleAlertView, TEMPLE_ALERT_KINDS } from './temple_alert_view';
 import { WildheartAlertSceneScan, type WildheartSceneEntity } from './wildheart_alert_scene_core';
@@ -80,6 +127,8 @@ export interface DungeonPromptsFrame {
   player: {
     id: number;
     pos: { x: number; z: number };
+    /** Where the player faces (the wind badge turns to it). */
+    facing?: number;
     auras: readonly {
       id: string;
       sourceId?: number;
@@ -88,6 +137,7 @@ export interface DungeonPromptsFrame {
       duration?: number;
       stacks?: number;
       value?: number;
+      value3?: number;
     }[];
     /** The player's target (an alert may read the boss being targeted). */
     targetId?: number | null;
@@ -108,7 +158,10 @@ export interface DungeonPromptsFrame {
         CryptSceneEntity &
         WildheartSceneEntity &
         TempleSceneEntity &
-        KitUseBody
+        KitUseBody &
+        FinalPhaseBoss &
+        TankSwapBody &
+        BreathWindBody
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -132,6 +185,22 @@ export class DungeonPrompts {
   private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
+  private readonly quench: EncounterAlert;
+  private readonly quenchScreen: QuenchScreenOverlay;
+  private readonly quenchScreenView = makeQuenchScreenView();
+  private readonly knot: EncounterAlert;
+  private readonly tankSwap: EncounterAlert;
+  private readonly tankBuster: EncounterAlert;
+  /** The tank buster alert's per-instance memory (its pulses and its latched
+   *  last second). */
+  private readonly tankBusterLatch = new TankBusterLatch();
+  private readonly liveCoal: EncounterAlert;
+  private readonly finalPhase: HeartFinalPhasePanel;
+  private readonly finalPhaseView = makeFinalPhaseView();
+  private readonly finalScan = new HeartFinalScan();
+  private readonly breathWind: BreathWindBadge;
+  private readonly breathWindView = makeBreathWindView();
+  private readonly breathWindScan = new BreathWindScan();
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly temple: EncounterAlert;
   private readonly templeScene = new TempleAlertSceneScan();
@@ -150,6 +219,8 @@ export class DungeonPrompts {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    quench: false,
+    knot: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,
@@ -178,6 +249,43 @@ export class DungeonPrompts {
       className: 'ui-panel-strong encounter-alert crypt-alert',
       kinds: CRYPT_ALERT_KINDS,
     });
+    // The cold bar is the player's own gauge, read the whole fight: docked on
+    // the player frame like a secondary resource bar (never the screen's
+    // middle; the owner's rule of 2026-11-04), the HUD layer the fallback.
+    this.quench = new EncounterAlert(
+      { ...deps, layer: () => quenchDock(deps.layer()) },
+      {
+        id: 'heart-quench-alert',
+        className: 'ui-panel-strong encounter-alert heart-quench-alert',
+        kinds: QUENCH_ALERT_KINDS,
+      },
+    );
+    // The frost border and the water's tint: over the world, under the
+    // nameplates and every HUD frame (mounted before the nameplates layer).
+    this.quenchScreen = new QuenchScreenOverlay({
+      ...deps,
+      before: () => quenchScreenAnchor(deps.layer()),
+    });
+    this.knot = new EncounterAlert(deps, {
+      id: 'heart-knot-alert',
+      className: 'ui-panel-strong encounter-alert heart-knot-alert',
+      kinds: KNOT_ALERT_KINDS,
+    });
+    this.tankSwap = new EncounterAlert(deps, {
+      id: 'heart-tank-swap',
+      className: 'ui-panel-strong encounter-alert heart-tank-swap',
+      kinds: TANK_SWAP_ALERT_KINDS,
+    });
+    // The tank buster alert: the swap's family, a compact line in the tank
+    // corner (its look and placement class are the view core's).
+    this.tankBuster = new EncounterAlert(deps, TANK_BUSTER_ALERT_LOOK);
+    this.liveCoal = new EncounterAlert(deps, {
+      id: 'heart-live-coal',
+      className: 'ui-panel-strong encounter-alert heart-live-coal',
+      kinds: COAL_ALERT_KINDS,
+    });
+    this.finalPhase = new HeartFinalPhasePanel(deps);
+    this.breathWind = new BreathWindBadge(deps);
     this.temple = new EncounterAlert(deps, {
       id: 'temple-alert',
       className: 'ui-panel-strong encounter-alert temple-alert',
@@ -263,6 +371,59 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
+    // The Hammer Council paints no prompt: its marks read in the world only
+    // (the team's feedback of 2026-11-17; docs/design/raid/smith_heart.md 7.1).
+    // The cold bar is the player's own gauge: never hidden by the hints.
+    const quench = dungeonPromptEnabled('quench', hints)
+      ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
+      : HINT_HIDDEN;
+    this.quench.paint(quench);
+    // The frost and the water on the screen: the player's own state, every
+    // tier and whatever the hints setting.
+    this.quenchScreen.paint(
+      buildQuenchScreenView({ auras: p.auras, dead: p.dead }, this.quenchScreenView),
+    );
+    // The Knotted Gale's part in the fight (the panel is the throw's button).
+    const knot = dungeonPromptEnabled('knot', hints)
+      ? buildKnotAlertView({
+          auras: p.auras,
+          pos: p.pos,
+          dead: p.dead,
+          interactKey: f.interactKey,
+          touch: f.touch,
+        })
+      : HINT_HIDDEN;
+    this.knot.paint(knot);
+    // The raid's one tank swap cue (an action prompt: never the hints'; off
+    // the shared slot, so it never makes the use prompt yield).
+    this.tankSwap.paint(
+      dungeonPromptEnabled('tankSwap', hints)
+        ? buildTankSwapAlertView({ self: p, entity })
+        : HINT_HIDDEN,
+    );
+    // A boss's heavy hit on the local tank (an action prompt, off the slot):
+    // only the tank it is aimed at carries its marker. The latch holds each
+    // alert's pulses and its last second across snapshots (the UI clock).
+    this.tankBuster.paint(
+      dungeonPromptEnabled('tankBuster', hints)
+        ? buildTankBusterAlertView({ self: p, entity, latch: this.tankBusterLatch, now })
+        : HINT_HIDDEN,
+    );
+    // The Live Coal's bearer's own chip (an action readout, off the slot).
+    this.liveCoal.paint(
+      dungeonPromptEnabled('liveCoal', hints)
+        ? buildCoalAlertView({ auras: p.auras, dead: p.dead })
+        : HINT_HIDDEN,
+    );
+    // The Masterless Strength's raid HUD (its phase readout; its Overload
+    // bars are the room's ring): no personal alert since Jose's playtest of
+    // 2026-11-19 (its marks read in the world).
+    this.finalPhase.paint(buildFinalPhaseView(this.finalScan.frame(f.world), this.finalPhaseView));
+    // The Breath's wind badge: every preset, never behind the hints setting
+    // (the wind's way is what the player acts on).
+    this.breathWind.paint(
+      buildBreathWindView(this.breathWindScan.frame(f.world), p, this.breathWindView),
+    );
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
           selfPos: p.pos,
@@ -280,6 +441,8 @@ export class DungeonPrompts {
     slot.wildheart = wildheart.visible;
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
+    slot.quench = quench.visible;
+    slot.knot = knot.visible;
     slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
     slot.wildheartSoft = wildheartSoft;
@@ -308,7 +471,27 @@ export class DungeonPrompts {
     this.wildheart.dispose();
     this.sanctum.dispose();
     this.crypt.dispose();
+    this.quench.dispose();
+    this.quenchScreen.dispose();
+    this.knot.dispose();
+    this.tankSwap.dispose();
+    this.tankBuster.dispose();
+    this.liveCoal.dispose();
+    this.finalPhase.dispose();
+    this.breathWind.dispose();
     this.temple.dispose();
     this.kitUse.dispose();
   }
+}
+
+/** Where the Quench cold bar docks: the player frame when the HUD has one,
+ *  else the HUD layer itself. */
+export function quenchDock(layer: HTMLElement | null): HTMLElement | null {
+  return layer?.ownerDocument.getElementById('player-frame') ?? layer;
+}
+
+/** Where the Quench screen effects mount: just before the nameplates layer
+ *  (outside the HUD root), so they sit under the nameplates and the HUD. */
+export function quenchScreenAnchor(layer: HTMLElement | null): HTMLElement | null {
+  return layer?.ownerDocument.getElementById('nameplates') ?? null;
 }

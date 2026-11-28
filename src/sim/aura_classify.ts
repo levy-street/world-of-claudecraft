@@ -84,7 +84,36 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
 // which hid it behind the buff bar's low-tier overflow cap alongside ordinary
 // stat buffs even though missing it costs the player a timing window, not just
 // a cosmetic icon.
-const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set(['shaman_stormsurge_ready']);
+// The Smith's Heart's Guardian of the Breath rides quiet `internal_cd` markers
+// for its wind, its pull, the pinned, the marked conductor and the spent
+// (encounters/smith_heart/breath_ids.ts, wind_drift.ts): each is a hazard the
+// player must read, so it sits on the debuff bar.
+const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set([
+  'shaman_stormsurge_ready',
+  'wind_drift',
+  'wind_draw',
+  'heart_breath_pinned',
+  'heart_breath_drawn_lightning',
+  'heart_breath_calm_spent',
+  'heart_breath_portal_a',
+  'heart_breath_portal_b',
+  'heart_breath_portal_c',
+  'heart_breath_portal_d',
+  'heart_breath_laden',
+  // The Guardian of the Quench's cold bar (encounters/smith_heart/quench_ids.ts):
+  // the hazard every player watches, so it sits on the debuff bar.
+  'heart_quench_cold',
+  // A shatter's splash on an ally (the cold it added): a short hazard mark.
+  'heart_quench_splashed',
+  // The Guardian of the Heat's marks (encounters/smith_heart/heat_ids.ts): a
+  // Wellkeeper's Kindling Mark and the Cinder Trail it becomes, the Hunted of
+  // a Rolling Cinder's quarry, and a cinder's Cooling Crust (on its frame: it
+  // cannot be knocked back yet).
+  'heart_heat_kindling',
+  'heart_heat_trailing',
+  'heart_heat_hunted',
+  'heart_heat_crust',
+]);
 
 export function isDebuffDisplayAura(kind: AuraKind, value: number, id?: string): boolean {
   return isDebuffAura(kind, value) || (id !== undefined && DEBUFF_DISPLAY_AURA_IDS.has(id));

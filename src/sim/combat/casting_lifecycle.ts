@@ -2,6 +2,7 @@ import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
 import { courierSummon } from '../courier';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
+import { carriesLoad, movesCaster } from './carried_load';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 import { shadowPeriodicHit } from './priest/periodic_crit';
 import { spiritBombCastError } from './priest/spirit_bomb_cast';
@@ -227,7 +228,7 @@ import {
 } from './paladin_solar_reprisal';
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
-import { effectivePlayerAttackRange } from './player_attack_reach';
+import { effectivePlayerAttackRange, playerAbilityBand } from './player_attack_reach';
 import { reserveShadowStilledMind } from './priest/stilled_mind';
 import {
   duskhymnChannelStart,
@@ -1372,6 +1373,11 @@ export function castAbility(
     ctx.error(p.id, "Can't move!");
     return;
   }
+  // Nor may the Knotted Gale's carrier move except on foot.
+  if (carriesLoad(p) && movesCaster(res.effects)) {
+    ctx.error(p.id, "Can't move!");
+    return;
+  }
   // casting is deliberate action — drop any active follow so you don't drift
   ctx.stopFollow(p);
   if (ability.requiresDodgeProc && ctx.time > p.overpowerUntil) {
@@ -1613,12 +1619,18 @@ export function castAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
-    if (d > maxRange) {
+    // A gap closer's band runs from a big body's edge (player_attack_reach.ts).
+    const band = playerAbilityBand(
+      target,
+      ability.range,
+      ability.minRange,
+      meleeReachActor(ctx, p),
+    );
+    if (d > band.max) {
       ctx.error(p.id, 'Out of range.');
       return;
     }
-    if (ability.minRange && d < ability.minRange) {
+    if (d < band.min) {
       ctx.error(p.id, 'Too close!');
       return;
     }
@@ -2950,7 +2962,13 @@ function applyAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
+    // The cast gate's own band (a gap closer's from a big body's edge).
+    const maxRange = playerAbilityBand(
+      target,
+      ability.range,
+      ability.minRange,
+      meleeReachActor(ctx, p),
+    ).max;
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;

@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "rigSource": "tmp/asset_src/heart_heat_caller_woc.glb",
+      "src": "tmp/asset_src/heart_heat_caller_woc.slim.glb",
+      "out": "models/creatures/heart_heat_caller.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "IdleFidget",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Turn",
+        "Attack",
+        "Attack2",
+        "CastBolt",
+        "Hit",
+        "Hit2",
+        "Stunned",
+        "Death"
+      ],
+      "dropStillChannels": true,
+      "materialName": "heart_heat_caller",
+      "maxTex": 1024
+    }
+  ]
+}

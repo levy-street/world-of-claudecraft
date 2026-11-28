@@ -19,6 +19,7 @@ import {
   type CombatWallPlacement,
   isCombatWallTemplate,
   setCombatWalls,
+  wallPlacement,
 } from '../../instances/combat_wall_state';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -95,15 +96,7 @@ export function combatWallPlacements(
   for (const id of inst.objectIds) {
     const e = ctx.entities.get(id);
     if (!e || e.kitObject?.kind !== 'wall') continue;
-    out.push({
-      id: e.id,
-      templateId: e.templateId,
-      x: e.pos.x - ox,
-      z: e.pos.z - oz,
-      y: e.pos.y,
-      rot: e.facing,
-      scale: e.scale,
-    });
+    out.push(wallPlacement(e, ox, oz));
   }
   return out;
 }

@@ -652,6 +652,9 @@
     border-radius: var(--radius-xs);
     overflow: hidden;
     border: 1px solid var(--color-keyline);
+    /* The boss ability painting the target cast bar writes (target_cast_bar.ts). */
+    background-position: center;
+    background-size: cover;
   }
   .ui-cast-label {
     position: absolute;

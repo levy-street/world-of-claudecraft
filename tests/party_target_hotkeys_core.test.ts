@@ -141,7 +141,11 @@ function fakeWorld(info: PartyInfo | null) {
     targetEntity: vi.fn(),
     partyInfo: info,
     playerId: ME,
-    player: { pos: { x: 0, z: 0 } } as never,
+    player: { pos: { x: 0, z: 0 }, targetId: null } as never,
+    entities: new Map(),
+    markerFor: () => null,
+    setMarker: vi.fn(),
+    clearMarker: vi.fn(),
   };
 }
 

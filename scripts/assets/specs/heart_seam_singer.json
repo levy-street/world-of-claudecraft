@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "rigSource": "tmp/asset_src/heart_seam_singer_woc.glb",
+      "src": "tmp/asset_src/heart_seam_singer_woc.slim.glb",
+      "out": "models/creatures/heart_seam_singer.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "IdleFidget",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Turn",
+        "Attack",
+        "Attack2",
+        "CastBolt",
+        "CastSong",
+        "CastWrath",
+        "Hit",
+        "Hit2",
+        "Awaken",
+        "Death"
+      ],
+      "resampleTolerance": 0.005,
+      "dropStillChannels": true,
+      "materialName": "heart_seam_singer",
+      "maxTex": 1024
+    }
+  ]
+}

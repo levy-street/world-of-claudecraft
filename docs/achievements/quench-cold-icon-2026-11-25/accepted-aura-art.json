@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "quench-cold-icon-2026-11-25",
+    "acceptedDate": "2026-11-25",
+    "rasterGenerator": "Hand-authored SVG, rasterized with sharp",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+    "supersedes": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json"
+  },
+  "scope": {
+    "encounter": "The Smith's Heart raid",
+    "exactRuntimeAuras": 1,
+    "reason": "Playtest feedback (2026-11-25): the gauntlet painting for Quenching Cold read as a plain hand icon. The cold debuff now wears a white snowflake on a blue ground, readable at a glance. It replaces that one painting from the 2026-11-19 batch, whose record stays as it was accepted then."
+  },
+  "assets": [
+    {
+      "auraId": "heart_quench_cold",
+      "runtimeIds": ["heart_quench_cold"],
+      "sourceProvenance": "docs/achievements/quench-cold-icon-2026-11-25/accepted-aura-art.json",
+      "sourceFile": "docs/design/raid/kit/quench_cold_icon_src/heart_quench_cold.svg",
+      "sourceBytes": 1954,
+      "sourceSha256": "9bb20296338e9e4a12ae4ad249148de75cf679a0f706a344cae3dde522ebd8bc",
+      "acceptedSha256": "09bb58a793dfbde890f3d0be30c1d9b66bdc8454fd24a6408140b7d2bfb27ca7",
+      "acceptedBytes": 3984,
+      "references": [
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the icon stands for: where the raid applies heart_quench_cold."
+        },
+        {
+          "path": "docs/design/raid/kit/quench_cold_icon_src/heart_quench_cold.svg",
+          "role": "The vector source, rasterized to the shipped 128px opaque WebP with sharp (resize 128, flatten, webp quality 88)."
+        }
+      ],
+      "prompt": "A white six-armed snowflake with a soft pale-blue glow, centred on a blue radial ground inside a dark frame."
+    }
+  ]
+}

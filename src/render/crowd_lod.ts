@@ -320,11 +320,18 @@ export function showsStaticFarMesh(
  * Frames between mixer updates for a rig at `distSq` (1 = every frame). Callers
  * apply the `animatesEveryFrame` carve-out themselves, so this is the purely
  * cosmetic ladder: full rate, mid cadence, far cadence, then the frozen band's
- * keep-warm tick.
+ * keep-warm tick. A rig that never takes the far mesh (`keepsRig`: a Smith's
+ * Heart boss, smith_heart_fx/boss_far_lod_core.ts) plays its scripted clips
+ * (an entrance woken from past the articulated band) at no less than the mid
+ * cadence, however far it stands.
  */
-export function animCadenceFrames(distSq: number, bands: CharacterLodBands): number {
+export function animCadenceFrames(
+  distSq: number,
+  bands: CharacterLodBands,
+  keepsRig = false,
+): number {
   if (distSq <= bands.shadowRangeSq) return 1;
-  if (distSq <= bands.lodRangeSq) return bands.midCadence;
+  if (keepsRig || distSq <= bands.lodRangeSq) return bands.midCadence;
   if (distSq <= bands.staticRangeSq) return bands.farCadence;
   return STATIC_LOD_CADENCE;
 }

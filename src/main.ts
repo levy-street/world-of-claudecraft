@@ -144,6 +144,7 @@ import {
   activePvpOpponentIds,
   handlePickedEntity,
   isAttackableEntity,
+  pickedEntityApproachPoint,
   shouldApproachPickedEntity,
   shouldDeferPickedCorpseToGatherNode,
 } from './game/interactions';
@@ -196,6 +197,7 @@ import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
 import { applyNameplateRowScales, applyNameplateSetting } from './game/nameplate_settings';
 import { tryNearbyInteraction } from './game/nearby_interaction';
+import { nextPaint } from './game/next_paint';
 import { nextNpcTargetForWorld } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { offlineWorldConfig } from './game/offline_world_config';
@@ -1081,17 +1083,10 @@ function hideLoadingScreen(): void {
   }, loadingCurtainFadeDelayMs());
 }
 
-// Resolve only after the browser has actually painted. The scene build
-// (new Renderer/new Hud) runs fully synchronously and blocks the main thread,
-// so without a real paint first the loading screen never shows on warm loads
-// (cached assets ⇒ assetsReady resolves on a microtask) and entry looks frozen.
-// Two rAFs guarantee a paint happened between them, same idiom used to cut to
-// the game on the first rendered frame below.
-function nextPaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-  });
-}
+// Resolve only after the browser has actually painted (game/next_paint.ts). The
+// scene build (new Renderer/new Hud) runs fully synchronously and blocks the main
+// thread, so without a real paint first the loading screen never shows on warm
+// loads; a hidden window, which paints nothing, goes on without one.
 
 // The loading screen blocks pointer input but a covered button keeps keyboard
 // focus, so Enter/Space could re-fire it mid-entry. One entry per page load;
@@ -3445,8 +3440,7 @@ async function startGame(
         const hostile = isAttackableEntity(e, world.playerId, activePvpOpponentIds(world));
         renderer.spawnClickMarker(e.pos.x, e.pos.z, hostile);
       }
-      // The configured click-to-move mouse button approaches the entity while the
-      // regular click handler still performs target/interact behavior.
+      // The click-to-move button approaches the entity; the click handler still interacts.
       if (
         isClickMoveButton &&
         shouldApproachPickedEntity(
@@ -3457,7 +3451,7 @@ async function startGame(
           localPartyMemberIds(world.partyInfo),
         )
       ) {
-        const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
+        const target = resolvedClickMoveTarget(pickedEntityApproachPoint(e));
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
       }
     }

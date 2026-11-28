@@ -35,7 +35,7 @@
 
 import type { GatheringProfessionId } from '../sim/content/professions';
 import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
-import { corpseIndicatorFor } from '../sim/corpse_loot_state';
+import { corpseIndicatorFor, viewerBossLootDenied } from '../sim/corpse_loot_state';
 import {
   activeGatherNodes,
   activeZoneAt,
@@ -627,7 +627,13 @@ export function createMinimapMarkers(): MinimapMarkers {
           // has an open harvest left draws the pelt; a body offering neither
           // (a claimed harvest in its grace window, a stranger's owner-locked
           // pool, an expired corpse) draws nothing, lootable or not.
-          const indicator = corpseIndicatorFor(e, p.id, viewerPartyIds);
+          const indicator = corpseIndicatorFor(
+            e,
+            p.id,
+            viewerPartyIds,
+            true,
+            viewerBossLootDenied(world, e),
+          );
           if (indicator === 'loot' && centerFits(dist2, S, clearance['mob-loot'])) {
             dynamicMarkers.push({ kind: 'mob-loot', mx, my });
           } else if (indicator === 'harvest' && centerFits(dist2, S, clearance['mob-harvest'])) {

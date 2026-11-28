@@ -3,7 +3,9 @@
 // Shore's tide-pool miniboss). Lifted verbatim from nythraxis.ts when the
 // island grew its own summon; the double-summon guard, the summoner tap, and
 // the opening aggro all live here so every summon behaves identically.
+
 import { MOBS } from '../data';
+import { instanceHalfWidthOf } from '../instances/instance_footprint';
 import { spawnOpenWorldMob } from '../mob/open_world_tuning';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Vec3 } from '../types';
@@ -58,7 +60,10 @@ export function summonQuestMob(
   const inst = ctx.instances.find((i) => {
     if (i.partyKey === null) return false;
     const origin = ctx.instanceOriginOf(i);
-    return Math.abs(mob.pos.x - origin.x) < 120 && Math.abs(mob.pos.z - origin.z) < 250;
+    return (
+      Math.abs(mob.pos.x - origin.x) < instanceHalfWidthOf(i.dungeonId) &&
+      Math.abs(mob.pos.z - origin.z) < 250
+    );
   });
   if (inst) inst.mobIds.push(mob.id);
   const announcePid = opts?.announceOwnerOnly ? ownerPid : undefined;

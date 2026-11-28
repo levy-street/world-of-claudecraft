@@ -197,6 +197,11 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'pledgeGuild', // server-set display only (guild pledge board)
   'guildTier', // server-set display only (guild colour tier)
   'prevPos', // render interpolation
+  // The one-tick heal tally (combat/heal_taken.ts): read and emptied the next
+  // tick by Living Warmth, whose effect lands on the Quench's cold (pinned by
+  // tests/smith_heart_quench_rime.test.ts); like damageHistory, a combat log.
+  'healTakenAmount',
+  'healTakenTick',
   'prevFacing',
   'dungeonEntrySeq', // transient online acknowledgement generation; never read by gameplay
   'netUpdatedAt', // online wire cadence

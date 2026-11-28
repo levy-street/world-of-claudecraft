@@ -10,6 +10,7 @@ import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './clic
 import { groundCueY } from './dais_lift';
 import type { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import { SCHOOL_COLORS } from './vfx';
+import { WORLD_MARKER_COLORS } from './world_markers_core';
 
 export interface ClickMarkerSlot {
   group: THREE.Group;
@@ -35,6 +36,8 @@ export interface GroundAim {
   school: string;
   dimmed: boolean;
   blocked?: boolean;
+  /** A world marker's placement aim: draw in that marker's colour. */
+  marker?: number;
 }
 
 export class GroundFeedback {
@@ -99,7 +102,10 @@ export class GroundFeedback {
             x: aim.x,
             z: aim.z,
             radius: aim.radius,
-            color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
+            color:
+              aim.marker !== undefined
+                ? (WORLD_MARKER_COLORS[aim.marker] ?? 0xffffff)
+                : (SCHOOL_COLORS[aim.school] ?? 0xffffff),
             dimmed: aim.dimmed,
             blocked: aim.blocked === true,
           }

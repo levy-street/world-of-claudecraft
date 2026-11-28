@@ -12,9 +12,9 @@
 //                   outward from him, with bright edges, outward chevrons and a thin aiming
 //                   ray from his eye; then the beam, eye to ground, stopped on whatever
 //                   solid thing the sim said stopped it.
-//  - BARROW BURDEN  the shared-soak marker (ignivar_soak_telegraph.ts, the Shared Pyre's own
-//                   marker in a brown palette) at the carrier's feet, and our own vortex of
-//                   dust arcs, a funnel and the kit's stone shards spinning over their head,
+//  - BARROW BURDEN  the shared-soak marker (ignivar_soak_telegraph.ts: the shared soak
+//                   marker of floor_telegraph/soak_marker.ts, in shadow) at the carrier's
+//                   feet, and our own vortex of dust arcs, a funnel and the kit's stone shards spinning over their head,
 //                   winding tighter, lower and faster as it comes due.
 //  - BARROW CLEAVE  a draped fan that fills from him outward, a bright rim and edges, and
 //                   upward chevrons standing on the fan that climb as the arm comes: the
@@ -90,19 +90,12 @@ const BURDEN_ARC = 0xf0c58a;
 const BURDEN_ARC_HOT = 0xffe6b8;
 const BURDEN_FUNNEL = 0x9a6a36;
 
-/** The Barrow Burden's marker: the Shared Pyre's marker, re-dressed in the fen's earth. */
+/** The Barrow Burden's marker: the shared soak marker, in shadow. */
 export const BURDEN_SOAK_STYLE: Readonly<SoakTelegraphStyle> = Object.freeze({
   radius: BALGATH_BURDEN_RADIUS,
-  fill: 0x6b3f1a,
-  fillOpacity: 0.3,
-  rim: 0xe8a860,
-  swirl: 0xb87838,
-  arrows: 0xf6d6a0,
-  timer: 0xfff0c8,
-  ready: 0xfff4d8,
-  occupied: 0xffd89a,
-  empty: 0x3a2412,
-  fireCallIn: false,
+  // The barrow's burden: the shared soak marker in shadow (its dust vortex
+  // overhead stays this module's own).
+  element: 'shadow',
 });
 
 // ---- the one material bundle -------------------------------------------------------

@@ -21929,30 +21929,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Fermer la promotion de parrainage',
   'hudChrome.wocStore.referralPromo.cta': 'Inviter des amis',
   'hudChrome.wocStore.referralPromo.eyebrow': "Partir à l'aventure ensemble",
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    "Deux brins torsadés de bois noir cerclés de fer, surmontés d'une lanterne de fer ouverte où brûle une flamme crépusculaire violette entre deux cornes recourbées, des chaînes suspendues à sa base.",
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    "Toutes les lanternes du hall brillent vivement, sauf une. La flamme crépusculaire a été allumée pour garder le hall la nuit et répand de l'ombre là où les autres donnent de la lumière ; Garrick en taille lui-même la mèche. La fumée et la lueur violette ne sont qu'une apparence.",
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Bâton de la Mèche crépusculaire',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    "Lame flamboyante d'acier noirci aux tranchants brûlants de forge, une veine de métal fondu ramifiée sur les deux faces, une garde de flammes de bronze autour d'une pierre ardente et une poignée rouge sang de bœuf.",
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    "Le Hall de la Lanterne entretient un foyer qui ne s'est pas éteint depuis sa construction, et Garrick Holt jure que cette lame a été trempée dans ses braises. Les membres qui la portent disent que sa poignée reste chaude pendant la garde la plus froide. Le feu de ses tranchants n'est qu'une apparence.",
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Marque du foyer',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     "Large lame d'acier dont la gouttière contient un feu de lanterne couvant, des flancs dorés, une lanterne encagée brûlant dans la garde et une poignée de cuir bleu.",
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     "Garrick Holt ne vendra pas cette lame à un inconnu. Elle revient aux membres qui ont rempli les contrats du Hall de la Lanterne semaine après semaine, et il la remet toujours avec les mêmes mots : la lanterne de la garde est allumée au foyer du hall, alors partout où vous la portez, le hall vous accompagne. Le feu de la gouttière n'est qu'une apparence. La promesse est l'essentiel.",
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lame du Hall de la Lanterne',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    "Hampe pâle cerclée d'argent et enlacée de givre lumineux, surmontée d'une griffe d'argent qui tient un grand cristal de lumière froide dans une couronne de glace éclatée, des glaçons suspendus à son col.",
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    "La garde hivernale du Hall de la Lanterne portait des bâtons comme celui-ci sur la grande route, leurs couronnes éclairant les voyageurs perdus dans la neige. Garrick en garde un au râtelier pour les membres ayant des sceaux à dépenser. Le givre et sa lumière froide ne sont qu'une apparence.",
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Bâton de Lumière de givre',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    "Longue lame bleu marin aux tranchants brillants comme des vagues déferlantes, un canal de tempête renfermant un éclair fourchu, une vague dorée sur le ricasso, un aileron sur un bord et une garde de déferlantes dorées autour d'une perle d'orage.",
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    "Une capitaine qui naviguait pour la guilde a rapporté cette lame d'un grain qui lui a arraché son mât et laissé son navire résonner comme une cloche. Garrick ne la vend que contre des sceaux et avertit chaque acheteur qu'elle bourdonne avant une tempête. La foudre et la lumière marine ne sont qu'une apparence.",
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Crête de bourrasque',
   'hudChrome.wocStore.subscription.annualClaim': "Récupérer la monture de l'offre",
   'hudChrome.wocStore.subscription.annualDelivered':

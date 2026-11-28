@@ -1083,6 +1083,62 @@ the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild Wars 2).
 | the Gourdsworn | the title of Gourdlight Eve's whole-event meta deed (`feat_gourdlight_eve_complete`, round 12) | KEEP. Quoted exact-phrase searches for "Gourdsworn" and "the Gourdsworn", plus a coined-token search scoped to Wowhead, warcraft.wiki.gg, the RuneScape and OSRS wikis, the FFXIV wiki, the GW2 wiki, UESP, the PoE wiki and the Diablo wiki, returned no hit in any game. The nearest results were different tokens: WoW's "Death Foursworn" achievement, GW2's "Bladesworn" specialization, ESL's "Guildsworn" card and the unrelated games "Godsworn", "Crowsworn" and "Ironsworn". WoW's Hallow's End title is "the Hallowed", a different word; "-sworn" is a shared English suffix. |
 | Gourdlight, Start to Finish / Every Doorstep / At Hester's Beck and Call / Three Towns Startled | the round 12 whole-event meta and its three section Feats | KEEP. Plain English phrases built on this event's own names (Gourdlight, Hester); no coined token beyond those already audited above. |
 
+### The Smith's Heart raid (web-checked 2026-11-05)
+
+The raid's player-visible proper nouns (`src/sim/content/smith_heart.ts` and the
+encounters' `*_ids.ts` name tables). The raid is still dev-gated
+(`SMITH_HEART_PLAYABLE = false`), so these verdicts land before any player sees a name.
+Each distinctive name was searched as an exact phrase on the open web and by its coined
+token against the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild
+Wars 2).
+
+| Name | Where | Verdict |
+|---|---|---|
+| The Smith's Heart | the raid | KEEP. No exact-phrase hit in any game; the nearest is the unrelated title "Smith & Dungeon". Plain English. |
+| The Masterless Strength | the final boss | KEEP. No hit; the nearest is the card game "Masterless", a different name and role. |
+| The Seam Singer | the Hammer Council's second boss | KEEP. No hit in any game wiki. |
+| Wellspawn, Wellkeeper, Seedflame | the Heat guardian's adds | KEEP. No hit for any of the three tokens; nearest are different tokens ("Floraspawn", "Seed of Flame", "Siegespawn"). |
+| Gale Sentinel, Gale Mender, Rolling Cinder | the Breath isles' adds and the Heat's hunting cinder | KEEP. No hit on the wikis above; ESO's "Covenant Mender" and similar share only the generic word. |
+| Splinter of the Heat / Quench / Breath / Hammer | the final boss's adds | KEEP. Plain English built on the raid's own element names. |
+| Mountain's Wrath, Summit Roar, Storm Lance, Forge Fist, Tempering Strike, Bellows Wind | boss abilities | KEEP. Shared fantasy English; no distinctive match in the same role. |
+| Hammerfall | the Hammer Guardian's cleave | KEEP (borderline, recorded for the reviewer). WoW's Hammerfall is an orc town, a different role (a place, not an ability); the game already ships "Hammerfall Meteors" (Varkhul), and the word is shared English (also a band and a novel). |
+| Quarryheart Charger | the raid's reward mount (its meta-achievement's mount) | KEEP (web-checked 2026-11-11). No exact-phrase hit for "Quarryheart Charger" or "Quarryheart Steed", and no hit for the coined token "Quarryheart" on the WoW, RuneScape, FFXIV, GW2, ESO, Diablo or PoE wikis (nearest: Octopath Traveler's "Quarrycrest", a mining town, a different token and role). "Charger" is plain English for a war horse, shared across many games' mount names. "Heartwrought" was considered and dropped: it is an indie game's title. |
+| Reins of the Quarryheart Charger | its reins item | KEEP. The repo's reins pattern around the name above. |
+| Charge Through the Curse | the Hammer Council's encounter deed (every Mountain's Rush shatters the cursed pillar and strikes nobody, the two members fall within 15 s of each other) | KEEP (web-checked 2026-11-11). No exact-phrase game use found; plain English. |
+| Keep Your Feet | the Guardian of the Breath's encounter deed (nobody falls into the void, every Gale Bulwark broken before it bursts) | KEEP (web-checked 2026-11-11). No achievement of that name on the WoW, RuneScape, FFXIV, GW2 or Diablo wikis (nearest: RuneScape's "Keep Your Workstation Clear", GW2's "Boots on the Ground", different phrases). Plain English, and Captain Thessaly's own line in the raid. |
+| No One Left in the Cold | the Guardian of the Quench's encounter deed (nobody Encased in Rime, no ice blade strikes anyone) | KEEP (web-checked 2026-11-11), borderline noted: Frostpunk 2 has "No One Left Behind", a different phrase built on a common idiom; no exact-phrase game use found. |
+| Turn Back the Cinders | the Guardian of the Heat's encounter deed (no Rolling Cinder reaches its quarry) | KEEP (web-checked 2026-11-11). No exact-phrase game use found. |
+| Kept From the Brim | the Masterless Strength's encounter deed (no Overload Burst, no raider dies) | KEEP (web-checked 2026-11-11). No exact-phrase game use found. |
+| Heir to the Smith | the raid's meta deed (all five encounter deeds; pays the Quarryheart Charger) | KEEP (web-checked 2026-11-11). No exact-phrase game use found on the WoW, RuneScape or GW2 achievement lists. |
+| The Heart Stills | the raid's clear deed | KEEP (web-checked 2026-11-11). No exact-phrase game use found (nearest: Wildermyth's "The Unstilled Heart", a different phrase). |
+| Warden Ada Collier | the essence quest's giver at the raid's entrance (the Vigil of Highwatch) | KEEP (web-checked 2026-11-11). No game NPC of that name found; "Collier" is a plain English surname and trade. |
+| What the Heart Let Go | the entrance's weekly essence quest | KEEP (web-checked 2026-11-11). No exact-phrase game use found (nearest: The Blood of Dawnwalker's "The Heart Wants What It Wants", a different phrase). |
+| Remnant of the Masterless Strength | the final boss's quest drop | KEEP. Plain English around the raid's own boss name. |
+| Coffer of the Highwatch Vigil | the quest's reward chest | KEEP (web-checked 2026-11-11). No exact-phrase hit; plain English around the game's own Highwatch Vigil. |
+| Strength of the Bellows | the Guardian of the Breath's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found (nearest: Reverse: 1999's "Bellows of the Earth", a different phrase). Plain English around the raid's own bellows strength. |
+| Queen of the Frozen Lake | the Guardian of the Quench's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found; the nearest ice queens (Terraria's Ice Queen, Kingdom Rush's Winter Queen, Twilight Forest's Snow Queen) are different names. Plain English around the raid's own Frozen Lake. |
+| Giant of the Wellspring | the Guardian of the Heat's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found. Chosen over a "first flame" phrasing to stay clear of Dark Souls' Kiln of the First Flame. |
+| The Four Veins Made One | the Masterless Strength's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found; plain English around the raid's own four veins. |
+
+### The Smith's Heart bosses' proper names (web-checked 2026-11-27)
+
+The owner gave the raid's six bosses proper names, in the "Name, Title" shape the other named
+bosses use (Varkhul, Ysolei, Zulgar, Nythraxis). The mob ids are frozen; only the display names
+move (`src/sim/content/smith_heart.ts`). The "Guardian of the X" phrasing stays where mechanic
+text and lore use it as the role. Each personal name and each new title was searched as an
+exact phrase on the open web and against the game wikis named in `src/sim/content/CLAUDE.md`
+"Naming originality".
+
+| Name | Where | Verdict |
+|---|---|---|
+| Hrothmar, the Unyielding Hammer | the Hammer Council's Guardian member | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Hrothmar" in any game; the nearest is "Hrothgar" (the Beowulf king, FFXIV's playable race, a God of War einherjar), a different name. No game uses "Unyielding Hammer" as a name or title (nearest: "Infernal Hammer", "Hammer of Virtue", different phrases). Plain English. |
+| Velmira, the Seam Singer | the Hammer Council's Singer member | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Velmira" in any game; the nearest are the indie titles built on "Velmora", a different token. The title is recorded above. |
+| Aerwyn, the Unbound Gale | the Breath boss | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Aerwyn" in any game wiki (nearest: "Aldwynn", "Edwyn", different names). No game uses "the Unbound Gale" (nearest: "A Space for the Unbound", "Unbound Saga", different phrases). Plain English. |
+| Aurora, the Silent Winter | the Quench boss (the ice queen) | KEEP (web-checked 2026-11-27), borderline noted: "Aurora" is a real given name and a common word, used across many unrelated properties (Etheria: Restart's boss Aurora, Guild Wars Factions' Luxon Aurora, League of Legends' champion), so it is shared vocabulary under bar 2. No game uses "the Silent Winter" (nearest: "The Forever Winter", "Looming Winter", different phrases). |
+| Ignazhar, the Unquenchable | the Heat boss | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Ignazhar"; the nearest are WoW's "Igyniar" (a proto-dragon) and "Ignara" (an Aberrus NPC) and King of Fighters' "Igniz", all different names. No game boss titled "the Unquenchable" (nearest: Arknights' "Unquenched", a different word and role); plain English. "The Primordial Flame" was considered and rejected: it is a Terraria Thorium boss title. |
+| Ashgrand, Remnant of the Masterless Strength | the final boss | KEEP (web-checked 2026-11-27). No exact-phrase hit for "Ashgrand" in any game; the nearest are "Ashcrown" and "Crown of Ash", different tokens. The title reuses the raid's own boss name already recorded above. |
+| Calderra (first draft for the Heat boss) | none | WITHDRAWN before shipping (2026-11-27): replaced by Ignazhar on the owner's call, never shipped. Its check found no game hit (nearest: the word "caldera", "Great Houses of Calderia"). |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

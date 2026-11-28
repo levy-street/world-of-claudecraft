@@ -4021,7 +4021,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Ba hàng gồm mười một ô kỹ năng nằm phía trên thanh kinh nghiệm của bạn, với một nút tấn công riêng ở đầu hàng thứ nhất. Ban đầu chỉ có hàng thứ nhất xuất hiện: hàng thứ hai và thứ ba được bật trong phần cài đặt khi bạn cần thêm chỗ, và hàng thứ ba cần có hàng thứ hai đi kèm. Hàng số phía trên cùng bàn phím của bạn kích hoạt thanh thứ nhất, còn các thanh phụ mặc định dùng bàn phím số.\n\nKỹ năng đến từ sách phép của bạn (P): kéo một kỹ năng ra khỏi sách phép vào một ô, hoặc dùng công tắc trên hàng của nó để đặt nó vào ô trống đầu tiên. Vật phẩm cũng hoạt động theo cách tương tự, nên một chồng thuốc hay một cuộn băng có thể nằm trên một ô và dùng bằng một phím.\n\nKhi đã sắp xếp một thanh theo ý muốn, bạn có thể khóa nó lại. Khóa sẽ từ chối mọi thao tác kéo, thả, và xóa trong khi vẫn để các kỹ năng dùng được như thường, nên một cú bấm nhầm giữa trận chiến không thể làm xáo trộn các nút của bạn.\n\nHai thanh nhỏ hơn sẽ gia nhập hàng khi có thể áp dụng: Thanh Thú Cưng, với Tấn Công, Dừng, Khiêu Khích, Phòng Thủ, và Hung Hăng gán vào Ctrl cộng 1 tới 5, và một thanh tư thế cho các lớp nhân vật đổi tư thế hoặc hình dạng.',
   'guide.interfacePage.actionBarsTitle': 'Thanh kỹ năng của bạn',
   'guide.interfacePage.aurasBody':
-    'Các buff của riêng bạn hiện thành một hàng biểu tượng nhỏ ở góc trên bên phải, cạnh bản đồ nhỏ, mỗi biểu tượng đếm ngược thời gian còn lại, với các debuff của bạn xếp thành một hàng bên dưới chúng. Bấm chuột phải vào một buff của bạn sẽ gỡ nó xuống, miễn là đó là buff bạn được phép gỡ; debuff thì không bao giờ được, và dải hiệu ứng của mục tiêu chỉ để xem.\n\nHiệu Ứng Có Lợi Trên Khung Người Chơi, một tùy chọn ban đầu đang tắt, sẽ chuyển hàng buff của bạn lên khung đơn vị của chính bạn và nhường trọn góc màn hình cho debuff. Đây là cài đặt chỉ dành cho máy tính để bàn: bố cục trên điện thoại và máy tính bảng tự sắp xếp các hiệu ứng của bạn.\n\nBuff và debuff của mục tiêu nằm chung một dải dưới khung của nó. Khi bạn cần thêm chỗ cho chúng, Shift+J mở một cửa sổ Buff và Debuff Mục Tiêu riêng mà bạn có thể di chuyển, lọc chỉ còn buff hoặc chỉ còn debuff, và để mở.',
+    'Các buff của riêng bạn hiện thành một hàng biểu tượng nhỏ ở góc trên bên phải, cạnh bản đồ nhỏ, mỗi biểu tượng đếm ngược thời gian còn lại, với các debuff của bạn xếp thành một hàng bên dưới chúng. Bấm chuột phải vào một buff của bạn sẽ gỡ nó xuống, miễn là đó là buff bạn được phép gỡ; debuff thì không bao giờ được, và dải hiệu ứng của mục tiêu chỉ để xem.\n\nHiệu Ứng Có Lợi Trên Khung Người Chơi, một tùy chọn ban đầu đang tắt, sẽ chuyển hàng buff của bạn lên khung đơn vị của chính bạn và nhường trọn góc màn hình cho debuff. Đây là cài đặt chỉ dành cho máy tính để bàn: bố cục trên điện thoại và máy tính bảng tự sắp xếp các hiệu ứng của bạn.\n\nBuff và debuff của mục tiêu nằm chung một dải dưới khung của nó. Khi bạn cần thêm chỗ cho chúng, Shift+B mở một cửa sổ Buff và Debuff Mục Tiêu riêng mà bạn có thể di chuyển, lọc chỉ còn buff hoặc chỉ còn debuff, và để mở.',
   'guide.interfacePage.aurasTitle': 'Buff và debuff',
   'guide.interfacePage.barsBody':
     'Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.',
@@ -23108,30 +23108,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Đóng Quảng Bá Giới Thiệu Bạn',
   'hudChrome.wocStore.referralPromo.cta': 'Mời Bạn Bè',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Cùng Nhau Phiêu Lưu',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Hai dải gỗ đen xoắn quấn sắt, đỉnh là đèn sắt hở cháy ngọn lửa hoàng hôn tím giữa hai sừng cong, xích đung đưa từ đáy.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Mọi đèn trong sảnh đều sáng trừ một. Lửa hoàng hôn được thắp để giữ sảnh ban đêm, tỏa bóng tối nơi đèn khác tỏa sáng; Garrick tự tay tỉa bấc. Khói và ánh tím chỉ là diện mạo.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Trượng Bấc Hoàng Hôn',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Lưỡi thép đen uốn như lửa, mép nóng như lò, đường nóng chảy phân nhánh hai mặt, chắn tay là lửa đồng quanh đá cháy, chuôi đỏ huyết bò.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Sảnh Đèn Lồng giữ bếp lửa chưa tắt từ ngày xây sảnh, Garrick Holt thề lưỡi này được tôi trong than bếp. Thành viên mang kiếm nói chuôi vẫn ấm trong ca gác lạnh nhất. Lửa dọc mép chỉ là diện mạo.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Ấn Lửa Bếp',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Lưỡi thép rộng với rãnh lửa đèn ủ, má dát vàng, đèn lồng cháy trong chắn ngang, chuôi da xanh.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt không bán lưỡi kiếm này cho người lạ. Nó dành cho thành viên đã hoàn thành hợp đồng Sảnh Đèn Lồng tuần này qua tuần khác, và lần nào trao ông cũng nói: đèn nơi chắn tay được thắp từ bếp sảnh, nên mang nó đi đâu, sảnh cũng theo đó. Lửa trong rãnh chỉ là diện mạo. Lời hứa mới là điều cốt yếu.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lưỡi Kiếm Sảnh Đèn Lồng',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Thân nhạt quấn bạc và sương giá phát sáng, đỉnh là vuốt bạc giữ tinh thể sáng lạnh lớn trong vương miện băng vỡ, nhũ băng rủ từ cổ.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Đội gác mùa đông Sảnh Đèn Lồng từng mang trượng thế này trên đường cao, thắp đỉnh cho lữ khách lạc trong tuyết. Garrick giữ một cây trên giá cho thành viên dư ấn. Sương giá và ánh lạnh chỉ là diện mạo.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Trượng Ánh Sương',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Lưỡi dài xanh biển với mép sáng như sóng vỡ, rãnh bão giữ tia sét chẻ, sóng dát vàng trên đoạn sát chuôi, vây dọc một mép, chắn tay là sóng vỡ dát vàng quanh ngọc bão.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Nữ thuyền trưởng đi biển cho bang hội mang lưỡi kiếm này về từ cơn giông đã lấy cột buồm, để tàu rung như chuông. Garrick chỉ bán lấy ấn, cảnh báo mọi người mua rằng nó ngân trước bão. Sét và ánh biển chỉ là diện mạo.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Đỉnh Giông',
   'hudChrome.wocStore.subscription.annualClaim': 'Nhận Thú Cưỡi Gói',
   'hudChrome.wocStore.subscription.annualDelivered':

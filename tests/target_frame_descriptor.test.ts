@@ -117,6 +117,10 @@ describe('targetPortraitKey', () => {
       expect(d.hpText).toBe('300 / 600');
     },
   );
+  it("carries the target-of-target's raid target icon, none by default", () => {
+    expect(fillTargetOfTargetDescriptor(blank(), entity({ id: 9 }), 3, 5).raidMarker).toBe(5);
+    expect(fillTargetOfTargetDescriptor(blank(), entity({ id: 9 }), 3).raidMarker).toBeNull();
+  });
   it('is the bare id for a mob, helm bit or not', () => {
     expect(targetPortraitKey(entity({ id: 7 }))).toBe('7');
     expect(targetPortraitKey(entity({ id: 7, helmHidden: true }))).toBe('7');

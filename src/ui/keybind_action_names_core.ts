@@ -9,6 +9,7 @@
 // numbered slot label; slot 0 is always Attack.
 
 import { formatNumber, type TranslationKey, t } from './i18n';
+import { raidMarkerDisplayName } from './raid_marker_labels_view';
 
 // Localized labels for the keybind category headers + action rows.
 export const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
@@ -17,6 +18,9 @@ export const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> =
   Interface: 'hud.keybinds.categories.interface',
   'Action Bar': 'hud.keybinds.categories.actionBar',
   Pet: 'hudChrome.keybinds.categoryPet',
+  'World Markers': 'hudChrome.worldMarkers.title',
+  'Raid Target Icons': 'hudChrome.raidTargets.bindCategory',
+  Pings: 'hudChrome.pings.bindCategory',
 };
 export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   setFocus1: 'hudChrome.focusTargets.assign',
@@ -25,6 +29,25 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   targetFocus1: 'hudChrome.focusTargets.target',
   targetFocus2: 'hudChrome.focusTargets.target',
   targetFocus3: 'hudChrome.focusTargets.target',
+  worldMarker1: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker2: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker3: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker4: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker5: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker6: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker7: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker8: 'hudChrome.worldMarkers.bindPlace',
+  worldMarkerClear: 'hudChrome.worldMarkers.bindClear',
+  targetMarker1: 'hudChrome.raidTargets.bindSet',
+  targetMarker2: 'hudChrome.raidTargets.bindSet',
+  targetMarker3: 'hudChrome.raidTargets.bindSet',
+  targetMarker4: 'hudChrome.raidTargets.bindSet',
+  targetMarker5: 'hudChrome.raidTargets.bindSet',
+  targetMarker6: 'hudChrome.raidTargets.bindSet',
+  targetMarker7: 'hudChrome.raidTargets.bindSet',
+  targetMarker8: 'hudChrome.raidTargets.bindSet',
+  targetMarkerClear: 'hudChrome.raidTargets.bindClear',
+  ping: 'hudChrome.pings.bindPing',
   forward: 'hud.keybinds.actions.forward',
   back: 'hud.keybinds.actions.back',
   turnLeft: 'hud.keybinds.actions.turnLeft',
@@ -97,6 +120,7 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   harvestJournal: 'hudChrome.harvestJournal.title',
   perfecting: 'hudChrome.perfecting.title',
   lootExplorer: 'hudChrome.lootExplorer.title',
+  adventureJournal: 'hudChrome.adventureJournal.title',
 };
 
 /** The localized name of a bind action for prompts and rows. `fallback` is the
@@ -111,6 +135,16 @@ export function bindActionDisplayName(
   const focusKey = BIND_ACTION_LABEL_KEYS[actionId];
   if (focus && focusKey)
     return t(focusKey, { slot: formatNumber(Number(focus[2]), { maximumFractionDigits: 0 }) });
+  const marker = /^worldMarker([1-8])$/.exec(actionId);
+  if (marker)
+    return t('hudChrome.worldMarkers.bindPlace', {
+      marker: raidMarkerDisplayName(Number(marker[1]) - 1),
+    });
+  const targetMark = /^targetMarker([1-8])$/.exec(actionId);
+  if (targetMark)
+    return t('hudChrome.raidTargets.bindSet', {
+      marker: raidMarkerDisplayName(Number(targetMark[1]) - 1),
+    });
   if (!actionId.startsWith('slot')) {
     const key = BIND_ACTION_LABEL_KEYS[actionId];
     return key ? t(key) : (fallback ?? actionId);

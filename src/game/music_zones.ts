@@ -28,6 +28,8 @@ export type MusicZone =
   | 'dungeon_hollow_crypt'
   | 'dungeon_sunken_bastion'
   | 'dungeon_gravewyrm_sanctum'
+  // The Smith's Heart raid's halls between its bosses (smith_heart_music.ts)
+  | 'dungeon_smith_heart'
   | 'ignivar_forge_approach'
   | 'ignivar_raid_arena'
   | 'ignivar_inner_crucible'
@@ -154,6 +156,7 @@ const ALL_MUSIC_ZONE_FLAGS: Record<MusicZone, true> = {
   dungeon_hollow_crypt: true,
   dungeon_sunken_bastion: true,
   dungeon_gravewyrm_sanctum: true,
+  dungeon_smith_heart: true,
   rift_frost: true,
   rift_ember: true,
   rift_venom: true,

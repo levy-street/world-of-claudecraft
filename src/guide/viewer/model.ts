@@ -96,6 +96,25 @@ export function skinAwareBounds(root: THREE.Object3D): THREE.Box3 {
   return bounds;
 }
 
+/** The node extra a model file sets on every body but its default one, where it carries several
+ *  bodies over the same mesh for the game to swap between (the Smith's Heart final boss's five
+ *  forms: one mesh, a painting each). */
+export const HIDDEN_FORM_KEY = 'wocHiddenForm';
+
+/** Hide every node its file marks as an alternate form. The game shows one form at a time through
+ *  its own toggles; this viewer drives none, and drawn together the coincident bodies show
+ *  whichever material three happened to build last (its textures decode in no fixed order), so
+ *  a still or a turntable would pick a form at random. Returns how many nodes it hid. */
+export function hideAlternateForms(model: THREE.Object3D): number {
+  let hidden = 0;
+  model.traverse((o) => {
+    if (o.userData[HIDDEN_FORM_KEY] !== true) return;
+    o.visible = false;
+    hidden++;
+  });
+  return hidden;
+}
+
 export async function buildModel(spec: GuideModelSpec, tint: number | null): Promise<BuiltModel> {
   // A WOC body's modular head files are fetched beside its base, as the game fetches them.
   const head = guideWocHeadOf(spec);
@@ -140,6 +159,9 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     const mesh = o as THREE.Mesh;
     if (mesh.isMesh) o.userData.bodyMesh = true;
   });
+
+  // A model that ships several bodies over one mesh shows its default one alone.
+  hideAlternateForms(model);
 
   // KayKit characters ship every accessory mesh visible; keep only the kit's allowlist.
   if (spec.show) {

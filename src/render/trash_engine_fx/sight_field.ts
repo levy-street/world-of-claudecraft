@@ -47,6 +47,7 @@ varying float vR;
 varying float vReach;
 varying vec3 vWorld;
 varying vec3 vLocal;
+varying float vCamD;
 void main() {
   vR = aR;
   vReach = aReach;
@@ -54,6 +55,7 @@ void main() {
   vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
   float dc = max(length(mv.xyz), 1e-3);
+  vCamD = dc;
   mv.xyz -= mv.xyz * (min(${SIGHT_DEPTH_PULL.toFixed(3)}, dc * 0.25) / dc);
   gl_Position = projectionMatrix * mv;
 }
@@ -79,17 +81,22 @@ bool sightSteep(vec3 p) {
  * `sightShade(vR, vReach, radius, vLocal)`: the shadow behind cover, one look
  * for every sight field so a player learns it once: dark, cool and hatched
  * (the blast cannot see here), brighter near the cover that throws it, its
- * outer edge a faint dotted trace of the reach round the caster. Fed the
+ * outer edge a faint dotted trace of the reach round the caster, faded out
+ * within a few yards of the camera (never a wall of hatch over the lens). Fed the
  * caster-local point (exact; a world point far out in an instance band is
  * not). Returns rgb and alpha.
  */
 export const SIGHT_SHADE_GLSL = /* glsl */ `
+varying float vCamD;
 vec4 sightShade(float r, float reach, float radius, vec3 local) {
   float hatch = step(0.5, fract((local.x + local.z) * 0.9));
   float near = 1.0 - smoothstep(0.0, 1.2, r - reach);
   float trace = (1.0 - smoothstep(0.08, 0.2, radius - r)) * step(0.5, fract(atan(local.z, local.x) * 30.0));
   vec3 col = mix(vec3(0.02, 0.05, 0.09), vec3(0.45, 0.8, 0.95), hatch * 0.25 + near * 0.35);
-  return vec4(col, 0.34 + hatch * 0.08 + near * 0.2 + trace * 0.35);
+  // Faded out right at the lens: a camera low behind a player on the rim's
+  // slope stood inside the draped shadow, its hatch blown up over the view.
+  float lens = smoothstep(1.5, 4.5, vCamD);
+  return vec4(col, (0.34 + hatch * 0.08 + near * 0.2 + trace * 0.35) * lens);
 }
 `;
 

@@ -1228,7 +1228,13 @@ describe('nameplate canvas surface', () => {
     expect(source).toContain('if (state.hpVisible) {\n      y -= 7;');
     expect(NAMEPLATE_MARKER_ROW_HEIGHT).toBe(26);
     expect(source).toContain('if (state.comboPips > 0) {\n      y -= 9;');
-    expect(source).toContain('if (state.raidMarkerUrl) {\n      y -= 31;');
+    // The raid target icon docks BESIDE a shown plate and lifts nothing; only the
+    // floating icon of a toggled-off plate lifts the stack (nameplate_raid_mark_core.ts),
+    // in drawBase (the draw's return) and in drawEmote's mirror walk alike.
+    expect(source).toContain(
+      'y -= drawRaidMarkPlate(ctx, markArt, markBox, this.forcedColorsActive());',
+    );
+    expect(source).toContain('y -= raidMarkPlateLift(state, this.height);');
     expect(source).toContain('y -= 47;');
     vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
     vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(30);
@@ -1259,6 +1265,14 @@ describe('nameplate canvas surface', () => {
     const healthSpy = vi.spyOn(internals, 'drawHealth');
     const comboSpy = vi.spyOn(internals, 'drawCombo');
     const imageSpy = vi.spyOn(internals, 'drawImage');
+    const markArt = { tag: 'raid-art' } as unknown as HTMLImageElement;
+    const cache = (internals as unknown as { images: { get(url: string): unknown } }).images;
+    const realGet = cache.get.bind(cache);
+    vi.spyOn(cache, 'get').mockImplementation((url: string) =>
+      url === 'raid-mark' ? markArt : realGet(url),
+    );
+    const ctx = (internals as unknown as { ctx: CanvasRenderingContext2D }).ctx;
+    const blitSpy = vi.spyOn(ctx, 'drawImage');
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     surface.drawEmote(state, 320, 220);
@@ -1268,7 +1282,7 @@ describe('nameplate canvas surface', () => {
     const cast = drawSpy.mock.calls.find((call) => call[1] === 'Cast');
     const guild = drawSpy.mock.calls.find((call) => call[1] === '<The Testers>');
     const quest = drawSpy.mock.calls.find((call) => call[1] === '!');
-    const raid = imageSpy.mock.calls.find((call) => call[0] === 'raid-mark');
+    const raid = blitSpy.mock.calls.find((call) => call[0] === markArt);
     const emote = imageSpy.mock.calls.find((call) => call[0] === 'emote');
     const exactY = {
       guild: guild?.[3],
@@ -1276,28 +1290,33 @@ describe('nameplate canvas surface', () => {
       cast: castSpy.mock.calls[0]?.[2],
       quest: quest?.[3],
       combo: comboSpy.mock.calls[0]?.[2],
-      raid: raid?.[2],
       emote: emote?.[2],
     };
+    // Docked: 22 px on a 360 px view (the floor), left of the plate's widest part with
+    // a gap, vertically centred on the name-plus-bar block it belongs to.
+    const [, rx, ry, rsize] = raid as unknown as [unknown, number, number, number];
+    expect(rsize).toBe(22);
+    const plateLeft = 320 - Math.max(80, heraldry.plaque.w) / 2;
+    expect(rx + rsize).toBeLessThanOrEqual(Math.min(280, plateLeft));
+    expect(ry + rsize / 2).toBeGreaterThan(plaqueTop);
+    expect(ry + rsize / 2).toBeLessThan((exactY.hp as number) + 4);
     expect(exactY).toEqual({
       guild: 201,
       hp: 203,
       cast: 210,
       quest: 151,
       combo: 121,
-      raid: 90,
-      emote: 47,
+      emote: 78,
     });
     const topToBottom = [
       exactY.emote,
-      exactY.raid,
       exactY.combo,
       exactY.quest,
       exactY.guild,
       exactY.hp,
       exactY.cast,
     ] as number[];
-    expect(new Set(topToBottom).size).toBe(7);
+    expect(new Set(topToBottom).size).toBe(6);
     for (let higher = 0; higher < topToBottom.length; higher++) {
       for (let lower = higher + 1; lower < topToBottom.length; lower++) {
         expect(topToBottom[higher], `slot ${higher} must stay above slot ${lower}`).toBeLessThan(

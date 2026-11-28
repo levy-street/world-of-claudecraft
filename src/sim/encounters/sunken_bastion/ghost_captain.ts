@@ -27,6 +27,7 @@ import {
   GHOST_CAPTAIN_ANCHOR,
   GHOST_CAPTAIN_BOARDING,
   GHOST_CAPTAIN_BROADSIDE,
+  GHOST_CAPTAIN_NAMES,
   type GhostCaptainMove,
   inGhostLane,
   GHOST_CAPTAIN_TUNING as T,
@@ -38,11 +39,7 @@ const CAST = {
   anchor: GHOST_CAPTAIN_ANCHOR,
   boarding: GHOST_CAPTAIN_BOARDING,
 };
-const NAME = {
-  broadside: 'Spectral Broadside',
-  anchor: 'Cursed Anchor',
-  boarding: 'Phantom Boarding',
-};
+const NAME = GHOST_CAPTAIN_NAMES;
 const WARN = {
   broadside: GHOST_BROADSIDE_LANE,
   anchor: GHOST_ANCHOR_LANE,
@@ -173,7 +170,9 @@ function strike(
         mechanicDamage(ctx, boss, min, max),
         false,
         'frost',
-        CAST[a.move],
+        // The player-facing name, never the cast id: recap, log, meters and
+        // floating text all print this label.
+        NAME[a.move],
         'hit',
         true,
       );

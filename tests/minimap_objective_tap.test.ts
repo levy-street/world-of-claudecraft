@@ -40,6 +40,7 @@ describe('minimap objective tap probe', () => {
       '  toggleMap(): void {',
       '  private updateMapWindow(): void {',
       'bindMinimapObjectiveTap(mm, this);',
+      'private readonly interiorMaps = new InteriorMapController(',
     ]) {
       expect(hudSource, anchor).toContain(anchor);
     }

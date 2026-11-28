@@ -17,6 +17,7 @@ export const SIDE_BUTTONS: readonly [selector: string, action: string, labelKey:
     ['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],
     ['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title'],
     ['#mm-loot-explorer', 'lootExplorer', 'hudChrome.lootExplorer.title'],
+    ['#mm-journal', 'adventureJournal', 'hudChrome.adventureJournal.title'],
     ['#mm-harvest-journal', 'harvestJournal', 'hudChrome.harvestJournal.title'],
     ['#mm-perfecting', 'perfecting', 'hudChrome.perfecting.title'],
     ['#mm-cosmetics', 'cosmetics', 'hudChrome.cosmetics.title'],

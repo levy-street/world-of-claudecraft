@@ -740,7 +740,17 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Smith's Heart raid's renderer wiring (its death-zone and
+  // drawn-position hooks). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's dormant warders (a sleeping body's heap held
+  // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
+  // Re-minted for the Smith's Heart raid's lava-wave lights, articulated bosses and
+  // hidden-until-posed sleeping bosses (renderer.ts). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's light crossfade between its rooms
+  // (renderer.ts). No capture was retaken.
+  // Re-minted for the merge of the PR head into the Smith's Heart tuning branch
+  // (renderer.ts takes the PR head's room crossfade). No capture was retaken.
+  '91a8d3942ce39407ecada55f70784800439f4837a784aab36f9377fc39beee4c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

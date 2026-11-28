@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "rigSource": "tmp/asset_src/heart_breath_warder_woc.glb",
+      "src": "tmp/asset_src/heart_breath_warder_woc.slim.glb",
+      "out": "models/creatures/heart_breath_warder.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "IdleFidget",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Turn",
+        "Attack",
+        "Attack2",
+        "Cleave",
+        "Hit",
+        "Hit2",
+        "Stunned",
+        "Death"
+      ],
+      "dropStillChannels": true,
+      "materialName": "heart_breath_warder",
+      "maxTex": 1024
+    }
+  ]
+}

@@ -402,6 +402,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
           toggles++;
         },
         partyAuras: auraDeps,
+        raidMarkerUrl: (marker: number) => `mark:${marker}`,
       },
       fakeDoc,
     );
@@ -438,6 +439,22 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
 
     rowA.fire('click', {});
     expect(targeted).toEqual([2]);
+  });
+
+  it("shows a member's raid target icon and its spoken name, and hides it when cleared", () => {
+    painter.sync([member({ pid: 2, name: 'Alice', mark: 7 } as never)], 1, false);
+    const icon = rows()[0]
+      .childNodes.find((c) => String(c.className).includes('pfm-name'))
+      ?.childNodes.find((c) => String(c.className).includes('pfm-mark'));
+    expect(icon).toBeTruthy();
+    expect(calls).toContainEqual({ m: 'setAttr', el: icon, args: ['src', 'mark:7'] });
+    expect(calls).toContainEqual({ m: 'setDisplay', el: icon, args: [''] });
+    expect(calls).toContainEqual(
+      expect.objectContaining({ m: 'setText', args: ['Marked: Skull'] }),
+    );
+    calls.length = 0;
+    painter.sync([member({ pid: 2, name: 'Alice' })], 1, false);
+    expect(calls).toContainEqual({ m: 'setDisplay', el: icon, args: ['none'] });
   });
 
   it('paints a desktop Party N disclosure through the shared persisted collapse callback', () => {
@@ -729,22 +746,26 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(rows()).toHaveLength(2);
   });
 
-  it('keeps one stable boss-guide control between member rows and leader controls', () => {
-    const guide = fakeEl('button');
+  it('keeps one stable world-marker control between member rows and leader controls', () => {
+    const marker = fakeEl('button');
     const master = fakeEl('div');
     painter.setMasterControl(master as unknown as HTMLElement);
-    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.setWorldMarkerControl(marker as unknown as HTMLElement);
     painter.sync([member({ pid: 2 })], 1, false);
 
-    expect(container.childNodes).toEqual([headerOf(), wrapperOf(), guide, master]);
+    expect(container.childNodes).toEqual([headerOf(), wrapperOf(), marker, master]);
     const movesBefore = container._mutations;
-    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.setWorldMarkerControl(marker as unknown as HTMLElement);
     painter.sync([member({ pid: 2, hp: 40 })], 1, false);
     expect(container._mutations).toBe(movesBefore);
 
     painter.clear();
     expect(container.childNodes).toEqual([]);
-    expect(guide.parentNode).toBeNull();
+    expect(marker.parentNode).toBeNull();
+  });
+
+  it('no longer seats a boss-guide opener (the Adventure Journal replaced it)', () => {
+    expect('setGuideControl' in painter).toBe(false);
   });
 
   it('repaints the crest with the recycled member class via the live slot (the portrait gate)', () => {
@@ -937,15 +958,15 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(kids[kids.length - 1]).toBe(wrapperOf());
   });
 
-  it('keeps the complete mobile footer order with chip, rows, guide, and loot controls', () => {
-    const guide = fakeEl('button');
+  it('keeps the complete mobile footer order with chip, rows, marker, and loot controls', () => {
+    const marker = fakeEl('button');
     const master = fakeEl('div');
     painter.setCollapse(true, true, false, false);
-    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.setWorldMarkerControl(marker as unknown as HTMLElement);
     painter.setMasterControl(master as unknown as HTMLElement);
     painter.sync([member({ pid: 2 })], 1, false);
 
-    expect(container.childNodes).toEqual([findChip(), wrapperOf(), guide, master]);
+    expect(container.childNodes).toEqual([findChip(), wrapperOf(), marker, master]);
   });
 
   it('F1: an expanded party seats the chip alone on its line, no member frame beside it', () => {

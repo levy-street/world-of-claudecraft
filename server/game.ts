@@ -43,11 +43,10 @@ import {
   jailCageSpawn,
   jailGateTeleport,
 } from '../src/sim/jail';
-import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import type { MarketQuery } from '../src/sim/market_query';
 import { unequipWornMechChroma } from '../src/sim/mech_chroma_ownership';
 import {
-  partyFrameAbsorb,
+  partyFrameAbsorbs,
   partyFrameAggroTargets,
   partyFrameIncomingHeals,
   partyFrameRole,
@@ -58,7 +57,6 @@ import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/se
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import { selfRelicKeys, syncAccountRelicGrants } from '../src/sim/reliquary';
-import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, InstanceSlot, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -193,6 +191,7 @@ import {
   harvestCorpseCommandOutcome,
 } from './corpse_harvest_commands';
 import { dispatchCorpseHarvestInspection } from './corpse_harvest_inspection';
+import { writeCorpseLootWire } from './corpse_loot_wire';
 import {
   type CosmeticOpGuardState,
   consumeCosmeticOpToken,
@@ -379,7 +378,6 @@ import {
 import {
   describeRiftFloor,
   jailReturnPoint,
-  leaveRiftForModeration,
   moderationReturnSpot,
   type RiftExitSpot,
   riftExitSpotAt,
@@ -463,6 +461,7 @@ import {
 } from './entity_wire_cache';
 import { observeEventRecords } from './event_record_observers';
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
+import { dispatchMarkerCommand } from './marker_commands';
 import { recordLevelUp } from './progress_events';
 import * as questWire from './quest_command_wire';
 import * as questSnap from './quest_snapshot_wire';
@@ -475,7 +474,7 @@ import { dispatchRiftCommand } from './rift_forge_dispatch';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
 import { emitSelfScalarKeys } from './self_scalar_wire';
-import { duelWire, markersWire, tradeWire } from './self_social_wire';
+import { emitSelfSocialRows } from './self_social_wire';
 import {
   createDepthWarnedSerialWriter,
   createKeyedSerialWriter,
@@ -1346,16 +1345,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // HAS a target (players/bots in combat), so idle mobs (targetId stays null) add
   // nothing. The SELF record still carries its own precise `target` field.
   if (e.targetId !== null) out.tgt = e.targetId;
-  if (e.tappedById !== null) out.tap = e.tappedById;
-  // corpse harvest claim (single-use, first-come): the online corpse picker
-  // must stop offering a corpse another player already harvested
-  if (e.harvestClaimedBy !== null) out.hcb = e.harvestClaimedBy;
-  // loot owner-lock lapse (FFA): the online corpse picker must offer a
-  // stranger's aged-out corpse again for a deliberate manual loot, the same
-  // reliability contract hcb gives harvest claims. Flips once per corpse, so
-  // the per-entity dyn cache re-serializes exactly one changed record.
-  if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
-  if (e.kind === 'mob' && corpseHasDecayed(e.dead, e.corpseTimer)) out.cd = 1; // corpse decayed
+  writeCorpseLootWire(e, out); // tap, hcb, ffa, cd and the per-boss lock bll
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;
@@ -3206,6 +3196,7 @@ export class GameServer {
       updateLive: (cosmetics) => this.cosmetics.updateLive(accountId, cosmetics),
     });
     this.cosmetics.applyQuestLockouts(pid, accountCosmetics);
+    this.cosmetics.grantDeedRewardSkins(accountId, this.sim.meta(pid)?.deedsEarned.keys() ?? []);
     // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
     // applied skin shows from the first snapshot (owned skins only).
     this.sim.setWeaponSkinLoadout(pid, ownedWeaponSkinLoadout(accountCosmetics));
@@ -6947,13 +6938,13 @@ export class GameServer {
         )
           sim.assignMasterLoot(msg.rollId, msg.pids, pid);
         break;
-      // raid/target markers
-      case 'setMarker':
-        if (typeof msg.id === 'number' && typeof msg.marker === 'number')
-          sim.setMarker(msg.id, msg.marker, pid);
-        break;
+      case 'setMarker': // target markers, the raid's shared marks, pings (server/marker_commands.ts)
       case 'clearMarker':
-        if (typeof msg.id === 'number') sim.clearMarker(msg.id, pid);
+      case 'map_mark_set':
+      case 'map_mark_place':
+      case 'map_mark_clear':
+      case 'ping':
+        dispatchMarkerCommand(sim, command, msg, pid);
         break;
       // hunter pets
       case 'pet_abandon':
@@ -8409,10 +8400,8 @@ export class GameServer {
     maybe('offhandWeapon', p.offhandWeapon); // client derives dualWielding as !== null
     selfLap?.('self.timers');
     maybe('party', this.partyWire(anchorSession.pid));
-    // The three pure social rows live in server/self_social_wire.ts.
-    maybe('marks', markersWire(this.sim, anchorSession.pid));
-    maybe('trade', tradeWire(this.sim, anchorSession.pid));
-    maybe('duel', duelWire(this.sim, anchorSession.pid));
+    // The pure social rows (marks, mmarks, trade, duel) live in server/self_social_wire.ts.
+    emitSelfSocialRows(maybe, maybeSerialized, this.sim, anchorSession.pid);
     maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
     // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
     maybe('honor', meta.honor);
@@ -8756,7 +8745,7 @@ export class GameServer {
             z: round2(pos.z),
             inCombat: e.inCombat ? 1 : 0,
             group: party.raidGroups.get(mPid) ?? 1,
-            absorb: partyFrameAbsorb(e.auras),
+            ...partyFrameAbsorbs(e.auras),
             role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
             spec: meta.talentMods.spec ?? meta.talents.spec ?? null,
             // Effective health Rewind could currently restore to this member
@@ -8828,6 +8817,7 @@ export class GameServer {
           else deedUnlocks.set(s, [ev.deedId]);
           // Account ledger fan-out to sibling sessions (retro included: still a fact).
           this.ledger.noteDeedEarned(s, ev.deedId);
+          this.cosmetics.grantDeedRewardSkins(s.accountId, [ev.deedId]);
           // Marquee unlocks fan out to guildmates and followers, and
           // feed-worthy unlocks (titles, borders, the first koi) to the
           // Discord activity feed; retro unlocks NEVER fan out anywhere (a

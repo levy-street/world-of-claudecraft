@@ -17807,7 +17807,7 @@
       "tick": 1248,
       "time": 62.4,
       "nextId": 1024,
-      "state": "e8d635ae",
+      "state": "4c8e667f",
       "events": "3dbaee5f",
       "rng": {
         "draws": 10905,
@@ -17835,6 +17835,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -18045,6 +18048,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -18247,6 +18253,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -18449,6 +18458,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -18651,6 +18663,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -19474,7 +19489,7 @@
       "tick": 1250,
       "time": 62.5,
       "nextId": 1024,
-      "state": "32986331",
+      "state": "90b62156",
       "events": "741638a5",
       "rng": {
         "draws": 10926,
@@ -19485,7 +19500,7 @@
       "tick": 1260,
       "time": 63,
       "nextId": 1024,
-      "state": "518d070a",
+      "state": "c2034c83",
       "events": "741638a5",
       "rng": {
         "draws": 11013,
@@ -19496,7 +19511,7 @@
       "tick": 1270,
       "time": 63.5,
       "nextId": 1024,
-      "state": "2383952b",
+      "state": "3eda1644",
       "events": "741638a5",
       "rng": {
         "draws": 11094,
@@ -19507,7 +19522,7 @@
       "tick": 1280,
       "time": 64,
       "nextId": 1024,
-      "state": "0e795421",
+      "state": "aff97c66",
       "events": "741638a5",
       "rng": {
         "draws": 11168,
@@ -19518,7 +19533,7 @@
       "tick": 1290,
       "time": 64.5,
       "nextId": 1024,
-      "state": "40cb36a8",
+      "state": "c7a05ddd",
       "events": "741638a5",
       "rng": {
         "draws": 11262,
@@ -19529,7 +19544,7 @@
       "tick": 1300,
       "time": 65,
       "nextId": 1024,
-      "state": "0b007380",
+      "state": "07fc45a5",
       "events": "741638a5",
       "rng": {
         "draws": 11368,
@@ -19540,7 +19555,7 @@
       "tick": 1308,
       "time": 65.4,
       "nextId": 1024,
-      "state": "b400111a",
+      "state": "14cf71b3",
       "events": "acfb94ce",
       "rng": {
         "draws": 11439,
@@ -19568,6 +19583,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -19778,6 +19796,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -19980,6 +20001,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -20182,6 +20206,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },
@@ -20384,6 +20411,9 @@
             ]
           },
           "bgRating": 1500,
+          "bossKills": {
+            "nythraxis_scourge_of_thornpeak": 1
+          },
           "buddies": {
             "names": {}
           },

@@ -13,6 +13,8 @@ import type { IWorld } from '../../world_api';
 import { CTX_MENU_PICKER_CLASS } from '../bag_item_action_menu';
 import { t } from '../i18n';
 import type { InputDialogOpts } from '../input_controller';
+import { offersRaidTargetIcon, raidTargetMarking } from '../raid_target_icons_core';
+import { openRaidTargetMenu } from './raid_target_menu';
 import { buddyMenuHtml } from './target_frame_menu';
 
 export interface BuddyMenuHost {
@@ -39,7 +41,10 @@ export function openBuddyMenu(
   const el = document.querySelector('#ctx-menu') as HTMLElement;
   el.classList.remove(CTX_MENU_PICKER_CLASS);
   const armed = world.entities.get(world.playerId)?.buddyAutoloot === true;
-  el.innerHTML = buddyMenuHtml(name, armed);
+  const buddy = world.entities.get(buddyId);
+  const marking = raidTargetMarking(world.partyInfo, world.playerId);
+  const raidTarget = !!buddy && offersRaidTargetIcon(buddy, marking);
+  el.innerHTML = buddyMenuHtml(name, armed, raidTarget);
   el.style.display = 'block';
   host.placePopupAt(el, x, y, 170, 240);
   host.keepPopupOnScreen(el);
@@ -54,5 +59,6 @@ export function openBuddyMenu(
         onOk: (value) => world.renameBuddy(buddyId, value),
       });
     else if (act === 'autoloot') world.setBuddyAutoloot(!armed);
+    else if (act === 'raid-target') openRaidTargetMenu(host, world, buddyId, name, x, y);
   });
 }

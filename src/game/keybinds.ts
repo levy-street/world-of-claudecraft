@@ -241,6 +241,58 @@ export const BIND_ACTIONS: BindAction[] = [
       defaults: [`F${n + 1}`],
     }),
   ),
+  // The raid's world markers (src/ui/hud/world_markers/): place each symbol at
+  // the cursor, and clear them all. Unbound by default, as the classic client
+  // ships them; a raid leader binds the ones they use.
+  ...[1, 2, 3, 4, 5, 6, 7, 8].map(
+    (n): BindAction => ({
+      id: `worldMarker${n}`,
+      label: `Place World Marker ${n}`,
+      category: 'World Markers',
+      kind: 'edge',
+      defaults: [],
+    }),
+  ),
+  {
+    id: 'worldMarkerClear',
+    label: 'Clear All World Markers',
+    category: 'World Markers',
+    kind: 'edge',
+    defaults: [],
+  },
+  // The raid target icons on units (src/ui/raid_target_icons_core.ts): put a
+  // symbol on the current target (pressing it again on a unit that already
+  // wears it takes it off), and clear the target's mark. Unbound by default,
+  // as the classic client ships them.
+  ...[1, 2, 3, 4, 5, 6, 7, 8].map(
+    (n): BindAction => ({
+      id: `targetMarker${n}`,
+      label: `Mark Target ${n}`,
+      category: 'Raid Target Icons',
+      kind: 'edge',
+      defaults: [],
+    }),
+  ),
+  {
+    id: 'targetMarkerClear',
+    label: 'Clear Target Marker',
+    category: 'Raid Target Icons',
+    kind: 'edge',
+    defaults: [],
+  },
+  // Party pings (src/ui/hud/pings/): HOLD for the ping wheel, TAP to ping what is
+  // under the cursor. A held action, like the emote wheel, so its press and its
+  // release both reach the HUD. Y is the one bare letter no other default claims
+  // (its Shift layer is Cosmetics, which the ping press steps aside for); G is the
+  // PvP window, and rebinding Ping there takes G from it through the usual
+  // conflict prompt.
+  {
+    id: 'ping',
+    label: 'Ping',
+    category: 'Pings',
+    kind: 'held',
+    defaults: ['KeyY'],
+  },
   {
     id: 'interact',
     label: 'Interact / Loot',
@@ -306,12 +358,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyH'],
   },
+  // Target Buffs and Debuffs moved from Shift+J to Shift+B (B for Buffs) when
+  // the Adventure Journal took Shift+J, the classic MMO key for the encounter
+  // journal.
   {
     id: 'targetAuras',
     label: 'Target Buffs and Debuffs',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyJ'],
+    defaults: ['Shift+KeyB'],
   },
   {
     id: 'social',
@@ -394,8 +449,8 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['Shift+KeyX'],
   },
   // The Harvest Journal parks on Shift+K. Its own initials are both spoken
-  // for on the shifted layer (Shift+H is Damage Meters, Shift+J is Target
-  // Buffs and Debuffs), and K is the free key next to them; bare KeyK stays
+  // for on the shifted layer (Shift+H is Damage Meters, Shift+J is the
+  // Adventure Journal), and K is the free key next to them; bare KeyK stays
   // the Leaderboard. Rebindable like any action.
   {
     id: 'harvestJournal',
@@ -424,6 +479,15 @@ export const BIND_ACTIONS: BindAction[] = [
     category: 'Interface',
     kind: 'edge',
     defaults: ['Shift+KeyO'],
+  },
+  // The Adventure Journal (every dungeon and raid boss page) sits on Shift+J,
+  // the classic MMO key for the encounter journal. Rebindable like any action.
+  {
+    id: 'adventureJournal',
+    label: 'Adventure Journal',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyJ'],
   },
   // Cosmetics uses Shift+Y; Shift+K belongs to the Harvest Journal.
   {

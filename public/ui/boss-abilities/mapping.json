@@ -1,0 +1,2016 @@
+{
+  "schemaVersion": 1,
+  "family": "boss-abilities",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "iconSize": 128,
+  "runtimeDir": "public/ui/boss-abilities",
+  "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+  "assets": [
+    {
+      "iconId": "dgn_heart_avalanche",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_avalanche.png",
+      "sourceBytes": 3040797,
+      "output": "dgn_heart_avalanche.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "spikes of ice and stone running in straight lanes toward the centre of a room",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "0a5b5d1ba99dbaf4188c6290c8492c4d435502f9030eca62ae580d1683b6e616",
+      "acceptedSha256": "d51269a3f3ce2ff5a9ec523336adf0fcaad14371c0a61f3ca4fcfb092da618e7",
+      "acceptedBytes": 5986,
+      "webpQuality": 68,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_basalt_fist",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_basalt_fist.png",
+      "sourceBytes": 2646743,
+      "output": "dgn_heart_basalt_fist.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a basalt fist slamming down onto a marked spot, three molten swells rolling outward from the impact",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "f6c82648ade870f8632d78a5bb84af30842ba5398db68fa11d0144c68b186d83",
+      "acceptedSha256": "bb6a9322fa792703d8f350a76884272ed63c81b94557da08f974fe8ac79bb780",
+      "acceptedBytes": 4954,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_cinder_grip",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_cinder_grip.png",
+      "sourceBytes": 2689158,
+      "output": "dgn_heart_cinder_grip.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a burning grip of fire clamping a tank's gauntlet, layered ember rings stacking up the arm",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "d7992e30821e2699dd4993f87027566f884c6b1670d15ea29f698099d4b383fd",
+      "acceptedSha256": "b6a1fa5e09944341a02245c4d3188e0aa38723ff96c9d1fa59156912de5832e0",
+      "acceptedBytes": 5744,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_closing_storm",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_closing_storm.png",
+      "sourceBytes": 2794452,
+      "output": "dgn_heart_closing_storm.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a storm closing over a floating stone isle, the clouds tightening into a vortex above it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "3341e778af426195e69d25f1955b167c9390e8b8dc9a2c286349898ac30a3f02",
+      "acceptedSha256": "2f29166cb5ff0965aa839fb14a5e10cb88b0777cd56a5ef31f87c75195e11ab4",
+      "acceptedBytes": 5062,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_cursed_pillar",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_cursed_pillar.png",
+      "sourceBytes": 2841087,
+      "output": "dgn_heart_cursed_pillar.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a cracked quarry pillar pulsing with crimson-magenta curse light, rings of dust pulsing out from it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "3273957e54cd2dce38a89c2e67bfc8773eb33f10085b8eebd9346de96aeac33e",
+      "acceptedSha256": "cab02325c3bd17df436ad29954679532c6577afb1c0a59dabaf0410e71fd800f",
+      "acceptedBytes": 4678,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_dust_devil",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_dust_devil.png",
+      "sourceBytes": 3151999,
+      "output": "dgn_heart_dust_devil.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "dust devil whirlwinds rising beside a figure, throwing grit and sand",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "33c71baf29efd3766537c0638723af9438ae7d783d17187446605dde2078e03e",
+      "acceptedSha256": "bac59bc2965676ab7818af35276cfb7c39056abab3fed197be52f975f0fd3b18",
+      "acceptedBytes": 5806,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_elemental_strike",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_elemental_strike.try2.png",
+      "sourceBytes": 3025906,
+      "output": "dgn_heart_elemental_strike.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a massive stone fist crashing into a tank's raised steel shield, a single glowing element rune of flame branded onto the shield's face where it struck",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "f302a90ebd76d1f3593fcf40c5e02c4c35469f88067d9681c6e4269a59118633",
+      "acceptedSha256": "c13c912056662c5778154a8e0789eeaecae675102c107525196414c8ee895ce1",
+      "acceptedBytes": 6068,
+      "webpQuality": 68,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_every_star",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_every_star.png",
+      "sourceBytes": 3129236,
+      "output": "dgn_heart_every_star.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "four blazing stars of ochre, storm cyan, ice blue and white-gold rising together over a dark stone floor, all awake at once",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "fde382221fb6926c3d9b838666c1e2fb12f63732217de8bc4eaaed9d1c9e4fd2",
+      "acceptedSha256": "33dd6173bdf8ebeaeebb0c108b409e0444cb5880bb9eefe376457095a5d1c249",
+      "acceptedBytes": 6124,
+      "webpQuality": 64,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_falling_cinder",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_falling_cinder.try2.png",
+      "sourceBytes": 2517190,
+      "output": "dgn_heart_falling_cinder.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "an armoured adventurer seen from above raising a shield as two white-gold cinders plunge straight down onto them out of a black sky, long fire trails behind the cinders",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "10adb68932afb13fb2ea9aa0b9119bea4c6eb04a68fbe8c889f32275aa30aba2",
+      "acceptedSha256": "57fd2cc6adf2dd2fd2f2853748098e447310a2d0275facf564739eed01598e04",
+      "acceptedBytes": 4228,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_fire_whirl",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_fire_whirl.png",
+      "sourceBytes": 2676376,
+      "output": "dgn_heart_fire_whirl.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "two fire whirls wandering across a stone floor, spinning white-gold flame",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "b3fbf55776e83ee715d2a10c54186f01cb9290125477ed1998faf97ea701f03a",
+      "acceptedSha256": "e97e47480acc9179435097d294cae5196396877ebc60143bdfd9d6292fca9cdf",
+      "acceptedBytes": 5450,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_firestorm",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_firestorm.png",
+      "sourceBytes": 2856766,
+      "output": "dgn_heart_firestorm.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a wall of flame sweeping along a straight lane, carried by a storm wind",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "e0c4d6959a862b36fa1ae140d50b879342def70ca1fdde765a4aeb2e3bb038d4",
+      "acceptedSha256": "863e03685aace968e08449ff03b92de4241d5cd3f1c4df67ea9d515c94dbf75c",
+      "acceptedBytes": 5886,
+      "webpQuality": 72,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_forge_fist",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_forge_fist.png",
+      "sourceBytes": 2841983,
+      "output": "dgn_heart_forge_fist.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a four-coloured stone fist sweeping a wide arc, rubble and sparks along the arc",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "d88351751c4b87b5cf04cb6e304f02795f215c19ae5bb02bf271e057f2a95794",
+      "acceptedSha256": "ad53e1c59db88bda1aaa4288223306b3852a5bdecffea08c3ab161a660152287",
+      "acceptedBytes": 5812,
+      "webpQuality": 72,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_forge_fury",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_forge_fury.png",
+      "sourceBytes": 2831227,
+      "output": "dgn_heart_forge_fury.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a ring of roaring forge flame closing in on a small circle of stone floor from every side, embers filling the air, the hard enrage",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "0f6c75c12e0f16d42d80ee93b53b6b9134bf71ccfd04579f6f372544926a9145",
+      "acceptedSha256": "88090bc08895cf23bb388b5998c9906b035fb6bf88a3cf19c59efaaaef768455",
+      "acceptedBytes": 6064,
+      "webpQuality": 64,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_fusion",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_fusion.png",
+      "sourceBytes": 3143667,
+      "output": "dgn_heart_fusion.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "two element streams, one ice blue and one white-gold, fusing into a single combo blast",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "e32f0d466e6f8fec07d893874876935367fe5e6c1178b5b8d230449cc4c8243d",
+      "acceptedSha256": "59e7b42eea9a8be56a5880a45180426d760ef1b70d94435f913c71f3338c399c",
+      "acceptedBytes": 5952,
+      "webpQuality": 68,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_grieving_fury",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_grieving_fury.png",
+      "sourceBytes": 2908514,
+      "output": "dgn_heart_grieving_fury.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a stone giant roaring in grief and rage, tears of molten ochre-gold running down its cracked stone face, a glowing soul streaming into its chest",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "ed7339403e84a21a47a9366af8b0fbfd151bf5496c9b7290b83ab5279932df41",
+      "acceptedSha256": "c28472d4312314b8d8273a1ca7b8f10f742e315c615da5285abeff3a5e4cf2ee",
+      "acceptedBytes": 5674,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_hail",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_hail.png",
+      "sourceBytes": 3176132,
+      "output": "dgn_heart_hail.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "hailstones of blue ice falling into marked circles out of a storm cloud",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "c503e4bca99785c54958e8719815176bbefd402b02929cd388eb5c9b033ad5e1",
+      "acceptedSha256": "6b926f3cb912e50d9c73d4c109c1b230e3e2e31d5367f4c4cdc0973e4eef4d49",
+      "acceptedBytes": 5868,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_hammerfall",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_hammerfall.png",
+      "sourceBytes": 2665335,
+      "output": "dgn_heart_hammerfall.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a colossal stone warhammer swinging through a wide glowing ochre arc, rubble and dust flung all along the arc",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "85cf15be903301592e7d6fa577ea41da820db2a6d659cb27b094de05c382d4e8",
+      "acceptedSha256": "f8eecca8a4623d1b01320c730eca499367aa8cce56b55eaeb80badbe776cff57",
+      "acceptedBytes": 4390,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_hearthseed",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_hearthseed.png",
+      "sourceBytes": 2689613,
+      "output": "dgn_heart_hearthseed.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "glowing seeds of flame scattered across a basalt floor, each pulsing about to burst",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "14bded9ed57dfe90ca5b8157985097b58b3996d0b205c5f460845a55a2738ae7",
+      "acceptedSha256": "e47b4da8dc47c97339ddc2487d36d43a0c4f47e24953a870d982edda92303235",
+      "acceptedBytes": 5624,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_inherit",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_inherit.png",
+      "sourceBytes": 2843085,
+      "output": "dgn_heart_inherit.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a surviving stone giant's hands catching the glowing ochre soul of its fallen partner",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "d236edd71f10ef6ea80f6d8485fda90db7e51f50e4ddf69514c680f21c225ee7",
+      "acceptedSha256": "44925119d4ed1638af68ab14b55853b81ec401754dedf326666a6e07b812679e",
+      "acceptedBytes": 5554,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_isle_lightning",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_isle_lightning.png",
+      "sourceBytes": 2922222,
+      "output": "dgn_heart_isle_lightning.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a cyan lightning bolt striking down onto a small floating stone isle, a marked spot glowing beside it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "4defb51211f804d5b223d19674115fe1b2d67c0efae9952de4cee97b7db2bb3f",
+      "acceptedSha256": "9a3e6c37b1c0f97b6caf95236dbc0cec04f2359fa9e92a328c69fd94a866ad0d",
+      "acceptedBytes": 4634,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_leaping_bolt",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_leaping_bolt.png",
+      "sourceBytes": 3129887,
+      "output": "dgn_heart_leaping_bolt.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a bolt of cyan lightning forking and leaping in a zigzag chain between several small armoured figures standing apart",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "75b332252cb1c61c3a21bd71599017affb157c70987577e1261636f2c2623e6f",
+      "acceptedSha256": "75a1bae711ac0cb791c0fe556a14e882abf8fbc4266ac5f89230413400eb59b9",
+      "acceptedBytes": 6126,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_live_coal",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_live_coal.png",
+      "sourceBytes": 2694067,
+      "output": "dgn_heart_live_coal.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a live coal cupped in a gauntlet, burning hot, a dark shell drinking the healing light around it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "d7e2ac26de13713616a52e7f2e31a4fd760116c46d559481f7b222ad8b2de640",
+      "acceptedSha256": "fff35617e659568a12e1b979dec990a5e7b0fec478a1980da3a5190cdeee9024",
+      "acceptedBytes": 5154,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_loose_gale",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_loose_gale.png",
+      "sourceBytes": 2977159,
+      "output": "dgn_heart_loose_gale.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "three small wandering whirlwinds drifting across a stone cornice, debris caught in them",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "c13f6f15ac94cdc65c7004c6deb14cddb264612d6309a4b7555dda62bb75d3fb",
+      "acceptedSha256": "883e588b12bfbbb2d7805e375e16bb77dd6bd6f25f29fb78ea6776fea92be854",
+      "acceptedBytes": 4972,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_magma",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_magma.png",
+      "sourceBytes": 2995010,
+      "output": "dgn_heart_magma.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a fissure of magma erupting under a marked figure, cracked stone around it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "fb7d48989d316d0d0ac7ab5c2ca4d0c873cd1363462ff1aeb24a9c2c545e3672",
+      "acceptedSha256": "efd17be28f40f30e535847b568b7cd23cd128c7b70afb843e63ab3ea0e3d6a15",
+      "acceptedBytes": 5764,
+      "webpQuality": 72,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_mending_gale",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_mending_gale.try3.png",
+      "sourceBytes": 3086360,
+      "output": "dgn_heart_mending_gale.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a hooded storm caster raising both hands and channelling a ribbon of soft mint-green healing wind into a wounded ally beside it, bright green healing motes rising where the wind touches",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "0f1b367bce78a531a9d271d19b33451da84172ea5b9f4ffdc8a388d8cbe00334",
+      "acceptedSha256": "698136c7091f9791ab105a7dab81a064ec4746b9a9afc2457995297ad2d81c16",
+      "acceptedBytes": 5848,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_mounting_weight",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_mounting_weight.png",
+      "sourceBytes": 2919398,
+      "output": "dgn_heart_mounting_weight.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "stacked stone weights crushing down onto a figure's shoulders, each heavier than the last",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "52a6c90bfd74bd4d33278459c77acaf6522a458d55ee3fd28ae8dac21eb705af",
+      "acceptedSha256": "f033298603cd1c942e0a38e2e28a62acdf50ffbc7ffc593540cb8be7ccee3fb8",
+      "acceptedBytes": 4438,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_opposing",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_opposing.png",
+      "sourceBytes": 3025776,
+      "output": "dgn_heart_opposing.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "four element marks, fire against ice and earth against lightning, two opposite pairs repelling with arcane sparks",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "be63cb84cd93a028acd08d15e68c282d266b157dd7422e6afdfe2c8da59f963b",
+      "acceptedSha256": "f583d25a7d244adfc74db6111b5e560766ecdf8578ad841887067c2253777310",
+      "acceptedBytes": 5998,
+      "webpQuality": 52,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_overflow",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_overflow.png",
+      "sourceBytes": 3072992,
+      "output": "dgn_heart_overflow.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "rings of lava rolling out of a glowing wellspring one after another, each ring broken by two gaps",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "2a507fe454da1220bcb3ed5e59a8e4f84063e39b09199ddedacfd11faeec1bfc",
+      "acceptedSha256": "c1ea954510721e48cacfcc19bab4ebaa97156730bab63f0e04bf9277b00ecbf5",
+      "acceptedBytes": 6108,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_overload",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_overload.png",
+      "sourceBytes": 2659511,
+      "output": "dgn_heart_overload.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a glowing crystal vein in a stone floor brimming over and cracking open, four-coloured light about to burst out of it in pulsing waves",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "b9ef99b5700150a342024567a1ed7507d0c25aa0169e3c0ea9dc2438ec477527",
+      "acceptedSha256": "b0cb111d2a6368d6b0b99ca376467028f0662e8efbad07c216cdc16d842b3c4b",
+      "acceptedBytes": 5254,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_quench_cold",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_quench_cold.png",
+      "sourceBytes": 2956785,
+      "output": "dgn_heart_quench_cold.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a large faceted snowflake of glowing ice blue frost crystal, frost spikes growing from its six arms, freezing mist curling around it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "91630b27f7bbe28360631314aa4f2d2d577b662b6bbdb40b60796283264a28bb",
+      "acceptedSha256": "82b051711b58bc1f1cef9099ce3d99ed9e351fd99e47bc5ad8daf52068314a9c",
+      "acceptedBytes": 6040,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_quenching_breath",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_quenching_breath.png",
+      "sourceBytes": 3364655,
+      "output": "dgn_heart_quenching_breath.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "an ice giantess exhaling a wide cone of quenching frost over a frozen lake",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "7a426605a08300ef38415f506b65a191cf356e6f9d4574cace74aa972d4b0bc3",
+      "acceptedSha256": "0b8eeca03f9addf80761a3bdca1ddf299c17e966d84a29e8398bc1971c37e211",
+      "acceptedBytes": 4918,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_restless_stone",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_restless_stone.png",
+      "sourceBytes": 2885421,
+      "output": "dgn_heart_restless_stone.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "the base of a standing pillar cracking, sharp stone shards bursting out around it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "a7d89a9e871b2034d77dca0141fe7fe2d9e171d873d783ed8ef01fb309ee7ed8",
+      "acceptedSha256": "de216f693abd330c06c38787c2c2bc19994dbc663471cee7c378d4adb5bab929",
+      "acceptedBytes": 5002,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_rime_toll",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_rime_toll.png",
+      "sourceBytes": 2987171,
+      "output": "dgn_heart_rime_toll.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a bell of frost ringing out a wave of cold across the whole raid",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "183cceb3f0553e8e49fc7a4d3049fd6072be899662c7251cdbb6442921104411",
+      "acceptedSha256": "dff9c46b40e47540a94059a97bbc7a04832a6fbcf045d27f6cf8e1fecf60baf3",
+      "acceptedBytes": 5150,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_riven_squall",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_riven_squall.png",
+      "sourceBytes": 2713834,
+      "output": "dgn_heart_riven_squall.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a squall creature of storm cloud tearing into two smaller fragments as it dies",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "08b41a630e2fb9550a6731a0d908ae3581e44258f67782062a9bfc0aad11f998",
+      "acceptedSha256": "43c9c10e6d3a470f210abcc054bf3ef0f59dadd79088f2ad0967cf7120f8c459",
+      "acceptedBytes": 5178,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_seam_bolt",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_seam_bolt.png",
+      "sourceBytes": 2708098,
+      "output": "dgn_heart_seam_bolt.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a bolt of green-gold nature energy shooting straight out of a glowing seam split in dark rock",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "b6eb867dba609cf96f58431d3a2424178bb1fbff4bc2872d1abaf66721546975",
+      "acceptedSha256": "b401d341610378ee52a70a00f4de9414efd295f161acb5a08c9e4cc7aaf19911",
+      "acceptedBytes": 3970,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_shearing_blow",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_shearing_blow.png",
+      "sourceBytes": 2685212,
+      "output": "dgn_heart_shearing_blow.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a splinter creature's blade cutting a narrow cone of shearing force through the air",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "43f1ba04162eabe527723e1841dd6407247d1bbebc92a292779a63ebbdb499f8",
+      "acceptedSha256": "b42e592fec59d90aeb9281f36fcbe6692abb8e664dcaefde2336f8fcce1932c4",
+      "acceptedBytes": 3888,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_shoving_gale",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_shoving_gale.png",
+      "sourceBytes": 3043050,
+      "output": "dgn_heart_shoving_gale.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a hard gust shoving a figure sideways along a straight line toward the rim of a floating isle",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "df34d15c1f044ea14bacd9064752a55007a2a2c269f3f49cf2fc89c9565163fe",
+      "acceptedSha256": "ae045d0498f5746675d3ea041e98c660e29f5d2a55d233f70aec64a174e81d1d",
+      "acceptedBytes": 5356,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_skyrend_nova",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_skyrend_nova.png",
+      "sourceBytes": 3238760,
+      "output": "dgn_heart_skyrend_nova.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a cocoon of wind and lightning wrapped around a stone guardian, a white nova swelling inside about to rupture",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "1e8aea0b142a0a1706d05aee7177b416161882ff5b9f899269ab196e0de44cba",
+      "acceptedSha256": "b20e8fdc07140c308ae3850827dd474b909f11489c4a6582f0a5065d4dfa5129",
+      "acceptedBytes": 5974,
+      "webpQuality": 72,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_soft_enrage",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_soft_enrage.png",
+      "sourceBytes": 2794173,
+      "output": "dgn_heart_soft_enrage.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a cracked stone hourglass whose blazing ochre-gold sand pours through far too fast, fresh cracks racing up its stone frame",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "588badb089197564b808d7ba459398363f3b7e717273f33ad3e1560af2065778",
+      "acceptedSha256": "ec8d8826d6fc6831a617217cd6e55218a236b443bca40b720c0880595df0e5f3",
+      "acceptedBytes": 4966,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_soft_enrage_heat",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_soft_enrage_heat.png",
+      "sourceBytes": 2994006,
+      "output": "dgn_heart_soft_enrage_heat.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a rain of great fireballs plunging from a dark sky one after another, faster and faster, long white-gold fire trails behind them",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "c13c43664aae1ca46bd2c8d3d687ab252c5707ddaf40305fabe05ad91b5b04b8",
+      "acceptedSha256": "09b149945f629a6e74ed5435075e0cae5c00d6ecc62fb4d9ea079adc73b1fee9",
+      "acceptedBytes": 6048,
+      "webpQuality": 72,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_song",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_song.png",
+      "sourceBytes": 2991867,
+      "output": "dgn_heart_song.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a stone giantess singing with her head raised, ochre sound waves rippling into the rock around her",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "fce92517ef5827e1629643f952c730ea30b4c13d919f81714d88da32543e0421",
+      "acceptedSha256": "926d62e572b5da763ef85aadd12b6251b2727adeaf06c0641294a0c756c4a4f8",
+      "acceptedBytes": 5804,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_spires",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_spires.png",
+      "sourceBytes": 2845416,
+      "output": "dgn_heart_spires.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "lightning leaping in straight lines between three rising stone spires",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "9ef725a7c09640f45af98ccfa2ab9960ddbc76196f940c831078586e9bb3081c",
+      "acceptedSha256": "b7acc64b0bf1349db06d08e3fcc8ae468d97be0733dbc0223be9a1253db6fcc5",
+      "acceptedBytes": 5480,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_splinter_heat",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_splinter_heat.png",
+      "sourceBytes": 2792698,
+      "output": "dgn_heart_splinter_heat.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a jagged shard-creature of molten basalt crystal dragged across dark stone, leaving a trail of burning white-gold patches behind it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "5a3b7bee01efe1ad9c9541ea4fcdd79352e92271c9fb661fdee9327563ba6fd1",
+      "acceptedSha256": "4c5d506b706cc84ec575f7d5ade1fa1c74b26c6afd92cd952f9e86c469711b74",
+      "acceptedBytes": 5828,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_splintered",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_splintered.png",
+      "sourceBytes": 2902667,
+      "output": "dgn_heart_splintered.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "four small crystal splinters pulsing with light, rings of damage rippling outward from each",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "134c5fd7bf155e3a2f38f6bfe8fe3270a20f131e1355366876f7319edec435d9",
+      "acceptedSha256": "b92c9236aa5063bca57b3f268be005c5f5f4a7fab072cbdd007ac3938d4d1ef1",
+      "acceptedBytes": 5908,
+      "webpQuality": 56,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_squall_ward",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_squall_ward.png",
+      "sourceBytes": 3017784,
+      "output": "dgn_heart_squall_ward.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a storm shieldbearer's front-facing shield turning a blast aside in a curved spray of wind",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "7e12ac2e3922b9d5d603f5ffecf82d6e2ad15705dfc7f85862a8f100a0dc49ea",
+      "acceptedSha256": "94a0f9ef2a41231ef7d56cafda8212782c572c74f403b498138d366aa177b3ab",
+      "acceptedBytes": 5144,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_steam",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_steam.png",
+      "sourceBytes": 2795014,
+      "output": "dgn_heart_steam.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "clouds of scalding white steam rising where fire meets ice",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "cbd1b25878608b2a30bc3ab2c385da738d0aca935d3c752046b2782ef3c0396c",
+      "acceptedSha256": "8c3b2d03965daaca045e261debaf36c6c26736bdd4015388235dcf34629774d7",
+      "acceptedBytes": 5048,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_stillstone",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_stillstone.png",
+      "sourceBytes": 2941332,
+      "output": "dgn_heart_stillstone.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "an upright waking stone glowing mint, the wind around it falling still while hands reach to channel it",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "2a335498e99471d4b94f9657cdfaf5eae4410d30127aacaf20a41c9a4d798afc",
+      "acceptedSha256": "0a311e46c64011d7b714ce06a0a3ad9e743073275b6d17bab9cf8464af73fbbe",
+      "acceptedBytes": 4894,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_stone_thrum",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_stone_thrum.png",
+      "sourceBytes": 2928954,
+      "output": "dgn_heart_stone_thrum.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "three tall standing stones in a row, each pulsing with deep ochre resonance waves that overlap on the ground, dust shivering off them",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "87abbaa4cdce2d8fc925d6a59c00231b25c4356e42f62a4bd762aea8804851e4",
+      "acceptedSha256": "57d41549f6b8f78d851b9cb4dc2639d48476d01111d1d480245d70ac457354cb",
+      "acceptedBytes": 5144,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_storm_breaks",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_breaks.png",
+      "sourceBytes": 2889991,
+      "output": "dgn_heart_storm_breaks.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a barrage of cyan lightning bolts falling onto many marked spots across a cornice at once",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "20b73c0a3d66af78f5a327dce2f44adf964c1a4ad8a92b3fa0321b5cc2921049",
+      "acceptedSha256": "9cc6948179c0451f0b54378c538d2f2ac9715038954eefe57b4f1651f30482c1",
+      "acceptedBytes": 6000,
+      "webpQuality": 72,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_storm_charged",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_charged.png",
+      "sourceBytes": 2739201,
+      "output": "dgn_heart_storm_charged.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a stone pillar wrapped in arcing cyan lightning, charged and crackling",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "bdf677007450c5b5eb6b9efa0c39939662176fce42e374551e815098ceefc8b8",
+      "acceptedSha256": "b572536b980ac6b103f38754b3e1018751ef0018ecbb5b363535e9d1027e48db",
+      "acceptedBytes": 5336,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_storm_gust",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_gust.png",
+      "sourceBytes": 2927969,
+      "output": "dgn_heart_storm_gust.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a sudden storm gust: a hooded cloak and a tattered banner whipped violently sideways by a burst of cyan storm wind over a cornice floor",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "1b500e6d0042b8badef70c1d866a18c8f483169ad175804a822caed87eb70792",
+      "acceptedSha256": "407adbf3e358ea0a9bcf7f77784eb30b722cee924cb06d8a1578c4c9dd61c3e0",
+      "acceptedBytes": 4834,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_storm_lance",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_lance.png",
+      "sourceBytes": 2577055,
+      "output": "dgn_heart_storm_lance.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a long straight spear of cyan lightning lancing diagonally across the square over a stone cornice",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "ca139a4a742c1ad14a5910ef7bdb2a02784e9de0029c4c2bb9cfb84bf074efab",
+      "acceptedSha256": "498779c6ffd3e367d91ecae5d88c577c2607466364b90ae18845c3f82e54ac74",
+      "acceptedBytes": 3948,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_storm_orb",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_orb.png",
+      "sourceBytes": 2867548,
+      "output": "dgn_heart_storm_orb.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "two glowing storm orbs forming around a winged storm-stone beast",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "0014073ce738bf1072ad838dfac64ad108b5d72d4d38d9e64e7bc3d09731452d",
+      "acceptedSha256": "fc0b42a3e3a5ac643076654f764748b41185032d1841a1197eb1e55adbf4b905",
+      "acceptedBytes": 6078,
+      "webpQuality": 72,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_tremor",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_tremor.png",
+      "sourceBytes": 2805248,
+      "output": "dgn_heart_tremor.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "glowing ochre cracks opening in the ground under a pair of boots, about to erupt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "a9c4fefd5171c9d57b8503987d1f8e18f9cbcdcb16d70b4350e40d1400e4385e",
+      "acceptedSha256": "5e45460b9d37906571e239bbbef20c8d93408582f4c191ccc74c17c54ca79639",
+      "acceptedBytes": 4844,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_wakefire",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wakefire.try2.png",
+      "sourceBytes": 2736465,
+      "output": "dgn_heart_wakefire.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "three straight walls of white-gold fire bursting up out of cracks in a black basalt floor one after another, the nearest wall roaring tall, the middle one just igniting, the farthest still a glowing crack, seen low across the floor",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "62237e731608f16e0020155440e59aedc855b7b004e19d249da019f928ed1840",
+      "acceptedSha256": "97422518954bbdebcace5870630f8a6fe861ea34a5f14e0ae9b78f474ddc0c53",
+      "acceptedBytes": 4766,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_wellkeeper",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wellkeeper.png",
+      "sourceBytes": 3035779,
+      "output": "dgn_heart_wellkeeper.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "two hulking molten basalt guardians rising shoulder to shoulder out of a glowing white-gold lava wellspring",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "15cfa918ab9937b3ac7dea5c5fea06bdd0ad6a1e6bacbb2176290429b1ea3b2e",
+      "acceptedSha256": "75a07a51a21acf40cfa43344fae59672b88a1b42ad05e2117a9ca42b7f330199",
+      "acceptedBytes": 6054,
+      "webpQuality": 72,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_wellspawn",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wellspawn.try2.png",
+      "sourceBytes": 2862296,
+      "output": "dgn_heart_wellspawn.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "two small hunched molten imps of cracked basalt and glowing lava crawling on all fours across a dark floor toward a bright white-gold wellspring glowing behind them",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "08de920aee61a6fba3021fe1ee3450f31604ea876db20a2792f56dec7b49bf49",
+      "acceptedSha256": "2812feeedba3708b8b62ba4180e0fbb719ced0c5e02d0abc98d8bbcbe44d99f1",
+      "acceptedBytes": 5434,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_wellspring_brand",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wellspring_brand.png",
+      "sourceBytes": 2753273,
+      "output": "dgn_heart_wellspring_brand.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a white-gold fire brand hurled through the air at a raised shield, the shield beginning to glow",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "928164c4a16af05c99345f79c6f52b3862f2efb31381d21bc2af887c79518a85",
+      "acceptedSha256": "5d2a3675dd3a3ade1299762482156e09cf65d0cdfdaf3b30ee13cc9e623dd23c",
+      "acceptedBytes": 3872,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    },
+    {
+      "iconId": "dgn_heart_wheel",
+      "sourcePack": "boss-ability-art-2026-11-28",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wheel.png",
+      "sourceBytes": 2984898,
+      "output": "dgn_heart_wheel.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "a wheel of glowing white-gold wedges erupting on a basalt shore, one dark wedge left safe",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "sourceSha256": "af65d03a9626a25c887e6a0a7e3fc2de237e03691c4368b5f60305e9daea09f4",
+      "acceptedSha256": "8c7a07cb62dc479a204d64e3dc417d3a05ab22f7dc1e148c661cdf202c82c3b2",
+      "acceptedBytes": 6144,
+      "webpQuality": 76,
+      "acceptedArtManifest": "docs/achievements/boss-ability-art-2026-11-28/accepted-boss-ability-art.json",
+      "sourceProvenance": "docs/achievements/boss-ability-art-2026-11-28/generation-report.json"
+    }
+  ],
+  "reused": [
+    {
+      "iconId": "dgn_heart_anvil",
+      "runtimeUrl": "/ui/auras/heart_final_anvil_mark.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_bellows_wind",
+      "runtimeUrl": "/ui/auras/wind_drift.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_blades_wake",
+      "runtimeUrl": "/ui/auras/heart_quench_blades_awake.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_call",
+      "runtimeUrl": "/ui/auras/heart_final_shield.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_calm",
+      "runtimeUrl": "/ui/auras/heart_breath_anchor.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_cradle",
+      "runtimeUrl": "/ui/auras/heart_breath_cradled.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_crossing_blade",
+      "runtimeUrl": "/ui/auras/heart_quench_slash_mark.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_deepening_cold",
+      "runtimeUrl": "/ui/auras/heart_quench_deepening.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_drawn_lightning",
+      "runtimeUrl": "/ui/auras/heart_breath_drawn_lightning.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_ember_mark",
+      "runtimeUrl": "/ui/auras/heart_final_ember_mark.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_encased",
+      "runtimeUrl": "/ui/auras/heart_quench_frozen.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_falling_rock",
+      "runtimeUrl": "/ui/auras/heart_falling_rock_mark.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_gale_pounce",
+      "runtimeUrl": "/ui/auras/heart_final_tethered.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_groaning_ice",
+      "runtimeUrl": "/ui/auras/heart_quench_trapped.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_hammers_weight",
+      "runtimeUrl": "/ui/auras/heart_hammers_weight.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_heart_unbound",
+      "runtimeUrl": "/ui/auras/heart_final_unbound.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_hearth_flare",
+      "runtimeUrl": "/ui/auras/heart_heat_scorched.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_inhale",
+      "runtimeUrl": "/ui/auras/wind_draw.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_knotted_gale",
+      "runtimeUrl": "/ui/auras/heart_breath_laden.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_masterless_fury",
+      "runtimeUrl": "/ui/auras/heart_final_fury.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_quenching_ring",
+      "runtimeUrl": "/ui/auras/heart_final_ring_chill.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_resonance",
+      "runtimeUrl": "/ui/auras/heart_resonance.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_rolling_cinder",
+      "runtimeUrl": "/ui/auras/heart_heat_hunted.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_rush",
+      "runtimeUrl": "/ui/auras/heart_mountains_rush_mark.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_sky_strike",
+      "runtimeUrl": "/ui/auras/heart_breath_sky_mark.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_stone_shell",
+      "runtimeUrl": "/ui/auras/heart_final_shell.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_summit_roar",
+      "runtimeUrl": "/ui/auras/wind_blast.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_swelling_storm",
+      "runtimeUrl": "/ui/auras/heart_breath_swelling_storm.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_vein_shock",
+      "runtimeUrl": "/ui/auras/heart_final_shaken.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_wake_stone",
+      "runtimeUrl": "/ui/auras/heart_wake_mark.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "dgn_heart_wrath",
+      "runtimeUrl": "/ui/auras/heart_narrow_shelter.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "heart_breath_blow_mark",
+      "runtimeUrl": "/ui/auras/heart_breath_blow_mark.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "heart_breath_thunder_laden",
+      "runtimeUrl": "/ui/auras/heart_breath_thunder_laden.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "heart_quench_rime",
+      "runtimeUrl": "/ui/auras/heart_quench_rime.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    },
+    {
+      "iconId": "heart_quench_tempered",
+      "runtimeUrl": "/ui/auras/heart_quench_tempered.webp",
+      "ownerManifest": "public/ui/auras/mapping.json"
+    }
+  ]
+}

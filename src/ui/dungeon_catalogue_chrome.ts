@@ -49,6 +49,28 @@ export function adventureToolbarHtml(
   );
 }
 
-export function lootPreviewControlsHtml(selection: LootPreviewSelection): string {
-  return `<div class="df-loot-filter"><div class="df-sub">${esc(t('hudChrome.adventureGuide.inspectLoot'))}</div><div class="df-loot-selects"><label>${esc(t('hudChrome.adventureGuide.lootClass'))}<select class="ui-input" data-loot-class ${FOCUS_KEY_ATTR}="loot-class">${ALL_CLASSES.map((cls) => `<option value="${cls}"${cls === selection.cls ? ' selected' : ''}>${esc(classDisplayName(cls))}</option>`).join('')}</select></label><label>${esc(t('hudChrome.adventureGuide.lootSpec'))}<select class="ui-input" data-loot-spec ${FOCUS_KEY_ATTR}="loot-spec"><option value=""${selection.spec === null ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.allSpecs'))}</option>${TALENTS[selection.cls].specs.map((spec) => `<option value="${esc(spec.id)}"${spec.id === selection.spec ? ' selected' : ''}>${esc(tTalent({ kind: 'talentSpec', spec, field: 'name' }))}</option>`).join('')}</select></label></div><p class="df-loot-hint">${esc(t('hudChrome.adventureGuide.lootHint'))}</p></div>`;
+export interface LootPreviewControlsOptions {
+  /** Offer "All classes" at the top of the class list; a null selection picks
+   *  it (the Adventure Journal's Loot tab). */
+  allClasses?: boolean;
+  /** Leave out the heading and the hint, for a host that labels the filter
+   *  itself. */
+  bare?: boolean;
+}
+
+/** The class and specialization pickers of a loot preview (the Adventure
+ *  Guide's encounter loot, the Adventure Journal's Loot tab). A null
+ *  selection is "All classes": the specialization list then offers only
+ *  "All specializations" and is disabled. */
+export function lootPreviewControlsHtml(
+  selection: LootPreviewSelection | null,
+  options: LootPreviewControlsOptions = {},
+): string {
+  const all = options.allClasses
+    ? `<option value=""${selection === null ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.allClasses'))}</option>`
+    : '';
+  const specs = selection ? TALENTS[selection.cls].specs : [];
+  const selects = `<div class="df-loot-selects"><label>${esc(t('hudChrome.adventureGuide.lootClass'))}<select class="ui-input" data-loot-class ${FOCUS_KEY_ATTR}="loot-class">${all}${ALL_CLASSES.map((cls) => `<option value="${cls}"${cls === selection?.cls ? ' selected' : ''}>${esc(classDisplayName(cls))}</option>`).join('')}</select></label><label>${esc(t('hudChrome.adventureGuide.lootSpec'))}<select class="ui-input" data-loot-spec ${FOCUS_KEY_ATTR}="loot-spec"${selection ? '' : ' disabled'}><option value=""${selection?.spec == null ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.allSpecs'))}</option>${specs.map((spec) => `<option value="${esc(spec.id)}"${spec.id === selection?.spec ? ' selected' : ''}>${esc(tTalent({ kind: 'talentSpec', spec, field: 'name' }))}</option>`).join('')}</select></label></div>`;
+  if (options.bare) return `<div class="df-loot-filter df-loot-filter-bare">${selects}</div>`;
+  return `<div class="df-loot-filter"><div class="df-sub">${esc(t('hudChrome.adventureGuide.inspectLoot'))}</div>${selects}<p class="df-loot-hint">${esc(t('hudChrome.adventureGuide.lootHint'))}</p></div>`;
 }

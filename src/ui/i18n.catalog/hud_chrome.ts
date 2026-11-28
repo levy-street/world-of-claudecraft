@@ -41,6 +41,7 @@ export const hudChromeStrings = {
     lootClass: 'Class',
     lootSpec: 'Specialization',
     allSpecs: 'All specializations',
+    allClasses: 'All classes',
     lootHint:
       "Usable gear with the selected specialization's stat affinity. General rewards remain visible. Drop chances use the full loot table.",
     lootEmpty: 'No equipment matches this class and specialization.',
@@ -1315,6 +1316,7 @@ export const hudChromeStrings = {
     professions: 'Professions',
     reliquary: 'Reliquary',
     lootExplorer: 'Loot Explorer',
+    journal: 'Journal',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
@@ -2048,6 +2050,15 @@ export const hudChromeStrings = {
     // Entry-denied toast for a heroic daily lockout when no live countdown is
     // mirrored yet ({name} = dungeon name).
     heroicLocked: 'You are locked to Heroic {name}.',
+    // Display name for one boss of a per-boss raid lockout (the Smith's Heart:
+    // src/sim/raid_boss_lockout_id.ts). {raid} = the raid's name, {boss} = the
+    // boss page's name as the Adventure Journal titles it.
+    bossName: '{raid}: {boss}',
+    // The same boss's Heroic lock (Normal and Heroic save apart).
+    bossNameHeroic: '{raid}: {boss} (Heroic)',
+    // The sim's line (and loot refusal) for a raider saved to a per-boss raid
+    // boss this week: the boss still falls, it just pays them nothing.
+    bossSavedNoLoot: 'You have already defeated this boss this week, so it holds no loot for you.',
   },
   // The practice DPS tracker (src/ui/hud/practice/): the compact readout that
   // appears while the player targets or hits a training dummy. It reads the
@@ -2624,6 +2635,7 @@ export const hudChromeStrings = {
     name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_lantern_hall_destrier: 'Lantern Hall Destrier',
+    name_quarryheart_charger: 'Quarryheart Charger',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
     name_emberbristle_broom: 'Emberbristle Broom',
@@ -2660,6 +2672,8 @@ export const hudChromeStrings = {
       'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
     desc_lantern_hall_destrier:
       "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
+    desc_quarryheart_charger:
+      "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
     desc_nightwing_chimera:
       'A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.',
     desc_chimeglass_tortoise:
@@ -5461,6 +5475,102 @@ export const hudChromeStrings = {
     crownEndures: 'The Crown Endures! Nythraxis is enraged!',
   },
   varkhulWaveStatus: 'Wave {wave}/{waves} | Enemies: {remaining}',
+  // The Adventure Journal (src/ui/hud/journal/): the one encounter browser for
+  // every dungeon and raid, opened from the side rail, Shift+J, the book beside
+  // the target frame and the Dungeon Finder. The per-boss pages keep their own
+  // keys (raidBossGuide.*, bossJournal.*); these are the window's chrome.
+  adventureJournal: {
+    title: 'Adventure Journal',
+    close: 'Close the Adventure Journal',
+    crumbs: '{instance} | {boss} | {difficulty}',
+    browse: 'Browse',
+    navLabel: 'Dungeons and raids',
+    groupDungeons: 'Dungeons',
+    groupRaids: 'Raids',
+    expandInstance: 'Show the bosses of {instance}',
+    collapseInstance: 'Hide the bosses of {instance}',
+    bossProgress: '{defeated} of {total} defeated',
+    youAreHere: 'You are here',
+    inCombat: 'In combat',
+    kindRaid: 'Raid',
+    kindDungeon: 'Dungeon',
+    pageKicker: '{instance} | {kind} | Boss {index} of {total}',
+    previousBoss: 'Previous boss: {boss}',
+    nextBoss: 'Next boss: {boss}',
+    noPreviousBoss: 'This is the first boss',
+    noNextBoss: 'This is the last boss',
+    councilMembers: 'Council members',
+    mythic: 'Mythic',
+    sectionsLabel: 'Journal sections',
+    tabOverview: 'Overview',
+    tabAbilities: 'Abilities',
+    tabLoot: 'Loot',
+    comingSoon: 'Coming soon',
+    comingSoonBody:
+      'Mythic is still being forged. Its abilities, numbers and rewards will be written here when it opens.',
+    readTier: 'Read {difficulty}',
+    strategyHeading: 'Strategy by role',
+    watchFor: 'Watch for',
+    jumpToAbility: 'Show {ability} under Abilities',
+    roleNothing: 'No ability here asks for this role alone. Follow the lines every role shares.',
+    abilityCountPlural: { one: '{count} ability', other: '{count} abilities' },
+    lootLabel: '{difficulty} loot',
+    lootNone: 'This boss drops no items on {difficulty}.',
+    lootFrom: 'Dropped by {boss}',
+    targetButton: 'Open this boss in the Adventure Journal',
+    bannerKicker: '{instance}, boss {index} of {total}',
+    bossCount: '{defeated} of {total}',
+    statusNext: 'Next up',
+    mythicSoon: 'Mythic: coming soon',
+    roleEveryone: 'Everyone',
+    aboutHeading: 'About the encounter',
+    openList: 'Show every dungeon and raid',
+    mobileCrumb: '{group} / {instance}',
+    phaseRangeWhole: 'Whole fight',
+    phaseRangeBand: '{from} to {to}',
+    phaseRangeToEnd: '{from} to the end',
+    phaseRangeAt: 'At {marks}',
+    factDamage: '{min} to {max} damage',
+    factDamageArcane: '{min} to {max} Arcane damage',
+    factDamageFire: '{min} to {max} Fire damage',
+    factDamageFrost: '{min} to {max} Frost damage',
+    factDamageNature: '{min} to {max} Nature damage',
+    factDamagePhysical: '{min} to {max} Physical damage',
+    factDamageShadow: '{min} to {max} Shadow damage',
+    factEvery: 'Every {seconds} sec',
+    // The personal progress strip on a boss page ({difficulty} = Normal or
+    // Heroic, {count} = a formatted number of kills).
+    progressLabel: 'Your progress on this boss',
+    killsLabel: 'Your kills',
+    killsCell: '{difficulty} kills: {count}',
+    // The lockout line when the character is saved on the difficulty read.
+    savedBosses: 'Saved on {difficulty}: {saved} of {total} bosses',
+    savedInstance: 'Saved on {difficulty}',
+    // {time} = the lockout countdown (2d 4h), {when} = the reset's weekday and time.
+    resetsIn: 'Resets in {time}, {when}',
+    // The banner chip of a boss the character is saved on (weekly raid rooms,
+    // and the realm-day lockouts of the rest).
+    defeatedThisWeek: 'Defeated this week',
+    defeatedToday: 'Defeated today',
+    // The boss search at the top of the list ({count} = a formatted number).
+    searchLabel: 'Search bosses',
+    searchPlaceholder: 'Search bosses or instances',
+    searchResults: 'Bosses found',
+    searchEmpty: 'No bosses found',
+    searchClear: 'Clear the search',
+    searchCount: { one: '{count} boss found', other: '{count} bosses found' },
+    // The Loot tab's scope and filter ({instance} = a dungeon or raid name,
+    // {difficulty} = Normal or Heroic, {count} = a formatted number).
+    lootScopeLabel: 'Loot to show',
+    lootScopeBoss: 'This boss',
+    lootScopeInstance: 'All bosses',
+    lootNoneInstance: 'No boss in {instance} drops items on {difficulty}.',
+    lootShowAll: 'Show every class',
+    lootHiddenPlural: {
+      one: '{count} more drop is for another class or specialization.',
+      other: '{count} more drops are for other classes or specializations.',
+    },
+  },
   raidBossGuide: {
     title: 'Boss Guide',
     button: 'Boss Guide: {boss}',
@@ -5933,6 +6043,245 @@ export const hudChromeStrings = {
       creepingRime:
         'Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.',
       icedOver: 'Frozen solid by Creeping Rime: unable to move or act.',
+    },
+    // The Smith's Heart's Hammer Council (src/ui/council_aura_effect.ts).
+    // The entrance's marker is wordy (M16): non-Latin fills in the overlays.
+    council: {
+      intro: 'Dormant: cannot be attacked or harmed until the council wakes.',
+      wakeMark:
+        'When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      rockMark:
+        'When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroicTotal} damage shared, and {heroicTremorMin} to {heroicTremorMax} to the raid.',
+      resonance:
+        'Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      rushMark:
+        'When this ends, the Guardian of the Hammer braces for {windup} sec, then charges in a straight line through where you stood, on to the edge of the Quarry, and stops early at the first pillar in its way. Lead it into the Cursed Pillar: the pillar shatters, the Guardian is stunned for {stun} sec and takes {exposed}% more damage for {exposedSeconds} sec. A sheltering pillar in the way is destroyed instead. Everyone it runs into before it stops takes {min} to {max} damage and is thrown back, you too if you are still on its line. Mythic: a charge that hits no pillar starts the Quarry collapsing until the Cursed Pillar breaks. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      rushExposed: "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
+      collapse:
+        'The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.',
+      memory:
+        'Deals {pct}% more damage: the soul of its fallen partner in the Hammer Council burns in it.',
+      fury: "Attacks, casts and runs every one of its abilities {pct}% faster, and uses its fallen partner's abilities at full strength. Kill the two together to deny it.",
+      pillarLimit:
+        "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast. Anyone it finds unhidden takes {min} to {max} damage on Normal, {heroicMin} to {heroicMax} on Heroic and {mythicMin} to {mythicMax} on Mythic.",
+    },
+    // The Smith's Heart's Guardian of the Breath (src/ui/breath_aura_effect.ts).
+    // The entrance's marker is wordy (M16): non-Latin fills in the overlays.
+    breathGuardian: {
+      intro: 'Dormant: cannot be attacked or harmed until the storm sets it down.',
+      skyMark:
+        'Lightning strikes where you stood when this was laid, in {warn} sec: {min} to {max} damage within {radius} yd. Step out of its circle. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      portalA:
+        'When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.',
+      portalB:
+        'When this ends, Portal B opens exactly where you stand. Stand at the edge of the Cornice. You cannot carry the Knotted Gale this round.',
+      portalC:
+        'When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.',
+      portalD:
+        'When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the edge of the Cornice, away from Portal B. You cannot carry the Knotted Gale this round.',
+      laden:
+        'You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Press Interact at the edge of the Cornice to throw it into the void. A portal is a shortcut: walk into one and you come out at its partner (A to B; on Mythic, C to D too). When this ends it bursts: everyone within {core} yd of it dies, whatever shields them, and anyone farther takes less the farther they stand, down to {floor}% of their maximum health at {far} yd or more. Carry it away from the raid.',
+      wind: "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows while you stand. Walking, you go where you point: it slows a walk into it, speeds a walk with it, and pushes a walk across it only {cross}% as hard. It does not interrupt your casts. No wall stands round the Cornice: carried off its edge, you fall into the void.",
+      draw: "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Summit Roar deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd straight away from it ({heroicThrow} on Heroic and Mythic, where a throw that reaches the edge carries you off the Cornice), then a gust blows them on that way for a few seconds, {gustSpeed} yd a second ({heroicGustSpeed} on Heroic and Mythic): walk straight back toward the Guardian or it carries you to the edge. Stand near the Guardian when it roars, or in Thessaly's anchor. Heroic and Mythic: {heroicMin} to {heroicMax} and {heroicGustMin} to {heroicGustMax} damage respectively.",
+      pinned:
+        "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
+      anchor:
+        "Captain Thessaly's calm holds you: no wind, pull, blast or throw can move you. Damage still lands.",
+      spent:
+        "Your anchor has run out: Captain Thessaly's circle of calm cannot anchor you again until this ends.",
+      drawn:
+        'A lightning strike falls where you stand every {every} sec: after {warn} sec it deals {min} to {max} damage to everyone within {radius} yd and leaves charged ground that deals {cmin} to {cmax} every second for {charged} sec. Keep moving, and lead the strikes to the edge, away from the raid. Heroic and Mythic: {heroicMin} to {heroicMax} and {heroicCMin} to {heroicCMax} damage respectively.',
+      cradled:
+        'Lifted into the storm and held for {hold} sec while the Guardian channels the cradle; it casts nothing else meanwhile. Then the discharge deals {total} damage, split between you and everyone within {radius} yd beneath you. With fewer than {soakers} sharing it, each takes {penalty}% more and everyone on the Cornice takes {bmin} to {bmax}. Heroic: {heroicCount} players are lifted at once, each discharge {heroicTotal} wanting {heroicSoakers}, so the raid splits between them. Heroic and Mythic: the backlash deals {heroicBMin} to {heroicBMax} damage.',
+      cocoon:
+        "The Guardian cannot be harmed while it channels Skyrend Nova. If the channel ends, the nova kills everyone, whatever shields them. Ride Captain Thessaly's Updrafts out to the floating isles, east and west, and channel both Stillstones to cut it: {stilled} of 2 stilled. A Stillstone wakes once its isle's foes are down; everyone on its isle can channel it at once, and the more channel it, the faster it fills. A hit breaks your channel, never the stone's progress.",
+      riding:
+        'The wind carries you over the void on a fixed path: you cannot act until it sets you down.',
+      ward: 'Turns aside {cut}% of the damage from attacks made within {arc} degrees of where it faces. Attack its back while its target turns it away. Heroic and Mythic: {heroicCut}%.',
+      thrown: 'Thrown by the Summit Roar: you cannot move until the throw sets you down.',
+      blast:
+        "The Summit Roar's blast drives you away from the Guardian, {speed} yd a second at its mouth, easing farther out, for {seconds} sec in all. Run straight back against it, or stand in Thessaly's anchor, or it carries you off the Cornice.",
+      gust: "The Summit Roar's gust blows you on the way it threw you, {speed} yd a second, for a few seconds. Walk straight back toward the Guardian to hold your ground, or stand in Thessaly's anchor, or it carries you toward the edge of the Cornice.",
+      tossed: 'Tossed by a Loose Gale: you cannot move until the gust sets you down.',
+      blown: 'Thrown by Bellows Blow: you cannot move until the throw sets you down.',
+      blowMark:
+        'Bellows Blow strikes you when the cast ends: {min} to {max} Nature damage, and it throws you {yards} yd straight away from the Guardian of the Breath. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      blowMarkRuin:
+        "Bellows Blow strikes you when the cast ends: {min} to {max} Nature damage, and it throws you off the Cornice, straight away from the Guardian of the Breath. Only Captain Thessaly's anchor keeps your feet. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
+      battered:
+        'Your next Bellows Blow throws you {next} yd straight away from the Guardian of the Breath ({stacks} stacks: each one throws it further). Each Bellows Blow on you adds a stack and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, the blow at {heroicRuin} stacks throws you off the Cornice; on Normal it always stops short of the edge.',
+      thunderLaden:
+        'You take {pct}% more Nature and other magic damage ({per}% for each of {stacks} stacks). Each Thunder Lash on you deals {min} to {max} Nature damage, adds a stack and resets this to {seconds} sec. From {draw} stacks, every Leaping Bolt also leaps to you. Swap tanks at {swap} stacks. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      stormForm:
+        'Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.',
+      swell:
+        'Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage, {heroicGrowth}% more for every pulse before it.',
+    },
+    // The Smith's Heart's Guardian of the Quench (src/ui/quench_aura_effect.ts).
+    quenchGuardian: {
+      intro:
+        'Frozen under the lake: she cannot be attacked or harmed until she breaks free of the ice.',
+      cold: 'Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Living Warmth: healing you receive lowers it by 1 for every {healPct}% of your maximum health healed ({heroicHealPct}% on Heroic and Mythic). Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.',
+      warmth:
+        'Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.',
+      frozen:
+        'Encased in rime: you cannot act and take {pct}% more damage from all sources, and the rime cracks immunities such as Cold Coffin. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic). Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      brittle:
+        "Takes {pct}% more damage from all sources. While this lasts, a shattering ally's splash cannot take your cold past {cap}.",
+      splashed:
+        "An ally's shattering ice splashed you: +{cold} cold. Get back into a huddle before your own bar fills.",
+      trapped:
+        'Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      awake:
+        "The Smith's four blades are awake. Each round more players are marked, and a blade flies across the lake down a line through each in turn. It locks {lock} sec before the blade flies (a little later on Heroic and Mythic), then strikes anyone on it for {min} to {max} Frost damage and adds {cold} cold. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
+      marked:
+        'You are number {order} of {count}: a blade will fly across the lake down the line through you. Lead the line away from the raid. It locks {lock} sec before the blade flies (a little later on Heroic and Mythic), so step off then, or take {min} to {max} Frost damage and {cold} cold. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      deepening:
+        "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far).",
+      rime: 'Living Rime absorbs the next {left} healing you receive ({whole} in all). While it holds you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic), so leave the group. Heal it through within {seconds} sec and it falls away. If not, you are Encased in Rime at once and the cold bursts on everyone within {radius} yd, adding {cold} cold ({heroicCold} on Heroic and Mythic). Normal: {normalAbsorb} on one player. Heroic: {heroicAbsorb} on {heroicTargets} players, and a burst leaps to the nearest other player with a fresh crust. Mythic: as Heroic, on {mythicTargets} players.',
+      rimePool:
+        'Living Rime: {pct}% of their maximum health in healing still to break it. Not healed through within {seconds} sec of landing, they freeze and the cold bursts on everyone within {radius} yd.',
+      rimeSlow:
+        'Slowed by Living Rime: you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic) until the crust is healed through or bursts.',
+      tempered:
+        'Tempering Strike tempered you {stacks} times: your cold cannot fall below {floor}, and you take {pct}% more Frost damage. Each Tempering Strike on you adds a stack ({cold} cold and {per}% Frost damage each) and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, stack {heroicMax} fills your cold to {max} and you freeze solid; Normal stops at {normalMax} stacks ({normalFloor} cold).',
+    },
+    // The Smith's Heart's Guardian of the Heat (src/ui/heat_aura_effect.ts).
+    // Forge-Fury, the Smith's Heart's hard enrage on Heroic and Mythic
+    // (src/ui/hard_enrage_aura_effect.ts). Wordy (M16): non-Latin fills.
+    forgeFury: {
+      gathering:
+        'Forge-Fury comes {minutes} min after the pull. When this runs out, every {every} sec it burns everyone in the fight: {share}% of their maximum health, then {share2}%, and the third burn kills them whatever shields them. Defeat the boss first. Heroic and Mythic only; it never lands while the boss cannot be harmed.',
+      fury: 'The fight ran past {minutes} min. Every {every} sec Forge-Fury burns everyone in the fight: {share}% of their maximum health, then {share2}%, and the third burn kills them whatever shields them. It lasts until the fight ends.',
+    },
+    heatGuardian: {
+      statePhase1:
+        'Half sunk in its wellspring: it never moves. The Wheel of the Hearth cuts the shore into four wedges in front of the guardian and four behind it: on each side three glow red and erupt after {warn} sec ({heroicWarn} sec on Heroic) and one stays dark and safe, and as one round erupts the next round shows the safe wedge of each side one or two over. Basalt Fist slams the spot of a marked player on the shore (two marked players, two spots, on Heroic and Mythic) and three Molten Swells roll out from each, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.',
+      statePhase2:
+        'Half sunk in its wellspring: it never moves. The Wheel of the Hearth and Basalt Fist go on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.',
+      statePhase3:
+        'Half sunk in its wellspring: it never moves. The Wheel of the Hearth, Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.',
+      intro:
+        'Cold in its wellspring: it cannot be attacked or harmed until the raid comes near and it wakes, burning.',
+      stateUnder:
+        "Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. Rings of lava roll out of the wellspring one after another, each with two gaps where its flames part; the next ring's gaps glow on the floor before it comes. Stand in a gap as a ring passes, or take {min} to {max} Fire damage ({heroicMin} to {heroicMax} on Heroic). The second overflow's rings come quicker and their gaps are narrower. It rises again once the last ring has passed.",
+      scorched:
+        'Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage. Every {every} sec, Hearth Flare strikes everyone farther than {reach} yd from the wellspring and renews this.',
+      grip: "Takes {total} Fire damage every second ({per} for each of your {stacks} stacks). Each of the guardian's landed swings adds a stack, up to {most}, and lasts {seconds} sec: swap tanks before it grows too heavy.",
+      kindling:
+        "In {seconds} sec you trail fire for {trail} sec. Each patch burns allies for {min} to {max} Fire damage a second and heals a Wellspawn standing in it by {heal}% of its health a second: leave the group and the Wellspawn's path. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
+      trail:
+        'You leave a Cinder Trail: patches of fire {radius} yd wide that burn for {life} sec, dealing {min} to {max} Fire damage a second to allies in them and healing a Wellspawn in them by {heal}% of its health a second. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      hunted:
+        'A Rolling Cinder or a Seedflame is after you. A Rolling Cinder that reaches you kills you and burns everyone within {radius} yd: keep away, and let allies strike it, each strike knocks it {knock} yd back (then not again for {crust} sec).',
+      crust: 'Cooled hard: strikes cannot knock it back until this ends.',
+      brand:
+        'Wellspring Brand: you take {pct}% more Fire, Frost, Nature, Shadow and Arcane damage for {seconds} sec, Cinder Grip included. Every {every} sec the guardian hurls a brand at its tank, even while it casts, stands under its own bar or cannot reach you: {min} to {max} Fire damage and this mark. The other tank must taunt before the next one lands. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      coal: 'Absorbs the next {absorb} healing you receive and burns you for {burnMin} to {burnMax} Fire damage every second. Heal through it to put it out. Any player who comes within {leap} yd of you takes it, with the absorb it has left, and {leapMin} to {leapMax} Fire damage; it cannot leap for {grace} sec after it lands on someone. Not healed through in {seconds} sec, it bursts for {burstMin} to {burstMax} Fire damage on everyone within {radius} yd, you included.',
+    },
+    // The Masterless Strength (src/ui/final_aura_effect.ts; the numbers are
+    // encounters/smith_heart/final_ids.ts FINAL_TUNING's). Wordy (M16).
+    finalBoss: {
+      stateHeat:
+        "Drinking the Heat: Basalt Fist slams a player's spot and three Molten Swells roll out of it. Its star, Fire Whirl, wakes for the rest of the fight: tall columns of fire run across the floor. On Heroic, Ember Marks drop fire at ranged players' feet; on Mythic, its frontal leaves Forge Fire.",
+      stateQuench:
+        'Drinking the Quench. Its star, Crossing Blade, wakes for the rest of the fight: a sword of ice sweeps a line through a marked player and shatters every pillar on it. On Heroic, the ice breaks under marked players; on Mythic, its frontal slows by {slow}%.',
+      stateBreath:
+        'Drinking the Breath: Leaping Bolt leaps between players within {jump} yd of each other. Its star, Sky Strike, wakes for the rest of the fight: lightning falls under players, and lightning that falls by a pillar arcs round it and charges it. On Heroic, Drawn Lightning marks players; on Mythic, each Storm Orb must be taken by one player.',
+      stateHammer:
+        'Drinking the Hammer: Tremor Cracks erupt under players. Its star, Wake the Stone, wakes for the rest of the fight: pillars burst out of the floor and stay until a Crossing Blade shatters them. On Heroic, Stone Shell absorbs healing.',
+      stateRing:
+        'In the central ring it drinks no quarter: every awake star runs at {pace}% pace. Above {pct}% health it grows Heart Unbound there every second.',
+      overloadHeat:
+        "The Heat's Overload, {value}% full. It fills while the boss stands in the Heat quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
+      overloadQuench:
+        "The Quench's Overload, {value}% full. It fills while the boss stands in the Quench quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
+      overloadBreath:
+        "The Breath's Overload, {value}% full. It fills while the boss stands in the Breath quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
+      overloadHammer:
+        "The Hammer's Overload, {value}% full. It fills while the boss stands in the Hammer quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
+      unbound:
+        'Deals {per} damage to the whole raid every second for each stack ({total} now) and gains a stack every second while it stands in the central ring. Drag it out of the ring to end it. Heroic: {heroicPer} per stack. Mythic: {mythicPer} per stack.',
+      shaken:
+        'A quarter change hits you {mult} times as hard while this lasts ({min} to {max} damage instead of {baseMin} to {baseMax}). Each change renews it for {seconds} sec. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      underIce: 'Stunned: you fell through the breaking ice.',
+      numbing: 'Movement speed reduced by {pct}% for {seconds} sec by its frontal.',
+      ember:
+        'In {seconds} sec embers fall at your feet and smoulder for {life} sec in a {radius} yd pool that deals {min} to {max} Fire damage a second to anyone in it. Join the other marked players in one corner, then move out. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      drawn:
+        'Every second for {seconds} sec it arcs from you to every other player within {reach} yd, dealing {min} to {max} Nature damage to each. Keep {reach} yd from everyone. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      shell: 'Absorbs the next {value} healing you receive.',
+      skyMark:
+        'Lightning falls where you stand in {seconds} sec: {min} to {max} Nature damage to everyone within {radius} yd. Move out. Lightning that falls within {arcReach} yd of a pillar arcs round it and leaves it Storm-Charged. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      bladeMark:
+        'A Crossing Blade aims its line through you: it follows you, then locks {lock} sec before it flies. Lead the line through the pillars to shatter them, then step off it. Everyone on the line takes {min} to {max} Frost damage. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      devilThrown:
+        'Thrown by a Dust Devil: carried {yards} yd out of the whirlwind. You cannot move until it sets you down.',
+      anvilMark:
+        'Weight of the Anvil follows you: its {radius} yd circle moves with you and plants {lock} sec before it falls. Gather the raid inside it: {total} Physical damage is split between everyone in it, half as much again each with fewer than {fewer}. Heroic: {heroicTotal}. Mythic: {mythicTotal}.',
+      // Its own elements (src/ui/final_elements_aura_effect.ts; the numbers
+      // are final_elements_ids.ts ELEMENT_DIFFICULTY's and ELEMENT_TUNING's).
+      strikeHeat:
+        'Searing Burn: you take {total} Fire damage every second ({per} for each of your {stacks} stacks). Every {every} sec Elemental Strike hits the tank for {min} to {max} at one stack, {growth}% more for each stack, and adds a stack of the element of the quarter the boss stands in. The stacks last {seconds} sec after the last strike: at {swap} stacks, let the other tank take the boss. Heroic: {heroicPer} per stack, strikes {heroicGrowth}% harder per stack. Mythic: {mythicPer} per stack, {mythicGrowth}% per stack.',
+      strikeQuench:
+        'Biting Frost: movement speed reduced by {pct}% ({per}% for each of your {stacks} stacks, at most {cap}%). From {freeze} stacks each Elemental Strike also plants Hardening Frost at your feet: a {radius} yd ring that closes after {warn} sec and freezes anyone still in it solid for {frozen} sec. Step out of it. The strike that turns older stacks into frost never plants it. Every {every} sec Elemental Strike hits the tank for {min} to {max} at one stack, {growth}% more for each stack. The stacks last {seconds} sec after the last strike: at {swap} stacks, let the other tank take the boss. Heroic and Mythic strike {heroicGrowth}% and {mythicGrowth}% harder per stack.',
+      strikeBreath:
+        'Static Charge: magic damage taken increased by {pct}%. From {from} stacks, lightning arcs from you every {arcEvery} sec to every ally within {reach} yd for {arcMin} to {arcMax} Nature damage, {arcGrowth}% more for each further stack: keep the raid {reach} yd away. Every {every} sec Elemental Strike hits the tank for {min} to {max} at one stack, {growth}% more for each stack. The stacks last {seconds} sec after the last strike: at {swap} stacks, let the other tank take the boss. Heroic arcs: {heroicArcMin} to {heroicArcMax}. Mythic arcs: {mythicArcMin} to {mythicArcMax}.',
+      strikeHammer:
+        'Cracked Armor: armor reduced by {pct}% ({per}% for each of your {stacks} stacks, never below {floor}% of your armor). Every {every} sec Elemental Strike hits the tank for {min} to {max} at one stack, {growth}% more for each stack. The stacks last {seconds} sec after the last strike: at {swap} stacks, let the other tank take the boss. Heroic: {heroicPer}% per stack. Mythic: {mythicPer}% per stack.',
+      frozen: 'Frozen solid by Biting Frost: stunned for {seconds} sec.',
+      rime: 'Hardening Frost closes at your feet in {seconds} sec: anyone within {radius} yd of it is frozen solid for {frozen} sec. Step out of the ring.',
+      fusionSteam:
+        'Elemental Fusion of the Heat and the Quench: in {seconds} sec thick clouds of Scalding Steam rise in the quarter it entered and drift through it, burning anyone inside every second. Stay out of the clouds.',
+      fusionMagma:
+        'Elemental Fusion of the Heat and the Hammer: in {seconds} sec Magma Rift marks players; a fissure erupts under each of them and leaves a pool of lava. Move the marks away from the raid.',
+      fusionFirestorm:
+        'Elemental Fusion of the Heat and the Breath: in {seconds} sec a Firestorm lane is laid across the room, then a wall of flame sweeps along it. Leave the lane.',
+      fusionHail:
+        'Elemental Fusion of the Quench and the Breath: in {seconds} sec a Hailstorm falls on the quarter it entered for several seconds, each hailstone into a small circle on the floor. Step out of the circles.',
+      fusionAvalanche:
+        'Elemental Fusion of the Quench and the Hammer: in {seconds} sec spikes of ice and stone run from the wall toward the centre in lanes. Stand in the gaps between the lanes.',
+      fusionSpires:
+        'Elemental Fusion of the Breath and the Hammer: in {seconds} sec Storm Spires rise in the quarter it entered and charge, then lightning leaps from spire to spire along the lines shown on the floor. Never stand between two spires.',
+      magmaMark:
+        'Magma Rift: in {seconds} sec a fissure erupts under you for {min} to {max} Fire damage to everyone within {radius} yd, and leaves a pool of lava that burns for {life} sec ({poolMin} to {poolMax} Fire damage a second). Move away from the raid before it erupts. Heroic: {heroicMin} to {heroicMax}. Mythic: {mythicMin} to {mythicMax}.',
+      polarityFire:
+        'Opposing Elements, Fire: touch a player marked Ice (within {meet} yd) to cancel both marks. Touching any other mark explodes for {min} to {max} Arcane damage to both of you (on Mythic, to everyone within {clash} yd). Not cancelled within {seconds} sec: {lateMin} to {lateMax} Arcane damage to you on Normal; to the whole raid on Heroic ({heroicLateMin} to {heroicLateMax}) and Mythic ({mythicLateMin} to {mythicLateMax}), once for each pair left uncancelled.',
+      polarityIce:
+        'Opposing Elements, Ice: touch a player marked Fire (within {meet} yd) to cancel both marks. Touching any other mark explodes for {min} to {max} Arcane damage to both of you (on Mythic, to everyone within {clash} yd). Not cancelled within {seconds} sec: {lateMin} to {lateMax} Arcane damage to you on Normal; to the whole raid on Heroic ({heroicLateMin} to {heroicLateMax}) and Mythic ({mythicLateMin} to {mythicLateMax}), once for each pair left uncancelled.',
+      polarityEarth:
+        'Opposing Elements, Earth: touch a player marked Lightning (within {meet} yd) to cancel both marks. Touching any other mark explodes for {min} to {max} Arcane damage to both of you (on Mythic, to everyone within {clash} yd). Not cancelled within {seconds} sec: {lateMin} to {lateMax} Arcane damage to you on Normal; to the whole raid on Heroic ({heroicLateMin} to {heroicLateMax}) and Mythic ({mythicLateMin} to {mythicLateMax}), once for each pair left uncancelled.',
+      polarityLightning:
+        'Opposing Elements, Lightning: touch a player marked Earth (within {meet} yd) to cancel both marks. Touching any other mark explodes for {min} to {max} Arcane damage to both of you (on Mythic, to everyone within {clash} yd). Not cancelled within {seconds} sec: {lateMin} to {lateMax} Arcane damage to you on Normal; to the whole raid on Heroic ({heroicLateMin} to {heroicLateMax}) and Mythic ({mythicLateMin} to {mythicLateMax}), once for each pair left uncancelled.',
+      // Part 2 (src/ui/final_phase_aura_effect.ts; the numbers are
+      // final_phase_ids.ts FINAL_PHASES').
+      phaseCall:
+        'Call of the Quarters: shielded in the centre for {seconds} sec while its Splinters live. Every Splinter deals {min} to {max} damage to the whole raid every {every} sec, {rise}% more with each pulse. Kill them all to break the shield early; any still alive when the call ends pours its element into it for the rest of the fight. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      phaseFight:
+        'At {first}% and {second}% health it strides into the centre, shielded, and calls a Splinter out of each of its fullest quarters. At {final}% all four quarters wake for the end of the fight.',
+      phaseFinal:
+        'All four quarters are awake: it stays in the central ring and all four stars run at once at {pace}% pace, pillars, lightning, blades and whirls together. After {enrage} sec it loses all restraint (Masterless Fury).',
+      phaseKneel: 'It kneels. Nothing harms it.',
+      phaseRebirth: 'The Heart beats. Nothing harms it until it rises at {percent}% health.',
+      unmade:
+        'Every {every} sec a whole quarter of the Anvil falls, the one with the fullest Overload bar first, after {warn} sec of warning cracks. Anyone standing on it falls and dies. {ring} sec after the last quarter the central ring breaks and kills everyone.',
+      shield: 'Gathered Strength: immune to all damage and cannot be targeted.',
+      pouredHeat:
+        'The Heat poured into it: Fire Whirls rise every {every} sec wherever it stands, for the rest of the fight.',
+      pouredQuench:
+        'The Quench poured into it: Crossing Blades sweep the room every {every} sec wherever it stands, for the rest of the fight.',
+      pouredBreath:
+        'The Breath poured into it: Sky Strikes fall every {every} sec wherever it stands, for the rest of the fight.',
+      pouredHammer:
+        'The Hammer poured into it: pillars rise every {every} sec wherever it stands, for the rest of the fight.',
+      fury: 'Masterless Fury: deals {min} to {max} damage to the whole raid every {every} sec, {rise}% more with each pulse. Kill it now. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      coal: 'In {seconds} sec the coal bursts: {min} to {max} Fire damage to every other player within {reach} yd of you, and {selfMin} to {selfMax} to you. Leave the group now. Heroic: {heroicMin} to {heroicMax} and {heroicSelfMin} to {heroicSelfMax} damage respectively. Mythic: {mythicMin} to {mythicMax} and {mythicSelfMin} to {mythicSelfMax}.',
+      tether:
+        'The Splinter of the Breath hunts you for {seconds} sec. Its Buffeting Gale deals {min} to {max} Nature damage every second to everyone else within {reach} yd of it: drag it away from the group. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
+      chill:
+        'Movement speed reduced by {pct}% for {seconds} sec: you crossed a Quenching Ring outside its gaps.',
+      weight:
+        'Deals {total} Physical damage a second ({per} per stack). Each stack makes the Splinter of the Hammer hit you {step}% harder ({harder}% now). Lasts {seconds} sec; the tanks swap at {swap} stacks. Each stack makes it hit {heroicStep}% harder on Heroic and {mythicStep}% on Mythic.',
     },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
@@ -10105,6 +10454,285 @@ export const hudChromeStrings = {
     breathLine:
       'The stone jaguar is about to breathe over this half of the terrace. Cross to the other half',
   },
+  // The Smith's Heart's Hammer Council (encounters/smith_heart/council*.ts):
+  // what its members say (boss yells). The fight paints nothing on the
+  // screen of its own (no raid warning, no personal alert since the team's
+  // feedback of 2026-11-17): its mechanics read in the world.
+  council: {
+    // What the two members SAY (boss yells, encounters/smith_heart/
+    // council_voice.ts COUNCIL_LINES, the same English).
+    say: {
+      guardian_pull: "Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
+      guardian_wrath: 'The mountain answers me! Hide, if the stone will have you!',
+      guardian_rush: 'Stand in my path, then. The mountain does not turn aside.',
+      guardian_collapse: 'Then let the whole Quarry fall!',
+      guardian_slay_a: 'Crushed, as ore beneath the hammer.',
+      guardian_slay_b: 'One less hand to steal the strength.',
+      guardian_death: 'My strength... I give it to the stone.',
+      guardian_remember: 'The stone remembers. What was theirs is mine.',
+      guardian_grief: 'You took her song. I will make it a dirge.',
+      guardian_soul: 'I am the stone now. My wrath has no body left to fail.',
+      guardian_wipe: 'Dust. As all flesh becomes.',
+      guardian_defeat: "The Hammer's strength... is yours to carry.",
+      singer_pull: 'Hear the seam sing? It has waited so long for your voices.',
+      singer_song: 'Sing with me, and break!',
+      singer_wake: 'Wake, sleeping stone. Rise where they stand!',
+      singer_rock: 'Look up, little ones! The mountain is falling!',
+      singer_hush: 'You would silence the seam? It only sings louder.',
+      singer_slay_a: 'Your voice joins the seam now.',
+      singer_slay_b: 'Hear that? One note fewer.',
+      singer_death: 'My song... runs into the rock...',
+      singer_remember: 'The stone remembers. Listen, it still sings.',
+      singer_grief: 'His strength is mine now. Feel the mountain sing.',
+      singer_soul: 'Listen. In the stone, my song never ends.',
+      singer_wipe: 'Hush now. The seam is still.',
+      singer_defeat: 'The last note... fades.',
+    },
+  },
+  // The Smith's Heart's Guardian of the Breath (encounters/smith_heart/
+  // breath*.ts): the Knotted Gale alert's short titles and its throw prompt
+  // (src/ui/hud/dungeon/knot_alert_view.ts), and what the guardian and
+  // Captain Thessaly SAY (breath_voice.ts BREATH_LINES, the same English).
+  knotAlert: {
+    aTitle: 'You are Portal A!',
+    bTitle: 'You are Portal B!',
+    cTitle: 'You are Portal C!',
+    dTitle: 'You are Portal D!',
+    carryTitle: 'You carry the Knotted Gale!',
+    lipTitle: 'Throw it now!',
+    throwKey: 'Press {key} at the edge to throw',
+    throwTap: 'Tap here at the edge to throw',
+    throwClick: 'Click here at the edge to throw',
+    throwAria: 'Throw the Knotted Gale into the void',
+    // The tank swap (breath_blow.ts): RETIRED 2026-11-24 for the raid's shared
+    // tank swap alert (tankSwap below); kept for the overlays' reviewed rows.
+    batteredTitle: 'Wind-Battered x{stacks}: swap tanks!',
+    chargedTitle: 'Thunder-Laden x{stacks}: swap tanks!',
+    ruinTitle: 'Bellows Blow throws you off the edge!',
+  },
+  breathGuardian: {
+    say: {
+      guardian_intro:
+        'The summit was silent for an age. Now it draws breath, and the sky breathes with it.',
+      guardian_pull:
+        'You climbed to the top of the mountain to steal its breath? Then breathe with me.',
+      guardian_blow: 'Feel the wind turn. The edge is closer than you think.',
+      guardian_inhale: 'Come closer. All of you.',
+      guardian_storm: 'Enough breath. Now the storm!',
+      guardian_cradle: 'Rise, little one. Let them catch you.',
+      guardian_drawn: 'The sky has chosen you. Run, and it follows.',
+      guardian_isles: 'Wrap me in the gale! When I breathe out, the sky ends.',
+      guardian_bulwark: 'My cocoon... torn open. Then feel the storm!',
+      guardian_roar: 'Hear the summit roar!',
+      guardian_knot: 'Hold my storm, if your arms can bear it.',
+      guardian_slay_a: 'Another one given to the wind.',
+      guardian_slay_b: 'The sky does not catch the fallen.',
+      guardian_slay_c: 'Your last breath is mine.',
+      guardian_wipe: 'Blown away, like dust from the summit.',
+      guardian_death: 'The Breath... goes back... to the mountain...',
+      thessaly_pull:
+        'Highwatch stands with you! There is no wall up here: the wind will throw you off the edge!',
+      thessaly_isles:
+        'It is gathering a nova! Two stones out on the isles can still it: split in two and ride my updrafts!',
+      thessaly_updraft: 'Isle clear! The next updraft is up, go!',
+      thessaly_stone: 'The stone is awake! Channel it, and let nothing strike you!',
+      thessaly_circle_a: 'Into my calm, quickly! It holds three, no more!',
+      thessaly_circle_b: 'Here! Stand with me and let the wind break on us!',
+      thessaly_circle_c: 'Calm on the stone! Three of you, now!',
+      thessaly_inhale: 'It is drawing breath! Get to its sides, never before its mouth!',
+      thessaly_storm: 'The storm is breaking! My calm cannot hold this. Spread out!',
+      thessaly_fall: 'Hold on to the stone!',
+      thessaly_victory: 'The Breath is free. Highwatch will remember this climb.',
+      thessaly_wipe: 'Fall back and catch your breath. We go again.',
+    },
+  },
+  // The Smith's Heart's Guardian of the Quench (encounters/smith_heart/
+  // quench*.ts): what the guardian SAYS (quench_voice.ts QUENCH_LINES, the
+  // same English). Its fight calls no raid warning banner (the owner's rule
+  // of 2026-11-04: its mechanics read in the world). The entrance's line is
+  // wordy (M16): non-Latin fills in the overlays.
+  quenchGuardian: {
+    say: {
+      intro:
+        'Hush... the lake was sleeping. You have woken the cold, and the cold does not forgive.',
+      pull: 'Warm blood on my lake. It will not stay warm for long.',
+      shatter: 'Frozen through. Now break.',
+      hole: 'The ice remembers every step. Stand together, and it gives.',
+      wake: 'Blades of the Smith, wake! Hunt them across the ice!',
+      cross: 'Go, blades! Cut them from the warmth!',
+      flurry: 'Every blade! Every edge! Leave nothing standing on my lake!',
+      deepen: 'Feel it? The cold is going deeper.',
+      breath: 'Breathe in the deep cold.',
+      slay_a: 'Tempered... and broken.',
+      slay_b: 'Cool now. Quiet now.',
+      slay_c: 'The lake keeps what it takes.',
+      wipe: 'Still. Silent. Quenched.',
+      death: 'The cold... lets go... The Quench is yours.',
+    },
+  },
+  // The Smith's Heart's Guardian of the Quench cold bar (src/ui/hud/dungeon/
+  // quench_alert_view.ts): short titles and the bar's words, no sentence
+  // lines (the owner's rule of 2026-11-03). Wordy (M16): non-Latin fills in
+  // the overlays.
+  quenchAlert: {
+    markedTitle: 'A blade hunts you! ({order} of {count})',
+    // The cold, the freeze and the water: RETIRED 2026-11-25 (the cold reads
+    // on its debuff's badge and the frost marks, quench_cold_view.ts; the
+    // freeze and the water on their debuffs' timers); kept for the overlays'
+    // reviewed rows.
+    coldTitle: 'Cold',
+    freezingTitle: 'Freezing!',
+    warmTitle: 'Huddled warmth',
+    frozenTitle: 'Encased in rime!',
+    waterTitle: 'Under the ice!',
+    splashTitle: 'Rime splash! +{cold} cold',
+    coldBar: 'Cold {cold} / {max}',
+    coldAria: 'Cold {cold} of {max}',
+    timeAria: '{seconds} seconds left',
+    // The seconds printed on a timed bar (every Smith's Heart alert).
+    secondsBar: '{seconds}s',
+    rimeTitle: 'Living Rime! Leave the group',
+    rimeBar: 'Rime {left} / {whole}',
+    rimeAria: 'Living Rime: {left} of {whole} healing left to break it',
+    // Rime-Tempered at its swap count (quench_temper.ts): RETIRED 2026-11-24
+    // for the raid's shared tank swap alert (tankSwap below); kept for the
+    // overlays' reviewed rows.
+    temperedTitle: 'Swap tanks! x{stacks}',
+  },
+  // The Smith's Heart's tank swap alert (src/ui/hud/dungeon/
+  // tank_swap_alert_view.ts): the raid's one tank swap cue, a word each, no
+  // sentence (Jose's rule of 2026-11-24). Swap: the tank carrying the swap
+  // debuff at its count (its stacks); nobody else is prompted.
+  tankSwap: {
+    swapTitle: 'Swap x{stacks}',
+    timeAria: '{seconds} seconds left on the debuff',
+  },
+  // The Smith's Heart's tank buster alert (tank_swap_alert_view.ts, the swap's
+  // family): a boss's heavy hit on the tank it is aimed at, its name and its
+  // countdown on one compact line (the team's feedback of 2026-11-25; the
+  // owner's call of 2026-11-27 moved it out of the screen's middle). `onYou`
+  // is RETIRED with that move, kept for the overlays' reviewed rows. Wordy
+  // (M16): non-Latin fills in the overlays.
+  tankBuster: {
+    weight: "Hammer's Weight",
+    blow: 'Bellows Blow',
+    thunder: 'Thunder Lash',
+    tempering: 'Tempering Strike',
+    strike: 'Elemental Strike',
+    shear: 'Shearing Blow',
+    brand: 'Wellspring Brand',
+    onYou: 'On you',
+    seconds: '{seconds} sec',
+    timeAria: '{name} hits you in {seconds} seconds',
+  },
+  // The Smith's Heart's Live Coal chip (src/ui/hud/dungeon/coal_alert_view.ts):
+  // the bearer's own small readout, a word and a number (Jose's rule of
+  // 2026-11-24). Wordy (M16): non-Latin fills in the overlays.
+  liveCoal: {
+    title: 'Live Coal',
+    absorb: '{absorb} to heal',
+    fuseAria: '{seconds} seconds until it bursts',
+  },
+  // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):
+  // what the guardian SAYS (heat_voice.ts HEAT_LINES, the same English). Its
+  // fight calls no raid warning banner (the owner's rule of 2026-11-03). The
+  // entrance's line is wordy (M16): non-Latin fills in the overlays.
+  heatGuardian: {
+    say: {
+      intro:
+        'Insects. You crawl into the first flame and expect to leave? I was burning before your kind learned fire. Then burn with it!',
+      pull: 'You walk into the first flame. Nothing leaves it unchanged.',
+      fist: 'Stand where the stone falls, and be part of it.',
+      sink: 'The wellspring rises to meet you!',
+      sinkAgain: 'Again the Hearth overflows. Again you burn.',
+      feed: 'Yes... come home to the flame.',
+      rise: 'I rise with the first fire!',
+      seeds: 'Every spark I scatter takes root.',
+      zones: 'The Hearth wakes beneath your feet.',
+      cinder: 'Run, little ember. The flame is hungry.',
+      wheel: 'The Hearth turns! Keep pace with it, or burn!',
+      slay_a: 'Another spark goes home to the flame.',
+      slay_b: 'Burned clean.',
+      slay_c: 'The first flame takes its due.',
+      wipe: 'Ash, all of you. The Hearth burns on.',
+      death: 'The flame... sinks back... into the stone. Carry it well.',
+    },
+  },
+  // The Smith's Heart's Masterless Strength (encounters/smith_heart/final*.ts):
+  // what it SAYS (final_voice.ts FINAL_LINES, the same English). Its fight
+  // calls no raid warning banner (the owner's rule of 2026-11-03). Wordy
+  // (M16): non-Latin fills in the overlays.
+  finalBoss: {
+    say: {
+      arrivalWake:
+        'Who wakes the heart of the mountain? Warm breath... here, where nothing breathes.',
+      arrivalRise:
+        'Stone, rise. Bind to us. The hand that shaped us is gone, so we shape ourselves.',
+      arrivalRoar: "We are the Smith's strength, and we have no master!",
+      pull: 'You broke the Hammer, the Breath, the Quench and the Heat. You slew every one of our brothers. Good. Their strength did not die with them... it flows to us. We will wear their power, and crush you with it!',
+      drinkHeat: 'The first flame fills us!',
+      drinkQuench: 'Cold water, harden us!',
+      drinkBreath: 'Breathe, bellows! Lift the storm!',
+      drinkHammer: 'Strike, Hammer! Make us heavy!',
+      burst: 'The vein runs over! Drown in it!',
+      anvil: 'Bear the weight of the world!',
+      call: 'Splinters of our strength, rise from the veins! Guard the heart!',
+      callAgain: 'Again! Every vein, give us your children!',
+      shattered: 'Our splinters... shattered. Then we fight with what remains.',
+      poured: 'Yes... pour into us. Every vein, one body.',
+      final: 'Enough! Every vein at once! The whole mountain falls on you!',
+      fury: 'No hand to stay us. No end to our strength!',
+      kneel: 'So this is how he felt... lying down... at last...',
+      rebirth: 'No. The mountain does not sleep twice!',
+      collapse: 'Fall, stone! If we cannot hold the mountain, no one stands on it!',
+      anvilsEnd: 'The Anvil ends. Everything ends.',
+      slay_a: 'Back into the stone.',
+      slay_b: 'Your blood returns to the vein.',
+      slay_c: 'One more warmth, sealed in.',
+      wipe: 'Sealed. Silent. As he wanted.',
+      death:
+        'Useless... all of them. The Guardians... Varkhul... useless, every one. But you cannot kill the elements. Stone, fire, wind and ice do not die... they wait. We will return... and the mountain will remember your names.',
+    },
+  },
+  // The Masterless Strength's raid HUD (src/ui/hud/dungeon/heart_final_phase_view.ts):
+  // the switch mark and part 2's clocks; the quarter names also label the room's
+  // Overload ring (src/render/smith_heart_fx/final_overload_ring.ts). title, unbound
+  // and the three aria rows are retired (scripts/i18n_retired_keys.mjs). Wordy (M16).
+  // The Guardian of the Breath's wind badge (src/ui/hud/dungeon/breath_wind_view.ts):
+  // its label under the arrow while the wind blows, and while it turns.
+  breathWind: {
+    blowing: 'Wind',
+    turning: 'Wind turning',
+  },
+  finalOverload: {
+    kneeling: 'It kneels',
+    rising: 'The Heart beats',
+    fallsIn: '{quarter} falls in {seconds}',
+    ringFallsIn: 'The ring breaks in {seconds}',
+    allFallen: 'Nothing is left',
+    title: 'Overload',
+    heat: 'Heat',
+    quench: 'Quench',
+    breath: 'Breath',
+    hammer: 'Hammer',
+    shaken: 'Shaken {seconds}',
+    unbound: 'Unbound x{stacks}',
+    barAria: '{quarter} Overload {pct} percent',
+    activeAria: 'Active quarter: {quarter}',
+    groupAria: 'Ashgrand: Overload bars',
+    // Part 2: the intermission, the final phase, the poured elements.
+    titleCall: 'Call of the Quarters',
+    titleFinal: 'All quarters awake',
+    titleUnmade: 'The Unmade Anvil',
+    call: 'Shield {seconds}',
+    splinters: 'Splinters {count}',
+    striding: 'Striding to the centre',
+    enrage: 'Enrage in {seconds}',
+    fury: 'Masterless Fury x{stacks}',
+    poured: 'Poured in: {elements}',
+    pouredTimes: '{quarter} x{times}',
+  },
+
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
   // Wordy (M16): non-Latin fills in the overlays.
   sanctumAlert: {
@@ -10560,6 +11188,10 @@ export const hudChromeStrings = {
     hiddenBadge: 'Hidden',
     titleChip: 'Title reward',
     borderChip: 'Border reward',
+    // A deed paying a cosmetic beyond the Book (the Smith's Heart's feats and meta).
+    cosmeticChip: 'Cosmetic reward',
+    rewardAppearance: 'Reward: the {name} weapon appearance, for every character on your account',
+    rewardMount: 'Reward: the {name} mount',
     watch: 'Watch',
     unwatch: 'Unwatch',
     watchFull: 'Watchlist full ({cap} max)',
@@ -10658,6 +11290,129 @@ export const hudChromeStrings = {
     toggleAria: 'Switch between the world map, zone map, and instance map',
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',
+  },
+  // The raid atlas (src/ui/hud/raid_atlas/): the Smith's Heart's illustrated
+  // M-map, its pages, room names, tools, pin styles and legend.
+  raidAtlas: {
+    canvasAria: 'Raid map',
+    // The cartouche's progress line: plural on the boss total (tPlural).
+    subtitle: {
+      one: '{floor}: {defeated} of {total} boss defeated',
+      other: '{floor}: {defeated} of {total} bosses defeated',
+    },
+    north: 'N',
+    scale: '{yards} yd',
+    floorsAria: 'Map pages',
+    floor: {
+      veins: 'The Veins',
+      heart: 'The Heart',
+    },
+    youAreHere: 'You are here',
+    room: {
+      cleft: 'The Cleft',
+      gallery: 'Hammer Gallery',
+      quarry: "Smith's Quarry",
+      balcony: 'The Balcony',
+      ring: 'The Ring',
+      dais: 'Seal Dais',
+      cornice: 'Storm Cornice',
+      bridge: 'Wind Bridge',
+      basin: 'Quench Basin',
+      hearth: 'The Hearth',
+      castingFloor: 'Casting Floor',
+      anvil: 'Anvil of the World',
+      terrace: 'Arrival Terrace',
+    },
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    reset: 'Show the whole map',
+    pinTool: 'Place pins',
+    pinToolHint: 'Pin tool on: tap or click the map to place a pin',
+    pinStyle: 'Pin style',
+    pinEdit: 'Edit pin',
+    removePin: 'Remove pin',
+    clearPins: 'Remove all pins',
+    done: 'Done',
+    pinIconsAria: 'Pin icon',
+    pinColorsAria: 'Pin colour',
+    pinIcon: {
+      star: 'Star',
+      flag: 'Flag',
+      skull: 'Skull',
+      swords: 'Swords',
+      shield: 'Shield',
+      diamond: 'Diamond',
+    },
+    pinColor: {
+      gold: 'Gold',
+      red: 'Red',
+      blue: 'Blue',
+      green: 'Green',
+      purple: 'Purple',
+      white: 'White',
+    },
+    legendToggle: 'Legend',
+    legend: {
+      you: 'You',
+      member: 'Raid member',
+      boss: 'Boss',
+      engaged: 'Boss in combat',
+      defeated: 'Boss defeated',
+      portal: 'Portal',
+      entrance: 'Entrance',
+      pin: 'Your pin',
+      shared: 'Raid mark (shared)',
+      river: 'Path of light to a guardian',
+    },
+    // The group's shared raid marks (src/ui/hud/raid_atlas/raid_atlas_shared_marks.ts):
+    // the eight raid-marker symbols set on the map for everyone in the instance,
+    // apart from the player's own pins. The symbols' names are hud.markers.names.*.
+    shared: {
+      tool: 'Raid marks',
+      title: 'Raid marks',
+      symbolsAria: 'Raid mark symbols',
+      placeHint:
+        'Tap or click the map to place {marker} for your group. Tap or click a raid mark to remove it.',
+      clearAll: 'Clear all',
+      noteEditable: 'Everyone in your group sees these marks.',
+      readOnly: 'Only the raid leader can place raid marks.',
+    },
+    hintDesktop:
+      'Scroll to zoom, drag to pan, double-click to zoom in. Right-click the map to place a pin, right-click a pin to remove it, click a pin to restyle it.',
+    hintTouch:
+      'Pinch to zoom and drag to pan. Turn on the pin tool, then tap the map to place a pin; tap a pin to restyle or remove it.',
+    // The boss pins' portrait medallions and their tooltip card
+    // (src/ui/hud/raid_atlas/raid_atlas_boss_pins.ts): the encounter's subtitle,
+    // its state and a short lore note drawn from docs/design/raid/smith_heart.md.
+    boss: {
+      aria: 'Boss: {name}, {state}',
+      state: {
+        alive: 'Alive',
+        engaged: 'In combat',
+        dead: 'Defeated',
+      },
+      hammer: {
+        title: 'The Hammer Council',
+        subtitle: '{lead} and {partner}',
+        lore: 'Two beings of living stone share the Hammer, the strength that shapes the mountain. Without their master they keep his last order with blind force: crush whatever enters the Quarry. The Seam Singer wakes the rock with her song, and the Guardian brings it down.',
+      },
+      breath: {
+        subtitle: 'Strength of the Bellows',
+        lore: "The Breath of the bellows once fanned the Smith's forge, and now it sleeps in the north vein, high on a cornice over open sky. Its guardian is granite and crystal held together by living wind, and its gales can lift a raid from the stone.",
+      },
+      quench: {
+        subtitle: 'Queen of the Frozen Lake',
+        lore: 'The Quench is the cold water that hardens a blade, and its strength sleeps beneath a frozen lake in the east vein. Its keeper is a giantess of dark slate and ice, crowned in frost, a star of cold blazing in her chest. She fights with her fists, and where she strikes, the lake breaks.',
+      },
+      heat: {
+        subtitle: 'Giant of the Wellspring',
+        lore: "The Hearth keeps the Smith's oldest flame, white-gold fire sealed in living crystal and black basalt. Its guardian stands waist-deep in the wellspring, as tall as seven men, and never leaves it: the raid must come to the fire.",
+      },
+      final: {
+        subtitle: 'The Four Veins Made One',
+        lore: "Before he lay down to become Thornpeak, the Smith split his strength in four so his seal would hold for centuries. Here on the Anvil of the World the four veins gather into one mindless body. It means to finish its master's last task: seal the mountain forever, with everything that breathes inside.",
+      },
+    },
   },
   // World map atlas rail. These labels name visible filters, quest actions,
   // region facts, and the compact marker legend; wordy values carry same-change
@@ -11245,5 +12000,71 @@ export const hudChromeStrings = {
     chosen: 'Weekly quest taken: {category}',
     progress: '{label}: {count}/{required}',
     done: 'Weekly quest complete: {category}',
+  },
+  // The raid's world markers in the 3D world (src/ui/hud/world_markers/): the
+  // party-column button and its flyout of the eight raid-marker symbols, placed by
+  // clicking the ground. The same marks the raid map calls raid marks
+  // (raidAtlas.shared); the symbols' names are hud.markers.names.*.
+  worldMarkers: {
+    button: 'World Markers',
+    buttonArmed: 'Placing {marker}',
+    title: 'World Markers',
+    flyoutAria: 'World markers',
+    tip: 'Mark a spot on the floor for your group: pick a marker, then click the ground where it goes. Everyone in your group inside this instance sees it, on the floor and on the map.',
+    tipTouch:
+      'Mark a spot on the floor for your group: pick a marker, then tap the ground where it goes. Everyone in your group inside this instance sees it, on the floor and on the map.',
+    tileTip:
+      'Click it, then click the ground to place it there. Placing it again moves it. Right-click the ground or press Escape to cancel.',
+    tileTipTouch: 'Tap it, then tap the ground to place it there. Placing it again moves it.',
+    tileRemove: 'Right-click: remove it.',
+    tileRemoveTouch: 'Press and hold: remove it.',
+    tileAria: '{marker} world marker',
+    tileAriaPlaced: '{marker} world marker, placed',
+    clearAll: 'Clear all',
+    clearAllTip: 'Remove every world marker your group has placed in this instance.',
+    readOnly: 'Only the raid leader can place world markers.',
+    bindPlace: 'Place World Marker: {marker}',
+    bindClear: 'Clear All World Markers',
+  },
+  // The raid target icons on UNITS (src/ui/raid_target_icons_core.ts): the
+  // player-menu row that opens the icon picker, the key-binding section and its
+  // rows, and the party/raid frame icon's spoken name. The symbols' names are
+  // hud.markers.names.*, the picker's own rows hud.markers.*.
+  raidTargets: {
+    menuRow: 'Raid Target Icon',
+    menuRowTip:
+      'Put one of the eight raid target icons over this unit. Your whole group sees it, and each icon sits on one unit at a time.',
+    bindCategory: 'Raid Target Icons',
+    bindSet: 'Mark Target: {marker}',
+    bindClear: 'Clear Target Marker',
+    frameMark: 'Marked: {marker}',
+  },
+  // Party pings (src/ui/hud/pings/): the Ping key's binding row, the hold wheel's
+  // four wedges and its cancel centre, each ping kind's name, the party chat line
+  // a ping writes (the sender's name first, a colon, then the callout), and the
+  // Options switch. The sim owns every ping rule (src/sim/social/party_pings.ts).
+  pings: {
+    bindCategory: 'Pings',
+    bindPing: 'Ping',
+    wheelAria: 'Ping wheel',
+    cancel: 'Cancel',
+    kindLook: 'Look Here',
+    kindAttack: 'Attack',
+    kindWarning: 'Warning',
+    kindOnMyWay: 'On My Way',
+    kindAssist: 'Assist',
+    // The chat callout: the frame around the sender and the callout, then the
+    // callout itself for a unit ping ({target} is the unit's name). A ground
+    // ping's callout is just the kind's name above.
+    chatLine: '{name}: {callout}',
+    calloutAttackUnit: 'Attack {target}',
+    calloutAssistUnit: 'Assist {target}',
+    calloutWarningUnit: 'Warning, {target}',
+    calloutOnMyWayUnit: 'On my way to {target}',
+    calloutLookUnit: 'Look at {target}',
+    enableSetting: 'Enable Pings',
+    chatSetting: 'Show Pings in Chat',
+    enableSettingNote:
+      'Hold the Ping key to open the ping wheel, or tap it to ping what is under the cursor. Only your party or raid sees your pings, at most 4 every 5 seconds. Turning this off also hides every ping from your group: no icon, sound, chat line or minimap mark.',
   },
 };

@@ -12,6 +12,9 @@
 // geometry's center-relative XZ positions and a `groundHeight` sampler, honoring
 // the "terrain height = sim height" invariant (see src/render/CLAUDE.md).
 
+import { SMITH_HEART_FINAL_BOSS } from '../sim/content/smith_heart';
+import { FINAL_BODY_RADIUS } from '../sim/encounters/smith_heart/final_ids';
+
 /** A terrain height sampler: world (x, z) -> ground height on the up axis. */
 export type HeightSampler = (x: number, z: number) => number;
 
@@ -39,10 +42,31 @@ const RING_REFERENCE_HEIGHT = 1.8;
  * fox or a dragonkin whelp) additionally shrinks the ring so it hugs that
  * target's real footprint instead of the reference creature's.
  */
-export function selectionRingScale(entityScale: number, viewHeight: number): number {
+export function selectionRingScale(
+  entityScale: number,
+  viewHeight: number,
+  templateId?: string,
+): number {
   const heightFactor = Math.min(1, viewHeight / RING_REFERENCE_HEIGHT);
-  return entityScale * heightFactor;
+  const scale = entityScale * heightFactor;
+  // A towering body whose hitbox is its authored body (BODY_EDGE_RINGS): the
+  // ring's outer edge lies at that edge, never inside the model.
+  const edge = templateId !== undefined ? BODY_EDGE_RINGS[templateId] : undefined;
+  return edge !== undefined ? Math.max(scale, edge / SELECTION_RING_OUTER) : scale;
 }
+
+/** The reticle's outer radius at scale 1 (selection_reticle.ts flatRing). */
+export const SELECTION_RING_OUTER = 1.15;
+
+/** Templates whose target circle is drawn at their body's edge (yards from
+ *  the pivot, the template's bodyRadius: where melee reaches them from, 3 yd
+ *  past it). The Masterless Strength (the team's playtest of 2026-11-25:
+ *  "make the boss hitbox bigger"), whose circle at its scale alone sat
+ *  inside its 20 yd colossus's stance. Opt-in, so no other boss's circle
+ *  moves. */
+export const BODY_EDGE_RINGS: Readonly<Record<string, number>> = {
+  [SMITH_HEART_FINAL_BOSS]: FINAL_BODY_RADIUS,
+};
 
 /**
  * Compute the local Y for each ring vertex so the ring drapes over the terrain.

@@ -1,3 +1,4 @@
+import { SMITH_HEART_MOBS } from '../content/smith_heart';
 import { MOBS } from '../data';
 import { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 import { IGNIVAR_BOSS_ID, MELEE_RANGE } from '../types';
@@ -9,6 +10,8 @@ export const RAID_BOSS_PLAYER_MELEE_RANGE = 8;
 export const HOARD_BOSS_PLAYER_MELEE_RANGE = 7;
 /** A player's melee reaches a big body from this far past its bodyRadius. */
 export const BODY_EDGE_MELEE_REACH = 3;
+/** Abilities this short (taunts, short strikes) reach a big body from its edge. */
+export const SHORT_REACH = 10;
 
 /** The melee reach a player has against a mob template that authors a
  *  bodyRadius (the towering dungeon bosses), or 0 when it authors none. */
@@ -53,5 +56,49 @@ export function effectivePlayerAttackRange(
     const edge = bodyEdgeMeleeRange(target.templateId);
     if (edge > baseRange) return edge + bonus;
   }
+  // A short-reach ability (a taunt, an 8 yd strike) measures to the body's
+  // edge too, or a tank standing where its melee lands could never Goad it
+  // (the Guardian of the Heat from its wellspring's lip). Long-range spells
+  // keep their authored range. Scoped to the Smith's Heart's bodies: the
+  // older dungeons' towering bosses keep the reach they were tuned with.
+  if (
+    baseRange > MELEE_RANGE &&
+    baseRange <= SHORT_REACH &&
+    target.kind === 'mob' &&
+    SMITH_HEART_MOBS[target.templateId] !== undefined
+  ) {
+    const r = MOBS[target.templateId]?.bodyRadius;
+    if (r !== undefined && r > 0) return baseRange + r + bonus;
+  }
   return baseRange + bonus;
+}
+
+/** A target's authored body radius: a mob's `bodyRadius` (the towering
+ *  bosses), 0 for players and every mob that authors none. */
+export function targetBodyRadius(target: AttackTarget): number {
+  if (target.kind !== 'mob') return 0;
+  const r = MOBS[target.templateId]?.bodyRadius;
+  return r !== undefined && r > 0 ? r : 0;
+}
+
+/**
+ * The pivot-to-pivot band a player ability is cast within against `target`.
+ * A RANGE-BANDED ability (one that authors a `minRange`: Charge, Bruin Rush,
+ * Intervene) measures both ends of its band from a big body's edge, like its
+ * melee and short reach do: before, its 8 yd minimum ran from the pivot, so a
+ * warrior standing in melee of the Guardian of the Heat (13.5 yd body) could
+ * still Charge it, and Charge reached only 11.5 yd past its edge (Jose's
+ * playtest of 2026-11-24). Every other ability keeps
+ * `effectivePlayerAttackRange` and no minimum.
+ */
+export function playerAbilityBand(
+  target: AttackTarget,
+  range: number,
+  minRange: number | undefined,
+  attacker?: MeleeReachActor | null,
+): { min: number; max: number } {
+  const max = effectivePlayerAttackRange(target, range, attacker);
+  if (!minRange) return { min: 0, max };
+  const body = targetBodyRadius(target);
+  return { min: minRange + body, max: Math.max(max, range + body) };
 }

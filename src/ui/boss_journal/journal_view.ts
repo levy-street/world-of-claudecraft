@@ -1,6 +1,6 @@
 // Pure encounter-journal core shared by the raid guide and the five-player
 // dungeon guides. A journal SOURCE lists its bosses in route order and builds
-// one boss page per difficulty; the window (raid_boss_guide_window.ts) paints
+// one boss page per difficulty; the Adventure Journal (hud/journal/) paints
 // whatever source the room context or the Dungeon Finder hands it. The raid
 // source wraps raid_boss_guide_view.ts unchanged; each dungeon is one
 // data-as-code module under ./dungeons/ whose numbers come from the sim's own
@@ -45,7 +45,20 @@ export interface JournalMechanic {
   percentValues?: readonly string[];
   marks?: readonly JournalMark[];
   compare?: JournalDamageCompare;
+  /** The sim's damage labels this mechanic hits players under (see
+   *  JournalMechanicDef.hits): the death recap's icon lookup. */
+  hits?: readonly string[];
+  /** The sim cast id behind the mechanic's cast bar (JournalMechanicDef.castId):
+   *  the boss cast bar's icon lookup (hud/journal/journal_cast_icons.ts). */
+  castId?: string;
 }
+
+/** The boss health a phase covers, as fractions of 1: the whole fight, a band
+ *  (`to` 0 means to the end), or the health marks it happens at. */
+export type JournalHealthRange =
+  | 'whole'
+  | { readonly from: number; readonly to: number }
+  | { readonly at: readonly number[] };
 
 export interface JournalPhase {
   id: string;
@@ -54,6 +67,17 @@ export interface JournalPhase {
   values?: JournalValues;
   percentValues?: readonly string[];
   mechanics: readonly JournalMechanic[];
+  /** The health band the phase header's pill shows. */
+  health?: JournalHealthRange;
+  /** The summary only restates the band: the pill replaces it. */
+  rangeOnly?: boolean;
+}
+
+/** One stat chip under a boss page's one-line summary (values print bold). */
+export interface JournalChip {
+  key: TranslationKey;
+  values?: JournalValues;
+  percentValues?: readonly string[];
 }
 
 export interface JournalTip {
@@ -96,6 +120,23 @@ export interface JournalBossView {
   choices?: readonly JournalChoice[];
   /** What changes on Heroic, shown as a callout on the Heroic tab. */
   heroicNotes?: readonly JournalNote[];
+  /** Every body of a council page, in roster order (the page's `mobId` is the
+   *  first): each gets its portrait and name in the header, and the page is
+   *  defeated only once all of them are down. Absent for a single boss. */
+  members?: readonly string[];
+  /** The page's own short title (a council's "A and B"); absent, the page
+   *  reads its bodies' names. */
+  nameKey?: TranslationKey;
+  /** The banner's one-line summary; a page without one shows its overview. */
+  tagline?: JournalNote;
+  /** The banner's stat chips (none when absent). */
+  chips?: readonly JournalChip[];
+  /** Bodies besides the page's own whose hits its mechanics' `hits` name (a
+   *  boss's adds, its other heads): see JournalBossDef.hitSources. */
+  hitSources?: readonly string[];
+  /** Bodies besides the page's own and its hitSources that cast its mechanics'
+   *  bars: see JournalBossDef.castSources. */
+  castSources?: readonly string[];
 }
 
 export interface JournalSource {
@@ -127,6 +168,13 @@ export interface JournalMechanicDef {
   percentValues?: readonly string[];
   /** Print both tiers' range (from `difficultyValues[tier].min/max`). */
   compare?: boolean;
+  /** Every damage label the sim deals this mechanic under (the `ability` of
+   *  its `damage` events: a dealDamage label, a DoT aura's name, a template
+   *  kit's name), read from the encounter's own name tables where it has them.
+   *  The death recap shows a hit under one of these with this mechanic's icon
+   *  (hud/journal/journal_hit_icons.ts); tests/journal_hit_icons.test.ts pins
+   *  every label to the encounter code. */
+  hits?: readonly string[];
 }
 
 export interface JournalPhaseDef {
@@ -136,6 +184,13 @@ export interface JournalPhaseDef {
   values?: JournalValues;
   percentValues?: readonly string[];
   mechanics: readonly JournalMechanicDef[];
+  health?: JournalHealthRange;
+  rangeOnly?: boolean;
+}
+
+export interface JournalChipDef extends JournalChip {
+  /** A chip shown on Heroic only (the hard enrage). */
+  availability?: 'heroic';
 }
 
 export interface JournalChoiceDef {
@@ -162,9 +217,27 @@ export interface JournalBossDef {
   heroicNotes: readonly TranslationKey[];
   heroicNoteValues?: JournalValues;
   heroicNotePercentValues?: readonly string[];
+  /** A council fought as one encounter: every body, `mobId` first. */
+  members?: readonly string[];
+  nameKey?: TranslationKey;
+  taglineKey?: JournalText;
+  taglineValues?: JournalValues;
+  taglinePercentValues?: readonly string[];
+  chips?: readonly JournalChipDef[];
+  /** Mob templates other than the page's bodies (`members`, else `mobId`) that
+   *  deal this page's mechanics: an add, another head. The death recap matches
+   *  a hit's label only against the page whose bodies or hitSources dealt it,
+   *  so a trash mob's ability that shares a name never borrows a boss icon. */
+  hitSources?: readonly string[];
+  /** Mob templates besides the page's bodies and `hitSources` that cast a
+   *  mechanic's bar (`castId`) and deal no hit of their own: an add's heal or
+   *  shove. The boss cast bar matches a cast only against the page whose bodies,
+   *  hitSources or castSources cast it (hud/journal/journal_cast_icons.ts). */
+  castSources?: readonly string[];
 }
 
 export interface DungeonJournalDef {
+  /** The instance id (a five-player dungeon, or a raid such as the Smith's Heart). */
   dungeonId: string;
   bosses: readonly JournalBossDef[];
 }
@@ -223,6 +296,8 @@ export function buildJournalPhases(
       summaryKey: pick(phase.summaryKey, difficulty),
       ...(phase.values ? { values: phase.values } : {}),
       ...(phase.percentValues ? { percentValues: phase.percentValues } : {}),
+      ...(phase.health !== undefined ? { health: phase.health } : {}),
+      ...(phase.rangeOnly ? { rangeOnly: true } : {}),
       mechanics: phase.mechanics
         .filter((m) => !m.availability || m.availability === difficulty)
         .map((m): JournalMechanic => {
@@ -245,6 +320,8 @@ export function buildJournalPhases(
             ...(m.percentValues ? { percentValues: m.percentValues } : {}),
             ...(marks.length > 0 ? { marks } : {}),
             ...(compare ? { compare } : {}),
+            ...(m.hits ? { hits: m.hits } : {}),
+            ...(m.castId ? { castId: m.castId } : {}),
           };
         }),
     }))
@@ -291,15 +368,45 @@ export function dungeonJournalBossView(
               : {}),
           }))
         : [],
+    ...(boss.members ? { members: boss.members } : {}),
+    ...(boss.hitSources ? { hitSources: boss.hitSources } : {}),
+    ...(boss.castSources ? { castSources: boss.castSources } : {}),
+    ...(boss.nameKey ? { nameKey: boss.nameKey } : {}),
+    ...(boss.taglineKey
+      ? {
+          tagline: {
+            key: pick(boss.taglineKey, difficulty),
+            ...(boss.taglineValues ? { values: boss.taglineValues } : {}),
+            ...(boss.taglinePercentValues ? { percentValues: boss.taglinePercentValues } : {}),
+          },
+        }
+      : {}),
+    ...(boss.chips
+      ? {
+          chips: boss.chips
+            .filter((chip) => !chip.availability || chip.availability === difficulty)
+            .map(
+              ({ key, values, percentValues }): JournalChip => ({
+                key,
+                ...(values ? { values } : {}),
+                ...(percentValues ? { percentValues } : {}),
+              }),
+            ),
+        }
+      : {}),
   };
 }
 
-/** A dungeon journal as a window source. */
-export function dungeonJournalSource(def: DungeonJournalDef): JournalSource {
+/** A data-as-code journal (a dungeon's, or a raid authored the same way) as a
+ *  window source. */
+export function dungeonJournalSource(
+  def: DungeonJournalDef,
+  kind: JournalSource['kind'] = 'dungeon',
+): JournalSource {
   const byKey = new Map(def.bosses.map((boss) => [boss.mobId, boss]));
   return {
     id: def.dungeonId,
-    kind: 'dungeon',
+    kind,
     bossKeys: def.bosses.map((boss) => boss.mobId),
     view(bossKey, difficulty) {
       const boss = byKey.get(bossKey) ?? def.bosses[0];
@@ -328,6 +435,7 @@ export const RAID_JOURNAL_SOURCE: JournalSource = {
       difficulty,
       portraitUrl: view.portraitUrl,
       overviewKey: view.overviewKey as TranslationKey,
+      ...(view.hitSources ? { hitSources: view.hitSources } : {}),
       phases: view.phases.map((phase) => ({
         ...phase,
         nameKey: phase.nameKey as TranslationKey,

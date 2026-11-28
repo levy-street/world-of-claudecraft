@@ -1,3 +1,5 @@
+import type { PartyPing } from '../sim/social/party_pings';
+import type { SharedMapMark } from '../sim/social/shared_map_marks';
 import type {
   AuraKind,
   MasterLootSettings,
@@ -5,6 +7,8 @@ import type {
   PlayerClass,
   ResourceType,
 } from '../sim/types';
+
+export type { PartyPing, SharedMapMark };
 
 /** A compact aura summary for a party row's mini icon strip. Relevant effects are
  *  selected before the PARTY_MEMBER_AURA_CAP limit is applied. */
@@ -35,6 +39,9 @@ export interface PartyMemberInfo {
   group: 1 | 2;
   /** Remaining absorb-shield total. Optional for compatibility with older snapshots. */
   absorb?: number;
+  /** Remaining heal absorb (healing the member must take before their health
+   *  moves). Omitted when none is up, and by older snapshots. */
+  healAbsorb?: number;
   /** Active specialization role, when known. Older snapshots omit it. */
   role?: 'tank' | 'healer' | 'dps';
   /** Active specialization id, when known. Older snapshots omit it. */
@@ -81,4 +88,22 @@ export interface IWorldParty {
   markerFor(entityId: number): number | null;
   setMarker(entityId: number, markerId: number): void;
   clearMarker(entityId: number): void;
+  // Shared raid-map marks (the raid's world markers): the group's marks, one per
+  // marker symbol 0..7, each a map page point (instance-local yards) AND its world
+  // point on the floor (wx, y, wz), so the map and the 3D world show one mark.
+  // Everyone in the instance copy sees them; in a raid only the leader edits
+  // (src/sim/social/shared_map_marks.ts owns every rule).
+  sharedMapMarks(): readonly SharedMapMark[];
+  // From the map: a page point; the sim resolves the floor height.
+  placeSharedMapMark(page: number, x: number, z: number, symbol: number): void;
+  // From the world: a clicked WORLD point (y only picks the floor storey).
+  placeSharedWorldMark(page: number, x: number, y: number, z: number, symbol: number): void;
+  // symbol null clears every mark
+  clearSharedMapMarks(symbol: number | null): void;
+  // Party pings (the ping wheel): the group's live pings, solo only your own
+  // (src/sim/social/party_pings.ts owns every rule: range, rate limit, expiry).
+  partyPings(): readonly PartyPing[];
+  // Ping `kind` (PING_LOOK..PING_ASSIST) at unit `target`, or at the world
+  // point (x, y, z) when target is null (y only picks the floor storey).
+  sendPing(kind: number, target: number | null, x: number, y: number, z: number): void;
 }

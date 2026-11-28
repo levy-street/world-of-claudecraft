@@ -65,7 +65,8 @@ async function loadContent() {
       contents:
         "export { NPCS, QUESTS, ESCORTS } from './src/sim/data.ts'; " +
         "export { IGNIVAR_DIALOGUE_LINES } from './src/sim/encounters/ignivar_dialogue.ts'; " +
-        "export { VARKHUL_DIALOGUE_LINES } from './src/sim/encounters/varkhul_dialogue.ts';",
+        "export { VARKHUL_DIALOGUE_LINES } from './src/sim/encounters/varkhul_dialogue.ts'; " +
+        "export { SMITH_HEART_VOICE_LINES } from './src/sim/encounters/smith_heart/voice_lines.ts';",
       resolveDir: root,
       sourcefile: 'voice-lines-entry.ts',
       loader: 'ts',

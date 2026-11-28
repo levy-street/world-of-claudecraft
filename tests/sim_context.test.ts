@@ -78,6 +78,7 @@ const CALLBACK_KEYS = [
   'partyOf',
   'removeFromParty',
   'dropPartyMarkers',
+  'dropMemberMarkers',
   'formDungeonFinderGroup',
   // Quest-credit callbacks + the countItem the collect arm consumes.
   'onMobKilledForQuests',
@@ -478,6 +479,7 @@ function makeFakeHost() {
     hillPartyDisband: vi.fn(),
     hillPartyJoin: vi.fn(),
     dropPartyMarkers: vi.fn(),
+    dropMemberMarkers: vi.fn(),
     formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
     onMobKilledForWorldQuests: vi.fn(),

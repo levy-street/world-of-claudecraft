@@ -541,6 +541,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the SELF debuff row: never tier-gated (your own debuffs are the ACTIONABLE read, docs/design/graphics-settings-fairness.md), so it paints every frame on every graphics preset, same as the target debuffs strip',
   },
   {
+    call: 'this.interiorMaps.frame',
+    band: 'frame',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/raid_atlas/raid_atlas_controller.ts',
+      proof: "if (!this.host.planShown() || this.win?.style.display !== 'block') {",
+    },
+    why: "the raid atlas's per-frame tick (src/ui/hud/raid_atlas/): the open M-map's eased zoom glide and live player arrow; it returns at once while the atlas is not showing",
+  },
+  {
     call: 'this.dungeonPrompts.paint',
     band: 'frame',
     gate: '',
@@ -586,9 +598,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     call: 'this.toggleClass',
     band: 'frame',
     gate: "target && target.kind !== 'object'",
-    sites: 3,
+    sites: 4,
     surface: 'chrome',
-    why: 'the target elite class, the boss class, and the forced-colors hostile cue',
+    why: 'the target elite class, the boss class, the Adventure Journal book (has-journal, an allocation-free lookup), and the forced-colors hostile cue',
   },
   {
     call: 'this.setText',
@@ -1974,7 +1986,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 55, chrome: 101, none: 21 });
+      // window 55 -> 56: the raid atlas's per-frame tick (interiorMaps.frame), which
+      // shipped with the atlas without its row.
+    ).toEqual({ window: 56, chrome: 101, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1999,7 +2013,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // refreshing instead of only closing.
       // The courier window owns both revision and content signature guards.
       // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
-      module: 32,
+      module: 33,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -2089,6 +2103,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'target_auras_window.ts: if (this.cleared) return;',
         'weekly_quests_window.ts: if (sig === this.lastSig) return;',
         'hud/guild_hall/guild_hall_window.ts: if (sig === this.lastSig) return;',
+        "hud/raid_atlas/raid_atlas_controller.ts: if (!this.host.planShown() || this.win?.style.display !== 'block') {",
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),
     );

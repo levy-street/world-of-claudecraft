@@ -1,0 +1,10 @@
+{
+  "src": "tmp/asset_src/smith_heart_hammer_colossi_src_painted.glb",
+  "out": "tmp/asset_src/smith_heart_hammer_colossi_src.glb",
+  "preview": "tmp/hammer_colossi/recolour/applied",
+  "statues": {
+    "env_colossus_keeper": "tmp/hammer_colossi/recolour/out/keeper.png",
+    "env_colossus_waking": "tmp/hammer_colossi/recolour/out/waking.png",
+    "env_colossus_bearer": "tmp/hammer_colossi/recolour/out/bearer.png"
+  }
+}

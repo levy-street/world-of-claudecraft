@@ -31,11 +31,13 @@ import { type MountLamps, updateMountLamps } from './mount_lamps';
 import { seatRiderOnBone } from './mount_lifecycle';
 import {
   createMountRearState,
+  MOUNT_REAR_SECONDS,
   type MountRearState,
   mountRearHopCancel,
   stepMountRear,
 } from './mount_rear_core';
 import { type MountVisualSpec, mountBobY } from './mount_visuals';
+import type { QuarryheartChargerFx, QuarryheartFrame } from './quarryheart_charger_fx';
 import { spinMountWheels, updateRickshawPuller } from './rickshaw_mount';
 import { type ExhaustPhase, RALLYCART_EXHAUST_PORTS } from './vehicle_exhaust_core';
 import {
@@ -78,6 +80,8 @@ export interface MountPresentationHost {
    *  mount. */
   mountRear?: MountRearState;
   mountGlows: MountGlows | null;
+  /** The Quarryheart Charger's body rig (quarryheart_charger_fx.ts), created with its visual. */
+  quarryheartFx?: QuarryheartChargerFx | null;
   mountSeatBone: THREE.Object3D | null;
   /** True while the current mount root's swapped-in materials are still
    *  linking (see mount_lifecycle.ts gateMountSwapOnCompile): the root itself
@@ -142,6 +146,47 @@ export interface MountAudioPort {
 
 const audioPort: MountAudioPort = { sink: null, id: 0, self: false };
 
+// ONE frame record for the charger's rig, rewritten per call (the audio port's idiom): the entity
+// sweep allocates nothing for it.
+const quarryheartFrame: QuarryheartFrame = {
+  dt: 0,
+  time: 0,
+  moving: false,
+  running: false,
+  facing: 0,
+  groundY: 0,
+  reducedMotion: false,
+  present: false,
+  vfx: null,
+  rearStart: null,
+  sinceSummon: null,
+};
+
+/** One frame of the Quarryheart Charger's body rig: the shaders keep time on every frame its
+ *  body is shown; particles only while it is presented. */
+function updateQuarryheart(
+  v: MountPresentationHost,
+  input: MountPresentationInputs,
+  presented: boolean,
+): void {
+  const fx = v.quarryheartFx;
+  if (!fx) return;
+  const f = quarryheartFrame;
+  f.dt = input.dt;
+  f.time = input.time;
+  f.moving = input.moving;
+  f.running = input.anim.running;
+  f.facing = input.facing;
+  f.groundY = v.group.position.y;
+  f.reducedMotion = input.vfx.reducedMotionActive;
+  f.present = presented && input.present;
+  f.vfx = f.present ? input.vfx : null;
+  const rear = v.mountRear;
+  f.rearStart = rear && rear.until > input.time ? rear.until - MOUNT_REAR_SECONDS : null;
+  f.sinceSummon = v.mountSummonAt === undefined ? null : performance.now() / 1000 - v.mountSummonAt;
+  fx.update(f);
+}
+
 /** The audio port for this frame's mount pass. ONE shared scratch, rewritten per call: the
  *  renderer builds it inline in the presentation input and the pass consumes it before the
  *  next entity's, so the per-frame entity sweep allocates nothing for it. */
@@ -197,6 +242,7 @@ export function updateMountPresentation(
   const { spec, dt } = input;
   if (v.mountVisual && spec && input.shown) {
     if (!input.present) {
+      updateQuarryheart(v, input, false);
       v.mountVisual.advanceOffscreen(dt);
       updateRickshawPuller(v, dt, input.anim, input.animate, false);
       return;
@@ -333,6 +379,9 @@ export function updateMountPresentation(
           running,
           groundY,
         );
+      } else if (spec.fx === 'quarryheart') {
+        // the Smith's Heart charger: its whole body rig (plates, heart, wind, trail, prints)
+        updateQuarryheart(v, input, true);
       } else if (spec.fx === 'sparks') {
         input.vfx.mountBroomSparks(v.group.position, input.facing, dt, input.moving);
       } else if (spec.fx === 'pipes' && v.mountSuspension) {

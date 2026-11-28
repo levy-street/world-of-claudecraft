@@ -16,6 +16,11 @@
 //   - the eat/drink overlay is PLAYER-ONLY: the target never eats/drinks, so its
 //     paint input simply omits `consume` and the consume branch is unreachable for
 //     it (the generic-Entity cast path stays the target's whole story).
+//   - `resolveCastIcon` (TARGET-ONLY) fills the bar's icon slot with a boss
+//     ability painting: the caster's template and cast id resolve through the
+//     journal cast index (hud/journal/journal_cast_icons.ts). The resolve reruns
+//     only when (caster, cast) changes and the slot writes go through the elided
+//     writers, so an unchanged frame costs nothing; the player passes no resolver.
 //   - `clearOnHide` clears the inner fill/label/timer + channel class when hidden.
 //     The player's inline block did this; the target's hidden path only set
 //     display:none, so the target leaves it off and stays byte-faithful.
@@ -48,6 +53,11 @@ const EMPTY_FILL = '0%';
 // Width percent precision (e.g. "62.5%") and the cast/consume timer precision
 // (e.g. "1.5"), both one decimal, matching the inline blocks this replaced.
 const PERCENT_FRACTION_DIGITS = 1;
+// The icon slot's painting rides background-image; the slot hides with the
+// boolean hidden attribute (present = hidden, the markup's default).
+const BACKGROUND_IMAGE_PROP = 'background-image';
+const HIDDEN_ATTR = 'hidden';
+const HIDDEN_ATTR_ON = '';
 const TIMER_FRACTION_DIGITS = 1;
 
 // The eat/drink mode -> the EXISTING localized label keys (reused, no new keys).
@@ -67,6 +77,8 @@ export interface CastBarElements {
   label: HTMLElement;
   /** The timer node (the localized seconds-remaining). */
   timer: HTMLElement;
+  /** The bar's icon slot (`.ui-cast-icon`), painted only with `resolveCastIcon`. */
+  icon?: HTMLElement;
 }
 
 /** Per-instance options that are not DOM element refs. */
@@ -80,6 +92,9 @@ export interface CastBarOptions {
   /** Display value when shown (default 'block'; the crafting window's cast
    *  strip is a flex row). */
   shownDisplay?: string;
+  /** The painted icon URL for a cast (the caster's mob template, the cast id),
+   *  or null to leave the icon slot hidden. TARGET-ONLY: the boss cast bar. */
+  resolveCastIcon?: (casterTemplateId: string | undefined, castId: string) => string | null;
 }
 
 /** The per-frame source the painter draws from. */
@@ -95,9 +110,16 @@ export interface CastBarPaintInput {
    *  it. Shown only when a summon is in progress (mountCastKey non-empty). Priority:
    *  below cast but above eat/drink, since you cannot cast while mounting. */
   mountSummon?: MountSummonBarState;
+  /** The caster's mob template id, for `resolveCastIcon` (the target only). */
+  casterTemplateId?: string;
 }
 
 export class CastBarPainter {
+  // The icon resolve's key and result: rerun only when (caster, cast) changes.
+  private iconCaster: string | undefined = undefined;
+  private iconCast = '';
+  private iconCss: string | null = null;
+
   constructor(
     private readonly writers: PainterHostWriters,
     private readonly el: CastBarElements,
@@ -112,6 +134,7 @@ export class CastBarPainter {
         this.opts.resolveCastLabel(input.cast),
         input.castRemaining,
       );
+      this.paintIcon(input.casterTemplateId, input.cast.label);
     } else if (input.mountSummon?.visible) {
       // PLAYER-ONLY: mount summon channel uses the channel styling (draining bar).
       // The label is the localized mount name (mountDisplayName), which resolves
@@ -158,6 +181,27 @@ export class CastBarPainter {
     // aria-valuemin/max but never exposed a value. Numeric, so no i18n key and no
     // hardcoded literal; routes through the elided setAttr so an unchanged percent does not write.
     this.writers.setAttr(this.el.bar, 'aria-valuenow', String(Math.round(fill * 100)));
+  }
+
+  // The boss ability painting in the icon slot (TARGET-ONLY). The hide path
+  // leaves the slot alone: the bar itself is display:none, and the next shown
+  // cast rewrites it.
+  private paintIcon(caster: string | undefined, castId: string): void {
+    const icon = this.el.icon;
+    const resolve = this.opts.resolveCastIcon;
+    if (!icon || !resolve) return;
+    if (caster !== this.iconCaster || castId !== this.iconCast) {
+      this.iconCaster = caster;
+      this.iconCast = castId;
+      const url = resolve(caster, castId);
+      this.iconCss = url ? `url("${url}")` : null;
+    }
+    if (this.iconCss) {
+      this.writers.setStyleProp(icon, BACKGROUND_IMAGE_PROP, this.iconCss);
+      this.writers.setAttr(icon, HIDDEN_ATTR, null);
+    } else {
+      this.writers.setAttr(icon, HIDDEN_ATTR, HIDDEN_ATTR_ON);
+    }
   }
 
   private timerText(remaining: number): string {

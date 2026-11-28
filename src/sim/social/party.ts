@@ -627,6 +627,7 @@ export class PartyMachine {
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
     this.partyByPid.delete(pid);
+    this.ctx.dropMemberMarkers(party.id, pid);
     if (party.members.length > 1 && party.leader !== pid)
       cancelPendingDifficultyChange(this.ctx, party.leader);
     // Paladin auras are tied to the party relationship. Keep the caster's own

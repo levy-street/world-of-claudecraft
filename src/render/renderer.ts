@@ -160,8 +160,8 @@ import {
   setCharacterCullShadow,
 } from './character_cull_core';
 import {
+  applyCharacterBodyTints,
   type CharacterWeaponAura,
-  characterRuneTintColor,
   characterVeilboundState,
   characterWeaponAuraInto,
   characterWeaponAuraMode,
@@ -380,7 +380,12 @@ import {
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
-import { latchFarLod } from './far_lod_latch';
+import {
+  keepsArticulatedRig,
+  latchFarLod,
+  noteScriptedGesture,
+  scriptedPoseHidden,
+} from './far_lod_latch';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -416,6 +421,7 @@ import { FirstPersonRig } from './first_person_camera';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
 import { applyFloorVfxLayer } from './floor_vfx_layer';
+import { FogSceneFade } from './fog_scene_fade';
 import { applyFogScenePreset, resolveFogScene } from './fog_scene_state';
 import {
   buildFoliage,
@@ -644,6 +650,7 @@ import {
   type PaladinSunVerdictVisual,
   syncPaladinSunVerdictVisual,
 } from './paladin_sun_verdict_visual';
+import { PartyPingLayer, partyPingPrewarmEntry } from './party_pings';
 import { projectionScalePixels } from './perceptual_lod_core';
 import { buildPickOnlyObjectBody, isPickOnlyObjectTemplate } from './pick_only_objects';
 import { PlacedAssetsView } from './placed_assets';
@@ -883,6 +890,7 @@ import { refreshTextureAnisotropy } from './texture_anisotropy';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { TextureResidencyLedger } from './texture_residency_ledger';
+import { thrownHopLift } from './thrown_hop';
 import {
   groundSpeedFromFrame,
   hasTravelFormAura,
@@ -950,6 +958,7 @@ import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
 import { WorldBossLayer } from './world_boss_layer';
 import { playWorldCueFx } from './world_cue_fx';
 import { WorldGuidance } from './world_guidance';
+import { WorldMarkerLayer, worldMarkerPrewarmEntry, worldMarkerSimFloor } from './world_markers';
 import { WorldPicking } from './world_picking';
 import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
@@ -1420,6 +1429,8 @@ export class Renderer {
   // Null until enabled; once built it is re-draped over the terrain in front of
   // the local player every frame. See target_cone_debug.ts.
   private targetCone: TargetConeOverlay | null = null;
+  private worldMarkers!: WorldMarkerLayer;
+  private pings!: PartyPingLayer; // the group's pings in the world (party_pings.ts)
   // Click markers, AoE impact rings and the ground-aim reticle (ground_feedback.ts).
   private readonly groundFeedback = new GroundFeedback(
     (x, z) => groundHeight(x, z, this.sim.cfg.seed),
@@ -2481,6 +2492,7 @@ export class Renderer {
     this.sunDir.copy(SUN_DIR);
     // The boot rig, captured for the editor lighting override to restore.
     this.lightRig = { sun: this.sun, hemi: this.hemi, sunDir: this.sunDir };
+    this.sceneFade = new FogSceneFade(this.scene, this.sun, this.hemi);
     this.authoredLighting.capture(this.lightRig, this.envOutdoorIntensity);
     // A map with authored lighting (the editor's Lighting tab, saved into the
     // document and projected onto WorldContent) applies it from boot: playtest
@@ -2967,6 +2979,13 @@ export class Renderer {
     );
     this.groundFeedback.reticle = groundAimReticle;
     setRenderCategory(groundAimReticle.group, 'ui3d');
+    // The raid's world markers on the floor: 8 pooled slots, built hidden here (world_markers.ts).
+    this.worldMarkers = new WorldMarkerLayer(this.scene, {
+      floor: worldMarkerSimFloor(() => this.sim.cfg.seed),
+      lowTier: this.lowGfx,
+      boost: this.lowGfx ? 1 : SELECTION_RING_BOOST,
+    });
+    this.pings = new PartyPingLayer(this.scene, this.lowGfx, (id) => this.views.get(id));
     for (let i = 0; i < CLICK_MARKER_POOL; i++) {
       const ring = buildAoeRingMesh(aoeRingGeo);
       this.scene.add(ring);
@@ -3057,7 +3076,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
-        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture),
+        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position, this.budgetLights,
       );
     });
     this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
@@ -3364,6 +3383,8 @@ export class Renderer {
     // pool, texture and material release with the rest of the GPU state.
     bestEffort(() => this.blobShadows?.dispose());
     this.blobShadows = null;
+    bestEffort(() => this.worldMarkers.dispose());
+    bestEffort(() => this.pings.dispose());
     cleanupErrors.push(...(this.dungeons?.disposeAllInteriorResources().errors ?? []));
     bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
@@ -5960,6 +5981,10 @@ export class Renderer {
       cleanup: () => this.weather.endPrewarm(),
     });
 
+    const overlayPrewarmHost = {
+      prewarmTexture: (texture: THREE.Texture) => this.prewarmTexture(texture),
+      compileColor: (root: THREE.Object3D) => this.compilePrewarmColorPrograms(root, false),
+    };
     const manifest: PrewarmManifestEntry[] = [
       {
         id: 'views.required',
@@ -6469,6 +6494,8 @@ export class Renderer {
           await Promise.all(castVfxUnits().map((unit) => unit.run()));
         },
       },
+      worldMarkerPrewarmEntry(this.worldMarkers, overlayPrewarmHost),
+      partyPingPrewarmEntry(this.pings, overlayPrewarmHost),
       {
         // Rideable mounts: worn by whoever is riding one, so the FIRST
         // sighting of any given mount links its programs the moment it
@@ -8554,6 +8581,7 @@ export class Renderer {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return 0;
+    noteScriptedGesture(visual, this.time); // a boss's scripted pose reached this rig
     this.attackTriggerCount++;
     if (!gestureOnly)
       playSkinSwingTrail(this.abilityVfxFx, entityId, this.sim.entities.get(entityId), kind);
@@ -8666,6 +8694,8 @@ export class Renderer {
   private riftFogAuthored = false;
   /** Read by scenery eligibility; atmosphere updates remain owned here. */
   fogState: FogSceneState = 'outdoor';
+  /** How a settle lands: the raid's rooms crossfade (fog_scene_fade.ts). */
+  private sceneFade!: FogSceneFade;
 
   /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
@@ -9050,20 +9080,25 @@ export class Renderer {
         fog.far = style.fog.far;
       }
       this.fogState = 'rift';
+      this.sceneFade.cancel();
       this.applyStateLightRig('rift');
       return;
     }
     this.riftFogKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
-      applyFogScenePreset(desired, fog, () => valley?.fog ?? this.outdoorFogPreset());
-      // interiors must not leak daylight: drop sun + sky ambient + IBL
-      // underground so the torch point lights own the scene; restore outside.
-      // The rim glow cranks up instead, silhouettes must split from the murk.
-      // Which numbers each state means is interior_light_rig.ts's to own.
-      this.applyStateLightRig(desired);
+      this.sceneFade.settle(fogScene.interior, this.lightDir, () => {
+        applyFogScenePreset(desired, fog, () => valley?.fog ?? this.outdoorFogPreset());
+        // interiors must not leak daylight: drop sun + sky ambient + IBL
+        // underground so the torch point lights own the scene; restore outside.
+        // The rim glow cranks up instead, silhouettes must split from the murk.
+        // Which numbers each state means is interior_light_rig.ts's to own;
+        // how the settle lands (the raid's rooms crossfade) fog_scene_fade.ts's.
+        this.applyStateLightRig(desired);
+      });
       return;
     }
+    this.sceneFade.step(dt);
     // Outdoors, fog is also the residency boundary. Pull it inward immediately
     // before an unloaded zone can become visible; once that zone has been
     // loaded by the boundary transition, ease the view distance back out.
@@ -9337,6 +9372,7 @@ export class Renderer {
     const blend = t * t * (3 - 2 * t);
     this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
     interiorKeyLightDirection(this.fogState, this.lightDir);
+    this.sceneFade.keyDirection(this.lightDir);
     setWaterSunDirection(this.lightDir);
     setWaterDayNight(this.dnGrade.fog);
     setFarTerrainNightGrade(this.dnGrade.nightAmt);
@@ -9803,7 +9839,10 @@ export class Renderer {
         // Per-frame visibility follows the create/destroy hysteresis above so
         // rigs at the draw edge do not flicker. The object branch below may
         // still re-hide loot.
-        v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
+        // A boss awaiting its scripted (entrance) pose: hidden until it arrives.
+        v.group.visible =
+          raidEncounterViewVisibleDuringCompile(e, v.compilePending) &&
+          !scriptedPoseHidden(this.activeVisual(v) ?? v, e, this.time);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The
@@ -9817,7 +9856,7 @@ export class Renderer {
         }
         if (shadowsEnabled) {
           // mid-distance rigs keep rendering but leave the shadow pass
-          wantShadow = d2 < shadowRangeSq;
+          wantShadow = d2 < shadowRangeSq || keepsArticulatedRig(e.templateId);
           inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
           v.visual?.setShadow(wantShadow);
           // past the articulated gate the static-pose proxy carries the
@@ -9863,7 +9902,9 @@ export class Renderer {
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
       const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null, v);
-      const { x, y, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const hop = thrownHopLift(v, e.auras, this.time); // a thrown body's arc (thrown_hop.ts)
+      const { x, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const y = rp.y + hop;
       v.group.position.set(x, y, z);
       let facing = rp.facing;
       if (ignivarBossFacingLocked(e)) facing = e.facing;
@@ -10303,7 +10344,7 @@ export class Renderer {
       // Metamorphosis is no longer a tint on the base rig: it has its own lazy
       // CharacterVisual driven by formVisibility.metamorph above.
       active.setAscended(veilboundState !== 'none');
-      active.setRuneTint(characterRuneTintColor(e));
+      applyCharacterBodyTints(active, e, performance.now() / 1000);
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
@@ -10473,9 +10514,10 @@ export class Renderer {
       const airborne =
         !visuallyDead &&
         !swimming &&
-        (animFromDisplay && this.selfRender.predictor && !inRift
-          ? !this.selfRender.predictor.onGround
-          : !e.onGround || v.airborneHeurFrames >= 2);
+        (hop > 0 ||
+          (animFromDisplay && this.selfRender.predictor && !inRift
+            ? !this.selfRender.predictor.onGround
+            : !e.onGround || v.airborneHeurFrames >= 2));
       // Grounded presentation polish, both display-only (see the cores).
       // Vertical smoothing absorbs the step-up the solver performs inside a
       // single tick, so the body strides onto a kerb instead of teleporting up
@@ -10571,7 +10613,7 @@ export class Renderer {
       applyLocoDirection(st, loco, ghostWolf);
       st.dead = visuallyDead;
       st.casting = characterCasting;
-      st.asleep = e.asleep === true; // in bed (mob/slumber.ts): the sleep loop holds
+      st.asleep = heldUntilCollapse(deathHeld, e.asleep === true && !visuallyDead, active.sleeping);
       // Which ability, so the pose layer can tell a drawn shot from a pet
       // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
       st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;
@@ -10873,7 +10915,7 @@ export class Renderer {
       // mid-cast always animate every frame no matter how dense the crowd.
       let animate = true;
       if (!actionablePose) {
-        const cadence = animCadenceFrames(d2, lodBands);
+        const cadence = animCadenceFrames(d2, lodBands, keepsArticulatedRig(e.templateId));
         animate = cadence <= 1 || (this.frameIdx + e.id) % cadence === 0;
       }
       if (runCharacterPresentation) active.update(dt, st, animate, this.reducedMotion());
@@ -11104,7 +11146,7 @@ export class Renderer {
         x,
         z,
         y,
-        selectionRingScale(target.scale, tv.height),
+        selectionRingScale(target.scale, tv.height, target.templateId),
         hostile,
         heavy,
         dt,
@@ -11143,6 +11185,13 @@ export class Renderer {
     this.recklessSkulls.update(dt);
     this.fishingBobbers.update(dt, this.sim.entities, this.sim.cfg.seed);
     this.groundFeedback.reticle?.update(dt);
+    this.worldMarkers.update(
+      this.sim.sharedMapMarks(),
+      this.camera,
+      this.time,
+      this.reducedMotion(),
+    );
+    this.pings.update(this.sim.partyPings(), this.camera, this.time, this.reducedMotion());
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.
     if (this.targetCone) {

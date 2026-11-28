@@ -3998,7 +3998,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Tre rækker med elleve evnepladser sidder over din erfaringsbjælke, med en dedikeret angrebsknap i toppen af den første række. Kun den første række er der fra start: den anden og tredje slås til i indstillingerne, når du vil have mere plads, og den tredje kræver den anden. Talrækken øverst på dit tastatur affyrer den første bjælke, og de ekstra bjælker bruger som standard det numeriske tastatur.\n\nEvner kommer fra din besværgelsesbog (P): træk en ud af bogen og over på en plads, eller brug skifteknappen på dens række for at sætte den på den første ledige. Genstande fungerer på samme måde, så en stak trylledrikke eller en bandage kan ligge på en plads og bruges med en tast.\n\nNår en bjælke er sat op, som du kan lide den, kan du låse den. At låse afviser træk, slip og oprydning, samtidig med at selve evnerne forbliver lige så brugbare som altid, så et fejlklik i en kamp ikke kan flytte rundt på dine knapper.\n\nTo mindre bjælker slutter sig til rækken, når de er relevante: kæledyrsbjælken, med Angrib, Stop, Ægge, Defensiv og Aggressiv på Ctrl plus 1 til 5, og en stillingsbjælke for de klasser, der skifter stilling eller form.',
   'guide.interfacePage.actionBarsTitle': 'Dine handlingsbjælker',
   'guide.interfacePage.aurasBody':
-    'Dine egne forstærkninger vises som en række små ikoner i øverste højre hjørne ved siden af minikortet, hver med en nedtælling af den tid, der er tilbage, med dine svækkelser i en række under dem. Højreklik på en af dine egne forstærkninger for at fjerne den, så længe det er en, du må fjerne; svækkelser kan det aldrig, og dit måls række er skrivebeskyttet.\n\nBuffs på spillerrammen, en indstilling der er slået fra som standard, flytter din forstærkningsrække over på din egen enhedsramme og overlader hele hjørnet til dine svækkelser. Det er en desktop-indstilling: layoutet på telefon og tablet placerer dine auraer for dig.\n\nDit måls forstærkninger og svækkelser sidder sammen i en række under dets ramme. Når du vil have mere plads til dem, åbner Shift+J vinduet Målets auraer separat, som du kan flytte, filtrere ned til kun forstærkninger eller kun svækkelser, og lade stå åbent.',
+    'Dine egne forstærkninger vises som en række små ikoner i øverste højre hjørne ved siden af minikortet, hver med en nedtælling af den tid, der er tilbage, med dine svækkelser i en række under dem. Højreklik på en af dine egne forstærkninger for at fjerne den, så længe det er en, du må fjerne; svækkelser kan det aldrig, og dit måls række er skrivebeskyttet.\n\nBuffs på spillerrammen, en indstilling der er slået fra som standard, flytter din forstærkningsrække over på din egen enhedsramme og overlader hele hjørnet til dine svækkelser. Det er en desktop-indstilling: layoutet på telefon og tablet placerer dine auraer for dig.\n\nDit måls forstærkninger og svækkelser sidder sammen i en række under dets ramme. Når du vil have mere plads til dem, åbner Shift+B vinduet Målets auraer separat, som du kan flytte, filtrere ned til kun forstærkninger eller kun svækkelser, og lade stå åbent.',
   'guide.interfacePage.aurasTitle': 'Forstærkninger og svækkelser',
   'guide.interfacePage.barsBody':
     'Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.',
@@ -21861,30 +21861,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Luk Henvis en ven-tilbud',
   'hudChrome.wocStore.referralPromo.cta': 'Inviter venner',
   'hudChrome.wocStore.referralPromo.eyebrow': 'På eventyr sammen',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'To snoede strenge af sort træ bundet i jern, kronet af en åben jernlygte med en violet skumringsflamme mellem to buede horn og kæder svingende fra bunden.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Alle lygter i hallen brænder klart undtagen én. Skumringsflammen blev tændt for at vogte hallen om natten og afgiver skygge, hvor de andre giver lys; Garrick klipper selv dens væge. Røgen og det violette skær er kun et udseende.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Skumringsvægens stav',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Flammebølget klinge af sværtet stål med smedevarme ægge, en smeltet søm, som forgrener sig over begge sider, en parerstang af bronzeflammer omkring en brændende sten og et okseblodsrødt greb.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Lygtehallen holder et ildsted, som ikke er gået ud, siden hallen blev rejst, og Garrick Holt sværger på, at denne klinge blev hærdet i dets kul. Medlemmer, der bærer den, siger, at grebet holder sig varmt på den koldeste vagt. Ilden langs æggene er kun et udseende.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Arnebrand',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Bred stålklinge med en blodrille af ulmende lygteild, forgyldte sider, en indrammet lygte brændende i parerstangen og et blåt lædergreb.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt sælger ikke denne klinge til en fremmed. Den går til medlemmer, som har gennemført Lygtehallens kontrakter uge efter uge, og han giver den med de samme ord hver gang: lygten i parerstangen er tændt fra hallens eget ildsted, så hvor du end bærer den, følger hallen med. Ilden i blodrillen er kun et udseende. Løftet er det vigtige.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lygtehallens klinge',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Lyst skaft bundet i sølv og omviklet med glødende rimfrost, kronet af en sølvklo, der holder en stor krystal af koldt lys inde i en krone af splintret is, med istapper hængende fra kraven.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Lygtehallens vintervagt bar stave som denne langs landevejen, med kronerne tændt for rejsende faret vild i sneen. Garrick har en på stativet til medlemmer med segl til overs. Frosten og dens kolde lys er kun et udseende.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Rimlysets stav',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Lang havblå klinge med ægge lyse som brydende brænding, en stormkanal med et kløvet lyn, en forgyldt bølge over klingebasen, en finne langs én æg og et værn af forgyldte brændinger omkring en stormperle.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'En kaptajn, der sejlede for lauget, bragte denne klinge hjem fra en byge, som tog hendes mast og efterlod skibet klingende som en klokke. Garrick sælger den kun for segl og advarer hver køber om, at den summer før en storm. Lynet og havlyset er kun et udseende.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Bygekrone',
   'hudChrome.wocStore.subscription.annualClaim': 'Hent pakkens ridedyr',
   'hudChrome.wocStore.subscription.annualDelivered':

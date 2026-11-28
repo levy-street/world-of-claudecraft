@@ -47,6 +47,7 @@ import {
   partyFrameHealthText,
   resolvePartyFrameStyle,
 } from './party_frames';
+import { raidMarkerDisplayName } from './raid_marker_labels_view';
 import { unitFrameView } from './unit_frame';
 
 // The class-color custom property the frame's name reads (`color: var(--cls)`); a
@@ -110,6 +111,9 @@ export interface PartyFramesPainterDeps {
   /** The shared aura view/painter deps every row's mini aura strip builds over
    *  (each row owns its own view + painter instance; the deps are the Hud's). */
   partyAuras: PartyRowAuraDeps;
+  /** A raid target icon's art (icons.ts raidMarkerDataUrl, the symbol the
+   *  nameplate floats). Absent (the Edit Frames preview): no icon is drawn. */
+  raidMarkerUrl?: (marker: number) => string;
 }
 
 export class PartyFramesPainter {
@@ -123,7 +127,7 @@ export class PartyFramesPainter {
   // listeners stay attached and read the live slot, so a recycled row is safe.
   private readonly free: PartyRow[] = [];
   // The member-rows wrapper: every pooled row nests one level under #party-frames inside
-  // this element, so the chip, rows, boss guide, and master-loot control stack as a
+  // this element, so the chip, rows, marker control, and master-loot control stack as a
   // simple column (the chip alone on its own line). On mobile the wrapper carries the
   // 2-column auto-flow grid the container used to; on desktop it is display:contents
   // (transparent), so the rows lay out in the #party-frames flex column exactly as before.
@@ -149,9 +153,11 @@ export class PartyFramesPainter {
   // after the member rows, and persists across member-frame
   // rebuilds so its checkbox / dropdowns are never churned under the cursor.
   private masterControl: HTMLElement | null = null;
-  // Contextual raid-boss guide opener, owned by the Hud window controller and
-  // seated between member rows and the leader-only loot control.
-  private guideControl: HTMLElement | null = null;
+  // The world-marker button and flyout (src/ui/hud/world_markers/), owned by its
+  // controller and seated between the member rows and the leader-only loot control.
+  // (The old boss-guide opener that sat here is gone: the Adventure Journal opens
+  // from the side rail, Shift+J and the target frame's book, src/ui/hud/journal/.)
+  private markerControl: HTMLElement | null = null;
   // The last synced raid flag, so relocalize() can re-emit each pooled row's group
   // label in the new language after an in-game language switch (a switch does not flip
   // partyFrameSignature, so the Hud never re-syncs us, exactly like the badge tooltips).
@@ -273,12 +279,12 @@ export class PartyFramesPainter {
     if (el) this.container.appendChild(el);
   }
 
-  /** Set or clear the contextual raid-boss guide opener. Unlike member rows this
-   *  is cold UI, but it keeps one stable node so keyboard focus is never churned. */
-  setGuideControl(el: HTMLElement | null): void {
-    if (this.guideControl === el) return;
-    this.guideControl?.remove();
-    this.guideControl = el;
+  /** Set or clear the world-marker control. Unlike member rows this is cold UI,
+   *  but it keeps one stable node so keyboard focus is never churned. */
+  setWorldMarkerControl(el: HTMLElement | null): void {
+    if (this.markerControl === el) return;
+    this.markerControl?.remove();
+    this.markerControl = el;
     if (el) this.container.insertBefore(el, this.masterControl);
   }
 
@@ -355,9 +361,9 @@ export class PartyFramesPainter {
   // Two passes: (1) order the member rows INSIDE the rows wrapper (their own element,
   // so no member frame ever flows beside the container-level chip), then (2) order the
   // container's own direct children: the mobile chip first (when present, the collapse
-  // header above the stack), the rows wrapper, the contextual boss guide, and the
+  // header above the stack), the rows wrapper, the world-marker control, and the
   // leader-only master-loot control last. On desktop the chip is null and the wrapper is
-  // display:contents, so the sequence renders as wrapper's rows, [guide, master], exactly
+  // display:contents, so the sequence renders as wrapper's rows, [marker, master], exactly
   // the pre-wrapper order. A steady-state rebuild moves nothing in EITHER pass.
   private reconcileOrder(rows: PartyRow[]): void {
     const wrapper = this.ensureRowsWrapper();
@@ -382,7 +388,7 @@ export class PartyFramesPainter {
     if (this.header && this.header.el.parentNode === this.container) place(this.header.el);
     if (this.chip && this.chip.el.parentNode === this.container) place(this.chip.el);
     place(wrapper);
-    if (this.guideControl) place(this.guideControl);
+    if (this.markerControl) place(this.markerControl);
     if (this.masterControl) place(this.masterControl);
   }
 
@@ -403,6 +409,7 @@ export class PartyFramesPainter {
       // inline, so the two can never drift; every other write it makes is elided
       // to a no-op here because only the language moved.
       this.paintPet(row, row.slot.member);
+      this.paintMark(row, row.slot.member);
     }
     for (const row of this.free) row.relocalize();
     // Re-emit the chip caption in the new language while it is shown (a language
@@ -428,8 +435,8 @@ export class PartyFramesPainter {
     }
     this.masterControl?.remove();
     this.masterControl = null;
-    this.guideControl?.remove();
-    this.guideControl = null;
+    this.markerControl?.remove();
+    this.markerControl = null;
     // Detach the (now empty) rows wrapper too, so a no-party container is truly empty and
     // not a lone wrapper box; the detached wrapper node is kept for reuse when a party
     // re-forms (the pooled rows are re-parented back into it by reconcileOrder).
@@ -494,6 +501,9 @@ export class PartyFramesPainter {
         portraitKey: `${PARTY_CREST_KEY_PREFIX}${m.cls}`,
         absorb:
           config?.showAbsorbs === false ? null : { hp: m.hp, maxHp: m.mhp, total: m.absorb ?? 0 },
+        // Never gated by Show Absorb Shields: the healing a member still needs is
+        // actionable, the shield hatch is decoration.
+        healAbsorb: { hp: m.hp, maxHp: m.mhp, healTotal: m.healAbsorb ?? 0 },
         dead: !!m.dead,
         outOfRange: m.oor,
       }),
@@ -519,6 +529,7 @@ export class PartyFramesPainter {
     this.writers.setDisplay(row.badges.oor, m.oor ? BADGE_SHOWN : BADGE_HIDDEN);
     this.writers.setDisplay(row.badges.offline, m.connected === 0 ? BADGE_SHOWN : BADGE_HIDDEN);
     this.paintPet(row, m);
+    this.paintMark(row, m);
     // The member's mini aura strip: the row's own keyed aura pool (writes elided
     // inside it). Signature-gated like the rest of this sync, never per frame.
     row.paintAuras(config?.showAuras === false ? [] : (m.auras ?? []));
@@ -545,6 +556,20 @@ export class PartyFramesPainter {
     this.writers.setTransform(row.petFill, `scaleX(${frac.toFixed(PARTY_BAR_SCALE_PRECISION)})`);
     this.writers.toggleClass(row.petBar, PET_DEAD_CLASS, pet.dead);
     this.writers.setText(row.petLabel, this.deps.petLabel(pet.name, frac));
+  }
+
+  // The member's raid target icon. Read off the client-attached `mark` (absent when
+  // unmarked), so an unmarked row only ever holds the hidden, src-less icon.
+  private paintMark(row: PartyRow, m: PartyFrameMember): void {
+    const url = m.mark === undefined ? '' : (this.deps.raidMarkerUrl?.(m.mark) ?? '');
+    this.writers.setDisplay(row.mark, url ? BADGE_SHOWN : BADGE_HIDDEN);
+    if (url) this.writers.setAttr(row.mark, 'src', url);
+    this.writers.setText(
+      row.markLabel,
+      url && m.mark !== undefined
+        ? t('hudChrome.raidTargets.frameMark', { marker: raidMarkerDisplayName(m.mark) })
+        : '',
+    );
   }
 
   private groupLabel(m: PartyFrameMember, raid: boolean): string {

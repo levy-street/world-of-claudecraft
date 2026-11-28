@@ -36,10 +36,16 @@ import {
 } from '../sim/aura_classify';
 import { isCancelableAura } from '../sim/combat/aura_cancel';
 import { isColdsightInternalMarkerAuraId } from '../sim/combat/hunter_coldsight_read';
+import { TANK_BUSTER_AURA } from '../sim/encounters/smith_heart/tank_buster_ids';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 import { AURA_URGENCY_BUCKET_COUNT, auraUrgencyBucket } from './aura_strip_order_core';
+import {
+  quenchColdBadge,
+  quenchColdIconHidden,
+  quenchFrozenSolid,
+} from './hud/dungeon/quench_cold_view';
 
 // Re-export the shared set for the view contract and its exact-set regression test.
 // Classification itself stays in the sim leaf so HUD display surfaces cannot drift.
@@ -433,7 +439,10 @@ export function createAurasView(
       // so an in-game language switch lands on the next tick).
       const units = deps.durationUnits();
       const effectVersion = effectHtmlCacheVersion?.();
+      // Frozen solid in the Quench: the freeze's debuff replaces the cold's icon.
+      const frozenSolid = quenchFrozenSolid(entity.auras);
       const fill = (a: AuraInput, own: boolean): void => {
+        if (quenchColdIconHidden(a.id, frozenSolid)) return;
         // Temporal Echo marks are shown only to the chronomancer who placed them
         // (owner 2026-07-12): another caster's echo still heals in the sim but never
         // appears in this viewer's target/focus frame. ONLY the ownFirst views (the
@@ -454,6 +463,9 @@ export function createAurasView(
         // OTHER internal_cd marker (Heating Up, Stormsurge Ready, ...) and the
         // real armed Coldsight Read opportunity (10s) still render normally.
         if (a.kind === 'internal_cd' && isColdsightInternalMarkerAuraId(a.id)) return;
+        // The Smith's Heart's tank buster marker is the tank buster alert's
+        // source (tank_swap_alert_view.ts), never an icon of its own.
+        if (a.id === TANK_BUSTER_AURA) return;
         const debuff = isAuraDebuff(a);
         if (mode === 'debuffs' && !debuff) return;
         if (mode === 'buffs' && debuff) return;
@@ -474,15 +486,22 @@ export function createAurasView(
         slot.toggle = toggle;
         slot.alwaysRender = NEVER_SHED_IDS.has(a.id);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
-        // badge shows a stack count, and only when it stacks past 1.
+        // badge shows a stack count, and only when it stacks past 1. The Quench's cold
+        // badges its bar's own value (quench_cold_view.ts), so its level reads
+        // without a hover.
+        const coldBadge = quenchColdBadge(a.id, a.value);
         slot.stacksText =
-          a.poolPct !== undefined
-            ? deps.formatStacks(a.poolPct)
-            : a.charges !== undefined
-              ? deps.formatStacks(a.charges)
-              : a.stacks !== undefined && (a.stacks > 1 || isPersistentEngineAura(a.id))
-                ? deps.formatStacks(a.stacks)
-                : '';
+          coldBadge !== null
+            ? coldBadge > 0
+              ? deps.formatStacks(coldBadge)
+              : ''
+            : a.poolPct !== undefined
+              ? deps.formatStacks(a.poolPct)
+              : a.charges !== undefined
+                ? deps.formatStacks(a.charges)
+                : a.stacks !== undefined && (a.stacks > 1 || isPersistentEngineAura(a.id))
+                  ? deps.formatStacks(a.stacks)
+                  : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
         slot.duration = a.duration;

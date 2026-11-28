@@ -1,10 +1,12 @@
 # src/ui/boss_journal: the encounter journal (raid + five-player dungeons)
 
-One window, `src/ui/raid_boss_guide_window.ts` (`#raid-boss-guide-window`), paints
-any journal SOURCE: the raid guide (`raid_boss_guide_view.ts`, unchanged, wrapped by
-`RAID_JOURNAL_SOURCE`) or a dungeon page from this directory. It opens from the party
-frames' guide button inside the instance and from the Dungeon Finder's boss list
-(`openJournal`), so the page can be read before the run.
+These are the boss pages; the window that browses them is the Adventure Journal
+(`src/ui/hud/journal/`, `#adventure-journal-window`), which lists every instance and
+paints any journal SOURCE: the shipped raid guide (`raid_boss_guide_view.ts`, unchanged,
+wrapped by `RAID_JOURNAL_SOURCE` and split per instance by the journal's catalog), a
+dungeon page from `dungeons/`, or the Smith's Heart page in `raids/` (the same data
+format, `members` for a council). The journal opens from the side rail, Shift+J, the
+book beside the target frame and the Dungeon Finder's boss list.
 
 | Module | Role |
 |---|---|
@@ -13,6 +15,7 @@ frames' guide button inside the instance and from the Dungeon Finder's boss list
 | `journal_sections.ts` | Markup helper (strings only, never DOM): the dungeon-only sections (role tips, key choices, the Heroic callout, rank chips, tier marks, the two-tier damage line). A DOM touch here would need a `UI_DOM_MODULES` row. |
 | `journal_model_spec.ts` | The boss's real in-game model (`mobVisualKey` + `VISUALS`) reduced to the guide viewer's spec, mirroring `scripts/wiki/build_content.mjs`. A body the standalone viewer cannot build (split WOC body, bodyless) returns null and the page keeps its portrait with no WebGL context. The model controller releases, on close, the GLB files the journal was the first to load. |
 | `registry.ts` | `DUNGEON_JOURNALS`: one row per dungeon page. |
+| `raids/smith_heart.ts` | The Smith's Heart page, data-as-code in the dungeon format, registered in `hud/journal/journal_catalog.ts`; its numbers resolve per tier through `heart_tier_damage.ts` (pinned by `tests/smith_heart_journal.test.ts`). |
 | `dungeons/<dungeon>.ts` | Data-as-code, one file per dungeon: bosses in route order (minibosses included), phases, mechanics, tips, choices, heroic notes. |
 
 ## Adding or changing a dungeon page
@@ -25,9 +28,30 @@ frames' guide button inside the instance and from the Dungeon Finder's boss list
 - English only, in `src/ui/i18n.catalog/boss_journal.ts` (`bossJournal.<dungeon>.<boss>.*`),
   written per `docs/design/tooltip-writing.md`: action first, resolved numbers, every limit.
   A new wordy value also needs its five non-Latin fills (M16) in the same change.
+- Optional banner content on a boss: `taglineKey` (the one-line summary; without it the
+  banner shows the overview), `chips` (stat chips, values print bold, `availability:
+  'heroic'` for a Heroic-only chip), `nameKey` (a council's short title). A phase may set
+  `health` (its pill: `'whole'`, `{ from, to }` with `to: 0` for the end, or `{ at }`)
+  and `rangeOnly` when its summary only restates the band. Write them from the live
+  mechanics, numbers from the tuning (`tests/adventure_journal_banner.test.ts`).
 - Each mechanic `iconId` needs an explicit recipe in `src/ui/icons.ts` (`dgn_<dungeon>_*`).
+  On the Smith's Heart page it also needs a painting (`src/ui/boss_ability_art.ts`, its own or
+  the raid aura painting of the same mechanic): `tests/boss_ability_art.test.ts` fails a new
+  raid row until it has one.
+- A mechanic with a `castId` whose bar a body other than the page's own (`members`, else
+  `mobId`) or its `hitSources` casts names that caster in `castSources`: the boss cast bar
+  shows the mechanic's painting only for a caster on the page
+  (`hud/journal/journal_cast_icons.ts`, `tests/journal_cast_icons.test.ts`).
+- A mechanic that deals damage lists `hits`: every label the sim deals it under (the
+  `ability` of its `damage` events: a dealDamage label, a DoT aura's name, a template
+  kit's name), read from the encounter's name tables where it has them. A boss whose
+  adds or other heads deal its mechanics names them in `hitSources`. The death recap
+  shows such a hit with the mechanic's icon (`hud/journal/journal_hit_icons.ts`);
+  `tests/journal_hit_icons.test.ts` pins every label to the sim, every dealer to a real
+  template, no label to two icons, and the encounters' own damage calls to a row.
 - `tests/boss_journal_view.test.ts` runs over EVERY registered journal (finder bosses present
   and in order, every key resolves with no placeholder left, cast names, kicks, heroic marks,
   the in-game model); add a per-dungeon facts block for the numbers players misread.
-- The window polls `syncAvailability` from the party frames: an unchanged room and run
-  (`IWorld.dungeonRun` is reference-stable) must stay a no-op (`tests/boss_journal_window.test.ts`).
+- The journal polls `syncRun` from the party-frames tick: an unchanged room and run
+  (`IWorld.dungeonRun` / `IWorld.raidRun` are reference-stable) must stay a no-op
+  (`tests/adventure_journal_window.test.ts`).

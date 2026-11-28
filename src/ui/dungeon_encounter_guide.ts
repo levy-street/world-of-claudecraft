@@ -47,7 +47,7 @@ const DUNGEON_RESPONSES = {
 } as const;
 
 // The raid journal owns a template-key type; adapt it at the localization
-// boundary just as raid_boss_guide_window.ts does.
+// boundary just as the Adventure Journal does.
 function raidText(
   key: RaidBossGuideTextKey | TranslationKey,
   values?: InterpolationValues,

@@ -258,6 +258,7 @@ function makeCtx() {
     hillPartyDisband: vi.fn(),
     hillPartyJoin: vi.fn(),
     dropPartyMarkers: vi.fn(),
+    dropMemberMarkers: vi.fn(),
     formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
     onMobKilledForWorldQuests: vi.fn(),

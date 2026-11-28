@@ -403,6 +403,9 @@
              mobs they hold. The unit_frame painter shows/hides it and paints the
              symbol image; decorative (the name is announced by #target-live). -->
         <div class="uf-raid-marker" id="tf-raid-marker" aria-hidden="true"></div>
+        <!-- The Adventure Journal's book: shown (#target-frame.has-journal) while
+             the target has a journal page, and opens straight on it. -->
+        <button type="button" class="tf-journal ui-icon-btn" id="tf-journal" data-i18n-title="hudChrome.adventureJournal.targetButton" data-i18n-aria="hudChrome.adventureJournal.targetButton" title="Open this boss in the Adventure Journal" aria-label="Open this boss in the Adventure Journal" data-icon="journal"></button>
       </div>
       <div class="uf-bars">
         <div class="uf-name-header deed-heraldry-plaque deed-heraldry-plaque-mirror ui-ribbon ui-ribbon--mirror" id="tf-name-header">
@@ -431,6 +434,8 @@
         <div class="portrait-wrap ui-portrait-wrap">
           <div class="portrait ui-portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
           <div class="level-chip ui-medal" id="totf-level"></div>
+          <!-- The target-of-target's raid target icon, as on #tf-raid-marker. -->
+          <div class="uf-raid-marker" id="totf-raid-marker" aria-hidden="true"></div>
         </div>
         <div class="uf-bars">
           <div class="uf-name ui-ribbon" id="totf-name"></div>
@@ -750,7 +755,7 @@
     </div>
     <div id="arena-window" class="window panel ui-window"></div>
     <div id="dungeon-finder-window" class="window panel ui-window"></div>
-    <div id="raid-boss-guide-window" class="window panel"></div>
+    <div id="adventure-journal-window" class="window panel"></div>
     <div id="dfinder-proposal-popup" class="panel ui-panel"></div>
     <div id="bg-proposal-popup" class="panel ui-panel"></div>
     <div id="leaderboard-window" class="window panel ui-window"></div>
@@ -790,6 +795,7 @@
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind ui-keycap">s-z</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="keybind ui-keycap">s-x</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-loot-explorer" data-i18n-title="hudChrome.lootExplorer.title" data-i18n-aria="hudChrome.lootExplorer.title" title="Loot Explorer" aria-label="Loot Explorer" data-icon="chest"><span class="keybind ui-keycap">s-o</span></button>
+        <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-journal" data-i18n-title="hudChrome.adventureJournal.title" data-i18n-aria="hudChrome.adventureJournal.title" title="Adventure Journal" aria-label="Adventure Journal" data-icon="journal"><span class="keybind ui-keycap">s-j</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="keybind ui-keycap">s-p</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-harvest-journal" data-i18n-title="hudChrome.harvestJournal.title" data-i18n-aria="hudChrome.harvestJournal.title" title="Harvest Journal" aria-label="Harvest Journal" data-icon="harvest-journal"><span class="keybind ui-keycap">s-k</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind ui-keycap">b</span></button>
@@ -2142,6 +2148,7 @@
           <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
           <button type="button" class="mobile-btn" id="mobile-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="mobile-label" data-i18n="hudChrome.mobile.reliquary">Reliquary</span></button>
           <button type="button" class="mobile-btn" id="mobile-loot-explorer" data-i18n-title="hudChrome.lootExplorer.title" data-i18n-aria="hudChrome.lootExplorer.title" title="Loot Explorer" aria-label="Loot Explorer" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.lootExplorer">Loot Explorer</span></button>
+          <button type="button" class="mobile-btn" id="mobile-journal" data-i18n-title="hudChrome.adventureJournal.title" data-i18n-aria="hudChrome.adventureJournal.title" title="Adventure Journal" aria-label="Adventure Journal" data-icon="journal"><span class="mobile-label" data-i18n="hudChrome.mobile.journal">Journal</span></button>
           <button type="button" class="mobile-btn" id="mobile-mounts" data-i18n-title="hudChrome.keybinds.mount" data-i18n-aria="hudChrome.keybinds.mount" title="Mount / Dismount" aria-label="Mount / Dismount" data-icon="mount"><span class="mobile-label" data-i18n="hudChrome.mounts.mount">Mount</span></button>
           <button type="button" class="mobile-btn" id="mobile-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="mobile-label" data-i18n="hudChrome.mobile.professions">Professions</span></button>
           <button type="button" class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>

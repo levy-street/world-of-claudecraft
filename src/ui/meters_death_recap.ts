@@ -2,6 +2,7 @@
 // Maintains a bounded ring buffer of recent damage, heal, and absorb events per player,
 // latched at death so the player or raid leader can inspect the lethal sequence.
 
+import { journalHitIconId } from './hud/journal/journal_hit_icons';
 import { formatNumber } from './i18n';
 
 export interface DeathRecapEvent {
@@ -10,6 +11,9 @@ export interface DeathRecapEvent {
   ability: string;
   sourceName: string;
   sourceId: number;
+  /** The dealer's template id (a mob's, a player's class), latched at ingest
+   *  so a boss hit finds its journal icon after the body is gone. */
+  sourceTemplateId?: string;
   amount: number;
   hpBefore?: number;
   hpAfter?: number;
@@ -33,6 +37,8 @@ export interface DeathRecapRowView {
   timeRel: string; // e.g. "-3.1s" or " 0.0s"
   ability: string;
   abilityId?: string | null;
+  /** The Adventure Journal icon of a boss hit (deathRecapJournalIcon), else null. */
+  journalIconId: string | null;
   sourceName: string;
   amount: number;
   amountStr: string; // e.g. "-412" or "+182"
@@ -45,6 +51,16 @@ export interface DeathRecapRowView {
 }
 
 export const DEATH_RECAP_BUFFER_CAP = 25;
+
+/** The journal icon of a recap event: a raid or dungeon boss's hit wears the
+ *  icon its Adventure Journal page shows for that mechanic (matched on the
+ *  hit's label and its dealer), every other event null. */
+export function deathRecapJournalIcon(
+  ev: Pick<DeathRecapEvent, 'type' | 'ability' | 'sourceTemplateId'>,
+): string | null {
+  if (ev.type !== 'damage') return null;
+  return journalHitIconId(ev.ability, ev.sourceTemplateId);
+}
 
 export class DeathRecapBuffer {
   private readonly buffers = new Map<number, DeathRecapEvent[]>();
@@ -116,6 +132,7 @@ export function buildDeathRecapRows(record: DeathRecapRecord): DeathRecapRowView
       timeRel,
       ability: ev.ability || 'Attack',
       abilityId: ev.abilityId ?? null,
+      journalIconId: deathRecapJournalIcon(ev),
       sourceName: ev.sourceName || 'Unknown',
       amount: ev.amount,
       amountStr,

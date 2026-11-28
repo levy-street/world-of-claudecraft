@@ -5,9 +5,10 @@
 //
 // The module owns the whole rule set behind the SimContext seam: the week
 // identity (derived from the host-fed reset day, so every host agrees), the
-// emissary spawn, the talk that opens the client window, the pick, the three
+// emissary spawn, the talk that opens the client window, the pick, the
 // credit hooks the existing systems call (dungeon and raid clears from the
-// deeds credit path, battleground results, world-boss kills), the reward, and
+// deeds credit path, a per-boss raid's bosses from its lockout settle,
+// battleground results, world-boss kills), the reward, and
 // the save shape. Nothing here draws randomness.
 import {
   WEEKLY_EMISSARY_NPC_DEF,
@@ -30,6 +31,7 @@ import {
 } from './factions';
 import { formatMoney } from './format_money';
 import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from './instances/dungeons';
+import { PER_BOSS_LOCKOUT_RAIDS } from './raid_boss_lockout_id';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity, WeeklyQuestProgress } from './types';
@@ -231,14 +233,28 @@ export function creditWeeklyQuest(ctx: SimContext, meta: PlayerMeta, kind: Weekl
 // ---- the credit hooks the existing systems call ----------------------------
 
 /** A final boss fell: a raid room credits the raid charge, any other dungeon
- *  the dungeon charge. Recipients are the caller's clear-credit roster. */
+ *  the dungeon charge. Recipients are the caller's clear-credit roster. A
+ *  per-boss raid (the Smith's Heart) is neither: every one of its bosses
+ *  credits the raid charge through onRaidBossKilledForWeeklyQuests instead,
+ *  so its final boss never counts as a dungeon clear. */
 export function onDungeonClearedForWeeklyQuests(
   ctx: SimContext,
   dungeonId: string,
   recipients: readonly PlayerMeta[],
 ): void {
+  if (PER_BOSS_LOCKOUT_RAIDS.has(dungeonId)) return;
   const raid = WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId) || DAILY_LOCKOUT_RAID_ROOMS.has(dungeonId);
   for (const meta of recipients) creditWeeklyQuest(ctx, meta, raid ? 'raid' : 'dungeons');
+}
+
+/** Any boss of a per-boss raid fell (instances/raid_boss_lockout.ts): the
+ *  raid charge for every raider the kill found unsaved to that boss, the way
+ *  a Crucible room's boss credits it for the raiders its lock admits. */
+export function onRaidBossKilledForWeeklyQuests(
+  ctx: SimContext,
+  recipients: readonly PlayerMeta[],
+): void {
+  for (const meta of recipients) creditWeeklyQuest(ctx, meta, 'raid');
 }
 
 /** A battleground match resolved for this fighter, win or lose. */

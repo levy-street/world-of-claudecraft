@@ -4021,7 +4021,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tre handlingsfält med elva förmågeplatser vardera sitter ovanför din erfarenhetsmätare, med en egen anfallsknapp längst fram på det första fältet. Bara det första fältet finns till att börja med: det andra och tredje slås på i inställningarna när du vill ha mer utrymme, och det tredje kräver det andra. Sifferraden överst på tangentbordet avfyrar det första fältet, och de extra fälten använder det numeriska tangentbordet som standard.\n\nFörmågor kommer från din trollformelsbok (P): dra en ur boken till en plats, eller använd växlingsknappen på dess rad för att lägga den på den första lediga. Föremål fungerar likadant, så en stapel drycker eller ett bandage kan ligga på en plats och användas med en tangent.\n\nNär ett fält är arrangerat som du vill kan du låsa det. Låsning avvisar dragningar, släpp och rensningar samtidigt som förmågorna själva förblir lika användbara som alltid, så ett felklick i strid kan inte kasta om dina knappar.\n\nTvå mindre fält ansluter när de gäller: Djurraden, med Anfall, Stopp, Håna, Defensiv och Aggressiv på Ctrl plus 1 till 5, samt en ställningsrad för de klasser som byter ställning eller form.',
   'guide.interfacePage.actionBarsTitle': 'Dina handlingsfält',
   'guide.interfacePage.aurasBody':
-    'Dina egna buffar visas som en rad små ikoner i det övre högra hörnet bredvid minikartan, var och en med en nedräkning av tiden som är kvar, med dina debuffar i en rad under dem. Att högerklicka på en av dina egna buffar tar bort den, så länge det är en du får ta bort; debuffar går aldrig att ta bort, och ditt måls remsa är skrivskyddad.\n\nFörstärkningar på spelarramen, ett alternativ som är avstängt från början, flyttar din buffrad till din egen ram och lämnar hela hörnet åt dina debuffar. Det är en skrivbordsinställning: layouten för telefon och surfplatta placerar dina auror åt dig.\n\nDitt måls buffar och debuffar sitter tillsammans i en remsa under dess ram. När du vill ha mer utrymme för dem öppnar Shift+J ett separat fönster, Målets buffar och debuffar, som du kan flytta, filtrera ner till enbart buffar eller enbart debuffar, och lämna öppet.',
+    'Dina egna buffar visas som en rad små ikoner i det övre högra hörnet bredvid minikartan, var och en med en nedräkning av tiden som är kvar, med dina debuffar i en rad under dem. Att högerklicka på en av dina egna buffar tar bort den, så länge det är en du får ta bort; debuffar går aldrig att ta bort, och ditt måls remsa är skrivskyddad.\n\nFörstärkningar på spelarramen, ett alternativ som är avstängt från början, flyttar din buffrad till din egen ram och lämnar hela hörnet åt dina debuffar. Det är en skrivbordsinställning: layouten för telefon och surfplatta placerar dina auror åt dig.\n\nDitt måls buffar och debuffar sitter tillsammans i en remsa under dess ram. När du vill ha mer utrymme för dem öppnar Shift+B ett separat fönster, Målets buffar och debuffar, som du kan flytta, filtrera ner till enbart buffar eller enbart debuffar, och lämna öppet.',
   'guide.interfacePage.aurasTitle': 'Buffar och debuffar',
   'guide.interfacePage.barsBody':
     'Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.',
@@ -21347,30 +21347,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Stäng kampanjen Värva en vän',
   'hudChrome.wocStore.referralPromo.cta': 'Bjud in vänner',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Äventyra tillsammans',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Två tvinnade strängar av svart trä bundna i järn, krönta av en öppen järnlykta där en violett skymningslåga brinner mellan två böjda horn, med kedjor svängande från bottnen.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Varje lykta i hallen brinner klart utom en. Skymningslågan tändes för att vakta hallen om natten och avger skugga där de andra ger ljus; Garrick ansar själv dess veke. Röken och det violetta skenet är bara ett utseende.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Skymningsvekens stav',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Flamvågig klinga av svärtat stål med smidesheta eggar, en smält söm som förgrenar sig över båda sidorna, ett parerskydd av bronslågor runt en brinnande sten och ett oxblodsrött grepp.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Lykthallen håller en härd som inte slocknat sedan hallen restes, och Garrick Holt svär på att denna klinga härdades i dess kol. Medlemmar som bär den säger att greppet förblir varmt under den kallaste vakt. Elden längs eggarna är bara ett utseende.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Härdbrand',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Bred stålklinga med en blodränna av pyrande lykteld, förgyllda sidor, en burlykta brinnande i parerstången och ett blått lädergrepp.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt säljer inte denna klinga till en främling. Den går till medlemmar som fullgjort Lykthallens kontrakt vecka efter vecka, och han överlämnar den med samma ord varje gång: lyktan i parerskyddet är tänd från hallens egen härd, så vart du än bär den följer hallen med. Elden i blodrännan är bara ett utseende. Löftet är det viktiga.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lykthallens klinga',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Ljust skaft bundet i silver och omvirat av glödande rimfrost, krönt av en silverklo som håller en stor kristall av kallt ljus i en krona av splittrad is, med istappar hängande från kragen.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Lykthallens vintervakt bar stavar som denna längs landsvägen, med kronorna tända för resenärer vilse i snön. Garrick håller en på stället åt medlemmar med sigill över. Frosten och dess kalla ljus är bara ett utseende.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Rimljusets stav',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Lång havsblå klinga med eggar ljusa som brytande bränningar, en stormränna med en kluven blixt, en förgylld våg över klingbasen, en fena längs ena eggen och ett parerskydd av förgyllda bränningar runt en stormpärla.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'En kapten som seglade för gillet tog hem denna klinga från en stormby som tog hennes mast och lämnade skeppet klingande som en klocka. Garrick säljer den bara för sigill och varnar varje köpare för att den surrar före en storm. Blixten och havsljuset är bara ett utseende.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Stormkrön',
   'hudChrome.wocStore.subscription.annualClaim': 'Hämta paketets riddjur',
   'hudChrome.wocStore.subscription.annualDelivered':

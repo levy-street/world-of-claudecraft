@@ -387,6 +387,22 @@ export const RETIRED_KEYS = [
   'guide.combat.unstuckBody',
   'guide.commandsPage.unstuck',
   'guide.glossary.unstuckDef',
+  // -- The Masterless Strength's Overload bars left the HUD for the room (Jose's brief of
+  // 2026-11-20: the ring round the central well, src/render/smith_heart_fx/
+  // final_overload_ring.ts, shows the bar, its quarter and Heart Unbound's stacks). The
+  // HUD panel that rendered these is now the phase readout alone, with no bar to label.
+  'hudChrome.finalOverload.title',
+  'hudChrome.finalOverload.unbound',
+  'hudChrome.finalOverload.barAria',
+  'hudChrome.finalOverload.activeAria',
+  'hudChrome.finalOverload.groupAria',
+  // -- The Smith's Heart's tank swaps moved to ONE shared alert (Jose's rule of
+  // 2026-11-24: src/ui/hud/dungeon/tank_swap_alert_view.ts, hudChrome.tankSwap.*).
+  // The Breath's Wind-Battered and Thunder-Laden panels and the Quench cold bar's
+  // Rime-Tempered title no longer render.
+  'hudChrome.knotAlert.batteredTitle',
+  'hudChrome.knotAlert.chargedTitle',
+  'hudChrome.quenchAlert.temperedTitle',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

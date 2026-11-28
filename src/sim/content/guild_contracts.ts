@@ -183,8 +183,8 @@ export type GuildQuartermasterOffer =
 
 /** Garrick Holt's stock: three titles cheapest first, then the guild's sword and its horse. The
  *  titles are some six weeks of every contract (seven seals a week). The four elemental arms
- *  once sold here (Hearthbrand, Squallcrest, Rimelight, Duskwick) are RESERVED as loot for a
- *  future raid (content/weapon_skins.ts earnedFrom 'future_raid') and are not stocked. */
+ *  once sold here (Hearthbrand, Squallcrest, Rimelight, Duskwick) became the Smith's Heart raid's
+ *  rewards (content/weapon_skins.ts earnedFrom 'smiths_heart') and are not stocked. */
 export const GUILD_QUARTERMASTER_STOCK: readonly GuildQuartermasterOffer[] = [
   { id: 'title_writ_runner', kind: 'title', deedId: 'feat_guild_writ_runner', seals: 6 },
   { id: 'title_hallsworn', kind: 'title', deedId: 'feat_guild_hallsworn', seals: 14 },

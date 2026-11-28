@@ -1,0 +1,541 @@
+// The Masterless Strength's Heat quarter (design doc 7.5): dodge and place.
+// The Guardian of the Heat's fist, compressed.
+//
+//   Basalt Fist     every 16 s (first 5 s into the quarter) a quick bar (the
+//                   tier's fistCast: 1.9 s Normal, 1.7 Heroic, 1.6 Mythic since
+//                   Jose's playtest of 2026-11-19; 3 s before it),
+//                   planted, its facing on the spot where a hashed player
+//                   (never the tank while anyone else stands) stood: the
+//                   spot's lethal blow, then three Molten Swells roll out
+//                   of it (away from the boss and to either side), the Heat
+//                   guardian's own objects, lanes and numbers, all the way
+//                   to the Anvil's rim (heat_geometry.ts laneReach).
+//   Fire Whirl      the Heat's STAR since the rework of 2026-11-18 (woken
+//                   for the rest of the fight; final_stars.ts runs its
+//                   clock): the tier's count of tall columns of fire rise by
+//                   hashed players (2 s of warning), then run straight
+//                   across the floor for 10 s, turning back off the rim: each
+//                   strikes a player it touches at most once a second.
+//   Ember Mark      Heroic, every 22 s (first 10 s in): up to three ranged
+//                   players (12 yd or more from the boss) are marked; 6 s
+//                   later embers drop at their feet and smoulder 30 s. The
+//                   raid stacks the marks in one corner, then moves out.
+//   Forge Fire      Mythic: the boss's frontal (Forge Fist, its swing
+//                   cleave) leaves a pool of fire where it struck.
+//
+// Deterministic: every pick is hashed (pickPlayers, finalHash), every heading
+// derived; the only rng draws are the damage rolls, in player order.
+
+import { HEART_ROOM } from '../../content/smith_heart_layout';
+import { knockbackDistanceAfterGuards } from '../../knockback';
+import { DT, type Entity } from '../../types';
+import { clearCastIf } from '../sunken_bastion/claim';
+import { beginShove, clearShoves, stepShoves } from './breath_shove';
+import {
+  devilTemplate,
+  FINAL_AURAS,
+  FINAL_CASTS,
+  FINAL_CUES,
+  FINAL_NAMES,
+  type FinalPoolKind,
+  finalHash,
+  poolTemplate,
+  FINAL_TUNING as T,
+  whirlTemplate,
+} from './final_ids';
+import { FINAL_PHASE_NAMES, FINAL_PHASES as P } from './final_phase_ids';
+import {
+  at,
+  beginBar,
+  cueAt,
+  dropAura,
+  dropFightObject,
+  type FinalScope,
+  type FPoint,
+  facingTo,
+  fromCentre,
+  hit,
+  livePlayers,
+  local,
+  moveFightObject,
+  onFloor,
+  overTheVoid,
+  pickPlayers,
+  punishMult,
+  putMarker,
+  roll,
+  spawnFightObject,
+  standingSpot,
+} from './final_scope';
+import type { FinalPool, FinalSwell } from './final_state';
+import { ANVIL_LANE_MAX, inWave, laneReach } from './heat_geometry';
+import {
+  HEAT_TUNING as H,
+  HEAT_CUES,
+  HEAT_OBJECTS,
+  heatTimed,
+  swellLaneTemplate,
+} from './heat_ids';
+
+// ---- Basalt Fist and the Molten Swells -----------------------------------------------------
+
+/** Begin Basalt Fist on a hashed player's spot (or `forced`). Exported for
+ *  the dev trigger. */
+export function startFist(s: FinalScope, forced?: FPoint): boolean {
+  const st = s.st;
+  st.kit.fist = T.fistEvery;
+  let aim: FPoint | null = forced ?? null;
+  if (!aim) {
+    const [victim] = pickPlayers(s, 1, st.casts + 301);
+    if (!victim) return false;
+    aim = at(s, victim);
+  }
+  const spot = onFloor(aim, 1);
+  const obj = spawnFightObject(
+    s.ctx,
+    s.inst,
+    heatTimed(HEAT_OBJECTS.fistPrefix, s.rules.fistCast),
+    FINAL_NAMES.fist,
+    spot.x,
+    spot.z,
+    T.fistR,
+  );
+  const here = local(s.ctx, s.inst, s.boss);
+  const away =
+    Math.hypot(spot.x - here.x, spot.z - here.z) > 0.5 ? facingTo(here, spot) : s.boss.facing;
+  const bearings = [away, away + Math.PI / 2, away - Math.PI / 2];
+  const lanes: number[] = [];
+  for (const b of bearings) {
+    const lane = spawnFightObject(
+      s.ctx,
+      s.inst,
+      swellLaneTemplate('warn', s.rules.fistCast + H.waveDelay),
+      FINAL_NAMES.swell,
+      spot.x,
+      spot.z,
+      H.laneHalf,
+    );
+    lane.facing = b;
+    lanes.push(lane.id);
+  }
+  st.fist = { objectId: obj.id, x: spot.x, z: spot.z, lanes, bearings };
+  beginBar(s, FINAL_CASTS.fist, s.rules.fistCast, away);
+  return true;
+}
+
+/** The fist lands (its bar ran out or was cut) and its swells begin. Returns
+ *  who it struck. */
+export function landFist(s: FinalScope): Entity[] {
+  const st = s.st;
+  const f = st.fist;
+  if (!f) return [];
+  st.fist = null;
+  dropFightObject(s.ctx, s.inst, f.objectId);
+  cueAt(s, HEAT_CUES.fist, f.x, f.z, T.fistR);
+  const struck: Entity[] = [];
+  for (const p of livePlayers(s)) {
+    const here = at(s, p);
+    if (Math.hypot(here.x - f.x, here.z - f.z) > T.fistR) continue;
+    struck.push(p);
+    hit(s, p, roll(s, T.fistMin, T.fistMax, punishMult(s)), FINAL_NAMES.fist, 'fire');
+  }
+  f.lanes.forEach((laneId, i) => {
+    st.swells.push({
+      laneId,
+      waveId: null,
+      x: f.x,
+      z: f.z,
+      facing: f.bearings[i],
+      delay: H.waveDelay,
+      front: 0,
+      struck: [],
+    });
+  });
+  return struck;
+}
+
+function stepSwell(s: FinalScope, w: FinalSwell): boolean {
+  // To the Anvil's rim (laneReach: the whole way since the playtest of 2026-11-19).
+  const length = laneReach(w.x, w.z, w.facing, ANVIL_LANE_MAX);
+  if (w.waveId === null) {
+    w.delay -= DT;
+    if (w.delay > 1e-9) return true;
+    const lane = s.ctx.entities.get(w.laneId);
+    if (lane) lane.templateId = swellLaneTemplate('roll', length / H.waveSpeed);
+    const wave = spawnFightObject(
+      s.ctx,
+      s.inst,
+      HEAT_OBJECTS.wave,
+      FINAL_NAMES.swell,
+      w.x,
+      w.z,
+      H.laneHalf,
+    );
+    wave.facing = w.facing;
+    w.waveId = wave.id;
+    cueAt(s, HEAT_CUES.swell, w.x, w.z, H.laneHalf);
+  }
+  w.front += H.waveSpeed * DT;
+  const wave = s.ctx.entities.get(w.waveId);
+  const ahead = Math.min(w.front, length);
+  if (wave)
+    moveFightObject(
+      s.ctx,
+      s.inst,
+      wave,
+      w.x + Math.sin(w.facing) * ahead,
+      w.z + Math.cos(w.facing) * ahead,
+    );
+  for (const p of livePlayers(s)) {
+    if (w.struck.includes(p.id)) continue;
+    const here = at(s, p);
+    if (!inWave(w.x, w.z, w.facing, ahead, here.x, here.z)) continue;
+    w.struck.push(p.id);
+    hit(s, p, roll(s, H.waveMin, H.waveMax), FINAL_NAMES.swell, 'fire');
+  }
+  return w.front < length + H.waveDepth;
+}
+
+/** One tick of every Molten Swell. */
+export function stepSwells(s: FinalScope): void {
+  const st = s.st;
+  if (st.swells.length === 0) return;
+  const keep: FinalSwell[] = [];
+  for (const w of st.swells) {
+    if (stepSwell(s, w)) {
+      keep.push(w);
+      continue;
+    }
+    dropFightObject(s.ctx, s.inst, w.laneId);
+    dropFightObject(s.ctx, s.inst, w.waveId);
+  }
+  st.swells = keep;
+}
+
+// ---- Fire Whirls ---------------------------------------------------------------------------
+
+/** The tier's Fire Whirls rise by hashed players. Returns how many. */
+export function raiseWhirls(s: FinalScope): number {
+  const st = s.st;
+  const victims = pickPlayers(s, s.rules.whirlCount, st.casts + 401);
+  let n = 0;
+  victims.forEach((v, i) => {
+    const h = finalHash(s.boss.id, st.casts * 13 + i);
+    const heading = ((h % 360) * Math.PI) / 180;
+    const p = at(s, v);
+    // It rises a few yards off them, so the first step is a dodge.
+    const spot = standingSpot(
+      s,
+      onFloor({ x: p.x - Math.sin(heading) * 5, z: p.z - Math.cos(heading) * 5 }, 3),
+      p,
+    );
+    const obj = spawnFightObject(
+      s.ctx,
+      s.inst,
+      whirlTemplate('warn'),
+      FINAL_NAMES.whirl,
+      spot.x,
+      spot.z,
+      T.whirlR,
+    );
+    obj.facing = heading;
+    st.whirls.push({
+      objectId: obj.id,
+      warn: T.whirlWarn,
+      life: T.whirlLife,
+      heading,
+      cooldown: {},
+    });
+    n++;
+  });
+  st.casts++;
+  return n;
+}
+
+/** A Dust Devil at (instance-local) `eye` throws `pl` straight out of it:
+ *  the knockback's yards after every immunity and resistance, slid over
+ *  `devilSlide` with its root held (the online client draws the server's
+ *  slide). A body still sliding is not thrown again (two throws never
+ *  stack). Exported for the tests. */
+export function throwOutOfDevil(s: FinalScope, pl: Entity, eye: FPoint): boolean {
+  if (s.st.devilShoves.some((sl) => sl.id === pl.id)) return false;
+  const here = at(s, pl);
+  const dx = here.x - eye.x;
+  const dz = here.z - eye.z;
+  const d = Math.hypot(dx, dz);
+  // Dead centre: out along the devil's own path's side, a fixed bearing.
+  const ux = d > 1e-3 ? dx / d : 0;
+  const uz = d > 1e-3 ? dz / d : 1;
+  // Every knockback immunity and the target's resistance (the guards read
+  // only who throws, never where from).
+  const yards = knockbackDistanceAfterGuards(s.ctx, s.boss, pl, T.devilKnockback);
+  if (yards <= 0) return false;
+  const shove = beginShove(
+    s,
+    pl,
+    ux,
+    uz,
+    yards,
+    T.devilSlide,
+    'out',
+    FINAL_AURAS.devilThrown,
+    FINAL_NAMES.devil,
+  );
+  if (!shove) return false;
+  s.st.devilShoves.push(shove);
+  return true;
+}
+
+/** One tick of every Fire Whirl (and every Breath Dust Devil). */
+export function stepWhirls(s: FinalScope): void {
+  const st = s.st;
+  // The throws already under way slide on a step (before the devils move,
+  // so a body thrown last tick never waits on the loop below).
+  if (st.devilShoves.length > 0) stepShoves(s, st.devilShoves);
+  if (st.whirls.length === 0) return;
+  const keep: typeof st.whirls = [];
+  for (const w of st.whirls) {
+    const obj = s.ctx.entities.get(w.objectId);
+    if (!obj) continue;
+    // A Breath Dust Devil (final_breath.ts) runs the same loop on its own
+    // numbers: it wanders, and it throws instead of burning.
+    const wind = w.wind === true;
+    const speed = wind ? T.devilSpeed : T.whirlSpeed;
+    const reach = wind ? T.devilR : T.whirlR;
+    if (w.warn > 0) {
+      w.warn -= DT;
+      if (w.warn <= 1e-9) obj.templateId = wind ? devilTemplate('live') : whirlTemplate('live');
+      keep.push(w);
+      continue;
+    }
+    w.life -= DT;
+    if (w.life <= 1e-9) {
+      dropFightObject(s.ctx, s.inst, w.objectId);
+      continue;
+    }
+    if (wind) {
+      // It wanders: a hashed turn of up to 60 degrees either way, every few seconds.
+      w.turn = (w.turn ?? T.devilTurnEvery) - DT;
+      if (w.turn <= 1e-9) {
+        w.turn = T.devilTurnEvery;
+        const h = finalHash(obj.id, Math.round(w.life * 10));
+        w.heading += (((h % 121) - 60) * Math.PI) / 180;
+        obj.facing = w.heading;
+      }
+    }
+    const p = at(s, obj);
+    let next = {
+      x: p.x + Math.sin(w.heading) * speed * DT,
+      z: p.z + Math.cos(w.heading) * speed * DT,
+    };
+    if (fromCentre(next) > HEART_ROOM.r - reach) {
+      // Off the rim: turn back toward the centre.
+      w.heading = facingTo(next, HEART_ROOM);
+      obj.facing = w.heading;
+      next = onFloor(next, reach);
+    }
+    // At a fallen quarter's edge: it turns for the centre, never out over it.
+    if (overTheVoid(s, next)) {
+      w.heading = facingTo(p, HEART_ROOM);
+      obj.facing = w.heading;
+      next = p;
+    }
+    // Through Weight of the Anvil's bar it veers off the mark (the Heroic bot
+    // raids of 2026-11-18: tornadoes rolling into the stacked soakers): the
+    // raid's one gather is never a tornado's.
+    const anvil = st.anvil;
+    if (anvil && Math.hypot(next.x - anvil.x, next.z - anvil.z) < T.anvilR + reach) {
+      w.heading = facingTo(anvil, p);
+      obj.facing = w.heading;
+      next = p;
+    }
+    moveFightObject(s.ctx, s.inst, obj, next.x, next.z);
+    for (const id of Object.keys(w.cooldown)) {
+      const k = Number(id);
+      w.cooldown[k] -= DT;
+      if (w.cooldown[k] <= 1e-9) delete w.cooldown[k];
+    }
+    for (const pl of livePlayers(s)) {
+      if (w.cooldown[pl.id] !== undefined) continue;
+      const here = at(s, pl);
+      if (Math.hypot(here.x - next.x, here.z - next.z) > reach) continue;
+      if (wind) {
+        w.cooldown[pl.id] = T.devilHitEvery;
+        hit(s, pl, roll(s, T.devilMin, T.devilMax), FINAL_NAMES.devil, 'nature');
+        // Thrown out of it, away from its eye: a SLIDE eased out over
+        // devilSlide (breath_shove.ts), never a one-tick knockback (the
+        // team's playtest of 2026-11-25 read that as a teleport backwards).
+        if (!pl.dead) throwOutOfDevil(s, pl, next);
+      } else {
+        w.cooldown[pl.id] = T.whirlHitEvery;
+        hit(s, pl, roll(s, T.whirlMin, T.whirlMax), FINAL_NAMES.whirl, 'fire');
+      }
+      s.ctx.emit({
+        type: 'spellfx',
+        sourceId: obj.id,
+        targetId: pl.id,
+        school: wind ? 'nature' : 'fire',
+        fx: 'nova',
+        ability: wind ? FINAL_CUES.devil : FINAL_CUES.whirl,
+      });
+    }
+    keep.push(w);
+  }
+  st.whirls = keep;
+}
+
+// ---- Ember Mark and the pools --------------------------------------------------------------
+
+/** Heroic: mark up to three ranged players. Returns who. */
+export function markEmbers(s: FinalScope): Entity[] {
+  const st = s.st;
+  st.kit.ember = T.emberEvery;
+  const boss = at(s, s.boss);
+  const ranged = livePlayers(s).filter((p) => {
+    const q = at(s, p);
+    return Math.hypot(q.x - boss.x, q.z - boss.z) >= T.emberRanged && p.id !== s.boss.aggroTargetId;
+  });
+  const busy = new Set(
+    livePlayers(s)
+      .filter((p) => !ranged.includes(p))
+      .map((p) => p.id),
+  );
+  const marked = ranged.length > 0 ? pickPlayers(s, T.emberMarks, st.casts + 501, busy) : [];
+  st.casts++;
+  for (const p of marked) {
+    if (!ranged.includes(p)) continue;
+    putMarker(p, FINAL_AURAS.ember, FINAL_NAMES.ember, T.emberSeconds, s.boss.id, {
+      school: 'fire',
+    });
+    st.embers.push({ pid: p.id, left: T.emberSeconds });
+  }
+  return marked.filter((p) => ranged.includes(p));
+}
+
+/** Each pool kind's radius, life, burn, name and cap (the Cinder Trail's
+ *  are part 2's FINAL_PHASES). */
+function poolSpec(kind: FinalPoolKind) {
+  if (kind === 'ember')
+    return {
+      r: T.emberR,
+      life: T.emberLife,
+      min: T.emberMin,
+      max: T.emberMax,
+      name: FINAL_NAMES.embers,
+      cue: FINAL_CUES.embers as string | null,
+      cap: T.poolCap,
+    };
+  if (kind === 'forge')
+    return {
+      r: T.forgeFireR,
+      life: T.forgeFireLife,
+      min: T.forgeFireMin,
+      max: T.forgeFireMax,
+      name: FINAL_NAMES.forgeFire,
+      cue: FINAL_CUES.forgeFire as string | null,
+      cap: T.poolCap,
+    };
+  return {
+    r: P.trailR,
+    life: P.trailLife,
+    min: P.trailMin,
+    max: P.trailMax,
+    name: FINAL_PHASE_NAMES.trail,
+    cue: null,
+    cap: P.trailCap,
+  };
+}
+
+/** A burning pool at (x, z) (the oldest of its kind goes out past its
+ *  kind's cap: a Cinder Trail never puts out an Ember Mark's pool). */
+export function layPool(s: FinalScope, kind: FinalPoolKind, x: number, z: number): void {
+  const st = s.st;
+  const spec = poolSpec(kind);
+  const obj = spawnFightObject(s.ctx, s.inst, poolTemplate(kind), spec.name, x, z, spec.r);
+  st.pools.push({ objectId: obj.id, kind, x, z, r: spec.r, life: spec.life });
+  const sameKind = (q: FinalPool) => (kind === 'trail' ? q.kind === 'trail' : q.kind !== 'trail');
+  while (st.pools.filter(sameKind).length > spec.cap) {
+    const old = st.pools.find(sameKind);
+    if (!old) break;
+    st.pools.splice(st.pools.indexOf(old), 1);
+    dropFightObject(s.ctx, s.inst, old.objectId);
+  }
+  if (spec.cue) cueAt(s, spec.cue, x, z, spec.r);
+}
+
+/** One tick of the marks (their embers drop) and the pools (they burn). */
+export function stepEmbersAndPools(s: FinalScope): void {
+  const st = s.st;
+  if (st.embers.length > 0) {
+    const keep: typeof st.embers = [];
+    for (const m of st.embers) {
+      m.left -= DT;
+      if (m.left > 1e-9) {
+        keep.push(m);
+        continue;
+      }
+      const p = s.ctx.entities.get(m.pid);
+      if (!p) continue;
+      dropAura(p, FINAL_AURAS.ember);
+      if (p.dead) continue;
+      const q = at(s, p);
+      layPool(s, 'ember', q.x, q.z);
+    }
+    st.embers = keep;
+  }
+  if (st.pools.length === 0) return;
+  const keep = st.pools.filter((pool) => {
+    pool.life -= DT;
+    if (pool.life > 1e-9) return true;
+    dropFightObject(s.ctx, s.inst, pool.objectId);
+    return false;
+  });
+  st.pools = keep;
+  st.poolTick -= DT;
+  if (st.poolTick > 1e-9) return;
+  st.poolTick = T.poolTick;
+  for (const p of livePlayers(s)) {
+    const q = at(s, p);
+    const pool = st.pools.find((o) => Math.hypot(q.x - o.x, q.z - o.z) <= o.r);
+    if (!pool) continue;
+    const spec = poolSpec(pool.kind);
+    hit(s, p, roll(s, spec.min, spec.max), spec.name, 'fire');
+  }
+}
+
+/** Mythic: the frontal struck in the Heat quarter: fire where it fell. */
+export function forgeFire(s: FinalScope): void {
+  const b = at(s, s.boss);
+  const f = s.boss.facing;
+  const spot = onFloor({ x: b.x + Math.sin(f) * 5, z: b.z + Math.cos(f) * 5 }, 2);
+  layPool(s, 'forge', spot.x, spot.z);
+}
+
+// ---- the quarter's end and the fight's -----------------------------------------------------
+
+/** Basalt Fist's spot and lanes off the floor, every swell with them. */
+export function clearFist(s: Pick<FinalScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
+  const st = s.st;
+  if (st.fist) {
+    dropFightObject(s.ctx, s.inst, st.fist.objectId);
+    for (const id of st.fist.lanes) dropFightObject(s.ctx, s.inst, id);
+    st.fist = null;
+  }
+  for (const w of st.swells) {
+    dropFightObject(s.ctx, s.inst, w.laneId);
+    dropFightObject(s.ctx, s.inst, w.waveId);
+  }
+  st.swells = [];
+  clearCastIf(s.boss, FINAL_CASTS.fist);
+}
+
+/** Every Heat footprint gone (the fight's end). */
+export function clearHeat(s: Pick<FinalScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
+  clearFist(s);
+  for (const w of s.st.whirls) dropFightObject(s.ctx, s.inst, w.objectId);
+  clearShoves(s, s.st.devilShoves);
+  for (const p of s.st.pools) dropFightObject(s.ctx, s.inst, p.objectId);
+  s.st.whirls = [];
+  s.st.pools = [];
+  s.st.embers = [];
+}

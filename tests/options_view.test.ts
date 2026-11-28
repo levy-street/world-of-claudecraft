@@ -941,6 +941,10 @@ const COMBAT_KEYS = [
   // The advisory dungeon alerts' switch, with the note that names what stays.
   'showDungeonHints',
   'note:hudChrome.options.showDungeonHintsNote',
+  // The party pings' switch (off disables the key and hides others' pings), with its note.
+  'partyPings',
+  'partyPingsChat',
+  'note:hudChrome.pings.enableSettingNote',
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',
   'showAttackButton',
@@ -1099,6 +1103,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
       // The Combat tab's one note (the dungeon hints toggle), unconditional.
       { control: 'note', textKey: 'hudChrome.options.showDungeonHintsNote', category: 'combat' },
+      { control: 'note', textKey: 'hudChrome.pings.enableSettingNote', category: 'combat' },
       {
         control: 'note',
         textKey: 'hudChrome.options.enemyHighlightStyle',

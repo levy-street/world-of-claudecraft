@@ -3568,6 +3568,15 @@
     align-items: center;
     min-width: 0;
   }
+  /* The member's raid target icon: the crest goes inline on touch, so the icon
+     takes the row's top-right corner instead of the crest's. */
+  body.mobile-touch #party-frames .party-frame .pfm-mark {
+    left: auto;
+    right: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+  }
   body.mobile-touch #party-frames .pfm-crest {
     position: static;
     left: auto;
@@ -3703,181 +3712,422 @@
   body.mobile-touch #party-frames:not(.party-expanded) .party-frame {
     display: none;
   }
-  body.mobile-touch #party-frames:not(.party-expanded) .party-boss-guide-button {
+  /* World markers on touch: a 40px button, and a flyout of 44px tiles that opens
+     under it (the ground must stay free to tap once a symbol is armed). */
+  body.mobile-touch .party-world-markers {
+    width: min(344px, calc(100dvw - 30px));
+  }
+  body.mobile-touch #party-frames:not(.party-expanded) .party-world-markers {
     display: none;
   }
-  body.mobile-touch .party-boss-guide-button {
-    width: min(344px, calc(100dvw - 30px));
+  body.mobile-touch .party-world-markers-tile {
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  body.mobile-touch .party-world-markers-button {
     min-height: 40px;
     border-radius: 8px;
     font-size: 12px;
   }
-  body.mobile-touch #raid-boss-guide-window {
-    left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
-    right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
-    top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));
-    width: auto;
-    max-width: 620px;
-    max-height: calc(
-      var(--app-vh, 100dvh) /
-      var(--window-scale, 1) -
-      (max(10px, env(safe-area-inset-top)) / var(--window-scale, 1)) -
-      (max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1))
-    );
-    margin-inline: auto;
-    transform: none;
+  body.mobile-touch .party-world-markers-flyout {
+    left: 0;
+    top: calc(100% + 6px);
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-shell {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
+  body.mobile-touch .party-world-markers-grid {
+    grid-template-columns: repeat(4, 44px);
+    gap: 7px;
+  }
+  body.mobile-touch .party-world-markers-tile {
+    width: 44px;
+    height: 44px;
+  }
+  body.mobile-touch .party-world-markers-tile-glyph {
+    width: 30px;
+    height: 30px;
+  }
+  body.mobile-touch .party-world-markers-clear {
+    min-height: 40px;
+  }
+  /* The Adventure Journal on a phone: one full sheet. A breadcrumb opens the
+     Dungeons and Raids list as a drawer over the page (it closes again once a
+     boss is picked), and a row of the instance's boss portraits steps between
+     its pages. Text stays at 15px and up; every control is 40px or more. */
+  body.mobile-touch #adventure-journal-window {
+    left: calc(env(safe-area-inset-left, 0px) / var(--window-scale, 1));
+    right: calc(env(safe-area-inset-right, 0px) / var(--window-scale, 1));
+    top: calc(env(safe-area-inset-top, 0px) / var(--window-scale, 1));
+    width: auto;
+    max-width: none;
     height: calc(
       var(--app-vh, 100dvh) /
       var(--window-scale, 1) -
-      82px -
-      (max(10px, env(safe-area-inset-top)) / var(--window-scale, 1)) -
-      (max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1))
+      (env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px)) /
+      var(--window-scale, 1)
     );
-    min-height: 0;
-    max-height: calc(
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    transform: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 15.5px;
+  }
+  body.mobile-touch #adventure-journal-window > .aj-head {
+    height: 48px;
+    min-height: 48px;
+    padding: 0 62px 0 16px;
+    font-size: 17px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-head-crumb {
+    display: none;
+  }
+  body.mobile-touch #adventure-journal-window > .aj-head > .aj-close {
+    width: 44px;
+    height: 44px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    height: calc(
       var(--app-vh, 100dvh) /
       var(--window-scale, 1) -
-      82px -
-      (max(10px, env(safe-area-inset-top)) / var(--window-scale, 1)) -
-      (max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1))
+      49px -
+      (env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px)) /
+      var(--window-scale, 1)
     );
+    overflow: hidden;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 7px;
-    border-right: 0;
-    border-bottom: 1px solid var(--color-rbg-divider);
+  body.mobile-touch #adventure-journal-window .aj-nav {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 4;
+    width: min(330px, 88%);
+    height: auto;
+    border-right: 1px solid var(--color-aj-line);
+    background: var(--color-aj-nav);
+    box-shadow: 8px 0 24px var(--color-aj-shadow);
+    transform: translateX(-104%);
+    visibility: hidden;
+    transition:
+      transform calc(var(--dur-panel) * var(--motion-scale)) ease-out,
+      visibility 0s linear calc(var(--dur-panel) * var(--motion-scale));
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-boss-tab {
-    grid-template-columns: 38px minmax(0, 1fr);
-    min-height: 48px;
-    font-size: 9px;
+  body.mobile-touch #adventure-journal-window .aj-shell.aj-nav-open .aj-nav {
+    transform: none;
+    visibility: visible;
+    transition: transform calc(var(--dur-panel) * var(--motion-scale)) ease-out;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-boss-tab img {
-    width: 38px;
-    height: 38px;
+  body.mobile-touch #adventure-journal-window .aj-shell.aj-nav-open::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: var(--color-aj-scrim);
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-journal {
-    padding: 10px 10px 16px;
+  body.mobile-touch #adventure-journal-window .aj-instance-toggle,
+  body.mobile-touch #adventure-journal-window .aj-boss {
+    min-height: 44px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-hero {
-    grid-template-columns: 132px minmax(0, 1fr);
-    gap: 11px;
-    min-height: 146px;
-    padding: 6px;
+  /* A phone is held sideways in game: the breadcrumb and the boss row share
+     one line, and the banner keeps the desktop's three columns. */
+  body.mobile-touch #adventure-journal-window .aj-mobile-top {
+    display: flex;
+    border-bottom: 1px solid var(--color-aj-line);
+    align-items: center;
+    gap: 6px;
+    padding-right: 12px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-model-slot,
-  body.mobile-touch #raid-boss-guide-window .rbg-model-viewer {
-    min-height: 146px;
+  body.mobile-touch #adventure-journal-window .aj-crumb {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 0;
+    background: transparent;
+    color: var(--color-aj-soft);
+    font-size: 15px;
+    text-align: left;
+    cursor: var(--cursor-point);
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-model-stage {
-    min-height: 118px;
+  body.mobile-touch #adventure-journal-window .aj-crumb b {
+    color: var(--color-aj-text);
+    font-weight: 700;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-model-load {
-    min-width: 106px;
-    min-height: 40px;
-    bottom: 8px;
-    font-size: 10px;
+  body.mobile-touch #adventure-journal-window .aj-crumb .aj-glyph {
+    width: 18px;
+    height: 18px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-model-hint {
-    min-height: 28px;
-    font-size: 8px;
+  body.mobile-touch #adventure-journal-window .aj-strip {
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    min-width: 0;
+    padding: 6px 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-overview {
-    padding: 4px 4px 4px 0;
+  body.mobile-touch #adventure-journal-window .aj-strip-boss {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid var(--color-aj-ring);
+    border-radius: 50%;
+    background: var(--color-aj-portrait-bg);
+    cursor: var(--cursor-point);
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-overview h2 {
-    margin-bottom: 7px;
+  body.mobile-touch #adventure-journal-window .aj-strip-boss img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  body.mobile-touch #adventure-journal-window .aj-strip-boss.defeated img {
+    filter: saturate(0.4) brightness(0.7);
+  }
+  body.mobile-touch #adventure-journal-window .aj-strip-boss.active {
+    border-color: var(--color-aj-accent);
+    box-shadow: 0 0 0 3px var(--color-aj-accent-line);
+  }
+  body.mobile-touch #adventure-journal-window .aj-banner {
+    gap: 14px 16px;
+    padding: 14px 16px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-portrait {
+    width: 76px;
+    height: 76px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-council-member {
+    width: 62px;
+    height: 62px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-council-member + .aj-council-member {
+    margin-left: -18px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-model-jump {
+    width: 40px;
+    height: 40px;
+    right: -10px;
+    bottom: -10px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-kicker {
     font-size: 15px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-overview p {
-    font-size: 10px;
-    line-height: 1.35;
+  body.mobile-touch #adventure-journal-window .aj-boss-title {
+    font-size: 22px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-difficulty {
-    justify-content: space-between;
-    margin: 9px 0 11px;
+  body.mobile-touch #adventure-journal-window .aj-tagline {
+    margin-top: 4px;
+    font-size: 15.5px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-segmented button {
-    min-width: 66px;
+  body.mobile-touch #adventure-journal-window .aj-stat-chips {
+    gap: 6px;
+    margin-top: 8px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-stat-chip {
+    padding: 3px 10px;
+    font-size: 14px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-progress {
+    gap: 6px 10px;
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-kill {
+    padding: 2px 9px 3px;
+  }
+  /* The phone banner is short: the lockout line joins the kills row when it fits. */
+  body.mobile-touch #adventure-journal-window .aj-lockout {
+    flex-basis: auto;
+  }
+  body.mobile-touch #adventure-journal-window .aj-diff button {
+    min-width: 68px;
+    min-height: 40px;
+    padding: 8px 8px 7px;
+    gap: 4px;
+    font-size: 15px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-crest-wrap {
+    width: 31px;
+    height: 34px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-diff .aj-skulls .ui-icon {
+    width: 10px;
+    height: 10px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-diff .aj-skulls-1 .ui-icon {
+    width: 15px;
+    height: 15px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-soon-note {
+    font-size: 14px;
+  }
+  /* Held upright (a tablet, or a phone outside the game's landscape gate):
+     the approved phone layout, the boss row under the breadcrumb and the
+     banner stacked, its summary, chips and difficulty full width. */
+  @media (max-aspect-ratio: 1 / 1) {
+    body.mobile-touch #adventure-journal-window .aj-mobile-top {
+      display: block;
+      padding-right: 0;
+    }
+    body.mobile-touch #adventure-journal-window .aj-strip {
+      padding: 2px 12px 12px;
+    }
+    body.mobile-touch #adventure-journal-window .aj-strip-boss {
+      width: 52px;
+      height: 52px;
+    }
+    body.mobile-touch #adventure-journal-window .aj-banner {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 12px 14px;
+      padding: 16px;
+    }
+    body.mobile-touch #adventure-journal-window .aj-banner-text {
+      display: contents;
+    }
+    body.mobile-touch #adventure-journal-window .aj-portrait-wrap {
+      grid-row: 1 / span 2;
+    }
+    body.mobile-touch #adventure-journal-window .aj-kicker {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: end;
+      margin: 0;
+    }
+    body.mobile-touch #adventure-journal-window .aj-boss-title {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: start;
+    }
+    body.mobile-touch #adventure-journal-window .aj-tagline,
+    body.mobile-touch #adventure-journal-window .aj-stat-chips,
+    body.mobile-touch #adventure-journal-window .aj-progress,
+    body.mobile-touch #adventure-journal-window .aj-diffbox {
+      grid-column: 1 / -1;
+      margin: 0;
+    }
+    body.mobile-touch #adventure-journal-window .aj-diffbox {
+      align-items: stretch;
+    }
+    body.mobile-touch #adventure-journal-window .aj-diff button {
+      flex: 1;
+    }
+    body.mobile-touch #adventure-journal-window .aj-soon-note {
+      align-self: flex-end;
+    }
+  }
+  body.mobile-touch #adventure-journal-window .aj-tabbar {
+    padding: 0 12px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-tab {
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 16px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-steps {
+    display: none;
+  }
+  body.mobile-touch #adventure-journal-window .aj-panel {
+    padding: 14px 12px 24px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-phase-toggle,
+  body.mobile-touch #adventure-journal-window .aj-watch-link,
+  body.mobile-touch #adventure-journal-window .aj-soon-tier {
     min-height: 40px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-phase {
-    margin-top: 11px;
+  body.mobile-touch #adventure-journal-window .aj-ab-row {
+    grid-template-columns: 40px minmax(0, 1fr) 20px;
+    align-items: start;
+    gap: 6px 12px;
+    min-height: 56px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-phase header p {
-    font-size: 10px;
+  body.mobile-touch #adventure-journal-window .aj-ab-socket {
+    --ui-socket-size: 40px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-ability-toggle {
-    min-height: 54px;
-    grid-template-columns: 44px minmax(0, 1fr) auto;
-    gap: 6px;
-    padding-right: 5px;
+  /* A phone sheet has no window edge to frame: no corner marks. */
+  body.mobile-touch #adventure-journal-window .aj-corner {
+    display: none;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-ability-toggle > img {
-    width: 42px;
-    height: 42px;
+  body.mobile-touch #adventure-journal-window .aj-ab-chev {
+    grid-column: 3;
+    grid-row: 1;
+    margin-top: 10px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-ability-name {
-    font-size: 10px;
+  body.mobile-touch #adventure-journal-window .aj-ab-tags {
+    grid-column: 2 / 3;
+    grid-row: 2;
+    justify-content: flex-start;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-badges {
-    gap: 3px;
+  body.mobile-touch #adventure-journal-window .aj-ab-do {
+    font-size: 15px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-badge {
-    width: 20px;
-    height: 20px;
+  body.mobile-touch #adventure-journal-window .aj-ab-detail {
+    padding: 2px 14px 14px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-badge .ui-icon {
-    width: 11px;
-    height: 11px;
+  body.mobile-touch #adventure-journal-window .aj-soon {
+    margin: 16px 12px 24px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-ability-detail {
-    margin-left: 51px;
-    padding: 7px 8px;
+  /* Mythic's panel has no tabs, and the portrait row replaces the steps:
+     the empty bar goes. */
+  body.mobile-touch #adventure-journal-window .aj-tabbar:not(:has(.aj-tabs)) {
+    display: none;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-ability-detail p {
-    font-size: 10px;
+  body.mobile-touch #adventure-journal-window .aj-about {
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 16px;
+    padding: 12px;
   }
-  /* Dungeon pages: four or five bosses ride one horizontal strip instead of a
-     two-column grid, so the journal keeps its height on a landscape phone. */
-  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x proximity;
+  body.mobile-touch #adventure-journal-window .aj-about-model,
+  body.mobile-touch #adventure-journal-window .rbg-model-viewer {
+    min-height: 250px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon .rbg-boss-tab {
-    flex: 0 0 auto;
-    width: 150px;
-    scroll-snap-align: start;
+  body.mobile-touch #adventure-journal-window .rbg-model-stage {
+    min-height: 220px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-tip-grid,
-  body.mobile-touch #raid-boss-guide-window .rbg-choice-sides {
+  /* Held upright, the encounter card, role cards and trade-offs stack. */
+  @media (max-aspect-ratio: 1 / 1) {
+    body.mobile-touch #adventure-journal-window .aj-about,
+    body.mobile-touch #adventure-journal-window .aj-role-grid,
+    body.mobile-touch #adventure-journal-window .rbg-choice-sides {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  body.mobile-touch #adventure-journal-window .rbg-model-load {
+    min-height: 40px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-loot {
     grid-template-columns: minmax(0, 1fr);
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-tip p,
-  body.mobile-touch #raid-boss-guide-window .rbg-choice p,
-  body.mobile-touch #raid-boss-guide-window .rbg-heroic ul,
-  body.mobile-touch #raid-boss-guide-window .rbg-ability-summary {
-    font-size: 10px;
+  /* The boss search in the drawer, and the Loot bar: 40px targets and up. */
+  body.mobile-touch #adventure-journal-window .aj-search-input {
+    height: 44px;
+    padding-right: 46px;
   }
-  body.mobile-touch
-    #raid-boss-guide-window
-    .rbg-boss-nav-dungeon
-    ~ .rbg-journal
-    .rbg-ability-toggle {
-    grid-template-columns: 44px minmax(0, 1fr);
+  body.mobile-touch #adventure-journal-window .aj-search-clear {
+    right: 2px;
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
   }
-  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon ~ .rbg-journal .rbg-badges {
-    grid-column: 2;
-    padding-bottom: 4px;
+  body.mobile-touch #adventure-journal-window .aj-search-hit {
+    min-height: 44px;
+  }
+  body.mobile-touch #adventure-journal-window .aj-loot-bar {
+    align-items: stretch;
+  }
+  body.mobile-touch #adventure-journal-window .aj-loot-scope-btn {
+    flex: 1;
+    min-height: 40px;
+    font-size: 15px;
+  }
+  body.mobile-touch #adventure-journal-window .df-loot-selects select {
+    height: 44px;
   }
   /* One anchor for both strips: the column (hud.css #aura-stack) owns the
      buff-to-debuff clearance, so the two `top` offsets that used to set it are

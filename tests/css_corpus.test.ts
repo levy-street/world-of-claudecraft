@@ -167,6 +167,7 @@ const INDEX_SECTIONS = [
   'skull bag pane',
   'social',
   'map',
+  'raid atlas',
   'Dungeon Finder',
   'Ashen Coliseum (arena)',
   "The World Market (the Merchant's auction house)",
@@ -178,6 +179,7 @@ const INDEX_SECTIONS = [
   '2v2 Fiesta HUD',
   'center messages',
   'low-health screen vignette',
+  'Quench frost and water screen effects',
   'death overlay',
   'start screen layout overhaul',
   'loading screen (entering the world)',
@@ -255,11 +257,13 @@ describe('css_corpus section manifest', () => {
     // + the dungeon objectives tracker (hud.css, in both entries): 78, 76.
     // + the launcher turntable's loading silhouette (shell.css, in both entries): 79, 77.
     // + the phone creator's pinch hint (shell.css, in both entries): 80, 78.
-    expect(INDEX_SECTIONS.length).toBe(82);
-    expect(PLAY_SECTIONS.length).toBe(80);
-    expect(MANIFEST.length).toBe(82);
-    expect(new Set(INDEX_SECTIONS).size).toBe(82);
-    expect(new Set(PLAY_SECTIONS).size).toBe(80);
+    // + the raid atlas (components.css, in both entries): 83, 81.
+    // + the Quench frost and water screen effects (hud.css, in both entries): 84, 82.
+    expect(INDEX_SECTIONS.length).toBe(84);
+    expect(PLAY_SECTIONS.length).toBe(82);
+    expect(MANIFEST.length).toBe(84);
+    expect(new Set(INDEX_SECTIONS).size).toBe(84);
+    expect(new Set(PLAY_SECTIONS).size).toBe(82);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

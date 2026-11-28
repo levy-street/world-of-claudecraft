@@ -13,6 +13,7 @@ import { wireEntity } from '../server/game';
 import { syncClientDungeonGates } from '../src/net/dungeon_gate_wire';
 import { isBlocked, resolvePosition } from '../src/sim/colliders';
 import { HOLLOW_CRYPT_GATES } from '../src/sim/content/hollow_crypt';
+import { SMITH_HEART_GUARDIANS } from '../src/sim/content/smith_heart';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   KORZUL_EMERGE_FROM,
@@ -20,6 +21,8 @@ import {
 } from '../src/sim/encounters/gravewyrm_sanctum/korzul_emerge_plan';
 import { BELL_YARD, MARROW_ID } from '../src/sim/encounters/hollow_crypt';
 import { MORTHEN_SPOT } from '../src/sim/encounters/hollow_crypt/ids';
+import { gapAt, openLipAt } from '../src/sim/encounters/smith_heart/breath_geometry';
+import { HEAT_LIP_WALL } from '../src/sim/encounters/smith_heart/heat_ids';
 import { VAEL_INTRO_STOPS } from '../src/sim/encounters/sunken_bastion/ids';
 import { clearDungeonGateStateForTest } from '../src/sim/instances/dungeon_gate_state';
 import {
@@ -637,7 +640,7 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
     (d.gates ?? []).filter((g) => g.sealWhileEngaged).map((g) => [d.id, g.id] as const),
   );
 
-  it('covers the five reworked dungeons', () => {
+  it("covers the five reworked dungeons and the Smith's Heart raid", () => {
     expect(new Set(SEALING.map(([d]) => d))).toEqual(
       new Set([
         'hollow_crypt',
@@ -645,13 +648,21 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
         'drowned_temple',
         'gravewyrm_sanctum',
         'wildheart_basin',
+        'smith_heart',
       ]),
     );
     expect(SEALING.length).toBeGreaterThanOrEqual(17);
   });
 
   function claim(dungeonId: string): { sim: Sim; inst: InstanceSlot } {
-    const sim = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true, world: WORLD });
+    // The Smith's Heart is a dev-only blockout (encounters/smith_heart/entry.ts).
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WORLD,
+      devCommands: dungeonId === 'smith_heart',
+    });
     const pid = sim.addPlayer('warrior', 'Sealwalker');
     sim.setPlayerLevel(20, pid);
     expect(enterDungeon(sim.ctx, dungeonId, pid)).toBe(true);
@@ -742,7 +753,11 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
       const home = { x: spawn.x, z: spawn.z };
       const seen = new Set<number>();
       const key = (x: number, z: number): number => (x + 2048) * 4096 + (z + 2048);
-      const queue: [number, number][] = [[Math.round(spawn.x), Math.round(spawn.z)]];
+      // The Guardian of the Heat stands walled in its wellspring (its lip
+      // wall, 2026-11-24): the flood starts on the shore at the wall's foot.
+      const walled = gate.sealWhileEngaged === SMITH_HEART_GUARDIANS.heat;
+      const sx = walled ? spawn.x + HEAT_LIP_WALL.outer + 2 : spawn.x;
+      const queue: [number, number][] = [[Math.round(sx), Math.round(spawn.z)]];
       seen.add(key(queue[0][0], queue[0][1]));
       let least = Infinity;
       let cells = 0;
@@ -760,6 +775,12 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
           const nz = z + dz;
           if (Math.abs(nx) > 400 || Math.abs(nz) > 500 || seen.has(key(nx, nz))) continue;
           seen.add(key(nx, nz));
+          // The Storm Cornice is walled by a void, not colliders: a gap in its
+          // rim or its open lip (CORNICE_OPEN_RIM: no wall stands round the
+          // Cornice) is a lethal fall (breath_geometry.ts), never a way out, so
+          // the flood stops there as it does at a wall.
+          if (dungeonId === 'smith_heart' && (gapAt(nx, nz) !== null || openLipAt(nx, nz)))
+            continue;
           if (!isBlocked(WORLD_SEED, o.x + nx, o.z + nz, 0.5)) queue.push([nx, nz]);
         }
       }
@@ -873,7 +894,13 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
     // Every file under src/sim/encounters that assigns a spawnPos. Each was
     // read for this suite: only korzul_emerge.ts moves a SEALING boss's home
     // (covered above); the rest re-home adds, shackles and raid bosses that
-    // have no sealing gate. A file that joins this list has not been read yet.
+    // have no sealing gate. The Smith's Heart's five: breath_isle_adds.ts,
+    // breath_isles.ts, final_adds.ts and heat_scope.ts home freshly raised
+    // bodies (the Breath isles' adds and its Stillstones, the Splinters, the
+    // Heat's adds) where they rise; final.ts reHome
+    // sets the sealing final boss's home back to its authored spawn (HEART_ROOM,
+    // the spawn the check above already reads), never a new spot. A file that
+    // joins this list has not been read yet.
     const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'sim', 'encounters');
     const writers: string[] = [];
     const walk = (dir: string): void => {
@@ -894,6 +921,11 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
       'hollow_crypt/knellwyrm.ts',
       'ignivar.ts',
       'nythraxis.ts',
+      'smith_heart/breath_isle_adds.ts',
+      'smith_heart/breath_isles.ts',
+      'smith_heart/final.ts',
+      'smith_heart/final_adds.ts',
+      'smith_heart/heat_scope.ts',
       'varkhul.ts',
     ]);
     // And none of the others is a sealing boss's own module by another name:

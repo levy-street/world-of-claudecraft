@@ -1466,6 +1466,21 @@ describe('Guide deeds cross-page surfaces', () => {
     expect(html).toContain('<kbd>Shift+X</kbd></td><td>The Reliquary</td>');
   });
 
+  it('lists the Ping key on the controls page, matching the in-game default', () => {
+    setLanguage('en');
+    const pingBind = BIND_ACTIONS.find((a) => a.id === 'ping');
+    expect(pingBind?.defaults).toEqual(['KeyY']);
+    expect(pingBind?.kind).toBe('held');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain(
+      '<kbd>Y</kbd></td><td>Ping: tap to ping what is under the cursor, hold for the ping wheel</td>',
+    );
+  });
+
   it('cross-links the deeds catalog from the dungeons page', () => {
     setLanguage('en');
     const html = dungeonsPage.render({
@@ -1656,7 +1671,8 @@ describe('Guide controls reference completeness', () => {
       titleKey: 'guide.nav.controls',
     });
     expect(html).toContain('<kbd>Shift+P</kbd></td><td>Professions</td>');
-    expect(html).toContain('<kbd>Shift+J</kbd></td><td>Target buffs and debuffs</td>');
+    expect(html).toContain('<kbd>Shift+B</kbd></td><td>Target buffs and debuffs</td>');
+    expect(html).toContain('<kbd>Shift+J</kbd></td><td>Adventure Journal</td>');
     expect(html).toContain('<kbd>Shift+I</kbd></td><td>Dungeon Finder</td>');
     expect(html).toContain('<kbd>`</kbd></td><td>Mount / Dismount</td>');
     expect(html).toContain('<kbd>Z</kbd></td><td>Sheathe/Unsheathe Weapon</td>');
@@ -1741,7 +1757,8 @@ describe('Guide controls reference completeness', () => {
   it('keeps those five binds in step with the game defaults', () => {
     const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
     expect(defaults.get('professions')).toEqual(['Shift+KeyP']);
-    expect(defaults.get('targetAuras')).toEqual(['Shift+KeyJ']);
+    expect(defaults.get('targetAuras')).toEqual(['Shift+KeyB']);
+    expect(defaults.get('adventureJournal')).toEqual(['Shift+KeyJ']);
     expect(defaults.get('dungeonFinder')).toEqual(['Shift+KeyI']);
     expect(defaults.get('mount')).toEqual(['Backquote']);
     expect(defaults.get('sheathe')).toEqual(['KeyZ']);
@@ -7010,8 +7027,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // The emote wheel is the one held bind of the set, and the prose says so.
     expect(bind('emoteWheel').kind).toBe('held');
     expect(beat).toContain(`The emote wheel (${key('emoteWheel')}) is the exception: hold its key`);
-    // No bind defaults to Y and no Vale Cup bind exists: the dead entry is gone.
-    expect(BIND_ACTIONS.some((b) => b.defaults.includes('KeyY'))).toBe(false);
+    // No window binds to Y and no Vale Cup bind exists: the dead entry is gone.
+    // Y is now only the held Ping key (the controls page lists it, not this beat).
+    expect(BIND_ACTIONS.filter((b) => b.defaults.includes('KeyY')).map((b) => b.id)).toEqual([
+      'ping',
+    ]);
     expect(BIND_ACTIONS.some((b) => /vale/i.test(b.id) || /vale cup/i.test(b.label))).toBe(false);
     expect(beat).not.toContain('Vale Cup');
     expect(beat).not.toContain('(Y)');

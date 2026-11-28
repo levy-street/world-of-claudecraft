@@ -60,6 +60,16 @@ const SWIM_GAIN = 0.5;
  *  the rider's own landing are untouched. */
 const MOUNT_LAND_BOOST = 1.125;
 const MAX_VOICES = 24; // concurrent one-shot sources (frame-budget guard)
+/** Voices kept back above MAX_VOICES for a `priority` one-shot: a raid
+ *  mechanic's warning or impact (the Smith's Heart's cues) still sounds when a
+ *  busy raid's spells have filled the ordinary pool. Bounded, so the frame
+ *  budget holds. */
+export const PRIORITY_VOICE_HEADROOM = 8;
+
+/** The concurrent one-shot cap a play is held to. */
+export function voiceCapFor(priority: boolean | undefined): number {
+  return priority ? MAX_VOICES + PRIORITY_VOICE_HEADROOM : MAX_VOICES;
+}
 // Per-ability synth layer (abilityAudio): its own small voice pool, separate
 // from MAX_VOICES so ability spam can never starve footsteps/UI one-shots,
 // and a conservative layer gain that keeps every recipe under the sampled
@@ -203,6 +213,9 @@ export interface PlayOpts {
   voiceKey?: string;
   /** Seconds to crossfade when replacing an existing `voiceKey` voice. */
   voiceCrossfade?: number;
+  /** A mechanic cue a player reacts to: it may use the PRIORITY_VOICE_HEADROOM
+   *  voices past the ordinary cap, so spell spam never silences it. */
+  priority?: boolean;
 }
 
 interface LoopSlot {
@@ -734,7 +747,7 @@ class Sfx {
     }
     const now = ctx.currentTime;
     this.pruneLastPlay(now);
-    if (this.active >= MAX_VOICES) return false;
+    if (this.active >= voiceCapFor(opts?.priority)) return false;
     const cd = opts?.cooldown ?? 0.03;
     const cooldownKey = opts?.cooldownKey ?? key;
     // -Infinity, not -1: a fresh key (never played) must never be blocked, at

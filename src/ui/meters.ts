@@ -780,6 +780,7 @@ export class MeterData {
           ability: ev.ability || 'Attack',
           sourceName,
           sourceId: ev.sourceId,
+          sourceTemplateId: srcEntity?.templateId,
           amount: ev.amount,
           hpBefore,
           hpAfter,
@@ -3018,7 +3019,9 @@ export class MetersPanel {
         let iconHtml = '';
         try {
           const rawKey =
-            r.abilityId || (r.ability ? r.ability.toLowerCase().replace(/\s+/g, '_') : 'attack');
+            r.journalIconId ||
+            r.abilityId ||
+            (r.ability ? r.ability.toLowerCase().replace(/\s+/g, '_') : 'attack');
           const url = iconDataUrl('ability', rawKey, 16);
           if (url) {
             iconHtml = `<span class="mt-tip-icon" style="background-image:url('${url}')"></span>`;

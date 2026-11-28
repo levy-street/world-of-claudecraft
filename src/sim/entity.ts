@@ -22,6 +22,7 @@ import {
   membershipWeaponDisplayId,
   membershipWeaponItem,
 } from './membership_weapon';
+import { putDormant } from './mob/dormant_state';
 import { countsWarfareRating, pvpFractionsFromRatings, pvpVitalityFromRating } from './pvp';
 import type {
   Entity,
@@ -959,6 +960,10 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
     e.hostile = false;
     e.friendlyPracticeTarget = true;
   }
+  // A template that sleeps until it is woken (MobTemplate.dormant, mob/dormant.ts) is born
+  // asleep with its ward on, through every spawn path (a raid claim, a dev spawn). Set ONLY
+  // for such a template, so no other mob's parity samples churn.
+  if (template.dormant) putDormant(e, template.dormant);
   return e;
 }
 

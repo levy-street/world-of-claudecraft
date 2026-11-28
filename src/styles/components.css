@@ -15478,6 +15478,751 @@
     clip-path: polygon(0 50%, 50% 0, 100% 50%, 50% 100%);
   }
 
+  /* ---------- raid atlas ---------- */
+  /* The raid atlas (src/ui/hud/raid_atlas/): a raid's illustrated M-map,
+     drawn on its own DPR-sharp canvas that takes the shared map canvas's
+     place while the controller stamps #map-window.raid-atlas-on, with its
+     chrome (page tabs, zoom, pin tools, pin editor, legend) laid over it.
+     The window itself fades and lifts in on open and fades out on close. */
+  @media (prefers-reduced-motion: no-preference) {
+    #map-window {
+      transition:
+        opacity 0.18s ease-out,
+        scale 0.18s ease-out,
+        display 0.18s allow-discrete;
+    }
+    #map-window[style*="display: none"] {
+      opacity: 0;
+      scale: 0.985;
+    }
+    @starting-style {
+      #map-window {
+        opacity: 0;
+        scale: 0.975;
+      }
+    }
+  }
+  #raid-atlas-canvas,
+  .raid-atlas-chrome {
+    display: none;
+  }
+  #map-window.raid-atlas-on #map-canvas,
+  #map-window.raid-atlas-on #map-zoom,
+  #map-window.raid-atlas-on .map-atlas-compass {
+    display: none !important;
+  }
+  #map-window.raid-atlas-on #raid-atlas-canvas {
+    display: block;
+    box-sizing: content-box;
+    width: 560px;
+    height: 560px;
+    border: 2px solid var(--color-raid-atlas-frame-dark);
+    box-shadow: 0 6px 22px var(--color-raid-atlas-frame-dark);
+    touch-action: none;
+    cursor: grab;
+    outline: none;
+  }
+  #map-window.raid-atlas-on #raid-atlas-canvas:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  #map-window.raid-atlas-on #raid-atlas-canvas.is-grabbing {
+    cursor: grabbing;
+  }
+  #map-window.raid-atlas-on #raid-atlas-canvas.is-pinning {
+    cursor: crosshair;
+  }
+  body:not(.mobile-touch) #map-window.raid-atlas-on.window-sized #raid-atlas-canvas {
+    width: calc(var(--map-face) - 4px);
+    height: calc(var(--map-face) - 4px);
+  }
+  /* The chrome lies exactly over the atlas canvas's square (its 2px border
+     included), so every control is placed against the map face. */
+  #map-window.raid-atlas-on .raid-atlas-chrome {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 564px;
+    height: 564px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  body:not(.mobile-touch) #map-window.raid-atlas-on.window-sized .raid-atlas-chrome {
+    width: var(--map-face);
+    height: var(--map-face);
+  }
+  body.mobile-touch #map-window.raid-atlas-on .raid-atlas-chrome {
+    left: var(--window-pad);
+    right: var(--window-pad);
+    top: var(--window-pad);
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    transform: none;
+  }
+  .raid-atlas-chrome > * {
+    pointer-events: auto;
+  }
+  .raid-atlas-btn {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 4px 10px;
+    border: 1px solid var(--color-raid-atlas-gold-deep);
+    background: linear-gradient(
+      180deg,
+      var(--color-raid-atlas-frame-mid),
+      var(--color-raid-atlas-frame-dark)
+    );
+    color: var(--color-raid-atlas-gold-light);
+    font-family: var(--font-display);
+    box-shadow:
+      inset 0 1px 0 var(--color-raid-atlas-gold-deep),
+      0 2px 6px var(--color-raid-atlas-frame-dark);
+  }
+  .raid-atlas-btn:hover:not(:disabled) {
+    border-color: var(--color-raid-atlas-gold);
+    color: var(--color-raid-atlas-gold-white);
+  }
+  .raid-atlas-btn:disabled {
+    opacity: 0.45;
+  }
+  .raid-atlas-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .raid-atlas-floors {
+    position: absolute;
+    top: 52px;
+    left: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  .raid-atlas-floor {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .raid-atlas-floor.is-current {
+    border-color: var(--color-raid-atlas-gold);
+    background: linear-gradient(
+      180deg,
+      var(--color-raid-atlas-gold-deep),
+      var(--color-raid-atlas-frame-dark)
+    );
+    color: var(--color-raid-atlas-gold-white);
+  }
+  .raid-atlas-here {
+    display: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-raid-atlas-glow);
+    box-shadow: 0 0 6px var(--color-raid-atlas-glow);
+  }
+  .raid-atlas-floor.has-player .raid-atlas-here {
+    display: inline-block;
+  }
+  .raid-atlas-zoom {
+    position: absolute;
+    right: 24px;
+    bottom: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .raid-atlas-zoom .raid-atlas-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .raid-atlas-reset-glyph {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    box-shadow:
+      inset 0 0 0 2px var(--color-raid-atlas-frame-dark),
+      inset 0 0 0 4px currentColor;
+  }
+  .raid-atlas-tools {
+    position: absolute;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .raid-atlas-tool-glyph,
+  .raid-atlas-chip-glyph,
+  .raid-atlas-legend-glyph {
+    width: 22px;
+    height: 22px;
+    display: block;
+    flex: none;
+  }
+  .raid-atlas-pin-tool,
+  .raid-atlas-style,
+  .raid-atlas-shared-tool {
+    width: 40px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .raid-atlas-pin-tool.is-on,
+  .raid-atlas-shared-tool.is-on {
+    border-color: var(--color-raid-atlas-glow);
+    box-shadow:
+      0 0 0 1px var(--color-raid-atlas-glow),
+      0 0 12px var(--color-raid-atlas-glow);
+  }
+  .raid-atlas-legend-btn {
+    height: 36px;
+    font-size: 12px;
+  }
+  /* The group's raid marks: the target markers' sprites (icons.ts) on the tool
+     and the eight symbol chips, apart from the pin tool's gilded teardrops. */
+  .raid-atlas-shared-tool-glyph,
+  .raid-atlas-shared-chip-glyph {
+    width: 22px;
+    height: 22px;
+    display: block;
+    flex: none;
+    filter: drop-shadow(0 1px 1px var(--color-raid-atlas-frame-dark));
+  }
+  .raid-atlas-shared-chip:disabled .raid-atlas-shared-chip-glyph {
+    opacity: 0.55;
+  }
+  .raid-atlas-shared-row {
+    display: grid;
+    grid-template-columns: repeat(4, 34px);
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .raid-atlas-shared-note {
+    margin: 0 0 8px;
+    max-width: 220px;
+    font-size: 11px;
+    line-height: 1.35;
+    text-align: center;
+    font-style: italic;
+    color: var(--color-raid-atlas-parchment-dark);
+  }
+  /* The raid marks panel docks at the map's left edge so the middle of the
+     page, where marks go, stays free to click. */
+  body:not(.mobile-touch) .raid-atlas-shared {
+    left: 18px;
+    bottom: 72px;
+    transform: none;
+  }
+  .raid-atlas-shared.is-read-only .raid-atlas-shared-note {
+    color: var(--color-raid-atlas-gold-light);
+  }
+  .raid-atlas-editor,
+  .raid-atlas-shared,
+  .raid-atlas-legend {
+    position: absolute;
+    bottom: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    padding: 10px 12px;
+    border: 1px solid var(--color-raid-atlas-gold);
+    background: linear-gradient(
+      180deg,
+      var(--color-raid-atlas-frame-mid),
+      var(--color-raid-atlas-frame-dark)
+    );
+    color: var(--color-raid-atlas-parchment);
+    box-shadow: 0 8px 24px var(--color-raid-atlas-frame-dark);
+    max-width: calc(100% - 40px);
+  }
+  .raid-atlas-editor.is-open,
+  .raid-atlas-shared.is-open,
+  .raid-atlas-legend.is-open {
+    display: block;
+  }
+  .raid-atlas-editor-title {
+    font-family: var(--font-display);
+    color: var(--color-raid-atlas-gold-light);
+    font-size: 13px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .raid-atlas-editor-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .raid-atlas-chip {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .raid-atlas-chip[aria-pressed="true"] {
+    border-color: var(--color-raid-atlas-glow);
+    box-shadow: 0 0 0 2px var(--color-raid-atlas-glow);
+  }
+  .raid-atlas-color::before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--color-raid-atlas-frame-dark);
+    box-shadow: 0 0 0 1px var(--color-raid-atlas-gold);
+  }
+  .raid-atlas-color.is-gold::before {
+    background: var(--color-raid-atlas-pin-gold);
+  }
+  .raid-atlas-color.is-red::before {
+    background: var(--color-raid-atlas-pin-red);
+  }
+  .raid-atlas-color.is-blue::before {
+    background: var(--color-raid-atlas-pin-blue);
+  }
+  .raid-atlas-color.is-green::before {
+    background: var(--color-raid-atlas-pin-green);
+  }
+  .raid-atlas-color.is-purple::before {
+    background: var(--color-raid-atlas-pin-purple);
+  }
+  .raid-atlas-color.is-white::before {
+    background: var(--color-raid-atlas-pin-white);
+  }
+  .raid-atlas-editor-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  .raid-atlas-editor-actions .raid-atlas-btn {
+    font-size: 12px;
+  }
+  .raid-atlas-legend {
+    width: 280px;
+  }
+  .raid-atlas-legend-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+  }
+  .raid-atlas-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .raid-atlas-legend-row:last-child {
+    grid-column: 1 / -1;
+  }
+  .raid-atlas-hint {
+    margin: 8px 0 0;
+    font-size: 11px;
+    line-height: 1.35;
+    font-style: italic;
+    color: var(--color-raid-atlas-parchment-dark);
+  }
+  .raid-atlas-toast {
+    position: absolute;
+    top: 112px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    max-width: calc(100% - 40px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-raid-atlas-gold-light);
+    background: var(--color-raid-atlas-frame-dark);
+    border: 1px solid var(--color-raid-atlas-gold-deep);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .raid-atlas-toast.is-on {
+    opacity: 1;
+  }
+  /* The boss pins (raid_atlas_boss_pins.ts): a hand cursor over a portrait
+     medallion, one transparent keyboard focus stop over each (pointer-events
+     off: the canvas keeps every drag and tap), and the boss card, a gilded
+     parchment leaf with the boss's face, name, encounter, state and lore. */
+  #map-window.raid-atlas-on #raid-atlas-canvas.is-over-boss {
+    cursor: pointer;
+  }
+  .raid-atlas-chrome > .raid-atlas-boss-stops {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .raid-atlas-boss-stop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    pointer-events: none;
+    outline: none;
+  }
+  .raid-atlas-boss-stop:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--color-raid-atlas-frame-dark),
+      0 0 0 4px var(--color-border-focus);
+  }
+  .raid-atlas-chrome > .raid-atlas-boss-card,
+  .raid-atlas-boss-card.is-minimap {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    display: none;
+    box-sizing: border-box;
+    width: 272px;
+    padding: 12px 16px 14px;
+    pointer-events: none;
+    color: var(--color-raid-atlas-ink);
+    text-align: center;
+    background: radial-gradient(
+      ellipse at 50% 18%,
+      var(--color-raid-atlas-parchment-light),
+      var(--color-raid-atlas-parchment) 62%,
+      var(--color-raid-atlas-parchment-dark)
+    );
+    border: 2px solid var(--color-raid-atlas-gold);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 1px var(--color-raid-atlas-frame-dark),
+      inset 0 0 0 1px var(--color-raid-atlas-gold-light),
+      inset 0 0 22px var(--color-raid-atlas-stain),
+      0 10px 26px var(--color-raid-atlas-frame-dark);
+  }
+  .raid-atlas-boss-card.is-open {
+    display: block;
+  }
+  /* The minimap's card (raid_atlas_minimap_card.ts) sits beside the round
+     minimap, over the HUD like the shared tooltip. */
+  .raid-atlas-boss-card.is-minimap {
+    z-index: 100;
+  }
+  .raid-atlas-boss-faces {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 92px;
+    margin: 0 auto 6px;
+  }
+  .raid-atlas-boss-face {
+    box-sizing: border-box;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 3px solid var(--color-raid-atlas-gold);
+    background: radial-gradient(
+      circle at 40% 32%,
+      var(--color-raid-atlas-boss),
+      var(--color-raid-atlas-frame-dark) 78%
+    );
+    box-shadow:
+      0 0 0 1px var(--color-raid-atlas-frame-dark),
+      inset 0 0 0 1px var(--color-raid-atlas-gold-deep),
+      0 4px 10px var(--color-raid-atlas-frame-dark);
+    object-fit: cover;
+  }
+  .raid-atlas-boss-faces.is-council .raid-atlas-boss-face {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 8px;
+  }
+  .raid-atlas-boss-faces.is-council .raid-atlas-boss-face.is-partner {
+    width: 62px;
+    height: 62px;
+    margin: 0 0 0 -16px;
+  }
+  .raid-atlas-boss-card[data-state="engaged"] .raid-atlas-boss-face {
+    border-color: var(--color-raid-atlas-boss-engaged);
+    background: radial-gradient(
+      circle at 40% 32%,
+      var(--color-raid-atlas-boss-engaged),
+      var(--color-raid-atlas-frame-dark) 78%
+    );
+  }
+  .raid-atlas-boss-card[data-state="dead"] .raid-atlas-boss-face {
+    border-color: var(--color-raid-atlas-dead);
+    background: radial-gradient(
+      circle at 40% 32%,
+      var(--color-raid-atlas-dead),
+      var(--color-raid-atlas-frame-mid) 78%
+    );
+    filter: grayscale(1);
+    opacity: 0.8;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .raid-atlas-boss-card[data-state="engaged"] .raid-atlas-boss-face {
+      animation: raid-atlas-boss-burn 1.25s ease-in-out infinite;
+    }
+  }
+  @keyframes raid-atlas-boss-burn {
+    50% {
+      box-shadow:
+        0 0 0 1px var(--color-raid-atlas-frame-dark),
+        0 0 14px 3px var(--color-raid-atlas-boss-engaged);
+    }
+  }
+  .raid-atlas-boss-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    line-height: 1.15;
+    font-weight: 600;
+    color: var(--color-raid-atlas-ink);
+    text-shadow: 0 1px 0 var(--color-raid-atlas-parchment-light);
+  }
+  .raid-atlas-boss-subtitle {
+    margin-top: 2px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    color: var(--color-raid-atlas-ink-soft);
+  }
+  .raid-atlas-boss-state {
+    display: inline-block;
+    margin-top: 7px;
+    padding: 1px 10px 2px;
+    border-radius: 9px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--color-raid-atlas-gold-light);
+    background: var(--color-raid-atlas-frame-mid);
+    border: 1px solid var(--color-raid-atlas-gold-deep);
+  }
+  .raid-atlas-boss-card[data-state="engaged"] .raid-atlas-boss-state {
+    color: var(--color-raid-atlas-gold-white);
+    background: var(--color-raid-atlas-boss);
+    border-color: var(--color-raid-atlas-boss-engaged);
+  }
+  .raid-atlas-boss-card[data-state="dead"] .raid-atlas-boss-state {
+    color: var(--color-raid-atlas-parchment-light);
+    background: var(--color-raid-atlas-dead);
+    border-color: var(--color-raid-atlas-frame-mid);
+  }
+  .raid-atlas-boss-rule {
+    height: 1px;
+    margin: 9px 6px 8px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-raid-atlas-gold-deep) 20%,
+      var(--color-raid-atlas-gold) 50%,
+      var(--color-raid-atlas-gold-deep) 80%,
+      transparent
+    );
+  }
+  .raid-atlas-boss-lore {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 12.5px;
+    line-height: 1.45;
+    text-align: left;
+    color: var(--color-raid-atlas-ink);
+  }
+  /* Touch: the face is a small square, so the card turns into a compact
+     strip across it (the face beside the name, the lore below), set above or
+     below its pin (raidAtlasTooltipPlacement) so the pin stays in sight. */
+  body.mobile-touch .raid-atlas-boss-card.is-minimap {
+    width: min(340px, calc(100vw - 20px));
+    padding: 7px 9px 8px;
+    text-align: left;
+  }
+  body.mobile-touch .raid-atlas-boss-card.is-minimap.is-open {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+    align-items: center;
+  }
+  body.mobile-touch .raid-atlas-chrome > .raid-atlas-boss-card {
+    width: calc(100% - 16px);
+    max-width: 340px;
+    padding: 7px 9px 8px;
+    text-align: left;
+  }
+  body.mobile-touch .raid-atlas-chrome > .raid-atlas-boss-card.is-open {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+    align-items: center;
+  }
+  body.mobile-touch .raid-atlas-boss-faces {
+    grid-row: 1 / span 2;
+    height: 50px;
+    margin: 0;
+  }
+  body.mobile-touch .raid-atlas-boss-face {
+    width: 48px;
+    height: 48px;
+    border-width: 2px;
+  }
+  body.mobile-touch .raid-atlas-boss-faces.is-council .raid-atlas-boss-face {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 4px;
+  }
+  body.mobile-touch .raid-atlas-boss-faces.is-council .raid-atlas-boss-face.is-partner {
+    width: 32px;
+    height: 32px;
+    margin: 0 0 0 -12px;
+  }
+  body.mobile-touch .raid-atlas-boss-title {
+    font-size: 13px;
+  }
+  body.mobile-touch .raid-atlas-boss-subtitle {
+    font-size: 10.5px;
+    margin-top: 0;
+  }
+  body.mobile-touch .raid-atlas-boss-state {
+    justify-self: start;
+    margin-top: 3px;
+    padding: 0 8px 1px;
+    font-size: 9.5px;
+  }
+  body.mobile-touch .raid-atlas-boss-rule {
+    grid-column: 1 / -1;
+    margin: 6px 2px 5px;
+  }
+  body.mobile-touch .raid-atlas-boss-lore {
+    grid-column: 1 / -1;
+    font-size: 10.5px;
+    line-height: 1.35;
+  }
+  /* Touch: the map face is small (a 330px sheet, or a square beside a 58px
+     rail in landscape), so the chrome tightens to two rows of 40px targets:
+     the page switch (only the OTHER page shows, so one tap swaps) at the
+     bottom left, the pin tools at the bottom right, zoom up the right edge.
+     The canvas follows the shared map canvas's own touch sizes. */
+  body.mobile-touch #map-window.raid-atlas-on #raid-atlas-canvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #map-window.raid-atlas-on .raid-atlas-chrome {
+    left: var(--window-pad);
+    top: var(--window-pad);
+    width: calc(100% - var(--window-pad) * 2);
+    height: auto;
+    aspect-ratio: 1;
+    transform: none;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch #map-window.raid-atlas-on #raid-atlas-canvas,
+    body.mobile-touch #map-window.raid-atlas-on .raid-atlas-chrome {
+      width: var(--mobile-map-size, 100%);
+      max-width: calc(100% - var(--mobile-map-rail, 0px));
+    }
+    /* Landscape keeps a rail right of the map for the close button: zoom
+       joins it there, off the drawn map. */
+    body.mobile-touch #map-window .raid-atlas-zoom {
+      right: calc(9px - var(--mobile-map-rail, 58px));
+    }
+  }
+  body.mobile-touch .raid-atlas-floors {
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+  }
+  body.mobile-touch .raid-atlas-floor.is-current {
+    display: none;
+  }
+  body.mobile-touch .raid-atlas-floor {
+    font-size: 11px;
+    min-height: 40px;
+    padding: 2px 8px;
+  }
+  body.mobile-touch .raid-atlas-zoom {
+    right: 10px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+  body.mobile-touch .raid-atlas-zoom .raid-atlas-btn,
+  body.mobile-touch .raid-atlas-pin-tool,
+  body.mobile-touch .raid-atlas-style,
+  body.mobile-touch .raid-atlas-shared-tool,
+  body.mobile-touch .raid-atlas-legend-btn,
+  body.mobile-touch .raid-atlas-chip {
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch .raid-atlas-editor-actions .raid-atlas-btn {
+    min-height: 40px;
+  }
+  /* The legend toggle shows a glyph on touch (its name stays its label). */
+  body.mobile-touch .raid-atlas-legend-btn {
+    font-size: 0;
+  }
+  body.mobile-touch .raid-atlas-legend-btn::before {
+    content: "?";
+    font-size: 18px;
+  }
+  body.mobile-touch .raid-atlas-tools {
+    left: auto;
+    right: 10px;
+    bottom: 10px;
+    transform: none;
+  }
+  body.mobile-touch .raid-atlas-toast {
+    top: auto;
+    bottom: 58px;
+  }
+  body.mobile-touch .raid-atlas-editor,
+  body.mobile-touch .raid-atlas-shared,
+  body.mobile-touch .raid-atlas-legend {
+    bottom: 58px;
+    width: calc(100% - 20px);
+    max-width: none;
+    max-height: calc(100% - 70px);
+    overflow: auto;
+    padding: 8px;
+  }
+  body.mobile-touch .raid-atlas-shared-row {
+    grid-template-columns: repeat(4, 40px);
+  }
+  body.mobile-touch .raid-atlas-shared-note {
+    max-width: none;
+  }
+  body.mobile-touch .raid-atlas-legend-row {
+    font-size: 11px;
+    gap: 4px;
+  }
+  body.mobile-touch .raid-atlas-legend-list {
+    gap: 2px 8px;
+  }
+  body.mobile-touch .raid-atlas-hint {
+    font-size: 10px;
+    margin-top: 6px;
+  }
+
   /* ---------- Dungeon Finder ---------- */
   /* Closed by default: this @layer components rule outranks `.window { display: none }`
      in @layer layout, so the closed state has to be declared HERE or the empty panel
@@ -18616,6 +19361,8 @@
   #wildheart-alert,
   #sanctum-alert,
   #crypt-alert,
+  #heart-quench-alert,
+  #heart-knot-alert,
   #temple-alert,
   #kit-use-prompt {
     bottom: calc(260px + var(--castbar-h) + 14px);
@@ -18626,6 +19373,8 @@
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert,
   body.show-actionbar3 #crypt-alert,
+  body.show-actionbar3 #heart-quench-alert,
+  body.show-actionbar3 #heart-knot-alert,
   body.show-actionbar3 #temple-alert,
   body.show-actionbar3 #kit-use-prompt {
     bottom: calc(312px + var(--castbar-h) + 14px);
@@ -18636,6 +19385,8 @@
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert,
   body.mobile-touch #crypt-alert,
+  body.mobile-touch #heart-quench-alert,
+  body.mobile-touch #heart-knot-alert,
   body.mobile-touch #temple-alert,
   body.mobile-touch #kit-use-prompt {
     bottom: 56%;
@@ -19054,6 +19805,778 @@
   }
   body.mobile-touch #wildheart-alert {
     min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Smith's Heart's Guardian of the Quench cold bar ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/quench_alert_view.ts: the player's own cold, the whole
+     fight, on every graphics tier (never hidden by the hints setting). It
+     never takes the pointer. The state is carried by the text too: the cold
+     rises in the frost tone, freezing and the freeze in the hostile tone, the
+     huddle's warmth in the gold, the water in the mana blue. */
+  #heart-quench-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-debuff-frost);
+  }
+  #heart-quench-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-debuff-frost);
+  }
+  #heart-quench-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-quench-alert .fa-hint {
+    display: none;
+  }
+  #heart-quench-alert .fa-bar {
+    --bar-h: 14px;
+    --bar-color: var(--color-debuff-frost);
+    width: 100%;
+  }
+  #heart-quench-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-quench-alert.is-marked,
+  #heart-quench-alert.is-rime {
+    border-color: var(--color-hostile);
+  }
+  #heart-quench-alert.is-marked .fa-title,
+  #heart-quench-alert.is-rime .fa-title,
+  #heart-quench-alert.is-marked .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  /* Living Rime: the bar is the crust's healing left, drawn in the frost
+     tone as it drains; the title in the hostile tone tells its carrier to
+     leave the group. */
+  #heart-quench-alert.is-rime .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  #heart-quench-alert.is-rime {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  body.mobile-touch #heart-quench-alert {
+    min-width: min(340px, calc(100vw - 32px));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-quench-alert {
+      animation: none;
+    }
+  }
+  /* Docked on the player frame (dungeon_prompts.ts quenchDock; the owner's
+     rule of 2026-11-04: no box in the middle of the screen). A compact frost
+     bar riding just above the frame like a secondary resource bar: a frost
+     crystal icon and a small title on the left, the bar with its numbers on
+     the right, the state carried by colour, icon and the title's words. The
+     instruction line is dropped (the world shows what to do); the freeze
+     pulses the bar's edge, never anything over the screen's middle. */
+  #player-frame > #heart-quench-alert {
+    --qa-tone: var(--color-debuff-frost);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: calc(100% + 6px);
+    transform: none;
+    min-width: 0;
+    max-width: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px 2px 26px;
+    border-width: 1px;
+    border-color: var(--qa-tone);
+    text-align: left;
+  }
+  #player-frame > #heart-quench-alert::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    width: 13px;
+    height: 13px;
+    transform: translateY(-50%);
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    background: radial-gradient(circle, var(--color-text-light) 0 22%, var(--qa-tone) 60%);
+  }
+  #player-frame > #heart-quench-alert .fa-title {
+    flex: 0 0 auto;
+    max-width: 46%;
+    overflow: hidden;
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--qa-tone);
+  }
+  #player-frame > #heart-quench-alert .fa-line {
+    display: none;
+  }
+  #player-frame > #heart-quench-alert .fa-bar {
+    --bar-h: 10px;
+    --bar-color: var(--qa-tone);
+    flex: 1 1 auto;
+    width: auto;
+  }
+  #player-frame > #heart-quench-alert .fa-bar-label {
+    flex: 0 0 auto;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  #player-frame > #heart-quench-alert.is-warm {
+    --qa-tone: var(--color-gold);
+  }
+  #player-frame > #heart-quench-alert.is-freezing,
+  #player-frame > #heart-quench-alert.is-frozen,
+  #player-frame > #heart-quench-alert.is-marked {
+    --qa-tone: var(--color-hostile);
+  }
+  #player-frame > #heart-quench-alert.is-water {
+    --qa-tone: var(--color-mana);
+  }
+  #player-frame > #heart-quench-alert.is-freezing {
+    animation: none;
+  }
+  #player-frame > #heart-quench-alert.is-frozen {
+    animation: heart-quench-dock-pulse 0.7s ease-in-out infinite alternate;
+  }
+  @keyframes heart-quench-dock-pulse {
+    from {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    to {
+      box-shadow: 0 0 10px 1px var(--qa-tone);
+    }
+  }
+  body.mobile-touch #player-frame > #heart-quench-alert {
+    left: -4px;
+    right: auto;
+    width: min(220px, 60vw);
+    min-width: 0;
+    bottom: calc(100% + 10px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #player-frame > #heart-quench-alert.is-frozen {
+      animation: none;
+    }
+  }
+
+  /* The Knotted Gale (Mythic, knot_alert_view.ts): Portal A in the storm's teal,
+     Portal B in its violet, Portal C in spring green, Portal D in rose (the
+     floor's colours), the load in gold, the lip in
+     the hostile tone. The panel is the throw's button while the player carries. */
+  #heart-knot-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-debuff-frost);
+  }
+  #heart-knot-alert.is-pressable {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  #heart-knot-alert.is-portalB {
+    border-color: var(--color-debuff-shadow);
+  }
+  /* Phase 2's second pair: Portal C in spring green, Portal D in rose. */
+  #heart-knot-alert.is-portalC {
+    border-color: var(--color-knot-portal-c);
+  }
+  #heart-knot-alert.is-portalD {
+    border-color: var(--color-knot-portal-d);
+  }
+  #heart-knot-alert.is-carry {
+    border-color: var(--color-gold-300);
+  }
+  #heart-knot-alert.is-lip {
+    border-color: var(--color-debuff-fire);
+  }
+  #heart-knot-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  #heart-knot-alert .fa-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  #heart-knot-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-debuff-frost);
+    width: 100%;
+  }
+  #heart-knot-alert.is-portalB .fa-bar {
+    --bar-color: var(--color-debuff-shadow);
+  }
+  #heart-knot-alert.is-portalC .fa-bar {
+    --bar-color: var(--color-knot-portal-c);
+  }
+  #heart-knot-alert.is-portalD .fa-bar {
+    --bar-color: var(--color-knot-portal-d);
+  }
+  #heart-knot-alert.is-carry .fa-bar {
+    --bar-color: var(--color-gold-300);
+  }
+  #heart-knot-alert.is-lip .fa-bar {
+    --bar-color: var(--color-debuff-fire);
+  }
+  /* A ruinous Bellows Blow (breath_blow.ts) in the hostile tone (the swap
+     itself is the raid's tank swap alert, #heart-tank-swap). */
+  #heart-knot-alert.is-ruin {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #heart-knot-alert.is-ruin .fa-bar {
+    --bar-color: var(--color-hostile);
+  }
+  #heart-knot-alert.is-ruin .fa-title {
+    color: var(--color-hostile);
+  }
+  #heart-knot-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  /* The Smith's Heart's short alerts (2026-11-09): a title over the bar and
+     its number, no sentence under it. The number (the seconds left, or a
+     gauge's value) sits under the bar, in steady-width digits. */
+  #heart-knot-alert .fa-bar-label {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- The Smith's Heart's tank swap alert ---------- */
+  /* Self-mounted by the shared encounter alert painter from
+     src/ui/hud/dungeon/tank_swap_alert_view.ts: the raid's one tank swap cue
+     (Jose's rule of 2026-11-24: for the tanks only, and calm). A small chip
+     off the screen's middle, level with the target frame's stock seat just
+     right of the action bar, so it never covers the boss or the floor's
+     telegraphs. Swap: the stacks and a thin bar of the debuff's time left, in
+     the hostile tone. Taunt: one word in gold. It fades in with one soft pulse
+     and fades out; nothing flashes while it stays. Every tier, never hidden
+     by the hints setting; it never takes the pointer. */
+  #heart-tank-swap {
+    position: absolute;
+    left: calc(50% + var(--action-rail-w) / 2 + 14px);
+    top: calc(
+      100% -
+      var(--unit-frame-seat-offset) -
+      var(--stance-row-lift, 0px) -
+      var(--pet-row-lift, 0px)
+    );
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    z-index: 7;
+    min-width: 92px;
+    max-width: 180px;
+    padding: 5px 12px 6px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-hostile);
+    opacity: 0.94;
+  }
+  #heart-tank-swap .fa-title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: var(--color-hostile);
+  }
+  #heart-tank-swap .fa-line,
+  #heart-tank-swap .fa-hint,
+  #heart-tank-swap .fa-bar-label {
+    display: none;
+  }
+  #heart-tank-swap .fa-bar {
+    --bar-h: 4px;
+    --bar-color: var(--color-hostile);
+    width: 100%;
+  }
+  #heart-tank-swap .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    #heart-tank-swap {
+      transition:
+        opacity 0.25s ease-out,
+        display 0.25s allow-discrete;
+      animation: heart-tank-swap-in 0.5s ease-out 1;
+    }
+    #heart-tank-swap[style*="display: none"] {
+      opacity: 0;
+    }
+    @starting-style {
+      #heart-tank-swap {
+        opacity: 0;
+      }
+    }
+  }
+  @keyframes heart-tank-swap-in {
+    0% {
+      scale: 1.12;
+    }
+    45% {
+      scale: 0.98;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  /* Touch: the unit frames sit at the top, so the chip waits under the
+     target frame's corner, clear of the action ring and the joystick. */
+  body.mobile-touch #heart-tank-swap {
+    left: auto;
+    transform: none;
+    right: 12px;
+    top: 34%;
+  }
+
+  /* The tank swap's sibling, the tank buster alert. Self-mounted by the shared
+     encounter alert painter from src/ui/hud/dungeon/tank_swap_alert_view.ts
+     (TANK_BUSTER_ALERT_LOOK): a boss's heavy hit on the local tank (the team's
+     feedback of 2026-11-25). Only the tank it is aimed at ever sees it, for
+     the second or two the hit takes to come. The owner's call of 2026-11-27:
+     no banner in the screen's middle. One compact line in the tank corner,
+     seated by the view core's placement class (.tank-corner): on desktop just
+     above the tank swap chip (same left edge, its bottom 6px over the chip's
+     seat), right of the action bar and beside the boss's frame, so the tank
+     reads both cues where the boss already is, clear of the raid frames (top
+     left), the target's aura strip (inside the action bar's width) and the
+     player frame's docked bars. The hit's name and its countdown share one
+     row in the hostile tone, a thin bar under them runs down to the hit. It
+     lands with one short pulse and pulses once more in its last second
+     (.is-busterLast); nothing flashes while it stays. Every tier, never
+     hidden by the hints setting; it never takes the pointer. */
+  #heart-tank-buster {
+    display: none;
+    z-index: 7;
+    min-width: 132px;
+    max-width: 240px;
+    padding: 4px 10px 5px;
+    pointer-events: none;
+    user-select: none;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-hostile);
+    opacity: 0.94;
+  }
+  /* The root is a flex column (the painter writes display: flex); the row is
+     a wrap: the title and the countdown on the first line, the bar a full
+     line under them. */
+  #heart-tank-buster.tank-corner {
+    position: absolute;
+    left: calc(50% + var(--action-rail-w) / 2 + 14px);
+    top: auto;
+    /* The target frame's own lifts ride along (an extra action row each, the
+       target aura band below the frame), so a raised Target of Target beside
+       the frame never climbs into the line. */
+    bottom: calc(
+      var(--unit-frame-seat-offset) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--tank-buster-bar-lift, 0px) +
+      var(--target-aura-band-lift, 0px) +
+      6px
+    );
+    flex-flow: row wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    column-gap: 10px;
+    row-gap: 3px;
+    text-align: left;
+  }
+  #heart-tank-buster .fa-title {
+    /* A zero basis keeps the name and the countdown on one line: a long name
+       ellipsizes, it never wraps the countdown under it. */
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-hostile);
+  }
+  #heart-tank-buster .fa-line,
+  #heart-tank-buster .fa-hint {
+    display: none;
+  }
+  #heart-tank-buster .fa-bar-label {
+    flex: 0 0 auto;
+    order: 1;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  #heart-tank-buster .fa-bar {
+    --bar-h: 3px;
+    --bar-color: var(--color-hostile);
+    flex: 1 0 100%;
+    order: 2;
+    width: 100%;
+  }
+  #heart-tank-buster .fa-fill {
+    width: 0;
+    transition: width 60ms linear;
+  }
+  body.show-actionbar2,
+  body.show-actionbar3 {
+    --tank-buster-bar-lift: calc(var(--socket-size) + var(--socket-row-gap));
+  }
+  body.show-actionbar2.show-actionbar3 {
+    --tank-buster-bar-lift: calc(2 * (var(--socket-size) + var(--socket-row-gap)));
+  }
+  /* The last second: a hostile edge glow that stays (the cue survives reduced
+     motion), plus one more pulse below. The view core's TankBusterLatch picks
+     the kind: each pulse is its own short-lived kind (busterEnter,
+     busterLast) lasting exactly its animation, the steady kinds (buster,
+     busterLastHold) carry none, so a re-shown panel never replays a pulse. */
+  #heart-tank-buster.is-busterLast,
+  #heart-tank-buster.is-busterLastHold {
+    box-shadow: 0 0 8px 1px var(--color-hostile);
+  }
+  /* Forced colours drop the glow: a system-colour outline keeps the cue. */
+  @media (forced-colors: active) {
+    #heart-tank-buster.is-busterLast,
+    #heart-tank-buster.is-busterLastHold {
+      outline: 2px solid Highlight;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    #heart-tank-buster.is-busterEnter {
+      animation: heart-tank-buster-in 0.4s ease-out 1;
+    }
+    #heart-tank-buster.is-busterLast {
+      animation: heart-tank-buster-last 0.45s ease-out 1;
+    }
+  }
+  @keyframes heart-tank-buster-in {
+    0% {
+      scale: 1.12;
+      opacity: 0;
+    }
+    50% {
+      scale: 0.98;
+      opacity: 1;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  @keyframes heart-tank-buster-last {
+    0% {
+      scale: 1.1;
+    }
+    45% {
+      scale: 0.98;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  /* Touch: the unit frames sit at the top and the swap chip waits under the
+     minimap (right: 12px; top: 34%), the action ring right below it. The line
+     sits on the chip's row to its left, its right edge past the chip's widest
+     box (180px) so a long localized swap title never runs under it, and past
+     the right tracker stack's column (hud.mobile.css #right-tracker-stack,
+     wider on tablets) and the safe-area inset. */
+  body.mobile-touch #heart-tank-buster.tank-corner {
+    --tank-buster-tracker-w: 190px;
+    left: auto;
+    right: max(
+      calc(12px + 180px + 8px),
+      calc(
+        max(10px, env(safe-area-inset-right)) +
+        var(--tank-buster-tracker-w) *
+        var(--mobile-chrome-scale, 1) +
+        8px
+      )
+    );
+    top: 34%;
+    bottom: auto;
+    transform: none;
+    min-width: 120px;
+    max-width: 200px;
+  }
+  body.mobile-touch.hud-mobile-tablet #heart-tank-buster.tank-corner {
+    --tank-buster-tracker-w: 220px;
+  }
+  body.mobile-touch #heart-tank-buster .fa-title {
+    font-size: 13px;
+  }
+
+  /* ---------- The Smith's Heart's Live Coal chip ---------- */
+  /* Self-mounted by the shared encounter alert painter from
+     src/ui/hud/dungeon/coal_alert_view.ts: the Guardian of the Heat's Live
+     Coal (Heroic and Mythic), for its bearer only, calm and small (Jose's
+     rule of 2026-11-24: the coal reads in the world for everyone, the arrow
+     over its bearer). The tank swap chip's mirror, just left of the action
+     bar at the player frame's level: the coal's name, a thin bar of its fuse
+     and, under it, the healing it still absorbs, in the fire tone. It fades
+     in with one soft pulse and out; nothing flashes while it stays. Every
+     tier, never hidden by the hints setting; it never takes the pointer. */
+  #heart-live-coal {
+    position: absolute;
+    right: calc(50% + var(--action-rail-w) / 2 + 14px);
+    top: calc(
+      100% -
+      var(--unit-frame-seat-offset) -
+      var(--stance-row-lift, 0px) -
+      var(--pet-row-lift, 0px)
+    );
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    z-index: 7;
+    min-width: 92px;
+    max-width: 180px;
+    padding: 5px 12px 5px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-debuff-fire);
+    opacity: 0.94;
+  }
+  #heart-live-coal .fa-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: var(--color-debuff-fire);
+  }
+  #heart-live-coal .fa-line,
+  #heart-live-coal .fa-hint {
+    display: none;
+  }
+  #heart-live-coal .fa-bar {
+    --bar-h: 4px;
+    --bar-color: var(--color-debuff-fire);
+    width: 100%;
+  }
+  #heart-live-coal .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-live-coal .fa-bar-label {
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    #heart-live-coal {
+      transition:
+        opacity 0.25s ease-out,
+        display 0.25s allow-discrete;
+      animation: heart-tank-swap-in 0.5s ease-out 1;
+    }
+    #heart-live-coal[style*="display: none"] {
+      opacity: 0;
+    }
+    @starting-style {
+      #heart-live-coal {
+        opacity: 0;
+      }
+    }
+  }
+  /* Touch: the tank swap chip's own seat under the target frame's corner
+     (a coal never lands on a tank, so the two never share it), clear of the
+     raid frames down the left, the action ring and the joystick. */
+  body.mobile-touch #heart-live-coal {
+    right: max(12px, calc(env(safe-area-inset-right) + 8px));
+    top: 34%;
+  }
+
+  /* ---------- The Masterless Strength's phase readout (the raid HUD) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/heart_final_phase_painter.ts from
+     heart_final_phase_view.ts: the Heroic switch mark's seconds and part 2's
+     clocks (the call and its Splinters, the enrage or the fury, what falls
+     next) at the top of the screen, and the poured elements. The Overload
+     bars and Heart Unbound's stacks are the room's now (the ring round the
+     central well, src/render/smith_heart_fx/final_overload_ring.ts). Every
+     tier, never hidden by the hints setting; it never takes the pointer. */
+  #heart-final-phase {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    z-index: 31;
+    padding: 5px 14px 6px;
+    max-width: calc(100vw - 32px);
+    pointer-events: none;
+    user-select: none;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-gold-700);
+  }
+  #heart-final-phase .hfp-title {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-gold);
+  }
+  #heart-final-phase .hfp-foot {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    font-size: 12px;
+  }
+  #heart-final-phase .hfp-shaken {
+    color: var(--color-hostile);
+    font-weight: 700;
+  }
+  #heart-final-phase .hfp-phase {
+    color: var(--color-gold);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  #heart-final-phase .hfp-phase.is-urgent {
+    color: var(--color-hostile);
+    animation: bce-throb 0.7s ease-in-out infinite alternate;
+  }
+  #heart-final-phase .hfp-splinters {
+    color: var(--color-text-light);
+    font-weight: 700;
+  }
+  #heart-final-phase .hfp-poured {
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-debuff-fire);
+  }
+  body.mobile-touch #heart-final-phase {
+    top: 4px;
+    padding: 4px 8px 5px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-final-phase .hfp-phase {
+      animation: none;
+    }
+  }
+
+  /* The Guardian of the Breath's wind badge: self-mounted by src/ui/hud/dungeon/breath_wind_painter.ts (view:
+     breath_wind_view.ts). Top centre while the wind turns or blows: an arrow
+     the way it carries you (up is ahead). Every graphics preset: the wind's way
+     is what a player acts on. It never takes the pointer. */
+  #heart-breath-wind {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    z-index: 31;
+    padding: 5px 10px 4px;
+    pointer-events: none;
+    user-select: none;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-gold-700);
+  }
+  #heart-breath-wind .hbw-dial {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--color-debuff-nature);
+    background: radial-gradient(
+      circle,
+      var(--color-breath-wind-dial) 55%,
+      var(--color-breath-wind-dial-edge)
+    );
+    box-shadow: 0 0 8px var(--color-breath-wind-glow);
+  }
+  #heart-breath-wind .hbw-arrow {
+    width: 100%;
+    height: 100%;
+  }
+  #heart-breath-wind .hbw-arrow-shape {
+    fill: var(--color-breath-wind-arrow);
+    stroke: var(--color-breath-wind-arrow-edge);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+  }
+  #heart-breath-wind .hbw-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-text-light);
+  }
+  #heart-breath-wind.is-turning .hbw-dial {
+    animation: hbw-turning 0.6s ease-in-out infinite alternate;
+  }
+  #heart-breath-wind.is-turning .hbw-arrow-shape {
+    fill: var(--color-breath-wind-turning);
+  }
+  @keyframes hbw-turning {
+    from {
+      box-shadow: 0 0 4px var(--color-breath-wind-turning-glow-soft);
+    }
+    to {
+      box-shadow: 0 0 14px var(--color-breath-wind-turning-glow);
+    }
+  }
+  body.mobile-touch #heart-breath-wind {
+    top: 4px;
+    padding: 3px 6px 3px;
+  }
+  body.mobile-touch #heart-breath-wind .hbw-dial {
+    width: 36px;
+    height: 36px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-breath-wind.is-turning .hbw-dial {
+      animation: none;
+    }
   }
 
   /* ---------- The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) ---------- */

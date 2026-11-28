@@ -18,6 +18,7 @@ import {
   NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
 } from '../sim/content/zone3';
 import { ABILITIES, ITEMS } from '../sim/data';
+import { bossAbilityImageUrl } from './boss_ability_art';
 import { crestIconUrl } from './crest_icon_art';
 import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
@@ -25,6 +26,7 @@ import { professionImageUrl } from './hud/professions/profession_art';
 import { ITEM_ART_PLACEHOLDERS } from './item_art_placeholders';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
+import { SMITH_HEART_AURA_IMAGE_IDS } from './smith_heart_aura_art';
 import { TRINKET_AURA_IMAGE_URLS } from './trinket_aura_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
@@ -2817,6 +2819,33 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   dgn_crypt_lantern: r('holy', 'holyGold', ['candle', { p: 'shield', ...BR }], ['glow']),
   dgn_crypt_embrace: r('frost', 'ice', ['hand', { p: 'snowflake', ...BR }], ['sparkle']),
   dgn_crypt_rime_path: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
+  // The Guardian of the Quench's Living Rime (encounters/smith_heart/quench_rime.ts):
+  // the crust that drinks healing (a frozen heart, cracking) and its slow.
+  heart_quench_rime: r('frost', 'ice', ['heart', { p: 'snowflake', ...BR }], ['crack']),
+  heart_quench_rime_slow: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
+  // The tank swaps (quench_temper.ts, breath_blow.ts): Rime-Tempered (a
+  // tempered fist in the frost), Wind-Battered (a shield in the wind),
+  // Thunder-Laden (a bolt on a shield), Bellows Blow's mark and throw.
+  heart_quench_tempered: r('frost', 'ice', ['fist', { p: 'snowflake', ...BR }], ['crack']),
+  heart_breath_wind_battered: r(
+    'storm',
+    'silverWhite',
+    ['shield', { p: 'wing', ...BR }],
+    ['motion'],
+  ),
+  heart_breath_thunder_laden: r(
+    'storm',
+    'shadowPurple',
+    ['shield', { p: 'bolt', ...BR }],
+    ['arcs'],
+  ),
+  heart_breath_blow_mark: r(
+    'storm',
+    'silverWhite',
+    ['wing', { p: 'crosshair', ...BR }],
+    ['motion'],
+  ),
+  heart_breath_blow_thrown: r('storm', 'silverWhite', ['wing', { p: 'boot', ...BR }], ['motion']),
   dgn_crypt_bridal_freeze: r(
     'frost',
     'silverWhite',
@@ -2923,6 +2952,136 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   dgn_temple_moonspawn: r('shadow', 'sky', ['moon', { p: 'claw_slash', ...BR }], ['arcs']),
   dgn_temple_wrath: r('fury', 'sky', ['roar', { p: 'moon', ...BR }], ['glow']),
   dgn_temple_falling_moon: r('arcane', 'gold', ['moon', { p: 'meteor', ...BR }], ['glow']),
+  // The Smith's Heart raid-journal icons (src/ui/boss_journal/raids/smith_heart.ts).
+  // Shared by the raid's pages: the hard enrage, a soft enrage, and the
+  // mechanics the final boss borrows from its guardians.
+  dgn_heart_forge_fury: r('fire', 'blood', ['hourglass', { p: 'flame', ...BR }], ['glow']),
+  dgn_heart_soft_enrage: r('fury', 'ember', ['hourglass', { p: 'roar', ...BR }], ['glow']),
+  // The Hammer Council.
+  dgn_heart_wrath: r('earth', 'earthBrown', ['mace', { p: 'sunburst', ...BIG }], ['crack']),
+  dgn_heart_hammers_weight: r('earth', 'steel', ['mace', { p: 'shield', ...BR }], ['crack']),
+  dgn_heart_hammerfall: r('earth', 'earthBrown', ['mace', { p: 'claw_slash', ...BR }], ['motion']),
+  dgn_heart_rush: r('earth', 'blood', ['fist', { p: 'arrow', ...BR }], ['motion']),
+  dgn_heart_cursed_pillar: r('shadow', 'shadowPurple', ['gem', { p: 'skull', ...BR }], ['arcs']),
+  dgn_heart_wake_stone: r('earth', 'gold', ['gem', { p: 'hand', ...BR }], ['crack']),
+  dgn_heart_stone_thrum: r('earth', 'gold', ['gem', { p: 'bell', ...BR }], ['arcs']),
+  dgn_heart_restless_stone: r('nature', 'earthBrown', ['gem', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_heart_falling_rock: r('earth', 'gold', ['meteor', { p: 'crosshair', ...BR }], ['crack']),
+  dgn_heart_seam_bolt: r('nature', 'gold', ['bolt', { p: 'gem', ...BR }], ['sparkle']),
+  dgn_heart_song: r('nature', 'gold', ['bell', { p: 'gem', ...BR }], ['arcs']),
+  dgn_heart_resonance: r('nature', 'holyGold', ['bell', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_heart_grieving_fury: r('fury', 'gold', ['heart', { p: 'roar', ...BR }], ['glow']),
+  dgn_heart_inherit: r('holy', 'holyGold', ['heart', { p: 'hand', ...BR }], ['sparkle']),
+  // Aerwyn, the Unbound Gale.
+  dgn_heart_bellows_wind: r('storm', 'sky', ['wing', { p: 'arrow', ...BR }], ['motion']),
+  dgn_heart_calm: r('holy', 'silverWhite', ['shield', { p: 'wing', ...BR }], ['sparkle']),
+  dgn_heart_inhale: r('storm', 'sky', ['roar', { p: 'hand', ...BR }], ['motion']),
+  dgn_heart_summit_roar: r('storm', 'silverWhite', ['roar', { p: 'sunburst', ...BIG }], ['motion']),
+  dgn_heart_storm_lance: r('storm', 'sky', ['lightning', { p: 'arrow', ...BR }], ['arcs']),
+  dgn_heart_sky_strike: r('storm', 'sky', ['lightning', { p: 'crosshair', ...BR }], ['glow']),
+  dgn_heart_loose_gale: r('storm', 'silverWhite', ['wing', { p: 'boot', ...BR }], ['motion']),
+  dgn_heart_knotted_gale: r('storm', 'shadowPurple', ['wing', { p: 'gem', ...BR }], ['glow']),
+  dgn_heart_skyrend_nova: r('storm', 'sky', ['sunburst', { p: 'wing', ...BR }], ['glow', 'arcs']),
+  dgn_heart_closing_storm: r(
+    'storm',
+    'shadowPurple',
+    ['hourglass', { p: 'lightning', ...BR }],
+    ['arcs'],
+  ),
+  dgn_heart_isle_lightning: r('storm', 'sky', ['bolt', { p: 'eye', ...BR }], ['sparkle']),
+  dgn_heart_mending_gale: r('nature', 'sky', ['heart', { p: 'wing', ...BR }], ['sparkle']),
+  dgn_heart_shoving_gale: r('storm', 'sky', ['hand', { p: 'arrow', ...BR }], ['motion']),
+  dgn_heart_riven_squall: r(
+    'storm',
+    'silverWhite',
+    ['claw_slash', { p: 'wing', ...BR }],
+    ['crack'],
+  ),
+  dgn_heart_squall_ward: r('steel', 'sky', ['shield', { p: 'lightning', ...BR }], ['glow']),
+  dgn_heart_stillstone: r('arcane', 'sky', ['gem', { p: 'hourglass', ...BR }], ['sparkle']),
+  dgn_heart_storm_breaks: r(
+    'storm',
+    'shadowPurple',
+    ['lightning', { p: 'sunburst', ...BIG }],
+    ['arcs'],
+  ),
+  dgn_heart_leaping_bolt: r('storm', 'sky', ['bolt', { p: 'lightning', ...BR }], ['arcs']),
+  dgn_heart_cradle: r('storm', 'gold', ['hand', { p: 'lightning', ...BR }], ['glow']),
+  dgn_heart_drawn_lightning: r('storm', 'sky', ['lightning', { p: 'boot', ...BR }], ['drips']),
+  dgn_heart_swelling_storm: r(
+    'storm',
+    'shadowPurple',
+    ['lightning', { p: 'hourglass', ...BR }],
+    ['glow'],
+  ),
+  dgn_heart_storm_gust: r('storm', 'silverWhite', ['wing', { p: 'lightning', ...BR }], ['motion']),
+  // Aurora, the Silent Winter.
+  dgn_heart_quench_cold: r('frost', 'ice', ['snowflake', { p: 'heart', ...BR }], ['sparkle']),
+  dgn_heart_encased: r('frost', 'ice', ['snowflake', { p: 'skull', ...BR }], ['crack']),
+  dgn_heart_groaning_ice: r('frost', 'ice', ['crosshair', { p: 'droplet', ...BR }], ['crack']),
+  dgn_heart_quenching_breath: r(
+    'frost',
+    'silverWhite',
+    ['roar', { p: 'snowflake', ...BR }],
+    ['motion'],
+  ),
+  dgn_heart_crossing_blade: r('frost', 'ice', ['sword', { p: 'arrow', ...BR }], ['motion']),
+  dgn_heart_blades_wake: r('frost', 'ice', ['sword', { p: 'sunburst', ...BIG }], ['glow']),
+  dgn_heart_deepening_cold: r('frost', 'ice', ['snowflake', { p: 'hourglass', ...BR }], ['drips']),
+  // Ignazhar, the Unquenchable.
+  dgn_heart_wheel: r('fire', 'ember', ['gear', { p: 'flame', ...BR }], ['glow']),
+  dgn_heart_basalt_fist: r('fire', 'earthBrown', ['fist', { p: 'flame', ...BR }], ['crack']),
+  dgn_heart_cinder_grip: r('fire', 'ember', ['hand', { p: 'flame', ...BR }], ['drips']),
+  dgn_heart_wellspring_brand: r('fire', 'gold', ['sigil_rune', { p: 'droplet', ...BR }], ['glow']),
+  dgn_heart_live_coal: r('fire', 'ember', ['gem', { p: 'heart', ...BR }], ['glow']),
+  dgn_heart_hearth_flare: r('fire', 'gold', ['flame', { p: 'sunburst', ...BIG }], ['glow']),
+  dgn_heart_overflow: r('fire', 'ember', ['droplet', { p: 'flame', ...BR }], ['motion']),
+  dgn_heart_falling_cinder: r('fire', 'ember', ['meteor', { p: 'flame', ...BR }], ['drips']),
+  dgn_heart_wellspawn: r('fire', 'gold', ['imp_head', { p: 'boot', ...BR }], ['motion']),
+  dgn_heart_wellkeeper: r('fire', 'blood', ['imp_head', { p: 'shield', ...BR }], ['glow']),
+  dgn_heart_hearthseed: r('fire', 'gold', ['leaf', { p: 'flame', ...BR }], ['sparkle']),
+  dgn_heart_wakefire: r('fire', 'blood', ['flame', { p: 'boot', ...BR }], ['arcs']),
+  dgn_heart_rolling_cinder: r('fire', 'ember', ['meteor', { p: 'eye', ...BR }], ['motion']),
+  // Its own glyph: the Hammer council's Soft Enrage hastens the Wrath, this one
+  // the Rolling Cinders (the cinders falling faster).
+  dgn_heart_soft_enrage_heat: r('fire', 'ember', ['hourglass', { p: 'meteor', ...BR }], ['drips']),
+  // Ashgrand, Remnant of the Masterless Strength.
+  dgn_heart_overload: r('arcane', 'gold', ['sigil_rune', { p: 'sunburst', ...BIG }], ['glow']),
+  dgn_heart_heart_unbound: r('blood', 'gold', ['heart', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_heart_vein_shock: r('storm', 'gold', ['heart', { p: 'lightning', ...BR }], ['crack']),
+  dgn_heart_forge_fist: r('fire', 'steel', ['fist', { p: 'claw_slash', ...BR }], ['motion']),
+  dgn_heart_elemental_strike: r('arcane', 'arcanePink', ['fist', { p: 'gem', ...BR }], ['glow']),
+  dgn_heart_anvil: r('steel', 'earthBrown', ['mace', { p: 'crosshair', ...BR }], ['crack']),
+  dgn_heart_opposing: r('arcane', 'arcanePink', ['gem', { p: 'cross', ...BR }], ['arcs']),
+  dgn_heart_fusion: r('arcane', 'arcanePink', ['sigil_rune', { p: 'gem', ...BR }], ['sparkle']),
+  dgn_heart_steam: r('frost', 'silverWhite', ['droplet', { p: 'flame', ...BR }], ['motion']),
+  dgn_heart_magma: r('fire', 'earthBrown', ['crosshair', { p: 'flame', ...BR }], ['crack']),
+  dgn_heart_firestorm: r('fire', 'ember', ['flame', { p: 'wing', ...BR }], ['motion']),
+  dgn_heart_hail: r('frost', 'ice', ['meteor', { p: 'snowflake', ...BR }], ['drips']),
+  dgn_heart_avalanche: r('frost', 'earthBrown', ['pickaxe', { p: 'snowflake', ...BR }], ['motion']),
+  dgn_heart_spires: r('storm', 'earthBrown', ['staff', { p: 'lightning', ...BR }], ['arcs']),
+  dgn_heart_storm_charged: r('storm', 'gold', ['gem', { p: 'lightning', ...BR }], ['arcs']),
+  dgn_heart_fire_whirl: r('fire', 'ember', ['flame', { p: 'gear', ...BR }], ['motion']),
+  dgn_heart_dust_devil: r('earth', 'earthBrown', ['wing', { p: 'gear', ...BR }], ['motion']),
+  dgn_heart_tremor: r('earth', 'earthBrown', ['boot', { p: 'crosshair', ...BR }], ['crack']),
+  dgn_heart_ember_mark: r('fire', 'ember', ['crosshair', { p: 'flame', ...BR }], ['drips']),
+  dgn_heart_stone_shell: r('earth', 'steel', ['shield', { p: 'heart', ...BR }], ['crack']),
+  dgn_heart_call: r('arcane', 'gold', ['ascension_seal', { p: 'gem', ...BR }], ['glow']),
+  dgn_heart_splintered: r('arcane', 'gold', ['gem', { p: 'claw_slash', ...BR }], ['arcs']),
+  dgn_heart_shearing_blow: r('steel', 'blood', ['axe', { p: 'claw_slash', ...BR }], ['motion']),
+  dgn_heart_splinter_heat: r('fire', 'ember', ['gem', { p: 'flame', ...BR }], ['drips']),
+  dgn_heart_rime_toll: r('frost', 'ice', ['bell', { p: 'snowflake', ...BR }], ['arcs']),
+  dgn_heart_quenching_ring: r('frost', 'ice', ['sunburst', { p: 'snowflake', ...BR }], ['motion']),
+  dgn_heart_mounting_weight: r('earth', 'steel', ['mace', { p: 'hourglass', ...BR }], ['crack']),
+  dgn_heart_gale_pounce: r('storm', 'sky', ['claw_slash', { p: 'wing', ...BR }], ['motion']),
+  dgn_heart_storm_orb: r('storm', 'sky', ['gem', { p: 'boot', ...BR }], ['sparkle']),
+  dgn_heart_every_star: r(
+    'holy',
+    'holyGold',
+    ['sunburst', { p: 'gem', ...BR }],
+    ['sparkle', 'glow'],
+  ),
+  dgn_heart_masterless_fury: r('fury', 'blood', ['roar', { p: 'sunburst', ...BIG }], ['glow']),
   // pet action bar (dedicated, never a class ability id: see pet_action_icons.ts).
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
@@ -5335,6 +5494,8 @@ const AURA_ICON_DIR = '/ui/auras';
 /** Exact aura-art identities whose shipping files live directly under /ui/auras. */
 export const AURA_FILE_IMAGE_IDS: ReadonlySet<string> = new Set([
   ...MOB_AURA_IMAGE_IDS,
+  // The Smith's Heart raid's debuffs and boss auras (smith_heart_aura_art.ts).
+  ...SMITH_HEART_AURA_IMAGE_IDS,
   'affliction_doom',
   'battle_trance',
   'bg_battle_rune',
@@ -5905,6 +6066,15 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'feat_guild_writ_runner',
   'feat_guild_hallsworn',
   'feat_guild_of_lantern_hall',
+  // The Smith's Heart's seven (hidden while the raid is dev-gated): the dungeon crest until
+  // their paintings are commissioned.
+  'dgn_smith_heart',
+  'dgn_heart_council_feat',
+  'dgn_heart_breath_feat',
+  'dgn_heart_quench_feat',
+  'dgn_heart_heat_feat',
+  'dgn_heart_final_feat',
+  'dgn_heart_meta',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
@@ -6039,7 +6209,7 @@ function staticIconUrl(kind: IconKind, id: string): string | null {
   // then share matching ability art. Generic aura_<kind> ids still fall through to
   // their procedural recipe.
   if (kind === 'ability') {
-    const img = abilityImageUrl(id);
+    const img = abilityImageUrl(id) ?? bossAbilityImageUrl(id);
     if (img) return img;
   }
   if (kind === 'aura') {
@@ -6278,6 +6448,28 @@ function raidSkullPath(ctx: Ctx): void {
   ctx.closePath();
 }
 
+// A crescent moon (Jose's playtest call of 2026-11-22: "a plain crescent"):
+// the outer disc's long arc, then back along the carving disc's inner arc,
+// as ONE closed path so the outline follows the crescent and nothing else.
+// The carve sits up and right, so the horns open toward the upper right.
+function raidCrescentPath(ctx: Ctx): void {
+  const R = 38; // the moon
+  const r = 32; // the carving disc
+  const d = 15; // their centres' distance
+  const tilt = (-25 * Math.PI) / 180;
+  const cx = d * Math.cos(tilt);
+  const cy = d * Math.sin(tilt);
+  const phi = Math.acos((R * R - r * r + d * d) / (2 * d * R));
+  const t1 = tilt + phi;
+  const t2 = tilt - phi;
+  const a1 = Math.atan2(R * Math.sin(t1) - cy, R * Math.cos(t1) - cx);
+  const a2 = Math.atan2(R * Math.sin(t2) - cy, R * Math.cos(t2) - cx);
+  ctx.beginPath();
+  ctx.arc(0, 0, R, t1, t2 + TAU, false); // the long way round, away from the carve
+  ctx.arc(cx, cy, r, a2, a1, true); // the bite's edge, inside the moon
+  ctx.closePath();
+}
+
 // Outline a single closed path, then fill it — the centered stroke leaves a
 // crisp dark border once the fill paints over its inner half.
 function raidStrokeFill(ctx: Ctx, fill: string): void {
@@ -6318,21 +6510,10 @@ function drawRaidMarker(ctx: Ctx, idx: number): void {
       ctx.closePath();
       raidStrokeFill(ctx, fill);
       break;
-    case 4: {
-      // moon — a dark crescent with a slightly inset colored one on top
-      const crescent = (outerR: number, carveX: number, carveR: number): void => {
-        ctx.beginPath();
-        ctx.arc(-4, 0, outerR, 0, TAU, false);
-        ctx.arc(carveX, 0, carveR, 0, TAU, true); // opposite winding carves a bite
-      };
-      crescent(40, 20, 40);
-      ctx.fillStyle = RAID_MARKER_OUTLINE;
-      ctx.fill();
-      crescent(34, 23, 40);
-      ctx.fillStyle = fill;
-      ctx.fill();
+    case 4: // moon: a clean crescent, outlined like the other symbols
+      raidCrescentPath(ctx);
+      raidStrokeFill(ctx, fill);
       break;
-    }
     case 5: // square
       ctx.beginPath();
       ctx.rect(-34, -34, 68, 68);
@@ -6374,6 +6555,24 @@ function drawRaidMarker(ctx: Ctx, idx: number): void {
       ctx.arc(0, 0, 36, 0, TAU);
       raidStrokeFill(ctx, fill);
   }
+}
+
+// The raid marker `idx` (0..7) as a cached canvas sprite (transparent, one per
+// symbol per session), for canvas painters that draw the same symbols at their
+// own size: the raid atlas's shared map marks (src/ui/hud/raid_atlas/).
+const raidMarkerSprites = new Map<number, HTMLCanvasElement>();
+export function raidMarkerSprite(idx: number): HTMLCanvasElement {
+  const cached = raidMarkerSprites.get(idx);
+  if (cached) return cached;
+  const canvas = document.createElement('canvas');
+  canvas.width = RAID_MARKER_PX * 2;
+  canvas.height = RAID_MARKER_PX * 2;
+  const ctx = getCanvas2d(canvas);
+  ctx.scale((RAID_MARKER_PX * 2) / 100, (RAID_MARKER_PX * 2) / 100);
+  ctx.translate(50, 50);
+  drawRaidMarker(ctx, idx);
+  raidMarkerSprites.set(idx, canvas);
+  return canvas;
 }
 
 // Cached transparent-background PNG data URL for raid marker `idx` (0..7).

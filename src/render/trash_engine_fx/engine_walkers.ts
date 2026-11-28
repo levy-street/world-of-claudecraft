@@ -22,6 +22,7 @@
 
 import * as THREE from 'three';
 import type { Entity, KitWalkerDef, SimEvent } from '../../sim/types';
+import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { FLAME_HEAT } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 import {
@@ -620,24 +621,25 @@ export class EngineWalkers {
         slot.mote.visible = false;
         continue;
       }
+      const eAt = fxAnchor(e);
       const bh = h.bodyHeight(e);
-      const gy = h.groundY(e.pos.x, e.pos.z);
+      const gy = h.groundY(eAt.x, eAt.z);
       const k = empowerPulse(clock);
-      slot.glow.position.set(e.pos.x, gy + 0.16, e.pos.z);
+      slot.glow.position.set(eAt.x, gy + 0.16, eAt.z);
       slot.glow.scale.set(bh * 1.25 * k, 1, bh * 1.25 * k);
       slot.glowMat.opacity = 0.62;
       // A mote of the orb circling its head.
       const a = clock * 3.4 + e.id;
       const r = Math.max(0.6, bh * 0.28);
       slot.mote.position.set(
-        e.pos.x + Math.cos(a) * r,
+        eAt.x + Math.cos(a) * r,
         gy + bh * 0.92 + Math.sin(clock * 5) * 0.12,
-        e.pos.z + Math.sin(a) * r,
+        eAt.z + Math.sin(a) * r,
       );
       slot.emit += dt * 16 * h.density;
       while (slot.emit >= 1) {
         slot.emit -= 1;
-        h.puff(e.pos.x, gy + bh * 0.3, e.pos.z, 1, {
+        h.puff(eAt.x, gy + bh * 0.3, eAt.z, 1, {
           speed: 0.5,
           up: 2.2,
           life: 1,
@@ -648,7 +650,7 @@ export class EngineWalkers {
           radius: bh * 0.22,
         });
         if (h.rand() < 0.3)
-          h.puff(e.pos.x, gy + 0.1, e.pos.z, 1, {
+          h.puff(eAt.x, gy + 0.1, eAt.z, 1, {
             speed: 0.3,
             up: 1.4,
             life: 0.7,

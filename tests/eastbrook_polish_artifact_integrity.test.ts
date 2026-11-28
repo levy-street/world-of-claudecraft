@@ -1438,7 +1438,17 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  '4f474fa63f385a9500a579234fa54bb0347928db42b34bce32c8b908ea32f6db';
+  // Re-minted for the Smith's Heart raid's renderer wiring (its death-zone and
+  // drawn-position hooks). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's dormant warders (a sleeping body's heap held
+  // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
+  // Re-minted for the Smith's Heart raid's lava-wave lights, articulated bosses and
+  // hidden-until-posed sleeping bosses (renderer.ts). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's light crossfade between its rooms
+  // (renderer.ts). No capture was retaken.
+  // Re-minted for the merge of the PR head into the Smith's Heart tuning branch
+  // (renderer.ts takes the PR head's room crossfade). No capture was retaken.
+  '00b1a75320572ebc511228187d9d1e23f069189334de354f9a25cc1a5ff9a1fd';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1496,7 +1506,17 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Smith's Heart raid's renderer wiring (its death-zone and
+  // drawn-position hooks). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's dormant warders (a sleeping body's heap held
+  // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
+  // Re-minted for the Smith's Heart raid's lava-wave lights, articulated bosses and
+  // hidden-until-posed sleeping bosses (renderer.ts). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's light crossfade between its rooms
+  // (renderer.ts). No capture was retaken.
+  // Re-minted for the merge of the PR head into the Smith's Heart tuning branch
+  // (renderer.ts takes the PR head's room crossfade). No capture was retaken.
+  '91a8d3942ce39407ecada55f70784800439f4837a784aab36f9377fc39beee4c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2905,7 +2925,17 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
       // v0.45.4 graphics and dungeon loading optimizations in renderer.ts:
       // recomputed from the swept evidence. No capture was retaken.
-    ).toBe('cac822feca2db6382e3569357b7b23fab2f038db18acfc98cc07412512475032');
+      // The Smith's Heart raid's renderer wiring: recomputed from the swept
+      // evidence. No capture was retaken.
+      // The Smith's Heart raid's dormant warders over the Quench queen: recomputed from the
+      // swept evidence. No capture was retaken.
+      // The Smith's Heart raid's lava-wave lights and boss rig changes: recomputed
+      // from the swept evidence. No capture was retaken.
+      // The Smith's Heart raid's light crossfade between its rooms: recomputed from the
+      // swept evidence. No capture was retaken.
+      // The merge of the PR head into the Smith's Heart tuning branch: recomputed
+      // from the swept evidence. No capture was retaken.
+    ).toBe('9f9e51a0fd6eb7ad294ffc209753d36366fd89e55ae70e7c5c3cc6a3de0d9e44');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

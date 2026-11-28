@@ -140,13 +140,26 @@ describe('ability icons', () => {
     // 586: plus the Sunken Bastion boss guide recipes (dgn_bastion_*).
     // 614: plus the Drowned Temple boss guide recipes (dgn_temple_*).
     // Vampiric Touch, Tithe Bomb and Void Rupture.
-    expect(ids).toHaveLength(626);
+    // 628: plus the Smith's Heart Quench's Living Rime crust and its slow
+    // (heart_quench_rime, heart_quench_rime_slow; encounters/smith_heart/quench_rime.ts).
+    // 633: plus the Quench and Breath tank-swap glyphs (heart_quench_tempered,
+    // heart_breath_wind_battered, heart_breath_thunder_laden, heart_breath_blow_mark,
+    // heart_breath_blow_thrown; quench_temper.ts, breath_blow.ts).
+    // 722: plus the Smith's Heart raid-journal recipes (dgn_heart_*,
+    // src/ui/boss_journal/raids/smith_heart.ts).
+    // 723: plus Ignazhar's own Soft Enrage glyph (dgn_heart_soft_enrage_heat), split
+    // from the Hammer council's for the boss ability paintings.
+    expect(ids).toHaveLength(723);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
     // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier;
     // then + the five-player dungeon boss guide recipes, plus release ability recipes).
-    expect(hash).toBe('91b046f0c1025ce2aa9666728280d33fef818d263036c8b269a2b4834b52f5fb');
+    // Re-minted for the Living Rime pair, then for the five tank-swap glyphs, then for
+    // the Smith's Heart raid-journal recipes, then for Wellspring Brand's own glyph
+    // (dgn_heart_wellspring_brand: gold sigil and droplet, no longer Ignivar's brand),
+    // then for Ignazhar's own Soft Enrage glyph (dgn_heart_soft_enrage_heat).
+    expect(hash).toBe('a39f5996ffdeff9e33dbebabea3d4dfbbde50ed15dfb4d2a5e03ff59726b3e84');
   });
 });

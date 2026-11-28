@@ -28,6 +28,8 @@ interface GroundAimHudFacet {
     school: string;
     dimmed: boolean;
     blocked: boolean;
+    /** A world marker's aim: the symbol whose colour the reticle takes. */
+    marker?: number;
   } | null;
 }
 
@@ -120,6 +122,7 @@ export interface GroundAimReticleSyncDeps {
       school: string;
       dimmed: boolean;
       blocked: boolean;
+      marker?: number;
     } | null,
   ) => void;
 }
@@ -153,6 +156,7 @@ export function syncGroundAimReticleFrame(deps: GroundAimReticleSyncDeps): void 
           school: reticle.school,
           dimmed: reticle.dimmed,
           blocked: reticle.blocked,
+          ...(reticle.marker !== undefined ? { marker: reticle.marker } : {}),
         }
       : null,
   );

@@ -205,6 +205,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeLootRolls', kind: 'method' }, // read-returning (2/6)
   { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
   { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
+  { name: 'corpseBossLootDenied', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
   { name: 'townFocusPending', kind: 'data' },
@@ -302,6 +303,12 @@ export const IWORLD_MEMBERS = [
   { name: 'markerFor', kind: 'method' }, // read-returning (3/6)
   { name: 'setMarker', kind: 'method' },
   { name: 'clearMarker', kind: 'method' },
+  { name: 'sharedMapMarks', kind: 'method' }, // read-returning
+  { name: 'placeSharedMapMark', kind: 'method' },
+  { name: 'placeSharedWorldMark', kind: 'method' },
+  { name: 'clearSharedMapMarks', kind: 'method' },
+  { name: 'partyPings', kind: 'method' }, // read-returning
+  { name: 'sendPing', kind: 'method' },
   { name: 'readyCheckRespond', kind: 'method' },
   { name: 'tradeRequest', kind: 'method' },
   { name: 'tradeAccept', kind: 'method' },
@@ -520,6 +527,8 @@ export const IWORLD_MEMBERS = [
   { name: 'worldBossActive', kind: 'method' }, // realm liveness, separate from loot lockout
   { name: 'answerDungeonGuide', kind: 'method' }, // a dungeon guide's offer answer (send-only)
   { name: 'dungeonRun', kind: 'data' }, // the group dungeon run stood in, with boss progress (null outside)
+  { name: 'raidRun', kind: 'data' }, // the raid run stood in, boss defeated and engaged state (null outside)
+  { name: 'bossKills', kind: 'data' }, // lifetime boss kills per difficulty (the journal's Your kills)
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
@@ -1031,9 +1040,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Riding ranks (PR 4390) add one method over the release: 466/140/329.
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
     // more: 471/140/331.
-    expect(IWORLD_MEMBERS.length).toBe(471);
-    expect(DATA_MEMBERS.length).toBe(140);
-    expect(METHOD_MEMBERS.length).toBe(331);
+    // The raid's world markers add placeSharedWorldMark (method): 475/140/335.
+    // The party pings add partyPings and sendPing (methods): 477/140/337.
+    // The Adventure Journal's raidRun adds one data member: 478/141/337.
+    // The journal's boss kill tally bossKills adds one data member: 479/142/337.
+    // The per-boss raid save's corpse cue read corpseBossLootDenied adds one
+    // method: 480/142/338.
+    expect(IWORLD_MEMBERS.length).toBe(480);
+    expect(DATA_MEMBERS.length).toBe(142);
+    expect(METHOD_MEMBERS.length).toBe(338);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1110,6 +1125,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'blockAdd',
       'blockRemove',
       'boostWorldQuestGlider',
+      'bossKills',
       'buyBackItem',
       'buyCrucibleVendorItem',
       'buyGuildCosmetic',
@@ -1136,6 +1152,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
+      'clearSharedMapMarks',
       'clueHunt',
       'collectDelveChestLoot',
       'combineMaterialStacks',
@@ -1149,6 +1166,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'convertPartyToRaid',
       'convertRaidToParty',
       'copper',
+      'corpseBossLootDenied',
       'corpseHarvestInfo',
       'courierDispatch',
       'courierInfo',
@@ -1336,6 +1354,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInvite',
       'partyKick',
       'partyLeave',
+      'partyPings',
       'partyPromote',
       'partyTradeMsRemaining',
       'pendingBuddies',
@@ -1350,6 +1369,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'pickUpObject',
       'placeFeast',
       'placeMobileStation',
+      'placeSharedMapMark',
+      'placeSharedWorldMark',
       'plantCrop',
       'playCardInDuel',
       'playEmote',
@@ -1364,6 +1385,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'questsDone',
       'raidLockouts',
+      'raidRun',
       'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'realm',
@@ -1414,6 +1436,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'sendPing',
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
@@ -1435,6 +1458,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sharedMapMarks',
       'sitOnSeat',
       'skullBagAction',
       'slotToolEffect',
@@ -1552,6 +1576,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bankInfo',
       'bankPurchasedSlots',
       'bgInfo',
+      'bossKills',
       'cardMinigameInfo',
       'cfg',
       'civicServicePlacements',
@@ -1620,6 +1645,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'professionsState',
       'questLog',
       'questsDone',
+      'raidRun',
       'realm',
       'recipeList',
       'reliquaryAccountFinds',
@@ -1722,6 +1748,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
+      'clearSharedMapMarks',
       'collectDelveChestLoot',
       'combineMaterialStacks',
       'commendWeeklyQuest',
@@ -1730,6 +1757,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'convertHusks',
       'convertPartyToRaid',
       'convertRaidToParty',
+      'corpseBossLootDenied',
       'corpseHarvestInfo',
       'courierDispatch',
       'craftItem',
@@ -1865,6 +1893,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInvite',
       'partyKick',
       'partyLeave',
+      'partyPings',
       'partyPromote',
       'partyTradeMsRemaining',
       'pendingBuddies',
@@ -1878,6 +1907,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'pickUpObject',
       'placeFeast',
       'placeMobileStation',
+      'placeSharedMapMark',
+      'placeSharedWorldMark',
       'plantCrop',
       'playCardInDuel',
       'playEmote',
@@ -1923,6 +1954,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'sendPing',
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
@@ -1944,6 +1976,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sharedMapMarks',
       'sitOnSeat',
       'skullBagAction',
       'slotToolEffect',
@@ -2175,6 +2208,7 @@ const FACET_LOOT = [
   'activeLootRolls',
   'lootRollGroupStatus',
   'activeMasterLootRolls',
+  'corpseBossLootDenied',
 ] as const satisfies readonly (keyof IWorldLoot)[];
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
@@ -2338,6 +2372,12 @@ const FACET_PARTY = [
   'markerFor',
   'setMarker',
   'clearMarker',
+  'sharedMapMarks',
+  'placeSharedMapMark',
+  'placeSharedWorldMark',
+  'clearSharedMapMarks',
+  'partyPings',
+  'sendPing',
   'readyCheckRespond',
 ] as const satisfies readonly (keyof IWorldParty)[];
 type _ExhaustParty = AssertNever<Exclude<keyof IWorldParty, (typeof FACET_PARTY)[number]>>;
@@ -2509,6 +2549,8 @@ const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'dungeonRun',
+  'raidRun',
+  'bossKills',
   'raidLockouts',
   'worldBossActive',
   'answerDungeonGuide',
@@ -2887,8 +2929,11 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(471);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(471);
+    // Plus the world markers' placeSharedWorldMark.
+    // Plus the party pings' partyPings and sendPing.
+    // Plus the Adventure Journal's raidRun, and its boss kill tally bossKills.
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(480);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(480);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

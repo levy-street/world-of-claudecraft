@@ -38,6 +38,14 @@ category, routing state, modified state, or unsafe peak. The summary reports
 both cue count and published track count because one cue can have multiple
 round-robin takes.
 
+The Group menu above the list narrows it to one set of cues: the Smith's Heart
+raid as a whole, each of its fights, the raid's shared cues, or the party pings
+(`scripts/sfx_studio/cue_groups.mjs`). Changing the group resets the category
+filter. The same menu also lists the raid's boss voices, one entry per speaker:
+those are listen-only clips from `public/audio/voice/`, rendered by their own
+pipeline (`scripts/render_smith_heart_voice_pack.mjs`), so the Studio plays them
+but never edits or publishes them.
+
 Selecting a cue loads:
 
 - its published audio and content hash;
@@ -90,7 +98,10 @@ but they do not define the final production level. Every exact preview and
 publish ends with the fixed repository conform pass:
 
 - clips shorter than 1 second target -6 dBFS true peak;
-- clips at least 1 second long target -14 LUFS integrated loudness;
+- clips at least 1 second long target -14 LUFS integrated loudness, with at
+  most 4 dB of limiting on the loudest peak; a transient-heavy cue that would
+  need more publishes under -14 LUFS, marked `peakLimited`, with its punch
+  intact;
 - output is a 44.1 kHz, 192 kbps MP3.
 
 This two-branch standard is intentional. Peak normalization suits short

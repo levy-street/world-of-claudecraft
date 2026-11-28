@@ -71,7 +71,7 @@ import {
   raidBossGuideView,
 } from '../src/ui/raid_boss_guide_view';
 
-// The window's value formatting (raid_boss_guide_window.ts formattedValues), so a
+// The window's value formatting (hud/journal/journal_page_html.ts pageValues), so a
 // rendered summary can be checked for unfilled {tokens} against the real catalog.
 function renderedValues(
   values: Readonly<Record<string, number>> | undefined,
