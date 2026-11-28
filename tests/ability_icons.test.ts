@@ -155,7 +155,8 @@ describe('ability icons', () => {
     // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier;
     // then + the five-player dungeon boss guide recipes, plus release ability recipes).
     // Re-minted for the Living Rime pair, then for the five tank-swap glyphs, then for
-    // the Smith's Heart raid-journal recipes.
-    expect(hash).toBe('d7837c43157ed7a7bf14208490c1f8f3e458c53fb15111b0373d5e6ac6f71e07');
+    // the Smith's Heart raid-journal recipes, then for Wellspring Brand's own glyph
+    // (dgn_heart_wellspring_brand: gold sigil and droplet, no longer Ignivar's brand).
+    expect(hash).toBe('eeef20d46614f12e92ca3a72ceeebbc26344b1ca8ceb6d9f503e5bcba78e8adf');
   });
 });
