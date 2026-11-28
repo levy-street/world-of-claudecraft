@@ -648,7 +648,9 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     ).toBe(true);
     expect(rec.notes.guardianId).not.toBeNull();
     expect(rec.notes.bankBeforeMindfracture).toBe(0);
-    expect(rec.notes.bankAfterMindfracture).toBe(1);
+    // Mindfracture's echo banks 1. Dirge of Decay now lands with no travel time, so its
+    // next tick on the Effigy also falls inside the 60-tick window and banks the second.
+    expect(rec.notes.bankAfterMindfracture).toBe(2);
     expect(rec.notes.mindfractureEchoTargets).toEqual(rec.notes.expectedEchoTargets);
     expect(rec.notes.foreignOwnerIsolated).toBe(true);
     expect(rec.notes.manaAfterGuardian).toBeGreaterThan(rec.notes.manaAfterSummon as number);
