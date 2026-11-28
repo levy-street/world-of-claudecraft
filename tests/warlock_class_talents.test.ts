@@ -13,7 +13,7 @@ import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
 import { abilityDisplayDescription } from '../src/ui/ability_description';
 
-function rig(rows: Record<number, string>, spec = 'destruction') {
+function rig(rows: Record<number, string>, spec: string | null = 'destruction') {
   const sim = new Sim({ seed: 73, playerClass: 'warlock', autoEquip: true });
   sim.setPlayerLevel(20);
   expect(sim.applyTalents({ spec, rows })).toBe(true);

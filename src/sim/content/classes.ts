@@ -4038,6 +4038,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     school: 'nature',
     scalesWith: 'ranged',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 20, duration: 15, interval: 3 }],
     ranks: [
@@ -4576,6 +4578,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'shadow',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 30, duration: 18, interval: 3 }],
     ranks: [
@@ -7304,6 +7308,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'nature',
+    // No travel time: the DoT lands the moment the cast finishes (same resist roll).
+    projectile: false,
     requiresTarget: true,
     effects: [{ type: 'dot', total: 48, duration: 12, interval: 3 }],
     description: 'The enemy is swarmed by insects, taking $d Nature damage over 12 sec.',
