@@ -198,7 +198,7 @@ import { CalendarWindow } from './calendar_window';
 import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
-import { castDisplayName, targetCastDisplayName } from './cast_display_name';
+import { castDisplayName } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -945,6 +945,7 @@ import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
+import { TargetCastBar } from './target_cast_bar';
 import { TargetDiscordController } from './target_discord_controller';
 import {
   fillTargetFrameDescriptor,
@@ -1303,7 +1304,6 @@ export class Hud {
     },
   });
   private playerCastBarInput: CastBarPaintInput | null = null;
-  private targetCastBarInput: CastBarPaintInput | null = null;
   // The mobile action ring: a SECOND createActionBarView instance over a 6-slot
   // descriptor (slot 0 attack, slots 1-5 resolve through
   // sourceSlotForMobileButton(mobileActionPage, i-1)). mobileActionPage is the
@@ -1608,10 +1608,6 @@ export class Hud {
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
   private castbarLabelEl = this.castbarEl.querySelector('.label') as HTMLElement;
   private castbarTimerEl = this.castbarEl.querySelector('.timer') as HTMLElement;
-  private targetCastbarEl = $('#tf-castbar');
-  private targetCastbarFillEl = this.targetCastbarEl.querySelector('.fill') as HTMLElement;
-  private targetCastbarLabelEl = this.targetCastbarEl.querySelector('.label') as HTMLElement;
-  private targetCastbarTimerEl = this.targetCastbarEl.querySelector('.timer') as HTMLElement;
   private actionbarEl = $('#actionbar');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
@@ -4721,10 +4717,8 @@ export class Hud {
   // castBarState core. Both instances localize cast ids: the PLAYER instance
   // resolves through castDisplayName, layers the eat/drink overlay
   // (consumeBarState, player-only), and clears the bar on hide (its inline
-  // block did). The TARGET instance resolves every id through
-  // abilityDisplayNameFromSource, has no eat/drink (the target never
-  // eats/drinks, so its paint omits `consume`), and hides with only
-  // display:none (no inline-block clear).
+  // block did). The TARGET instance (target_cast_bar.ts) names the cast,
+  // paints the boss ability icon and never eats/drinks.
   private readonly playerCastBarPainter = new CastBarPainter(
     this.writerFacet,
     {
@@ -4735,22 +4729,7 @@ export class Hud {
     },
     { resolveCastLabel: (s) => castDisplayName(s.label), clearOnHide: true },
   );
-  private readonly targetCastBarPainter = new CastBarPainter(
-    this.writerFacet,
-    {
-      bar: this.targetCastbarEl,
-      fill: this.targetCastbarFillEl,
-      label: this.targetCastbarLabelEl,
-      timer: this.targetCastbarTimerEl,
-    },
-    {
-      // Hoard and rift boss cast IDs resolve to their localized wind-up name,
-      // then every other label through abilityDisplayNameFromSource (the boss
-      // mechanic names ride the aura/mechanic matcher there), so a cave boss
-      // never shows its raw cast id (cast_display_name.ts).
-      resolveCastLabel: (s) => targetCastDisplayName(s.label),
-    },
-  );
+  private readonly targetCastBarPainter = new TargetCastBar(this.writerFacet, $('#tf-castbar'));
   // Second unit-frame painter instance; heraldry hosts are player identity only.
   // Target validity stays call-site gated. Elite and reaction CSS stay there too;
   // dead/out-of-range are deliberately pinned false, so no stateClasses.
@@ -8805,21 +8784,9 @@ export class Hud {
         );
       }
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
-      // HP so the raid sees exactly when to channel the wardstones. The target
-      // instance shows the raw cast id and never eats/drinks (no `consume`).
-      const targetCast = castBarState(target);
-      let targetCastInput = this.targetCastBarInput;
-      if (targetCastInput) {
-        targetCastInput.cast = targetCast;
-        targetCastInput.castRemaining = target.castRemaining;
-      } else {
-        targetCastInput = {
-          cast: targetCast,
-          castRemaining: target.castRemaining,
-        };
-        this.targetCastBarInput = targetCastInput;
-      }
-      this.targetCastBarPainter.paint(targetCastInput);
+      // HP so the raid sees exactly when to channel the wardstones, with the boss
+      // ability icon the Adventure Journal shows for that cast (target_cast_bar.ts).
+      this.targetCastBarPainter.paint(target);
       // Target of Target (showTargetOfTarget): resolve who the target is targeting (a
       // mob/pet's aggro target, a player's selected target) and paint the mini-frame.
       // The id already rides the wire (aggro for mobs, tgt for players), but the ENTITY

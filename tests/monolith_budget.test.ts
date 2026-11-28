@@ -562,7 +562,9 @@ const MONOLITHS: MonolithRow[] = [
     // party / target-of-target frame wiring.
     // LOWERED 17709 -> 17704 by the party pings: four dead imports went, paying
     // for the hud/pings/ field, its import and its fast-band tick.
-    ceiling: 17704,
+    // LOWERED 17704 -> 17671: the target cast bar's element refs, options and
+    // reused paint input moved to target_cast_bar.ts with the boss ability icon.
+    ceiling: 17671,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

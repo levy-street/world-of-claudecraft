@@ -35,6 +35,13 @@ book beside the target frame and the Dungeon Finder's boss list.
   and `rangeOnly` when its summary only restates the band. Write them from the live
   mechanics, numbers from the tuning (`tests/adventure_journal_banner.test.ts`).
 - Each mechanic `iconId` needs an explicit recipe in `src/ui/icons.ts` (`dgn_<dungeon>_*`).
+  On the Smith's Heart page it also needs a painting (`src/ui/boss_ability_art.ts`, its own or
+  the raid aura painting of the same mechanic): `tests/boss_ability_art.test.ts` fails a new
+  raid row until it has one.
+- A mechanic with a `castId` whose bar a body other than the page's own (`members`, else
+  `mobId`) or its `hitSources` casts names that caster in `castSources`: the boss cast bar
+  shows the mechanic's painting only for a caster on the page
+  (`hud/journal/journal_cast_icons.ts`, `tests/journal_cast_icons.test.ts`).
 - A mechanic that deals damage lists `hits`: every label the sim deals it under (the
   `ability` of its `damage` events: a dealDamage label, a DoT aura's name, a template
   kit's name), read from the encounter's name tables where it has them. A boss whose
