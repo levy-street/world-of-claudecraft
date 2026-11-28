@@ -318,6 +318,11 @@ describe('Adventure Journal styles', () => {
     expect(
       rule(mobileCss, 'body.mobile-touch #adventure-journal-window .df-loot-selects select'),
     ).toMatch(/height:\s*44px/);
+    // Held upright, the kills strip spans the stacked banner like the chips,
+    // or it squeezes the boss name into a one-letter column.
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #adventure-journal-window \.aj-progress,\s*body\.mobile-touch #adventure-journal-window \.aj-diffbox\s*\{\s*grid-column: 1 \/ -1;/,
+    );
     // While a query narrows the list, the results stand in for it.
     expect(rule(desktopCss, '#adventure-journal-window .aj-nav.aj-searching .aj-group')).toMatch(
       /display:\s*none/,

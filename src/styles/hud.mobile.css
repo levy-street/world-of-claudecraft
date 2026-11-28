@@ -4007,6 +4007,7 @@
     }
     body.mobile-touch #adventure-journal-window .aj-tagline,
     body.mobile-touch #adventure-journal-window .aj-stat-chips,
+    body.mobile-touch #adventure-journal-window .aj-progress,
     body.mobile-touch #adventure-journal-window .aj-diffbox {
       grid-column: 1 / -1;
       margin: 0;
