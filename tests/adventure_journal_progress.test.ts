@@ -78,8 +78,18 @@ describe('journal progress: the rooms the sim locks', () => {
     );
   });
 
-  it('gives the Smith Heart no lockout (the sim locks none of its rooms)', () => {
-    expect(journalLockRooms(heart())).toEqual([]);
+  it('reads the Smith Heart as five weekly boss locks, one per page, the council as one', () => {
+    const rooms = journalLockRooms(heart());
+    expect(rooms.map((r) => r.room)).toEqual([
+      `smith_heart:${COUNCIL_GUARDIAN}`,
+      'smith_heart:heart_breath_guardian',
+      'smith_heart:heart_quench_guardian',
+      'smith_heart:heart_heat_guardian',
+      'smith_heart:heart_masterless_strength',
+    ]);
+    expect(rooms.map((r) => r.bossKey)).toEqual([...heart().source.bossKeys]);
+    expect(rooms[0].bossKey).toBe(councilKey());
+    expect(rooms.every((r) => r.boundary === 'weekly')).toBe(true);
   });
 
   it('uses the sim lockout ids: raid rooms on both tiers, dungeons on Heroic only', () => {
@@ -88,6 +98,11 @@ describe('journal progress: the rooms the sim locks', () => {
     expect(journalLockoutId('hollow_crypt', 'normal')).toBeNull();
     expect(journalLockoutId('hollow_crypt', 'heroic')).toBe('hollow_crypt:heroic');
     expect(journalLockoutId('ignivar_raid_arena', 'mythic')).toBeNull();
+    // A per-boss raid's boss locks on both tiers, apart; Mythic is not run yet.
+    const council = `smith_heart:${COUNCIL_GUARDIAN}`;
+    expect(journalLockoutId(council, 'normal')).toBe(council);
+    expect(journalLockoutId(council, 'heroic')).toBe(`${council}:heroic`);
+    expect(journalLockoutId(council, 'mythic')).toBeNull();
   });
 });
 
@@ -163,6 +178,56 @@ describe('journal progress: lockouts', () => {
         NOW,
       ).lockout,
     ).toBeNull();
+  });
+
+  it('reads the Smith Heart per boss: N of 5 saved, the page itself, each tier apart', () => {
+    const council = `smith_heart:${COUNCIL_GUARDIAN}`;
+    const lockouts = [
+      { id: council, msRemaining: 3 * DAY },
+      { id: 'smith_heart:heart_breath_guardian', msRemaining: 3 * DAY },
+      { id: 'smith_heart:heart_heat_guardian', msRemaining: 3 * DAY },
+      { id: 'smith_heart:heart_quench_guardian:heroic', msRemaining: 3 * DAY },
+      { id: 'ignivar_raid_arena', msRemaining: DAY },
+    ];
+    const onCouncil = journalPageProgress(heart(), councilKey(), 'normal', {}, lockouts, NOW);
+    expect(onCouncil.lockout).toEqual({
+      saved: 3,
+      total: 5,
+      boundary: 'weekly',
+      msRemaining: 3 * DAY,
+      resetAtMs: NOW + 3 * DAY,
+    });
+    expect(onCouncil.pageSaved).toBe('weekly');
+    const finalKey = heart().source.bossKeys[4];
+    expect(
+      journalPageProgress(heart(), finalKey, 'normal', {}, lockouts, NOW).pageSaved,
+    ).toBeNull();
+    // Heroic is its own lock: only the Quench is saved there.
+    const heroic = journalPageProgress(heart(), councilKey(), 'heroic', {}, lockouts, NOW);
+    expect(heroic.lockout?.saved).toBe(1);
+    expect(heroic.pageSaved).toBeNull();
+    expect([...journalSavedPages(heart(), 'normal', lockouts)]).toEqual([
+      heart().source.bossKeys[0],
+      heart().source.bossKeys[1],
+      heart().source.bossKeys[3],
+    ]);
+    expect([...journalSavedPages(heart(), 'heroic', lockouts)]).toEqual([
+      heart().source.bossKeys[2],
+    ]);
+    // The list marks the three saved pages Defeated.
+    const saved = new Map([[SMITH_HEART_DUNGEON, journalSavedPages(heart(), 'normal', lockouts)]]);
+    const nav = buildJournalNav([heart()], null, new Set(), null, null, saved);
+    expect(nav[0].instances[0].bosses.map((b) => b.defeated)).toEqual([
+      true,
+      true,
+      false,
+      true,
+      false,
+    ]);
+    expect(nav[0].instances[0].defeatedCount).toBe(3);
+    // The header line reads the five.
+    expect(progressHtml(onCouncil)).toContain('Saved on Normal: 3 of 5 bosses');
+    expect(savedChipHtml(onCouncil.pageSaved)).toContain('Defeated this week');
   });
 
   it('marks the saved pages Defeated in the list, on the tier being read only', () => {

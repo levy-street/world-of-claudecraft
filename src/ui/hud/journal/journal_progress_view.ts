@@ -13,12 +13,20 @@
 // Crucible); each room's lock belongs to the journal page whose bodies hold
 // that room's final boss. The reset boundary is the room's (weekly for the
 // raid rooms the sim lists in WEEKLY_LOCKOUT_RAID_ROOMS, the realm day for the
-// rest). An instance with no rooms the sim locks (the Smith's Heart today)
-// shows its kills and no lockout at all.
+// rest). A raid the sim locks PER BOSS instead (PER_BOSS_LOCKOUT_RAIDS, the
+// Smith's Heart: src/sim/raid_boss_lockout_id.ts) has one lock per page, to
+// the weekly reset, so its header reads "N of 5 bosses" and each defeated
+// page reads Defeated this week. An instance with no locks at all shows its
+// kills and no lockout.
 
-import { bossKillCount } from '../../../sim/boss_kill_tally';
+import { BOSS_KILL_ENCOUNTERS, bossKillCount } from '../../../sim/boss_kill_tally';
 import { HEROIC_DUNGEON_TUNING } from '../../../sim/content/dungeon_difficulty';
 import { FINDER_ACTIVITIES } from '../../../sim/content/dungeon_finder';
+import {
+  bossLockoutId,
+  PER_BOSS_LOCKOUT_RAIDS,
+  parseBossLockoutId,
+} from '../../../sim/raid_boss_lockout_id';
 import { isRaidRoom, WEEKLY_LOCKOUT_RAID_ROOMS } from '../../../sim/raid_rooms';
 import type { RaidLockout } from '../../../world_api/dungeons';
 import type { JournalInstance, JournalTier } from './journal_catalog';
@@ -69,6 +77,11 @@ const roomCache = new Map<string, readonly JournalLockRoom[]>();
 export function journalLockRooms(instance: JournalInstance): readonly JournalLockRoom[] {
   const cached = roomCache.get(instance.id);
   if (cached) return cached;
+  if (PER_BOSS_LOCKOUT_RAIDS.has(instance.id)) {
+    const perBoss = journalBossLocks(instance);
+    roomCache.set(instance.id, perBoss);
+    return perBoss;
+  }
   const rooms = new Set<string>();
   for (const activity of FINDER_ACTIVITIES) {
     if (activity.dungeonId !== instance.id || activity.lockout === 'none') continue;
@@ -93,9 +106,33 @@ export function journalLockRooms(instance: JournalInstance): readonly JournalLoc
   return out;
 }
 
+/** A per-boss raid's locks: one per page, under the encounter its bodies
+ *  belong to (the boss kill tally's, a council as one), in page order. The
+ *  `room` is the boss's Normal lock id; journalLockoutId derives the rest. */
+function journalBossLocks(instance: JournalInstance): readonly JournalLockRoom[] {
+  const out: JournalLockRoom[] = [];
+  for (const bossKey of instance.source.bossKeys) {
+    const encounter = journalPageBodies(instance.source, bossKey)
+      .map((body) => BOSS_KILL_ENCOUNTERS.get(body))
+      .find((found) => found !== undefined);
+    if (!encounter) continue;
+    out.push({
+      room: bossLockoutId(instance.id, encounter.mobId, 'normal'),
+      bossKey,
+      boundary: 'weekly',
+    });
+  }
+  return out;
+}
+
 /** The lockout id the sim stamps for a room on a difficulty, or null when that
- *  difficulty never locks there (a dungeon's Normal, any room's Mythic). */
+ *  difficulty never locks there (a dungeon's Normal, any room's Mythic). A
+ *  per-boss raid's "room" is its boss's Normal lock id. */
 export function journalLockoutId(room: string, tier: JournalTier): string | null {
+  const boss = parseBossLockoutId(room);
+  if (boss) {
+    return tier === 'mythic' ? null : bossLockoutId(boss.raidId, boss.encounterId, tier);
+  }
   if (tier === 'heroic') return `${room}:heroic`;
   if (tier === 'normal') return isRaidRoom(room) ? room : null;
   return null;
