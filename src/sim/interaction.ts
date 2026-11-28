@@ -52,6 +52,7 @@ import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { mobLootSource } from './loot/awarded_loot_hold';
+import { bossLootDenied } from './loot/boss_loot_lock';
 import {
   corpseLootDistance,
   corpseLootReachBonus,
@@ -107,7 +108,13 @@ function corpseLootRights(
   mob: Entity,
   entityId: number,
   ffaUnlocked: boolean,
-): { shared: boolean; personal: boolean; open: boolean } {
+): { shared: boolean; personal: boolean; open: boolean; saved: boolean } {
+  // A raider saved to this per-boss raid boss this week holds no right to its
+  // corpse at all, free-for-all lapse included (loot/boss_loot_lock.ts).
+  const player = mob.bossLootLock ? ctx.players.get(entityId) : undefined;
+  if (player && bossLootDenied(mob, player, ctx.lockoutNowMs())) {
+    return { shared: false, personal: false, open: false, saved: true };
+  }
   // A World PvP body's gold is the killing blow's alone (bodyPoolSharedWithParty).
   const tapperParty =
     mob.tappedById !== null && bodyPoolSharedWithParty(mob) ? ctx.partyOf(mob.tappedById) : null;
@@ -119,7 +126,7 @@ function corpseLootRights(
   );
   const personal = mob.loot?.items.some((s) => s.personalFor?.includes(entityId)) ?? false;
   const open = mob.loot?.items.some((s) => s.openToAll && s.count > 0) ?? false;
-  return { shared, personal, open };
+  return { shared, personal, open, saved: false };
 }
 
 // `honorFfa` (default true) keeps manual looting honoring the owner-lock lapse; the
@@ -160,6 +167,13 @@ export function lootCorpse(
   // they take instead of it being split by the absent tapping party's strategies.
   const ffaUnlocked = honorFfa && lootHasGoneFfa(mob.lootFfaTimer);
   const rights = corpseLootRights(ctx, mob, meta.entityId, ffaUnlocked);
+  if (rights.saved) {
+    ctx.error(
+      meta.entityId,
+      'You have already defeated this boss this week, so it holds no loot for you.',
+    );
+    return false;
+  }
   if (!rights.shared && !rights.personal && !rights.open) {
     ctx.error(meta.entityId, "You don't have permission to loot that.");
     return false;

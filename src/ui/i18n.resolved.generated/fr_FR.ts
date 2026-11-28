@@ -2225,7 +2225,10 @@ export const fr_FR: EnTranslations = {
       "lessThanMinute": "<1min",
       "lockedToast": "Vous êtes verrouillé sur {raid}. Déverrouillage dans {time}.",
       "heroicName": "{name} héroïque",
-      "heroicLocked": "Vous êtes verrouillé sur {name} héroïque."
+      "heroicLocked": "Vous êtes verrouillé sur {name} héroïque.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Mannequin d’entraînement",

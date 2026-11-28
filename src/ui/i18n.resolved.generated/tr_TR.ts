@@ -2225,7 +2225,10 @@ export const tr_TR: EnTranslations = {
       "lessThanMinute": "<1d",
       "lockedToast": "{raid} akınına kilitlisin. {time} içinde açılır.",
       "heroicName": "Kahramanca {name}",
-      "heroicLocked": "Kahramanca {name} akınına kilitlisin."
+      "heroicLocked": "Kahramanca {name} akınına kilitlisin.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Pratik Kuklası",

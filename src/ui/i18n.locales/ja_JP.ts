@@ -8609,6 +8609,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '匠の残り火',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
+  'hudChrome.raidLockout.bossSavedNoLoot': '今週はすでにこのボスを倒しているため、あなたへの戦利品はありません。',
+  'hudChrome.raidLockout.bossNameHeroic': '{raid}:{boss}(ヒロイック)',
   'hudChrome.practiceDps.title': '練習用ダミー',
   'hudChrome.practiceDps.prompt': 'ダミーを攻撃して計測を開始',
   'hudChrome.practiceDps.previous': 'これまでの計測',

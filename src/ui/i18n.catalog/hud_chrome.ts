@@ -2049,6 +2049,15 @@ export const hudChromeStrings = {
     // Entry-denied toast for a heroic daily lockout when no live countdown is
     // mirrored yet ({name} = dungeon name).
     heroicLocked: 'You are locked to Heroic {name}.',
+    // Display name for one boss of a per-boss raid lockout (the Smith's Heart:
+    // src/sim/raid_boss_lockout_id.ts). {raid} = the raid's name, {boss} = the
+    // boss page's name as the Adventure Journal titles it.
+    bossName: '{raid}: {boss}',
+    // The same boss's Heroic lock (Normal and Heroic save apart).
+    bossNameHeroic: '{raid}: {boss} (Heroic)',
+    // The sim's line (and loot refusal) for a raider saved to a per-boss raid
+    // boss this week: the boss still falls, it just pays them nothing.
+    bossSavedNoLoot: 'You have already defeated this boss this week, so it holds no loot for you.',
   },
   // The practice DPS tracker (src/ui/hud/practice/): the compact readout that
   // appears while the player targets or hits a training dummy. It reads the

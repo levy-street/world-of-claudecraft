@@ -2225,7 +2225,10 @@ export const en_XA: EnTranslations = {
       "lessThanMinute": "[<1ɱ]",
       "lockedToast": "[Ýóú áŕé ļóçķéð ţó {raid}. Úñļóçķš íñ {time}.]",
       "heroicName": "[Ĥéŕóíç {name}]",
-      "heroicLocked": "[Ýóú áŕé ļóçķéð ţó Ĥéŕóíç {name}.]"
+      "heroicLocked": "[Ýóú áŕé ļóçķéð ţó Ĥéŕóíç {name}.]",
+      "bossName": "[{raid}: {boss}]",
+      "bossNameHeroic": "[{raid}: {boss} (Ĥéŕóíç)]",
+      "bossSavedNoLoot": "[Ýóú ĥáʋé áļŕéáðý ðéƒéáţéð ţĥíš ƀóšš ţĥíš ŵééķ, šó íţ ĥóļðš ñó ļóóţ ƒóŕ ýóú.]"
     },
     "practiceDps": {
       "title": "[Þŕáçţíçé Ðúɱɱý]",

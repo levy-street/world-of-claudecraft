@@ -2225,7 +2225,10 @@ export const id_ID: EnTranslations = {
       "lessThanMinute": "<1mnt",
       "lockedToast": "Anda terkunci pada {raid}. Terbuka dalam {time}.",
       "heroicName": "{name} Heroik",
-      "heroicLocked": "Anda terkunci pada {name} Heroik."
+      "heroicLocked": "Anda terkunci pada {name} Heroik.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Boneka Latihan",

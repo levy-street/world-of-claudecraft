@@ -191,20 +191,38 @@ export function recordBossKillTally(
   if (!inst || inst.partyKey === null) return;
   const encounter = completedBossEncounter(ctx, inst, boss.templateId);
   if (!encounter) return;
-  // A grown-back last head pays no kill credit of its own (Entity.regrown), so
-  // it arrives with no recipients; the claim's roster is then the credit list.
-  // Any other death with nobody to credit stays uncredited.
-  if (recipients.length === 0 && !(encounter.bodyIds.length > 1 && boss.regrown === true)) return;
+  const credited = bossKillCreditRoster(ctx, boss, encounter, recipients, inst);
+  if (!credited) return;
   if (!firstCountInClaim(inst, encounter.mobId)) return;
+  for (const meta of credited) addBossKill(meta, encounter.mobId, inst.difficulty);
+}
+
+/**
+ * Who a completed encounter credits (see the header's WHO): the death-time
+ * participation snapshot, widened by the claim's roster for those who walked
+ * through the door, a character on its way out left off. Null when the death
+ * credits nobody: a grown-back last head pays no kill credit of its own
+ * (Entity.regrown), so it arrives with no recipients and the claim's roster is
+ * then the whole list; any other death with nobody to credit stays uncredited.
+ * Shared with the per-boss raid lockout's weekly credit
+ * (instances/raid_boss_lockout.ts, weekly_rewards.ts). Pure read.
+ */
+export function bossKillCreditRoster(
+  ctx: SimContext,
+  boss: Entity,
+  encounter: BossKillEncounter,
+  recipients: readonly PlayerMeta[],
+  inst: InstanceSlot,
+): PlayerMeta[] | null {
+  if (recipients.length === 0 && !(encounter.bodyIds.length > 1 && boss.regrown === true)) {
+    return null;
+  }
   const credited = new Map<number, PlayerMeta>();
   for (const meta of recipients) credited.set(meta.entityId, meta);
   for (const meta of instanceLockoutMetas(ctx, inst)) {
     if (inst.enteredBy.has(meta.entityId)) credited.set(meta.entityId, meta);
   }
-  for (const meta of credited.values()) {
-    if (meta.leaving) continue;
-    addBossKill(meta, encounter.mobId, inst.difficulty);
-  }
+  return [...credited.values()].filter((meta) => !meta.leaving);
 }
 
 /**

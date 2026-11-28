@@ -2225,7 +2225,10 @@ export const pl_PL: EnTranslations = {
       "lessThanMinute": "<1m",
       "lockedToast": "Jesteś przypisany do rajdu {raid}. Odblokowanie za {time}.",
       "heroicName": "Heroiczny {name}",
-      "heroicLocked": "Jesteś przypisany do heroicznego {name}."
+      "heroicLocked": "Jesteś przypisany do heroicznego {name}.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Manekin treningowy",

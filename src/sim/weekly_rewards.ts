@@ -461,6 +461,15 @@ export function recordWeeklyBossKill(
     }
   }
 }
+// One raid clear of a per-boss raid's boss on the vault's raid row, never the
+// dungeon row (instances/raid_boss_lockout.ts settleBossLockoutDeath calls it
+// for every raider the kill credits who was not already saved to that boss,
+// so a boss pays one clear a week per difficulty, as a Crucible room's lock
+// pays its boss once). 1 for Normal, 2 for Heroic.
+export function recordWeeklyRaidClear(ctx: SimContext, meta: PlayerMeta, tier: 1 | 2): void {
+  const state = stateFor(ctx, meta);
+  state.raidClears = bestRaidClearTiers([...state.raidClears, tier]);
+}
 // Every loot-table id an instance's spawns drop at a difficulty (quest items and
 // dead entries excluded); heroic swaps in the generated variant and adds the
 // bespoke heroic boss table.

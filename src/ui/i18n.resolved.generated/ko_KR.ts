@@ -2225,7 +2225,10 @@ export const ko_KR: EnTranslations = {
       "lessThanMinute": "1분 미만",
       "lockedToast": "{raid}에 잠겨 있습니다. {time} 후 해제됩니다.",
       "heroicName": "영웅: {name}",
-      "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다."
+      "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (영웅)",
+      "bossSavedNoLoot": "이번 주에 이미 이 우두머리를 처치했으므로 당신을 위한 전리품이 없습니다."
     },
     "practiceDps": {
       "title": "훈련용 허수아비",

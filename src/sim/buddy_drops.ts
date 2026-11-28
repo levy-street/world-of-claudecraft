@@ -49,7 +49,9 @@ export function rollBossBuddyDrops(
       const chance = heroic ? (row.heroicChance ?? row.chance) : row.chance;
       // Draw even for a companion this player already has: the draw count
       // per (player, row) stays fixed across a party whatever each member
-      // owns, so one collector cannot shift another's stream.
+      // owns, so one collector cannot shift another's stream. (The one roster
+      // change upstream: a per-boss raid leaves its saved raiders out of
+      // `recipients` altogether, instances/raid_boss_lockout.ts.)
       const won = ctx.rng.chance(chance);
       if (!won) continue;
       attachPendingBuddy(ctx, meta.entityId, row.key, source, { x: boss.pos.x, z: boss.pos.z });

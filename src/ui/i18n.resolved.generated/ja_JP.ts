@@ -2225,7 +2225,10 @@ export const ja_JP: EnTranslations = {
       "lessThanMinute": "1分未満",
       "lockedToast": "{raid}にロックされています。解除まで{time}。",
       "heroicName": "ヒロイック:{name}",
-      "heroicLocked": "ヒロイックの{name}にロックされています。"
+      "heroicLocked": "ヒロイックの{name}にロックされています。",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}:{boss}(ヒロイック)",
+      "bossSavedNoLoot": "今週はすでにこのボスを倒しているため、あなたへの戦利品はありません。"
     },
     "practiceDps": {
       "title": "練習用ダミー",

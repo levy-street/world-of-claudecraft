@@ -2225,7 +2225,10 @@ export const cs_CZ: EnTranslations = {
       "lessThanMinute": "<1 min",
       "lockedToast": "Jsi uzamčen(a) k {raid}. Odemkne se za {time}.",
       "heroicName": "{name} (hrdinská)",
-      "heroicLocked": "Jsi uzamčen(a) k hrdinské verzi {name}."
+      "heroicLocked": "Jsi uzamčen(a) k hrdinské verzi {name}.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Cvičná figurína",

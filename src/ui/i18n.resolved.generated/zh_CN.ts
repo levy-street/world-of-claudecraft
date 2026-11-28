@@ -2225,7 +2225,10 @@ export const zh_CN: EnTranslations = {
       "lessThanMinute": "<1分",
       "lockedToast": "你已锁定到{raid}。{time}后解锁。",
       "heroicName": "英雄难度：{name}",
-      "heroicLocked": "你已被锁定至英雄难度的{name}。"
+      "heroicLocked": "你已被锁定至英雄难度的{name}。",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}：{boss}（英雄难度）",
+      "bossSavedNoLoot": "你本周已击败过这个首领，它不会再为你掉落战利品。"
     },
     "practiceDps": {
       "title": "训练假人",

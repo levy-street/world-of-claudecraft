@@ -2225,7 +2225,10 @@ export const de_DE: EnTranslations = {
       "lessThanMinute": "<1Min",
       "lockedToast": "Du bist für {raid} gesperrt. Freischaltung in {time}.",
       "heroicName": "Heroisch {name}",
-      "heroicLocked": "Du bist für Heroisch {name} gesperrt."
+      "heroicLocked": "Du bist für Heroisch {name} gesperrt.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Übungspuppe",

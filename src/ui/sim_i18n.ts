@@ -31232,6 +31232,12 @@ const RULES: Rule[] = [
     re: /^Instances can only be reset once every 5 minutes\.$/,
     build: () => t('hudChrome.dungeonDifficulty.resetCooldown'),
   },
+  // The per-boss raid lockout (src/sim/instances/raid_boss_lockout.ts at the
+  // kill, src/sim/interaction.ts lootCorpse at the corpse).
+  {
+    re: /^You have already defeated this boss this week, so it holds no loot for you\.$/,
+    build: () => t('hudChrome.raidLockout.bossSavedNoLoot'),
+  },
   {
     re: /^This instance is set to Normal difficulty\. Use Reset All Instances to start a fresh Heroic run\.$/,
     build: () => t('hudChrome.dungeonDifficulty.entryMismatchNormal'),

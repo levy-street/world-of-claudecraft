@@ -9895,6 +9895,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '匠人余烬',
   'hudChrome.raidLockout.heroicName': '英雄难度：{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被锁定至英雄难度的{name}。',
+  'hudChrome.raidLockout.bossSavedNoLoot': '你本周已击败过这个首领，它不会再为你掉落战利品。',
+  'hudChrome.raidLockout.bossNameHeroic': '{raid}：{boss}（英雄难度）',
   'hudChrome.practiceDps.title': '训练假人',
   'hudChrome.practiceDps.prompt': '攻击假人以开始一轮测试',
   'hudChrome.practiceDps.previous': '之前的测试',

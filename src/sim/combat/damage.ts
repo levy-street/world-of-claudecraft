@@ -43,6 +43,7 @@ import {
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
 import { awardQueueEncounter, recordQueueDamage } from '../instances/queue_participation';
+import { settleBossLockoutDeath, withoutBossSaved } from '../instances/raid_boss_lockout';
 import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
 import { membershipActive } from '../membership';
 import { wearsMembershipArmour } from '../membership_armour';
@@ -1999,7 +2000,12 @@ export function handleDeath(
       // their own damage-contributor snapshot (rareContribs) so rollLoot's guaranteed
       // personal quest-item entries (questId, chance:1) can credit every contributing
       // quest-needer, not just the tap-credited party.
-      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible, rareContribs ?? undefined);
+      // A per-boss raid boss (the Smith's Heart) rolls only for the raiders not
+      // saved to it this week, and nothing when every one of them is
+      // (instances/raid_boss_lockout.ts); every other death passes `eligible`.
+      const lootEligible = withoutBossSaved(ctx, e, claimedInst, eligible);
+      if (!template?.worldBoss && lootEligible.length > 0)
+        ctx.rollLoot(e, meta, lootEligible, rareContribs ?? undefined);
       // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
@@ -2020,9 +2026,14 @@ export function handleDeath(
     // never-pruned contributor roster below instead. Draws rng ONLY for a
     // boss that carries a companion row.
     if (!template?.worldBoss) {
-      rollBossBuddyDrops(ctx, e, heroicRewardRecipients, claimedInst);
+      const buddyRecipients = withoutBossSaved(ctx, e, claimedInst, heroicRewardRecipients);
+      rollBossBuddyDrops(ctx, e, buddyRecipients, claimedInst);
     }
     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
+    // A per-boss raid's weekly lock (instances/raid_boss_lockout.ts): gate the
+    // corpse, credit the weekly raid quest, save the raid. After every reward
+    // read above, so each of them judged the locks held BEFORE this kill.
+    settleBossLockoutDeath(ctx, e, heroicRewardRecipients, claimedInst);
     // Intentional Gathering PR3: the kill-credit priority snapshot for a
     // future corpse-harvest cast, taken from the exact same eligible list the
     // heroic-reward award above uses (empty means the corpse is public at

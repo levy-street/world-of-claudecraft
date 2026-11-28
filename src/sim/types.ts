@@ -8399,6 +8399,12 @@ export interface Entity extends ClientMirroredEntityFields {
   lootable: boolean;
   loot: CorpseLoot | null;
   lootRecipientIds?: number[];
+  /** Runtime-only: the per-boss raid lockout this corpse's loot is gated on
+   *  (loot/boss_loot_lock.ts), stamped at the death by
+   *  instances/raid_boss_lockout.ts. `freshIds` are the players the kill
+   *  found unlocked; anyone else holding `lockId` is saved to the boss and
+   *  may not loot the corpse. Never persisted, never on the wire. */
+  bossLootLock?: { lockId: string; freshIds: readonly number[] };
   /** Runtime-only stable identity for a soulbound drop's party-trade window.
    *  Captured synchronously when loot rolls, so a later disconnect cannot
    *  erase a kill-eligible character from the copy's transfer group. */

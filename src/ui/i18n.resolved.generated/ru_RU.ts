@@ -2225,7 +2225,10 @@ export const ru_RU: EnTranslations = {
       "lessThanMinute": "<1м",
       "lockedToast": "Вы привязаны к {raid}. Разблокировка через {time}.",
       "heroicName": "Героический режим: {name}",
-      "heroicLocked": "Вы закреплены за героическим подземельем: {name}."
+      "heroicLocked": "Вы закреплены за героическим подземельем: {name}.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (героический режим)",
+      "bossSavedNoLoot": "Вы уже победили этого босса на этой неделе, поэтому добычи для вас нет."
     },
     "practiceDps": {
       "title": "Тренировочный манекен",

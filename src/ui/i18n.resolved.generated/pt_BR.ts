@@ -2225,7 +2225,10 @@ export const pt_BR: EnTranslations = {
       "lessThanMinute": "<1min",
       "lockedToast": "Você está bloqueado em {raid}. Desbloqueia em {time}.",
       "heroicName": "{name} Heroico",
-      "heroicLocked": "Você está vinculado a {name} Heroico."
+      "heroicLocked": "Você está vinculado a {name} Heroico.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Boneco de prática",

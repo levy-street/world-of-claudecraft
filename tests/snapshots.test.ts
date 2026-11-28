@@ -718,6 +718,34 @@ describe('raid lockouts over the wire', () => {
     expect(out[0].msRemaining).toBeGreaterThan(5 * 60 * 60 * 1000 - 5000);
   });
 
+  it("carries the Smith's Heart per-boss locks verbatim, each difficulty its own", () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Saved');
+    const meta = (server as any).sim.players.get(session.pid);
+    const until = Date.now() + 3 * 24 * 60 * 60 * 1000;
+    meta.raidLockouts.set('smith_heart:heart_hammer_guardian', until);
+    meta.raidLockouts.set('smith_heart:heart_masterless_strength:heroic', until);
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.lockouts).toEqual({
+      'smith_heart:heart_hammer_guardian': until,
+      'smith_heart:heart_masterless_strength:heroic': until,
+    });
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(
+      client
+        .raidLockouts()
+        .map((l) => l.id)
+        .sort(),
+    ).toEqual([
+      'smith_heart:heart_hammer_guardian',
+      'smith_heart:heart_masterless_strength:heroic',
+    ]);
+  });
+
   it('clears the client lockout once the server-side entry has expired', () => {
     const server = new GameServer();
     const fc = fakeWs();

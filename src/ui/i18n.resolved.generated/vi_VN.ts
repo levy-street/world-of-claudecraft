@@ -2225,7 +2225,10 @@ export const vi_VN: EnTranslations = {
       "lessThanMinute": "<1p",
       "lockedToast": "Bạn đang bị khóa với {raid}. Mở khóa sau {time}.",
       "heroicName": "{name} Anh Hùng",
-      "heroicLocked": "Bạn đang bị khóa với {name} Anh Hùng."
+      "heroicLocked": "Bạn đang bị khóa với {name} Anh Hùng.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Hình nộm luyện tập",

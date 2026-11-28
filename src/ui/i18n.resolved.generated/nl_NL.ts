@@ -2225,7 +2225,10 @@ export const nl_NL: EnTranslations = {
       "lessThanMinute": "<1m",
       "lockedToast": "Je bent vergrendeld voor {raid}. Ontgrendelt over {time}.",
       "heroicName": "Heroïsch {name}",
-      "heroicLocked": "Je bent vergrendeld voor Heroïsch {name}."
+      "heroicLocked": "Je bent vergrendeld voor Heroïsch {name}.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Oefenpop",

@@ -2225,7 +2225,10 @@ export const sv_SE: EnTranslations = {
       "lessThanMinute": "<1m",
       "lockedToast": "Du är låst till {raid}. Låses upp om {time}.",
       "heroicName": "Heroisk {name}",
-      "heroicLocked": "Du är låst till Heroisk {name}."
+      "heroicLocked": "Du är låst till Heroisk {name}.",
+      "bossName": "{raid}: {boss}",
+      "bossNameHeroic": "{raid}: {boss} (Heroic)",
+      "bossSavedNoLoot": "You have already defeated this boss this week, so it holds no loot for you."
     },
     "practiceDps": {
       "title": "Träningsdocka",
