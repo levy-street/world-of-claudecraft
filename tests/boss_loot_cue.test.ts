@@ -34,6 +34,7 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import { CORPSE_LOOT_WIRE_KEYS, writeCorpseLootWire } from '../server/corpse_loot_wire';
 import { wireEntity } from '../server/game';
 import {
   corpseLootAvailability,
@@ -374,6 +375,21 @@ describe('online: the lock rides the wire and ClientWorld answers per viewer', (
     ).toBe('loot');
   });
 
+  it('both worlds lift the denial together once the saved lock runs out', () => {
+    const r = savedAndFresh();
+    const [anna] = r.pids;
+    const corpse = kill(r, SMITH_HEART_FINAL_BOSS);
+    purse(r, corpse);
+    const { client, mirror } = mirrored(r, corpse, anna);
+    expect(r.sim.corpseBossLootDenied(corpse, anna)).toBe(true);
+    expect(client.corpseBossLootDenied(mirror)).toBe(true);
+    const until = r.sim.meta(anna)?.raidLockouts.get(FINAL_LOCK) as number;
+    r.clock.now = until;
+    vi.setSystemTime(until);
+    expect(r.sim.corpseBossLootDenied(corpse, anna)).toBe(false);
+    expect(client.corpseBossLootDenied(mirror)).toBe(false);
+  });
+
   it('a Normal save never hides the Heroic kill online either', () => {
     const r = savedAndFresh(true);
     const [anna] = r.pids;
@@ -397,6 +413,26 @@ describe('online: the lock rides the wire and ClientWorld answers per viewer', (
     const mirror = client.entities.get(corpse.id) as Entity;
     expect(mirror.bossLootLock).toBeUndefined();
     expect(client.corpseBossLootDenied(mirror)).toBe(false);
+  });
+});
+
+describe('the corpse-loot wire emitter', () => {
+  it('writes its keys in the pinned order, bll last, every one only while set', () => {
+    const r = savedAndFresh();
+    const corpse = kill(r, SMITH_HEART_FINAL_BOSS);
+    purse(r, corpse);
+    corpse.harvestClaimedBy = r.pids[1];
+    corpse.lootFfaTimer = 0;
+    corpse.corpseTimer = -1;
+    const out: Record<string, unknown> = {};
+    writeCorpseLootWire(corpse, out);
+    expect(Object.keys(out)).toEqual([...CORPSE_LOOT_WIRE_KEYS]);
+    expect(out.bll).toEqual({ id: FINAL_LOCK, f: [r.pids[1]] });
+    // Emptied (no longer lootable): the lock stops riding.
+    corpse.lootable = false;
+    const after: Record<string, unknown> = {};
+    writeCorpseLootWire(corpse, after);
+    expect(after).not.toHaveProperty('bll');
   });
 });
 
