@@ -1,0 +1,2848 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "boss-ability-art-2026-11-28",
+    "status": "accepted for the owner review (the HTML audit)",
+    "acceptedDate": "2026-11-28",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "instance": "The Smith's Heart raid only (the owner's ask; the other instances keep their glyphs)",
+    "journalAbilityRows": 105,
+    "newPaintings": 59,
+    "rowsOnNewPaintings": 65,
+    "reusedPaintings": 35,
+    "rowsOnReusedPaintings": 40,
+    "newIconIdsForSplits": ["dgn_heart_soft_enrage_heat"]
+  },
+  "generationContract": {
+    "imagegenCalls": 65,
+    "acceptedFirstOutputs": 54,
+    "rejectedOutputs": 6,
+    "shipping": {
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "maximumBytes": 6144,
+      "alpha": "opaque",
+      "dir": "public/ui/boss-abilities/"
+    }
+  },
+  "reused": [
+    {
+      "iconId": "dgn_heart_anvil",
+      "reuseFile": "public/ui/auras/heart_final_anvil_mark.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "weight-of-the-anvil",
+          "name": "Weight of the Anvil"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_bellows_wind",
+      "reuseFile": "public/ui/auras/wind_drift.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "bellows-wind",
+          "name": "Bellows Wind"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_blades_wake",
+      "reuseFile": "public/ui/auras/heart_quench_blades_awake.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "blades-wake",
+          "name": "The Blades Wake"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_call",
+      "reuseFile": "public/ui/auras/heart_final_shield.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "call-of-the-quarters",
+          "name": "Call of the Quarters"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_calm",
+      "reuseFile": "public/ui/auras/heart_breath_anchor.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "circle-of-calm",
+          "name": "Circle of Calm"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_cradle",
+      "reuseFile": "public/ui/auras/heart_breath_cradled.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "thunders-cradle",
+          "name": "Thunder's Cradle"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_crossing_blade",
+      "reuseFile": "public/ui/auras/heart_quench_slash_mark.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "crossing-blade",
+          "name": "Crossing Blade"
+        },
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "star-blade",
+          "name": "Crossing Blade"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_deepening_cold",
+      "reuseFile": "public/ui/auras/heart_quench_deepening.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "deepening-cold",
+          "name": "Deepening Cold"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_drawn_lightning",
+      "reuseFile": "public/ui/auras/heart_breath_drawn_lightning.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "drawn-lightning",
+          "name": "Drawn Lightning"
+        },
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "final-drawn-lightning",
+          "name": "Drawn Lightning"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_ember_mark",
+      "reuseFile": "public/ui/auras/heart_final_ember_mark.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "ember-marks",
+          "name": "Ember Mark"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_encased",
+      "reuseFile": "public/ui/auras/heart_quench_frozen.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "encased-in-rime",
+          "name": "Encased in Rime"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_falling_rock",
+      "reuseFile": "public/ui/auras/heart_falling_rock_mark.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "falling-rock",
+          "name": "Falling Rock"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_gale_pounce",
+      "reuseFile": "public/ui/auras/heart_final_tethered.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "gale-pounce",
+          "name": "Gale Pounce"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_groaning_ice",
+      "reuseFile": "public/ui/auras/heart_quench_trapped.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "groaning-ice",
+          "name": "Groaning Ice"
+        },
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "final-groaning-ice",
+          "name": "Groaning Ice"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_hammers_weight",
+      "reuseFile": "public/ui/auras/heart_hammers_weight.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "hammers-weight",
+          "name": "Hammer's Weight"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_heart_unbound",
+      "reuseFile": "public/ui/auras/heart_final_unbound.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "heart-unbound",
+          "name": "Heart Unbound"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_hearth_flare",
+      "reuseFile": "public/ui/auras/heart_heat_scorched.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "hearth-flare",
+          "name": "Hearth Flare"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_inhale",
+      "reuseFile": "public/ui/auras/wind_draw.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "indrawn-breath",
+          "name": "Indrawn Breath"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_knotted_gale",
+      "reuseFile": "public/ui/auras/heart_breath_laden.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "knotted-gale",
+          "name": "Knotted Gale"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_masterless_fury",
+      "reuseFile": "public/ui/auras/heart_final_fury.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "masterless-fury",
+          "name": "Masterless Fury"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_quenching_ring",
+      "reuseFile": "public/ui/auras/heart_final_ring_chill.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "quenching-ring",
+          "name": "Quenching Ring"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_resonance",
+      "reuseFile": "public/ui/auras/heart_resonance.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "resonance",
+          "name": "Resonance"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_rolling_cinder",
+      "reuseFile": "public/ui/auras/heart_heat_hunted.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "rolling-cinders",
+          "name": "Rolling Cinder"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_rush",
+      "reuseFile": "public/ui/auras/heart_mountains_rush_mark.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "mountains-rush",
+          "name": "Mountain's Rush"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_sky_strike",
+      "reuseFile": "public/ui/auras/heart_breath_sky_mark.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "sky-strike",
+          "name": "Sky Strike"
+        },
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "star-sky",
+          "name": "Sky Strike"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_stone_shell",
+      "reuseFile": "public/ui/auras/heart_final_shell.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "stone-shell",
+          "name": "Stone Shell"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_summit_roar",
+      "reuseFile": "public/ui/auras/wind_blast.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "summit-roar",
+          "name": "Summit Roar"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_swelling_storm",
+      "reuseFile": "public/ui/auras/heart_breath_swelling_storm.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "swelling-storm",
+          "name": "Swelling Storm"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_vein_shock",
+      "reuseFile": "public/ui/auras/heart_final_shaken.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "vein-shock",
+          "name": "Vein Shock"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_wake_stone",
+      "reuseFile": "public/ui/auras/heart_wake_mark.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "wake-the-stone",
+          "name": "Wake the Stone"
+        },
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "star-pillars",
+          "name": "Wake the Stone"
+        }
+      ]
+    },
+    {
+      "iconId": "dgn_heart_wrath",
+      "reuseFile": "public/ui/auras/heart_narrow_shelter.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "mountains-wrath",
+          "name": "Mountain's Wrath"
+        }
+      ]
+    },
+    {
+      "iconId": "heart_breath_blow_mark",
+      "reuseFile": "public/ui/auras/heart_breath_blow_mark.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "bellows-blow",
+          "name": "Bellows Blow"
+        }
+      ]
+    },
+    {
+      "iconId": "heart_breath_thunder_laden",
+      "reuseFile": "public/ui/auras/heart_breath_thunder_laden.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "thunder-lash",
+          "name": "Thunder Lash"
+        }
+      ]
+    },
+    {
+      "iconId": "heart_quench_rime",
+      "reuseFile": "public/ui/auras/heart_quench_rime.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "living-rime",
+          "name": "Living Rime"
+        }
+      ]
+    },
+    {
+      "iconId": "heart_quench_tempered",
+      "reuseFile": "public/ui/auras/heart_quench_tempered.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "tempering-strike",
+          "name": "Tempering Strike"
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "iconId": "dgn_heart_avalanche",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_avalanche.png",
+      "sourceBytes": 3040797,
+      "sourceSha256": "0a5b5d1ba99dbaf4188c6290c8492c4d435502f9030eca62ae580d1683b6e616",
+      "acceptedSha256": "d51269a3f3ce2ff5a9ec523336adf0fcaad14371c0a61f3ca4fcfb092da618e7",
+      "acceptedBytes": 5986,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_avalanche.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "avalanche",
+          "name": "Avalanche",
+          "tiers": ["normal", "heroic"],
+          "does": "The Quench and the Hammer: spikes of ice and stone run from the wall toward the centre in lanes (5 at a time), 2.5 sec after they show, dealing 391 to 437 damage to anyone in a lane.",
+          "hits": ["Avalanche"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "spikes of ice and stone running in straight lanes toward the centre of a room",
+      "palette": "ice blue and ochre stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Avalanche. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Quench and the Hammer: spikes of ice and stone run from the wall toward the centre in lanes (5 at a time), 2.5 sec after they show, dealing 391 to 437 damage to anyone in a lane. Paint: spikes of ice and stone running in straight lanes toward the centre of a room. Palette: ice blue and ochre stone."
+    },
+    {
+      "iconId": "dgn_heart_basalt_fist",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_basalt_fist.png",
+      "sourceBytes": 2646743,
+      "sourceSha256": "f6c82648ade870f8632d78a5bb84af30842ba5398db68fa11d0144c68b186d83",
+      "acceptedSha256": "bb6a9322fa792703d8f350a76884272ed63c81b94557da08f974fe8ac79bb780",
+      "acceptedBytes": 4954,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_basalt_fist.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "basalt-fist",
+          "name": "Basalt Fist",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 22 sec, a 3 sec cast at the spots where marked players stood (1 at a time): anyone within 6 yd when it slams takes 2,500 to 2,700 Fire damage.",
+          "hits": ["Basalt Fist", "Molten Swell"],
+          "castIds": ["heart_heat_fist"]
+        },
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "final-basalt-fist",
+          "name": "Basalt Fist",
+          "tiers": ["normal", "heroic"],
+          "does": "In the Heat: every 16 sec, a 1.9 sec cast at a player's spot: 2,200 to 2,400 Fire damage within 6 yd, then three Molten Swells roll out from it, dealing 437 to 506 to everyone they roll over.",
+          "hits": ["Basalt Fist", "Molten Swell"],
+          "castIds": ["heart_heat_fist"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a basalt fist slamming down onto a marked spot, three molten swells rolling outward from the impact",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Basalt Fist. What it does: an ability several bosses of The Smith's Heart raid share (Ignazhar, the Unquenchable; Ashgrand, Remnant of the Masterless Strength): Every 22 sec, a 3 sec cast at the spots where marked players stood (1 at a time): anyone within 6 yd when it slams takes 2,500 to 2,700 Fire damage. Paint: a basalt fist slamming down onto a marked spot, three molten swells rolling outward from the impact. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_cinder_grip",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_cinder_grip.png",
+      "sourceBytes": 2689158,
+      "sourceSha256": "d7992e30821e2699dd4993f87027566f884c6b1670d15ea29f698099d4b383fd",
+      "acceptedSha256": "b6a1fa5e09944341a02245c4d3188e0aa38723ff96c9d1fa59156912de5832e0",
+      "acceptedBytes": 5744,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_cinder_grip.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "cinder-grip",
+          "name": "Cinder Grip",
+          "tiers": ["normal", "heroic"],
+          "does": "Each of Ignazhar's landed swings adds a stack to its tank: 15 Fire damage a second for each stack, up to 10, for 15 sec.",
+          "hits": ["Cinder Grip"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a burning grip of fire clamping a tank's gauntlet, layered ember rings stacking up the arm",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Cinder Grip. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: Each of Ignazhar's landed swings adds a stack to its tank: 15 Fire damage a second for each stack, up to 10, for 15 sec. Paint: a burning grip of fire clamping a tank's gauntlet, layered ember rings stacking up the arm. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_closing_storm",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_closing_storm.png",
+      "sourceBytes": 2794452,
+      "sourceSha256": "3341e778af426195e69d25f1955b167c9390e8b8dc9a2c286349898ac30a3f02",
+      "acceptedSha256": "2f29166cb5ff0965aa839fb14a5e10cb88b0777cd56a5ef31f87c75195e11ab4",
+      "acceptedBytes": 5062,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_closing_storm.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "closing-storm",
+          "name": "Closing Storm",
+          "tiers": ["normal", "heroic"],
+          "does": "From the first landing on an isle, its storm closes for 50 sec.",
+          "hits": ["Sky's Reckoning"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a storm closing over a floating stone isle, the clouds tightening into a vortex above it",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Closing Storm. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: From the first landing on an isle, its storm closes for 50 sec. Paint: a storm closing over a floating stone isle, the clouds tightening into a vortex above it. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_cursed_pillar",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_cursed_pillar.png",
+      "sourceBytes": 2841087,
+      "sourceSha256": "3273957e54cd2dce38a89c2e67bfc8773eb33f10085b8eebd9346de96aeac33e",
+      "acceptedSha256": "cab02325c3bd17df436ad29954679532c6577afb1c0a59dabaf0410e71fd800f",
+      "acceptedBytes": 4678,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_cursed_pillar.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "cursed-pillar",
+          "name": "Cursed Pillar",
+          "tiers": ["normal", "heroic"],
+          "does": "While it stands, the Cursed Pillar deals 8 to 10 damage to the whole raid every 2 sec.",
+          "hits": ["Cursed Pillar"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a cracked quarry pillar pulsing with crimson-magenta curse light, rings of dust pulsing out from it",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Cursed Pillar. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: While it stands, the Cursed Pillar deals 8 to 10 damage to the whole raid every 2 sec. Paint: a cracked quarry pillar pulsing with crimson-magenta curse light, rings of dust pulsing out from it. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_dust_devil",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_dust_devil.png",
+      "sourceBytes": 3151999,
+      "sourceSha256": "33c71baf29efd3766537c0638723af9438ae7d783d17187446605dde2078e03e",
+      "acceptedSha256": "bac59bc2965676ab7818af35276cfb7c39056abab3fed197be52f975f0fd3b18",
+      "acceptedBytes": 5806,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_dust_devil.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "dust-devils",
+          "name": "Dust Devil",
+          "tiers": ["normal", "heroic"],
+          "does": "In the Breath: every 20 sec, Dust Devils rise by players (2 at a time) after 2 sec and wander for 9 sec.",
+          "hits": ["Dust Devil"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "dust devil whirlwinds rising beside a figure, throwing grit and sand",
+      "palette": "storm cyan and dusty ochre",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Dust Devil. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: In the Breath: every 20 sec, Dust Devils rise by players (2 at a time) after 2 sec and wander for 9 sec. Paint: dust devil whirlwinds rising beside a figure, throwing grit and sand. Palette: storm cyan and dusty ochre."
+    },
+    {
+      "iconId": "dgn_heart_elemental_strike",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_elemental_strike.try2.png",
+      "sourceBytes": 3025906,
+      "sourceSha256": "f302a90ebd76d1f3593fcf40c5e02c4c35469f88067d9681c6e4269a59118633",
+      "acceptedSha256": "c13c912056662c5778154a8e0789eeaecae675102c107525196414c8ee895ce1",
+      "acceptedBytes": 6068,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_elemental_strike.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "elemental-strike",
+          "name": "Elemental Strike",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 8 sec, its tank takes 379 to 425 at one stack, 45% more for each stack, and a stack of its quarter's element for 30 sec: Searing Burn (13 Fire damage a second a stack), Biting Frost (8% slower...",
+          "hits": ["Elemental Strike", "Searing Burn", "Static Charge"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a massive stone fist crashing into a tank's raised steel shield, a single glowing element rune of flame branded onto the shield's face where it struck",
+      "palette": "the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Elemental Strike. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: Every 8 sec, its tank takes 379 to 425 at one stack, 45% more for each stack, and a stack of its quarter's element for 30 sec: Searing Burn (13 Fire damage a second a stack), Biting Frost (8% slower... Paint: a massive stone fist crashing into a tank's raised steel shield, a single glowing element rune of flame branded onto the shield's face where it struck. Palette: the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_every_star",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_every_star.png",
+      "sourceBytes": 3129236,
+      "sourceSha256": "fde382221fb6926c3d9b838666c1e2fb12f63732217de8bc4eaaed9d1c9e4fd2",
+      "acceptedSha256": "33dd6173bdf8ebeaeebb0c108b409e0444cb5880bb9eefe376457095a5d1c249",
+      "acceptedBytes": 6124,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_every_star.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "every-star",
+          "name": "Every Star Awake",
+          "tiers": ["normal", "heroic"],
+          "does": "All four stars run at once at 75% pace: pillars, lightning, blades and whirls together.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "four blazing stars of ochre, storm cyan, ice blue and white-gold rising together over a dark stone floor, all awake at once",
+      "palette": "the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Every Star Awake. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: All four stars run at once at 75% pace: pillars, lightning, blades and whirls together. Paint: four blazing stars of ochre, storm cyan, ice blue and white-gold rising together over a dark stone floor, all awake at once. Palette: the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_falling_cinder",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_falling_cinder.try2.png",
+      "sourceBytes": 2517190,
+      "sourceSha256": "10adb68932afb13fb2ea9aa0b9119bea4c6eb04a68fbe8c889f32275aa30aba2",
+      "acceptedSha256": "57fd2cc6adf2dd2fd2f2853748098e447310a2d0275facf564739eed01598e04",
+      "acceptedBytes": 4228,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_falling_cinder.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "falling-cinders",
+          "name": "Falling Cinder",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 3 sec during an overflow, 2 random players take 182 to 221 Fire damage.",
+          "hits": ["Falling Cinder"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "an armoured adventurer seen from above raising a shield as two white-gold cinders plunge straight down onto them out of a black sky, long fire trails behind the cinders",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Falling Cinder. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: Every 3 sec during an overflow, 2 random players take 182 to 221 Fire damage. Paint: an armoured adventurer seen from above raising a shield as two white-gold cinders plunge straight down onto them out of a black sky, long fire trails behind the cinders. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_fire_whirl",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_fire_whirl.png",
+      "sourceBytes": 2676376,
+      "sourceSha256": "b3fbf55776e83ee715d2a10c54186f01cb9290125477ed1998faf97ea701f03a",
+      "acceptedSha256": "e97e47480acc9179435097d294cae5196396877ebc60143bdfd9d6292fca9cdf",
+      "acceptedBytes": 5450,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_fire_whirl.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "fire-whirl",
+          "name": "Fire Whirl",
+          "tiers": ["normal", "heroic"],
+          "does": "The Heat's star: every 15 sec, Fire Whirls rise (2 at a time) after 2 sec and wander the floor for 10 sec at 6.3 yd a second, dealing 345 to 391 Fire damage to anyone they touch.",
+          "hits": ["Fire Whirl"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "two fire whirls wandering across a stone floor, spinning white-gold flame",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Fire Whirl. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Heat's star: every 15 sec, Fire Whirls rise (2 at a time) after 2 sec and wander the floor for 10 sec at 6.3 yd a second, dealing 345 to 391 Fire damage to anyone they touch. Paint: two fire whirls wandering across a stone floor, spinning white-gold flame. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_firestorm",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_firestorm.png",
+      "sourceBytes": 2856766,
+      "sourceSha256": "e0c4d6959a862b36fa1ae140d50b879342def70ca1fdde765a4aeb2e3bb038d4",
+      "acceptedSha256": "863e03685aace968e08449ff03b92de4241d5cd3f1c4df67ea9d515c94dbf75c",
+      "acceptedBytes": 5886,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_firestorm.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "firestorm",
+          "name": "Firestorm",
+          "tiers": ["normal", "heroic"],
+          "does": "The Heat and the Breath: lanes 10 yd wide are laid across the room (1 at a time); 3 sec later a wall of flame sweeps along each, dealing 437 to 483 Fire damage.",
+          "hits": ["Firestorm"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a wall of flame sweeping along a straight lane, carried by a storm wind",
+      "palette": "white-gold fire and storm cyan wind",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Firestorm. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Heat and the Breath: lanes 10 yd wide are laid across the room (1 at a time); 3 sec later a wall of flame sweeps along each, dealing 437 to 483 Fire damage. Paint: a wall of flame sweeping along a straight lane, carried by a storm wind. Palette: white-gold fire and storm cyan wind."
+    },
+    {
+      "iconId": "dgn_heart_forge_fist",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_forge_fist.png",
+      "sourceBytes": 2841983,
+      "sourceSha256": "d88351751c4b87b5cf04cb6e304f02795f215c19ae5bb02bf271e057f2a95794",
+      "acceptedSha256": "ad53e1c59db88bda1aaa4288223306b3852a5bdecffea08c3ab161a660152287",
+      "acceptedBytes": 5812,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_forge_fist.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "forge-fist",
+          "name": "Forge Fist",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 3 swings, its fist sweeps a 110 degree arc in front of it, out to 9 yd, for 70% of a swing to everyone in it.",
+          "hits": ["Forge Fist", "Forge Fire"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a four-coloured stone fist sweeping a wide arc, rubble and sparks along the arc",
+      "palette": "the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Forge Fist. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: Every 3 swings, its fist sweeps a 110 degree arc in front of it, out to 9 yd, for 70% of a swing to everyone in it. Paint: a four-coloured stone fist sweeping a wide arc, rubble and sparks along the arc. Palette: the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_forge_fury",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_forge_fury.png",
+      "sourceBytes": 2831227,
+      "sourceSha256": "0f6c75c12e0f16d42d80ee93b53b6b9134bf71ccfd04579f6f372544926a9145",
+      "acceptedSha256": "88090bc08895cf23bb388b5998c9906b035fb6bf88a3cf19c59efaaaef768455",
+      "acceptedBytes": 6064,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_forge_fury.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "forge-fury",
+          "name": "Forge-Fury",
+          "tiers": ["heroic"],
+          "does": "Gathering Forge-Fury warns 30 sec ahead.",
+          "hits": ["Forge-Fury"],
+          "castIds": []
+        },
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "forge-fury",
+          "name": "Forge-Fury",
+          "tiers": ["heroic"],
+          "does": "Gathering Forge-Fury warns 30 sec ahead.",
+          "hits": ["Forge-Fury"],
+          "castIds": []
+        },
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "forge-fury",
+          "name": "Forge-Fury",
+          "tiers": ["heroic"],
+          "does": "Gathering Forge-Fury warns 30 sec ahead.",
+          "hits": ["Forge-Fury"],
+          "castIds": []
+        },
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "forge-fury",
+          "name": "Forge-Fury",
+          "tiers": ["heroic"],
+          "does": "Gathering Forge-Fury warns 30 sec ahead.",
+          "hits": ["Forge-Fury"],
+          "castIds": []
+        },
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "forge-fury",
+          "name": "Forge-Fury",
+          "tiers": ["heroic"],
+          "does": "Gathering Forge-Fury warns 30 sec ahead.",
+          "hits": ["Forge-Fury"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a ring of roaring forge flame closing in on a small circle of stone floor from every side, embers filling the air, the hard enrage",
+      "palette": "forge orange and white-gold fire on dark stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Forge-Fury. What it does: an ability several bosses of The Smith's Heart raid share (Hrothmar and Velmira; Aerwyn, the Unbound Gale; Aurora, the Silent Winter; Ignazhar, the Unquenchable; Ashgrand, Remnant of the Masterless Strength): Gathering Forge-Fury warns 30 sec ahead. Paint: a ring of roaring forge flame closing in on a small circle of stone floor from every side, embers filling the air, the hard enrage. Palette: forge orange and white-gold fire on dark stone."
+    },
+    {
+      "iconId": "dgn_heart_fusion",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_fusion.png",
+      "sourceBytes": 3143667,
+      "sourceSha256": "e32f0d466e6f8fec07d893874876935367fe5e6c1178b5b8d230449cc4c8243d",
+      "acceptedSha256": "59e7b42eea9a8be56a5880a45180426d760ef1b70d94435f913c71f3338c399c",
+      "acceptedBytes": 5952,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_fusion.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "elemental-fusion",
+          "name": "Elemental Fusion",
+          "tiers": ["normal", "heroic"],
+          "does": "A 3 sec cast on each move into a new quarter.",
+          "hits": ["Elemental Residue"],
+          "castIds": ["heart_final_fusion"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "two element streams, one ice blue and one white-gold, fusing into a single combo blast",
+      "palette": "the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Elemental Fusion. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: A 3 sec cast on each move into a new quarter. Paint: two element streams, one ice blue and one white-gold, fusing into a single combo blast. Palette: the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_grieving_fury",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_grieving_fury.png",
+      "sourceBytes": 2908514,
+      "sourceSha256": "ed7339403e84a21a47a9366af8b0fbfd151bf5496c9b7290b83ab5279932df41",
+      "acceptedSha256": "c28472d4312314b8d8273a1ca7b8f10f742e315c615da5285abeff3a5e4cf2ee",
+      "acceptedBytes": 5674,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_grieving_fury.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "grieving-fury",
+          "name": "Grieving Fury",
+          "tiers": ["normal", "heroic"],
+          "does": "When one falls, its soul reaches the other 3 sec later.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": "public/ui/auras/heart_memory_of_stone.webp",
+      "subject": "a stone giant roaring in grief and rage, tears of molten ochre-gold running down its cracked stone face, a glowing soul streaming into its chest",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Grieving Fury. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: When one falls, its soul reaches the other 3 sec later. Paint: a stone giant roaring in grief and rage, tears of molten ochre-gold running down its cracked stone face, a glowing soul streaming into its chest. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_hail",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_hail.png",
+      "sourceBytes": 3176132,
+      "sourceSha256": "c503e4bca99785c54958e8719815176bbefd402b02929cd388eb5c9b033ad5e1",
+      "acceptedSha256": "6b926f3cb912e50d9c73d4c109c1b230e3e2e31d5367f4c4cdc0973e4eef4d49",
+      "acceptedBytes": 5868,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_hail.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "hailstorm",
+          "name": "Hailstorm",
+          "tiers": ["normal", "heroic"],
+          "does": "The Quench and the Breath: for 6 sec, hailstones fall on the quarter (2 every 0.6 sec, half of them on players).",
+          "hits": ["Hailstorm"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "hailstones of blue ice falling into marked circles out of a storm cloud",
+      "palette": "ice blue and storm cyan",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Hailstorm. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Quench and the Breath: for 6 sec, hailstones fall on the quarter (2 every 0.6 sec, half of them on players). Paint: hailstones of blue ice falling into marked circles out of a storm cloud. Palette: ice blue and storm cyan."
+    },
+    {
+      "iconId": "dgn_heart_hammerfall",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_hammerfall.png",
+      "sourceBytes": 2665335,
+      "sourceSha256": "85cf15be903301592e7d6fa577ea41da820db2a6d659cb27b094de05c382d4e8",
+      "acceptedSha256": "f8eecca8a4623d1b01320c730eca499367aa8cce56b55eaeb80badbe776cff57",
+      "acceptedBytes": 4390,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_hammerfall.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "hammerfall",
+          "name": "Hammerfall",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 3 swings, his blow sweeps a 110 degree arc in front of him, out to 9 yd, hitting everyone in it for 70% of a swing.",
+          "hits": ["Hammerfall"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a colossal stone warhammer swinging through a wide glowing ochre arc, rubble and dust flung all along the arc",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Hammerfall. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: Every 3 swings, his blow sweeps a 110 degree arc in front of him, out to 9 yd, hitting everyone in it for 70% of a swing. Paint: a colossal stone warhammer swinging through a wide glowing ochre arc, rubble and dust flung all along the arc. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_hearthseed",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_hearthseed.png",
+      "sourceBytes": 2689613,
+      "sourceSha256": "14bded9ed57dfe90ca5b8157985097b58b3996d0b205c5f460845a55a2738ae7",
+      "acceptedSha256": "e47b4da8dc47c97339ddc2487d36d43a0c4f47e24953a870d982edda92303235",
+      "acceptedBytes": 5624,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_hearthseed.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "hearthseeds",
+          "name": "Hearthseed",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 30 sec, Ignazhar hurls a seed of flame at every player's spot (up to 10).",
+          "hits": ["Hearthseed"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "glowing seeds of flame scattered across a basalt floor, each pulsing about to burst",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Hearthseed. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: Every 30 sec, Ignazhar hurls a seed of flame at every player's spot (up to 10). Paint: glowing seeds of flame scattered across a basalt floor, each pulsing about to burst. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_inherit",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_inherit.png",
+      "sourceBytes": 2843085,
+      "sourceSha256": "d236edd71f10ef6ea80f6d8485fda90db7e51f50e4ddf69514c680f21c225ee7",
+      "acceptedSha256": "44925119d4ed1638af68ab14b55853b81ec401754dedf326666a6e07b812679e",
+      "acceptedBytes": 5554,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_inherit.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "inherited",
+          "name": "Inherited Abilities",
+          "tiers": ["normal", "heroic"],
+          "does": "With the soul, the survivor takes up the fallen one's abilities at full strength.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a surviving stone giant's hands catching the glowing ochre soul of its fallen partner",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Inherited Abilities. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: With the soul, the survivor takes up the fallen one's abilities at full strength. Paint: a surviving stone giant's hands catching the glowing ochre soul of its fallen partner. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_isle_lightning",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_isle_lightning.png",
+      "sourceBytes": 2922222,
+      "sourceSha256": "4defb51211f804d5b223d19674115fe1b2d67c0efae9952de4cee97b7db2bb3f",
+      "acceptedSha256": "9a3e6c37b1c0f97b6caf95236dbc0cec04f2359fa9e92a328c69fd94a866ad0d",
+      "acceptedBytes": 4634,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_isle_lightning.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "isle-lightning",
+          "name": "Isle Lightning",
+          "tiers": ["normal", "heroic"],
+          "does": "While an isle's foes stand, every 8 sec lightning marks one player and one spot on it.",
+          "hits": ["Sky Strike"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a cyan lightning bolt striking down onto a small floating stone isle, a marked spot glowing beside it",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Isle Lightning. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: While an isle's foes stand, every 8 sec lightning marks one player and one spot on it. Paint: a cyan lightning bolt striking down onto a small floating stone isle, a marked spot glowing beside it. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_leaping_bolt",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_leaping_bolt.png",
+      "sourceBytes": 3129887,
+      "sourceSha256": "75b332252cb1c61c3a21bd71599017affb157c70987577e1261636f2c2623e6f",
+      "acceptedSha256": "75a1bae711ac0cb791c0fe556a14e882abf8fbc4266ac5f89230413400eb59b9",
+      "acceptedBytes": 6126,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_leaping_bolt.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "leaping-bolt",
+          "name": "Leaping Bolt",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 22 sec, a 2.5 sec cast at a player: 276 to 322 Nature damage, then it leaps to the nearest player within 8 yd, again and again.",
+          "hits": ["Leaping Bolt"],
+          "castIds": ["heart_breath_forking_bolt"]
+        },
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "final-leaping-bolt",
+          "name": "Leaping Bolt",
+          "tiers": ["normal", "heroic"],
+          "does": "In the Breath: every 14 sec, a 2 sec cast at a player: 345 to 391 Nature damage, then it leaps to every player within 6 yd of anyone struck, 50% harder with each leap.",
+          "hits": ["Leaping Bolt"],
+          "castIds": ["heart_final_leaping_bolt"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a bolt of cyan lightning forking and leaping in a zigzag chain between several small armoured figures standing apart",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Leaping Bolt. What it does: an ability several bosses of The Smith's Heart raid share (Aerwyn, the Unbound Gale; Ashgrand, Remnant of the Masterless Strength): Every 22 sec, a 2.5 sec cast at a player: 276 to 322 Nature damage, then it leaps to the nearest player within 8 yd, again and again. Paint: a bolt of cyan lightning forking and leaping in a zigzag chain between several small armoured figures standing apart. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_live_coal",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_live_coal.png",
+      "sourceBytes": 2694067,
+      "sourceSha256": "d7e2ac26de13713616a52e7f2e31a4fd760116c46d559481f7b222ad8b2de640",
+      "acceptedSha256": "fff35617e659568a12e1b979dec990a5e7b0fec478a1980da3a5190cdeee9024",
+      "acceptedBytes": 5154,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_live_coal.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "live-coal",
+          "name": "Live Coal",
+          "tiers": ["heroic"],
+          "does": "Every 50 sec, 2 players who are not tanking carry a Live Coal: it absorbs the next 604 healing and burns them for 55 to 63 Fire damage a second.",
+          "hits": ["Live Coal", "Coal Burst"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a live coal cupped in a gauntlet, burning hot, a dark shell drinking the healing light around it",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Live Coal. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: Every 50 sec, 2 players who are not tanking carry a Live Coal: it absorbs the next 604 healing and burns them for 55 to 63 Fire damage a second. Paint: a live coal cupped in a gauntlet, burning hot, a dark shell drinking the healing light around it. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_loose_gale",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_loose_gale.png",
+      "sourceBytes": 2977159,
+      "sourceSha256": "c13f6f15ac94cdc65c7004c6deb14cddb264612d6309a4b7555dda62bb75d3fb",
+      "acceptedSha256": "883e588b12bfbbb2d7805e375e16bb77dd6bd6f25f29fb78ea6776fea92be854",
+      "acceptedBytes": 4972,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_loose_gale.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "loose-gales",
+          "name": "Loose Gale",
+          "tiers": ["heroic"],
+          "does": "After each Indrawn Breath, 3 Loose Gales wander the Cornice for 20 sec.",
+          "hits": ["Loose Gale"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "three small wandering whirlwinds drifting across a stone cornice, debris caught in them",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Loose Gale. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: After each Indrawn Breath, 3 Loose Gales wander the Cornice for 20 sec. Paint: three small wandering whirlwinds drifting across a stone cornice, debris caught in them. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_magma",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_magma.png",
+      "sourceBytes": 2995010,
+      "sourceSha256": "fb7d48989d316d0d0ac7ab5c2ca4d0c873cd1363462ff1aeb24a9c2c545e3672",
+      "acceptedSha256": "efd17be28f40f30e535847b568b7cd23cd128c7b70afb843e63ab3ea0e3d6a15",
+      "acceptedBytes": 5764,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_magma.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "magma-rift",
+          "name": "Magma Rift",
+          "tiers": ["normal", "heroic"],
+          "does": "The Heat and the Hammer: players are marked (3 at a time); 3 sec later a fissure erupts under each for 299 to 334 Fire damage within 3.5 yd, leaving lava that burns for 20 sec (92 to 109 a second).",
+          "hits": ["Magma Rift", "Lava Pool"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a fissure of magma erupting under a marked figure, cracked stone around it",
+      "palette": "ochre stone and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Magma Rift. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Heat and the Hammer: players are marked (3 at a time); 3 sec later a fissure erupts under each for 299 to 334 Fire damage within 3.5 yd, leaving lava that burns for 20 sec (92 to 109 a second). Paint: a fissure of magma erupting under a marked figure, cracked stone around it. Palette: ochre stone and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_mending_gale",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_mending_gale.try3.png",
+      "sourceBytes": 3086360,
+      "sourceSha256": "0f1b367bce78a531a9d271d19b33451da84172ea5b9f4ffdc8a388d8cbe00334",
+      "acceptedSha256": "698136c7091f9791ab105a7dab81a064ec4746b9a9afc2457995297ad2d81c16",
+      "acceptedBytes": 5848,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_mending_gale.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "mending-gale",
+          "name": "Mending Gale",
+          "tiers": ["normal", "heroic"],
+          "does": "The first isle's Gale Mender: every 10 sec, a 3 sec channel that restores 20% of the health of each foe on its isle.",
+          "hits": [],
+          "castIds": ["heart_breath_mending_gale"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a hooded storm caster raising both hands and channelling a ribbon of soft mint-green healing wind into a wounded ally beside it, bright green healing motes rising where the wind touches",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Mending Gale. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: The first isle's Gale Mender: every 10 sec, a 3 sec channel that restores 20% of the health of each foe on its isle. Paint: a hooded storm caster raising both hands and channelling a ribbon of soft mint-green healing wind into a wounded ally beside it, bright green healing motes rising where the wind touches. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_mounting_weight",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_mounting_weight.png",
+      "sourceBytes": 2919398,
+      "sourceSha256": "52a6c90bfd74bd4d33278459c77acaf6522a458d55ee3fd28ae8dac21eb705af",
+      "acceptedSha256": "f033298603cd1c942e0a38e2e28a62acdf50ffbc7ffc593540cb8be7ccee3fb8",
+      "acceptedBytes": 4438,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_mounting_weight.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "mounting-weight",
+          "name": "Mounting Weight",
+          "tiers": ["normal", "heroic"],
+          "does": "The Splinter of the Hammer: each landed swing adds a stack to its target (6 damage a second a stack, for 25 sec), and each stack makes its swings land 15% harder.",
+          "hits": ["Mounting Weight"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "stacked stone weights crushing down onto a figure's shoulders, each heavier than the last",
+      "palette": "ochre and gold on dark stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Mounting Weight. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Splinter of the Hammer: each landed swing adds a stack to its target (6 damage a second a stack, for 25 sec), and each stack makes its swings land 15% harder. Paint: stacked stone weights crushing down onto a figure's shoulders, each heavier than the last. Palette: ochre and gold on dark stone."
+    },
+    {
+      "iconId": "dgn_heart_opposing",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_opposing.png",
+      "sourceBytes": 3025776,
+      "sourceSha256": "be63cb84cd93a028acd08d15e68c282d266b157dd7422e6afdfe2c8da59f963b",
+      "acceptedSha256": "f583d25a7d244adfc74db6111b5e560766ecdf8578ad841887067c2253777310",
+      "acceptedBytes": 5998,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_opposing.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "opposing-elements",
+          "name": "Opposing Elements",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 48 sec, 4 players who are not tanking are marked Fire, Ice, Earth or Lightning, in opposite pairs, for 10 sec.",
+          "hits": ["Clashing Elements", "Unbalanced Elements"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "four element marks, fire against ice and earth against lightning, two opposite pairs repelling with arcane sparks",
+      "palette": "the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Opposing Elements. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: Every 48 sec, 4 players who are not tanking are marked Fire, Ice, Earth or Lightning, in opposite pairs, for 10 sec. Paint: four element marks, fire against ice and earth against lightning, two opposite pairs repelling with arcane sparks. Palette: the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_overflow",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_overflow.png",
+      "sourceBytes": 3072992,
+      "sourceSha256": "2a507fe454da1220bcb3ed5e59a8e4f84063e39b09199ddedacfd11faeec1bfc",
+      "acceptedSha256": "c1ea954510721e48cacfcc19bab4ebaa97156730bab63f0e04bf9277b00ecbf5",
+      "acceptedBytes": 6108,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_overflow.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "lava-waves",
+          "name": "Wellspring Overflow",
+          "tiers": ["normal", "heroic"],
+          "does": "Rings of lava roll out of the wellspring one after another: 4 in the first overflow, 5 in the second, faster and narrower.",
+          "hits": ["Wellspring Overflow"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "rings of lava rolling out of a glowing wellspring one after another, each ring broken by two gaps",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Wellspring Overflow. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: Rings of lava roll out of the wellspring one after another: 4 in the first overflow, 5 in the second, faster and narrower. Paint: rings of lava rolling out of a glowing wellspring one after another, each ring broken by two gaps. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_overload",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_overload.png",
+      "sourceBytes": 2659511,
+      "sourceSha256": "b9ef99b5700150a342024567a1ed7507d0c25aa0169e3c0ea9dc2438ec477527",
+      "acceptedSha256": "b0cb111d2a6368d6b0b99ca376467028f0662e8efbad07c216cdc16d842b3c4b",
+      "acceptedBytes": 5254,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_overload.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "overload",
+          "name": "Overload",
+          "tiers": ["normal", "heroic"],
+          "does": "Each quarter has an Overload bar that fills while Ashgrand stands in it (empty to full in 60 sec) and drains at a third of that speed elsewhere.",
+          "hits": ["Overload Burst", "Overload Pulse"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a glowing crystal vein in a stone floor brimming over and cracking open, four-coloured light about to burst out of it in pulsing waves",
+      "palette": "the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Overload. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: Each quarter has an Overload bar that fills while Ashgrand stands in it (empty to full in 60 sec) and drains at a third of that speed elsewhere. Paint: a glowing crystal vein in a stone floor brimming over and cracking open, four-coloured light about to burst out of it in pulsing waves. Palette: the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_quench_cold",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_quench_cold.png",
+      "sourceBytes": 2956785,
+      "sourceSha256": "91630b27f7bbe28360631314aa4f2d2d577b662b6bbdb40b60796283264a28bb",
+      "acceptedSha256": "82b051711b58bc1f1cef9099ce3d99ed9e351fd99e47bc5ad8daf52068314a9c",
+      "acceptedBytes": 6040,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_quench_cold.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "quenching-cold",
+          "name": "Quenching Cold",
+          "tiers": ["normal", "heroic"],
+          "does": "Alone, your cold fills from 0 to 100 in about 24 sec.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": "public/ui/auras/heart_quench_cold.webp",
+      "subject": "a large faceted snowflake of glowing ice blue frost crystal, frost spikes growing from its six arms, freezing mist curling around it",
+      "palette": "deep ice blue and pale frost on black lake water",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Quenching Cold. What it does: an ability of Aurora, the Silent Winter in The Smith's Heart raid: Alone, your cold fills from 0 to 100 in about 24 sec. Paint: a large faceted snowflake of glowing ice blue frost crystal, frost spikes growing from its six arms, freezing mist curling around it. Palette: deep ice blue and pale frost on black lake water."
+    },
+    {
+      "iconId": "dgn_heart_quenching_breath",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_quenching_breath.png",
+      "sourceBytes": 3364655,
+      "sourceSha256": "7a426605a08300ef38415f506b65a191cf356e6f9d4574cace74aa972d4b0bc3",
+      "acceptedSha256": "0b8eeca03f9addf80761a3bdca1ddf299c17e966d84a29e8398bc1971c37e211",
+      "acceptedBytes": 4918,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_quenching_breath.webp",
+      "covers": [
+        {
+          "boss": "heart_quench_guardian",
+          "bossName": "Aurora, the Silent Winter",
+          "mechanic": "quenching-breath",
+          "name": "Quenching Breath",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 14 sec, a 2.5 sec cast: a 70 degree cone in front of her, out to 22 yd, deals 420 to 490 Frost damage and adds 20 cold.",
+          "hits": ["Quenching Breath"],
+          "castIds": ["heart_quenching_breath"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "an ice giantess exhaling a wide cone of quenching frost over a frozen lake",
+      "palette": "deep ice blue and pale frost on black lake water",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Quenching Breath. What it does: an ability of Aurora, the Silent Winter in The Smith's Heart raid: Every 14 sec, a 2.5 sec cast: a 70 degree cone in front of her, out to 22 yd, deals 420 to 490 Frost damage and adds 20 cold. Paint: an ice giantess exhaling a wide cone of quenching frost over a frozen lake. Palette: deep ice blue and pale frost on black lake water."
+    },
+    {
+      "iconId": "dgn_heart_restless_stone",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_restless_stone.png",
+      "sourceBytes": 2885421,
+      "sourceSha256": "a7d89a9e871b2034d77dca0141fe7fe2d9e171d873d783ed8ef01fb309ee7ed8",
+      "acceptedSha256": "de216f693abd330c06c38787c2c2bc19994dbc663471cee7c378d4adb5bab929",
+      "acceptedBytes": 5002,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_restless_stone.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "restless-stone",
+          "name": "Restless Stone",
+          "tiers": ["heroic"],
+          "does": "Every 2 sec, every standing pillar deals 75 to 94 damage to anyone within 3 yd of it.",
+          "hits": ["Restless Stone"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "the base of a standing pillar cracking, sharp stone shards bursting out around it",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Restless Stone. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: Every 2 sec, every standing pillar deals 75 to 94 damage to anyone within 3 yd of it. Paint: the base of a standing pillar cracking, sharp stone shards bursting out around it. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_rime_toll",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_rime_toll.png",
+      "sourceBytes": 2987171,
+      "sourceSha256": "183cceb3f0553e8e49fc7a4d3049fd6072be899662c7251cdbb6442921104411",
+      "acceptedSha256": "dff9c46b40e47540a94059a97bbc7a04832a6fbcf045d27f6cf8e1fecf60baf3",
+      "acceptedBytes": 5150,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_rime_toll.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "rime-toll",
+          "name": "Rime Toll",
+          "tiers": ["normal", "heroic"],
+          "does": "The Splinter of the Quench: every 12 sec, a 2.5 sec cast that deals 747 to 828 Frost damage to the whole raid if it rings out.",
+          "hits": ["Rime Toll"],
+          "castIds": ["heart_final_rime_toll"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a bell of frost ringing out a wave of cold across the whole raid",
+      "palette": "deep ice blue and pale frost",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Rime Toll. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Splinter of the Quench: every 12 sec, a 2.5 sec cast that deals 747 to 828 Frost damage to the whole raid if it rings out. Paint: a bell of frost ringing out a wave of cold across the whole raid. Palette: deep ice blue and pale frost."
+    },
+    {
+      "iconId": "dgn_heart_riven_squall",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_riven_squall.png",
+      "sourceBytes": 2713834,
+      "sourceSha256": "08b41a630e2fb9550a6731a0d908ae3581e44258f67782062a9bfc0aad11f998",
+      "acceptedSha256": "43c9c10e6d3a470f210abcc054bf3ef0f59dadd79088f2ad0967cf7120f8c459",
+      "acceptedBytes": 5178,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_riven_squall.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "riven-squall",
+          "name": "Riven Squall",
+          "tiers": ["normal", "heroic"],
+          "does": "On the second isle, the Riven Squall splits into two Squall Fragments as it dies.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a squall creature of storm cloud tearing into two smaller fragments as it dies",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Riven Squall. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: On the second isle, the Riven Squall splits into two Squall Fragments as it dies. Paint: a squall creature of storm cloud tearing into two smaller fragments as it dies. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_seam_bolt",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_seam_bolt.png",
+      "sourceBytes": 2708098,
+      "sourceSha256": "b6eb867dba609cf96f58431d3a2424178bb1fbff4bc2872d1abaf66721546975",
+      "acceptedSha256": "b401d341610378ee52a70a00f4de9414efd295f161acb5a08c9e4cc7aaf19911",
+      "acceptedBytes": 3970,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_seam_bolt.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "seam-bolt",
+          "name": "Seam Bolt",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 8 sec, a 2 sec cast at a random player she can see: 345 to 391 Nature damage.",
+          "hits": ["Seam Bolt"],
+          "castIds": ["heart_seam_bolt"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a bolt of green-gold nature energy shooting straight out of a glowing seam split in dark rock",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Seam Bolt. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: Every 8 sec, a 2 sec cast at a random player she can see: 345 to 391 Nature damage. Paint: a bolt of green-gold nature energy shooting straight out of a glowing seam split in dark rock. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_shearing_blow",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_shearing_blow.png",
+      "sourceBytes": 2685212,
+      "sourceSha256": "43f1ba04162eabe527723e1841dd6407247d1bbebc92a292779a63ebbdb499f8",
+      "acceptedSha256": "b42e592fec59d90aeb9281f36fcbe6692abb8e664dcaefde2336f8fcce1932c4",
+      "acceptedBytes": 3888,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_shearing_blow.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "shearing-blow",
+          "name": "Shearing Blow",
+          "tiers": ["normal", "heroic"],
+          "does": "Every Splinter, every 11 sec: a 2 sec cast, a 100 degree cone 10 yd long at its target.",
+          "hits": ["Shearing Blow"],
+          "castIds": ["heart_final_shearing_blow"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a splinter creature's blade cutting a narrow cone of shearing force through the air",
+      "palette": "the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Shearing Blow. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: Every Splinter, every 11 sec: a 2 sec cast, a 100 degree cone 10 yd long at its target. Paint: a splinter creature's blade cutting a narrow cone of shearing force through the air. Palette: the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_shoving_gale",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_shoving_gale.png",
+      "sourceBytes": 3043050,
+      "sourceSha256": "df34d15c1f044ea14bacd9064752a55007a2a2c269f3f49cf2fc89c9565163fe",
+      "acceptedSha256": "ae045d0498f5746675d3ea041e98c660e29f5d2a55d233f70aec64a174e81d1d",
+      "acceptedBytes": 5356,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_shoving_gale.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "shoving-gale",
+          "name": "Shoving Gale",
+          "tiers": ["normal", "heroic"],
+          "does": "The second isle's Gust Herald: every 9 sec, a 2.5 sec cast down a line toward a player.",
+          "hits": [],
+          "castIds": ["heart_breath_shoving_gale"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a hard gust shoving a figure sideways along a straight line toward the rim of a floating isle",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Shoving Gale. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: The second isle's Gust Herald: every 9 sec, a 2.5 sec cast down a line toward a player. Paint: a hard gust shoving a figure sideways along a straight line toward the rim of a floating isle. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_skyrend_nova",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_skyrend_nova.png",
+      "sourceBytes": 3238760,
+      "sourceSha256": "1e8aea0b142a0a1706d05aee7177b416161882ff5b9f899269ab196e0de44cba",
+      "acceptedSha256": "b20e8fdc07140c308ae3850827dd474b909f11489c4a6582f0a5065d4dfa5129",
+      "acceptedBytes": 5974,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_skyrend_nova.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "skyrend-nova",
+          "name": "Skyrend Nova",
+          "tiers": ["normal", "heroic"],
+          "does": "Inside its Gale Cocoon, Aerwyn cannot be harmed and channels Skyrend Nova for 150 sec.",
+          "hits": ["Skyrend Nova"],
+          "castIds": ["heart_breath_skyrend_nova"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a cocoon of wind and lightning wrapped around a stone guardian, a white nova swelling inside about to rupture",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Skyrend Nova. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: Inside its Gale Cocoon, Aerwyn cannot be harmed and channels Skyrend Nova for 150 sec. Paint: a cocoon of wind and lightning wrapped around a stone guardian, a white nova swelling inside about to rupture. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_soft_enrage",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_soft_enrage.png",
+      "sourceBytes": 2794173,
+      "sourceSha256": "588badb089197564b808d7ba459398363f3b7e717273f33ad3e1560af2065778",
+      "acceptedSha256": "ec8d8826d6fc6831a617217cd6e55218a236b443bca40b720c0880595df0e5f3",
+      "acceptedBytes": 4966,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_soft_enrage.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "wrath-enrage",
+          "name": "Soft Enrage",
+          "tiers": ["normal", "heroic"],
+          "does": "Once 6 Wraths have landed, his energy fills 2.5 times as fast: a Wrath about every 26 sec.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a cracked stone hourglass whose blazing ochre-gold sand pours through far too fast, fresh cracks racing up its stone frame",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Soft Enrage. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: Once 6 Wraths have landed, his energy fills 2.5 times as fast: a Wrath about every 26 sec. Paint: a cracked stone hourglass whose blazing ochre-gold sand pours through far too fast, fresh cracks racing up its stone frame. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_soft_enrage_heat",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_soft_enrage_heat.png",
+      "sourceBytes": 2994006,
+      "sourceSha256": "c13c43664aae1ca46bd2c8d3d687ab252c5707ddaf40305fabe05ad91b5b04b8",
+      "acceptedSha256": "09b149945f629a6e74ed5435075e0cae5c00d6ecc62fb4d9ea079adc73b1fee9",
+      "acceptedBytes": 6048,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_soft_enrage_heat.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "cinder-enrage",
+          "name": "Soft Enrage",
+          "tiers": ["normal", "heroic"],
+          "does": "Once phase three has run 180 sec, the Rolling Cinders fall every 20 sec instead.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a rain of great fireballs plunging from a dark sky one after another, faster and faster, long white-gold fire trails behind them",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Soft Enrage. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: Once phase three has run 180 sec, the Rolling Cinders fall every 20 sec instead. Paint: a rain of great fireballs plunging from a dark sky one after another, faster and faster, long white-gold fire trails behind them. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_song",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_song.png",
+      "sourceBytes": 2991867,
+      "sourceSha256": "fce92517ef5827e1629643f952c730ea30b4c13d919f81714d88da32543e0421",
+      "acceptedSha256": "926d62e572b5da763ef85aadd12b6251b2727adeaf06c0641294a0c756c4a4f8",
+      "acceptedBytes": 5804,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_song.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "song-of-the-seam",
+          "name": "Song of the Seam",
+          "tiers": ["normal", "heroic"],
+          "does": "A 3 sec cast that begins 1 sec after each Wrath lands.",
+          "hits": ["Endless Song"],
+          "castIds": ["heart_song_of_the_seam"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a stone giantess singing with her head raised, ochre sound waves rippling into the rock around her",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Song of the Seam. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: A 3 sec cast that begins 1 sec after each Wrath lands. Paint: a stone giantess singing with her head raised, ochre sound waves rippling into the rock around her. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_spires",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_spires.png",
+      "sourceBytes": 2845416,
+      "sourceSha256": "9ef725a7c09640f45af98ccfa2ab9960ddbc76196f940c831078586e9bb3081c",
+      "acceptedSha256": "b7acc64b0bf1349db06d08e3fcc8ae468d97be0733dbc0223be9a1253db6fcc5",
+      "acceptedBytes": 5480,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_spires.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "storm-spires",
+          "name": "Storm Spires",
+          "tiers": ["normal", "heroic"],
+          "does": "The Breath and the Hammer: Storm Spires rise (3 at a time) and charge for 4 sec, then lightning leaps along every line between them for 368 to 408 Nature damage.",
+          "hits": ["Storm Spire"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "lightning leaping in straight lines between three rising stone spires",
+      "palette": "storm cyan lightning and ochre stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Storm Spires. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Breath and the Hammer: Storm Spires rise (3 at a time) and charge for 4 sec, then lightning leaps along every line between them for 368 to 408 Nature damage. Paint: lightning leaping in straight lines between three rising stone spires. Palette: storm cyan lightning and ochre stone."
+    },
+    {
+      "iconId": "dgn_heart_splinter_heat",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_splinter_heat.png",
+      "sourceBytes": 2792698,
+      "sourceSha256": "5a3b7bee01efe1ad9c9541ea4fcdd79352e92271c9fb661fdee9327563ba6fd1",
+      "acceptedSha256": "4c5d506b706cc84ec575f7d5ade1fa1c74b26c6afd92cd952f9e86c469711b74",
+      "acceptedBytes": 5828,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_splinter_heat.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "splinter-heat",
+          "name": "Splinter of the Heat",
+          "tiers": ["normal", "heroic"],
+          "does": "Where it is dragged it leaves a Cinder Trail: a 3 yd patch every 3 yd that burns for 18 sec (126 to 150 a second).",
+          "hits": ["Cinder Trail", "Bursting Coal"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": "public/ui/auras/heart_final_coal.webp",
+      "subject": "a jagged shard-creature of molten basalt crystal dragged across dark stone, leaving a trail of burning white-gold patches behind it",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Splinter of the Heat. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: Where it is dragged it leaves a Cinder Trail: a 3 yd patch every 3 yd that burns for 18 sec (126 to 150 a second). Paint: a jagged shard-creature of molten basalt crystal dragged across dark stone, leaving a trail of burning white-gold patches behind it. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_splintered",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_splintered.png",
+      "sourceBytes": 2902667,
+      "sourceSha256": "134c5fd7bf155e3a2f38f6bfe8fe3270a20f131e1355366876f7319edec435d9",
+      "acceptedSha256": "b92c9236aa5063bca57b3f268be005c5f5f4a7fab072cbdd007ac3938d4d1ef1",
+      "acceptedBytes": 5908,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_splintered.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "splintered-strength",
+          "name": "Splintered Strength",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 3 sec, each living Splinter deals 35 to 41 damage to the whole raid, 30% more with each pulse.",
+          "hits": ["Splintered Strength"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "four small crystal splinters pulsing with light, rings of damage rippling outward from each",
+      "palette": "the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Splintered Strength. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: Every 3 sec, each living Splinter deals 35 to 41 damage to the whole raid, 30% more with each pulse. Paint: four small crystal splinters pulsing with light, rings of damage rippling outward from each. Palette: the four vein colours together: ochre stone, storm cyan, ice blue and white-gold fire."
+    },
+    {
+      "iconId": "dgn_heart_squall_ward",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_squall_ward.png",
+      "sourceBytes": 3017784,
+      "sourceSha256": "7e12ac2e3922b9d5d603f5ffecf82d6e2ad15705dfc7f85862a8f100a0dc49ea",
+      "acceptedSha256": "94a0f9ef2a41231ef7d56cafda8212782c572c74f403b498138d366aa177b3ab",
+      "acceptedBytes": 5144,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_squall_ward.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "squall-ward",
+          "name": "Squall Ward",
+          "tiers": ["normal", "heroic"],
+          "does": "The third isle's Squall Shieldbearer turns aside 85% of the damage from attacks within 60 degrees of its front.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a storm shieldbearer's front-facing shield turning a blast aside in a curved spray of wind",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Squall Ward. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: The third isle's Squall Shieldbearer turns aside 85% of the damage from attacks within 60 degrees of its front. Paint: a storm shieldbearer's front-facing shield turning a blast aside in a curved spray of wind. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_steam",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_steam.png",
+      "sourceBytes": 2795014,
+      "sourceSha256": "cbd1b25878608b2a30bc3ab2c385da738d0aca935d3c752046b2782ef3c0396c",
+      "acceptedSha256": "8c3b2d03965daaca045e261debaf36c6c26736bdd4015388235dcf34629774d7",
+      "acceptedBytes": 5048,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_steam.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "scalding-steam",
+          "name": "Scalding Steam",
+          "tiers": ["normal", "heroic"],
+          "does": "The Heat and the Quench: clouds of steam (3 at a time) rise after 1.5 sec and drift through the quarter for 13 sec, dealing 109 to 126 damage a second to anyone inside.",
+          "hits": ["Scalding Steam"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "clouds of scalding white steam rising where fire meets ice",
+      "palette": "ice blue and white-gold fire, white steam",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Scalding Steam. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: The Heat and the Quench: clouds of steam (3 at a time) rise after 1.5 sec and drift through the quarter for 13 sec, dealing 109 to 126 damage a second to anyone inside. Paint: clouds of scalding white steam rising where fire meets ice. Palette: ice blue and white-gold fire, white steam."
+    },
+    {
+      "iconId": "dgn_heart_stillstone",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_stillstone.png",
+      "sourceBytes": 2941332,
+      "sourceSha256": "2a335498e99471d4b94f9657cdfaf5eae4410d30127aacaf20a41c9a4d798afc",
+      "acceptedSha256": "0a311e46c64011d7b714ce06a0a3ad9e743073275b6d17bab9cf8464af73fbbe",
+      "acceptedBytes": 4894,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_stillstone.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "stillstone",
+          "name": "Stillstone",
+          "tiers": ["normal", "heroic"],
+          "does": "Once its isle's foes are down, the Stillstone wakes.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "an upright waking stone glowing mint, the wind around it falling still while hands reach to channel it",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Stillstone. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: Once its isle's foes are down, the Stillstone wakes. Paint: an upright waking stone glowing mint, the wind around it falling still while hands reach to channel it. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_stone_thrum",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_stone_thrum.png",
+      "sourceBytes": 2928954,
+      "sourceSha256": "87abbaa4cdce2d8fc925d6a59c00231b25c4356e42f62a4bd762aea8804851e4",
+      "acceptedSha256": "57d41549f6b8f78d851b9cb4dc2639d48476d01111d1d480245d70ac457354cb",
+      "acceptedBytes": 5144,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_stone_thrum.webp",
+      "covers": [
+        {
+          "boss": "heart_hammer_guardian",
+          "bossName": "Hrothmar and Velmira",
+          "mechanic": "stone-thrum",
+          "name": "Stone Thrum",
+          "tiers": ["normal", "heroic"],
+          "does": "Every pillar Wake the Stone raised that still stands deals 16 to 18 damage to the whole raid every 2 sec, each pillar adding its own.",
+          "hits": ["Stone Thrum"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "three tall standing stones in a row, each pulsing with deep ochre resonance waves that overlap on the ground, dust shivering off them",
+      "palette": "ochre and gold light on dark quarry stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Stone Thrum. What it does: an ability of Hrothmar and Velmira in The Smith's Heart raid: Every pillar Wake the Stone raised that still stands deals 16 to 18 damage to the whole raid every 2 sec, each pillar adding its own. Paint: three tall standing stones in a row, each pulsing with deep ochre resonance waves that overlap on the ground, dust shivering off them. Palette: ochre and gold light on dark quarry stone."
+    },
+    {
+      "iconId": "dgn_heart_storm_breaks",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_breaks.png",
+      "sourceBytes": 2889991,
+      "sourceSha256": "20b73c0a3d66af78f5a327dce2f44adf964c1a4ad8a92b3fa0321b5cc2921049",
+      "acceptedSha256": "9cc6948179c0451f0b54378c538d2f2ac9715038954eefe57b4f1651f30482c1",
+      "acceptedBytes": 6000,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_storm_breaks.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "storm-breaks",
+          "name": "The Storm Breaks",
+          "tiers": ["normal", "heroic"],
+          "does": "As the raid comes home, a 4 sec cast, then a barrage of lightning for 10 sec: strikes fall on marked spots every 0.8 sec, each 368 to 437 damage within 3.5 yd.",
+          "hits": ["Breaking Storm"],
+          "castIds": ["heart_breath_storm_break"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a barrage of cyan lightning bolts falling onto many marked spots across a cornice at once",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: The Storm Breaks. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: As the raid comes home, a 4 sec cast, then a barrage of lightning for 10 sec: strikes fall on marked spots every 0.8 sec, each 368 to 437 damage within 3.5 yd. Paint: a barrage of cyan lightning bolts falling onto many marked spots across a cornice at once. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_storm_charged",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_charged.png",
+      "sourceBytes": 2739201,
+      "sourceSha256": "bdf677007450c5b5eb6b9efa0c39939662176fce42e374551e815098ceefc8b8",
+      "acceptedSha256": "b572536b980ac6b103f38754b3e1018751ef0018ecbb5b363535e9d1027e48db",
+      "acceptedBytes": 5336,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_storm_charged.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "storm-charged",
+          "name": "Storm-Charged",
+          "tiers": ["normal", "heroic"],
+          "does": "A Sky Strike that falls within 6.5 yd of a pillar arcs round it (437 to 483 within 9 yd) and charges it.",
+          "hits": ["Storm-Charged", "Charged Ground", "Arcing Stone"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a stone pillar wrapped in arcing cyan lightning, charged and crackling",
+      "palette": "storm cyan and ochre stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Storm-Charged. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: A Sky Strike that falls within 6.5 yd of a pillar arcs round it (437 to 483 within 9 yd) and charges it. Paint: a stone pillar wrapped in arcing cyan lightning, charged and crackling. Palette: storm cyan and ochre stone."
+    },
+    {
+      "iconId": "dgn_heart_storm_gust",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_gust.png",
+      "sourceBytes": 2927969,
+      "sourceSha256": "1b500e6d0042b8badef70c1d866a18c8f483169ad175804a822caed87eb70792",
+      "acceptedSha256": "407adbf3e358ea0a9bcf7f77784eb30b722cee924cb06d8a1578c4c9dd61c3e0",
+      "acceptedBytes": 4834,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_storm_gust.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "storm-gusts",
+          "name": "Storm Gusts",
+          "tiers": ["heroic"],
+          "does": "In the Storm, every 24 sec the wind returns: drawn on the floor for 2 sec, then it blows for 3.5 sec at 6.6 yd a second.",
+          "hits": [],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a sudden storm gust: a hooded cloak and a tattered banner whipped violently sideways by a burst of cyan storm wind over a cornice floor",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Storm Gusts. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: In the Storm, every 24 sec the wind returns: drawn on the floor for 2 sec, then it blows for 3.5 sec at 6.6 yd a second. Paint: a sudden storm gust: a hooded cloak and a tattered banner whipped violently sideways by a burst of cyan storm wind over a cornice floor. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_storm_lance",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_lance.png",
+      "sourceBytes": 2577055,
+      "sourceSha256": "ca139a4a742c1ad14a5910ef7bdb2a02784e9de0029c4c2bb9cfb84bf074efab",
+      "acceptedSha256": "498779c6ffd3e367d91ecae5d88c577c2607466364b90ae18845c3f82e54ac74",
+      "acceptedBytes": 3948,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_storm_lance.webp",
+      "covers": [
+        {
+          "boss": "heart_breath_guardian",
+          "bossName": "Aerwyn, the Unbound Gale",
+          "mechanic": "storm-lance",
+          "name": "Storm Lance",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 9 sec, a 1.5 sec cast at a player: a line 60 yd long and 6 yd wide strikes everyone in it for 380 to 440 Nature damage.",
+          "hits": ["Storm Lance"],
+          "castIds": ["heart_storm_lance"]
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a long straight spear of cyan lightning lancing diagonally across the square over a stone cornice",
+      "palette": "storm cyan lightning and mint wind on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Storm Lance. What it does: an ability of Aerwyn, the Unbound Gale in The Smith's Heart raid: Every 9 sec, a 1.5 sec cast at a player: a line 60 yd long and 6 yd wide strikes everyone in it for 380 to 440 Nature damage. Paint: a long straight spear of cyan lightning lancing diagonally across the square over a stone cornice. Palette: storm cyan lightning and mint wind on slate."
+    },
+    {
+      "iconId": "dgn_heart_storm_orb",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_storm_orb.png",
+      "sourceBytes": 2867548,
+      "sourceSha256": "0014073ce738bf1072ad838dfac64ad108b5d72d4d38d9e64e7bc3d09731452d",
+      "acceptedSha256": "fc0b42a3e3a5ac643076654f764748b41185032d1841a1197eb1e55adbf4b905",
+      "acceptedBytes": 6078,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_storm_orb.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "storm-orbs",
+          "name": "Storm Orb",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 13 sec, Storm Orbs form round the Splinter of the Breath (2 at a time).",
+          "hits": ["Storm Orb"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "two glowing storm orbs forming around a winged storm-stone beast",
+      "palette": "storm cyan lightning on slate",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Storm Orb. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: Every 13 sec, Storm Orbs form round the Splinter of the Breath (2 at a time). Paint: two glowing storm orbs forming around a winged storm-stone beast. Palette: storm cyan lightning on slate."
+    },
+    {
+      "iconId": "dgn_heart_tremor",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_tremor.png",
+      "sourceBytes": 2805248,
+      "sourceSha256": "a9c4fefd5171c9d57b8503987d1f8e18f9cbcdcb16d70b4350e40d1400e4385e",
+      "acceptedSha256": "5e45460b9d37906571e239bbbef20c8d93408582f4c191ccc74c17c54ca79639",
+      "acceptedBytes": 4844,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_tremor.webp",
+      "covers": [
+        {
+          "boss": "heart_masterless_strength",
+          "bossName": "Ashgrand, Remnant of the Masterless Strength",
+          "mechanic": "tremor-cracks",
+          "name": "Tremor Crack",
+          "tiers": ["normal", "heroic"],
+          "does": "In the Hammer: every 13 sec, cracks open under players (3 at a time).",
+          "hits": ["Tremor Crack"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "glowing ochre cracks opening in the ground under a pair of boots, about to erupt",
+      "palette": "ochre and gold on dark stone",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Tremor Crack. What it does: an ability of Ashgrand, Remnant of the Masterless Strength in The Smith's Heart raid: In the Hammer: every 13 sec, cracks open under players (3 at a time). Paint: glowing ochre cracks opening in the ground under a pair of boots, about to erupt. Palette: ochre and gold on dark stone."
+    },
+    {
+      "iconId": "dgn_heart_wakefire",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wakefire.try2.png",
+      "sourceBytes": 2736465,
+      "sourceSha256": "62237e731608f16e0020155440e59aedc855b7b004e19d249da019f928ed1840",
+      "acceptedSha256": "97422518954bbdebcace5870630f8a6fe861ea34a5f14e0ae9b78f474ddc0c53",
+      "acceptedBytes": 4766,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_wakefire.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "wakefire",
+          "name": "Wakefire",
+          "tiers": ["normal", "heroic"],
+          "does": "In phases two and three, every 34 sec three bands round the wellspring ignite one after another, from Ignazhar outward.",
+          "hits": ["Wakefire"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "three straight walls of white-gold fire bursting up out of cracks in a black basalt floor one after another, the nearest wall roaring tall, the middle one just igniting, the farthest still a glowing crack, seen low across the floor",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Wakefire. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: In phases two and three, every 34 sec three bands round the wellspring ignite one after another, from Ignazhar outward. Paint: three straight walls of white-gold fire bursting up out of cracks in a black basalt floor one after another, the nearest wall roaring tall, the middle one just igniting, the farthest still a glowing crack, seen low across the floor. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_wellkeeper",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wellkeeper.png",
+      "sourceBytes": 3035779,
+      "sourceSha256": "15cfa918ab9937b3ac7dea5c5fea06bdd0ad6a1e6bacbb2176290429b1ea3b2e",
+      "acceptedSha256": "75a07a51a21acf40cfa43344fae59672b88a1b42ad05e2117a9ca42b7f330199",
+      "acceptedBytes": 6054,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_wellkeeper.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "wellkeepers",
+          "name": "Wellkeepers",
+          "tiers": ["heroic"],
+          "does": "In the second overflow, two Wellkeepers rise by the wellspring and must be tanked.",
+          "hits": ["Cinder Trail"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": "public/ui/auras/heart_heat_kindling.webp",
+      "subject": "two hulking molten basalt guardians rising shoulder to shoulder out of a glowing white-gold lava wellspring",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Wellkeepers. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: In the second overflow, two Wellkeepers rise by the wellspring and must be tanked. Paint: two hulking molten basalt guardians rising shoulder to shoulder out of a glowing white-gold lava wellspring. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_wellspawn",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wellspawn.try2.png",
+      "sourceBytes": 2862296,
+      "sourceSha256": "08de920aee61a6fba3021fe1ee3450f31604ea876db20a2792f56dec7b49bf49",
+      "acceptedSha256": "2812feeedba3708b8b62ba4180e0fbb719ced0c5e02d0abc98d8bbcbe44d99f1",
+      "acceptedBytes": 5434,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_wellspawn.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "wellspawn",
+          "name": "Wellspawn",
+          "tiers": ["normal", "heroic"],
+          "does": "In the first overflow only, 2 Wellspawn climb out at the edge of the room and walk slowly to the wellspring, slowing as they lose health and crawling below 50%.",
+          "hits": ["Fed Flame"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "two small hunched molten imps of cracked basalt and glowing lava crawling on all fours across a dark floor toward a bright white-gold wellspring glowing behind them",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Wellspawn. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: In the first overflow only, 2 Wellspawn climb out at the edge of the room and walk slowly to the wellspring, slowing as they lose health and crawling below 50%. Paint: two small hunched molten imps of cracked basalt and glowing lava crawling on all fours across a dark floor toward a bright white-gold wellspring glowing behind them. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_wellspring_brand",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wellspring_brand.png",
+      "sourceBytes": 2753273,
+      "sourceSha256": "928164c4a16af05c99345f79c6f52b3862f2efb31381d21bc2af887c79518a85",
+      "acceptedSha256": "5d2a3675dd3a3ade1299762482156e09cf65d0cdfdaf3b30ee13cc9e623dd23c",
+      "acceptedBytes": 3872,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_wellspring_brand.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "wellspring-brand",
+          "name": "Wellspring Brand",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 25 sec, whatever Ignazhar is doing, it hurls a brand at its tank, told 2 sec ahead: 572 to 650 Fire damage, and the tank takes 100% more Fire and other magic damage for 30 sec.",
+          "hits": ["Wellspring Brand"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a white-gold fire brand hurled through the air at a raised shield, the shield beginning to glow",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Wellspring Brand. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: Every 25 sec, whatever Ignazhar is doing, it hurls a brand at its tank, told 2 sec ahead: 572 to 650 Fire damage, and the tank takes 100% more Fire and other magic damage for 30 sec. Paint: a white-gold fire brand hurled through the air at a raised shield, the shield beginning to glow. Palette: white-gold fire on black basalt."
+    },
+    {
+      "iconId": "dgn_heart_wheel",
+      "sourceFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wheel.png",
+      "sourceBytes": 2984898,
+      "sourceSha256": "af65d03a9626a25c887e6a0a7e3fc2de237e03691c4368b5f60305e9daea09f4",
+      "acceptedSha256": "8c7a07cb62dc479a204d64e3dc417d3a05ab22f7dc1e148c661cdf202c82c3b2",
+      "acceptedBytes": 6144,
+      "shippingFile": "public/ui/boss-abilities/dgn_heart_wheel.webp",
+      "covers": [
+        {
+          "boss": "heart_heat_guardian",
+          "bossName": "Ignazhar, the Unquenchable",
+          "mechanic": "wheel-of-the-hearth",
+          "name": "Wheel of the Hearth",
+          "tiers": ["normal", "heroic"],
+          "does": "Every 34 sec, the shore is cut into four wedges in front of Ignazhar and four behind it.",
+          "hits": ["Wheel of the Hearth"],
+          "castIds": []
+        }
+      ],
+      "replacedReuse": null,
+      "subject": "a wheel of glowing white-gold wedges erupting on a basalt shore, one dark wedge left safe",
+      "palette": "white-gold fire on black basalt",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House style reference attached to every generation (upscaled to 512px): one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/ui/boss_journal/raids/smith_heart.ts",
+          "role": "The journal page row whose mechanic the painting depicts."
+        },
+        {
+          "path": "docs/achievements/boss-ability-art-2026-11-28/README.md",
+          "role": "The art brief and the wiring."
+        }
+      ],
+      "prompt": "I'm making a boss ability icon for my fantasy MMO. The attached image is one of our existing icons: match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Do not copy the reference's subject (its earth slam); paint only the new subject below. Square 1:1, painted edge to edge, no text, letters or numbers, no border or frame, no rounded corners, no UI, one single picture (never a collage, grid or set of panels). Generate the image right away with your image generation tool, with no questions, and do not write or run any code.\n\nName: Wheel of the Hearth. What it does: an ability of Ignazhar, the Unquenchable in The Smith's Heart raid: Every 34 sec, the shore is cut into four wedges in front of Ignazhar and four behind it. Paint: a wheel of glowing white-gold wedges erupting on a basalt shore, one dark wedge left safe. Palette: white-gold fire on black basalt."
+    }
+  ]
+}

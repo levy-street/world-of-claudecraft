@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "batch": "boss-ability-art-2026-11-28",
+  "generator": "OpenAI built-in image generation, through the owner's ChatGPT account in the Codex CLI (codex exec, one non-interactive session per image)",
+  "session": {
+    "oneImagePerSession": true,
+    "styleReference": "public/ui/auras/stomp_stun.webp, upscaled to 512px and attached to every session",
+    "promptShape": "The house style brief, then the ability's name, what it does in the fight (its live journal summary), the painting subject and the element palette; square, one subject, no text, no border, no UI frame."
+  },
+  "review": "Every output was looked at full size and at 40px before it was accepted; a rejected output was regenerated with the reason folded into its prompt.",
+  "rejected": [
+    {
+      "iconId": "dgn_heart_mending_gale",
+      "attempt": 1,
+      "rawFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_mending_gale.png",
+      "reason": "at 40 px it read as a muddle of grey cloud: the healing, the point of the cast, did not show",
+      "retrySubject": "a small storm-cloud spirit with a torn, ragged body, bright mint-green healing light flowing into it in soft ribbons and knitting its torn cloud back together, the mending glow clearly at the centre"
+    },
+    {
+      "iconId": "dgn_heart_wakefire",
+      "attempt": 1,
+      "rawFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wakefire.png",
+      "reason": "it repeated Wellspring Overflow (concentric fire rings round the wellspring): the two icons would read the same",
+      "retrySubject": "three straight walls of white-gold fire bursting up out of cracks in a black basalt floor one after another, the nearest wall roaring tall, the middle one just igniting, the farthest still a glowing crack, seen low across the floor"
+    },
+    {
+      "iconId": "dgn_heart_falling_cinder",
+      "attempt": 1,
+      "rawFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_falling_cinder.png",
+      "reason": "at 40 px it read as a field of fire: the two players struck by the cinders were lost in the flames",
+      "retrySubject": "an armoured adventurer seen from above raising a shield as two white-gold cinders plunge straight down onto them out of a black sky, long fire trails behind the cinders"
+    },
+    {
+      "iconId": "dgn_heart_wellspawn",
+      "attempt": 1,
+      "rawFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_wellspawn.png",
+      "reason": "the creatures dissolved into the flames: at 40 px it was an orange muddle with no readable shape",
+      "retrySubject": "two small hunched molten imps of cracked basalt and glowing lava crawling on all fours across a dark floor toward a bright white-gold wellspring glowing behind them"
+    },
+    {
+      "iconId": "dgn_heart_elemental_strike",
+      "attempt": 1,
+      "rawFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_elemental_strike.png",
+      "reason": "the fist, the shield and the element mark tangled together: at 40 px nothing read",
+      "retrySubject": "a massive stone fist crashing into a tank's raised steel shield, a single glowing element rune of flame branded onto the shield's face where it struck"
+    },
+    {
+      "iconId": "dgn_heart_mending_gale",
+      "attempt": 2,
+      "rawFile": "tmp/imagegen/boss-ability-art-2026-11-28/raw/dgn_heart_mending_gale.try2.png",
+      "reason": "the second try was again a grey cloud with a mint glow: still no readable heal at 40 px",
+      "retrySubject": "a hooded storm caster raising both hands and channelling a ribbon of soft mint-green healing wind into a wounded ally beside it, bright green healing motes rising where the wind touches"
+    }
+  ],
+  "reuseRejudged": [
+    {
+      "iconId": "dgn_heart_grieving_fury",
+      "was": "public/ui/auras/heart_memory_of_stone.webp",
+      "reason": "a carved tablet reads as a memorial, not the survivor raging and hastened by its partner's soul"
+    },
+    {
+      "iconId": "dgn_heart_wellkeeper",
+      "was": "public/ui/auras/heart_heat_kindling.webp",
+      "reason": "a fire rune on basalt shows the mark the Wellkeepers cast, not the two adds that rise and must be tanked"
+    },
+    {
+      "iconId": "dgn_heart_splinter_heat",
+      "was": "public/ui/auras/heart_final_coal.webp",
+      "reason": "a bursting coal is the Live Coal debuff, not the Splinter dragged across the floor leaving its Cinder Trail"
+    },
+    {
+      "iconId": "dgn_heart_quench_cold",
+      "was": "public/ui/auras/heart_quench_cold.webp",
+      "reason": "the debuff's flat hand-authored snowflake is off the painted house style; the journal gets a painted ice snowflake that keeps the debuff's read (no gauntlet, which read as a hand in the 2026-11-25 playtest)"
+    }
+  ],
+  "encoding": {
+    "tool": "sharp",
+    "resize": "128x128 cover, lanczos3",
+    "flatten": "#000000, alpha removed",
+    "webp": "quality 76, stepping down by 4 until the file is at or under 6144 bytes, effort 6, smart subsample"
+  },
+  "ownerReview": "Pending: the HTML audit at E:/woc/entregas/raid_corazon/iconos_habilidades/corazon.html."
+}
