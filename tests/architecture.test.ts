@@ -247,6 +247,9 @@ const UI_PURE_CORES = [
   // The Smith's Heart's painted aura art: the ids with their own painting and the
   // aliases that share one (pure data folded into icons.ts and aura_icon_view.ts).
   'src/ui/smith_heart_aura_art.ts',
+  // The Smith's Heart's painted boss ability art: the journal icon ids with a
+  // painting and the ones wearing a raid aura painting (pure data folded into icons.ts).
+  'src/ui/boss_ability_art.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
@@ -1869,6 +1872,7 @@ const BARE_NAMED = [
   'src/ui/final_phase_aura_effect.ts',
   'src/ui/heart_tier_damage.ts',
   'src/ui/smith_heart_aura_art.ts',
+  'src/ui/boss_ability_art.ts',
   'src/ui/trinket_aura_art.ts',
   'src/ui/ability_tooltip_lines.ts',
   'src/ui/banner_queue.ts',
@@ -2997,6 +3001,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/bag_item_context_menu.ts',
   'src/ui/bank_filter.ts',
   'src/ui/banner_queue.ts',
+  'src/ui/boss_ability_art.ts',
   'src/ui/breath_aura_effect.ts',
   'src/ui/buddy_event_lines.ts',
   'src/ui/charter_fit_memory.ts',

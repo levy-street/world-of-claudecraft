@@ -48,6 +48,9 @@ export interface JournalMechanic {
   /** The sim's damage labels this mechanic hits players under (see
    *  JournalMechanicDef.hits): the death recap's icon lookup. */
   hits?: readonly string[];
+  /** The sim cast id behind the mechanic's cast bar (JournalMechanicDef.castId):
+   *  the boss cast bar's icon lookup (hud/journal/journal_cast_icons.ts). */
+  castId?: string;
 }
 
 /** The boss health a phase covers, as fractions of 1: the whole fight, a band
@@ -131,6 +134,9 @@ export interface JournalBossView {
   /** Bodies besides the page's own whose hits its mechanics' `hits` name (a
    *  boss's adds, its other heads): see JournalBossDef.hitSources. */
   hitSources?: readonly string[];
+  /** Bodies besides the page's own and its hitSources that cast its mechanics'
+   *  bars: see JournalBossDef.castSources. */
+  castSources?: readonly string[];
 }
 
 export interface JournalSource {
@@ -223,6 +229,11 @@ export interface JournalBossDef {
    *  a hit's label only against the page whose bodies or hitSources dealt it,
    *  so a trash mob's ability that shares a name never borrows a boss icon. */
   hitSources?: readonly string[];
+  /** Mob templates besides the page's bodies and `hitSources` that cast a
+   *  mechanic's bar (`castId`) and deal no hit of their own: an add's heal or
+   *  shove. The boss cast bar matches a cast only against the page whose bodies,
+   *  hitSources or castSources cast it (hud/journal/journal_cast_icons.ts). */
+  castSources?: readonly string[];
 }
 
 export interface DungeonJournalDef {
@@ -310,6 +321,7 @@ export function buildJournalPhases(
             ...(marks.length > 0 ? { marks } : {}),
             ...(compare ? { compare } : {}),
             ...(m.hits ? { hits: m.hits } : {}),
+            ...(m.castId ? { castId: m.castId } : {}),
           };
         }),
     }))
@@ -358,6 +370,7 @@ export function dungeonJournalBossView(
         : [],
     ...(boss.members ? { members: boss.members } : {}),
     ...(boss.hitSources ? { hitSources: boss.hitSources } : {}),
+    ...(boss.castSources ? { castSources: boss.castSources } : {}),
     ...(boss.nameKey ? { nameKey: boss.nameKey } : {}),
     ...(boss.taglineKey
       ? {

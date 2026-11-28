@@ -197,6 +197,17 @@ describe('journal hit index: lookups', () => {
     expect(journalHitIconId(FINAL_PHASE_NAMES.trail, FINAL_BOSS)).toBe('dgn_heart_splinter_heat');
   });
 
+  it("shows Hammer's Weight's blow with its journal icon", () => {
+    // The blow lands through heavySwing under the cast's own name
+    // (council_wrath.ts landWeight), from either council member.
+    expect(journalHitIconId(COUNCIL_NAMES.weight, COUNCIL_GUARDIAN)).toBe(
+      'dgn_heart_hammers_weight',
+    );
+    expect(journalHitIconId(COUNCIL_NAMES.weight, 'heart_seam_singer')).toBe(
+      'dgn_heart_hammers_weight',
+    );
+  });
+
   it('reads an add listed in hitSources as its page', () => {
     expect(journalHitIconId(FINAL_PHASE_NAMES.shear, FINAL_ADD_MOBS.hammer)).toBe(
       'dgn_heart_shearing_blow',
@@ -254,6 +265,8 @@ const HEART_DAMAGE_CALLS: readonly [string, number][] = [
   ['hit', 3],
   ['addHit', 4],
   ['finishFall', 2],
+  // the tank busters' weapon blow (sunken_bastion/claim.ts): Hammer's Weight
+  ['heavySwing', 4],
 ];
 
 /** Smith's Heart labels the fights deal that no journal row owns, and why. */

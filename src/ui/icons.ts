@@ -18,6 +18,7 @@ import {
   NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
 } from '../sim/content/zone3';
 import { ABILITIES, ITEMS } from '../sim/data';
+import { bossAbilityImageUrl } from './boss_ability_art';
 import { crestIconUrl } from './crest_icon_art';
 import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
@@ -3041,6 +3042,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   dgn_heart_hearthseed: r('fire', 'gold', ['leaf', { p: 'flame', ...BR }], ['sparkle']),
   dgn_heart_wakefire: r('fire', 'blood', ['flame', { p: 'boot', ...BR }], ['arcs']),
   dgn_heart_rolling_cinder: r('fire', 'ember', ['meteor', { p: 'eye', ...BR }], ['motion']),
+  // Its own glyph: the Hammer council's Soft Enrage hastens the Wrath, this one
+  // the Rolling Cinders (the cinders falling faster).
+  dgn_heart_soft_enrage_heat: r('fire', 'ember', ['hourglass', { p: 'meteor', ...BR }], ['drips']),
   // Ashgrand, Remnant of the Masterless Strength.
   dgn_heart_overload: r('arcane', 'gold', ['sigil_rune', { p: 'sunburst', ...BIG }], ['glow']),
   dgn_heart_heart_unbound: r('blood', 'gold', ['heart', { p: 'sunburst', ...BIG }], ['arcs']),
@@ -6205,7 +6209,7 @@ function staticIconUrl(kind: IconKind, id: string): string | null {
   // then share matching ability art. Generic aura_<kind> ids still fall through to
   // their procedural recipe.
   if (kind === 'ability') {
-    const img = abilityImageUrl(id);
+    const img = abilityImageUrl(id) ?? bossAbilityImageUrl(id);
     if (img) return img;
   }
   if (kind === 'aura') {

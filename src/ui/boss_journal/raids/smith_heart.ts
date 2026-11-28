@@ -22,6 +22,7 @@ import {
 } from '../../../sim/encounters/smith_heart/breath_ids';
 import {
   ISLE_CASTS,
+  ISLE_MOBS,
   ISLE_NAMES,
   ISLE_TIERS,
   ISLE_TUNING,
@@ -230,6 +231,7 @@ const COUNCIL: JournalBossDef = {
           id: 'hammers-weight',
           iconId: 'dgn_heart_hammers_weight',
           nameKey: cast(CC.weight),
+          hits: [COUNCIL_NAMES.weight],
           castId: CC.weight,
           summaryKey: k('council.weightSummary'),
           responseKey: k('council.weightResponse'),
@@ -509,6 +511,8 @@ const bdm = (t: Tier): number => BD[t].damageMult;
 const BREATH: JournalBossDef = {
   mobId: BREATH_GUARDIAN,
   rank: 'boss',
+  // The isle casters whose bars the journal lists (Mending Gale, Shoving Gale).
+  castSources: [ISLE_MOBS.mender, ISLE_MOBS.herald],
   taglineKey: k('breath.tagline'),
   taglineValues: { at: ISLE_TUNING.at },
   taglinePercentValues: ['at'],
@@ -1553,7 +1557,7 @@ const HEAT: JournalBossDef = {
         },
         {
           id: 'cinder-enrage',
-          iconId: 'dgn_heart_soft_enrage',
+          iconId: 'dgn_heart_soft_enrage_heat',
           nameKey: k('common.softEnrageName'),
           summaryKey: k('heat.lateSummary'),
           responseKey: k('heat.lateResponse'),

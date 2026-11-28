@@ -147,7 +147,9 @@ describe('ability icons', () => {
     // heart_breath_blow_thrown; quench_temper.ts, breath_blow.ts).
     // 722: plus the Smith's Heart raid-journal recipes (dgn_heart_*,
     // src/ui/boss_journal/raids/smith_heart.ts).
-    expect(ids).toHaveLength(722);
+    // 723: plus Ignazhar's own Soft Enrage glyph (dgn_heart_soft_enrage_heat), split
+    // from the Hammer council's for the boss ability paintings.
+    expect(ids).toHaveLength(723);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
@@ -156,7 +158,8 @@ describe('ability icons', () => {
     // then + the five-player dungeon boss guide recipes, plus release ability recipes).
     // Re-minted for the Living Rime pair, then for the five tank-swap glyphs, then for
     // the Smith's Heart raid-journal recipes, then for Wellspring Brand's own glyph
-    // (dgn_heart_wellspring_brand: gold sigil and droplet, no longer Ignivar's brand).
-    expect(hash).toBe('eeef20d46614f12e92ca3a72ceeebbc26344b1ca8ceb6d9f503e5bcba78e8adf');
+    // (dgn_heart_wellspring_brand: gold sigil and droplet, no longer Ignivar's brand),
+    // then for Ignazhar's own Soft Enrage glyph (dgn_heart_soft_enrage_heat).
+    expect(hash).toBe('a39f5996ffdeff9e33dbebabea3d4dfbbde50ed15dfb4d2a5e03ff59726b3e84');
   });
 });
