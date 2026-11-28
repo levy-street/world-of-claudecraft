@@ -13,6 +13,7 @@ import {
   GHOST_CAPTAIN_BOARDING,
   GHOST_CAPTAIN_BROADSIDE,
   GHOST_CAPTAIN_ID,
+  GHOST_CAPTAIN_NAMES,
   GHOST_CAPTAIN_TUNING,
   GHOST_SAILOR_ID,
 } from '../../../sim/encounters/sunken_bastion/ghost_captain_ids';
@@ -114,7 +115,7 @@ const CAPTAIN: JournalBossDef = {
         {
           id: 'spectral-broadside',
           iconId: 'dgn_bastion_broadside',
-          hits: [GHOST_CAPTAIN_BROADSIDE],
+          hits: [GHOST_CAPTAIN_NAMES.broadside],
           nameKey: cast(GHOST_CAPTAIN_BROADSIDE),
           castId: GHOST_CAPTAIN_BROADSIDE,
           summaryKey: k('captain.broadsideSummary'),
@@ -132,7 +133,7 @@ const CAPTAIN: JournalBossDef = {
         {
           id: 'cursed-anchor',
           iconId: 'dgn_bastion_cursed_anchor',
-          hits: [GHOST_CAPTAIN_ANCHOR],
+          hits: [GHOST_CAPTAIN_NAMES.anchor],
           nameKey: cast(GHOST_CAPTAIN_ANCHOR),
           castId: GHOST_CAPTAIN_ANCHOR,
           summaryKey: k('captain.anchorSummary'),
@@ -146,7 +147,7 @@ const CAPTAIN: JournalBossDef = {
         {
           id: 'phantom-boarding',
           iconId: 'dgn_bastion_boarding',
-          hits: [GHOST_CAPTAIN_BOARDING],
+          hits: [GHOST_CAPTAIN_NAMES.boarding],
           nameKey: cast(GHOST_CAPTAIN_BOARDING),
           castId: GHOST_CAPTAIN_BOARDING,
           summaryKey: k('captain.boardingSummary'),

@@ -3,7 +3,8 @@
 // no dealer maps one label to two icons, and the encounters' own damage calls
 // are covered: every Smith's Heart name-table label the fights deal resolves,
 // and every literal label a dungeon boss deals resolves, unless it is listed
-// below with the reason no journal row owns it.
+// below with the reason no journal row owns it. No damage label anywhere in
+// the sim is a raw snake_case id (the recap and log would print it verbatim).
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -22,6 +23,13 @@ import {
 import { HARD_ENRAGE_NAMES } from '../src/sim/encounters/smith_heart/hard_enrage_ids';
 import { HEAT_GUARDIAN, HEAT_NAMES } from '../src/sim/encounters/smith_heart/heat_ids';
 import { QUENCH_GUARDIAN, QUENCH_NAMES } from '../src/sim/encounters/smith_heart/quench_ids';
+import {
+  GHOST_CAPTAIN_ANCHOR,
+  GHOST_CAPTAIN_BOARDING,
+  GHOST_CAPTAIN_BROADSIDE,
+  GHOST_CAPTAIN_ID,
+  GHOST_CAPTAIN_NAMES,
+} from '../src/sim/encounters/sunken_bastion/ghost_captain_ids';
 import { JOURNAL_INSTANCES } from '../src/ui/hud/journal/journal_catalog';
 import {
   buildJournalHitIndex,
@@ -207,6 +215,18 @@ describe('journal hit index: lookups', () => {
     expect(journalHitIconId('Attack', HEAT_GUARDIAN)).toBeNull();
   });
 
+  it("maps the Shipwreck Captain's lanes by the names they deal, not their cast ids", () => {
+    const lanes: [string, string, string][] = [
+      [GHOST_CAPTAIN_NAMES.broadside, GHOST_CAPTAIN_BROADSIDE, 'dgn_bastion_broadside'],
+      [GHOST_CAPTAIN_NAMES.anchor, GHOST_CAPTAIN_ANCHOR, 'dgn_bastion_cursed_anchor'],
+      [GHOST_CAPTAIN_NAMES.boarding, GHOST_CAPTAIN_BOARDING, 'dgn_bastion_boarding'],
+    ];
+    for (const [name, castId, icon] of lanes) {
+      expect(journalHitIconId(name, GHOST_CAPTAIN_ID), name).toBe(icon);
+      expect(journalHitIconId(castId, GHOST_CAPTAIN_ID), castId).toBeNull();
+    }
+  });
+
   it('is built once and reused', () => {
     expect(journalHitIndex()).toBe(journalHitIndex());
   });
@@ -357,4 +377,93 @@ describe('journal hit index: every literal dungeon boss label resolves', () => {
       });
     }
   }
+});
+
+// ---- no damage label is a raw id ---------------------------------------------
+
+const RAW_ID = /^[a-z0-9]+(_[a-z0-9]+)+$/;
+
+/** Every `export const NAME = 'value'` string in the sim, by identifier. */
+const SIM_CONSTS: ReadonlyMap<string, string> = new Map(
+  [...SIM_TEXT.matchAll(/export const ([A-Z][A-Z0-9_]*) = (['"])(.*?)\2;/g)].map((m) => [
+    m[1],
+    m[3],
+  ]),
+);
+
+/** The string values a label argument can take: a literal, an exported string
+ *  constant, or a lookup (`TABLE[key]`, `TABLE.key`) into a file-local or
+ *  exported object table whose values are literals or such constants. Anything
+ *  else (a parameter, a def's `.name`) resolves to nothing and is skipped. */
+function labelValues(arg: string, src: string): string[] {
+  const lit = literal(arg);
+  if (lit !== null) return [lit];
+  const named = SIM_CONSTS.get(arg);
+  if (named !== undefined) return [named];
+  const table = arg.match(/^([A-Z][A-Z0-9_]*)(?:\[|\.)/)?.[1];
+  if (!table) return [];
+  let body: string | undefined;
+  for (const text of [src, SIM_TEXT]) {
+    const decl = text.match(
+      new RegExp(`const ${table}(?:: [^=]+)? = ([{][^}]*[}]|[A-Z][A-Z0-9_]*)`),
+    );
+    if (!decl) continue;
+    body = decl[1];
+    if (!body.startsWith('{')) {
+      const alias = SIM_TEXT.match(new RegExp(`export const ${body} = ([{][^}]*[}])`));
+      body = alias?.[1];
+    }
+    if (body) break;
+  }
+  if (!body) return [];
+  return [...body.matchAll(/:\s*([^,}\n]+)/g)].flatMap((m) => {
+    const value = m[1].trim();
+    return literal(value) ?? SIM_CONSTS.get(value) ?? [];
+  });
+}
+
+/** Damage calls and wrappers, with their label's argument index. */
+const DAMAGE_LABEL_CALLS: readonly [string, number][] = [
+  ['ctx.dealDamage', 5],
+  ['this.dealDamage', 5],
+  ['heavySwing', 4],
+  ['dealFractionalDamage', 4],
+  ['resolveEncounterWipe', 3],
+];
+
+describe('no sim damage event carries a raw snake_case id as its label', () => {
+  const offenders: string[] = [];
+  let resolved = 0;
+  for (const file of walk(SIM)) {
+    const src = readFileSync(file, 'utf8');
+    for (const [fn, at] of DAMAGE_LABEL_CALLS) {
+      for (const args of callArgs(src, fn)) {
+        for (const value of labelValues(args[at] ?? '', src)) {
+          resolved++;
+          if (RAW_ID.test(value)) offenders.push(`${file.slice(SIM.length + 1)}: ${value}`);
+        }
+      }
+    }
+  }
+  const captainSrc = readFileSync(
+    join(SIM, 'encounters', 'sunken_bastion', 'ghost_captain.ts'),
+    'utf8',
+  );
+
+  it('reads the labels (the scan is live, constants and name tables included)', () => {
+    expect(resolved).toBeGreaterThan(300);
+    // The Shipwreck Captain deals through its name table, which the scan follows.
+    expect(labelValues('NAME[a.move]', captainSrc)).toEqual(Object.values(GHOST_CAPTAIN_NAMES));
+    // Its cast-id table is what it used to deal under: the scan sees those raw ids.
+    expect(labelValues('CAST[a.move]', captainSrc)).toEqual([
+      GHOST_CAPTAIN_BROADSIDE,
+      GHOST_CAPTAIN_ANCHOR,
+      GHOST_CAPTAIN_BOARDING,
+    ]);
+    expect(labelValues('CAST[a.move]', captainSrc).every((v) => RAW_ID.test(v))).toBe(true);
+  });
+
+  it('deals every label as player-facing English', () => {
+    expect(offenders).toEqual([]);
+  });
 });

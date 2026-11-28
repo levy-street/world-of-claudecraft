@@ -4,6 +4,14 @@ export const GHOST_SAILOR_ID = 'barnacle_crawler';
 export const GHOST_CAPTAIN_BROADSIDE = 'ghost_captain_broadside';
 export const GHOST_CAPTAIN_ANCHOR = 'ghost_captain_anchor';
 export const GHOST_CAPTAIN_BOARDING = 'ghost_captain_boarding';
+/** The player-facing English each move deals its damage and names its objects
+ *  under (the client matcher localizes it; the journal's `hits` read it). The
+ *  cast ids above stay internal: they key the cast bar and the rig clips. */
+export const GHOST_CAPTAIN_NAMES = {
+  broadside: 'Spectral Broadside',
+  anchor: 'Cursed Anchor',
+  boarding: 'Phantom Boarding',
+} as const;
 export const GHOST_BROADSIDE_LANE = 'ghost_broadside_lane';
 export const GHOST_BROADSIDE_FIRE = 'ghost_broadside_fire';
 export const GHOST_BROADSIDE_SHIP = 'ghost_broadside_ship';
