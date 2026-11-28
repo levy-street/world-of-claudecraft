@@ -1,4 +1,8 @@
-import { isLootableBody } from '../sim/corpse_loot_state';
+import {
+  type BossLootDeniedWorld,
+  isLootableBody,
+  viewerBossLootDenied,
+} from '../sim/corpse_loot_state';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { corpseLootDistance } from '../sim/loot/corpse_loot_reach';
 import { kitUsableNow, kitUseOf } from '../sim/mob/trash_kit/encounter_use';
@@ -28,7 +32,7 @@ import { nearestInteractableFeast } from './feast_interact';
 import { pickHarvestBody } from './harvest_body_pick';
 import { objectInteractionRange } from './interactions';
 
-export interface NearbyInteractionScanWorld {
+export interface NearbyInteractionScanWorld extends BossLootDeniedWorld {
   player: Entity;
   playerId?: number;
   partyInfo?: { members: readonly { pid: number }[] } | null;
@@ -160,7 +164,14 @@ export function resolveNearbyInteractionCandidate(
       if (
         reach < INTERACT_RANGE &&
         reach < bestCorpseDistance &&
-        corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).hasLoot
+        corpseLootAvailability(
+          entity,
+          playerId,
+          harvestStateReliable,
+          partyIds,
+          true,
+          viewerBossLootDenied(world, entity),
+        ).hasLoot
       ) {
         bestCorpse = entity;
         bestCorpseDistance = reach;

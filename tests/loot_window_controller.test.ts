@@ -502,6 +502,7 @@ describe('LootWindowController', () => {
       visibleCopper: 0,
       hasLoot: false,
       canOpen: false,
+      bossSaved: false,
     }));
     const test = harness([mob], corpseAvailability);
 

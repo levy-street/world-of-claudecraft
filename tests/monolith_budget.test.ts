@@ -1335,7 +1335,10 @@ const MONOLITHS: MonolithRow[] = [
     // lockpick resolver and the death-zone read moved to rift/runs.ts
     // (riftInstanceForPid, riftBossDeathZonesFor), paying for the raidRun
     // getter over instances/raid_run.ts. wc -l, exact count.
-    ceiling: 11391,
+    // LOWERED 11391 -> 11390 by the per-boss save's corpse cue: the raidLockouts
+    // countdown loop moved to raid_lockout_state.ts (raidLockoutCountdowns),
+    // paying for the corpseBossLootDenied delegate over interaction.ts. wc -l.
+    ceiling: 11390,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1881,7 +1884,9 @@ const MONOLITHS: MonolithRow[] = [
     // Exact combined count; the three seasonal wiring lines are preserved.
     // LOWERED to 9694: the raid-marker cases and the social self rows moved to
     // server/marker_commands.ts and server/self_social_wire.ts. wc -l.
-    ceiling: 9694,
+    // LOWERED 9694 -> 9684: the corpse-loot wire bits (tap, hcb, ffa, cd) moved
+    // to server/corpse_loot_wire.ts with the per-boss lock's new bll. wc -l.
+    ceiling: 9684,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2083,7 +2088,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5338 -> 5330 at the integration merge of #4525: the reconnect backoff
     // schedule moved into reconnect_policy.ts beside its predicates, paying for the
     // tavern's resting getter and sitOnSeat send. wc -l. Exact count.
-    ceiling: 5330,
+    // LOWERED 5330 -> 5326: the corpse-loot decode (tap, hcb, ffa, and the new
+    // per-boss lock bll) moved to src/net/corpse_loot_wire.ts, paying for the
+    // corpseBossLootDenied read. wc -l. Exact count.
+    ceiling: 5326,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

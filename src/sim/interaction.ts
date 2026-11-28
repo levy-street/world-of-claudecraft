@@ -98,6 +98,21 @@ export function isQuestInteractionEntity(e: Entity): boolean {
   return e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0;
 }
 
+/** The offline IWorld.corpseBossLootDenied read: is player `pid` kept off this
+ *  corpse's loot by a per-boss raid lockout? The same gate corpseLootRights
+ *  refuses a press on (loot/boss_loot_lock.ts), so the corpse cue never
+ *  promises a saved raider what the press would refuse. False for a body
+ *  without a lock and for a pid with no meta. */
+export function corpseBossLootDenied(
+  ctx: SimContext,
+  corpse: Pick<Entity, 'bossLootLock'>,
+  pid: number,
+): boolean {
+  if (!corpse.bossLootLock) return false;
+  const meta = ctx.players.get(pid);
+  return !!meta && bossLootDenied(corpse, meta, ctx.lockoutNowMs());
+}
+
 // Shared corpse loot-rights snapshot for both the manual `lootCorpse` and the passive
 // walk-by `autoLootForParty`. The caller passes `ffaUnlocked` so the two paths can
 // diverge on the free-for-all rule: manual looting honors the FFA timer (a deliberate

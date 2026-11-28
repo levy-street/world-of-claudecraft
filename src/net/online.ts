@@ -217,6 +217,7 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import { applySelfCombatScalars } from './combat_scalar_wire';
+import { applyCorpseLootWire, clientBossLootDenied } from './corpse_loot_wire';
 import { craftResultViewFromEvent } from './craft_result_mirror';
 import { decodeMobileStationCrafts, EMPTY_MST_CRAFTS } from './crafting_wire';
 import {
@@ -2859,15 +2860,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // guard (countStale false here: the self-decode owns the budget decrement).
       if (w.id === this.playerId) this.applySelfTargetFromServer(e, w.tgt ?? null, false);
       else e.targetId = w.tgt ?? null;
-      e.tappedById = w.tap ?? null;
-      // corpse harvest claim: unconditional so a record without hcb (unclaimed,
-      // or a respawn that cleared the claim) resets any stale mirrored pid
-      e.harvestClaimedBy = typeof w.hcb === 'number' ? w.hcb : null;
-      // loot owner-lock lapse: flag present means lapsed (mirror as already counted down),
-      // absent means the lock still holds or never started; unconditional so a respawned
-      // record resets any stale lapse (same contract as hcb above). The server owns the
-      // countdown; the client only ever needs the boolean.
-      e.lootFfaTimer = w.ffa ? 0 : Infinity;
+      applyCorpseLootWire(e, w); // tap, hcb, ffa and the per-boss lock bll (corpse_loot_wire.ts)
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
@@ -3534,6 +3527,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   activeMasterLootRolls(): MasterLootPrompt[] {
     return this.masterLootPrompts;
+  }
+  corpseBossLootDenied(corpse: Pick<Entity, 'bossLootLock'>): boolean {
+    return clientBossLootDenied(corpse, this.playerId, this.selfLockouts, Date.now());
   }
   pickUpObject(id: number): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'pickup', id });

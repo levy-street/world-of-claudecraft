@@ -43,7 +43,6 @@ import {
   jailCageSpawn,
   jailGateTeleport,
 } from '../src/sim/jail';
-import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import type { MarketQuery } from '../src/sim/market_query';
 import { unequipWornMechChroma } from '../src/sim/mech_chroma_ownership';
 import {
@@ -58,7 +57,6 @@ import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/se
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import { selfRelicKeys, syncAccountRelicGrants } from '../src/sim/reliquary';
-import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, InstanceSlot, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -193,6 +191,7 @@ import {
   harvestCorpseCommandOutcome,
 } from './corpse_harvest_commands';
 import { dispatchCorpseHarvestInspection } from './corpse_harvest_inspection';
+import { writeCorpseLootWire } from './corpse_loot_wire';
 import {
   type CosmeticOpGuardState,
   consumeCosmeticOpToken,
@@ -1346,16 +1345,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // HAS a target (players/bots in combat), so idle mobs (targetId stays null) add
   // nothing. The SELF record still carries its own precise `target` field.
   if (e.targetId !== null) out.tgt = e.targetId;
-  if (e.tappedById !== null) out.tap = e.tappedById;
-  // corpse harvest claim (single-use, first-come): the online corpse picker
-  // must stop offering a corpse another player already harvested
-  if (e.harvestClaimedBy !== null) out.hcb = e.harvestClaimedBy;
-  // loot owner-lock lapse (FFA): the online corpse picker must offer a
-  // stranger's aged-out corpse again for a deliberate manual loot, the same
-  // reliability contract hcb gives harvest claims. Flips once per corpse, so
-  // the per-entity dyn cache re-serializes exactly one changed record.
-  if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
-  if (e.kind === 'mob' && corpseHasDecayed(e.dead, e.corpseTimer)) out.cd = 1; // corpse decayed
+  writeCorpseLootWire(e, out); // tap, hcb, ffa, cd and the per-boss lock bll
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;

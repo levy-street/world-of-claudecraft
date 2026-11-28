@@ -7,7 +7,11 @@ import * as THREE from 'three';
 import { friendlyNameplatesShown } from '../game/nameplate_view_prefs';
 import { isOwnAura } from '../sim/aura_classify';
 import { isPlayingDead } from '../sim/combat/hunter_play_dead';
-import { corpseIndicatorFor } from '../sim/corpse_loot_state';
+import {
+  type CorpseIndicator,
+  corpseIndicatorFor,
+  viewerBossLootDenied,
+} from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isBuddyMob } from '../sim/pet/buddy_ai';
@@ -313,6 +317,13 @@ export class NameplatePainter {
     this.isHostilePlayer = deps.isHostilePlayer;
     this.targetHighlight = deps.targetHighlight ?? newTargetHighlightFlags();
     this.surface = new NameplateCanvasSurface(deps.layer);
+  }
+
+  /** What this body offers the viewer (corpseIndicatorFor), the viewer's
+   *  per-boss raid save included (IWorld.corpseBossLootDenied). */
+  private corpseIndicator(entity: Entity, viewerId: number): CorpseIndicator {
+    const denied = viewerBossLootDenied(this.world, entity);
+    return corpseIndicatorFor(entity, viewerId, this.viewerPartyIds, true, denied);
   }
 
   update(fullPass: boolean): void {
@@ -860,7 +871,7 @@ export class NameplatePainter {
       // blow: src/sim/pvp/world_pvp_spoils.ts) wears the corpse loot satchel,
       // through the same per-viewer rule as a mob corpse.
       if (entity.dead) {
-        const spoils = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
+        const spoils = this.corpseIndicator(entity, player.id);
         if (spoils !== 'none') {
           state.marker = spoils;
           state.markerTone = spoils;
@@ -976,7 +987,7 @@ export class NameplatePainter {
     // stranger's owner-locked kill is lootable for someone else. Ordinary loot
     // wins the satchel; an open harvest with no ordinary loot shows the blade;
     // neither shows nothing.
-    const corpse = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
+    const corpse = this.corpseIndicator(entity, player.id);
     state.marker = corpse !== 'none' ? corpse : elite && !entity.dead ? '◆' : '';
     state.markerTone = corpse;
     state.frame = entity.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';

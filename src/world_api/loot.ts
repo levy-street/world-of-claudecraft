@@ -1,4 +1,5 @@
 import type {
+  Entity,
   LootRollChoice,
   LootRollGroupStatus,
   LootRollPrompt,
@@ -23,4 +24,12 @@ export interface IWorldLoot {
   // Returns an empty list for a candidate who is not the master looter, which is
   // what keeps a curate-phase roll off everyone else's screen as a prompt.
   activeMasterLootRolls(): MasterLootPrompt[];
+  // Is the local player kept off this corpse's loot by a per-boss raid lockout
+  // (a Smith's Heart boss they were saved to before this kill)? The corpse cue
+  // (satchel, minimap square, coffer mood, popup, interact prompt) hides its
+  // loot for them. Both worlds answer with the sim's own gate
+  // (sim/loot/boss_loot_lock.ts bossLootLockDenies): offline from the player's
+  // meta, online from the corpse's mirrored `bll` lock and the mirrored
+  // lockouts. False for every body without such a lock.
+  corpseBossLootDenied(corpse: Pick<Entity, 'bossLootLock'>): boolean;
 }

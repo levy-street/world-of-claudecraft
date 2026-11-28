@@ -205,6 +205,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeLootRolls', kind: 'method' }, // read-returning (2/6)
   { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
   { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
+  { name: 'corpseBossLootDenied', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
   { name: 'townFocusPending', kind: 'data' },
@@ -1043,9 +1044,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // The party pings add partyPings and sendPing (methods): 477/140/337.
     // The Adventure Journal's raidRun adds one data member: 478/141/337.
     // The journal's boss kill tally bossKills adds one data member: 479/142/337.
-    expect(IWORLD_MEMBERS.length).toBe(479);
+    // The per-boss raid save's corpse cue read corpseBossLootDenied adds one
+    // method: 480/142/338.
+    expect(IWORLD_MEMBERS.length).toBe(480);
     expect(DATA_MEMBERS.length).toBe(142);
-    expect(METHOD_MEMBERS.length).toBe(337);
+    expect(METHOD_MEMBERS.length).toBe(338);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1163,6 +1166,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'convertPartyToRaid',
       'convertRaidToParty',
       'copper',
+      'corpseBossLootDenied',
       'corpseHarvestInfo',
       'courierDispatch',
       'courierInfo',
@@ -1753,6 +1757,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'convertHusks',
       'convertPartyToRaid',
       'convertRaidToParty',
+      'corpseBossLootDenied',
       'corpseHarvestInfo',
       'courierDispatch',
       'craftItem',
@@ -2203,6 +2208,7 @@ const FACET_LOOT = [
   'activeLootRolls',
   'lootRollGroupStatus',
   'activeMasterLootRolls',
+  'corpseBossLootDenied',
 ] as const satisfies readonly (keyof IWorldLoot)[];
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
@@ -2926,8 +2932,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Plus the world markers' placeSharedWorldMark.
     // Plus the party pings' partyPings and sendPing.
     // Plus the Adventure Journal's raidRun, and its boss kill tally bossKills.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(479);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(479);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(480);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(480);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

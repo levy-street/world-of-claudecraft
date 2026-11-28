@@ -1,9 +1,11 @@
 import {
+  type BossLootDeniedWorld,
   bodyPoolSharedWithParty,
   corpseHarvestClaimOpen,
   corpseHasOrdinaryLootFor,
   corpseSharedLootRightsFor,
   tapperPartyFromViewerParty,
+  viewerBossLootDenied,
 } from '../sim/corpse_loot_state';
 import { MOBS } from '../sim/data';
 import { corpseHasDecayed } from '../sim/respawn_policy';
@@ -46,13 +48,18 @@ import type { Entity, InvSlot } from '../sim/types';
  *  tapper's party exactly when that grants anything (the tapper being in MY
  *  party). Offline entities carry the real tappedById / lootFfaTimer and the
  *  roster is the bot party; online both ride the wire (tap, ffa keys), so the
- *  same code serves both hosts unchanged. */
+ *  same code serves both hosts unchanged.
+ *  `lootDenied` is the viewer's per-boss raid save (IWorld.corpseBossLootDenied
+ *  via viewerBossLootDenied, sim/loot/boss_loot_lock.ts): a raider saved to the
+ *  boss takes nothing from its corpse, so nothing is listed, `hasLoot` stays
+ *  false and `bossSaved` says why (the click's explanation line). */
 export function corpseLootAvailability(
   mob: Entity,
   playerId: number,
   harvestStateReliable = true,
   partyMemberIds: readonly number[] | null = null,
   hasFieldKit = true,
+  lootDenied = false,
 ) {
   if (corpseHasDecayed(mob.dead, mob.corpseTimer)) {
     return {
@@ -62,6 +69,7 @@ export function corpseLootAvailability(
       visibleCopper: 0,
       hasLoot: false,
       canOpen: false,
+      bossSaved: false,
     };
   }
   const componentTags = MOBS[mob.templateId]?.componentTags;
@@ -70,30 +78,33 @@ export function corpseLootAvailability(
     mob.ownerId == null &&
     corpseHarvestClaimOpen(mob.templateId, mob.harvestClaimedBy, harvestStateReliable);
   const tappedById = mob.tappedById ?? null;
-  const sharedRights = corpseSharedLootRightsFor(
-    playerId,
-    tappedById,
-    bodyPoolSharedWithParty(mob) ? tapperPartyFromViewerParty(tappedById, partyMemberIds) : null,
-    mob.lootFfaTimer,
-    true,
-  );
+  const sharedRights =
+    !lootDenied &&
+    corpseSharedLootRightsFor(
+      playerId,
+      tappedById,
+      bodyPoolSharedWithParty(mob) ? tapperPartyFromViewerParty(tappedById, partyMemberIds) : null,
+      mob.lootFfaTimer,
+      true,
+    );
   // Exactly what THIS viewer could take, the three arms of the sim's lootCorpse
   // loop: personal slots naming me, open-to-all slots, and plain (tap-owned)
   // slots only with shared rights. The popup lists them; hasLoot is the same
   // rule answered by the shared predicate.
-  const visibleItems = mob.loot
-    ? mob.loot.items.filter((slot) =>
-        slot.personalFor
-          ? slot.count > 0 && slot.personalFor.includes(playerId)
-          : slot.openToAll
-            ? slot.count > 0
-            : sharedRights && slot.count > 0,
-      )
-    : [];
+  const visibleItems =
+    mob.loot && !lootDenied
+      ? mob.loot.items.filter((slot) =>
+          slot.personalFor
+            ? slot.count > 0 && slot.personalFor.includes(playerId)
+            : slot.openToAll
+              ? slot.count > 0
+              : sharedRights && slot.count > 0,
+        )
+      : [];
   // Copper is part of the shared (tap-owned) pool: without shared rights the
   // popup must not advertise it.
   const visibleCopper = sharedRights && mob.loot ? mob.loot.copper : 0;
-  const hasLoot = corpseHasOrdinaryLootFor(mob.loot, playerId, sharedRights);
+  const hasLoot = !lootDenied && corpseHasOrdinaryLootFor(mob.loot, playerId, sharedRights);
   return {
     componentTags,
     harvestable,
@@ -101,6 +112,7 @@ export function corpseLootAvailability(
     visibleCopper,
     hasLoot,
     canOpen: hasLoot || harvestable,
+    bossSaved: lootDenied,
   };
 }
 
@@ -120,7 +132,7 @@ export function carriesFieldKit(inventory: readonly Pick<InvSlot, 'itemId' | 'co
 
 /** Supply live inventory as well as loot rights to the shared popup rule. */
 export function corpseLootAvailabilityInWorld(
-  world: {
+  world: BossLootDeniedWorld & {
     playerId: number;
     inventory: readonly Pick<InvSlot, 'itemId' | 'count'>[];
     partyInfo: { members: readonly { pid: number }[] } | null;
@@ -133,5 +145,6 @@ export function corpseLootAvailabilityInWorld(
     true,
     localPartyMemberIds(world.partyInfo),
     carriesFieldKit(world.inventory),
+    viewerBossLootDenied(world, mob),
   );
 }

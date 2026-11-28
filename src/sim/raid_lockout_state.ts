@@ -59,3 +59,18 @@ export function activeRaidLockouts(
   }
   return out;
 }
+
+/** The live lockouts of a character's in-memory map as countdowns (the offline
+ *  IWorld.raidLockouts read, in map order): only those still running at
+ *  `nowMs`, each with its remaining milliseconds. */
+export function raidLockoutCountdowns(
+  lockouts: ReadonlyMap<string, number>,
+  nowMs: number,
+): { id: string; msRemaining: number }[] {
+  const out: { id: string; msRemaining: number }[] = [];
+  for (const [id, until] of lockouts) {
+    const msRemaining = until - nowMs;
+    if (msRemaining > 0) out.push({ id, msRemaining });
+  }
+  return out;
+}

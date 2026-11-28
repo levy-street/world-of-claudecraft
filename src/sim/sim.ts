@@ -673,6 +673,7 @@ import * as worldPvpMod from './pvp/world_pvp';
 import { savedWorldPvpFields } from './pvp/world_pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { turnInOrAcceptAtNpc } from './quests/npc_quest_talk';
+import { raidLockoutCountdowns } from './raid_lockout_state';
 import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {
   accountReliquaryOwnershipOpts,
@@ -4782,13 +4783,7 @@ export class Sim {
     return Promise.resolve(ids.slice(-deedsMod.DEEDS_RECENT_CAP).reverse());
   }
   raidLockouts(): import('../world_api').RaidLockout[] {
-    const now = this.lockoutNowMs();
-    const out: import('../world_api').RaidLockout[] = [];
-    for (const [id, until] of this.primary.raidLockouts) {
-      const msRemaining = until - now;
-      if (msRemaining > 0) out.push({ id, msRemaining });
-    }
-    return out;
+    return raidLockoutCountdowns(this.primary.raidLockouts, this.lockoutNowMs());
   }
   worldBossActive(bossId: string): boolean {
     return worldQuestState.worldBossActive(this.entities, this.worldBossEntityIds, bossId);
@@ -7370,6 +7365,10 @@ export class Sim {
 
   activeMasterLootRolls(pid = this.playerId): MasterLootPrompt[] {
     return activeMasterLootRollsImpl(this.ctx, pid);
+  }
+
+  corpseBossLootDenied(corpse: Pick<Entity, 'bossLootLock'>, pid = this.playerId): boolean {
+    return interaction.corpseBossLootDenied(this.ctx, corpse, pid);
   }
 
   submitLootRoll(rollId: number, choice: LootRollChoice, pid?: number): void {

@@ -3,7 +3,11 @@ import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
-import { isLootableBody } from '../sim/corpse_loot_state';
+import {
+  type BossLootDeniedWorld,
+  isLootableBody,
+  viewerBossLootDenied,
+} from '../sim/corpse_loot_state';
 import { ESCORTS } from '../sim/data';
 import { corpseLootApproachPoint, corpseLootDistance } from '../sim/loot/corpse_loot_reach';
 import { kitUsableNow, kitUseOf } from '../sim/mob/trash_kit/encounter_use';
@@ -29,7 +33,9 @@ import { decideEscortPress, handleEscortPress, isEscorteeEntity } from './escort
 import { carriesFirebottle, isTorchableHut } from './hut_torch';
 import type { InteractionOutcome } from './interaction_autorun';
 
-export interface PickInteractionWorld {
+// The per-boss raid save read (IWorld.corpseBossLootDenied), optional for the
+// same reason as partyInfo below.
+export interface PickInteractionWorld extends BossLootDeniedWorld {
   player: IWorld['player'];
   playerId?: IWorld['playerId'];
   entities: IWorld['entities'];
@@ -269,6 +275,28 @@ export function shouldDeferPickedCorpseToGatherNode(
   );
 }
 
+/** May the local player open this corpse's popup? A raider saved to the boss
+ *  (IWorld.corpseBossLootDenied) may not, and the click says why with the
+ *  sim's own line instead of opening an empty popup. */
+function corpseOpensFor(
+  world: PickInteractionWorld,
+  hud: PickInteractionHud,
+  e: Entity,
+  harvestStateReliable: boolean,
+): boolean {
+  const availability = corpseLootAvailability(
+    e,
+    world.playerId ?? world.player.id,
+    harvestStateReliable,
+    localPartyMemberIds(world.partyInfo),
+    true,
+    viewerBossLootDenied(world, e),
+  );
+  if (availability.canOpen) return true;
+  if (availability.bossSaved) hud.showError(t('hudChrome.raidLockout.bossSavedNoLoot'));
+  return false;
+}
+
 /** Route a picked entity and report only completed non-combat world interactions. */
 export function handlePickedEntity(
   world: PickInteractionWorld,
@@ -330,15 +358,7 @@ export function handlePickedEntity(
       // A big body is looted from its edge, a guardian from its coffer's spot
       // too (sim/loot/corpse_loot_reach.ts corpseLootDistance).
       if (corpseLootDistance(e, world.player.pos) <= INTERACT_RANGE + 1) {
-        if (
-          !corpseLootAvailability(
-            e,
-            world.playerId ?? world.player.id,
-            harvestStateReliable,
-            localPartyMemberIds(world.partyInfo),
-          ).canOpen
-        )
-          return false;
+        if (!corpseOpensFor(world, hud, e, harvestStateReliable)) return false;
         hud.openLoot(id, screenX, screenY);
         return true;
       }
@@ -437,15 +457,7 @@ export function handlePickedEntity(
       }
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 1) {
-        if (
-          !corpseLootAvailability(
-            e,
-            world.playerId ?? world.player.id,
-            harvestStateReliable,
-            localPartyMemberIds(world.partyInfo),
-          ).canOpen
-        )
-          return false;
+        if (!corpseOpensFor(world, hud, e, harvestStateReliable)) return false;
         hud.openLoot(id, screenX, screenY);
         return true;
       }

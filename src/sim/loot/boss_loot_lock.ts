@@ -17,19 +17,38 @@
 // player who holds no lock (a stranger after the free-for-all lapse) is not
 // this gate's business.
 //
-// KNOWN GAP (presentation only): the corpse indicators and the corpse popup
-// (corpse_loot_state.ts, corpse_interaction.ts) do not read this gate, so a
-// saved raider in the tapping party may still see the loot cue on a corpse
-// with shared slots, and a press is refused with the sim's line. Reading the
-// gate there would split the worlds: the online client cannot rebuild it from
-// raidLockouts (the kill stamps the same expiry on the raiders it found
-// fresh), so a faithful fix needs a per-viewer signal from the server.
+// The corpse CUE reads this same gate, per viewer, through
+// IWorld.corpseBossLootDenied: the satchel and minimap square, the Smith's
+// Heart coffer's open mood, the popup and the interact prompt
+// (corpse_loot_state.ts corpseIndicatorFor, src/game/corpse_loot_availability.ts).
+// The offline Sim answers from the viewer's PlayerMeta
+// (instances/raid_boss_lockout.ts viewerBossLootDenied); the online ClientWorld
+// from the corpse's lock mirrored off the wire (the `bll` key,
+// server/corpse_loot_wire.ts) against its own mirrored lockouts. The fresh ids
+// ride with the lock, so a raider the kill itself saved still reads as fresh.
+// Both worlds call bossLootLockDenies, so they cannot disagree.
 //
 // Pure leaf: no Sim, no rng; the caller passes the lockout clock
 // (ctx.lockoutNowMs()).
 
 import type { PlayerMeta } from '../sim';
 import type { Entity } from '../types';
+
+/** The lock a per-boss raid corpse was judged on (Entity.bossLootLock). */
+export type BossLootLock = NonNullable<Entity['bossLootLock']>;
+
+/** The gate on primitives: `lockedUntilMs` is the viewer's own unlock epoch for
+ *  `lock.lockId` (undefined when they hold none). Denied only while that lock
+ *  runs and the death did not find the viewer fresh. */
+export function bossLootLockDenies(
+  lock: BossLootLock | undefined,
+  viewerId: number,
+  lockedUntilMs: number | undefined,
+  nowMs: number,
+): boolean {
+  if (!lock || lock.freshIds.includes(viewerId)) return false;
+  return (lockedUntilMs ?? 0) > nowMs;
+}
 
 /** Is this player kept off this corpse's loot by a per-boss raid lockout? */
 export function bossLootDenied(
@@ -38,6 +57,5 @@ export function bossLootDenied(
   nowMs: number,
 ): boolean {
   const lock = mob.bossLootLock;
-  if (!lock || lock.freshIds.includes(meta.entityId)) return false;
-  return (meta.raidLockouts.get(lock.lockId) ?? 0) > nowMs;
+  return bossLootLockDenies(lock, meta.entityId, lock && meta.raidLockouts.get(lock.lockId), nowMs);
 }

@@ -33,7 +33,7 @@ import * as THREE from 'three';
 import { localPartyMemberIds } from '../../game/corpse_loot_availability';
 import { sfx } from '../../game/sfx';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
-import { corpseIndicatorFor } from '../../sim/corpse_loot_state';
+import { corpseIndicatorFor, viewerBossLootDenied } from '../../sim/corpse_loot_state';
 import { corpseHasDecayed } from '../../sim/respawn_policy';
 import type { Entity } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -539,7 +539,7 @@ export class LootCofferFx {
       }
       if (Number.isNaN(track.deadAt))
         track.deadAt = track.seenAlive ? this.clock : Number.NEGATIVE_INFINITY;
-      const mood = this.moodOf(e, world.playerId);
+      const mood = this.moodOf(e, world);
       if (track.slot) {
         if (track.slot.goneAt < 0) this.setMood(track.slot, mood);
         continue;
@@ -554,9 +554,10 @@ export class LootCofferFx {
     }
   }
 
-  private moodOf(e: Entity, viewerId: number): LootCofferMood {
+  private moodOf(e: Entity, world: IWorld): LootCofferMood {
     return lootCofferMood(
-      corpseIndicatorFor(e, viewerId, this.partyIds),
+      // a raider saved to this boss sees the coffer as another's (no shaft)
+      corpseIndicatorFor(e, world.playerId, this.partyIds, true, viewerBossLootDenied(world, e)),
       e.dead,
       e.lootable,
       corpseHasDecayed(e.dead, e.corpseTimer),
