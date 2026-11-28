@@ -6,7 +6,7 @@ const REVEAL_SECONDS = 0.22;
 const BREAK_SECONDS = 0.28;
 const MOTE_COUNT = 12;
 
-export type MageBarrierTheme = 'frost' | 'fire' | 'temporal' | 'holy';
+export type MageBarrierTheme = 'frost' | 'fire' | 'temporal' | 'holy' | 'sanguine';
 
 export interface MageBarrierState {
   theme: MageBarrierTheme;
@@ -27,7 +27,17 @@ const PALETTES: Record<MageBarrierTheme, BarrierPalette> = {
   fire: { shell: 0xff6b32, rune: 0xffd08a, mote: 0xfff0c2 },
   temporal: { shell: 0x9f6cff, rune: 0x67e8f9, mote: 0xe9d5ff },
   holy: { shell: 0xf2bd42, rune: 0xffed9b, mote: 0xfff7cf },
+  // The warlock's Sanguine Covenant: the same shell in blood red, drawn very faint.
+  sanguine: { shell: 0xd8202f, rune: 0xff8c8c, mote: 0xffd2d2 },
 };
+
+/**
+ * How strongly each theme draws, as a share of the mage barrier's opacity. Sanguine
+ * Covenant is a long, frequent warlock shield, so it reads at 20% to stay light.
+ */
+export function mageBarrierThemeStrength(theme: MageBarrierTheme): number {
+  return theme === 'sanguine' ? 0.2 : 1;
+}
 
 const SHELL_GEOMETRY = new THREE.SphereGeometry(0.98, 24, 16);
 const RUNE_GEOMETRY = new THREE.TorusGeometry(0.9, 0.025, 5, 48);
@@ -80,7 +90,9 @@ export function mageBarrierStateForAura(
                 : 'frost'
             : aura.id === 'divine_protection'
               ? 'holy'
-              : null;
+              : aura.id === 'dark_pact'
+                ? 'sanguine'
+                : null;
   if (!theme) return null;
   if (out) {
     out.theme = theme;
@@ -263,9 +275,10 @@ export class MageBarrierVisual {
       this.group.scale.setScalar(revealScale);
 
       const strength = clamp01(state.value / this.peakValue);
-      this.shellMaterial.opacity = 0.11 + strength * 0.16;
-      this.runeMaterial.opacity = 0.28 + strength * 0.46;
-      this.moteMaterial.opacity = 0.3 + strength * 0.55;
+      const themeStrength = mageBarrierThemeStrength(this.theme);
+      this.shellMaterial.opacity = (0.11 + strength * 0.16) * themeStrength;
+      this.runeMaterial.opacity = (0.28 + strength * 0.46) * themeStrength;
+      this.moteMaterial.opacity = (0.3 + strength * 0.55) * themeStrength;
       this.runeBands.rotation.y += delta * (0.42 + strength * 0.3);
       this.updateMotes(delta, strength);
       if (state.remaining !== undefined) this.lastRemaining = state.remaining;
@@ -289,9 +302,10 @@ export class MageBarrierVisual {
     const breakScale = 1 + easeOutCubic(progress) * 0.32;
     this.group.scale.setScalar(breakScale);
     const fade = 1 - progress;
-    this.shellMaterial.opacity = 0.27 * fade;
-    this.runeMaterial.opacity = 0.74 * fade;
-    this.moteMaterial.opacity = 0.85 * fade;
+    const themeFade = fade * mageBarrierThemeStrength(this.theme);
+    this.shellMaterial.opacity = 0.27 * themeFade;
+    this.runeMaterial.opacity = 0.74 * themeFade;
+    this.moteMaterial.opacity = 0.85 * themeFade;
     this.runeBands.rotation.y += delta * 2.4;
     this.updateMotes(delta * 2.2, fade);
     if (progress >= 1) {

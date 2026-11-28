@@ -4965,10 +4965,10 @@ export const id_ID: EnTranslations = {
       "formShadow": "Wujud Bayangan: kerusakan Bayangan meningkat {pct}%",
       "resourceCount": "{value} dari {max}",
       "formLich": "Tombak Jiwa juga menghantam hingga {targets} musuh terdekat sebesar {pct}% kerusakan",
-      "afflictionEye": "Tatapan Kutukan menyerang setiap {interval} dtk; efek pada Eye ini menghasilkan {pct}% Kecaman",
+      "afflictionEye": "DoT Anda memberikan {dotPct}% lebih banyak di sini dan memantulkan {echoPct}% dari setiap tick ke musuh terdekat yang terkena Busuk Hitam Anda; efek di sini menghasilkan {pct}% Kecaman",
       "afflictionEyeSecondary": "Efek pada Eye ini menghasilkan {doomPct}% Kecaman; Vonis bergema di sini sebesar {echoPct}% kerusakan",
       "afflictionAccomplice": "Kerusakan yang memenuhi syarat memberikan {value} Kecaman, paling banyak sekali setiap {interval} dtk",
-      "afflictionViolence": "{charges} balasan tersisa; serangan musuh memberikan {doom} Kecaman dan membalas {damage} kerusakan Bayangan",
+      "afflictionViolence": "Tick DoT Anda di sini memiliki peluang {pct}% untuk terjadi lagi",
       "afflictionVicarious": "Mengalihkan atau mengurangi {pct}% kerusakan masuk dan dapat menghasilkan hingga {max} Kecaman",
       "afflictionPossession": "Memperkuat Jarum Takdir, Melahap, Tatapan Kutukan, dan Vonis",
       "afflictionJudgment": "Eye utama menghasilkan {eyePct}% lebih banyak Kecaman; Vonis memberikan {sentencePct}% kerusakan lebih besar dan yang pertama mengembalikan {refund} Kecaman",
@@ -10164,6 +10164,7 @@ export const id_ID: EnTranslations = {
       "immolate": "Membakar sasaran untuk hantaman pembuka dan kobaran yang terus membara.",
       "corruption": "Membusukkan sasaran dengan bayangan yang menggerogoti sementara kamu melakukan hal lain.",
       "life_tap": "Menukar sebagian nyawamu sendiri kembali menjadi mana saat kamu kehabisan.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Anak panah alam yang dilontarkan ke sasaran dari kejauhan, serangan andalanmu.",
       "healing_touch": "Penyembuhan besar sasaran tunggal dengan rapalan panjang, untuk memenuhi nyawa seseorang.",
       "mark_of_the_wild": "Berkah tahan lama yang kamu pasang pada dirimu atau sekutu sebelum pertarungan.",
@@ -18283,9 +18284,13 @@ export const id_ID: EnTranslations = {
         "name": "Vonis",
         "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Tawar Getir",
-        "description": "Mengubah {damage} kesehatan menjadi {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Perjanjian Kejam",
+        "description": "Mengorbankan 10% kesehatan maksimum Anda untuk memulihkan {manaPct}% mana maksimum Anda. Tidak dapat digunakan pada 20% kesehatan atau kurang."
       },
       "cursed_accomplice": {
         "name": "Sekutu Terkutuk",
@@ -18338,6 +18343,10 @@ export const id_ID: EnTranslations = {
       "coven": {
         "name": "Persekutuan Penyihir",
         "description": "Menciptakan Mata Jahat sekunder pada hingga 4 musuh terdekat selama 15 detik. Mereka mengisi kumpulan Kecaman bersama sebesar 50%, dan Vonis bergema kepada mereka sebesar 35% kerusakan."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Menghabiskan 60 Kecaman: hingga 5 musuh dalam 30 yard yang terkena Busuk Hitam milikmu langsung menerima 4 detak dari setiap efek kerusakan berkala milikmu pada mereka."
       },
       "fear": {
         "name": "Cekaman",

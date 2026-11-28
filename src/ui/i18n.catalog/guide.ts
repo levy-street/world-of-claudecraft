@@ -1501,7 +1501,7 @@ export const guideStrings = {
   // One spoiler-safe, number-free line per signature ability (what it is for, when you
   // press it). Keyed by the sim ability id.
   abilityHook: {
-    evil_eye: 'Names the enemy whose actions and suffering will feed your Condemnation.',
+    evil_eye: 'Names the enemy whose actions and suffering will feed your Blight.',
     heroic_strike: 'Queues a heavier swing that spends rage on your next hit.',
     revenge: 'Sweeps enemies in front of you, with a chance to become free after a dodge or parry.',
     hamstring: "Cripples an enemy's movement to keep it from escaping.",
@@ -1595,7 +1595,8 @@ export const guideStrings = {
     demon_skin: 'A lasting self-buff that toughens your skin and adds armor.',
     immolate: 'Sets a target alight for an opening hit and a burn that lingers.',
     corruption: 'Rots a target with shadow that ticks while you do other things.',
-    life_tap: 'Trades some of your own health back into mana when you run dry.',
+    life_tap: 'Trades 10% of your health for 20% of your mana when you run dry.',
+    hard_bargain: 'Trades 20% of your mana for 20% of your health when you are hurt.',
     wrath: 'A nature bolt thrown at a target from range, your go-to nuke.',
     healing_touch: 'A big single-target heal with a long cast, for topping someone off.',
     mark_of_the_wild: 'A lasting blessing you put on yourself or an ally before a fight.',

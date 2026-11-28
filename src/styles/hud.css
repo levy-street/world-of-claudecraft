@@ -1345,14 +1345,15 @@
     width: min(300px, 72vw);
     height: 18px;
     overflow: hidden;
-    border: 2px solid #5d3b78;
+    /* Blightcraft rot green over dry bone, matching the Rot Splinters below. */
+    border: 2px solid #4f6223;
     border-radius: 5px;
     background:
-      linear-gradient(180deg, rgba(9, 4, 14, 0.96), rgba(25, 9, 34, 0.98)),
-      repeating-linear-gradient(90deg, transparent 0 23px, rgba(216, 174, 255, 0.08) 24px 25px);
+      linear-gradient(180deg, rgba(7, 10, 4, 0.96), rgba(20, 27, 9, 0.98)),
+      repeating-linear-gradient(90deg, transparent 0 23px, rgba(214, 236, 160, 0.08) 24px 25px);
     box-shadow:
       inset 0 0 7px rgba(0, 0, 0, 0.88),
-      0 0 7px rgba(128, 62, 174, 0.42);
+      0 0 7px rgba(102, 150, 40, 0.42);
   }
   .warlock-doom::before,
   .warlock-doom::after {
@@ -1362,8 +1363,8 @@
     top: 50%;
     width: 9px;
     height: 9px;
-    border: 1px solid #b790ce;
-    background: #21102d;
+    border: 1px solid #c7cf94;
+    background: #1b240c;
     transform: translateY(-50%) rotate(45deg);
   }
   .warlock-doom::before {
@@ -1379,10 +1380,10 @@
     transform: scaleX(var(--doom-scale));
     transform-origin: left center;
     border-radius: 2px;
-    background: linear-gradient(90deg, #351047 0%, #7f25a5 52%, #d27cff 100%);
+    background: linear-gradient(90deg, #2c4010 0%, #5f9a1f 52%, #c6f46a 100%);
     box-shadow:
       inset 0 1px rgba(255, 255, 255, 0.28),
-      0 0 10px rgba(197, 83, 255, 0.68);
+      0 0 10px rgba(150, 230, 70, 0.68);
     transition: transform 120ms linear;
   }
   .warlock-doom-label {
@@ -1391,7 +1392,7 @@
     inset: 0;
     display: grid;
     place-items: center;
-    color: #f6e8ff;
+    color: #f4f7e4;
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -1402,19 +1403,25 @@
     animation: warlock-doom-warning 0.7s ease-in-out infinite alternate;
   }
   .warlock-doom.ready {
-    border-color: #e7b7ff;
+    border-color: #d8f59a;
     box-shadow:
       inset 0 0 7px rgba(0, 0, 0, 0.88),
-      0 0 14px rgba(211, 112, 255, 0.88);
+      0 0 14px rgba(170, 240, 80, 0.88);
   }
+  /* Rot Splinters (Blightcraft): three jagged bone shards under the Blight bar,
+     dark and dry when empty, rot-green and weeping light when held. The class
+     names keep their old fate-thread spelling so the DOM contract stays put. */
   .warlock-fate-threads {
+    /* One rot glow for held shards and their ready beat. */
+    --rot-splinter-glow: drop-shadow(0 0 3px rgba(180, 255, 100, 0.95))
+      drop-shadow(0 0 7px rgba(96, 170, 30, 0.7));
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 18px;
+    gap: 20px;
     width: 184px;
-    height: 24px;
+    height: 26px;
     margin-top: -1px;
     isolation: isolate;
   }
@@ -1430,57 +1437,63 @@
     border-radius: 50%;
     background: radial-gradient(
       ellipse,
-      rgba(132, 57, 184, 0.22) 0,
-      rgba(52, 17, 76, 0.12) 42%,
+      rgba(96, 140, 38, 0.22) 0,
+      rgba(34, 52, 14, 0.14) 42%,
       transparent 72%
     );
-    opacity: 0.62;
+    opacity: 0.66;
   }
   .warlock-fate-threads::after {
     z-index: -1;
     inset: -12px -36px -8px;
     border-radius: 50%;
     background:
-      radial-gradient(circle at 28% 48%, rgba(154, 225, 255, 0.72) 0 1px, transparent 4px),
-      radial-gradient(circle at 50% 20%, rgba(232, 182, 255, 0.86) 0 2px, transparent 5px),
-      radial-gradient(circle at 72% 48%, rgba(255, 125, 196, 0.72) 0 1px, transparent 4px),
-      radial-gradient(ellipse, rgba(184, 83, 255, 0.32), transparent 68%);
+      radial-gradient(circle at 26% 56%, rgba(190, 255, 120, 0.7) 0 1px, transparent 4px),
+      radial-gradient(circle at 50% 18%, rgba(226, 255, 170, 0.8) 0 2px, transparent 5px),
+      radial-gradient(circle at 74% 60%, rgba(150, 230, 80, 0.7) 0 1px, transparent 4px),
+      radial-gradient(ellipse, rgba(120, 200, 50, 0.3), transparent 68%);
     opacity: 0;
   }
   .warlock-fate-threads.ready::after {
     opacity: 1;
     animation: warlock-fate-ready-aura 1.35s ease-in-out infinite;
   }
+  /* The rail is a dead, cracked branch the splinters sit on. */
   .warlock-fate-thread-rail {
     position: absolute;
     z-index: 0;
-    left: 14px;
-    right: 14px;
-    top: 4px;
-    height: 15px;
-    border-bottom: 2px solid rgba(126, 75, 159, 0.76);
-    border-radius: 50%;
-    background: radial-gradient(ellipse at 50% 92%, rgba(198, 126, 255, 0.16), transparent 68%);
+    left: 12px;
+    right: 12px;
+    top: 15px;
+    height: 4px;
+    border-radius: 2px;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(20, 24, 8, 0.9) 0 7px,
+      rgba(64, 74, 30, 0.9) 7px 9px,
+      rgba(28, 32, 12, 0.9) 9px 15px
+    );
     box-shadow:
-      0 2px 4px rgba(8, 2, 12, 0.9),
-      inset 0 -1px rgba(226, 182, 255, 0.28);
+      0 2px 4px rgba(4, 6, 2, 0.9),
+      inset 0 1px rgba(196, 230, 140, 0.18);
   }
+  /* The Rotmark sigil in the middle: a rot-green eye in a cracked bone ring. */
   .warlock-fate-thread-eye {
     position: absolute;
     z-index: 1;
     left: 50%;
-    top: 49%;
-    width: 39px;
-    height: 17px;
-    border: 1px solid rgba(164, 103, 204, 0.72);
+    top: 50%;
+    width: 34px;
+    height: 15px;
+    border: 1px solid rgba(150, 190, 90, 0.7);
     border-radius: 72% 18% 72% 18%;
     background: radial-gradient(
       circle,
-      rgba(180, 92, 222, 0.28) 0 22%,
-      rgba(34, 11, 47, 0.92) 25% 58%,
+      rgba(140, 220, 70, 0.32) 0 22%,
+      rgba(18, 24, 8, 0.94) 25% 58%,
       transparent 61%
     );
-    box-shadow: 0 0 7px rgba(122, 44, 166, 0.48);
+    box-shadow: 0 0 7px rgba(110, 170, 40, 0.45);
     transform: translate(-50%, -50%) rotate(45deg);
   }
   .warlock-fate-thread-eye::after {
@@ -1490,52 +1503,72 @@
     top: 50%;
     width: 5px;
     height: 5px;
-    border: 1px solid rgba(236, 200, 255, 0.76);
+    border: 1px solid rgba(220, 255, 170, 0.8);
     border-radius: 50%;
-    background: #3b174e;
-    box-shadow: 0 0 5px rgba(210, 124, 255, 0.58);
+    background: #1d2b0c;
+    box-shadow: 0 0 5px rgba(170, 240, 90, 0.6);
     transform: translate(-50%, -50%);
   }
+  /* One splinter: a jagged shard cut with clip-path, so its glow is a
+     drop-shadow filter (box-shadow would be clipped away). */
   .warlock-fate-thread {
     position: relative;
     z-index: 3;
-    width: 14px;
-    height: 14px;
-    border: 2px solid #644377;
-    border-radius: 3px 8px 3px 8px;
-    background: linear-gradient(145deg, #211128, #0d0711);
-    box-shadow:
-      0 2px 3px rgba(0, 0, 0, 0.82),
-      inset 2px 2px rgba(235, 204, 255, 0.05);
-    opacity: 0.72;
-    transform: rotate(45deg) scale(0.86);
+    width: 13px;
+    height: 27px;
+    clip-path: polygon(
+      48% 0,
+      66% 18%,
+      58% 30%,
+      80% 52%,
+      62% 66%,
+      70% 100%,
+      30% 82%,
+      38% 62%,
+      18% 44%,
+      36% 28%
+    );
+    background: linear-gradient(170deg, #8a8a6c 0%, #55573e 50%, #2c2e1c 100%);
+    filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.85));
+    opacity: 0.85;
+    transform: rotate(-18deg) scale(0.86);
     transition:
       opacity 160ms ease,
       transform 200ms ease,
       filter 200ms ease;
   }
+  .warlock-fate-thread.fate-2 {
+    transform: rotate(6deg) scale(0.86);
+  }
+  .warlock-fate-thread.fate-3 {
+    transform: rotate(24deg) scale(0.86);
+  }
+  /* The dry core line down the middle of each shard. */
   .warlock-fate-thread::after {
     content: "";
     position: absolute;
-    inset: 3px;
-    border-radius: 50% 10% 50% 10%;
-    background: #35203d;
-    transform: rotate(-45deg);
+    left: 46%;
+    top: 14%;
+    width: 2px;
+    height: 70%;
+    border-radius: 1px;
+    background: rgba(30, 32, 18, 0.75);
   }
   .warlock-fate-thread.on {
-    border-color: #d4a2ef;
-    background: radial-gradient(circle at 32% 24%, #f7e7ff, #b65ce0 38%, #592071 78%);
-    box-shadow:
-      0 0 9px rgba(205, 104, 255, 0.92),
-      0 0 17px rgba(113, 45, 157, 0.58),
-      inset 2px 2px rgba(255, 255, 255, 0.42);
+    background: linear-gradient(170deg, #f4f7d8 0%, #c8ec7a 28%, #7fc23a 62%, #2f5a12 100%);
+    filter: var(--rot-splinter-glow);
     opacity: 1;
-    filter: saturate(1.15);
-    transform: rotate(45deg) scale(1);
+    transform: rotate(-18deg) scale(1);
+  }
+  .warlock-fate-thread.on.fate-2 {
+    transform: rotate(6deg) scale(1);
+  }
+  .warlock-fate-thread.on.fate-3 {
+    transform: rotate(24deg) scale(1);
   }
   .warlock-fate-thread.on::after {
-    background: #fff1ff;
-    box-shadow: 0 0 5px #f4c7ff;
+    background: linear-gradient(180deg, #fbffe6, #b6f06a);
+    box-shadow: 0 0 4px #d9ff9c;
   }
   .warlock-fate-threads.ready .warlock-fate-thread.on {
     animation: warlock-fate-thread-beat 1.35s ease-in-out infinite;
@@ -1557,10 +1590,10 @@
   @keyframes warlock-fate-thread-beat {
     0%,
     100% {
-      filter: brightness(0.94) saturate(1.1);
+      filter: var(--rot-splinter-glow) brightness(0.94);
     }
     50% {
-      filter: brightness(1.5) saturate(1.35);
+      filter: var(--rot-splinter-glow) brightness(1.4);
     }
   }
   @keyframes warlock-fate-ready-aura {
@@ -1615,11 +1648,14 @@
       background: Canvas;
       box-shadow: none;
     }
+    /* Clipped shards show no border or outline: fill them instead. */
+    .warlock-fate-thread {
+      background: GrayText;
+      filter: none;
+    }
     .warlock-fate-thread.on {
-      border-color: Highlight;
       background: Highlight;
-      outline: 1px solid CanvasText;
-      outline-offset: 1px;
+      filter: none;
     }
   }
   /* Player Frame Scale (--player-frame-scale, playerFrameScale setting): zoom

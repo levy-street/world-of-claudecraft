@@ -11,8 +11,8 @@ const DRAIN_CORE = 0xc7ffd1;
 const DRAIN_FLOW = 0x46f27c;
 const DRAIN_SHADOW = 0x0b5c2a;
 const GAZE_CORE = 0xc8ff86;
-const GAZE_FLOW = 0x7d36bd;
-const GAZE_SHADOW = 0x351154;
+const GAZE_FLOW = 0x76c834;
+const GAZE_SHADOW = 0x2c3a10;
 const UP = new THREE.Vector3(0, 1, 0);
 
 export type DrainLifeParticleKind = 'extraction' | 'absorption' | 'transfer' | 'tick' | 'residue';

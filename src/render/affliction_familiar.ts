@@ -8,6 +8,7 @@ import {
   shouldShowAfflictionFamiliar,
   writeAfflictionFamiliarPose,
 } from './affliction_familiar_core';
+import { rotmarkPaintedCopy } from './affliction_familiar_paint';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachSceneGroupGated } from './gated_scene_attach';
@@ -16,7 +17,7 @@ const MODEL_HEIGHT = 0.65;
 const MODEL_FORWARD_YAW = -Math.PI / 2;
 const MODEL_URL = '/models/props/maledict_eye.glb';
 
-let loadedMaledictEye: THREE.Group | null = null;
+let loadedMaledictEye: THREE.Object3D | null = null;
 
 if (typeof window !== 'undefined') {
   // Deferred, never eager: a module-import registerPreload joins the launch
@@ -24,7 +25,9 @@ if (typeof window !== 'undefined') {
   // to prevent (tests/defer_launcher_preloads.test.ts pins the sanctioned set).
   registerDeferredPreload(() =>
     loadGltf(MODEL_URL).then((gltf) => {
-      loadedMaledictEye = gltf.scene;
+      // Painted once here in the Rotmark rot green (affliction_familiar_paint.ts),
+      // so every clone below shares the one patched material and its program.
+      loadedMaledictEye = rotmarkPaintedCopy(gltf.scene);
     }),
   );
 }
@@ -43,7 +46,7 @@ export type AfflictionFamiliarCompileGate = () =>
 function buildApprovedMaledictEye(): THREE.Object3D | null {
   if (!loadedMaledictEye) return null;
   // The loader cache is immutable. The familiar owns only this cloned transform
-  // graph; geometry, textures, and materials remain shared and untouched.
+  // graph; geometry, textures, and its painted materials remain shared.
   const model = loadedMaledictEye.clone(true);
   model.name = 'approved-maledict-eye-model';
   model.position.y = -MODEL_HEIGHT / 2;

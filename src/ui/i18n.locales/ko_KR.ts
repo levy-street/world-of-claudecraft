@@ -6244,8 +6244,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': '검은 부패',
   'entities.abilities.corruption.description':
     '대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
-  'entities.abilities.life_tap.name': '가혹한 거래',
-  'entities.abilities.life_tap.description': '생명력 {damage}을 마나 {damage}으로 전환합니다.',
+  'entities.abilities.life_tap.name': '잔혹한 계약',
+  'entities.abilities.life_tap.description':
+    '최대 생명력의 10%를 희생하여 최대 마나의 {manaPct}%를 회복합니다. 생명력이 20% 이하일 때는 사용할 수 없습니다.',
+  'entities.abilities.hard_bargain.name': '가혹한 거래',
+  'entities.abilities.hard_bargain.description':
+    '최대 마나의 20%를 희생하여 최대 생명력의 {healPct}%를 회복합니다.',
+  'guide.abilityHook.hard_bargain': '부상을 입었을 때 마나의 20%를 생명력의 20%로 바꿉니다.',
+  'entities.abilities.plague_bloom.name': '역병 개화',
+  'entities.abilities.plague_bloom.description':
+    '단죄 60 소모: 내 검은 부패에 걸린 30야드 이내의 적 최대 5명이 즉시 내 모든 지속 피해 효과의 4틱만큼 피해를 받습니다.',
   'entities.abilities.curse_of_agony.name': '고뇌의 저주',
   'entities.abilities.curse_of_agony.description':
     '대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
@@ -18542,7 +18550,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     '생명력 흡수가 운명의 실 {stacks}중첩을 소모해 매 틱 규탄을 {doom} 추가 생성합니다',
   'hudChrome.auraEffect.afflictionEye':
-    '저주의 시선이 {interval}초마다 공격하며, 이 사안에서 발동한 효과는 규탄을 {pct}% 생성합니다',
+    '이곳에서 내 지속 피해 효과가 {dotPct}% 더 큰 피해를 주고, 각 틱의 {echoPct}%가 내 검은 부패에 걸린 근처 적에게 전이됩니다. 이곳의 효과는 단죄를 {pct}% 생성합니다',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     '이 사안의 효과는 규탄을 {doomPct}% 생성하며, 선고가 이곳에 {echoPct}% 피해로 메아리칩니다',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -18556,7 +18564,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     '받는 피해의 {pct}%를 이전하거나 감소시키고 규탄을 최대 {max} 생성합니다',
   'hudChrome.auraEffect.afflictionViolence':
-    '보복 {charges}회 남음: 적의 공격이 규탄을 {doom} 생성하고 {damage}의 암흑 피해로 반격합니다',
+    '이곳에서 내 지속 피해 틱이 {pct}% 확률로 한 번 더 발동합니다',
   'hudChrome.auraEffect.aoeEcho':
     '메아리 {charges}회 남음: 단일 대상 기술이 주변 최대 {targets}명에게 {pct}% 피해를 줍니다',
   'hudChrome.auraEffect.arcaneCharge':

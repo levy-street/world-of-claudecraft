@@ -17,8 +17,11 @@ describe('Affliction full-BiS five-minute inert-boss balance', () => {
   it('spends the mana pool by five minutes inside the sanity corridor', () => {
     const result = runWarlockBalanceProbe('affliction', 42, 300);
 
-    expect(result.dps).toBeGreaterThanOrEqual(175);
-    expect(result.dps).toBeLessThanOrEqual(235);
+    // Re-anchored for the Blightcaller rework (the probe keeps the three DoTs
+    // running and spends Blight on Putrefy): seed 42 measures 225.5 DPS, and
+    // the corridor keeps about the same -15%/+15% margins as Demonology's.
+    expect(result.dps).toBeGreaterThanOrEqual(192);
+    expect(result.dps).toBeLessThanOrEqual(260);
     // Mana-end corridor widened 0.05 to 0.09 (all three specs) by the 2/4/6,
     // then to 0.12 at the 2026-08-30 legendary band (Heartwood budget growth)
     // lineage retune: the halved haste and Clearcasting rates mean fewer
@@ -37,10 +40,13 @@ describe('Affliction full-BiS five-minute inert-boss balance', () => {
     // pool survives the window. The corridor widens to 0.30 with the same
     // headroom the 0.12 line carried over its 0.096 measurement; the pool is
     // still finite (starvation still binds below).
-    expect(result.manaEndPct).toBeLessThan(0.3);
-    // And a floor under the measured 0.242, so the larger surviving pool is
+    // 0.544 measured with the Blightcaller rotation: the DoTs are cheap for
+    // their damage and Cruel Pact returns 20% of max mana per tap, so about
+    // half the pool survives the window. Pinned from both sides around it.
+    expect(result.manaEndPct).toBeLessThan(0.62);
+    // And a floor under the measured 0.544, so the larger surviving pool is
     // pinned from both sides rather than left open below.
-    expect(result.manaEndPct).toBeGreaterThan(0.18);
+    expect(result.manaEndPct).toBeGreaterThan(0.46);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });
@@ -59,8 +65,13 @@ describe('Demonology full-BiS five-minute inert-boss balance', () => {
     const result = runWarlockBalanceProbe('demonology', 42, 300);
 
     expect(result.dps).toBeGreaterThanOrEqual(192);
-    expect(result.dps).toBeLessThanOrEqual(269);
-    expect(result.manaEndPct).toBeLessThan(0.12);
+    // Ceiling 269 -> 280 for the shared pacts (Cruel Pact restores 20% of max
+    // mana for every spec, plus Hard Bargain): seed 42 measures 271.5.
+    expect(result.dps).toBeLessThanOrEqual(280);
+    // 0.12 -> 0.55: the probe taps Cruel Pact under 30% mana and each tap now
+    // returns 20% of max mana, so the window ends higher in the tap cycle
+    // (seed 42 measures 0.496). starvedPct below still pins a finite economy.
+    expect(result.manaEndPct).toBeLessThan(0.55);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });
@@ -87,8 +98,12 @@ describe('Destruction full-BiS five-minute inert-boss balance', () => {
     const result = runWarlockBalanceProbe('destruction', 42, 300);
 
     expect(result.dps).toBeGreaterThanOrEqual(170);
-    expect(result.dps).toBeLessThanOrEqual(255);
-    expect(result.manaEndPct).toBeLessThan(0.3);
+    // Ceiling 255 -> 272 for the shared pacts (Cruel Pact restores 20% of max
+    // mana for every spec, plus Hard Bargain): seed 42 measures 263.3.
+    expect(result.dps).toBeLessThanOrEqual(272);
+    // 0.30 -> 0.47: each Cruel Pact tap now returns 20% of max mana, so the
+    // window ends higher in the tap cycle (seed 42 measures 0.413).
+    expect(result.manaEndPct).toBeLessThan(0.47);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });

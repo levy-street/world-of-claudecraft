@@ -4965,10 +4965,10 @@ export const tr_TR: EnTranslations = {
       "formShadow": "Gölgeperde Formu: Gölge hasarı {pct}% artar",
       "resourceCount": "{value} / {max}",
       "formLich": "Ruh Mızrağı ayrıca yakındaki en fazla {targets} düşmana {pct}% hasarla vurur",
-      "afflictionEye": "Kem Bakış her {interval} sn'de bir saldırır; bu Göz'deki etkiler {pct}% Mahkûmiyet üretir",
+      "afflictionEye": "DoT'ların burada {dotPct}% daha fazla hasar verir ve her tikin {echoPct}%'ini Kara Çürümen olan yakındaki düşmanlara yansıtır; buradaki etkiler {pct}% Mahkûmiyet üretir",
       "afflictionEyeSecondary": "Bu Göz'deki etkiler {doomPct}% Mahkûmiyet üretir; Hüküm buraya {echoPct}% hasarla yankılanır",
       "afflictionAccomplice": "Uygun hasar {value} Mahkûmiyet kazandırır, en fazla {interval} sn'de bir",
-      "afflictionViolence": "{charges} misilleme kaldı; bir düşman saldırısı {doom} Mahkûmiyet kazandırır ve karşılığında {damage} Gölge hasarı verir",
+      "afflictionViolence": "Buradaki DoT tiklerinin yeniden gerçekleşme şansı {pct}%",
       "afflictionVicarious": "Gelen hasarın {pct}%'ini yönlendirir ya da azaltır ve en fazla {max} Mahkûmiyet üretebilir",
       "afflictionPossession": "Kader İğnesi'ni, Tüketme'yi, Kem Bakış'ı ve Hüküm'ü güçlendirir",
       "afflictionJudgment": "Birincil Göz {eyePct}% daha fazla Mahkûmiyet üretir; Hüküm {sentencePct}% daha fazla hasar verir ve ilki {refund} Mahkûmiyet geri kazandırır",
@@ -10164,6 +10164,7 @@ export const tr_TR: EnTranslations = {
       "immolate": "Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.",
       "corruption": "Bir hedefi gölgeyle çürütür ve sen başka işler yaparken hasar verir.",
       "life_tap": "Tükendiğinde kendi canının bir kısmını manaya çevirir.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Bir hedefe menzilden fırlatılan bir doğa oku; başvuru bomban.",
       "healing_touch": "Uzun süreli, birini tam dolduran büyük tek hedefli bir iyileştirme.",
       "mark_of_the_wild": "Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.",
@@ -18283,9 +18284,13 @@ export const tr_TR: EnTranslations = {
         "name": "Hüküm",
         "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Ağır Pazarlık",
-        "description": "{damage} canı {damage} manaya dönüştürür."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Zalim Ahit",
+        "description": "Azami canının %10'unu feda ederek azami mananın {manaPct}%'ini yeniler. Canın %20 veya altındayken kullanılamaz."
       },
       "cursed_accomplice": {
         "name": "Lanetli Suç Ortağı",
@@ -18338,6 +18343,10 @@ export const tr_TR: EnTranslations = {
       "coven": {
         "name": "Cadı Meclisi",
         "description": "Yakındaki en fazla 4 düşman üzerinde 15 sn süreyle ikincil Kem Gözler oluşturur. Bunlar ortak Mahkûmiyet havuzunu %50 oranında besler ve Hüküm onlara %35 hasarla yankılanır."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "60 Mahkûmiyet harcar: 30 metre içinde senin Kara Çürüme etkini taşıyan en fazla 5 düşman, üzerlerindeki her bir periyodik hasar etkinden anında 4 tik hasar alır."
       },
       "fear": {
         "name": "Dehşet",

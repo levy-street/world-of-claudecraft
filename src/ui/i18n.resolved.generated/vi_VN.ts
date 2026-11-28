@@ -4965,10 +4965,10 @@ export const vi_VN: EnTranslations = {
       "formShadow": "Hình Gloamveil: sát thương Bóng Tối tăng {pct}%",
       "resourceCount": "{value} trên {max}",
       "formLich": "Thương Linh Hồn cũng đánh trúng thêm tối đa {targets} kẻ địch gần đó với {pct}% sát thương",
-      "afflictionEye": "Ánh Nhìn Nguyền tấn công mỗi {interval} giây; hiệu ứng tại Mắt Nguyền này tạo ra {pct}% Kết Án",
+      "afflictionEye": "DoT của bạn gây thêm {dotPct}% sát thương tại đây và dội {echoPct}% mỗi nhịp sang kẻ địch gần đó đang chịu Hắc Hủ của bạn; hiệu ứng tại đây tạo ra {pct}% Kết Án",
       "afflictionEyeSecondary": "Hiệu ứng tại Mắt Nguyền này tạo ra {doomPct}% Kết Án; Phán Quyết vọng lại đây với {echoPct}% sát thương",
       "afflictionAccomplice": "Sát thương đủ điều kiện cấp {value} Kết Án, tối đa một lần mỗi {interval} giây",
-      "afflictionViolence": "Còn lại {charges} lần báo thù; một đòn tấn công của địch cấp {doom} Kết Án và phản lại {damage} sát thương Bóng Tối",
+      "afflictionViolence": "Các nhịp DoT của bạn tại đây có {pct}% cơ hội tác động thêm một lần",
       "afflictionVicarious": "Chuyển hướng hoặc giảm {pct}% sát thương phải nhận và có thể tạo ra tối đa {max} Kết Án",
       "afflictionPossession": "Tăng cường Kim Định Mệnh, Nuốt Chửng, Ánh Nhìn Nguyền, và Phán Quyết",
       "afflictionJudgment": "Mắt Nguyền chính tạo thêm {eyePct}% Kết Án; Phán Quyết gây thêm {sentencePct}% sát thương và lần đầu tiên hoàn lại {refund} Kết Án",
@@ -10164,6 +10164,7 @@ export const vi_VN: EnTranslations = {
       "immolate": "Thiêu cháy mục tiêu cho một đòn mở màn và một vệt cháy âm ỉ kéo dài.",
       "corruption": "Làm mục rữa mục tiêu bằng bóng tối, gây sát thương theo thời gian trong khi bạn làm việc khác.",
       "life_tap": "Đánh đổi một phần máu của chính bạn để lấy lại mana khi cạn kiệt.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Một tia tự nhiên ném vào mục tiêu từ xa, đòn chủ lực quen thuộc của bạn.",
       "healing_touch": "Một đòn trị liệu đơn mục tiêu lớn với thời gian niệm dài, dùng để hồi đầy cho ai đó.",
       "mark_of_the_wild": "Một phúc lành lâu dài bạn ban cho bản thân hoặc đồng đội trước trận đấu.",
@@ -18283,9 +18284,13 @@ export const vi_VN: EnTranslations = {
         "name": "Phán Quyết",
         "description": "Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Mỗi Sợi tăng 6% sát thương. Các hiệu ứng bổ sung leo thang ở 20, 50, 80, và 100 Kết Án. Mức tăng sát thương của nó chững lại sau cấp 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Mặc Cả Nghiệt Ngã",
-        "description": "Chuyển hóa {damage} máu thành {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Khế Ước Tàn Nhẫn",
+        "description": "Hiến tế 10% máu tối đa để hồi {manaPct}% mana tối đa. Không thể dùng khi máu từ 20% trở xuống."
       },
       "cursed_accomplice": {
         "name": "Đồng Lõa Bị Nguyền",
@@ -18338,6 +18343,10 @@ export const vi_VN: EnTranslations = {
       "coven": {
         "name": "Hội Phù Thủy",
         "description": "Tạo các Ác Nhãn phụ trên tối đa 4 kẻ địch gần đó trong 15 giây. Chúng nạp vào bể Kết Án chung ở mức 50%, và Phán Quyết vọng đến chúng với 35% sát thương."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Tiêu hao 60 Kết Án: tối đa 5 kẻ địch trong vòng 30 yard đang mang Hắc Hủ của bạn lập tức chịu 4 nhịp của mỗi hiệu ứng sát thương theo thời gian của bạn trên chúng."
       },
       "fear": {
         "name": "Giày Vò",

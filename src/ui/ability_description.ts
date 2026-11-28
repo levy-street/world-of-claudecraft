@@ -340,6 +340,15 @@ export function abilityDisplayDescription(
     (eff): eff is Extract<AbilityEffect, { type: 'afflictionNeedle' }> =>
       eff.type === 'afflictionNeedle',
   )?.doom;
+  // {manaPct}/{healPct} splice the RESOLVED Cruel Pact / Hard Bargain shares, so
+  // Blood Credit's 30% shows live once the talent is picked.
+  const pactMana = res.effects.find(
+    (eff): eff is Extract<AbilityEffect, { type: 'afflictionCruelPact' }> =>
+      eff.type === 'afflictionCruelPact',
+  )?.manaPctMax;
+  const bargainHeal = res.effects.find(
+    (eff): eff is Extract<AbilityEffect, { type: 'hardBargain' }> => eff.type === 'hardBargain',
+  )?.healPctMax;
   // {charges} splices the RESOLVED stored-use count (native maxCharges plus
   // any bonusCharges rows), so Conflagrate's "Holds N charges" line reads 3
   // for Ruincaller 2pc wearers and the base 2 for everyone else.
@@ -362,6 +371,8 @@ export function abilityDisplayDescription(
     rage: rageText,
     absorbPerRage: absorbPerRage === undefined ? '' : formatAbilityNumber(absorbPerRage),
     needleDoom: needleDoom === undefined ? '' : formatAbilityNumber(needleDoom),
+    manaPct: pactMana === undefined ? '' : formatAbilityNumber(pactMana * 100),
+    healPct: bargainHeal === undefined ? '' : formatAbilityNumber(bargainHeal * 100),
     charges: charges === undefined ? '' : formatAbilityNumber(charges),
     echoSinglePct: formatAbilityNumber(echoSingle * 100),
     echoAreaPct: formatAbilityNumber(TEMPORAL_ECHO_AREA_CONVERSION * 100),

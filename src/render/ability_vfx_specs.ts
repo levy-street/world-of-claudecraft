@@ -1706,6 +1706,7 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
   immolate: { c: '#ff7a2a', p: 'fire', pw: 0.9, sp: 36, sm: 1, lg: 4, a: 'dot' },
   corruption: { c: '#c8ff3c', p: 'venom', pw: 0.85, sp: 6, sm: 1, lg: 4, a: 'dot' },
   life_tap: { c: '#ff4a5a', p: 'blood', pw: 0.65, bl: 1, bo: 'heartbeat', lg: 1.5, a: 'buff' },
+  hard_bargain: { c: '#ff4a5a', p: 'blood', pw: 0.65, bl: 1, bo: 'heartbeat', lg: 1.5, a: 'buff' },
   summon_voidwalker: {
     c: '#8a6ab8',
     p: 'shadow',
@@ -1716,7 +1717,7 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
     lg: 2.5,
     a: 'summon',
   },
-  curse_of_agony: { c: '#8a6ab8', p: 'shadow', pw: 1.05, sp: 10, lg: 4, a: 'dot' },
+  curse_of_agony: { c: '#9bd23c', p: 'venom', pw: 1.05, sp: 10, lg: 4, a: 'dot' },
   drain_life: { c: '#d41f2e', p: 'blood', sp: 12, bl: 1, li: 1.6, lg: 2, a: 'beam' },
   fear: { c: '#8a6ab8', p: 'shadow', pw: 0.85, li: 1.5, lg: 4, a: 'cc' },
   searing_pain: {

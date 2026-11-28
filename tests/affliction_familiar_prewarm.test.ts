@@ -55,6 +55,10 @@ vi.mock('../src/render/characters', () => ({
 // The module registers its deferred preload only in a browser (a `window`
 // check at import), so a bare `window` is stubbed for that one import and
 // removed before anything else loads.
+// The Rotmark paint clones materials through material_clone_hooks, whose import
+// chain registers its own deferred preload (worn_stone's surface detail). Load
+// that chain first so the slice below holds only the familiar's preload.
+await import('../src/render/material_clone_hooks');
 const preloadsBefore = state.preloads.length;
 (globalThis as { window?: unknown }).window = {};
 const { AfflictionFamiliar, buildAfflictionFamiliarPrewarmStandIn } = await import(

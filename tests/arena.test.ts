@@ -581,7 +581,7 @@ describe('arena: a full bout', () => {
       expect.objectContaining({
         type: 'aura',
         targetId: a,
-        name: 'Condemnation',
+        name: 'Blight',
         gained: true,
       }),
     );

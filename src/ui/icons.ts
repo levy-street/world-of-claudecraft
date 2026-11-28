@@ -3301,6 +3301,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['glow', 'arcs'],
   ),
   life_tap: r('blood', 'shadowPurple', ['heart', { p: 'droplet', ...BR, pal: 'shadowPurple' }]),
+  hard_bargain: r('shadow', 'blood', ['droplet', { p: 'heart', ...BR }], ['glow']),
   curse_of_agony: r('shadow', 'shadowPurple', ['skull'], ['arcs']),
   drain_life: r('shadow', 'blood', [{ p: 'droplet', pal: 'blood' }], ['motion', 'drips']),
   umbral_anchor: r(
@@ -3330,6 +3331,17 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
       { p: 'skull', ...BR, s: 0.48, pal: 'blood' },
     ],
     ['glow', 'arcs'],
+  ),
+  // Blight Coven finisher: a skull bursting out of a toxic-green star. The painted
+  // art (ABILITY_IMAGE_IDS) was painted from this recipe, so the fallback matches it.
+  plague_bloom: r(
+    'nature',
+    'venom',
+    [
+      { p: 'sunburst', s: 1.6, pal: 'venom' },
+      { p: 'skull', s: 0.85, pal: 'shadowPurple' },
+    ],
+    ['glow', 'drips'],
   ),
   // druid
   wrath: r('nature', 'leafGreen', ['bolt', { p: 'leaf', ...BR }], ['glow']),
@@ -4863,6 +4875,9 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'demon_skin',
   'immolate',
   'corruption',
+  // The shadow-purple Blackrot art from before Blightcaller's rot-green pass, kept for
+  // the class-select warlock preview (SIGNATURE_ICON_IDS) where no spec is chosen.
+  'corruption_shadow',
   'curse_of_agony',
   'drain_life',
   'fear',
@@ -4875,6 +4890,9 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'summon_infernal',
   'summon_doomguard',
   'life_tap',
+  // Hard Bargain wears the original Hard Bargain painting (demon pack 44.png); life_tap
+  // (now Cruel Pact) wears the original Cruel Pact painting.
+  'hard_bargain',
   'searing_pain',
   // OpenAI-generated Warlock spell art. These complete the current ability catalog while
   // preserving the existing CraftPix-backed ids above.
@@ -4890,6 +4908,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'possess_evil_eye',
   'hour_of_judgment',
   'coven',
+  'plague_bloom',
   'soul_lance',
   'litany_of_guilt',
   'umbral_anchor',
@@ -5324,7 +5343,8 @@ export function abilityImageUrl(id: string): string | null {
             id === 'summon_succubus' ||
             id === 'summon_felhunter' ||
             id === 'summon_felguard' ||
-            id === 'summon_doomguard'
+            id === 'summon_doomguard' ||
+            id === 'corruption_shadow'
           ? 'warlock'
           : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;

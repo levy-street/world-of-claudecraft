@@ -11,8 +11,9 @@ import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
+import { abilityDisplayDescription } from '../src/ui/ability_description';
 
-function rig(rows: Record<number, string>, spec = 'destruction') {
+function rig(rows: Record<number, string>, spec: string | null = 'destruction') {
   const sim = new Sim({ seed: 73, playerClass: 'warlock', autoEquip: true });
   sim.setPlayerLevel(20);
   expect(sim.applyTalents({ spec, rows })).toBe(true);
@@ -108,6 +109,43 @@ describe('warlock class talent tree', () => {
     }
   });
 
+  it('holds the Leaden Hex slow while Blackrot ticks, but only a cast stacks or roots', () => {
+    const { sim, player } = rig({ 8: 'wlk_r8_curse_of_exhaustion' }, 'affliction');
+    const target = addTarget(sim);
+    player.hitBonus = 1;
+    sim.castAbility('corruption');
+    tick(sim, 2);
+    expect(
+      target.auras.some((aura) => aura.id === 'corruption' && aura.sourceId === player.id),
+    ).toBe(true);
+    const slow = () => target.auras.find((aura) => aura.id === 'wlk_leaden_hex_slow');
+    expect(slow()).toMatchObject({ stacks: 1, value: 0.9 });
+
+    // Well past the 5 sec slow: Blackrot's 3 sec ticks keep it on, at one stack.
+    tick(sim, 20 * 12);
+    expect(slow()).toMatchObject({ stacks: 1, value: 0.9 });
+    expect(target.auras.some((aura) => aura.id === 'wlk_leaden_hex_root')).toBe(false);
+
+    // A stack the ticks are holding still roots on the next cast at three.
+    onCastCompleted(ctxOf(sim), player, 'shadow_bolt', target);
+    onCastCompleted(ctxOf(sim), player, 'shadow_bolt', target);
+    expect(slow()).toMatchObject({ stacks: 3 });
+    tick(sim, 20 * 7);
+    expect(slow()).toMatchObject({ stacks: 3 });
+    expect(target.auras.some((aura) => aura.id === 'wlk_leaden_hex_root')).toBe(false);
+    onCastCompleted(ctxOf(sim), player, 'shadow_bolt', target);
+    expect(target.auras.some((aura) => aura.id === 'wlk_leaden_hex_root')).toBe(true);
+  });
+
+  it('lets the Leaden Hex slow wear off without a sustaining DoT', () => {
+    const { sim, player } = rig({ 8: 'wlk_r8_curse_of_exhaustion' }, 'affliction');
+    const target = addTarget(sim);
+    onCastCompleted(ctxOf(sim), player, 'needle_of_fate', target);
+    expect(target.auras.some((aura) => aura.id === 'wlk_leaden_hex_slow')).toBe(true);
+    tick(sim, 20 * 6);
+    expect(target.auras.some((aura) => aura.id === 'wlk_leaden_hex_slow')).toBe(false);
+  });
+
   it('does not aggro an idle mob until a Leaden Hex-triggering bolt actually lands', () => {
     const { sim, player } = rig({ 8: 'wlk_r8_curse_of_exhaustion' });
     const target = addTarget(sim, 6);
@@ -158,8 +196,9 @@ describe('warlock class talent tree', () => {
     expect(pact.player.auras.find((aura) => aura.id === 'dark_pact')).toMatchObject({
       kind: 'absorb',
       value: Math.round(pact.player.maxHp * 0.3),
-      remaining: 8,
+      remaining: 30,
     });
+    expect(pact.player.cooldowns.get('dark_pact')).toBe(30);
   });
 
   it('makes Pact Deepened double Fiendhide armor', () => {
@@ -186,21 +225,84 @@ describe('warlock class talent tree', () => {
     });
   });
 
-  it('keeps Hard Bargain a symmetric conversion under the viability floors', () => {
-    // The 2026-08-23 spellDmgPct floors must not reach the mana economy: the
-    // scaleEffect lifeTap arm passes through untouched, so the authored
-    // hp == mana symmetry the tooltip promises survives the damage knob.
+  it('keeps Cruel Pact a 10% health for 20% mana trade under the viability floors', () => {
+    // The 2026-08-23 spellDmgPct floors must not reach the mana economy: scaleEffect
+    // passes the Cruel Pact effect through untouched, so the tooltip's percentages hold.
     const { sim, player } = rig({});
-    const tap = sim.resolvedAbility('life_tap');
-    const effect = tap?.effects.find((candidate) => candidate.type === 'lifeTap');
-    if (effect?.type !== 'lifeTap') throw new Error('missing Hard Bargain effect');
-    expect(effect).toMatchObject({ hp: 85, mana: 85 });
+    expect(sim.resolvedAbility('life_tap')?.def.name).toBe('Cruel Pact');
+    const effect = sim
+      .resolvedAbility('life_tap')
+      ?.effects.find((candidate) => candidate.type === 'afflictionCruelPact');
+    expect(effect).toMatchObject({ healthPct: 0.1, manaPctMax: 0.2, doom: 0 });
 
-    player.resource = 100;
+    player.resource = 0;
     const hpBefore = player.hp;
     sim.castAbility('life_tap');
-    expect(player.hp).toBe(hpBefore - 85);
-    expect(player.resource).toBe(185);
+    expect(player.hp).toBe(hpBefore - Math.round(player.maxHp * 0.1));
+    expect(player.resource).toBe(Math.round(player.maxResource * 0.2));
+    expect(player.cooldowns.has('life_tap')).toBe(false);
+    // Only Blightcaller gains Blight from it.
+    expect(player.auras.some((aura) => aura.kind === 'affliction_doom')).toBe(false);
+  });
+
+  it('makes Blood Credit raise Cruel Pact and Hard Bargain to 30%, tooltips included', () => {
+    const base = rig({});
+    const baseTap = base.sim.resolvedAbility('life_tap');
+    const baseBargain = base.sim.resolvedAbility('hard_bargain');
+    if (!baseTap || !baseBargain) throw new Error('missing pacts');
+    expect(abilityDisplayDescription(baseTap, '')).toContain('restore 20% of your maximum mana');
+    expect(abilityDisplayDescription(baseBargain, '')).toContain(
+      'restore 20% of your maximum health',
+    );
+
+    const { sim, player } = rig({ 14: 'wlk_r14_ruin' });
+    const tap = sim.resolvedAbility('life_tap');
+    const bargain = sim.resolvedAbility('hard_bargain');
+    if (!tap || !bargain) throw new Error('missing pacts');
+    expect(tap.effects.find((e) => e.type === 'afflictionCruelPact')).toMatchObject({
+      manaPctMax: 0.3,
+    });
+    expect(bargain.effects.find((e) => e.type === 'hardBargain')).toMatchObject({
+      healPctMax: 0.3,
+    });
+    expect(abilityDisplayDescription(tap, '')).toContain('restore 30% of your maximum mana');
+    expect(abilityDisplayDescription(bargain, '')).toContain('restore 30% of your maximum health');
+
+    player.resource = player.maxResource;
+    player.hp = Math.round(player.maxHp / 2);
+    const hpBefore = player.hp;
+    sim.castAbility('hard_bargain');
+    expect(player.hp).toBe(hpBefore + Math.round(player.maxHp * 0.3));
+  });
+
+  it('makes Hard Bargain trade 20% of max mana for 20% of max health on the GCD', () => {
+    const { sim, player } = rig({});
+    expect(sim.resolvedAbility('hard_bargain')?.def.name).toBe('Hard Bargain');
+
+    player.resource = player.maxResource;
+    player.hp = Math.round(player.maxHp / 2);
+    const hpBefore = player.hp;
+    sim.castAbility('hard_bargain');
+    expect(player.resource).toBe(player.maxResource - Math.round(player.maxResource * 0.2));
+    expect(player.hp).toBe(hpBefore + Math.round(player.maxHp * 0.2));
+    expect(player.gcdRemaining).toBeGreaterThan(0);
+    expect(player.cooldowns.has('hard_bargain')).toBe(false);
+
+    // Short on mana: refused before the GCD, nothing spent or healed.
+    player.gcdRemaining = 0;
+    player.resource = Math.round(player.maxResource * 0.2) - 1;
+    const hpShort = player.hp;
+    sim.castAbility('hard_bargain');
+    expect(player.resource).toBe(Math.round(player.maxResource * 0.2) - 1);
+    expect(player.hp).toBe(hpShort);
+    expect(player.gcdRemaining).toBe(0);
+
+    // Full health: refused too, so a stray press costs no mana.
+    player.resource = player.maxResource;
+    player.hp = player.maxHp;
+    sim.castAbility('hard_bargain');
+    expect(player.resource).toBe(player.maxResource);
+    expect(player.gcdRemaining).toBe(0);
   });
 
   it('makes Pact Deepened reduce magic damage by 5% only while Fiendhide is active', () => {
@@ -324,6 +426,49 @@ describe('warlock class talent tree', () => {
 
     expect(player.cooldowns.get('metamorphosis')).toBeCloseTo(remaining);
     expect(canUseForbiddenReflection(player, 'metamorphosis')).toBe(false);
+  });
+
+  it('lets Forbidden Reflection give Festerhex a free copy', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' }, 'affliction');
+    addTarget(sim);
+    sim.castAbility('curse_of_agony');
+    const ready = player.auras.find((aura) => aura.id === 'wlk_forbidden_reflection');
+    expect(ready?.kind).toBe('next_cast_free');
+    expect(ready?.empowerAbilities).toEqual(['curse_of_agony']);
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection_lock')).toBe(true);
+    tick(sim, 30);
+    const resourceBefore = player.resource;
+
+    sim.castAbility('curse_of_agony');
+
+    expect(player.resource).toBe(resourceBefore);
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
+  });
+
+  it('keeps the Festerhex reflection when another free-cast buff pays instead', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' }, 'affliction');
+    addTarget(sim);
+    sim.castAbility('curse_of_agony');
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(true);
+    tick(sim, 30);
+    // A spell-agnostic free-cast buff found first: it pays for this Festerhex.
+    player.auras.unshift({
+      id: 'test_free_cast',
+      name: 'Test Free Cast',
+      kind: 'next_cast_free',
+      value: 1,
+      remaining: 30,
+      duration: 30,
+      sourceId: player.id,
+      school: 'arcane',
+    });
+    const resourceBefore = player.resource;
+
+    sim.castAbility('curse_of_agony');
+
+    expect(player.resource).toBe(resourceBefore);
+    expect(player.auras.some((aura) => aura.id === 'test_free_cast')).toBe(false);
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(true);
   });
 
   it('lets Forbidden Reflection repeat one shared cooldown without restarting it', () => {

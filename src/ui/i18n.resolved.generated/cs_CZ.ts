@@ -4965,10 +4965,10 @@ export const cs_CZ: EnTranslations = {
       "formShadow": "Podoba šerého závoje: stínové poškození zvýšeno o {pct} %",
       "resourceCount": "{value} z {max}",
       "formLich": "Kopí duše navíc zasáhne až {targets} blízké nepřátele za {pct} % poškození",
-      "afflictionEye": "Proklínající pohled útočí každých {interval} s; efekty na tomto Oku generují {pct} % Odsouzení",
+      "afflictionEye": "Vaše DoTy zde způsobují o {dotPct} % vyšší poškození a {echoPct} % každého tiku přenesou na blízké nepřátele s vaší Černou hnilobou; efekty zde generují {pct} % Odsouzení",
       "afflictionEyeSecondary": "Efekty na tomto Oku generují {doomPct} % Odsouzení; Rozsudek sem zasáhne ozvěnou za {echoPct} % poškození",
       "afflictionAccomplice": "Způsobilé poškození uděluje {value} Odsouzení, nejvýše jednou za {interval} s",
-      "afflictionViolence": "Zbývá {charges} odplat: nepřátelský útok udělí {doom} Odsouzení a vrátí {damage} stínového poškození",
+      "afflictionViolence": "Tiky vašich DoTů zde mají {pct}% šanci proběhnout znovu",
       "afflictionVicarious": "Přesměruje nebo sníží {pct} % příchozího poškození a může vygenerovat až {max} Odsouzení",
       "afflictionPossession": "Posiluje kouzla Jehla osudu, Vysát, Proklínající pohled a Rozsudek",
       "afflictionJudgment": "Primární Oko generuje o {eyePct} % více Odsouzení; Rozsudek způsobuje o {sentencePct} % více poškození a první vrátí {refund} Odsouzení",
@@ -10164,6 +10164,7 @@ export const cs_CZ: EnTranslations = {
       "immolate": "Zapálí cíl úvodním zásahem a přetrvávajícím hořením.",
       "corruption": "Rozloží cíl stínem, který tiká, zatímco děláš jiné věci.",
       "life_tap": "Vymění část tvého zdraví zpět za manu, když vyschneš.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Přírodní střela hozená na cíl z dálky, tvoje základní ničivé kouzlo.",
       "healing_touch": "Velké léčení jednoho cíle s dlouhým sesláním, pro úplné doléčení.",
       "mark_of_the_wild": "Trvalé požehnání, které dáváš sobě nebo spojenci před bojem.",
@@ -18283,9 +18284,13 @@ export const cs_CZ: EnTranslations = {
         "name": "Rozsudek",
         "description": "Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Každá Nit zvýší poškození o 6 %. Přidané efekty eskalují při 20, 50, 80 a 100 Odsouzení. Škálování jeho poškození se po úrovni 16 zplošťuje."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Tvrdý obchod",
-        "description": "Převede {damage} zdraví na {damage} many."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Krutá dohoda",
+        "description": "Obětuje 10 % maximálního zdraví a obnoví {manaPct} % maximální many. Nelze použít při 20 % zdraví nebo méně."
       },
       "cursed_accomplice": {
         "name": "Prokletý spolupachatel",
@@ -18338,6 +18343,10 @@ export const cs_CZ: EnTranslations = {
       "coven": {
         "name": "Sabat",
         "description": "Na 15 s vytvoří vedlejší Uhrančivá oka až na 4 blízkých nepřátelích. Krmí sdílenou zásobu Odsouzení z 50 % a Rozsudek se k nim šíří ozvěnou za 35 % poškození."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spotřebuje 60 Odsouzení: až 5 nepřátel do 30 yardů s vaší Černou hnilobou okamžitě utrpí 4 tiky každého vašeho periodického poškození, které na nich je."
       },
       "fear": {
         "name": "Děs",

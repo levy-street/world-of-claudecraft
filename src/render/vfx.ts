@@ -296,6 +296,11 @@ export const SCHOOL_COLORS: Record<string, number> = {
   frost: 0x8ed2ff,
   arcane: 0xd98aff,
   shadow: 0x9a5df0,
+  // Presentation-only: Blightcaller's shadow spells draw in rot green
+  // (blightcraft_fx.ts). No sim ability carries this school.
+  blight: 0x9bd23c,
+  // Presentation-only: Veinleech's blood red (blightcraft_fx.ts).
+  leech: 0xd8202f,
   holy: 0xffe9a0,
   nature: 0x86e86a,
   // warm steel-spark: near-white crossed the bloom threshold colorlessly and

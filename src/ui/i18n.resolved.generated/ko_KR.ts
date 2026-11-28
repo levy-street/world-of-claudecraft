@@ -4965,10 +4965,10 @@ export const ko_KR: EnTranslations = {
       "formShadow": "어스름장막 변신: 암흑 피해가 {pct}% 증가합니다",
       "resourceCount": "{value}/{max}",
       "formLich": "영혼 창이 주변 최대 {targets}명에게도 {pct}% 피해를 줍니다",
-      "afflictionEye": "저주의 시선이 {interval}초마다 공격하며, 이 사안에서 발동한 효과는 규탄을 {pct}% 생성합니다",
+      "afflictionEye": "이곳에서 내 지속 피해 효과가 {dotPct}% 더 큰 피해를 주고, 각 틱의 {echoPct}%가 내 검은 부패에 걸린 근처 적에게 전이됩니다. 이곳의 효과는 단죄를 {pct}% 생성합니다",
       "afflictionEyeSecondary": "이 사안의 효과는 규탄을 {doomPct}% 생성하며, 선고가 이곳에 {echoPct}% 피해로 메아리칩니다",
       "afflictionAccomplice": "조건을 만족하는 피해가 규탄을 {value} 생성합니다. {interval}초에 한 번만 발동합니다",
-      "afflictionViolence": "보복 {charges}회 남음: 적의 공격이 규탄을 {doom} 생성하고 {damage}의 암흑 피해로 반격합니다",
+      "afflictionViolence": "이곳에서 내 지속 피해 틱이 {pct}% 확률로 한 번 더 발동합니다",
       "afflictionVicarious": "받는 피해의 {pct}%를 이전하거나 감소시키고 규탄을 최대 {max} 생성합니다",
       "afflictionPossession": "운명의 바늘, 생명력 흡수, 저주의 시선, 선고를 강화합니다",
       "afflictionJudgment": "주 사안의 규탄 생성량이 {eyePct}% 증가하고 선고 피해가 {sentencePct}% 증가하며 첫 선고가 규탄 {refund}을 돌려줍니다",
@@ -10164,6 +10164,7 @@ export const ko_KR: EnTranslations = {
       "immolate": "대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.",
       "corruption": "대상을 어둠으로 부식시켜, 다른 일을 하는 동안에도 피해가 들어갑니다.",
       "life_tap": "마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.",
+      "hard_bargain": "부상을 입었을 때 마나의 20%를 생명력의 20%로 바꿉니다.",
       "wrath": "원거리에서 대상에게 던지는 자연 화살로, 주력 공격기입니다.",
       "healing_touch": "시전 시간이 긴 강력한 단일 대상 치유로, 체력을 가득 채울 때 씁니다.",
       "mark_of_the_wild": "전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.",
@@ -18283,9 +18284,13 @@ export const ko_KR: EnTranslations = {
         "name": "선고",
         "description": "모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "가혹한 거래",
-        "description": "생명력 {damage}을 마나 {damage}으로 전환합니다."
+        "description": "최대 마나의 20%를 희생하여 최대 생명력의 {healPct}%를 회복합니다."
+      },
+      "life_tap": {
+        "name": "잔혹한 계약",
+        "description": "최대 생명력의 10%를 희생하여 최대 마나의 {manaPct}%를 회복합니다. 생명력이 20% 이하일 때는 사용할 수 없습니다."
       },
       "cursed_accomplice": {
         "name": "저주받은 공모자",
@@ -18338,6 +18343,10 @@ export const ko_KR: EnTranslations = {
       "coven": {
         "name": "마녀회",
         "description": "주변 적 최대 4명에게 15초 동안 유지되는 보조 사안을 만듭니다. 공유 단죄를 50% 효율로 채우며 선고 피해의 35%를 메아리로 받습니다."
+      },
+      "plague_bloom": {
+        "name": "역병 개화",
+        "description": "단죄 60 소모: 내 검은 부패에 걸린 30야드 이내의 적 최대 5명이 즉시 내 모든 지속 피해 효과의 4틱만큼 피해를 받습니다."
       },
       "fear": {
         "name": "번민",

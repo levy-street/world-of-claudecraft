@@ -4063,6 +4063,9 @@ export type AbilityEffect =
       duration: number;
       interval: number;
       leechPct?: number;
+      /** Total spell power coefficient over the whole duration; defaults to
+       *  duration / SPELL_DOT_COEFF_DURATION (Hexcraft Blight Coven DoTs). */
+      spCoeff?: number;
       auraId?: string;
       directPct?: number;
       school?: Aura['school'];
@@ -4292,6 +4295,8 @@ export type AbilityEffect =
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'selfDamagePctCurrent'; pct: number }
   | { type: 'selfHealPctMax'; pct: number }
+  // Hard Bargain: spend a share of max mana to heal a share of max health.
+  | { type: 'hardBargain'; manaPctMax: number; healPctMax: number }
   | { type: 'selfAbsorbPctMax'; pct: number; duration: number }
   | { type: 'gainSoulFragments'; amount: number }
   | {
@@ -4333,9 +4338,11 @@ export type AbilityEffect =
   | {
       type: 'afflictionViolence';
       duration: number;
-      charges: number;
-      doomPerProc: number;
-      damage: number;
+      /** Blight Coven: chance for a DoT tick on the hexed enemy to tick again. */
+      chance?: number;
+      charges?: number;
+      doomPerProc?: number;
+      damage?: number;
       interval?: number;
       tickDoom?: number;
     }
@@ -4346,15 +4353,23 @@ export type AbilityEffect =
       doom: number;
     }
   | { type: 'afflictionVicarious'; duration: number; maxDoom: number }
-  | { type: 'warlockUmbralAnchor'; duration: number; maxRange: number }
   | {
-      type: 'afflictionCoven';
+      type: 'warlockUmbralAnchor';
       duration: number;
-      radius: number;
-      maxSecondary: number;
+      maxRange: number;
+      /** Share of the caster's max health healed on each recall teleport. */
+      recallHealPctMax?: number;
     }
   | { type: 'afflictionPossession'; duration: number; doom: number }
   | { type: 'afflictionJudgment'; duration: number; doom: number; refund: number }
+  | { type: 'afflictionContagion'; cost: number; maxTargets: number; radius: number }
+  | {
+      type: 'afflictionPlagueBloom';
+      cost: number;
+      ticks: number;
+      maxTargets: number;
+      range: number;
+    }
   | {
       type: 'afflictionLitany';
       duration: number;
@@ -4540,6 +4555,15 @@ export interface AbilityDef {
   // temporal uses this so the cast is refused (no cost/cooldown) on an out-of-group
   // target rather than resolving to an empty selection. Checked in casting_lifecycle.
   partyOnlyTarget?: boolean;
+  // With partyOnlyTarget: also accept a pet owned by the caster or a group member
+  // (Cursed Accomplice links a tanking pet).
+  partyPetTarget?: boolean;
+  // The target must carry this aura kind, applied by the caster (Blightcaller's
+  // Putrefy, Contagion and Litany of Guilt need your Rotmark on it). The sim
+  // refuses before billing, and the action bar paints the slot unusable.
+  requiresOwnTargetAuraKind?: AuraKind;
+  // A cast that never sends an Assist-stance pet in (Rotmark only marks).
+  noPetAssist?: boolean;
   // Combat resurrection (Temporal Reversal): the target must be a DEAD group/raid
   // member (not the living-friendly self-cast path). Resolved in casting_lifecycle.
   targetsDead?: boolean;
@@ -10303,6 +10327,9 @@ export type SimEvent = { pid?: number } & (
       sourceId: number;
       targetId: number;
       school: string;
+      // A periodic 'tick': the id of the DoT aura that ticked. Presentation only (the
+      // client colours Blightcaller and Veinleech ticks by it); never an ability claim.
+      dot?: string;
       fx:
         | 'projectile'
         // The same homing bolt drawn heavier (Pyroblast's boulder): mechanics

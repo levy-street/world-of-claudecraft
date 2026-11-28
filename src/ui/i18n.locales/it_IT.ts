@@ -9652,8 +9652,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Marciume Nero',
   'entities.abilities.corruption.description':
     'Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s.',
-  'entities.abilities.life_tap.name': 'Patto Amaro',
-  'entities.abilities.life_tap.description': 'Converte {damage} salute in {damage} mana.',
+  'entities.abilities.life_tap.name': 'Patto Crudele',
+  'entities.abilities.life_tap.description':
+    'Sacrifica il 10% della salute massima per ripristinare il {manaPct}% del mana massimo. Non utilizzabile con il 20% di salute o meno.',
+  'entities.abilities.hard_bargain.name': 'Patto Amaro',
   'entities.abilities.curse_of_agony.name': "Maleficio dell'Angoscia",
   'entities.abilities.curse_of_agony.description':
     'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',
@@ -17381,6 +17383,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Esplosione Cadaverica',
   'entities.abilities.coven.description':
     'Crea Malocchi secondari su un massimo di 4 nemici vicini per 15 sec. Alimentano la riserva condivisa di Condanna al 50%, e Sentenza riecheggia su di loro per il 35% dei danni.',
+  'entities.abilities.plague_bloom.description':
+    "Spende 60 Condanna: fino a 5 nemici entro 30 yard colpiti dal tuo Marciume Nero subiscono all'istante 4 tick di ogni tuo effetto di danno periodico su di loro.",
   'entities.abilities.coven.name': 'Congrega',
   'entities.abilities.cruel_pact.description':
     "Sacrifica il 12% della tua salute massima per ripristinare l'1,5% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno.",
@@ -17569,7 +17573,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Divorare sta consumando {stacks} Filamenti del Fato per {doom} Condanna extra per tick',
   'hudChrome.auraEffect.afflictionEye':
-    'Sguardo Maledetto attacca ogni {interval} sec; gli effetti su questo Malocchio generano il {pct}% di Condanna',
+    'I tuoi DoT infliggono il {dotPct}% di danni in più qui e riflettono il {echoPct}% di ogni tick sui nemici vicini colpiti dal tuo Marciume Nero; gli effetti qui generano il {pct}% di Condanna',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Gli effetti su questo Malocchio generano il {doomPct}% di Condanna; Sentenza riecheggia qui per il {echoPct}% dei danni',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -17583,7 +17587,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Reindirizza o riduce il {pct}% dei danni subiti e può generare fino a {max} Condanna',
   'hudChrome.auraEffect.afflictionViolence':
-    'Restano {charges} rappresaglie; un attacco nemico concede {doom} Condanna e infligge {damage} danni da Ombra di ritorno',
+    'I tick dei tuoi DoT qui hanno il {pct}% di probabilità di ripetersi',
   'hudChrome.auraEffect.aoeEcho':
     'Restano {charges} echi: le abilità a bersaglio singolo infliggono il {pct}% dei danni fino a {targets} nemici vicini',
   'hudChrome.auraEffect.arcaneCharge':

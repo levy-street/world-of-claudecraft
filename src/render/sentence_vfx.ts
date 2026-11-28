@@ -23,7 +23,7 @@ const BASE_SPARK_COUNT = 42;
 const MAXIMUM_SPARK_COUNT = 72;
 const SOUL_FRAGMENT_COUNT = 24;
 const CASTER_WISP_COUNT = 18;
-const CURSE_COLOR = 0x551462;
+const CURSE_COLOR = 0x406214;
 
 export type SentenceAnchorWriter = (
   entityId: number,
@@ -156,8 +156,8 @@ function lashGeometry(count = 28): THREE.BufferGeometry {
 function starburstGeometry(rayCount = 30): THREE.BufferGeometry {
   const vertices: number[] = [];
   const colors: number[] = [];
-  const purple = color(0x51205e, 0.75);
-  const deepPurple = color(0x32103e, 0.65);
+  const rot = color(0x435e20, 0.75);
+  const deepRot = color(0x2a3e10, 0.65);
   const up = new THREE.Vector3(0, 1, 0);
   const alternate = new THREE.Vector3(1, 0, 0);
   const direction = new THREE.Vector3();
@@ -180,7 +180,7 @@ function starburstGeometry(rayCount = 30): THREE.BufferGeometry {
     left.copy(base).addScaledVector(side, width);
     right.copy(base).addScaledVector(side, -width);
     vertices.push(left.x, left.y, left.z, right.x, right.y, right.z, tip.x, tip.y, tip.z);
-    const rayColor = index % 3 === 1 ? deepPurple : purple;
+    const rayColor = index % 3 === 1 ? deepRot : rot;
     for (let vertex = 0; vertex < 3; vertex++) {
       colors.push(rayColor.r, rayColor.g, rayColor.b);
     }
@@ -312,7 +312,7 @@ export class SentenceVfx {
     sourceGroup.add(sourceBillboard);
 
     const sourceCoreMaterial = new THREE.SpriteMaterial({
-      color: color(0x6b1b78, this.lowDetail ? 0.55 : 0.72),
+      color: color(0x4f781b, this.lowDetail ? 0.55 : 0.72),
       map: glowTexture,
       transparent: true,
       opacity: 0,
@@ -329,7 +329,7 @@ export class SentenceVfx {
     const sourceSealCount = this.lowDetail ? 1 : 3;
     for (let sealIndex = 0; sealIndex < sourceSealCount; sealIndex++) {
       const material = new THREE.MeshBasicMaterial({
-        color: color(sealIndex === 1 ? 0x8a245f : 0x51205e, 0.62 + sealIndex * 0.05),
+        color: color(sealIndex === 1 ? 0x5d8a24 : 0x435e20, 0.62 + sealIndex * 0.05),
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -355,7 +355,7 @@ export class SentenceVfx {
         new THREE.BufferAttribute(sourceWispPositions, 3).setUsage(THREE.DynamicDrawUsage),
       );
       sourceWispMaterial = new THREE.PointsMaterial({
-        color: color(0x6d2a79, 0.72),
+        color: color(0x56792a, 0.72),
         map: glowTexture,
         size: 0.24,
         transparent: true,
@@ -375,7 +375,7 @@ export class SentenceVfx {
     group.visible = false;
 
     const vortexMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x0c0710, 1),
+      color: color(0x0c1007, 1),
       transparent: true,
       opacity: 0,
       blending: THREE.NormalBlending,
@@ -392,7 +392,7 @@ export class SentenceVfx {
     const eye = new THREE.Group();
     eye.name = `sentence-vfx-eye-${index}`;
     const eyeMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x592069, this.lowDetail ? 0.65 : 0.75),
+      color: color(0x496920, this.lowDetail ? 0.65 : 0.75),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -408,7 +408,7 @@ export class SentenceVfx {
       side: THREE.DoubleSide,
     });
     const pupilMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x020104, 1),
+      color: color(0x030401, 1),
       transparent: true,
       opacity: 0,
       blending: THREE.NormalBlending,
@@ -416,7 +416,7 @@ export class SentenceVfx {
       side: THREE.DoubleSide,
     });
     const flashMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x32103e, this.lowDetail ? 0.5 : 0.65),
+      color: color(0x2a3e10, this.lowDetail ? 0.5 : 0.65),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -438,7 +438,7 @@ export class SentenceVfx {
     eye.add(flashMesh, eyeOuter, iris, pupilMesh);
 
     const lashMaterial = new THREE.LineBasicMaterial({
-      color: color(0x74317f, 0.75),
+      color: color(0x5d7f31, 0.75),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -459,7 +459,7 @@ export class SentenceVfx {
       sigils.name = `sentence-vfx-sigils-${index}`;
       for (let sigilIndex = 0; sigilIndex < 3; sigilIndex++) {
         const material = new THREE.MeshBasicMaterial({
-          color: color(sigilIndex === 1 ? 0x32103e : 0x54185f, sigilIndex === 1 ? 0.65 : 0.75),
+          color: color(sigilIndex === 1 ? 0x2a3e10 : 0x405f18, sigilIndex === 1 ? 0.65 : 0.75),
           transparent: true,
           opacity: 0,
           blending: THREE.AdditiveBlending,
@@ -481,7 +481,7 @@ export class SentenceVfx {
       crown = new THREE.Group();
       crown.name = `sentence-vfx-crown-${index}`;
       crownMaterial = new THREE.MeshBasicMaterial({
-        color: color(0x713082, 0.8),
+        color: color(0x5e8230, 0.8),
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -501,7 +501,7 @@ export class SentenceVfx {
     group.add(billboard);
 
     const waveMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x491554, this.lowDetail ? 0.72 : 0.8),
+      color: color(0x385415, this.lowDetail ? 0.72 : 0.8),
       transparent: true,
       opacity: 0,
       blending: THREE.NormalBlending,
@@ -517,7 +517,7 @@ export class SentenceVfx {
     let secondaryWaveMaterial: THREE.MeshBasicMaterial | null = null;
     if (!this.lowDetail) {
       secondaryWaveMaterial = new THREE.MeshBasicMaterial({
-        color: color(0x32103e, 0.65),
+        color: color(0x2a3e10, 0.65),
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -531,7 +531,7 @@ export class SentenceVfx {
     }
 
     const pillarMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x1c0824, this.lowDetail ? 0.65 : 0.8),
+      color: color(0x182408, this.lowDetail ? 0.65 : 0.8),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -544,7 +544,7 @@ export class SentenceVfx {
     group.add(pillar);
 
     const cataclysmCoreMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x050308, 1),
+      color: color(0x060803, 1),
       transparent: true,
       opacity: 0,
       blending: THREE.NormalBlending,
@@ -558,7 +558,7 @@ export class SentenceVfx {
     group.add(cataclysmCore);
 
     const detonationFlashMaterial = new THREE.SpriteMaterial({
-      color: color(0x5d1d70, this.lowDetail ? 0.65 : 0.8),
+      color: color(0x4b701d, this.lowDetail ? 0.65 : 0.8),
       map: glowTexture,
       transparent: true,
       opacity: 0,
@@ -579,7 +579,7 @@ export class SentenceVfx {
     let verticalHaloMaterial: THREE.MeshBasicMaterial | null = null;
     if (!this.lowDetail) {
       cataclysmShellMaterial = new THREE.MeshBasicMaterial({
-        color: color(0x4f185c, 0.68),
+        color: color(0x3e5c18, 0.68),
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -608,7 +608,7 @@ export class SentenceVfx {
       group.add(starburst);
 
       verticalHaloMaterial = new THREE.MeshBasicMaterial({
-        color: color(0x43164d, 0.65),
+        color: color(0x354d16, 0.65),
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -634,7 +634,7 @@ export class SentenceVfx {
     }
 
     const ruptureMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x4e145e, this.lowDetail ? 0.65 : 0.8),
+      color: color(0x3d5e14, this.lowDetail ? 0.65 : 0.8),
       transparent: true,
       opacity: 0,
       blending: THREE.NormalBlending,
@@ -649,7 +649,7 @@ export class SentenceVfx {
     group.add(rupture);
 
     const residueMaterial = new THREE.MeshBasicMaterial({
-      color: color(0x481150, this.lowDetail ? 0.5 : 0.68),
+      color: color(0x345011, this.lowDetail ? 0.5 : 0.68),
       map: runeTexture,
       transparent: true,
       opacity: 0,
@@ -684,7 +684,7 @@ export class SentenceVfx {
         new THREE.BufferAttribute(soulPositions, 3).setUsage(THREE.DynamicDrawUsage),
       );
       soulMaterial = new THREE.PointsMaterial({
-        color: color(0x7a2f83, 0.7),
+        color: color(0x5e832f, 0.7),
         map: glowTexture,
         size: 0.34,
         transparent: true,
@@ -724,7 +724,7 @@ export class SentenceVfx {
       position.setUsage(THREE.DynamicDrawUsage);
       sparkGeometry.setAttribute('position', position);
       sparkMaterial = new THREE.PointsMaterial({
-        color: color(0x6d3a79, 0.85),
+        color: color(0x5d793a, 0.85),
         map: glowTexture,
         size: 0.42,
         transparent: true,

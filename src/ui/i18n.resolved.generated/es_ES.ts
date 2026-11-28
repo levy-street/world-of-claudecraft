@@ -4965,10 +4965,10 @@ export const es_ES: EnTranslations = {
       "formShadow": "Forma de velo umbrío: daño de las Sombras aumentado un {pct}%",
       "resourceCount": "{value} de {max}",
       "formLich": "Lanza de alma también golpea hasta a {targets} enemigos cercanos por un {pct}% de daño",
-      "afflictionEye": "Mirada maléfica ataca cada {interval} s; los efectos en este Ojo generan un {pct}% de Condena",
+      "afflictionEye": "Tus DoT infligen un {dotPct}% más aquí y reflejan un {echoPct}% de cada tic en enemigos cercanos con tu Putrefacción Negra; los efectos aquí generan un {pct}% de Condena",
       "afflictionEyeSecondary": "Los efectos en este Ojo generan un {doomPct}% de Condena; Sentencia hace eco aquí por un {echoPct}% de daño",
       "afflictionAccomplice": "El daño válido genera {value} de Condena, como máximo una vez cada {interval} s",
-      "afflictionViolence": "Quedan {charges} represalias; un ataque enemigo genera {doom} de Condena y devuelve {damage} de daño de las Sombras",
+      "afflictionViolence": "Tus tics de DoT aquí tienen un {pct}% de probabilidad de repetirse",
       "afflictionVicarious": "Redirige o reduce un {pct}% del daño recibido y puede generar hasta {max} de Condena",
       "afflictionPossession": "Potencia Aguja del destino, Drenar vida, Mirada maléfica y Sentencia",
       "afflictionJudgment": "El Ojo principal genera un {eyePct}% más de Condena; Sentencia inflige un {sentencePct}% más y la primera devuelve {refund} de Condena",
@@ -10164,6 +10164,7 @@ export const es_ES: EnTranslations = {
       "immolate": "Prende fuego a un objetivo con un golpe inicial y una quemadura que perdura.",
       "corruption": "Pudre al objetivo con sombra que va dañando mientras haces otras cosas.",
       "life_tap": "Convierte parte de tu propia salud en maná cuando te quedas sin él.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Una descarga de naturaleza lanzada a un objetivo a distancia, tu hechizo de ataque habitual.",
       "healing_touch": "Una gran sanación de un solo objetivo con lanzamiento largo, para reponer a alguien por completo.",
       "mark_of_the_wild": "Una bendición duradera que pones sobre ti o un aliado antes de un combate.",
@@ -18283,9 +18284,13 @@ export const es_ES: EnTranslations = {
         "name": "Sentencia",
         "description": "Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Trato Amargo",
-        "description": "Convierte {damage} de salud en {damage} de maná."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Pacto cruel",
+        "description": "Sacrifica el 10% de tu salud máxima para restaurar el {manaPct}% de tu maná máximo. No se puede usar con el 20% de salud o menos."
       },
       "cursed_accomplice": {
         "name": "Cómplice maldito",
@@ -18338,6 +18343,10 @@ export const es_ES: EnTranslations = {
       "coven": {
         "name": "Aquelarre",
         "description": "Crea Males de ojo secundarios sobre hasta 4 enemigos cercanos durante 15 s. Alimentan la reserva compartida de Condena al 50% y reciben un eco del 35% del daño de Sentencia."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Gasta 60 de Condena: hasta 5 enemigos a menos de 30 m que tengan tu Putrefacción Negra reciben al instante 4 tics de cada uno de tus efectos de daño periódico sobre ellos."
       },
       "fear": {
         "name": "Espanto",

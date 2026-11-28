@@ -47,7 +47,8 @@ import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
-import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
+import { addFateThread, gainDoom, tickAfflictionAura } from './affliction';
+import { blightOnDotTick, blightTickMult, veinleechOverhealShield } from './affliction_blight';
 import { releaseStoneStatue, tickGutteredGlare } from './balgath_trinkets';
 import { regenParkedCatEnergy } from './cat_form_energy';
 import { isStunned } from './cc';
@@ -83,7 +84,11 @@ import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
-import { tickSacrilegiousMarch, tickWarlockTalentState } from './warlock_talents';
+import {
+  sustainLeadenHexFromDotTick,
+  tickSacrilegiousMarch,
+  tickWarlockTalentState,
+} from './warlock_talents';
 
 const SECOND_WIND_THRESHOLD = 0.35;
 
@@ -366,7 +371,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         } else if (a.id === TRINKET_AURA.stoneStatue) {
           releaseStoneStatue(ctx, e, a);
         } else if (
-          (a.kind === 'dot' || a.kind === 'affliction_eye' || a.kind === 'affliction_violence') &&
+          (a.kind === 'dot' || a.kind === 'affliction_eye') &&
           !periodicHarmStands(ctx, ctx.entities.get(a.sourceId) ?? null, e)
         ) {
           // The verdict lapsed since the aura landed (the victim left the
@@ -375,9 +380,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           // (periodic_harm.ts).
           a.remaining = 0;
         } else if (a.kind === 'affliction_eye') {
-          tickMaledictGaze(ctx, e, a);
-        } else if (a.kind === 'affliction_violence') {
-          tickHexOfViolence(ctx, e, a);
+          // Rotmark: its tick only re-checks periodic harm (the arm above).
         } else if (a.kind === 'dot') {
           const dotSource = ctx.entities.get(a.sourceId) ?? null;
           let tickDamage = a.value;
@@ -388,92 +391,128 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
             if (bleedAmp > 0) tickDamage = Math.round(tickDamage * (1 + bleedAmp));
           }
-          ctx.emit({
-            type: 'spellfx',
-            sourceId: a.sourceId,
-            targetId: e.id,
-            school: a.school,
-            fx: 'tick',
-          });
+          // Hexcraft Blight Coven: Evil Eye's bonus on its target (1 otherwise).
+          const blightMult = blightTickMult(dotSource, e, a);
+          if (blightMult !== 1) tickDamage = Math.round(tickDamage * blightMult);
+          // Rolled once (crit included): a Rotfever repeat lands this same hit. Nothing
+          // between here and the old roll site draws rng, so the stream is unchanged.
           const periodicHit =
             a.school === 'shadow' && !a.finalDamage
               ? shadowPeriodicHit(ctx, dotSource, a.id, tickDamage)
               : { amount: tickDamage, crit: false };
-          const resolution: DamageResolution | undefined =
-            a.id === 'vampiric_touch' ? { landedHpLoss: 0 } : undefined;
-          const tickLanded = ctx.dealDamage(
-            dotSource,
-            e,
-            periodicHit.amount,
-            periodicHit.crit,
-            a.school,
-            a.name,
-            'hit',
-            true,
-            // The source's Stonebound posture and the aura's own authored threat
-            // multiplier are independent, so a DoT carrying both applies both.
-            dotSource || a.threatMult !== undefined
-              ? {
-                  mult:
-                    (dotSource ? stoneboundThreatMultiplier(ctx, dotSource) : 1) *
-                    (a.threatMult ?? 1),
+          // One DoT tick landing: the normal tick and a Rotfever repeat share it.
+          const landTick = (repeat: boolean): number => {
+            ctx.emit({
+              type: 'spellfx',
+              sourceId: a.sourceId,
+              targetId: e.id,
+              school: a.school,
+              fx: 'tick',
+              dot: a.id,
+            });
+            // Leaden Hex: the warlock's DoT ticks hold its slow in place (no stack, no root).
+            sustainLeadenHexFromDotTick(e, a);
+            const resolution: DamageResolution | undefined =
+              a.id === 'vampiric_touch' ? { landedHpLoss: 0 } : undefined;
+            const tickLanded = ctx.dealDamage(
+              dotSource,
+              e,
+              periodicHit.amount,
+              periodicHit.crit,
+              a.school,
+              a.name,
+              'hit',
+              true,
+              // The source's Stonebound posture and the aura's own authored threat
+              // multiplier are independent, so a DoT carrying both applies both.
+              dotSource || a.threatMult !== undefined
+                ? {
+                    mult:
+                      (dotSource ? stoneboundThreatMultiplier(ctx, dotSource) : 1) *
+                      (a.threatMult ?? 1),
+                  }
+                : undefined,
+              // Periodic (DoT) ticks are not a direct attack: they must not walk a
+              // mob's leash anchor, so a DoT-kited mob still leashes home. Ticks
+              // also deliberately carry NO abilityId (the label above is FCT and
+              // combat-log only): a hybrid ability's dot shares its ability id
+              // (Throat Wire's bleed is aura id 'garrote'), so a tick that carried
+              // the id would replay the ability's dedicated impact recording
+              // (IMPACT_ABILITY_CUES) every interval, the exact per-tick spam the
+              // one-shot dotApply moment exists to avoid.
+              false,
+              false,
+              // Banks copied from resolved damage (Ignite) skip the source-output
+              // multipliers so the payout equals what was banked, once.
+              a.finalDamage === true,
+              null,
+              false,
+              resolution,
+            );
+            if (resolution) healVampiricTouch(ctx, dotSource, a, resolution.landedHpLoss);
+            blightOnDotTick(
+              ctx,
+              dotSource,
+              e,
+              a,
+              periodicHit.amount,
+              {
+                gainDoom,
+                addStack: () => dotSource && addFateThread(ctx, dotSource),
+                // Rotfever: the repeat is a real tick (threat, leech, flash, Leaden
+                // Hex, Blight) with the same damage and no further repeat roll.
+                repeatTick: () => {
+                  if (repeat || e.dead) return;
+                  landTick(true);
+                  applyLeech();
+                },
+              },
+              repeat,
+            );
+            return tickLanded;
+          };
+          const applyLeech = (): void => {
+            if (a.leechPct !== undefined) {
+              const src = dotSource;
+              if (src && !src.dead) {
+                // A leech is healing the SOURCE receives, so it runs the same
+                // recipient-side pipeline as applyHeal: incoming-heal mult, then
+                // the absorb drain, then the missing-hp clamp.
+                const intended = Math.round(tickDamage * a.leechPct * ctx.healingTakenMult(src));
+                const landing = consumeHealAbsorb(ctx, src, intended);
+                const absorbed = intended - landing;
+                const healed = Math.min(landing, Math.max(0, src.maxHp - src.hp));
+                onCraftedCollectionHeal(ctx, src, src, landing - healed);
+                const overheal = landing - healed;
+                if (healed > 0 || absorbed > 0 || overheal > 0) {
+                  if (healed > 0) src.hp += healed;
+                  // A tick that landed as pure overheal still reports it for the
+                  // meters and the parse, flagged hot so the client treats it as a
+                  // silent passive tick; every other leech tick keeps its shape.
+                  const passive = healed === 0 && absorbed === 0;
+                  ctx.emit({
+                    type: 'heal2',
+                    sourceId: src.id,
+                    targetId: src.id,
+                    amount: healed,
+                    crit: false,
+                    ability: a.name,
+                    ...(passive ? { hot: true } : {}),
+                    ...(absorbed > 0 ? { absorbed } : {}),
+                    ...(overheal > 0 ? { overheal } : {}),
+                  });
+                  if (healed > 0) ctx.healingThreat(src, src, healed);
                 }
-              : undefined,
-            // Periodic (DoT) ticks are not a direct attack: they must not walk a
-            // mob's leash anchor, so a DoT-kited mob still leashes home. Ticks
-            // also deliberately carry NO abilityId (the label above is FCT and
-            // combat-log only): a hybrid ability's dot shares its ability id
-            // (Throat Wire's bleed is aura id 'garrote'), so a tick that carried
-            // the id would replay the ability's dedicated impact recording
-            // (IMPACT_ABILITY_CUES) every interval, the exact per-tick spam the
-            // one-shot dotApply moment exists to avoid.
-            false,
-            false,
-            // Banks copied from resolved damage (Ignite) skip the source-output
-            // multipliers so the payout equals what was banked, once.
-            a.finalDamage === true,
-            null,
-            false,
-            resolution,
-          );
-          if (resolution) healVampiricTouch(ctx, dotSource, a, resolution.landedHpLoss);
+                veinleechOverhealShield(ctx, src, a, overheal);
+              }
+            }
+          };
+          const tickLanded = landTick(false);
           shadowSecondVerseTick(ctx, e, a);
           vespersOnDotTick(ctx, e, a);
           thundercallOnDotTick(ctx, dotSource, a, tickLanded);
           druidEngineOnBleedTick(ctx, dotSource, a);
-          if (a.leechPct !== undefined) {
-            const src = dotSource;
-            if (src && !src.dead) {
-              // A leech is healing the SOURCE receives, so it runs the same
-              // recipient-side pipeline as applyHeal: incoming-heal mult, then
-              // the absorb drain, then the missing-hp clamp.
-              const intended = Math.round(tickDamage * a.leechPct * ctx.healingTakenMult(src));
-              const landing = consumeHealAbsorb(ctx, src, intended);
-              const absorbed = intended - landing;
-              const healed = Math.min(landing, Math.max(0, src.maxHp - src.hp));
-              onCraftedCollectionHeal(ctx, src, src, landing - healed);
-              const overheal = landing - healed;
-              if (healed > 0 || absorbed > 0 || overheal > 0) {
-                if (healed > 0) src.hp += healed;
-                // A tick that landed as pure overheal still reports it for the
-                // meters and the parse, flagged hot so the client treats it as a
-                // silent passive tick; every other leech tick keeps its shape.
-                const passive = healed === 0 && absorbed === 0;
-                ctx.emit({
-                  type: 'heal2',
-                  sourceId: src.id,
-                  targetId: src.id,
-                  amount: healed,
-                  crit: false,
-                  ability: a.name,
-                  ...(passive ? { hot: true } : {}),
-                  ...(absorbed > 0 ? { absorbed } : {}),
-                  ...(overheal > 0 ? { overheal } : {}),
-                });
-                if (healed > 0) ctx.healingThreat(src, src, healed);
-              }
-            }
-          }
+          applyLeech();
           if (e.dead) return;
           if (a.maxTickStacks !== undefined) {
             const oldStacks = Math.max(1, a.stacks ?? 1);

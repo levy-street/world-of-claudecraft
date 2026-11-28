@@ -4965,10 +4965,10 @@ export const it_IT: EnTranslations = {
       "formShadow": "Forma d'Ombra: danni da Ombra aumentati del {pct}%",
       "resourceCount": "{value} su {max}",
       "formLich": "Lancia dell'Anima colpisce anche fino a {targets} nemici vicini per il {pct}% dei danni",
-      "afflictionEye": "Sguardo Maledetto attacca ogni {interval} sec; gli effetti su questo Malocchio generano il {pct}% di Condanna",
+      "afflictionEye": "I tuoi DoT infliggono il {dotPct}% di danni in più qui e riflettono il {echoPct}% di ogni tick sui nemici vicini colpiti dal tuo Marciume Nero; gli effetti qui generano il {pct}% di Condanna",
       "afflictionEyeSecondary": "Gli effetti su questo Malocchio generano il {doomPct}% di Condanna; Sentenza riecheggia qui per il {echoPct}% dei danni",
       "afflictionAccomplice": "I danni idonei concedono {value} Condanna, al massimo una volta ogni {interval} sec",
-      "afflictionViolence": "Restano {charges} rappresaglie; un attacco nemico concede {doom} Condanna e infligge {damage} danni da Ombra di ritorno",
+      "afflictionViolence": "I tick dei tuoi DoT qui hanno il {pct}% di probabilità di ripetersi",
       "afflictionVicarious": "Reindirizza o riduce il {pct}% dei danni subiti e può generare fino a {max} Condanna",
       "afflictionPossession": "Potenzia Ago del Destino, Divorare, Sguardo Maledetto e Sentenza",
       "afflictionJudgment": "Il Malocchio primario genera il {eyePct}% di Condanna in più; Sentenza infligge il {sentencePct}% di danni in più e la prima rimborsa {refund} Condanna",
@@ -10164,6 +10164,7 @@ export const it_IT: EnTranslations = {
       "immolate": "Incendia un bersaglio per un colpo iniziale e un'ustione che perdura.",
       "corruption": "Marcisce il bersaglio con l'ombra, che continua a pulsare mentre fai altro.",
       "life_tap": "Converte parte della tua salute in mana quando resti a secco.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Un dardo di natura scagliato su un bersaglio dalla distanza, il tuo colpo di riferimento.",
       "healing_touch": "Una grande cura a bersaglio singolo dal lancio lungo, per rimettere in piedi qualcuno.",
       "mark_of_the_wild": "Una benedizione duratura che metti su di te o un alleato prima di uno scontro.",
@@ -18283,9 +18284,13 @@ export const it_IT: EnTranslations = {
         "name": "Sentenza",
         "description": "Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Patto Amaro",
-        "description": "Converte {damage} salute in {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Patto Crudele",
+        "description": "Sacrifica il 10% della salute massima per ripristinare il {manaPct}% del mana massimo. Non utilizzabile con il 20% di salute o meno."
       },
       "cursed_accomplice": {
         "name": "Complice Maledetto",
@@ -18338,6 +18343,10 @@ export const it_IT: EnTranslations = {
       "coven": {
         "name": "Congrega",
         "description": "Crea Malocchi secondari su un massimo di 4 nemici vicini per 15 sec. Alimentano la riserva condivisa di Condanna al 50%, e Sentenza riecheggia su di loro per il 35% dei danni."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Spende 60 Condanna: fino a 5 nemici entro 30 yard colpiti dal tuo Marciume Nero subiscono all'istante 4 tick di ogni tuo effetto di danno periodico su di loro."
       },
       "fear": {
         "name": "Tormento",

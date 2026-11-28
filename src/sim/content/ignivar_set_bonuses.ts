@@ -232,21 +232,15 @@ export const FROSTQUENCH_4PC_WINTERS_CHILL_CHARGES = 3;
 
 // Audited constants for the bespoke warlock bends (read by the class-module
 // call sites AND pinned by tests, so the copy cannot drift from the code).
-/** Hexthread 2pc: extra Condemnation on the RESOLVED afflictionNeedle payload
- *  (base doom 7 on the needle_of_fate effect). The bonus is a resolved-ability
- *  rewrite in applyTalentMods, so the dispatch (resolveNeedleOfFate) and the
- *  {needleDoom} tooltip splice read the ONE resolved number and can never
- *  diverge. eyeGeneration still multiplies the total afterward: on a secondary
- *  Coven Eye the x0.5-with-rounding pays +1 (a +1 bonus would pay zero there),
- *  and under Hour of Judgment the primary-Eye x2 pays +4, both disclosed by
- *  the set doc. Income lift on the needle source only: the drain, death, and
- *  enemy-action streams keep their base amounts. */
-export const HEXTHREAD_2PC_NEEDLE_DOOM_BONUS = 2;
-/** Hexthread 4pc: Condemnation refunded after a resolved Sentence, at the
- *  post-consume site beside Hour of Judgment's once-per-90s 50-refund charge
- *  (additive with it; near-moot overlap, stated by the set doc). Flagged as
- *  the tuning pass's first shave, per the set doc. */
-export const HEXTHREAD_4PC_SENTENCE_DOOM_REFUND = 10;
+/** Hexthread 2pc (Blight Coven): chance that one of your DoT ticks on your
+ *  primary Rotmark target adds a Carrion stack, rolled in blightOnDotTick
+ *  (combat/affliction_blight.ts). Rotfever's repeated ticks roll too. Replaced
+ *  the flat +2 on the Carrion Dart payload, which the DoT rotation outgrew. */
+export const HEXTHREAD_2PC_TICK_STACK_CHANCE = 0.1;
+/** Hexthread 4pc (Blight Coven): Blight refunded per Carrion stack a resolved
+ *  Putrefy consumes (up to 3 stacks, so up to 30), at the post-consume site in
+ *  resolveSentence, additive beside Hour of Rot's once-per-90s 50 refund. */
+export const HEXTHREAD_4PC_REFUND_PER_STACK = 10;
 /** Gravebrand 2pc: seconds cut from Reaping Command's cooldown (base 8; the
  *  honest claim is +33 percent Reaping Commands, cooldown-bound in the probe).
  *  The Soul Fragment bank and the 2-fragment cost are deliberately untouched:
@@ -981,25 +975,20 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   hexthread: [
     {
       pieces: 2,
-      // Needle of Fate grants 2 additional Condemnation: a resolved-ability
-      // rewrite in applyTalentMods bakes the bonus into the afflictionNeedle
-      // payload, the ONE number resolveNeedleOfFate and the {needleDoom}
-      // tooltip splice both read. eyeGeneration multiplies the total after
-      // (x0.5-with-rounding on secondary Coven Eyes pays +1; x2 under Hour of
-      // Judgment pays +4; both disclosed). The caster 2pc pushback rider rides
-      // the generic global knob. Deterministic, no rng involved.
+      // DoT ticks on the primary Rotmark target have a 10% chance to add a
+      // Carrion stack (blightOnDotTick). The caster 2pc pushback rider rides
+      // the generic global knob. Draws rng only for wearers.
       effect: {
         global: { castPushbackReduction: 1 },
-        tuning: { needleDoomBonus: HEXTHREAD_2PC_NEEDLE_DOOM_BONUS },
+        tuning: { tickStackChance: HEXTHREAD_2PC_TICK_STACK_CHANCE },
       },
     },
     {
       pieces: 4,
-      // Passing Sentence refunds 10 Condemnation: bespoke flag-gated refund at
-      // the post-consume site in resolveSentence (combat/affliction.ts),
-      // additive beside Hour of Judgment's once-per-90s 50-refund charge.
+      // Putrefy refunds 10 Blight per Carrion stack it consumes: flag-gated
+      // refund at the post-consume site in resolveSentence (combat/affliction.ts).
       // Draws no rng; gainDoom is deterministic.
-      effect: { tuning: { sentenceDoomRefund: HEXTHREAD_4PC_SENTENCE_DOOM_REFUND } },
+      effect: { tuning: { refundPerStack: HEXTHREAD_4PC_REFUND_PER_STACK } },
     },
   ],
   gravebrand: [

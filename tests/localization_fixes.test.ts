@@ -759,12 +759,12 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
   it('resolves every player-visible Warlock resource, ability, and row aura name', () => {
     setLanguage('zh_CN');
     for (const name of [
-      'Condemnation',
+      'Blight',
       'Soul Fragments',
       'Umbral Anchor',
-      'Fate Threads',
-      'Possess the Evil Eye',
-      'Hour of Judgment',
+      'Rot Splinters',
+      'Possess the Rotmark',
+      'Hour of Rot',
       'Coven',
       'Sacrilegious March',
       'Sanguine Covenant',
@@ -776,7 +776,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       expect(localizeSimAuraName(name), `no Warlock aura matcher row for '${name}'`).not.toBeNull();
     }
     expect(localizeSimAuraName('Shadow Credit')).not.toBe('Shadow Credit');
-    expect(auraDisplayNameForHud('Fate Threads', '命运之针')).toBe('命运丝线');
+    expect(auraDisplayNameForHud('Rot Splinters', '命运之针')).toBe('命运丝线');
     setLanguage('en');
   });
 

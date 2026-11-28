@@ -4965,10 +4965,10 @@ export const zh_CN: EnTranslations = {
       "formShadow": "幽幕形态：暗影伤害提高 {pct}%",
       "resourceCount": "{value}/{max}",
       "formLich": "灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害",
-      "afflictionEye": "恶咒凝视每 {interval} 秒攻击一次；此邪眼上的效果产生 {pct}% 的定罪值",
+      "afflictionEye": "你的持续伤害效果在此处造成的伤害提高 {dotPct}%，每次跳伤的 {echoPct}% 会传导给附近带有你黑腐术的敌人；此处的效果产生 {pct}% 的谴罪",
       "afflictionEyeSecondary": "此邪眼上的效果产生 {doomPct}% 的定罪值；宣判在此回响并造成 {echoPct}% 伤害",
       "afflictionAccomplice": "符合条件的伤害产生 {value} 点定罪值，每 {interval} 秒最多一次",
-      "afflictionViolence": "剩余 {charges} 次报复；敌人攻击会产生 {doom} 点定罪值并反击 {damage} 点暗影伤害",
+      "afflictionViolence": "你在此处的持续伤害跳伤有 {pct}% 的几率再跳一次",
       "afflictionVicarious": "转移或降低 {pct}% 的受到伤害，并可产生最多 {max} 点定罪值",
       "afflictionPossession": "强化命运之针、吸取生命、恶咒凝视和宣判",
       "afflictionJudgment": "主邪眼产生的定罪值提高 {eyePct}%；宣判伤害提高 {sentencePct}%，第一次返还 {refund} 点定罪值",
@@ -10164,6 +10164,7 @@ export const zh_CN: EnTranslations = {
       "immolate": "点燃目标，打出一记起手伤害并留下持续燃烧。",
       "corruption": "用暗影腐蚀目标，在你做别的事时持续造成伤害。",
       "life_tap": "在法力枯竭时，将部分自身生命值转化为法力。",
+      "hard_bargain": "受伤时以 20% 的法力值换取 20% 的生命值。",
       "wrath": "从远处向目标投出一道自然箭矢，是你的常用输出。",
       "healing_touch": "一记施法时间较长的单体大治疗，用于把人奶满。",
       "mark_of_the_wild": "开战前为自己或盟友施加的持续祝福。",
@@ -18283,9 +18284,13 @@ export const zh_CN: EnTranslations = {
         "name": "裁决",
         "description": "消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。"
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "苛酷交易",
-        "description": "将 {damage} 点生命值转化为 {damage} 点法力值。"
+        "description": "牺牲最大法力值的 20%，恢复最大生命值的 {healPct}%。"
+      },
+      "life_tap": {
+        "name": "残酷契约",
+        "description": "牺牲最大生命值的 10%，恢复最大法力值的 {manaPct}%。生命值不高于 20% 时无法使用。"
       },
       "cursed_accomplice": {
         "name": "受咒同谋",
@@ -18338,6 +18343,10 @@ export const zh_CN: EnTranslations = {
       "coven": {
         "name": "巫契",
         "description": "在最多4名附近敌人身上制造持续15秒的次级邪眼。它们以50%的效率补充共享谴罪池，并承受裁决35%的回响伤害。"
+      },
+      "plague_bloom": {
+        "name": "瘟疫绽放",
+        "description": "消耗 60 点谴罪：30 码内最多 5 个带有你黑腐术的敌人立即承受你在其身上所有持续伤害效果的 4 次跳伤。"
       },
       "fear": {
         "name": "惊惧",

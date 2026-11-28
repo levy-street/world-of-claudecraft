@@ -740,7 +740,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Blightcaller rot-green spell effects in renderer.ts.
+  // No capture was retaken.
+  '88d8c8a4f7e48c3ffbd4c0aea4271f52f3f8ba01a3e966e8efc0e29e8f358f01';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

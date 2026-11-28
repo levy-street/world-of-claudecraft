@@ -9683,8 +9683,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': 'Schwarzfäule',
   'entities.abilities.corruption.description':
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
-  'entities.abilities.life_tap.name': 'Harter Handel',
-  'entities.abilities.life_tap.description': 'Wandelt {damage} Gesundheit in {damage} Mana um.',
+  'entities.abilities.life_tap.name': 'Grausamer Pakt',
+  'entities.abilities.life_tap.description':
+    'Opfert 10% Eurer maximalen Gesundheit, um {manaPct}% Eures maximalen Manas wiederherzustellen. Kann bei 20% Gesundheit oder weniger nicht eingesetzt werden.',
+  'entities.abilities.hard_bargain.name': 'Harter Handel',
   'entities.abilities.curse_of_agony.name': 'Fluch der Qual',
   'entities.abilities.curse_of_agony.description':
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
@@ -16939,6 +16941,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Leichenexplosion',
   'entities.abilities.coven.description':
     'Erschafft für 15 Sek. sekundäre Böse Augen auf bis zu 4 nahen Gegnern. Sie speisen den gemeinsamen Verdammnis-Vorrat mit 50%, und Schuldspruch hallt zu ihnen für 35% Schaden wider.',
+  'entities.abilities.plague_bloom.description':
+    'Verbraucht 60 Verdammnis: Bis zu 5 Gegner im Umkreis von 30 Yard, die deine Schwarzfäule tragen, erleiden sofort 4 Ticks jedes deiner regelmäßigen Schadenseffekte auf ihnen.',
   'entities.abilities.coven.name': 'Hexenzirkel',
   'entities.abilities.cruel_pact.description':
     'Opfert 12% Eurer maximalen Gesundheit, um 1,5% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter.',
@@ -17127,7 +17131,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Verzehren verbraucht {stacks} Schicksalsfäden für {doom} zusätzliche Verdammnis pro Tick',
   'hudChrome.auraEffect.afflictionEye':
-    'Fluchblick greift alle {interval} Sek. an; Effekte an diesem Bösen Auge erzeugen {pct}% Verdammnis',
+    'Eure DoTs verursachen hier {dotPct}% mehr Schaden und übertragen {echoPct}% jedes Ticks auf nahe Gegner mit Eurer Schwarzfäule; Effekte hier erzeugen {pct}% Verdammnis',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Effekte an diesem Bösen Auge erzeugen {doomPct}% Verdammnis; Schuldspruch hallt hier für {echoPct}% Schaden wider',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -17141,7 +17145,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Leitet {pct}% des erlittenen Schadens um oder verringert ihn und kann bis zu {max} Verdammnis erzeugen',
   'hudChrome.auraEffect.afflictionViolence':
-    '{charges} Vergeltungen verbleiben; ein feindlicher Angriff gewährt {doom} Verdammnis und verursacht {damage} Schattenschaden zurück',
+    'Eure DoT-Ticks haben hier eine Chance von {pct}%, erneut zu ticken',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} Echos verbleiben: Fähigkeiten mit einem Ziel verursachen {pct}% Schaden an bis zu {targets} nahen Gegnern',
   'hudChrome.auraEffect.arcaneCharge':

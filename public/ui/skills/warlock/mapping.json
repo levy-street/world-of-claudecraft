@@ -5,7 +5,10 @@
   "sourcePacks": [
     "tmp/asset_src/warlock-skill-icons",
     "tmp/asset_src/demon-skill-icons (summons + life_tap/searing_pain)",
-    "OpenAI image generation (Warlock spell and talent completion, 2026-08-01)"
+    "OpenAI image generation (Warlock spell and talent completion, 2026-08-01)",
+    "Tripo image-to-image (Blight Coven Plague Bloom, 2026-11-26)",
+    "Tripo image-to-image (Blightcraft Rotmark, 2026-11-27)",
+    "Blightcraft rot-green hue pass over the shipped icons (2026-11-27)"
   ],
   "runtimeDir": "public/ui/skills/warlock",
   "abilities": [
@@ -32,6 +35,12 @@
       "sourcePack": "warlock",
       "sourceFile": "12.png",
       "output": "corruption.webp"
+    },
+    {
+      "abilityId": "corruption_shadow",
+      "sourcePack": "warlock",
+      "sourceFile": "12.png",
+      "output": "corruption_shadow.webp"
     },
     {
       "abilityId": "curse_of_agony",
@@ -101,10 +110,10 @@
       "output": "summon_doomguard.webp"
     },
     {
-      "abilityId": "life_tap",
+      "abilityId": "hard_bargain",
       "sourcePack": "demon",
       "sourceFile": "44.png",
-      "output": "life_tap.webp"
+      "output": "hard_bargain.webp"
     },
     {
       "abilityId": "searing_pain",
@@ -447,7 +456,6 @@
       "generator": "OpenAI image generation",
       "artDirection": "Compact low-poly fantasy MMORPG icons with faceted KayKit-inspired materials, unique silhouettes, no text or UI frames",
       "abilityIds": [
-        "evil_eye",
         "maledict_gaze",
         "needle_of_fate",
         "sentence",
@@ -519,6 +527,53 @@
         "hour_of_judgment",
         "cinderhide",
         "raise_gravewing"
+      ]
+    },
+    {
+      "name": "warlock-blight-coven-plague-bloom",
+      "generator": "Tripo image-to-image (chat_image_2, medium), from the procedural plague_bloom recipe plus sentence, hour_of_judgment and coven as style references",
+      "artDirection": "Original painted dark-fantasy MMORPG icon: a purple skull bursting out of a spiked toxic-green plague star with green drips; no text, border, logo, or copied franchise design",
+      "abilityIds": [
+        "plague_bloom"
+      ]
+    },
+    {
+      "name": "warlock-blightcraft-rotmark",
+      "generator": "Tripo image-to-image (chat_image_2, medium), from the in-game Rotmark marker texture plus plague_bloom and the previous evil_eye icon as style references",
+      "artDirection": "Original painted dark-fantasy MMORPG icon: a diseased slit-pupil eye with a sick green iris set in cracked bone, green rot glowing in the cracks and dripping below; no text, border, logo, or copied franchise design",
+      "abilityIds": [
+        "evil_eye"
+      ]
+    },
+    {
+      "name": "warlock-cruel-pact-art-on-life-tap",
+      "generator": "OpenAI image generation: the original Cruel Pact painting from the warlock-spell-completion batch (2026-08-01), byte-identical, moved onto life_tap when Hard Bargain was renamed Cruel Pact",
+      "artDirection": "A heart pouring blood into a blue mana crystal: health traded for mana",
+      "abilityIds": [
+        "life_tap"
+      ]
+    }
+  ],
+  "modifications": [
+    {
+      "name": "warlock-blightcraft-rot-green",
+      "date": "2026-11-27",
+      "process": "Local hue pass, no new art: the purple and blue bands of the shipped icons shifted to Blightcraft rot green, each pixel keeping its own saturation and brightness, re-encoded to WebP at 128px",
+      "ownership": "Each icon keeps the source, author, and license recorded for it above (CraftPix entries stay CraftPix-licensed; generated entries stay project art)",
+      "abilityIds": [
+        "maledict_gaze",
+        "needle_of_fate",
+        "sentence",
+        "cursed_accomplice",
+        "hex_of_violence",
+        "cruel_pact",
+        "vicarious_suffering",
+        "possess_evil_eye",
+        "hour_of_judgment",
+        "coven",
+        "litany_of_guilt",
+        "corruption",
+        "curse_of_agony"
       ]
     }
   ]

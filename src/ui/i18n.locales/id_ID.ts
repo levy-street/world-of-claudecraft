@@ -8169,8 +8169,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description':
     'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.lesser_heal.name': 'Doa Berbisik',
-  'entities.abilities.life_tap.description': 'Mengubah {damage} kesehatan menjadi {damage} mana.',
-  'entities.abilities.life_tap.name': 'Tawar Getir',
+  'entities.abilities.life_tap.description':
+    'Mengorbankan 10% kesehatan maksimum Anda untuk memulihkan {manaPct}% mana maksimum Anda. Tidak dapat digunakan pada 20% kesehatan atau kurang.',
+  'entities.abilities.hard_bargain.name': 'Tawar Getir',
+  'entities.abilities.life_tap.name': 'Perjanjian Kejam',
   'entities.abilities.lightning_bolt.description':
     'Memberi {damage} kerusakan Alam. Kerusakan meningkat dengan Kekuatan Mantra. Elemental: pukulan telak memberi 1 Guntur.',
   'entities.abilities.lightning_bolt.name': 'Sambaran Busur',
@@ -16657,6 +16659,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corpse_explosion.name': 'Ledakan Mayat',
   'entities.abilities.coven.description':
     'Menciptakan Mata Jahat sekunder pada hingga 4 musuh terdekat selama 15 detik. Mereka mengisi kumpulan Kecaman bersama sebesar 50%, dan Vonis bergema kepada mereka sebesar 35% kerusakan.',
+  'entities.abilities.plague_bloom.description':
+    'Menghabiskan 60 Kecaman: hingga 5 musuh dalam 30 yard yang terkena Busuk Hitam milikmu langsung menerima 4 detak dari setiap efek kerusakan berkala milikmu pada mereka.',
   'entities.abilities.coven.name': 'Persekutuan Penyihir',
   'entities.abilities.cruel_pact.description':
     'Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa.',
@@ -16845,7 +16849,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Melahap sedang mengonsumsi {stacks} Benang Takdir untuk {doom} Kecaman tambahan per tik',
   'hudChrome.auraEffect.afflictionEye':
-    'Tatapan Kutukan menyerang setiap {interval} dtk; efek pada Eye ini menghasilkan {pct}% Kecaman',
+    'DoT Anda memberikan {dotPct}% lebih banyak di sini dan memantulkan {echoPct}% dari setiap tick ke musuh terdekat yang terkena Busuk Hitam Anda; efek di sini menghasilkan {pct}% Kecaman',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'Efek pada Eye ini menghasilkan {doomPct}% Kecaman; Vonis bergema di sini sebesar {echoPct}% kerusakan',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -16859,7 +16863,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     'Mengalihkan atau mengurangi {pct}% kerusakan masuk dan dapat menghasilkan hingga {max} Kecaman',
   'hudChrome.auraEffect.afflictionViolence':
-    '{charges} balasan tersisa; serangan musuh memberikan {doom} Kecaman dan membalas {damage} kerusakan Bayangan',
+    'Tick DoT Anda di sini memiliki peluang {pct}% untuk terjadi lagi',
   'hudChrome.auraEffect.aoeEcho':
     '{charges} gema tersisa: kemampuan bertarget tunggal memberikan {pct}% kerusakan kepada hingga {targets} musuh terdekat',
   'hudChrome.auraEffect.arcaneCharge':

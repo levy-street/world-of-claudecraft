@@ -79,11 +79,9 @@ import {
   swingMissChance,
 } from '../types';
 import {
-  applyCoven,
   applyCruelPact,
   applyCursedAccomplice,
   applyEvilEyePossession,
-  applyHexOfViolence,
   applyHourOfJudgment,
   applyLitanyOfGuilt,
   applyVicariousSuffering,
@@ -91,6 +89,12 @@ import {
   resolveNeedleOfFate,
   resolveSentence,
 } from './affliction';
+import {
+  applyContagion,
+  applyPlagueBloom,
+  BLIGHT_VIOLENCE_DOUBLE_TICK_CHANCE,
+  survivesStealthStrip,
+} from './affliction_blight';
 import {
   abilityQualifiesForAreaEcho,
   consumeAreaEchoCharge,
@@ -2172,7 +2176,8 @@ export function runEffects(
               eff.interval,
               talentDmgMult *
                 (1 + mods.global.dotDmgPct) *
-                (ability.id === 'shadow_word_pain' ? vespersDirgeSpMultiplier(meta) : 1),
+                (ability.id === 'shadow_word_pain' ? vespersDirgeSpMultiplier(meta) : 1) *
+                (eff.spCoeff !== undefined ? eff.spCoeff / (dotDuration / 15) : 1),
             )
           : 0;
         const dotId = eff.auraId ?? ability.id;
@@ -3440,6 +3445,8 @@ export function runEffects(
         let removed = 0;
         for (let i = p.auras.length - 1; i >= 0 && removed < eff.removeDotCount; i--) {
           if (p.auras[i].kind !== 'dot') continue;
+          // Hexcraft's Blackrot (the weakest DoT) cannot be shed by a vanish.
+          if (survivesStealthStrip(p.auras[i])) continue;
           const gone = p.auras[i];
           p.auras.splice(i, 1);
           removed++;
@@ -4134,6 +4141,16 @@ export function runEffects(
         });
         break;
       }
+      case 'hardBargain': {
+        // Billing and the not-enough-mana / full-health refusals run before the GCD in
+        // casting_lifecycle (hardBargainCastError); this re-checks for direct calls.
+        const spend = Math.round(p.maxResource * eff.manaPctMax);
+        if (p.resourceType !== 'mana' || p.resource < spend) break;
+        p.resource -= spend;
+        // A flat share: no crit roll, so it draws no rng.
+        ctx.applyHeal(p, p, Math.round(p.maxHp * eff.healPctMax), ability.name, ability.id, false);
+        break;
+      }
       case 'selfHealPctMax': {
         // Emberfury 4pc: Bloodletting's self-heal rises to 8 percent of max
         // health for the wearer. The furious_mending FLOOR (max with 0.2)
@@ -4224,32 +4241,37 @@ export function runEffects(
         break;
       }
       case 'afflictionViolence': {
+        // Blight Coven: a hex that gives your DoT ticks on the target a chance
+        // to tick again (rolled in affliction_blight.blightOnDotTick).
         if (target) {
-          const spBonus = dotTickBonus(
-            abilityScalingPower(p, ability),
-            ability,
-            eff.duration,
-            eff.interval ?? 2,
-            talentDmgMult * (1 + mods.global.dotDmgPct),
-          );
-          applyHexOfViolence(
-            ctx,
-            p,
-            target,
-            eff.duration,
-            eff.charges,
-            eff.doomPerProc,
-            eff.damage,
-            spBonus,
-            eff.interval ?? 2,
-            eff.tickDoom ?? 2,
-          );
+          ctx.applyAura(target, {
+            id: 'hex_of_violence',
+            name: 'Rotfever',
+            kind: 'affliction_violence',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.chance ?? BLIGHT_VIOLENCE_DOUBLE_TICK_CHANCE,
+            charges: 0,
+            sourceId: p.id,
+            school: 'shadow',
+          });
+          ctx.enterCombat(p, target);
         }
         break;
       }
+      // Contagion and Plague Bloom pay their Condemnation at cast commit via
+      // consumesRequiredAuraStacks (casting_lifecycle.ts), not here.
+      case 'afflictionContagion': {
+        if (target) applyContagion(ctx, p, target, eff.maxTargets, eff.radius);
+        break;
+      }
+      case 'afflictionPlagueBloom': {
+        applyPlagueBloom(ctx, p, eff.ticks, eff.maxTargets, eff.range);
+        break;
+      }
       case 'afflictionCruelPact': {
-        const manaPctMax = eff.manaPctMax * (1 + (mods.abilities[ability.id]?.buffPct ?? 0));
-        applyCruelPact(ctx, p, eff.healthPct, manaPctMax, eff.doom);
+        // Blood Credit is already folded into the resolved manaPctMax (classes.ts).
+        applyCruelPact(ctx, p, eff.healthPct, eff.manaPctMax, eff.doom);
         break;
       }
       case 'afflictionVicarious': {
@@ -4259,11 +4281,13 @@ export function runEffects(
       case 'warlockUmbralAnchor': {
         if (placeOrRecallUmbralAnchor(ctx, p, eff.duration, eff.maxRange)) {
           applyBlacktideReturnSpeed(ctx, p);
+          // Every spec: the return knits 10% of max health. A flat share, so no
+          // crit roll (and no rng draw).
+          if (eff.recallHealPctMax && !p.dead) {
+            const heal = Math.round(p.maxHp * eff.recallHealPctMax);
+            ctx.applyHeal(p, p, heal, ability.name, ability.id, false);
+          }
         }
-        break;
-      }
-      case 'afflictionCoven': {
-        if (target) applyCoven(ctx, p, target, eff.duration, eff.radius, eff.maxSecondary);
         break;
       }
       case 'afflictionPossession': {

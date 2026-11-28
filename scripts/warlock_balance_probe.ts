@@ -207,23 +207,45 @@ function equipFullBis(sim: Sim, equipment = WARLOCK_FULL_BIS_GEAR): void {
   sim.player.resource = sim.player.maxResource;
 }
 
+// Blightcaller's three DoTs. Their ticks build Blight, so the rotation keeps
+// all three running on the Rotmark target before it spends a cast on anything
+// else.
+const BLIGHTCALLER_DOTS = ['corruption', 'curse_of_agony', 'siphon_life'] as const;
+// Recast a DoT once it has less than this many seconds left (about one tick).
+const DOT_REFRESH_SECONDS = 3;
+
 function tryAffliction(sim: Sim, target: Entity): boolean {
   const player = sim.player;
   if (!hasAuraKind(target, 'affliction_eye')) return cast(sim, 'evil_eye', target);
   if (!hasAuraKind(player, 'affliction_accomplice')) {
     return cast(sim, 'cursed_accomplice', target);
   }
+  // Cruel Pact has no cooldown: tap only when mana is short.
+  if (player.resource < player.maxResource * 0.3 && cast(sim, 'life_tap', target)) return true;
+  for (const dot of BLIGHTCALLER_DOTS) {
+    if (auraRemaining(target, dot, player.id) < DOT_REFRESH_SECONDS && cast(sim, dot, target)) {
+      return true;
+    }
+  }
+  // Cooldowns once the DoTs are rolling, so Hour of Rot's doubled Blight and
+  // Rotfever's repeat chance both land on live ticks.
+  if (cooldownReady(player, 'hour_of_judgment') && cast(sim, 'hour_of_judgment', target)) {
+    return true;
+  }
+  if (cooldownReady(player, 'hex_of_violence') && cast(sim, 'hex_of_violence', target)) {
+    return true;
+  }
   const possessed = hasAuraKind(player, 'affliction_possession');
-  if (!possessed && cooldownReady(player, 'hour_of_judgment')) {
-    return cast(sim, 'hour_of_judgment', target);
+  if (
+    !possessed &&
+    cooldownReady(player, 'possess_evil_eye') &&
+    cast(sim, 'possess_evil_eye', target)
+  ) {
+    return true;
   }
-  if (!possessed && cooldownReady(player, 'possess_evil_eye')) {
-    return cast(sim, 'possess_evil_eye', target);
-  }
-  if (cooldownReady(player, 'cruel_pact')) return cast(sim, 'cruel_pact', target);
-  const doom = player.auras.find((aura) => aura.kind === 'affliction_doom')?.stacks ?? 0;
-  const nextNeedle = possessed ? 9 : 7;
-  if (doom + nextNeedle > 100) return cast(sim, 'sentence', target);
+  // Putrefy at full Blight: the 100-stage bonus, and it refreshes the DoTs.
+  const blight = player.auras.find((aura) => aura.kind === 'affliction_doom')?.stacks ?? 0;
+  if (blight >= 100 && cast(sim, 'sentence', target)) return true;
   return cast(sim, 'needle_of_fate', target);
 }
 

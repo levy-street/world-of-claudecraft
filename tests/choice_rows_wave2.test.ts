@@ -137,7 +137,7 @@ describe('warlock wave 2 choice rows', () => {
     expect(leadenHex).toMatchObject({
       effect: { tuning: { rootDuration: 3.5 } },
       description:
-        'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
+        'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. While your Blackrot, Festerhex or Veinleech ticks on the target, the slow does not wear off. At 3 stacks, the next spell cast roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
     });
     if (!improvedAbyssalGag) throw new Error('Missing Improved Abyssal Gag talent');
     setLanguage('zh_CN');
@@ -166,7 +166,7 @@ describe('warlock wave 2 choice rows', () => {
       .find((row) => row.level === 17)
       ?.options.find((option) => option.id === 'wlk_r17_death_coil');
     expect(grandMalediction?.description).toBe(
-      "Reduces your specialization's setup cooldown by 25%: Hex of Violence (Affliction; punishes the enemy's damaging actions), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
+      "Reduces your specialization's setup cooldown by 25%: Rotfever (Blightcaller; makes your DoT ticks tick again), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
     );
 
     const capstones = WARLOCK_CHOICE_ROWS.rows.find((row) => row.level === 20)?.options ?? [];
@@ -178,7 +178,7 @@ describe('warlock wave 2 choice rows', () => {
       'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class and specialization abilities by 0.5 sec. Does not affect capstone talents.',
     );
     expect(forbiddenReflection?.description).toBe(
-      'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+      'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. Festerhex also counts: its reflection makes your next Festerhex within 10 sec cost no Mana. This effect can occur once every 60 sec.',
     );
     expect(`${unbrokenRitual?.description} ${forbiddenReflection?.description}`).not.toMatch(
       /\bshared\b/i,
@@ -187,7 +187,8 @@ describe('warlock wave 2 choice rows', () => {
 
   it('Grand Malediction reduces an already-known setup cooldown for every specialization', () => {
     for (const [spec, ability, cooldown] of [
-      ['affliction', 'hex_of_violence', 11.25],
+      // Rotfever's base cooldown is 20 sec (Blightcaller rework).
+      ['affliction', 'hex_of_violence', 15],
       ['demonology', 'unholy_command', 33.75],
       ['destruction', 'ruinous_brand', 15],
     ] as const) {
@@ -267,18 +268,18 @@ describe('warlock wave 2 choice rows', () => {
     credited.p.resource = 0;
     const hpBeforeTap = credited.p.hp;
     credited.sim.castAbility('life_tap');
-    expect(credited.p.resource).toBe(128);
-    expect(credited.p.hp).toBe(hpBeforeTap - 85);
+    expect(credited.p.resource).toBe(Math.round(credited.p.maxResource * (0.2 * (1 + 0.5))));
+    expect(credited.p.hp).toBe(hpBeforeTap - Math.round(credited.p.maxHp * 0.1));
 
     const afflictionCredit = rig('warlock', 20, { 14: 'wlk_r14_ruin' }, 'affliction');
     afflictionCredit.p.resource = 0;
     const hpBeforeCruelPact = afflictionCredit.p.hp;
-    afflictionCredit.sim.castAbility('cruel_pact');
+    afflictionCredit.sim.castAbility('life_tap');
     expect(afflictionCredit.p.resource).toBe(
-      Math.round(afflictionCredit.p.maxResource * 0.015 * 1.5),
+      Math.round(afflictionCredit.p.maxResource * (0.2 * (1 + 0.5))),
     );
     expect(afflictionCredit.p.hp).toBe(
-      hpBeforeCruelPact - Math.round(afflictionCredit.p.maxHp * 0.12),
+      hpBeforeCruelPact - Math.round(afflictionCredit.p.maxHp * 0.1),
     );
 
     const guarded = rig('warlock', 20, { 11: 'wlk_r11_fel_concentration' });

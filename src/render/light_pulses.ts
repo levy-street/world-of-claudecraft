@@ -24,6 +24,10 @@ const SCHOOL_LIGHT: Record<string, number> = {
   frost: 0x86c9ff,
   arcane: 0xc79bff,
   shadow: 0x9a6bff,
+  // Blightcaller's presentation-only rot green (blightcraft_fx.ts).
+  blight: 0xa6e65a,
+  // Veinleech's presentation-only blood red (blightcraft_fx.ts).
+  leech: 0xff4a5a,
   holy: 0xffe28a,
   nature: 0x9cf58e,
   physical: 0xffd9b0,

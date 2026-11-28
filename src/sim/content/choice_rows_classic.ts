@@ -1613,7 +1613,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r8_curse_of_exhaustion',
           name: 'Leaden Hex',
           description:
-            'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
+            'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. While your Blackrot, Festerhex or Veinleech ticks on the target, the slow does not wear off. At 3 stacks, the next spell cast roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
           icon: 'wlk_r8_curse_of_exhaustion',
           effect: {
             global: { warlockLeadenHex: 0.1 },
@@ -1647,7 +1647,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r11_fel_concentration',
           name: 'Sanguine Covenant',
           description:
-            'Grants Sanguine Covenant: sacrifice 10% of your current health to absorb 30% of your maximum health for 8 sec.',
+            'Grants Sanguine Covenant: sacrifice 10% of your current health to absorb 30% of your maximum health for 30 sec. 30 sec cooldown.',
           icon: 'wlk_r11_fel_concentration',
           effect: { grant: { ability: 'dark_pact' } },
         },
@@ -1685,12 +1685,13 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r14_ruin',
           name: 'Blood Credit',
-          description: 'Hard Bargain and Cruel Pact restore 50% more mana for the same health.',
+          description:
+            'Cruel Pact and Hard Bargain each grant 50% more: Cruel Pact restores 30% of your maximum mana and Hard Bargain 30% of your maximum health, instead of 20%.',
           icon: 'wlk_r14_ruin',
           effect: {
             ability: [
               { ability: 'life_tap', buffPct: 0.5 },
-              { ability: 'cruel_pact', buffPct: 0.5 },
+              { ability: 'hard_bargain', buffPct: 0.5 },
             ],
           },
         },
@@ -1716,7 +1717,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r17_death_coil',
           name: 'Grand Malediction',
           description:
-            "Reduces your specialization's setup cooldown by 25%: Hex of Violence (Affliction; punishes the enemy's damaging actions), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
+            "Reduces your specialization's setup cooldown by 25%: Rotfever (Blightcaller; makes your DoT ticks tick again), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
           icon: 'wlk_r17_death_coil',
           effect: {
             ability: [
@@ -1783,7 +1784,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r20_grimoire_of_haste',
           name: 'Forbidden Reflection',
           description:
-            'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+            'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. Festerhex also counts: its reflection makes your next Festerhex within 10 sec cost no Mana. This effect can occur once every 60 sec.',
           icon: 'wlk_r20_grimoire_of_haste',
           effect: {
             global: { warlockForbiddenReflection: 60 },

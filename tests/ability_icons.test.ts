@@ -140,13 +140,16 @@ describe('ability icons', () => {
     // 586: plus the Sunken Bastion boss guide recipes (dgn_bastion_*).
     // 614: plus the Drowned Temple boss guide recipes (dgn_temple_*).
     // Vampiric Touch, Tithe Bomb and Void Rupture.
-    expect(ids).toHaveLength(626);
+    // 627: plus Plague Bloom (Hexcraft Blight Coven finisher).
+    // 628: plus Hard Bargain (its original painting).
+    expect(ids).toHaveLength(628);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
     // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier;
     // then + the five-player dungeon boss guide recipes, plus release ability recipes).
-    expect(hash).toBe('91b046f0c1025ce2aa9666728280d33fef818d263036c8b269a2b4834b52f5fb');
+    // Re-minted for + plague_bloom (Blight Coven), then + hard_bargain.
+    expect(hash).toBe('bfa96b77fe551261bb31ef20c8669ebbaee8a3aa778e6a150b857c7933c50fcd');
   });
 });

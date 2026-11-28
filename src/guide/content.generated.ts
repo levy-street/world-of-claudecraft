@@ -1704,7 +1704,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "affliction",
-        "name": "Hexcraft",
+        "name": "Blightcaller",
         "role": "dps",
         "signature": "evil_eye"
       },
@@ -1744,7 +1744,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "evil_eye",
-        "name": "Evil Eye"
+        "name": "Rotmark"
       }
     ],
     "abilities": [
@@ -1770,7 +1770,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "evil_eye",
-        "name": "Evil Eye"
+        "name": "Rotmark"
       },
       {
         "id": "maledict_gaze",
@@ -1778,14 +1778,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "needle_of_fate",
-        "name": "Needle of Fate"
+        "name": "Carrion Dart"
       },
       {
         "id": "sentence",
-        "name": "Sentence"
+        "name": "Putrefy"
       },
       {
         "id": "life_tap",
+        "name": "Cruel Pact"
+      },
+      {
+        "id": "hard_bargain",
         "name": "Hard Bargain"
       },
       {
@@ -1798,7 +1802,11 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "curse_of_agony",
-        "name": "Hex of Anguish"
+        "name": "Festerhex"
+      },
+      {
+        "id": "siphon_life",
+        "name": "Veinleech"
       },
       {
         "id": "drain_life",
@@ -1830,7 +1838,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "hex_of_violence",
-        "name": "Hex of Violence"
+        "name": "Rotfever"
       },
       {
         "id": "ossuary_mark",
@@ -1841,8 +1849,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Harrow"
       },
       {
-        "id": "cruel_pact",
-        "name": "Cruel Pact"
+        "id": "plague_bloom",
+        "name": "Plague Bloom"
       },
       {
         "id": "shadowburn",
@@ -1874,15 +1882,15 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "possess_evil_eye",
-        "name": "Possess the Evil Eye"
+        "name": "Possess the Rotmark"
       },
       {
         "id": "hour_of_judgment",
-        "name": "Hour of Judgment"
+        "name": "Hour of Rot"
       },
       {
         "id": "coven",
-        "name": "Coven"
+        "name": "Contagion"
       },
       {
         "id": "soul_harvest",

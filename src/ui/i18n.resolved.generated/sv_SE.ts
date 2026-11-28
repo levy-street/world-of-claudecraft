@@ -4965,10 +4965,10 @@ export const sv_SE: EnTranslations = {
       "formShadow": "Dunkelslöja: skuggskada ökad med {pct}%",
       "resourceCount": "{value} av {max}",
       "formLich": "Själslans träffar även upp till {targets} närliggande fiender för {pct}% skada",
-      "afflictionEye": "Förbannad blick attackerar var {interval}:e sek; effekter vid detta onda öga genererar {pct}% Fördömelse",
+      "afflictionEye": "Dina DoT-effekter gör {dotPct}% mer skada här och ekar {echoPct}% av varje tick till närliggande fiender med din Svartröta; effekter här genererar {pct}% Fördömelse",
       "afflictionEyeSecondary": "Effekter vid detta onda öga genererar {doomPct}% Fördömelse; Dom ekar hit för {echoPct}% skada",
       "afflictionAccomplice": "Kvalificerande skada ger {value} Fördömelse, högst en gång var {interval}:e sek",
-      "afflictionViolence": "{charges} vedergällningar återstår; en fiendeattack ger {doom} Fördömelse och vållar {damage} skuggskada tillbaka",
+      "afflictionViolence": "Dina DoT-tick här har {pct}% chans att ticka igen",
       "afflictionVicarious": "Omdirigerar eller minskar {pct}% av inkommande skada och kan generera upp till {max} Fördömelse",
       "afflictionPossession": "Förstärker Ödets nål, Förtär, Förbannad blick och Dom",
       "afflictionJudgment": "Det primära onda ögat genererar {eyePct}% mer Fördömelse; Dom gör {sentencePct}% mer skada och den första återbetalar {refund} Fördömelse",
@@ -10164,6 +10164,7 @@ export const sv_SE: EnTranslations = {
       "immolate": "Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.",
       "corruption": "Förmultnar ett mål med skugga som tickar medan du gör andra saker.",
       "life_tap": "Byter en del av din egen hälsa tillbaka till mana när du sinar.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "En naturpil kastad mot ett mål från avstånd, din förstavalskanon.",
       "healing_touch": "En stor enmålsläkning med lång kasttid, för att toppa upp någon.",
       "mark_of_the_wild": "En varaktig välsignelse du lägger på dig själv eller en allierad före en strid.",
@@ -18283,9 +18284,13 @@ export const sv_SE: EnTranslations = {
         "name": "Dom",
         "description": "Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Hårt köpslag",
-        "description": "Omvandlar {damage} hälsa till {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Grym pakt",
+        "description": "Offrar 10% av din maximala hälsa för att återställa {manaPct}% av din maximala mana. Kan inte användas vid 20% hälsa eller lägre."
       },
       "cursed_accomplice": {
         "name": "Förbannad medhjälpare",
@@ -18338,6 +18343,10 @@ export const sv_SE: EnTranslations = {
       "coven": {
         "name": "Häxring",
         "description": "Skapar sekundära onda ögon på upp till 4 närliggande fiender i 15 sek. De matar den delade Fördömelse-poolen med 50%, och Dom ekar till dem för 35% skada."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Förbrukar 60 Fördömelse: upp till 5 fiender inom 30 meter som bär din Svartröta tar omedelbart 4 tick av var och en av dina skada-över-tid-effekter på dem."
       },
       "fear": {
         "name": "Plåga",

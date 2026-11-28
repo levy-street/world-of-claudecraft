@@ -28,19 +28,33 @@ describe('pressStartsAutoAttack', () => {
     // heal, and engaging would start swinging at the selected enemy.
     for (const id of ['solar_invocation', 'scouring_mercy']) {
       expect(abilityStartsAutoAttack(effectsOf(id)), id).toBe(true);
-      expect(pressStartsAutoAttack(effectsOf(id), false), id).toBe(true);
-      expect(pressStartsAutoAttack(effectsOf(id), true), id).toBe(false);
+      expect(pressStartsAutoAttack({ effects: effectsOf(id) }, false), id).toBe(true);
+      expect(pressStartsAutoAttack({ effects: effectsOf(id) }, true), id).toBe(false);
     }
     // An unredirected press is exactly the effect test.
-    expect(pressStartsAutoAttack(effectsOf('sinister_strike'), false)).toBe(true);
-    expect(pressStartsAutoAttack(effectsOf('battle_shout'), false)).toBe(false);
+    expect(pressStartsAutoAttack({ effects: effectsOf('sinister_strike') }, false)).toBe(true);
+    expect(pressStartsAutoAttack({ effects: effectsOf('battle_shout') }, false)).toBe(false);
+  });
+
+  it('does not engage on a press the Rotmark requirement will refuse', () => {
+    const litany = { effects: effectsOf('litany_of_guilt'), def: ABILITIES.litany_of_guilt };
+    const caster = { id: 1 };
+    const marked = { auras: [{ kind: 'affliction_eye', sourceId: 1 }] } as never;
+    const unmarked = { auras: [] } as never;
+    const markedByOther = { auras: [{ kind: 'affliction_eye', sourceId: 9 }] } as never;
+    expect(pressStartsAutoAttack(litany, false, marked, caster)).toBe(true);
+    expect(pressStartsAutoAttack(litany, false, unmarked, caster)).toBe(false);
+    expect(pressStartsAutoAttack(litany, false, markedByOther, caster)).toBe(false);
+    expect(pressStartsAutoAttack(litany, false, null, caster)).toBe(false);
   });
 
   it('is the predicate the HUD press path engages through, fed the redirect', () => {
     // castSlot has no unit seam: pin the call site so the redirect flag cannot be
     // dropped while the predicate above stays green.
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    expect(hud).toContain('pressStartsAutoAttack(resolved.effects, mouseoverPid !== null)');
+    expect(hud).toContain(
+      'pressStartsAutoAttack(resolved, mouseoverPid !== null, target, this.sim.player)',
+    );
     expect(hud).not.toContain('abilityStartsAutoAttack(resolved.effects)');
   });
 });

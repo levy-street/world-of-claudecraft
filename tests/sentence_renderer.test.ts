@@ -71,7 +71,7 @@ describe('Sentence renderer routing', () => {
     expect(harness.addShake).not.toHaveBeenCalled();
     painter.update(0.002);
 
-    expect(harness.pulseAt).toHaveBeenCalledWith(22, 'shadow', 11.5, 0.72);
+    expect(harness.pulseAt).toHaveBeenCalledWith(22, 'blight', 11.5, 0.72);
     expect(harness.addShake).toHaveBeenCalledWith(0.9);
     expect(harness.punchFov).toHaveBeenCalledWith(4);
   });
@@ -94,7 +94,7 @@ describe('Sentence renderer routing', () => {
     expect(harness.punchFov).not.toHaveBeenCalled();
 
     harness.renderer.sentenceImpactFeedback(11, 22, 100);
-    expect(harness.pulseAt).toHaveBeenCalledWith(22, 'shadow', 11.5, 0.72);
+    expect(harness.pulseAt).toHaveBeenCalledWith(22, 'blight', 11.5, 0.72);
     expect(harness.addShake).toHaveBeenCalledWith(0.9);
     expect(harness.punchFov).toHaveBeenCalledWith(4);
   });
@@ -127,7 +127,7 @@ describe('Sentence renderer routing', () => {
       const harness = makeHarness();
       harness.renderer.sentenceImpactFeedback(33, 22, tier.condemnation);
 
-      expect(harness.pulseAt).toHaveBeenCalledWith(22, 'shadow', tier.light, tier.duration);
+      expect(harness.pulseAt).toHaveBeenCalledWith(22, 'blight', tier.light, tier.duration);
       expect(harness.addShake).not.toHaveBeenCalled();
       expect(harness.punchFov).not.toHaveBeenCalled();
     }

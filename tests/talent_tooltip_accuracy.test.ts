@@ -650,6 +650,18 @@ function legitNumbers(effect: unknown): Set<number> {
           out.add(Math.round(Math.abs(abilityEffect.value)));
           out.add(Math.round(Math.abs(abilityEffect.value * (1 + mod.buffPct))));
         }
+        // Blood Credit states the warlock pacts' shares before and after the boost
+        // (Cruel Pact 20% of max mana, Hard Bargain 20% of max health, to 30%).
+        const share =
+          abilityEffect.type === 'afflictionCruelPact'
+            ? abilityEffect.manaPctMax
+            : abilityEffect.type === 'hardBargain'
+              ? abilityEffect.healPctMax
+              : undefined;
+        if (share !== undefined) {
+          out.add(Math.round(share * 100));
+          out.add(Math.round(share * (1 + mod.buffPct) * 100));
+        }
       }
     }
   }

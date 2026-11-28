@@ -4965,10 +4965,10 @@ export const fr_CA: EnTranslations = {
       "formShadow": "Forme d'Ombre : dégâts d'Ombre augmentés de {pct}%",
       "resourceCount": "{value} sur {max}",
       "formLich": "Lance d'âme touche aussi jusqu'à {targets} ennemis proches pour {pct}% de dégâts",
-      "afflictionEye": "Regard maudit attaque toutes les {interval} s ; les effets sur cet Œil génèrent {pct}% de Condamnation",
+      "afflictionEye": "Vos DoT infligent {dotPct}% de dégâts en plus ici et renvoient {echoPct}% de chaque tick aux ennemis proches affectés par votre Pourriture noire ; les effets ici génèrent {pct}% de Condamnation",
       "afflictionEyeSecondary": "Les effets sur cet Œil génèrent {doomPct}% de Condamnation ; Sentence se répercute ici pour {echoPct}% de dégâts",
       "afflictionAccomplice": "Les dégâts valables accordent {value} Condamnation, au plus une fois toutes les {interval} s",
-      "afflictionViolence": "{charges} représailles restantes ; une attaque ennemie accorde {doom} Condamnation et inflige {damage} points de dégâts d'Ombre en retour",
+      "afflictionViolence": "Vos ticks de DoT ici ont {pct}% de chances de se répéter",
       "afflictionVicarious": "Redirige ou réduit {pct}% des dégâts subis et peut générer jusqu'à {max} Condamnation",
       "afflictionPossession": "Renforce Aiguille du destin, Consumer, Regard maudit et Sentence",
       "afflictionJudgment": "L'Œil principal génère {eyePct}% de Condamnation en plus ; Sentence inflige {sentencePct}% de dégâts en plus et la première rembourse {refund} Condamnation",
@@ -10164,6 +10164,7 @@ export const fr_CA: EnTranslations = {
       "immolate": "Embrase une cible pour un coup d'ouverture et une brûlure qui s'attarde.",
       "corruption": "Ronge une cible d'ombre dont les dégâts s'égrènent pendant que vous faites autre chose.",
       "life_tap": "Échange une part de votre propre vie contre du mana quand vous êtes à sec.",
+      "hard_bargain": "Trades 20% of your mana for 20% of your health when you are hurt.",
       "wrath": "Un trait de nature lancé sur une cible à distance, votre frappe de prédilection.",
       "healing_touch": "Un gros soin sur une cible au temps d'incantation long, pour remettre quelqu'un d'aplomb.",
       "mark_of_the_wild": "Une bénédiction durable à poser sur vous-même ou un allié avant un combat.",
@@ -18283,9 +18284,13 @@ export const fr_CA: EnTranslations = {
         "name": "Sentence",
         "description": "Consomme toute la Condamnation et les Fils du destin pour prononcer la sentence sur l'ennemi. Chaque Fil augmente les dégâts de 6%. Des effets supplémentaires s'ajoutent à 20, 50, 80 et 100 Condamnation. Sa montée en dégâts se stabilise après le niveau 16."
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "Marché brutal",
-        "description": "Convertit {damage} points de vie en {damage} mana."
+        "description": "Sacrifices 20% of your maximum mana to restore {healPct}% of your maximum health."
+      },
+      "life_tap": {
+        "name": "Pacte cruel",
+        "description": "Sacrifie 10% de vos points de vie maximum pour rendre {manaPct}% de votre mana maximum. Impossible à utiliser à 20% de points de vie ou moins."
       },
       "cursed_accomplice": {
         "name": "Complice maudit",
@@ -18338,6 +18343,10 @@ export const fr_CA: EnTranslations = {
       "coven": {
         "name": "Sabbat",
         "description": "Crée jusqu'à 4 Mauvais œil secondaires sur des ennemis proches pendant 15 s. Ils alimentent la réserve commune de Condamnation à 50%, et Sentence se répercute sur eux pour 35% de dégâts."
+      },
+      "plague_bloom": {
+        "name": "Plague Bloom",
+        "description": "Dépense 60 Condamnation : jusqu'à 5 ennemis à moins de 30 mètres portant votre Pourriture noire subissent instantanément 4 tics de chacun de vos effets de dégâts périodiques sur eux."
       },
       "fear": {
         "name": "Tourment",

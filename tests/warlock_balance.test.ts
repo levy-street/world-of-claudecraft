@@ -137,8 +137,9 @@ describe('warlock low-level sustained damage tuning', () => {
   });
 
   it('pins the maintenance DoTs and the Ruination Gloom Bolt capstone rank', () => {
-    expect(dotTotal('corruption')).toBe(85);
-    expect(dotTotal('curse_of_agony')).toBe(78);
+    // The starter DoTs use the Blightcaller numbers.
+    expect(dotTotal('corruption')).toBe(433);
+    expect(dotTotal('curse_of_agony')).toBe(176);
 
     const shadowBolt = ABILITIES.shadow_bolt.ranks?.find((rank) => rank.rank === 4);
     expect(shadowBolt?.castTime).toBe(2);
@@ -162,6 +163,11 @@ describe('warlock low-level sustained damage tuning', () => {
       // Owner ruling 2026-08-08: Litany joined the mastery so its authored
       // 5/9/14 resolve at the 6/10/15 the viability tests always expected.
       { ability: 'litany_of_guilt', dmgPct: 0.1 },
+      // Blightcaller: +10% to the three DoTs, -10% to Consume.
+      { ability: 'corruption', dmgPct: 0.1 },
+      { ability: 'curse_of_agony', dmgPct: 0.1 },
+      { ability: 'siphon_life', dmgPct: 0.1 },
+      { ability: 'drain_life', dmgPct: -0.1 },
     ]);
     expect(spec('affliction').mastery.effect.global?.spellDmgPct).toBeUndefined();
     expect(spec('affliction').mastery.effect.global?.dotDmgPct).toBeUndefined();

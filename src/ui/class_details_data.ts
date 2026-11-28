@@ -92,6 +92,12 @@ export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   druid: ['wrath', 'bear_form', 'rejuvenation'],
 };
 
+// Icon overrides for the class-select preview, which shows a class before any spec.
+// Blackrot's own icon is Blightcaller rot green; the warlock card keeps the shadow purple.
+export const SIGNATURE_ICON_IDS: Readonly<Record<string, string>> = {
+  corruption: 'corruption_shadow',
+};
+
 // Spec-card presentation for the Specialization screen. Keyed by class, then spec id:
 // spec ids are NOT globally unique (paladin/priest both have "holy", shaman/druid both
 // have "restoration"), so a flat spec-id map cannot cover all 27 specs. The card's

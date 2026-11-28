@@ -6,6 +6,7 @@ import {
   MageBarrierVisual,
   mageBarrierStateForAura,
   mageBarrierStateForAuras,
+  mageBarrierThemeStrength,
   syncMageBarrierVisual,
 } from '../src/render/mage_barrier_visual';
 
@@ -112,6 +113,27 @@ describe('Mage barrier visual', () => {
     expect(bounds.max.y).toBeGreaterThan(2);
     expect(bounds.max.x - bounds.min.x).toBeGreaterThan(1.5);
     expect(bounds.max.z - bounds.min.z).toBeGreaterThan(1.5);
+  });
+
+  it('draws Sanguine Covenant as a red shell at 20% of the mage barrier', () => {
+    expect(
+      mageBarrierStateForAura({ id: 'dark_pact', kind: 'absorb', value: 90, remaining: 30 }),
+    ).toEqual({ theme: 'sanguine', value: 90, remaining: 30 });
+    expect(mageBarrierThemeStrength('sanguine')).toBe(0.2);
+    expect(mageBarrierThemeStrength('frost')).toBe(1);
+
+    const frost = new MageBarrierVisual(1.8, 'frost');
+    const blood = new MageBarrierVisual(1.8, 'sanguine');
+    frost.update({ theme: 'frost', value: 130 }, 1);
+    blood.update({ theme: 'sanguine', value: 130 }, 1);
+    for (const name of ['mage-barrier-shell', 'mage-barrier-motes']) {
+      const opacity = (visual: MageBarrierVisual) =>
+        ((visual.group.getObjectByName(name) as THREE.Mesh).material as THREE.MeshBasicMaterial)
+          .opacity;
+      expect(opacity(blood), name).toBeCloseTo(opacity(frost) * 0.2, 5);
+    }
+    const shell = blood.group.getObjectByName('mage-barrier-shell') as THREE.Mesh;
+    expect((shell.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xd8202f);
   });
 
   it('pulses in, weakens with remaining absorb, then plays a short break instead of popping', () => {

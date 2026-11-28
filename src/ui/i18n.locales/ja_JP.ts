@@ -6292,8 +6292,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.name': '黒腐れ',
   'entities.abilities.corruption.description':
     '対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。',
-  'entities.abilities.life_tap.name': '過酷な取引',
-  'entities.abilities.life_tap.description': '体力{damage}をマナ{damage}に変換します。',
+  'entities.abilities.life_tap.name': '残酷な契約',
+  'entities.abilities.life_tap.description':
+    '最大体力の10%を捧げ、最大マナの{manaPct}%を回復します。体力が20%以下のときは使用できません。',
+  'entities.abilities.hard_bargain.name': '過酷な取引',
+  'entities.abilities.hard_bargain.description':
+    '最大マナの20%を捧げ、最大体力の{healPct}%を回復します。',
+  'guide.abilityHook.hard_bargain': '傷を負ったとき、マナの20%を体力の20%と引き換えます。',
+  'entities.abilities.plague_bloom.name': '疫病の開花',
+  'entities.abilities.plague_bloom.description':
+    '断罪を60消費：自分の黒腐れを受けている30ヤード以内の敵最大5体が、自分のすべてのDoTの4ティック分のダメージを即座に受ける。',
   'entities.abilities.curse_of_agony.name': '苦悶の呪い',
   'entities.abilities.curse_of_agony.description':
     '対象に苦痛の呪いをかけ、24秒間で {damage} の暗黒ダメージを与えます。',
@@ -18595,7 +18603,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する',
   'hudChrome.auraEffect.afflictionEye':
-    'マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する',
+    'ここでは自分のDoTのダメージが{dotPct}%増加し、各ティックの{echoPct}%が自分の黒腐れを受けている近くの敵にも伝わる。ここでの効果は断罪を{pct}%生成する',
   'hudChrome.auraEffect.afflictionEyeSecondary':
     'この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する',
   'hudChrome.auraEffect.afflictionFateThreads':
@@ -18609,7 +18617,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionVicarious':
     '受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する',
   'hudChrome.auraEffect.afflictionViolence':
-    '報復は残り{charges}回。敵の攻撃で断罪を{doom}生成し、{damage}の影ダメージを返す',
+    'ここでは自分のDoTのティックが{pct}%の確率でもう一度発生する',
   'hudChrome.auraEffect.aoeEcho':
     '残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える',
   'hudChrome.auraEffect.arcaneCharge':

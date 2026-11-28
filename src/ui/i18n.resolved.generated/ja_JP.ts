@@ -4965,10 +4965,10 @@ export const ja_JP: EnTranslations = {
       "formShadow": "グロームヴェイル形態：影ダメージが{pct}%増加する",
       "resourceCount": "{value}/{max}",
       "formLich": "ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える",
-      "afflictionEye": "マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する",
+      "afflictionEye": "ここでは自分のDoTのダメージが{dotPct}%増加し、各ティックの{echoPct}%が自分の黒腐れを受けている近くの敵にも伝わる。ここでの効果は断罪を{pct}%生成する",
       "afflictionEyeSecondary": "この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する",
       "afflictionAccomplice": "対象となるダメージが断罪を{value}生成する。{interval}秒に1回まで",
-      "afflictionViolence": "報復は残り{charges}回。敵の攻撃で断罪を{doom}生成し、{damage}の影ダメージを返す",
+      "afflictionViolence": "ここでは自分のDoTのティックが{pct}%の確率でもう一度発生する",
       "afflictionVicarious": "受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する",
       "afflictionPossession": "ニードル・オブ・フェイト、ドレイン・ライフ、マレディクト・ゲイズ、センテンスを強化する",
       "afflictionJudgment": "主邪眼の断罪生成が{eyePct}%増加し、センテンスのダメージが{sentencePct}%増加、最初の1回は断罪を{refund}返還する",
@@ -10164,6 +10164,7 @@ export const ja_JP: EnTranslations = {
       "immolate": "標的に火を放ち、初撃を与えつつ燃焼を残します。",
       "corruption": "標的をシャドウで蝕み、他の行動をしている間も継続して効果が続きます。",
       "life_tap": "マナが尽きたとき、自分の体力を一部マナに変換します。",
+      "hard_bargain": "傷を負ったとき、マナの20%を体力の20%と引き換えます。",
       "wrath": "遠距離から標的に放つネイチャーのボルト。主力の火力です。",
       "healing_touch": "詠唱は長いものの回復量の大きい単体ヒールで、体力を満タンに戻します。",
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
@@ -18283,9 +18284,13 @@ export const ja_JP: EnTranslations = {
         "name": "宣告",
         "description": "断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。"
       },
-      "life_tap": {
+      "hard_bargain": {
         "name": "過酷な取引",
-        "description": "体力{damage}をマナ{damage}に変換します。"
+        "description": "最大マナの20%を捧げ、最大体力の{healPct}%を回復します。"
+      },
+      "life_tap": {
+        "name": "残酷な契約",
+        "description": "最大体力の10%を捧げ、最大マナの{manaPct}%を回復します。体力が20%以下のときは使用できません。"
       },
       "cursed_accomplice": {
         "name": "呪われた共犯者",
@@ -18338,6 +18343,10 @@ export const ja_JP: EnTranslations = {
       "coven": {
         "name": "魔女盟約",
         "description": "周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。"
+      },
+      "plague_bloom": {
+        "name": "疫病の開花",
+        "description": "断罪を60消費：自分の黒腐れを受けている30ヤード以内の敵最大5体が、自分のすべてのDoTの4ティック分のダメージを即座に受ける。"
       },
       "fear": {
         "name": "責め苦",

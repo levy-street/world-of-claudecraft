@@ -70,7 +70,7 @@ describe('spec masteries', () => {
       ],
     });
     const afflictionMastery = TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery;
-    expect(afflictionMastery?.name).toBe('Sentence');
+    expect(afflictionMastery?.name).toBe('Putrefy');
     expect(afflictionMastery?.effect).toEqual({
       ability: [
         { ability: 'needle_of_fate', dmgPct: 0.1 },
@@ -78,6 +78,11 @@ describe('spec masteries', () => {
         // Owner ruling 2026-08-08: the viability pass authored Litany's ranks
         // expecting the mastery on top; the wiring was missed when it landed.
         { ability: 'litany_of_guilt', dmgPct: 0.1 },
+        // Blightcaller: +10% to the three DoTs, -10% to Consume.
+        { ability: 'corruption', dmgPct: 0.1 },
+        { ability: 'curse_of_agony', dmgPct: 0.1 },
+        { ability: 'siphon_life', dmgPct: 0.1 },
+        { ability: 'drain_life', dmgPct: -0.1 },
       ],
     });
     // Mage rework (owner leveling pass 2026-07-14): Fire's mastery is Ignition, a
@@ -183,7 +188,8 @@ describe('spec masteries', () => {
   });
 
   it('bakes DoT, HoT, absorb, cost, and melee damage mastery fields into abilities', () => {
-    expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
+    // A warlock with no spec keeps Blackrot at the Blightcaller numbers.
+    expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(433);
     // 2026-08-09 120s band round re-pin: needle rank-3 base stepped 45-53 to
     // 41-49 in the Hexcraft trim (41/49 times the affliction mastery rider).
     expect(effect(known('warlock', 'needle_of_fate', 'affliction'), 'directDamage')).toMatchObject({
@@ -191,7 +197,8 @@ describe('spec masteries', () => {
       max: 54,
     });
     expect(effect(known('warlock', 'sentence', 'affliction'), 'afflictionSentence')).toMatchObject({
-      damageMult: 1.1,
+      // The mastery 1.1 times the Blightcaller Putrefy tuning (0.72).
+      damageMult: 0.792,
     });
 
     expect(effect(known('druid', 'rejuvenation'), 'hot').total).toBe(168);
@@ -349,7 +356,7 @@ describe('spec masteries', () => {
     expect(rangedFrenzied / rangedCalm).toBeLessThan(1.35);
   });
 
-  it('replaces Veinleech with the Evil Eye Condemnation signature', () => {
+  it('gives Blightcaller Veinleech alongside the Rotmark Blight kit', () => {
     const sim = new Sim({ seed: 12, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('affliction');
@@ -358,7 +365,7 @@ describe('spec masteries', () => {
     expect(knownIds).toEqual(
       expect.arrayContaining(['evil_eye', 'needle_of_fate', 'sentence', 'drain_life']),
     );
-    expect(knownIds).not.toContain('siphon_life');
+    expect(knownIds).toContain('siphon_life');
   });
 
   it('applies passive stat, pet damage, damage-share, and heal-crit masteries at runtime', () => {

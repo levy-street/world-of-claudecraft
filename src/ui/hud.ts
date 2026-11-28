@@ -7376,7 +7376,7 @@ export class Hud {
           const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
-            pressStartsAutoAttack(resolved.effects, mouseoverPid !== null) &&
+            pressStartsAutoAttack(resolved, mouseoverPid !== null, target, this.sim.player) &&
             hasAutoAttackTarget(target, isPvpHostileTargetId(this.sim, tid))
           ) {
             // Timed casts defer engage until cast begins; instants start immediately.
