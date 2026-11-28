@@ -273,7 +273,7 @@ describe('journal progress: markup', () => {
     expect(html).toContain('Coming soon');
     expect(html).toContain('Saved on Heroic: 1 of 2 bosses');
     expect(html).toContain('Resets in 2d 4h, ');
-    expect(html).not.toMatch(/[–—]/);
+    expect(html).not.toMatch(/[\u2013\u2014]/);
   });
 
   it('says Saved on its own for a one-room instance and nothing when not saved', () => {

@@ -130,7 +130,7 @@ describe("the Smith's Heart banner content", () => {
         );
         for (const line of lines) {
           expect(line, key).not.toMatch(/[{}]|\.chip|\.tagline/);
-          expect(line, key).not.toMatch(/[–—]/);
+          expect(line, key).not.toMatch(/[\u2013\u2014]/);
         }
       }
     }
