@@ -54,6 +54,9 @@ describe('Guardian of the Heat: the lip wall', () => {
       inner: HEAT_LIP_WALL.inner,
       outer: HEAT_LIP_WALL.outer,
       sightClear: true,
+      // The one body pinned inside the solid circle (the placement sweep in
+      // tests/fixes.test.ts admits exactly it, exactly at the middle).
+      holds: HEAT_GUARDIAN,
     });
     const cols = authoredFieldColliders(SMITH_HEART_FIELD, 0);
     const lip = cols.filter(

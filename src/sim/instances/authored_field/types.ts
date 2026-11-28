@@ -125,6 +125,12 @@ export interface FieldRingWall {
   height: number;
   /** A low wall a sight line passes over: it blocks bodies, never sight. */
   sightClear?: boolean;
+  /** The one body its encounter pins at the circle's middle (a mob template
+   *  id: the Guardian of the Heat, sunk in its wellspring, heat.ts
+   *  holdStance). It stands inside the solid circle by design; the placement
+   *  sweep (tests/fixes.test.ts) admits exactly it, exactly there, and every
+   *  other body in the circle still reads as spawned in geometry. */
+  holds?: string;
 }
 
 /** A dressing piece from the dungeon's kit. `r` or `hw`/`hd` add a collider. */

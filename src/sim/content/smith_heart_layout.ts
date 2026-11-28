@@ -46,7 +46,7 @@
 // the renderer (terrain, light rivers, the seal, the portal) read this one
 // record.
 
-import { HEAT_LIP_WALL, HEAT_WELL_R } from '../encounters/smith_heart/heat_ids';
+import { HEAT_GUARDIAN, HEAT_LIP_WALL, HEAT_WELL_R } from '../encounters/smith_heart/heat_ids';
 import type {
   AuthoredFieldDef,
   FieldPolySurface,
@@ -520,7 +520,7 @@ export const HEARTH_WELL = { x: -220, z: 0, r: HEAT_WELL_R } as const;
  *  Sight-clear (a sight line passes over it to the guardian), solid to every
  *  body (the playtest of 2026-11-24: nobody walks into the stumps and the
  *  fire). The guardian inside it is pinned to the well's middle by the
- *  encounter (heat.ts holdStance). */
+ *  encounter (heat.ts holdStance), and the wall names it (`holds`). */
 export const HEARTH_LIP_RING: FieldRingWall = {
   id: 'heat_lip',
   x: HEARTH_WELL.x,
@@ -529,6 +529,7 @@ export const HEARTH_LIP_RING: FieldRingWall = {
   outer: HEAT_LIP_WALL.outer,
   height: HEAT_LIP_WALL.height,
   sightClear: true,
+  holds: HEAT_GUARDIAN,
 };
 
 // ---- the Heart: the separate final room ---------------------------------------------
