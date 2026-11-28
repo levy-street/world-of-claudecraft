@@ -366,4 +366,53 @@ describe('DeathRecapDialog (DOM dialog controller)', () => {
     dialog.close();
     rootEl.remove();
   });
+
+  it('draws its close X itself, with no boot-time icon hydration pass', () => {
+    // The dialog renders after boot, so hydrateIcons (which fills index.html's
+    // [data-icon] placeholders once) never reaches it: an empty placeholder
+    // shows as a bare box, most visibly at the 40px touch floor on a phone.
+    const record: DeathRecapRecord = {
+      pid: 1,
+      playerName: 'Player1',
+      deathTime: 1000,
+      killerName: 'Grave Creeper',
+      killerAbility: 'Shadow Bolt',
+      events: [
+        {
+          timestamp: 1000,
+          type: 'damage',
+          ability: 'Shadow Bolt',
+          abilityId: 'shadow_bolt',
+          sourceName: 'Grave Creeper',
+          sourceId: 20,
+          amount: 1200,
+          hpBefore: 1200,
+          hpAfter: 0,
+          maxHp: 1200,
+          school: 'shadow',
+          lethal: true,
+        },
+      ],
+    };
+    for (const recap of [record, null]) {
+      const rootEl = document.createElement('div');
+      rootEl.id = 'death-recap-dialog';
+      document.body.appendChild(rootEl);
+      const dialog = new DeathRecapDialog({
+        root: () => rootEl,
+        getLatestRecap: () => recap,
+        attachTooltip: vi.fn(),
+        hideTooltip: vi.fn(),
+      });
+      dialog.open();
+      const close = rootEl.querySelector<HTMLButtonElement>('.death-recap-header .x-btn');
+      const label = recap ? 'populated' : 'empty';
+      expect(close, label).not.toBeNull();
+      expect(close?.querySelector(':scope > svg.ui-icon'), label).not.toBeNull();
+      expect(close?.hasAttribute('data-icon'), label).toBe(false);
+      expect(close?.getAttribute('aria-label'), label).toBeTruthy();
+      dialog.close();
+      rootEl.remove();
+    }
+  });
 });
